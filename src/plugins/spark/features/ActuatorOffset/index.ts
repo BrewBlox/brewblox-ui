@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   AnalogConstraintsObj,
@@ -11,8 +11,11 @@ import {
   BlockType,
   ReferenceKind,
 } from '@/plugins/spark/types';
-import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import {
+  blockWidgetSelector,
+  prettifyConstraints,
+} from '@/plugins/spark/utils';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 
 import widget from './ActuatorOffsetWidget.vue';
@@ -21,12 +24,18 @@ const type = BlockType.ActuatorOffset;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<ActuatorOffsetBlock> = {
       type,
       generate: () => ({
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
-        drivenTargetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface, true),
+        drivenTargetId: bloxLink(
+          null,
+          BlockIntfType.SetpointSensorPairInterface,
+          true,
+        ),
         referenceId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
         desiredSetting: 0,
@@ -58,14 +67,16 @@ const plugin: Plugin = {
         key: 'targetId',
         title: 'Target',
         component: 'LinkValEdit',
-        generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+        generate: () =>
+          bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
       },
       {
         type,
         key: 'referenceId',
         title: 'Reference',
         component: 'LinkValEdit',
-        generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+        generate: () =>
+          bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
       },
       {
         type,
@@ -109,8 +120,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

@@ -2,7 +2,7 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils';
 import { Link } from '@/shared-types';
 
@@ -11,38 +11,32 @@ export default defineComponent({
   props: {
     ...useValEdit.props,
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
+  emits: [...useValEdit.emits],
   setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<Link>(props.modelValue);
-    const sparkModule = sparkStore.moduleById(props.serviceId)!;
+    const sparkStore = useSparkStore();
+    const { field, startEdit } = useValEdit.setup<Link>(props.modelValue);
 
-    const blockIdOpts = computed<string[]>(
-      () => sparkModule
-        .blocks
-        .filter(block => isCompatible(block.type, field.value.type))
-        .map(block => block.id),
+    const blockIdOpts = computed<string[]>(() =>
+      sparkStore
+        .blocksByService(props.serviceId)
+        .filter((block) => isCompatible(block.type, field.value.type))
+        .map((block) => block.id),
     );
 
     const filteredOpts = ref<string[]>(blockIdOpts.value);
 
-    const displayVal = computed<string>(
-      () => field.value.id || '<None>',
-    );
+    const displayVal = computed<string>(() => field.value.id || '<None>');
 
     function filterFn(val, update): void {
       if (val === '') {
-        update(() => filteredOpts.value = blockIdOpts.value);
+        update(() => (filteredOpts.value = blockIdOpts.value));
         return;
       }
       update(() => {
         const needle = val.toLowerCase();
-        filteredOpts.value = blockIdOpts.value
-          .filter(opt => opt.toLowerCase().match(needle));
+        filteredOpts.value = blockIdOpts.value.filter((opt) =>
+          opt.toLowerCase().match(needle),
+        );
       });
     }
 
@@ -69,11 +63,7 @@ export default defineComponent({
     item-aligned
     @filter="filterFn"
   />
-  <div
-    v-else
-    class="clickable q-pa-sm rounded-borders"
-    @click="startEdit"
-  >
+  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
     {{ displayVal }}
   </div>
 </template>

@@ -1,10 +1,10 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, MockPinsBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 
 import widget from './MockPinsWidget.vue';
 
@@ -12,6 +12,9 @@ const type = BlockType.MockPins;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
+
     const blockSpec: BlockSpec<MockPinsBlock> = {
       type,
       generate: () => ({
@@ -31,7 +34,7 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
+    specStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

@@ -3,7 +3,7 @@ import range from 'lodash/range';
 
 import { typeName as graphType } from '@/plugins/history/Graph/const';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, DisplayOpts } from '@/plugins/spark/types';
 import { createWidgetWizard } from '@/plugins/wizardry';
 import {
@@ -12,10 +12,12 @@ import {
   BlockType,
   DigitalActuatorBlock,
   DisplaySlot,
+  DS2408Block,
+  IoArrayBlock,
   MotorValveBlock,
 } from '@/shared-types';
-import { dashboardStore } from '@/store/dashboards';
-import { widgetStore } from '@/store/widgets';
+import { useDashboardStore } from '@/store/dashboards';
+import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { bloxLink } from '@/utils/link';
@@ -23,6 +25,7 @@ import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 
 import { makeBlockIdRules } from './configuration';
+import { channelName } from './formatting';
 import {
   isBlockDisplayed,
   isBlockDisplayReady,
@@ -46,13 +49,13 @@ export function startChangeBlockId(block: Block | null): void {
       rules: makeBlockIdRules(block.serviceId),
     },
   }).onOk((newId: string) => {
-    const module = sparkStore.moduleById(block.serviceId);
-    if (!module) {
+    const sparkStore = useSparkStore();
+    if (!sparkStore.has(block.serviceId)) {
       return;
     } else if (isBlockVolatile(block)) {
-      module.saveBlock({ ...block, id: newId });
+      sparkStore.saveBlock({ ...block, id: newId });
     } else {
-      module.renameBlock([block.id, newId]).catch(() => {});
+      sparkStore.renameBlock(block.serviceId, block.id, newId).catch(() => {});
     }
   });
 }
@@ -61,6 +64,8 @@ export function startRemoveBlock(block: Block | null): void {
   if (!block) {
     return;
   }
+  const sparkStore = useSparkStore();
+  const widgetStore = useWidgetStore();
 
   const widgets = widgetStore.widgets.filter(
     (v) =>
@@ -113,6 +118,9 @@ export async function startAddBlockToGraphWidget(
   if (!block) {
     return;
   }
+
+  const widgetStore = useWidgetStore();
+  const dashboardStore = useDashboardStore();
 
   const graphOpts = widgetStore.widgets
     .filter((v) => v.feature === graphType)
@@ -206,7 +214,7 @@ export async function startAddBlockToDisplay(
       slot,
       ...display.data.widgets.filter((w) => w.pos !== opts.pos),
     ];
-    await sparkStore.saveBlock(display);
+    await useSparkStore().saveBlock(display);
     notify.info(`Added <i>${addr.id}</i> to the Spark display`, {
       shown: opts.showNotify,
     });
@@ -220,18 +228,19 @@ export async function startAddBlockToDisplay(
 export function saveHwInfo(serviceId: string): void {
   const linked: string[] = [];
   const addressed: string[] = [];
+  const sparkStore = useSparkStore();
 
-  sparkStore.serviceBlocks(serviceId).forEach((block) => {
+  sparkStore.blocksByService(serviceId).forEach((block) => {
     if (matchesType<MotorValveBlock>(BlockType.MotorValve, block)) {
       const { hwDevice, startChannel } = block.data;
       if (hwDevice.id === null || !startChannel) {
         return;
       }
-      const target = sparkStore.blockById(serviceId, hwDevice.id);
-      const pin = target?.data.pins[startChannel - 1];
-      if (target && pin !== undefined) {
-        const [name] = Object.keys(pin);
-        linked.push(`${block.id}: ${target.id} ${name}`);
+      const target = sparkStore.blockById<DS2408Block>(serviceId, hwDevice.id);
+      if (target) {
+        linked.push(
+          `${block.id}: ${target.id} ${channelName(target, startChannel)}`,
+        );
       }
     }
 
@@ -240,11 +249,11 @@ export function saveHwInfo(serviceId: string): void {
       if (hwDevice.id === null || !channel) {
         return;
       }
-      const target = sparkStore.blockById(serviceId, hwDevice.id);
-      const pin = target?.data.pins[channel - 1];
-      if (target && pin !== undefined) {
-        const [name] = Object.keys(pin);
-        linked.push(`${block.id}: ${target.id} ${name}`);
+      const target = sparkStore.blockById<IoArrayBlock>(serviceId, hwDevice.id);
+      if (target) {
+        linked.push(
+          `${block.id}: ${target.id} ${channelName(target, channel)}`,
+        );
       }
     }
 
@@ -270,7 +279,7 @@ export async function resetBlocks(
 ): Promise<void> {
   try {
     const addresses: Mapped<string> = {};
-    const module = sparkStore.moduleById(serviceId);
+    const sparkStore = useSparkStore();
 
     if (!module) {
       throw new Error(`Service <b>${serviceId}</b> not found`);
@@ -281,7 +290,8 @@ export async function resetBlocks(
     }
 
     if (opts.restore) {
-      module.blocks
+      sparkStore
+        .blocksByService(serviceId)
         .filter(
           (block) =>
             isCompatible(block.type, BlockIntfType.OneWireDeviceInterface) &&
@@ -290,25 +300,32 @@ export async function resetBlocks(
         .forEach((block) => (addresses[block.data.address] = block.id));
     }
 
-    await module.clearBlocks();
-    await module.fetchDiscoveredBlocks();
-    await module.fetchBlocks();
+    await sparkStore.clearBlocks(serviceId);
+    await sparkStore.fetchDiscoveredBlocks(serviceId);
+    await sparkStore.fetchBlocks(serviceId);
 
     if (opts.restore) {
-      const renameArgs: [string, string][] = module.blocks
+      const renaming: Promise<void>[] = sparkStore
+        .blocksByService(serviceId)
         .filter(
           (block) =>
             isCompatible(block.type, BlockIntfType.OneWireDeviceInterface) &&
             !!addresses[block.data.address],
         )
-        .map((block) => [block.id, addresses[block.data.address]]);
-      await Promise.all(renameArgs.map(module.renameBlock));
+        .map((block) =>
+          sparkStore.renameBlock(
+            serviceId,
+            block.id,
+            addresses[block.data.address],
+          ),
+        );
+      await Promise.all(renaming);
     }
     notify.done(
       'Removed all blocks' +
         (opts.restore ? ', and restored discovered blocks' : ''),
     );
-  } catch (e) {
+  } catch (e: any) {
     notify.error(`Failed to remove blocks: ${e.toString()}`);
   }
 }

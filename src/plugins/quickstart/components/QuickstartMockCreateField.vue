@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
 import { SparkStatus } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils';
@@ -21,14 +21,12 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
     const finished = ref(false);
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.serviceId),
-    );
-
-    const status = computed<SparkStatus | null>(
-      () => sparkModule.value?.status ?? null,
+    const status = computed<SparkStatus | null>(() =>
+      sparkStore.statusByService(props.serviceId),
     );
 
     const isSimulation = computed<boolean>(
@@ -36,9 +34,13 @@ export default defineComponent({
     );
 
     async function createMockSensors(): Promise<void> {
-      if (!sparkModule.value) { return; }
+      if (!sparkStore.has(props.serviceId)) {
+        return;
+      }
       const validator = makeRuleValidator(makeBlockIdRules(props.serviceId));
-      const spec = sparkStore.blockSpecByType<TempSensorMockBlock>(BlockType.TempSensorMock);
+      const spec = specStore.blockSpecByType<TempSensorMockBlock>(
+        BlockType.TempSensorMock,
+      );
 
       for (const name of props.names) {
         const block: TempSensorMockBlock = {
@@ -48,7 +50,7 @@ export default defineComponent({
           type: BlockType.TempSensorMock,
           data: spec.generate(),
         };
-        await sparkModule.value.createBlock(block);
+        await sparkStore.createBlock(block);
         notify.done(`Created sensor <i>${block.id}</i>`);
       }
 
@@ -78,7 +80,8 @@ export default defineComponent({
           class="col-auto self-center q-mr-sm"
         />
         <div class="col-grow text-italic">
-          '{{ serviceId }}' is a simulation service without physical sensors. <br>
+          '{{ serviceId }}' is a simulation service without physical sensors.
+          <br>
           Click here to create Temp Sensor (Mock) blocks.
         </div>
       </div>

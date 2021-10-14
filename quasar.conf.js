@@ -1,7 +1,8 @@
 const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
 const webpack = require('webpack');
 
@@ -22,7 +23,6 @@ module.exports = configure(function (ctx) {
 
     sourceFiles: {
       router: 'src/router.ts',
-      store: 'src/store/index.ts',
     },
 
     boot: ['externals', 'register', 'plugins', 'providers'],
@@ -37,7 +37,13 @@ module.exports = configure(function (ctx) {
       importStrategy: 'auto',
       iconSet: 'mdi-v4',
 
-      plugins: ['Cookies', 'Notify', 'Dialog', 'LocalStorage', 'SessionStorage'],
+      plugins: [
+        'Cookies',
+        'Notify',
+        'Dialog',
+        'LocalStorage',
+        'SessionStorage',
+      ],
 
       config: {
         dark: true,
@@ -108,7 +114,9 @@ module.exports = configure(function (ctx) {
         };
 
         // Replace the compression plugin because it was generating unnamed output files
-        const compressionIdx = config.plugins.findIndex((v) => v instanceof CompressionPlugin);
+        const compressionIdx = config.plugins.findIndex(
+          (v) => v instanceof CompressionPlugin,
+        );
         if (compressionIdx >= 0) {
           config.plugins.splice(compressionIdx, 1, new CompressionPlugin());
         }
@@ -123,7 +131,12 @@ module.exports = configure(function (ctx) {
         );
 
         if (ctx.prod) {
-          config.plugins.push(new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }));
+          config.plugins.push(
+            new BundleAnalyzerPlugin({
+              analyzerMode: 'static',
+              openAnalyzer: false,
+            }),
+          );
         }
       },
     },

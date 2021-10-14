@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { featureStore, QuickstartFeature } from '@/store/features';
+import { QuickstartFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 
 import BrewKettleCompletionTask from './BrewKettleCompletionTask.vue';
@@ -11,6 +11,8 @@ import BrewKettleSettingsTask from './BrewKettleSettingsTask.vue';
 
 const plugin: Plugin = {
   install(app) {
+    const featureStore = useFeatureStore();
+
     const feature: QuickstartFeature = {
       id: 'BrewKettle',
       title: 'Brew kettle',

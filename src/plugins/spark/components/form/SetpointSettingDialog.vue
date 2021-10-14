@@ -2,14 +2,13 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { ifCompatible } from '@/plugins/spark/utils';
 import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { prettyUnit } from '@/utils/formatting';
 import { tempQty } from '@/utils/quantity';
-
 
 export default defineComponent({
   name: 'SetpointSettingDialog',
@@ -20,17 +19,11 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const sparkStore = useSparkStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const block = ifCompatible<SetpointSensorPairBlock>(
       sparkStore.blockByAddress(props.address),
@@ -54,13 +47,12 @@ export default defineComponent({
           type: 'number',
           suffix: notation,
         },
-      })
-        .onOk(v => setting.value.value = v);
+      }).onOk((v) => (setting.value.value = v));
     }
 
     function save(): void {
       if (block) {
-        sparkStore.modifyBlock(block, actual => {
+        sparkStore.modifyBlock(block, (actual) => {
           actual.data.settingEnabled = enabled.value;
           actual.data.storedSetting = setting.value;
         });
@@ -91,12 +83,14 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <div
         class="
-        row items-center
-        q-gutter-x-md q-mx-md q-py-sm q-mt-sm
-        clickable rounded-borders
+          row
+          items-center
+          q-gutter-x-md q-mx-md q-py-sm q-mt-sm
+          clickable
+          rounded-borders
         "
         @click="enabled = !enabled"
       >
@@ -138,12 +132,7 @@ export default defineComponent({
       </q-input>
 
       <template #actions>
-        <q-btn
-          flat
-          label="Cancel"
-          color="primary"
-          @click="onDialogCancel"
-        />
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
           :disable="!isValid"
           flat

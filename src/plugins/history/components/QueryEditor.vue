@@ -2,7 +2,15 @@
 import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
 import { QTree } from 'quasar';
-import { computed, defineComponent, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  onMounted,
+  PropType,
+  ref,
+  watch,
+} from 'vue';
 
 import {
   defaultLabel,
@@ -11,7 +19,7 @@ import {
   targetBuilder,
   targetSplitter,
 } from '@/plugins/history/nodes';
-import { historyStore } from '@/plugins/history/store';
+import { useHistoryStore } from '@/plugins/history/store';
 import type { QueryConfig } from '@/plugins/history/types';
 import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
@@ -27,6 +35,7 @@ export default defineComponent({
   },
   emits: ['update:config'],
   setup(props, { emit }) {
+    const historyStore = useHistoryStore();
     const selectFilter = ref<string | null>(null);
     const expandedKeys = ref<string[]>([]);
     const treeRef = ref<QTree>();
@@ -49,8 +58,7 @@ export default defineComponent({
         componentProps: {
           modelValue: selectFilter.value,
         },
-      })
-        .onOk(v => selectFilter.value = v);
+      }).onOk((v) => (selectFilter.value = v));
     }
 
     /**
@@ -63,19 +71,21 @@ export default defineComponent({
      * - sparkey/blocky
      */
     function calcTickedExpanded(): string[] {
-      return [...new Set(
-        ticked
-          .value
-          .flatMap(s => s
-            // Remove leaf node -> 'sparkey/blocky'
-            .replace(/\/[^\/]+$/, '')
-            // Split in sections -> ['sparkey', 'blocky']
-            .split('/')
-            // Gradually build parents -> ['sparkey', 'sparkey/blocky']
-            .map((v, idx, arr) => arr.slice(0, idx + 1).join('/')),
-          )
-          .sort(),
-      )];
+      return [
+        ...new Set(
+          ticked.value
+            .flatMap((s) =>
+              s
+                // Remove leaf node -> 'sparkey/blocky'
+                .replace(/\/[^\/]+$/, '')
+                // Split in sections -> ['sparkey', 'blocky']
+                .split('/')
+                // Gradually build parents -> ['sparkey', 'sparkey/blocky']
+                .map((v, idx, arr) => arr.slice(0, idx + 1).join('/')),
+            )
+            .sort(),
+        ),
+      ];
     }
 
     function expand(): void {
@@ -120,7 +130,7 @@ export default defineComponent({
 
     const fieldsDuration = computed<Quantity>({
       get: () => historyStore.fieldsDuration,
-      set: v => {
+      set: (v) => {
         const jsv = bloxQty(v);
         if (!jsv.eq(historyStore.fieldsDuration)) {
           historyStore.fieldsDuration = jsv;
@@ -129,12 +139,10 @@ export default defineComponent({
       },
     });
 
-    const fields = computed<Mapped<string[]>>(
-      () => historyStore.fields,
-    );
+    const fields = computed<Mapped<string[]>>(() => historyStore.fields);
 
-    const nodes = computed<QuasarNode[]>(
-      () => nodeBuilder(fields.value, {
+    const nodes = computed<QuasarNode[]>(() =>
+      nodeBuilder(fields.value, {
         selectable: true,
         handler: nodeHandler,
         header: 'leaf',
@@ -143,13 +151,13 @@ export default defineComponent({
 
     const ticked = computed<string[]>({
       get: () => targetSplitter(props.config.targets),
-      set: vals => {
+      set: (vals) => {
         const targets = targetBuilder(vals, fields.value);
         const renames = vals
-          .filter(key => props.config.renames[key] === undefined)
-          .reduce(
-            (acc, key) => set(acc, key, defaultLabel(key)),
-            { ...props.config.renames });
+          .filter((key) => props.config.renames[key] === undefined)
+          .reduce((acc, key) => set(acc, key, defaultLabel(key)), {
+            ...props.config.renames,
+          });
         saveConfig({
           ...props.config,
           targets,
@@ -210,13 +218,7 @@ export default defineComponent({
       class="col-auto min-width-sm"
     />
 
-    <q-btn
-      flat
-      dense
-      icon="mdi-expand-all"
-      class="self-end"
-      @click="expand"
-    >
+    <q-btn flat dense icon="mdi-expand-all" class="self-end" @click="expand">
       <q-tooltip>Expand</q-tooltip>
     </q-btn>
     <q-btn

@@ -4,13 +4,12 @@ import { useRouter } from 'vue-router';
 
 import { RenderedItem } from '@/components/grid/types';
 import { useGlobals } from '@/composables';
-import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { featureStore, WidgetContext } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import { Dashboard, useDashboardStore } from '@/store/dashboards';
+import { useFeatureStore, WidgetContext } from '@/store/features';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { startChangeDashboardTitle } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-
 
 const widgetSorter = makeObjectSorter<Widget>('order');
 
@@ -23,24 +22,23 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const dashboardStore = useDashboardStore();
+    const widgetStore = useWidgetStore();
+    const featureStore = useFeatureStore();
     const widgetEditable = ref(false);
     const { dense } = useGlobals.setup();
     const router = useRouter();
 
-    const context = computed<WidgetContext>(
-      () => ({
-        mode: 'Basic',
-        container: 'Dashboard',
-        size: dense.value ? 'Content' : 'Fixed',
-      }),
-    );
+    const context = computed<WidgetContext>(() => ({
+      mode: 'Basic',
+      container: 'Dashboard',
+      size: dense.value ? 'Content' : 'Fixed',
+    }));
 
-    const dashboardId = computed<string | null>(
-      () => props.routeId ?? null,
-    );
+    const dashboardId = computed<string | null>(() => props.routeId ?? null);
 
-    const dashboard = computed<Dashboard | null>(
-      () => dashboardId.value
+    const dashboard = computed<Dashboard | null>(() =>
+      dashboardId.value
         ? dashboardStore.dashboardById(dashboardId.value)
         : null,
     );
@@ -55,15 +53,14 @@ export default defineComponent({
       });
     }
 
-    const widgets = computed<Widget[]>(
-      () => widgetStore
-        .widgets
-        .filter(widget => widget.dashboard === dashboardId.value)
+    const widgets = computed<Widget[]>(() =>
+      widgetStore.widgets
+        .filter((widget) => widget.dashboard === dashboardId.value)
         .sort(widgetSorter),
     );
 
-    const dashboardItems = computed<RenderedItem[]>(
-      () => widgets.value.map(widget => ({
+    const dashboardItems = computed<RenderedItem[]>(() =>
+      widgets.value.map((widget) => ({
         widget,
         ...featureStore.widgetComponent(widget),
       })),
@@ -71,16 +68,15 @@ export default defineComponent({
 
     function editTitle(): void {
       if (dashboard.value) {
-        startChangeDashboardTitle(
-          dashboard.value,
-          newId => router.replace(`/dashboard/${newId}`),
+        startChangeDashboardTitle(dashboard.value, (newId) =>
+          router.replace(`/dashboard/${newId}`),
         );
       }
     }
 
     watch(
       () => dashboardId.value,
-      () => widgetEditable.value = false,
+      () => (widgetEditable.value = false),
     );
 
     watch(
@@ -90,7 +86,11 @@ export default defineComponent({
         // - the dashboard was removed
         // - the user navigates to a dashboard ID that does not exist (or just /dashboard)
         // - dashboards are loaded from the datastore
-        if (newV === null && dashboardId.value !== null && dashboardStore.dashboards.length > 0) {
+        if (
+          newV === null &&
+          dashboardId.value !== null &&
+          dashboardStore.dashboards.length > 0
+        ) {
           router.replace('/');
         }
       },
@@ -99,7 +99,7 @@ export default defineComponent({
 
     watch(
       () => dashboard.value?.title,
-      v => document.title = `Brewblox | ${v ?? 'Dashboard'}`,
+      (v) => (document.title = `Brewblox | ${v ?? 'Dashboard'}`),
       { immediate: true },
     );
 
@@ -119,16 +119,15 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-page
-    class="page-height"
-    @dblclick="showWizard(true)"
-  >
+  <q-page class="page-height" @dblclick="showWizard(true)">
     <PageError v-if="!dashboard">
       <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
     </PageError>
     <template v-else>
       <TitleTeleport>
-        <span class="cursor-pointer" @click="editTitle">{{ dashboard.title }}</span>
+        <span class="cursor-pointer" @click="editTitle">{{
+          dashboard.title
+        }}</span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn
@@ -144,13 +143,8 @@ export default defineComponent({
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu
-          round
-          class="self-center"
-        >
-          <q-tooltip>
-            Dashboard actions
-          </q-tooltip>
+        <ActionMenu round class="self-center">
+          <q-tooltip> Dashboard actions </q-tooltip>
           <template #menus>
             <DashboardActions :dashboard-id="dashboardId" />
           </template>
@@ -158,10 +152,7 @@ export default defineComponent({
       </ButtonsTeleport>
 
       <q-scroll-area class="fit">
-        <div
-          v-if="dashboardItems.length === 0"
-          class="absolute-center"
-        >
+        <div v-if="dashboardItems.length === 0" class="absolute-center">
           <q-btn
             unelevated
             color="secondary"

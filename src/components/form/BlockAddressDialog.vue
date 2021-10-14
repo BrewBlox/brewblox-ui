@@ -2,11 +2,15 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
-import type { Block, BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { useSparkStore } from '@/plugins/spark/store';
+import type {
+  Block,
+  BlockAddress,
+  ComparedBlockType,
+} from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
@@ -53,31 +57,24 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogCancel,
-      onDialogHide,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogCancel, onDialogHide, onDialogOK } =
+      useDialog.setup();
+    const sparkStore = useSparkStore();
+    const featureStore = useFeatureStore();
     const local = ref<BlockAddress | null>(null);
 
-    const serviceIds = computed<string[]>(
-      () => sparkStore.serviceIds,
-    );
+    const serviceIds = computed<string[]>(() => sparkStore.serviceIds);
 
     const serviceId = computed<string>({
       get: () => {
         const { serviceId } = local.value ?? props.modelValue;
-        return (serviceId && serviceIds.value.includes(serviceId))
+        return serviceId && serviceIds.value.includes(serviceId)
           ? serviceId
           : serviceIds.value[0] ?? '';
       },
-      set: serviceId => {
+      set: (serviceId) => {
         if (local.value?.serviceId !== serviceId) {
           local.value = {
             serviceId,
@@ -88,31 +85,28 @@ export default defineComponent({
       },
     });
 
-    const typeFilter = computed<(type: string) => boolean>(
-      () => {
-        const intf = props.compatible ?? props.modelValue.type;
-        return type => isCompatible(type, intf);
-      },
-    );
+    const typeFilter = computed<(type: string) => boolean>(() => {
+      const intf = props.compatible ?? props.modelValue.type;
+      return (type) => isCompatible(type, intf);
+    });
 
-    const addressOpts = computed<BlockAddress[]>(
-      () => sparkStore.serviceBlocks(serviceId.value)
-        .filter(block => typeFilter.value(block.type))
+    const addressOpts = computed<BlockAddress[]>(() =>
+      sparkStore
+        .blocksByService(serviceId.value)
+        .filter((block) => typeFilter.value(block.type))
         .filter(props.blockFilter)
         .map(asAddr)
         .sort(makeObjectSorter('id')),
     );
 
-    const block = computed<Block | null>(
-      () => local.value
+    const block = computed<Block | null>(() =>
+      local.value
         ? sparkStore.blockById(serviceId.value, local.value.id)
         : null,
     );
 
-    const tooltip = computed<string | null>(
-      () => block.value
-        ? featureStore.widgetTitle(block.value.type)
-        : null,
+    const tooltip = computed<string | null>(() =>
+      block.value ? featureStore.widgetTitle(block.value.type) : null,
     );
 
     const localOk = computed<boolean>(
@@ -124,21 +118,25 @@ export default defineComponent({
     }
 
     function createBlock(): void {
-      createBlockWizard(serviceId.value, props.compatible ?? props.modelValue.type)
-        .onOk(({ block }) => {
-          if (block) {
-            local.value = asAddr(block);
-          }
-        });
+      createBlockWizard(
+        serviceId.value,
+        props.compatible ?? props.modelValue.type,
+      ).onOk(({ block }) => {
+        if (block) {
+          local.value = asAddr(block);
+        }
+      });
     }
 
     function save(): void {
       if (localOk.value) {
-        onDialogOK(local.value ?? {
-          id: null,
-          serviceId: serviceId.value,
-          type: props.modelValue.type,
-        });
+        onDialogOK(
+          local.value ?? {
+            id: null,
+            serviceId: serviceId.value,
+            type: props.modelValue.type,
+          },
+        );
       }
     }
 
@@ -170,7 +168,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-select
         v-if="anyService && serviceIds.length > 1"
         v-model="serviceId"
@@ -212,32 +210,15 @@ export default defineComponent({
           >
             <q-tooltip>Show {{ block.id }}</q-tooltip>
           </q-btn>
-          <q-btn
-            v-else
-            flat
-            round
-            disable
-            icon="mdi-launch"
-          />
+          <q-btn v-else flat round disable icon="mdi-launch" />
 
-          <q-btn
-            v-if="creatable"
-            flat
-            round
-            icon="add"
-            @click="createBlock"
-          >
+          <q-btn v-if="creatable" flat round icon="add" @click="createBlock">
             <q-tooltip>Create new block</q-tooltip>
           </q-btn>
         </template>
       </q-select>
       <template #actions>
-        <q-btn
-          flat
-          label="Cancel"
-          color="primary"
-          @click="onDialogCancel"
-        />
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
           :disable="!localOk"
           flat

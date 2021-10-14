@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import isObjectLike from 'lodash/isObjectLike';
 
 import { STORE_TOPIC } from '@/const';
@@ -9,15 +9,31 @@ import { notify } from '@/utils/notify';
 
 import { BrewbloxDatabase, EventHandler } from './types';
 
+interface SingleQueryArgs {
+  namespace: string;
+  id: string;
+}
+
+interface MultiQueryArgs {
+  namespace: string;
+  ids?: string;
+  filter?: string;
+}
+
+interface SingleValue<T extends StoreObject | null> {
+  value: T;
+}
+
+interface MultiValue<T extends StoreObject> {
+  values: T[];
+}
+
 const isStoreEvent = (data: unknown): data is DatastoreEvent =>
   isObjectLike(data) &&
   ('changed' in (data as any) || 'deleted' in (data as any));
 
-function intercept(
-  message: string,
-  namespace: string,
-): (e: AxiosError) => never {
-  return (e: AxiosError) => {
+function intercept(message: string, namespace: string): (e: unknown) => never {
+  return (e: unknown) => {
     notify.error(`DB error in ${message}(${namespace}): ${parseHttpError(e)}`, {
       shown: false,
     });
@@ -41,7 +57,7 @@ async function checkDatastore(): Promise<void> {
   try {
     await http.get('/history/datastore/ping', { timeout: 2000 });
   } catch (e) {
-    notify.error(`Datastore error: ${parseHttpError(e, true)}`, {
+    notify.error(`Datastore error: ${parseHttpError(e as AxiosError, true)}`, {
       shown: false,
     });
     await retryDatastore();
@@ -103,10 +119,13 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
     namespace: string,
   ): Promise<T[]> {
     return http
-      .post<{ values: T[] }>('/history/datastore/mget', {
-        namespace,
-        filter: '*',
-      })
+      .post<MultiQueryArgs, AxiosResponse<MultiValue<T>>>(
+        '/history/datastore/mget',
+        {
+          namespace,
+          filter: '*',
+        },
+      )
       .then((resp) => resp.data.values)
       .catch(intercept('Fetch all objects', namespace));
   }
@@ -116,10 +135,13 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
     objId: string,
   ): Promise<T | null> {
     return http
-      .post<{ value: T | null }>('/history/datastore/get', {
-        namespace,
-        id: objId,
-      })
+      .post<SingleQueryArgs, AxiosResponse<SingleValue<T | null>>>(
+        '/history/datastore/get',
+        {
+          namespace,
+          id: objId,
+        },
+      )
       .then((resp) => resp.data.value)
       .catch(intercept(`Fetch '${objId}'`, namespace));
   }
@@ -129,12 +151,15 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
     obj: T,
   ): Promise<T> {
     return http
-      .post<{ value: T }>('/history/datastore/set', {
-        value: {
-          ...obj,
-          namespace,
+      .post<SingleValue<T>, AxiosResponse<SingleValue<T>>>(
+        '/history/datastore/set',
+        {
+          value: {
+            ...obj,
+            namespace,
+          },
         },
-      })
+      )
       .then((resp) => resp.data.value)
       .catch(intercept(`Persist '${obj.id}'`, namespace));
   }
@@ -146,7 +171,7 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
     obj: T,
   ): Promise<T> {
     await http
-      .post('/history/datastore/delete', {
+      .post<SingleQueryArgs>('/history/datastore/delete', {
         namespace,
         id: obj.id,
       })

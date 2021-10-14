@@ -1,17 +1,17 @@
 <script lang="ts">
 import { computed, defineComponent, watch } from 'vue';
 
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type {
+  BlockRelation,
+  BlockRelationNode,
   PageMode,
-  RelationEdge,
-  RelationNode,
   SparkService,
   SparkStatus,
 } from '@/plugins/spark/types';
 import { BlockType } from '@/shared-types';
-import { featureStore } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { useFeatureStore } from '@/store/features';
+import { useServiceStore } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
 
@@ -31,10 +31,14 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const validTypes: BlockType[] = sparkStore.blockSpecs.map(s => s.type);
+    const serviceStore = useServiceStore();
+    const featureStore = useFeatureStore();
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
+    const validTypes = specStore.blockSpecs.map((s) => s.type);
 
-    const service = computed<SparkService | null>(
-      () => serviceStore.serviceById(props.serviceId),
+    const service = computed<SparkService | null>(() =>
+      serviceStore.serviceById(props.serviceId),
     );
 
     const title = computed<string>(
@@ -48,50 +52,51 @@ export default defineComponent({
       },
     );
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.serviceId),
-    );
-
     const isAvailable = computed<boolean>(
-      () => service.value !== null
-        && sparkModule.value !== null,
+      () => service.value !== null && sparkStore.has(props.serviceId),
     );
 
     const isReady = computed<boolean>(
-      () => isAvailable.value
-        && sparkModule.value?.lastBlocks != null,
+      () =>
+        isAvailable.value &&
+        sparkStore.lastBlocksAtByService(props.serviceId) != null,
     );
 
-    const status = computed<SparkStatus | null>(
-      () => sparkModule.value?.status ?? null,
+    const status = computed<SparkStatus | null>(() =>
+      sparkStore.statusByService(props.serviceId),
     );
 
     const statusNok = computed<boolean>(
-      () => isAvailable.value
-        && status.value !== null
-        && (!status.value.isSynchronized || !!status.value.isUpdating),
+      () =>
+        isAvailable.value &&
+        status.value !== null &&
+        (!status.value.isSynchronized || !!status.value.isUpdating),
     );
 
     const pageMode = computed<PageMode>({
-      get: () => sparkModule.value?.sessionConfig.pageMode ?? 'Relations',
-      set: v => sparkModule.value?.updateSessionConfig({ pageMode: v }),
+      get: () =>
+        sparkStore.sessionConfigByService(props.serviceId).pageMode ??
+        'Relations',
+      set: (v) =>
+        sparkStore.updateSessionConfig(props.serviceId, { pageMode: v }),
     });
 
-    const nodes = computed<RelationNode[]>(
-      () => sparkStore.serviceBlocks(props.serviceId)
-        .filter(block => validTypes.includes(block.type))
-        .map(block => ({
-          id: block.id,
-          type: featureStore.widgetTitle(block.type),
-          name: block.type === BlockType.SysInfo
-            ? title.value
-            : undefined,
-        }))
+    const nodes = computed<BlockRelationNode[]>(() =>
+      sparkStore
+        .blocksByService(props.serviceId)
+        .filter((block) => validTypes.includes(block.type))
+        .map(
+          (block): BlockRelationNode => ({
+            id: block.id,
+            type: featureStore.widgetTitle(block.type),
+            name: block.type === BlockType.SysInfo ? title.value : undefined,
+          }),
+        )
         .sort(makeObjectSorter('type')),
     );
 
-    const edges = computed<RelationEdge[]>(
-      () => sparkModule.value?.relations ?? [],
+    const edges = computed<BlockRelation[]>(() =>
+      sparkStore.relationsByService(props.serviceId),
     );
 
     function editTitle(): void {
@@ -147,9 +152,7 @@ export default defineComponent({
         size="12px"
         class="self-center"
       >
-        <q-tooltip>
-          Service actions
-        </q-tooltip>
+        <q-tooltip> Service actions </q-tooltip>
         <template #menus>
           <SparkActions :service-id="serviceId" />
         </template>
@@ -157,13 +160,8 @@ export default defineComponent({
     </ButtonsTeleport>
 
     <!-- Troubleshooter -->
-    <div
-      v-if="statusNok"
-      class="q-pa-lg row"
-    >
-      <Troubleshooter
-        :service-id="serviceId"
-      />
+    <div v-if="statusNok" class="q-pa-lg row">
+      <Troubleshooter :service-id="serviceId" />
     </div>
 
     <!-- Relations graph display -->
@@ -177,9 +175,6 @@ export default defineComponent({
     />
 
     <!-- Block list display -->
-    <SparkListView
-      v-else-if="pageMode === 'List'"
-      :service-id="serviceId"
-    />
+    <SparkListView v-else-if="pageMode === 'List'" :service-id="serviceId" />
   </q-page>
 </template>

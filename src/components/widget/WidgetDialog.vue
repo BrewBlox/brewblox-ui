@@ -2,8 +2,13 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { ComponentResult, featureStore, WidgetContext, WidgetMode } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import {
+  ComponentResult,
+  useFeatureStore,
+  WidgetContext,
+  WidgetMode,
+} from '@/store/features';
+import { useWidgetStore, Widget } from '@/store/widgets';
 
 export default defineComponent({
   name: 'WidgetDialog',
@@ -22,40 +27,28 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-    } = useDialog.setup();
-    const {
-      dense,
-    } = useGlobals.setup();
+    const widgetStore = useWidgetStore();
+    const featureStore = useFeatureStore();
+    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+    const { dense } = useGlobals.setup();
 
-    const widget = computed<Widget | null>(
-      () => widgetStore.widgetById(props.widgetId),
+    const widget = computed<Widget | null>(() =>
+      widgetStore.widgetById(props.widgetId),
     );
 
-    const context = computed<WidgetContext>(
-      () => ({
-        container: 'Dialog',
-        mode: props.mode,
-        size: 'Fixed',
-      }),
+    const context = computed<WidgetContext>(() => ({
+      container: 'Dialog',
+      mode: props.mode,
+      size: 'Fixed',
+    }));
+
+    const widgetComponent = computed<ComponentResult | null>(() =>
+      widget.value === null ? null : featureStore.widgetComponent(widget.value),
     );
 
-    const widgetComponent = computed<ComponentResult | null>(
-      () => widget.value === null
-        ? null
-        : featureStore.widgetComponent(widget.value),
-    );
-
-    const widgetProps = computed<AnyDict>(
-      () => props.getProps() ?? {},
-    );
+    const widgetProps = computed<AnyDict>(() => props.getProps() ?? {});
 
     return {
       dialogRef,

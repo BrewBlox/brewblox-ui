@@ -3,17 +3,16 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 
-
 const typeName = BlockType.SetpointProfile;
 
 export default defineComponent({
-  name: 'ProfilePresetDialog',
+  name: 'ProfileSnippetDialog',
   props: {
     ...useDialog.props,
     block: {
@@ -21,36 +20,30 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const sparkStore = useSparkStore();
+    const snippetStore = useBlockSnippetStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const selected = ref<SelectOption | null>(null);
     const block = ref<SetpointProfileBlock>(deepCopy(props.block));
 
-    const options = computed<SelectOption[]>(
-      () => sparkStore.presets
-        .filter(preset => preset.type === typeName)
-        .map(preset => ({ label: preset.name, value: preset.id })),
+    const options = computed<SelectOption[]>(() =>
+      snippetStore.blockSnippets
+        .filter((snippet) => snippet.type === typeName)
+        .map((snippet) => ({ label: snippet.name, value: snippet.id })),
     );
-
 
     function removeSelected(): void {
       if (selected.value === null) {
         return;
       }
       const { value } = selected.value;
-      const preset = sparkStore.presetById(value)!;
+      const snippet = snippetStore.snippetById(value)!;
       selected.value = null;
-      sparkStore.removePreset(preset);
+      snippetStore.removeSnippet(snippet);
     }
 
     function editSelected(): void {
@@ -58,15 +51,14 @@ export default defineComponent({
         return;
       }
       const { value } = selected.value;
-      const preset = sparkStore.presetById(value)!;
+      const snippet = snippetStore.snippetById(value)!;
       createDialog({
         component: 'InputDialog',
         componentProps: {
           title: 'Edit profile name',
-          modelValue: preset.name,
+          modelValue: snippet.name,
         },
-      })
-        .onOk(name => sparkStore.savePreset({ ...preset, name }));
+      }).onOk((name) => snippetStore.saveSnippet({ ...snippet, name }));
     }
 
     async function loadSelected(): Promise<void> {
@@ -74,8 +66,8 @@ export default defineComponent({
         return;
       }
       const { value } = selected.value;
-      const preset = sparkStore.presetById(value)!;
-      const points = deserialize(deepCopy(preset.data.points));
+      const snippet = snippetStore.snippetById(value)!;
+      const points = deserialize(deepCopy(snippet.data.points));
 
       createDialog({
         component: 'ConfirmDialog',
@@ -104,33 +96,32 @@ export default defineComponent({
         return;
       }
       const { value } = selected.value;
-      const preset = sparkStore.presetById(value)!;
-      preset.data = {
+      const snippet = snippetStore.snippetById(value)!;
+      snippet.data = {
         points: deepCopy(block.value.data.points),
       };
-      await sparkStore.savePreset(preset);
+      await snippetStore.saveSnippet(snippet);
       onDialogOK();
     }
 
-    function createPreset(): void {
+    function createSnippet(): void {
       createDialog({
         component: 'InputDialog',
         componentProps: {
           modelValue: `${block.value.id} profile`,
           title: 'Save as new profile',
         },
-      })
-        .onOk(async name => {
-          await sparkStore.createPreset({
-            id: nanoid(),
-            name,
-            type: typeName,
-            data: {
-              points: deepCopy(block.value.data.points),
-            },
-          });
-          onDialogOK();
+      }).onOk(async (name: string) => {
+        await snippetStore.createSnippet({
+          id: nanoid(),
+          name,
+          type: typeName,
+          data: {
+            points: deepCopy(block.value.data.points),
+          },
         });
+        onDialogOK();
+      });
     }
 
     return {
@@ -144,19 +135,15 @@ export default defineComponent({
       removeSelected,
       loadSelected,
       saveSelected,
-      createPreset,
+      createSnippet,
     };
   },
 });
 </script>
 
 <template>
-  <q-dialog
-    ref="dialogRef"
-    v-bind="dialogProps"
-    @hide="onDialogHide"
-  >
-    <DialogCard v-bind="{title, message, html}">
+  <q-dialog ref="dialogRef" v-bind="dialogProps" @hide="onDialogHide">
+    <DialogCard v-bind="{ title, message, html }">
       <q-select
         v-model="selected"
         :options="options"
@@ -184,9 +171,21 @@ export default defineComponent({
       <template #actions>
         <q-btn flat label="Cancel" @click="onDialogCancel" />
         <q-space />
-        <q-btn :disable="!selected" color="primary" flat label="load" @click="loadSelected" />
-        <q-btn :disable="!selected" color="primary" flat label="save" @click="saveSelected" />
-        <q-btn color="primary" flat label="New" @click="createPreset" />
+        <q-btn
+          :disable="!selected"
+          color="primary"
+          flat
+          label="load"
+          @click="loadSelected"
+        />
+        <q-btn
+          :disable="!selected"
+          color="primary"
+          flat
+          label="save"
+          @click="saveSelected"
+        />
+        <q-btn color="primary" flat label="New" @click="createSnippet" />
       </template>
     </DialogCard>
   </q-dialog>

@@ -1,7 +1,7 @@
 import { computed, ComputedRef, inject, Ref, ref, UnwrapRef, watch } from 'vue';
 
-import { featureStore } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useFeatureStore } from '@/store/features';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { InvalidateKey, WidgetIdKey } from '@/symbols';
 
 export interface UseWidgetComponent<WidgetT extends Widget> {
@@ -22,6 +22,8 @@ export interface UseWidgetComposable {
 
 export const useWidget: UseWidgetComposable = {
   setup<WidgetT extends Widget>(): UseWidgetComponent<WidgetT> {
+    const widgetStore = useWidgetStore();
+    const featureStore = useFeatureStore();
     const widgetId = inject(WidgetIdKey);
     const invalidate = inject(InvalidateKey);
     const widget = ref<WidgetT>(widgetStore.widgetById<WidgetT>(widgetId)!);
@@ -43,30 +45,30 @@ export const useWidget: UseWidgetComposable = {
       (newV) => {
         if (newV) {
           widget.value = newV;
-        }
-        else {
+        } else {
           invalidate();
         }
       },
     );
 
-    const config = computed<WidgetT['config']>(
-      () => widget.value.config,
-    );
+    const config = computed<WidgetT['config']>(() => widget.value.config);
 
-    const isVolatileWidget = computed<boolean>(
-      () => Boolean(widget.value.volatile),
+    const isVolatileWidget = computed<boolean>(() =>
+      Boolean(widget.value.volatile),
     );
 
     const featureTitle = computed<string>(
-      () => featureStore.widgetTitle(widget.value.feature) ?? widget.value.feature,
+      () =>
+        featureStore.widgetTitle(widget.value.feature) ?? widget.value.feature,
     );
 
     async function saveWidget(w: WidgetT = widget.value): Promise<void> {
       await widgetStore.saveWidget(w);
     }
 
-    async function saveConfig(c: WidgetT['config'] = config.value): Promise<void> {
+    async function saveConfig(
+      c: WidgetT['config'] = config.value,
+    ): Promise<void> {
       await widgetStore.saveWidget({ ...widget.value, config: c });
     }
 

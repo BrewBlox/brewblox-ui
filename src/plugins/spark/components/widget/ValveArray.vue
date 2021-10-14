@@ -4,11 +4,17 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel } from '@/plugins/spark/types';
-import { channelName, isBlockDriven } from '@/plugins/spark/utils';
+import {
+  channelName,
+  findLimitations,
+  isBlockDriven,
+  limitationString,
+} from '@/plugins/spark/utils';
 import { IoArrayBlock, Link } from '@/shared-types';
-import { findById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
+
+import { useSparkStore } from '../../store';
 
 interface EditableChannel extends IoChannel {
   name: string;
@@ -25,11 +31,12 @@ const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
 export default defineComponent({
   name: 'ValveArray',
   setup() {
-    const { serviceId, sparkModule, block } =
-      useBlockWidget.setup<IoArrayBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, block } = useBlockWidget.setup<IoArrayBlock>();
 
     const claims = computed<Claim[]>(() =>
-      sparkModule.blocks
+      sparkStore
+        .blocksByService(serviceId)
         .filter(motorValveFilter)
         .filter((b) => b.data.hwDevice.id === block.value.id)
         .map((b) => ({ driverId: b.id, channelId: b.data.startChannel })),
@@ -40,7 +47,10 @@ export default defineComponent({
         const { id } = channel;
         const claim = claims.value.find((c) => c.channelId === id);
         const name = channelName(block.value, id) ?? 'Unknown';
-        const driver = sparkModule.blockById<MotorValveBlock>(claim?.driverId);
+        const driver = sparkStore.blockById<MotorValveBlock>(
+          serviceId,
+          claim?.driverId,
+        );
         return { id, driver, name };
       }),
     );
@@ -54,10 +64,7 @@ export default defineComponent({
     }
 
     function driverLimitations(block: Block): string | null {
-      return (
-        findById(sparkModule.limitations, block.id)?.limitedBy.join(', ') ||
-        null
-      );
+      return limitationString(findLimitations(block));
     }
 
     async function saveDriver(
@@ -69,14 +76,17 @@ export default defineComponent({
       }
       if (channel.driver) {
         channel.driver.data.startChannel = 0;
-        await sparkModule.saveBlock(channel.driver);
+        await sparkStore.saveBlock(channel.driver);
       }
       if (link.id) {
-        const newDriver = sparkModule.blockById<MotorValveBlock>(link.id)!;
+        const newDriver = sparkStore.blockById<MotorValveBlock>(
+          serviceId,
+          link.id,
+        )!;
         const { id, type } = block.value;
         newDriver.data.hwDevice = bloxLink(id, type);
         newDriver.data.startChannel = channel.id;
-        await sparkModule.saveBlock(newDriver);
+        await sparkStore.saveBlock(newDriver);
       }
     }
 
@@ -86,7 +96,7 @@ export default defineComponent({
     ): Promise<void> {
       if (channel.driver) {
         channel.driver.data.desiredState = state;
-        await sparkModule.saveBlock(channel.driver);
+        await sparkStore.saveBlock(channel.driver);
       }
     }
 

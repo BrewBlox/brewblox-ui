@@ -1,14 +1,17 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 
-import { featureStore } from '@/store/features';
+import { useFeatureStore, WatcherFeature } from '@/store/features';
 
 export default defineComponent({
   name: 'Watchers',
-  computed: {
-    watchers() {
-      return featureStore.watchers;
-    },
+  setup() {
+    const featureStore = useFeatureStore();
+    const watchers = computed<WatcherFeature[]>(() => featureStore.watchers);
+
+    return {
+      watchers,
+    };
   },
 });
 </script>

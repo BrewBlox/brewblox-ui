@@ -3,19 +3,25 @@ import { Plugin } from 'vue';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
-import { featureStore, WatcherFeature, WidgetFeature } from '@/store/features';
+import {
+  useFeatureStore,
+  WatcherFeature,
+  WidgetFeature,
+} from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { deserialize } from '@/utils/parsing';
 
 import AutomationWatcher from './AutomationWatcher.vue';
 import AutomationWidget from './AutomationWidget.vue';
-import { automationStore } from './store';
+import { useAutomationStore } from './store';
 import { AutomationConfig, AutomationEvent } from './types';
 
 const automationTopic = STATE_TOPIC + '/automation';
 
 const plugin: Plugin = {
   install(app) {
+    const automationStore = useAutomationStore();
+    const featureStore = useFeatureStore();
 
     const widget: WidgetFeature<AutomationConfig> = {
       id: 'Automation',
@@ -39,13 +45,11 @@ const plugin: Plugin = {
     featureStore.addWatcherFeature(watcher);
 
     eventbus.subscribe(automationTopic);
-    eventbus.addListener(
-      automationTopic,
-      (_, evt: AutomationEvent) => {
-        if (evt.type === 'automation.active') {
-          automationStore.setEventData(deserialize(evt.data));
-        }
-      });
+    eventbus.addListener(automationTopic, (_, evt: AutomationEvent) => {
+      if (evt.type === 'automation.active') {
+        automationStore.setEventData(deserialize(evt.data));
+      }
+    });
 
     startup.onStart(() => automationStore.start());
   },

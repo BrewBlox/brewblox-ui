@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 
 import { WebframeConfig } from './types';
@@ -8,6 +8,8 @@ import widget from './WebframeWidget.vue';
 
 const plugin: Plugin = {
   install(app) {
+    const featureStore = useFeatureStore();
+
     const feature: WidgetFeature<WebframeConfig> = {
       id: 'Webframe',
       title: 'Web Frame',

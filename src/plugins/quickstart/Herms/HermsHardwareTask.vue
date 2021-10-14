@@ -8,7 +8,7 @@ import {
   ref,
 } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
 import { GpioChange, IoChannelAddress } from '../types';
@@ -25,6 +25,8 @@ export default defineComponent({
   },
   emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
+    const sparkStore = useSparkStore();
+
     const hltChannel = ref<IoChannelAddress | null>(
       props.config.hltChannel ?? null,
     );
@@ -59,7 +61,7 @@ export default defineComponent({
     );
 
     function discover(): void {
-      sparkStore.moduleById(props.config.serviceId)?.fetchDiscoveredBlocks();
+      sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
     }
 
     function startBlockWizard(): void {

@@ -10,31 +10,25 @@ import {
   startChangeBlockId,
   startRemoveBlock,
 } from '@/plugins/spark/utils';
+import { useServiceStore } from '@/store/services';
 import { saveFile } from '@/utils/import-export';
 import { startCopyWidget } from '@/utils/widgets';
-
 
 export default defineComponent({
   name: 'BlockActions',
   setup() {
-    const {
-      widget,
-      block,
-      sparkModule,
-      isVolatileWidget,
-      hasGraph,
-    } = useBlockWidget.setup();
+    const serviceStore = useServiceStore();
+    const { serviceId, widget, block, isVolatileWidget, hasGraph } =
+      useBlockWidget.setup();
 
     const serviceTitle = computed<string>(
-      () => sparkModule.service.title,
+      () => serviceStore.serviceById(serviceId)!.title,
     );
 
-    const canRemove = computed<boolean>(
-      () => isBlockRemovable(block.value),
-    );
+    const canRemove = computed<boolean>(() => isBlockRemovable(block.value));
 
-    const canDisplay = computed<boolean>(
-      () => isBlockDisplayReady(block.value),
+    const canDisplay = computed<boolean>(() =>
+      isBlockDisplayReady(block.value),
     );
 
     function exportBlock(): void {
@@ -80,11 +74,7 @@ export default defineComponent({
       label="Show on dashboard"
       @click="startCopyWidget(widget)"
     />
-    <ActionItem
-      icon="edit"
-      label="Rename"
-      @click="startChangeBlockId(block)"
-    />
+    <ActionItem icon="edit" label="Rename" @click="startChangeBlockId(block)" />
     <ActionItem
       v-if="hasGraph"
       icon="mdi-chart-line"
@@ -97,11 +87,7 @@ export default defineComponent({
       label="Add to Spark display"
       @click="startAddBlockToDisplay(block)"
     />
-    <ActionItem
-      icon="mdi-file-export"
-      label="Export"
-      @click="exportBlock"
-    />
+    <ActionItem icon="mdi-file-export" label="Export" @click="exportBlock" />
     <ActionItem
       v-if="canRemove"
       icon="delete"

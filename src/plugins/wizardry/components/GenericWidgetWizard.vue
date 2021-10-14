@@ -2,8 +2,8 @@
 import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 
 import { tryCreateWidget } from '@/plugins/wizardry';
-import { featureStore } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useFeatureStore } from '@/store/features';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 
 import { useWidgetWizard } from '../composables';
@@ -17,26 +17,20 @@ export default defineComponent({
       default: null,
     },
   },
-  emits: [
-    ...useWidgetWizard.emits,
-  ],
+  emits: [...useWidgetWizard.emits],
   setup(props) {
-    const {
-      onBack,
-      onDone,
-      defaultWidgetSize,
-      widgetId,
-      featureTitle,
-    } = useWidgetWizard.setup(props.featureId);
+    const widgetStore = useWidgetStore();
+    const featureStore = useFeatureStore();
+    const { onBack, onDone, defaultWidgetSize, widgetId, featureTitle } =
+      useWidgetWizard.setup(props.featureId);
 
-    const defaultConfig = featureStore.widgetById(props.featureId)?.generateConfig?.() ?? {};
+    const defaultConfig =
+      featureStore.widgetById(props.featureId)?.generateConfig?.() ?? {};
     const activeWidget = ref<Widget | null>(null);
     const dashboardId = ref<string | null>(null);
     const widgetTitle = ref<string>(featureTitle);
 
-    const canCreate = computed<boolean>(
-      () => Boolean(dashboardId.value),
-    );
+    const canCreate = computed<boolean>(() => Boolean(dashboardId.value));
 
     async function ensureVolatile(): Promise<void> {
       await widgetStore.setVolatileWidget({
@@ -63,8 +57,7 @@ export default defineComponent({
         componentProps: {
           modelValue: widgetTitle.value,
         },
-      })
-        .onOk(v => widgetTitle.value = v);
+      }).onOk((v) => (widgetTitle.value = v));
     }
 
     async function showWidget(): Promise<void> {
@@ -80,7 +73,10 @@ export default defineComponent({
     async function createWidget(): Promise<void> {
       await ensureVolatile();
       if (canCreate.value && activeWidget.value) {
-        const persistentWidget: Widget = { ...activeWidget.value, volatile: undefined };
+        const persistentWidget: Widget = {
+          ...activeWidget.value,
+          volatile: undefined,
+        };
         const widget = await tryCreateWidget(persistentWidget);
         onDone({ widget });
       }
@@ -107,10 +103,7 @@ export default defineComponent({
         :default-value="activeDashboardId"
       />
 
-      <q-input
-        v-model="widgetTitle"
-        label="Widget name"
-      >
+      <q-input v-model="widgetTitle" label="Widget name">
         <template #append>
           <KeyboardButton @click="showKeyboard" />
         </template>
@@ -120,11 +113,7 @@ export default defineComponent({
     <template #actions>
       <q-btn unelevated label="Back" @click="onBack" />
       <q-space />
-      <q-btn
-        unelevated
-        label="Configure"
-        @click="showWidget"
-      />
+      <q-btn unelevated label="Configure" @click="showWidget" />
       <q-btn
         :disable="!canCreate"
         unelevated

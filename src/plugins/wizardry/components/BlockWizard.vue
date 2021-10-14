@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import { DialogChainObject } from 'quasar';
 import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   BlockConfig,
@@ -18,8 +18,8 @@ import {
   makeBlockIdRules,
 } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
-import { featureStore } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useFeatureStore } from '@/store/features';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter, nullFilter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
@@ -45,6 +45,10 @@ export default defineComponent({
   },
   emits: [...useWizard.emits],
   setup(props) {
+    const widgetStore = useWidgetStore();
+    const featureStore = useFeatureStore();
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
     const { onBack, onClose, onDone, setDialogTitle } = useWizard.setup();
 
     const selected = ref<SelectOption<UserBlockType> | null>(null);
@@ -65,7 +69,7 @@ export default defineComponent({
     const serviceOpts = computed<string[]>(() => sparkStore.serviceIds);
 
     const wizardOpts = computed<SelectOption<UserBlockType>[]>(() =>
-      sparkStore.blockSpecs
+      specStore.blockSpecs
         .filter(
           (spec) =>
             !isSystemBlockType(spec.type) &&
@@ -85,10 +89,6 @@ export default defineComponent({
         .sort(makeObjectSorter('label')),
     );
 
-    const sparkModule = computed<SparkServiceModule | null>(() =>
-      sparkStore.moduleById(serviceId.value),
-    );
-
     const activeBlockIdRules = computed<InputRule[]>(() =>
       serviceId.value
         ? makeBlockIdRules(serviceId.value)
@@ -102,7 +102,7 @@ export default defineComponent({
     const createReady = computed<boolean>(
       () =>
         selected.value !== null &&
-        sparkModule.value !== null &&
+        sparkStore.has(serviceId.value) &&
         (activeBlock.value !== null || validator.value(blockId.value)),
     );
 
@@ -164,7 +164,7 @@ export default defineComponent({
           serviceId: serviceId.value,
           type: selected.value.value,
           groups: [0],
-          data: sparkStore.blockSpecByType(selected.value.value).generate(),
+          data: specStore.blockSpecByType(selected.value.value).generate(),
         });
         activeBlock.value = sparkStore.blockById(
           serviceId.value,
@@ -203,7 +203,7 @@ export default defineComponent({
     }
 
     function configureBlock(): void {
-      if (!createReady.value || !serviceId.value || !sparkModule.value) {
+      if (!createReady.value || !sparkStore.has(serviceId.value)) {
         return;
       }
       ensureVolatile();
@@ -224,7 +224,7 @@ export default defineComponent({
     }
 
     async function createBlock(): Promise<void> {
-      if (!createReady.value || !serviceId.value || !sparkModule.value) {
+      if (!createReady.value || !sparkStore.has(serviceId.value)) {
         return;
       }
       ensureVolatile();

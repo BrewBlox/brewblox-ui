@@ -3,11 +3,11 @@ import range from 'lodash/range';
 import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { widgetStore } from '@/store/widgets';
+import { useWidgetStore } from '@/store/widgets';
 import {
   Coordinates,
   CoordinatesParam,
@@ -27,7 +27,7 @@ import {
   deprecatedTypes,
   SQUARE_SIZE,
 } from './const';
-import { builderStore } from './store';
+import { useBuilderStore } from './store';
 import {
   BuilderLayout,
   FlowPart,
@@ -55,7 +55,7 @@ export function settingsBlock<T extends Block>(
   intf: ComparedBlockType,
 ): T | null {
   const addr = settingsAddress(part, key);
-  const block = sparkStore.blockByAddress<T>(addr);
+  const block = useSparkStore().blockByAddress<T>(addr);
   return block && isCompatible(block.type, intf) ? block : null;
 }
 
@@ -69,7 +69,7 @@ export function asPersistentPart(
 }
 
 export function asStatePart(part: PersistentPart): StatePart {
-  const spec = builderStore.spec(part);
+  const spec = useBuilderStore().spec(part);
   return {
     ...part,
     transitions: spec.transitions(part),
@@ -276,6 +276,7 @@ export function showDrivingBlockDialog(
   settingsKey: string,
   intf: ComparedBlockType,
 ): void {
+  const sparkStore = useSparkStore();
   const block = settingsBlock(part, settingsKey, intf);
 
   if (!block) {
@@ -283,12 +284,12 @@ export function showDrivingBlockDialog(
   }
 
   const driveChain = sparkStore
-    .moduleById(block.serviceId)
-    ?.drivenChains.find((chain) => chain[0] === block.id);
+    .driveChainsByService(block.serviceId)
+    .find((chain) => chain.target === block.id);
 
   const actual =
     driveChain !== undefined
-      ? sparkStore.blockById(block.serviceId, driveChain[driveChain.length - 1])
+      ? sparkStore.blockById(block.serviceId, driveChain.source)
       : block;
 
   if (actual) {
@@ -300,6 +301,7 @@ export function showLinkedWidgetDialog(
   part: PersistentPart,
   key: string,
 ): void {
+  const widgetStore = useWidgetStore();
   const widgetId = part.settings[key];
   if (!widgetId) {
     return;
@@ -350,6 +352,7 @@ export function vivifyParts(
   if (!parts) {
     return [];
   }
+  const builderStore = useBuilderStore();
   const sizes: Mapped<number> = {};
   return (
     parts
@@ -405,6 +408,7 @@ export async function startAddLayout(
     return null;
   }
   const id = nanoid();
+  const builderStore = useBuilderStore();
   await builderStore.createLayout({
     id,
     title,
@@ -420,6 +424,7 @@ export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
   if (!layout) {
     return;
   }
+  const builderStore = useBuilderStore();
   createDialog({
     component: 'InputDialog',
     componentProps: {
@@ -427,7 +432,7 @@ export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
       message: `Choose a new name for ${layout.title}`,
       modelValue: layout.title,
     },
-  }).onOk((title) => {
+  }).onOk((title: string) => {
     if (layout) {
       builderStore.saveLayout({ ...layout, title });
     }

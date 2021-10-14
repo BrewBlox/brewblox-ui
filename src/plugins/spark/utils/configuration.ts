@@ -4,7 +4,7 @@ import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockAddress,
   BlockConfig,
@@ -23,7 +23,8 @@ export const asBlockAddress = (block: Block): BlockAddress =>
 export function makeBlockIdRules(serviceId: string): InputRule[] {
   return [
     (v) => !!v || 'Name must not be empty',
-    (v) => sparkStore.blockById(serviceId, v) === null || 'Name must be unique',
+    (v) =>
+      useSparkStore().blockById(serviceId, v) === null || 'Name must be unique',
     (v) => /^[a-zA-Z]/.test(v) || 'Name must start with a letter',
     (v) =>
       /^[a-zA-Z0-9 \(\)_\-\|]*$/.test(v) ||
@@ -46,7 +47,7 @@ export function makeBlockGraphConfig<BlockT extends Block = Block>(
     graphLayout: {},
   });
 
-  const graphedFields: BlockFieldSpec[] = sparkStore
+  const graphedFields: BlockFieldSpec[] = useBlockSpecStore()
     .fieldSpecsByType(block.type)
     .filter((f) => f.graphed && fieldFilter(f));
 
@@ -91,11 +92,11 @@ export async function discoverBlocks(
   serviceId: string | null,
   show = true,
 ): Promise<string[]> {
-  const module = sparkStore.moduleById(serviceId);
-  if (!module) {
+  const sparkStore = useSparkStore();
+  if (!sparkStore.has(serviceId)) {
     return [];
   }
-  const discovered = await module.fetchDiscoveredBlocks();
+  const discovered = await sparkStore.fetchDiscoveredBlocks(serviceId);
   if (show) {
     notify.info({
       icon: 'mdi-magnify-plus-outline',

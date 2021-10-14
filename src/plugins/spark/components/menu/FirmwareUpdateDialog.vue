@@ -1,10 +1,17 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  onBeforeUnmount,
+  reactive,
+  ref,
+} from 'vue';
 
 import { useDialog } from '@/composables';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { isSparkUpdate } from '@/plugins/spark/utils';
 
@@ -17,17 +24,11 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-    } = useDialog.setup();
+    const sparkStore = useSparkStore();
+    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
 
-    const sparkModule = sparkStore.moduleById(props.serviceId)!;
     const busy = ref<boolean>(false);
     const error = ref<string>('');
     const listenerId = ref<string>('');
@@ -38,38 +39,33 @@ export default defineComponent({
         `${STATE_TOPIC}/${props.serviceId}/update`,
         (_, evt) => {
           if (isSparkUpdate(evt)) {
-            evt.data.log.forEach(v => messages.push(v));
+            evt.data.log.forEach((v) => messages.push(v));
           }
-        });
+        },
+      );
     });
 
     onBeforeUnmount(() => {
       eventbus.removeListener(listenerId.value);
     });
 
-    const status = computed<SparkStatus | null>(
-      () => sparkModule.status,
+    const status = computed<SparkStatus | null>(() =>
+      sparkStore.statusByService(props.serviceId),
     );
 
-    const updateAvailableText = computed<string>(
-      () => {
-        const latest = status.value?.isLatestFirmware;
-        return latest === undefined
-          ? 'Current firmware version is unknown.'
-          : latest
-            ? "You're using the latest firmware."
-            : 'A firmware update is available.';
-      },
-    );
+    const updateAvailableText = computed<string>(() => {
+      const latest = status.value?.isLatestFirmware;
+      return latest === undefined
+        ? 'Current firmware version is unknown.'
+        : latest
+        ? "You're using the latest firmware."
+        : 'A firmware update is available.';
+    });
 
-    const ready = computed<boolean>(
-      () => Boolean(status.value?.isConnected),
-    );
+    const ready = computed<boolean>(() => Boolean(status.value?.isConnected));
 
-    const buttonColor = computed<string>(
-      () => status.value?.isLatestFirmware
-        ? ''
-        : 'primary',
+    const buttonColor = computed<string>(() =>
+      status.value?.isLatestFirmware ? '' : 'primary',
     );
 
     function updateFirmware(): void {
@@ -80,10 +76,14 @@ export default defineComponent({
       error.value = '';
       messages.length = 0;
 
-      sparkModule
-        .flashFirmware()
-        .catch(e => { error.value = e.message; })
-        .finally(() => { busy.value = false; });
+      sparkStore
+        .flashFirmware(props.serviceId)
+        .catch((e) => {
+          error.value = e.message;
+        })
+        .finally(() => {
+          busy.value = false;
+        });
     }
 
     return {

@@ -1,10 +1,15 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec, BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import {
+  BlockFieldSpec,
+  BlockSpec,
+  BlockType,
+  TempSensorMockBlock,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { tempQty } from '@/utils/quantity';
 
 import widget from './TempSensorMockWidget.vue';
@@ -13,6 +18,8 @@ const type = BlockType.TempSensorMock;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<TempSensorMockBlock> = {
       type,
@@ -62,8 +69,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

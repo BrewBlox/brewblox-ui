@@ -2,11 +2,12 @@ import { DialogChainObject } from 'quasar';
 import KeyboardLayouts from 'simple-keyboard-layouts';
 import timezones from 'timezones/zones.json';
 
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { SystemConfig } from '@/store/system/types';
 import { createDialog } from '@/utils/dialog';
 
 export function startChangeKeyboardLayout(): DialogChainObject {
+  const systemStore = useSystemStore();
   return createDialog({
     component: 'SelectDialog',
     componentProps: {
@@ -21,6 +22,7 @@ export function startChangeKeyboardLayout(): DialogChainObject {
 }
 
 export function startEditBuilderTouchDelay(): DialogChainObject {
+  const systemStore = useSystemStore();
   const selectOptions: SelectOption<SystemConfig['builderTouchDelayed']>[] = [
     { label: 'Always', value: 'always' },
     { label: 'Never', value: 'never' },
@@ -46,6 +48,7 @@ export function startEditBuilderTouchDelay(): DialogChainObject {
 }
 
 export function startChangeTempUnit(): DialogChainObject {
+  const systemStore = useSystemStore();
   return createDialog({
     component: 'SelectDialog',
     componentProps: {
@@ -76,6 +79,7 @@ export function startChangeTempUnit(): DialogChainObject {
 }
 
 export function startChangeTimezone(): DialogChainObject {
+  const systemStore = useSystemStore();
   return createDialog({
     component: 'SelectDialog',
     componentProps: {

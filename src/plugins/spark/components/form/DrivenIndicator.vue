@@ -1,7 +1,8 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
+import { BlockDriveChain } from '@/shared-types';
 import { createBlockDialog } from '@/utils/dialog';
 
 export default defineComponent({
@@ -17,38 +18,30 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const sparkModule = sparkStore.moduleById(props.serviceId)!;
+    const sparkStore = useSparkStore();
 
-    const driveChains = computed<string[][]>(
-      () => sparkModule
-        .drivenChains
-        .filter(chain => chain[0] === props.blockId),
+    const driveChains = computed<BlockDriveChain[]>(() =>
+      sparkStore
+        .driveChainsByService(props.serviceId)
+        .filter((chain) => chain.target === props.blockId),
     );
 
-    const textChains = computed<string[][]>(
-      () => driveChains.value
-        .map(chain => chain
-          .slice(1)
-          .map((id, idx) => {
-            return idx === 0
-              ? `Driven by <i>${id}</i>`
-              : `&emsp; which is driven by <i>${id}</i>`;
-          })),
+    const textChains = computed<string[][]>(() =>
+      driveChains.value.map((chain) =>
+        [...chain.intermediate, chain.source].map((id, idx) => {
+          return idx === 0
+            ? `Driven by <i>${id}</i>`
+            : `&emsp; which is driven by <i>${id}</i>`;
+        }),
+      ),
     );
 
-    const isDriven = computed<boolean>(
-      () => textChains.value.length > 0,
-    );
-
-    function bossDriver(chainIdx: number): string {
-      const chain = driveChains.value[chainIdx];
-      return chain[chain.length - 1];
-    }
+    const isDriven = computed<boolean>(() => textChains.value.length > 0);
 
     function showDialog(chainIdx: number): void {
       createBlockDialog({
         serviceId: props.serviceId,
-        id: bossDriver(chainIdx),
+        id: driveChains.value[chainIdx].source,
         type: null,
       });
     }
@@ -57,7 +50,6 @@ export default defineComponent({
       driveChains,
       textChains,
       isDriven,
-      bossDriver,
       showDialog,
     };
   },
@@ -65,14 +57,14 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-list :class="[{clickable: isDriven}]" class="rounded-borders">
+  <q-list :class="[{ clickable: isDriven }]" class="rounded-borders">
     <div
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"
       class="col-auto q-pa-sm q-gutter-x-sm text-indigo-4 row"
       @click="showDialog(chainIdx)"
     >
-      <q-tooltip>Edit {{ bossDriver(chainIdx) }}</q-tooltip>
+      <q-tooltip>Edit {{ driveChains[chainIdx].source }}</q-tooltip>
       <q-icon name="mdi-fast-forward-outline" class="col-auto" size="sm" />
       <div class="col-auto">
         <div v-for="text in chain" :key="text">

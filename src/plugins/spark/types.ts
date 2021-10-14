@@ -9,7 +9,13 @@ import {
   GraphValueAxes,
   QueryParams,
 } from '@/plugins/history/types';
-import { Block, BlockOrIntfType, Quantity, StoreObject } from '@/shared-types';
+import {
+  AnyConstraintKey,
+  Block,
+  BlockOrIntfType,
+  Quantity,
+  StoreObject,
+} from '@/shared-types';
 import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 import { Widget } from '@/store/widgets';
@@ -60,28 +66,23 @@ export interface SparkExported {
   store: SparkStoreEntry[];
 }
 
-export interface RelationEdge {
-  source: string;
+export interface BlockLimitation {
   target: string;
-  relation: string[];
+  constraint: AnyConstraintKey;
+  remaining: Quantity | null;
 }
 
-export interface RelationNode {
+export interface BlockRelationNode {
   id: string;
   type: string;
   name?: string; // overrides `id` for rendering
   title?: string; // overrides `type` for rendering
 }
 
-export interface BlockLimitation {
-  id: string; // block ID
-  limitedBy: string[]; // descriptions
-}
-
-export interface StoredDataPreset<DataT = any> extends StoreObject {
-  type: string;
+export interface BlockDataSnippet<T extends Block = Block> extends StoreObject {
   name: string;
-  data: Partial<DataT>;
+  type: T['type'];
+  data: Partial<T['data']>;
 }
 
 export interface ProfileValues {

@@ -2,7 +2,7 @@
 import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   BlockFieldAddress,
@@ -49,6 +49,8 @@ export default defineComponent({
   setup(props) {
     const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
 
     const fieldId = ref<string | null>(props.modelValue.field);
 
@@ -86,10 +88,10 @@ export default defineComponent({
     });
 
     const validTypes = computed<BlockOrIntfType[]>(() =>
-      sparkStore.blockSpecs
+      specStore.blockSpecs
         .filter((spec) => isCompatible(spec.type, props.compatible))
         .filter((spec) =>
-          sparkStore.fieldSpecs.some(
+          specStore.fieldSpecs.some(
             (f) => f.type === spec.type && props.fieldFilter(f),
           ),
         )
@@ -99,8 +101,8 @@ export default defineComponent({
     const blockIdOpts = computed<string[]>(
       () =>
         sparkStore
-          .moduleById(serviceId.value)
-          ?.blocks.filter((block) => props.blockFilter(block))
+          .blocksByService(serviceId.value)
+          .filter((block) => props.blockFilter(block))
           .filter((block) => validTypes.value.includes(block.type))
           .map((block) => block.id)
           .sort() ?? [],
@@ -111,12 +113,12 @@ export default defineComponent({
     );
 
     const blockSpec = computed<BlockSpec | null>(() =>
-      block.value ? sparkStore.blockSpecByAddress(block.value) : null,
+      block.value ? specStore.blockSpecByAddress(block.value) : null,
     );
 
     const fieldIdOpts = computed<SelectOption<string>[]>(
       () =>
-        sparkStore
+        specStore
           .fieldSpecsByType(block.value?.type)
           .filter((f) => props.fieldFilter(f))
           .map((f) => ({ label: f.title, value: f.key })) ?? [],
@@ -124,7 +126,7 @@ export default defineComponent({
 
     const field = computed<BlockFieldSpec | null>(
       () =>
-        sparkStore.fieldSpecs.find(
+        specStore.fieldSpecs.find(
           (f) => f.type === block.value?.type && f.key === fieldId.value,
         ) ?? null,
     );

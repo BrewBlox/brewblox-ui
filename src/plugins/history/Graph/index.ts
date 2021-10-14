@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 
 import { emptyGraphConfig } from '../const';
@@ -8,9 +8,10 @@ import { GraphConfig } from '../types';
 import { typeName } from './const';
 import widget from './GraphWidget.vue';
 
-
 const plugin: Plugin = {
   install(app) {
+    const featureStore = useFeatureStore();
+
     const feature: WidgetFeature<GraphConfig> = {
       id: typeName,
       title: 'Graph',

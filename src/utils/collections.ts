@@ -10,9 +10,7 @@ export function findById<T extends HasId>(
   id: Maybe<string>,
   fallback: T | null = null,
 ): T | typeof fallback {
-  return id != null
-    ? arr.find(v => v.id === id) ?? fallback
-    : fallback;
+  return id != null ? arr.find((v) => v.id === id) ?? fallback : fallback;
 }
 
 /**
@@ -32,7 +30,7 @@ export function findByKey<T>(
   fallback: T | null = null,
 ): T | typeof fallback {
   return desired != null
-    ? arr.find(v => v[key] === desired) ?? fallback
+    ? arr.find((v) => v[key] === desired) ?? fallback
     : fallback;
 }
 
@@ -46,16 +44,25 @@ export function findByKey<T>(
  * @param insert true to replace the object, false to remove
  */
 export function spliceById<T extends HasId>(arr: T[], obj: T): T[];
-export function spliceById<T extends HasId>(arr: T[], obj: T, insert: true): T[];
-export function spliceById<T extends HasId>(arr: T[], obj: HasId, insert: false): T[];
-export function spliceById<T extends HasId>(arr: T[], obj: T, insert = true): T[] {
-  const idx = arr.findIndex(v => v.id === obj.id);
+export function spliceById<T extends HasId>(
+  arr: T[],
+  obj: T,
+  insert: true,
+): T[];
+export function spliceById<T extends HasId>(
+  arr: T[],
+  obj: HasId,
+  insert: false,
+): T[];
+export function spliceById<T extends HasId>(
+  arr: T[],
+  obj: T,
+  insert = true,
+): T[] {
+  const idx = arr.findIndex((v) => v.id === obj.id);
   if (idx >= 0) {
-    insert
-      ? arr.splice(idx, 1, obj)
-      : arr.splice(idx, 1);
-  }
-  else if (insert) {
+    insert ? arr.splice(idx, 1, obj) : arr.splice(idx, 1);
+  } else if (insert) {
     arr.push(obj);
   }
   return arr;
@@ -69,10 +76,8 @@ export function spliceById<T extends HasId>(arr: T[], obj: T, insert = true): T[
  * @param obj full object or { id } stub to compare against
  */
 export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
-  const idx = arr.findIndex(v => v.id === obj.id);
-  return idx >= 0
-    ? arr.splice(idx, 1)[0]
-    : undefined;
+  const idx = arr.findIndex((v) => v.id === obj.id);
+  return idx >= 0 ? arr.splice(idx, 1)[0] : undefined;
 }
 
 /**
@@ -86,7 +91,7 @@ export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
  * @param obj object to be inserted
  */
 export function concatById<T extends HasId>(arr: T[], obj: T): T[] {
-  const idx = arr.findIndex(v => v.id === obj.id);
+  const idx = arr.findIndex((v) => v.id === obj.id);
   return idx >= 0
     ? [...arr.slice(0, idx), obj, ...arr.slice(idx + 1)]
     : [...arr, obj];
@@ -101,5 +106,5 @@ export function concatById<T extends HasId>(arr: T[], obj: T): T[] {
  * @param obj full object or { id } stub to compare against
  */
 export function filterById<T extends HasId>(arr: T[], obj: T | HasId): T[] {
-  return arr.filter(v => v.id !== obj.id);
+  return [...arr.filter((v) => v.id !== obj.id)];
 }

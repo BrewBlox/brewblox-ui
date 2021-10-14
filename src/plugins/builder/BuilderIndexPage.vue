@@ -2,36 +2,35 @@
 import { computed, defineComponent, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { builderStore } from '@/plugins/builder/store';
-import { systemStore } from '@/store/system';
+import { useBuilderStore } from '@/plugins/builder/store';
+import { useSystemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
 export default defineComponent({
   name: 'IndexPage',
   setup() {
+    const systemStore = useSystemStore();
+    const builderStore = useBuilderStore();
     const router = useRouter();
 
-    const builderPage = computed<string | null>(
-      () => {
-        if (!systemStore.startupDone) {
-          return null;
-        }
+    const builderPage = computed<string | null>(() => {
+      if (!systemStore.startupDone) {
+        return null;
+      }
 
-        if (builderStore.layouts.length === 0) {
-          return '/builder/none';
-        }
+      if (builderStore.layouts.length === 0) {
+        return '/builder/none';
+      }
 
-        const layout = null
-          ?? builderStore.layoutById(builderStore.lastLayoutId)
-          ?? [...builderStore.layouts].sort(makeObjectSorter('order'))[0]
-          ?? null;
+      const layout =
+        null ??
+        builderStore.layoutById(builderStore.lastLayoutId) ??
+        [...builderStore.layouts].sort(makeObjectSorter('order'))[0] ??
+        null;
 
-        return layout
-          ? `/builder/${layout.id}`
-          : null;
-      },
-    );
+      return layout ? `/builder/${layout.id}` : null;
+    });
 
     function showWizard(): void {
       createDialog({ component: 'WizardDialog' });
@@ -39,7 +38,7 @@ export default defineComponent({
 
     watch(
       () => builderPage.value,
-      v => v && router.replace(v),
+      (v) => v && router.replace(v),
       { immediate: true },
     );
 

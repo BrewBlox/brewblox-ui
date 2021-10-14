@@ -18,6 +18,7 @@ import { createDialog } from '@/utils/dialog';
 import { prettyLink } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
 
+import { useSparkStore } from '../../store';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import { characterTitles, logicResultTitles, nonErrorResults } from './const';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
@@ -42,7 +43,8 @@ const validTypes: BlockIntfType[] = [
 export default defineComponent({
   name: 'ActuatorLogicFull',
   setup() {
-    const { serviceId, block, saveBlock, sparkModule } =
+    const sparkStore = useSparkStore();
+    const { serviceId, block, saveBlock } =
       useBlockWidget.setup<ActuatorLogicBlock>();
     const localExpression = ref<string | null>(null);
     const delayedSave = ref<number | null>(null);
@@ -70,9 +72,9 @@ export default defineComponent({
     });
 
     const validBlocks = computed<Block[]>(() =>
-      sparkModule.blocks.filter((block) =>
-        isCompatible(block.type, validTypes),
-      ),
+      sparkStore
+        .blocksByService(serviceId)
+        .filter((block) => isCompatible(block.type, validTypes)),
     );
 
     const expression = computed<string>(
@@ -103,7 +105,7 @@ export default defineComponent({
         key: analogKey(idx),
         pretty: prettyAnalog(
           cmp,
-          sparkModule.blockById(cmp.id.id)?.type ?? null,
+          sparkStore.blockById(serviceId, cmp.id.id)?.type ?? null,
         ),
       })),
     );

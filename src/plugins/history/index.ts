@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { historyStore } from '@/plugins/history/store';
+import { useHistoryStore } from '@/plugins/history/store';
 import { startup } from '@/startup';
 import { autoRegister } from '@/utils/component-ref';
 
@@ -10,6 +10,7 @@ import SessionLog from './SessionLog';
 
 const plugin: Plugin = {
   install(app) {
+    const historyStore = useHistoryStore();
     autoRegister(app, require.context('./components', true));
 
     app.use(Graph);

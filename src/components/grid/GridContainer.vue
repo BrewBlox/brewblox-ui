@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { WidgetContext } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { nullFilter } from '@/utils/functional';
 
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
@@ -29,45 +29,49 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const widgetStore = useWidgetStore();
     const containerRef = ref<HTMLDivElement>();
 
-    const minWidth = computed<number>(
-      () => props.items
-        .reduce(
-          (width: number, item: RenderedItem) => {
-            const { cols, pinnedPosition } = item.widget;
-            const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
-            return Math.max(width, minCols * GRID_SQUARE_SIZE + minCols * GRID_GAP_SIZE);
-          },
-          0,
-        ),
+    const minWidth = computed<number>(() =>
+      props.items.reduce((width: number, item: RenderedItem) => {
+        const { cols, pinnedPosition } = item.widget;
+        const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
+        return Math.max(
+          width,
+          minCols * GRID_SQUARE_SIZE + minCols * GRID_GAP_SIZE,
+        );
+      }, 0),
     );
 
-    const gridStyle = computed<Mapped<string>>(
-      () => {
-        return {
-          minHeight: props.editable ? '3000px' : '0px',
-          minWidth: `${minWidth.value}px`,
-        };
-      },
-    );
+    const gridStyle = computed<Mapped<string>>(() => {
+      return {
+        minHeight: props.editable ? '3000px' : '0px',
+        minWidth: `${minWidth.value}px`,
+      };
+    });
 
     function patchWidgets(updated: Patch<Widget>[]): void {
       updated
-        .map(change => {
+        .map((change) => {
           const existing = widgetStore.widgetById(change.id);
-          return existing
-            ? { ...existing, ...change }
-            : null;
+          return existing ? { ...existing, ...change } : null;
         })
         .filter(nullFilter)
-        .forEach(v => widgetStore.saveWidget(v));
+        .forEach((v) => widgetStore.saveWidget(v));
     }
 
-    function updateItemPosition(updatedId: string, pos: XYPosition | null): void {
-      const updated = Array.from(containerRef.value!.getElementsByClassName('grid-item'))
-        .map((el): [string, DOMRect] => [el.getAttribute('widget-id')!, el.getBoundingClientRect()])
-        .sort(([, rectA], [, rectB]) => (rectA.y - rectB.y) || (rectA.x - rectB.x))
+    function updateItemPosition(
+      updatedId: string,
+      pos: XYPosition | null,
+    ): void {
+      const updated = Array.from(
+        containerRef.value!.getElementsByClassName('grid-item'),
+      )
+        .map((el): [string, DOMRect] => [
+          el.getAttribute('widget-id')!,
+          el.getBoundingClientRect(),
+        ])
+        .sort(([, rectA], [, rectB]) => rectA.y - rectB.y || rectA.x - rectB.x)
         .map(([id], idx) =>
           id === updatedId
             ? { id, order: idx + 1, pinnedPosition: pos }
@@ -113,10 +117,7 @@ export default defineComponent({
         />
       </WidgetProvider>
     </GridItem>
-    <div
-      v-if="editable"
-      class="grid-container-overlay"
-    >
+    <div v-if="editable" class="grid-container-overlay">
       <div class="grid-container-overlay-grid" />
     </div>
   </div>

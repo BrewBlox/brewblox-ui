@@ -12,18 +12,21 @@ import {
 import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { Block } from '@/shared-types';
-import { widgetStore } from '@/store/widgets';
-import { findById } from '@/utils/collections';
+import { useWidgetStore } from '@/store/widgets';
 
-import { SparkServiceModule, sparkStore } from '../store';
+import { useBlockSpecStore, useSparkStore } from '../store';
 import { BlockConfig, BlockSpec, BlockWidget } from '../types';
-import { isBlockVolatile, makeBlockGraphConfig } from '../utils';
+import {
+  findLimitations,
+  isBlockVolatile,
+  limitationString,
+  makeBlockGraphConfig,
+} from '../utils';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {
   serviceId: string;
   blockId: string;
-  sparkModule: SparkServiceModule;
   block: Ref<UnwrapRef<BlockT>>;
   graphConfig: WritableComputedRef<GraphConfig | null>;
   blockSpec: ComputedRef<BlockSpec<BlockT>>;
@@ -45,20 +48,25 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     const { widget, config, invalidate, ...useWidgetResults } =
       useWidget.setup<BlockWidget>();
 
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
+    const widgetStore = useWidgetStore();
+
     // We assume that serviceId/blockId are constant while the widget is mounted
     // If we rename the block, we invalidate the rendering dialog
     const { serviceId, blockId } = config.value;
-    const sparkModule = sparkStore.moduleById(serviceId)!;
 
-    if (!sparkModule) {
+    if (!sparkStore.serviceIds.includes(serviceId)) {
       // We expect parent objects to check configuration before creating the widget
       // Module lifetime should always start before, and end after widget lifetime
       throw new Error(
-        `No Spark Module found for widget ${widget.value?.title} (${serviceId} / ${blockId})`,
+        `No Spark Service found for widget ${widget.value?.title} (${serviceId} / ${blockId})`,
       );
     }
 
-    const block = ref<BlockT>(sparkModule.blockById(config.value.blockId)!);
+    const block = ref<BlockT>(
+      sparkStore.blockById(serviceId, config.value.blockId)!,
+    );
 
     if (!block.value) {
       throw new Error(`Block not found: (${serviceId} / ${blockId})`);
@@ -66,7 +74,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
 
     const debouncedCheckValid = debounce(
       () => {
-        if (!sparkModule.blockById(config.value.blockId)) {
+        if (!sparkStore.blockById(serviceId, blockId)) {
           invalidate();
         }
       },
@@ -75,7 +83,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     );
 
     watch(
-      () => sparkModule.blockById(config.value.blockId),
+      () => sparkStore.blockById(serviceId, blockId),
       (newV) => {
         if (newV) {
           block.value = newV;
@@ -86,7 +94,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     );
 
     const blockSpec = computed<BlockSpec<BlockT>>(
-      () => sparkStore.blockSpecByAddress(block.value)!,
+      () => specStore.blockSpecByAddress(block.value)!,
     );
 
     const isVolatileBlock = computed<boolean>(() =>
@@ -94,19 +102,16 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     );
 
     async function saveBlock(v: BlockT = block.value): Promise<void> {
-      await sparkModule.saveBlock(v);
+      await sparkStore.saveBlock(v);
     }
 
-    const limitations = computed<string | null>(
-      () =>
-        findById(sparkModule.limitations, config.value.blockId)?.limitedBy.join(
-          ', ',
-        ) || null,
+    const limitations = computed<string | null>(() =>
+      limitationString(findLimitations(block.value)),
     );
 
     const hasGraph: boolean =
       !isVolatileBlock.value &&
-      sparkStore.fieldSpecs.some(
+      specStore.fieldSpecs.some(
         (f) => f.type === block.value.type && f.graphed,
       );
 
@@ -127,7 +132,9 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     });
 
     const isDriven = computed<boolean>(() =>
-      sparkModule.drivenBlocks.includes(config.value.blockId),
+      sparkStore
+        .driveChainsByService(serviceId)
+        .some((c) => c.target === blockId),
     );
 
     return {
@@ -135,7 +142,6 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       config,
       invalidate,
       ...useWidgetResults,
-      sparkModule,
       serviceId,
       blockId,
       block,

@@ -1,8 +1,8 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { dashboardStore } from '@/store/dashboards';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useDashboardStore } from '@/store/dashboards';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { makeObjectSorter } from '@/utils/functional';
 
 import { FlowPart } from '../types';
@@ -31,37 +31,40 @@ export default defineComponent({
       default: null,
     },
   },
-  emits: [
-    'update:part',
-  ],
+  emits: ['update:part'],
   setup(props, { emit }) {
+    const dashboardStore = useDashboardStore();
+    const widgetStore = useWidgetStore();
 
     const linked = computed<string | null>({
       get: () => props.part.settings[props.settingsKey] ?? null,
-      set: v => emit('update:part', {
-        ...props.part,
-        settings: {
-          ...props.part.settings,
-          [props.settingsKey]: v,
-        },
-      }),
+      set: (v) =>
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            [props.settingsKey]: v,
+          },
+        }),
     });
 
     const broken = computed<boolean>(
-      () => linked.value !== null
-        && !widgetStore.widgetIds.includes(linked.value),
+      () =>
+        linked.value !== null && !widgetStore.widgetIds.includes(linked.value),
     );
 
     const actualFilter = computed<(v: Widget) => boolean>(
-      () => props.filter ?? (v => props.types.includes(v.feature)),
+      () => props.filter ?? ((v) => props.types.includes(v.feature)),
     );
 
-    const linkedOpts = computed<SelectOption[]>(
-      () => widgetStore.widgets
+    const linkedOpts = computed<SelectOption[]>(() =>
+      widgetStore.widgets
         .filter(actualFilter.value)
         .sort(makeObjectSorter('title'))
-        .map(widget => ({
-          label: `[${dashboardStore.dashboardTitle(widget.dashboard)}] ${widget.title}`,
+        .map((widget) => ({
+          label: `[${dashboardStore.dashboardTitle(widget.dashboard)}] ${
+            widget.title
+          }`,
           value: widget.id,
         })),
     );

@@ -1,14 +1,21 @@
+import get from 'lodash/get';
 import { Enum } from 'typescript-string-enums';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   AnyConstraint,
   AnyConstraintsObj,
   BlockAddress,
+  BlockLimitation,
 } from '@/plugins/spark/types';
 import {
+  AnalogConstraint,
+  AnalogConstraintKey,
+  AnyConstraintKey,
   Block,
   BlockType,
+  DigitalConstraint,
+  DigitalConstraintKey,
   DS2408Block,
   OneWireGpioModuleBlock,
 } from '@/shared-types';
@@ -17,7 +24,7 @@ import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
 
-import { ioChannelNames } from '../const';
+import { constraintLabels, ioChannelNames } from '../const';
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>
   v?.id || '<not set>';
@@ -64,11 +71,11 @@ export const prettifyConstraints = (
 export async function cleanUnusedNames(
   serviceId: string | null,
 ): Promise<void> {
-  const module = sparkStore.moduleById(serviceId);
-  if (!module) {
+  const sparkStore = useSparkStore();
+  if (!sparkStore.has(serviceId)) {
     return;
   }
-  const names = await module.cleanUnusedNames();
+  const names = await sparkStore.cleanUnusedNames(serviceId);
 
   const message =
     names.length > 0
@@ -92,4 +99,67 @@ export function channelName(block: Block, id: number): string | undefined {
     return block.data.channels.find((c) => c.id === id)?.name;
   }
   return ioChannelNames[block.type]?.[id];
+}
+
+export function isDigitalConstraint(
+  constraint: AnyConstraint,
+): constraint is DigitalConstraint {
+  return (constraint as DigitalConstraint).remaining !== undefined;
+}
+
+export function isAnalogConstraint(
+  constraint: AnyConstraint,
+): constraint is AnalogConstraint {
+  return (constraint as AnalogConstraint).limiting !== undefined;
+}
+
+export function constraintKey(
+  constraint: DigitalConstraint,
+): DigitalConstraintKey;
+export function constraintKey(
+  constraint: AnalogConstraint,
+): AnalogConstraintKey;
+export function constraintKey(constraint: AnyConstraint): AnyConstraintKey {
+  return Object.keys(constraint).find(
+    (k): k is AnyConstraintKey => k !== 'remaining' && k !== 'limiting',
+  )!;
+}
+
+export function findLimitations(block: Block): BlockLimitation[] {
+  const constraints: AnyConstraint[] = get(
+    block,
+    'data.constrainedBy.constraints',
+    [],
+  );
+  const output: BlockLimitation[] = [];
+  constraints.forEach((c: AnyConstraint) => {
+    if (isDigitalConstraint(c) && c.remaining.value) {
+      output.push({
+        target: block.id,
+        constraint: constraintKey(c),
+        remaining: c.remaining,
+      });
+    } else if (isAnalogConstraint(c) && c.limiting) {
+      output.push({
+        target: block.id,
+        constraint: constraintKey(c),
+        remaining: null,
+      });
+    }
+  });
+  return output;
+}
+
+export function limitationString(
+  limitations: BlockLimitation[],
+): string | null {
+  return (
+    limitations
+      .map(({ constraint, remaining }) =>
+        remaining
+          ? `${constraintLabels[constraint]} (${durationString(remaining)})`
+          : `${constraintLabels[constraint]}`,
+      )
+      .join(', ') ?? null
+  );
 }

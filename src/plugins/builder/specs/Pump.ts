@@ -11,7 +11,7 @@ import {
   showAbsentBlock,
   showDrivingBlockDialog,
 } from '@/plugins/builder/utils';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   BlockType,
@@ -77,6 +77,7 @@ const spec: PartSpec = {
     };
   },
   interactHandler: (part: PersistentPart, { savePart }) => {
+    const sparkStore = useSparkStore();
     const hasAddr = !!part.settings[PUMP_KEY]?.id;
     const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
     const driven = isBlockDriven(block);

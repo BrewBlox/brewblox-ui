@@ -3,11 +3,10 @@ import truncate from 'lodash/truncate';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import type { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
-
 
 export default defineComponent({
   name: 'LinkField',
@@ -50,28 +49,25 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
+    const sparkStore = useSparkStore();
 
     function save(val: Link): void {
       emit('update:modelValue', val);
     }
 
-    const displayValue = computed<string>(
-      () => truncate(props.modelValue.id ?? 'click to assign'),
+    const displayValue = computed<string>(() =>
+      truncate(props.modelValue.id ?? 'click to assign'),
     );
 
-    const block = computed<Block | null>(
-      () => sparkStore.blockById(props.serviceId, props.modelValue.id),
+    const block = computed<Block | null>(() =>
+      sparkStore.blockById(props.serviceId, props.modelValue.id),
     );
 
     const canEdit = computed<boolean>(
-      () => block.value !== null
-        && props.configurable
-        && props.show,
+      () => block.value !== null && props.configurable && props.show,
     );
 
     function editBlock(): void {
@@ -99,8 +95,7 @@ export default defineComponent({
           configurable: props.configurable,
           ...props.dialogProps,
         },
-      })
-        .onOk(save);
+      }).onOk(save);
     }
 
     return {
@@ -115,7 +110,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
     <slot name="value">
       {{ displayValue }}
     </slot>

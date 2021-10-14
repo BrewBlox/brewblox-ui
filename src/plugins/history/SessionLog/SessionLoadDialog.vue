@@ -3,10 +3,9 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 
-import { historyStore } from '../store';
+import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
-
 
 export default defineComponent({
   name: 'SessionLoadDialog',
@@ -16,23 +15,15 @@ export default defineComponent({
   props: {
     ...useDialog.props,
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup() {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const historyStore = useHistoryStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const local = ref<LoggedSession | null>(null);
 
-    const sessions = computed<LoggedSession[]>(
-      () => historyStore.sessions,
-    );
+    const sessions = computed<LoggedSession[]>(() => historyStore.sessions);
 
     function save(): void {
       onDialogOK(local.value);
@@ -51,7 +42,6 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <q-dialog
     ref="dialogRef"
@@ -59,8 +49,12 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
-      <SessionSelectField v-model="local" :sessions="sessions" label="Select session" />
+    <DialogCard v-bind="{ title, message, html }">
+      <SessionSelectField
+        v-model="local"
+        :sessions="sessions"
+        label="Select session"
+      />
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

@@ -1,8 +1,6 @@
-import { Module, Mutation, VuexModule } from 'vuex-class-modules';
+import { defineStore } from 'pinia';
 
-import store from '@/store';
-
-export type LogLevel = 'DEBUG' | 'INFO' | 'DONE' | 'WARN' | 'ERROR'
+export type LogLevel = 'DEBUG' | 'INFO' | 'DONE' | 'WARN' | 'ERROR';
 
 export interface LogEntry {
   level: LogLevel;
@@ -10,15 +8,17 @@ export interface LogEntry {
   message: string;
 }
 
-@Module
-export class LoggingModule extends VuexModule {
-  public entries: LogEntry[] = [];
-
-  @Mutation
-  public addEntry(entry: LogEntry): void {
-    this.entries.push({ ...entry });
-  }
+interface LoggingStoreState {
+  entries: LogEntry[];
 }
 
-
-export const loggingStore = new LoggingModule({ store, name: 'logging' });
+export const useLoggingStore = defineStore('loggingStore', {
+  state: (): LoggingStoreState => ({
+    entries: [],
+  }),
+  actions: {
+    addEntry(entry: LogEntry): void {
+      this.entries.push({ ...entry });
+    },
+  },
+});

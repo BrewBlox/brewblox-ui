@@ -7,7 +7,7 @@ import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 
 import { emptyGraphConfig } from '../const';
-import { historyStore } from '../store';
+import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
 
@@ -27,17 +27,11 @@ export default defineComponent({
       default: null,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const historyStore = useHistoryStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const sessionTitle = ref<string>('New Session');
     const tags = ref<string[]>([]);
@@ -82,13 +76,12 @@ export default defineComponent({
       },
     );
 
-    const sessions = computed<LoggedSession[]>(
-      () => [example, ...historyStore.sessions],
-    );
+    const sessions = computed<LoggedSession[]>(() => [
+      example,
+      ...historyStore.sessions,
+    ]);
 
-    const knownTags = computed<string[]>(
-      () => historyStore.sessionTags,
-    );
+    const knownTags = computed<string[]>(() => historyStore.sessionTags);
 
     function saveTags(values: string[]): void {
       customTags.value = true;
@@ -99,7 +92,7 @@ export default defineComponent({
       customTags.value = true;
       tags.value = [
         ...props.widgetTags,
-        ...src?.tags?.filter(t => !t.startsWith('on:')) ?? [],
+        ...(src?.tags?.filter((t) => !t.startsWith('on:')) ?? []),
       ];
     }
 
@@ -109,27 +102,25 @@ export default defineComponent({
         componentProps: {
           modelValue: sessionTitle.value,
         },
-      })
-        .onOk(v => sessionTitle.value = v);
+      }).onOk((v) => (sessionTitle.value = v));
     }
 
     function sourceNotes(): SessionNote[] {
       if (source.value === null) {
         return [];
       }
-      return source.value.notes
-        .map(note => {
-          const copy = deepCopy(note);
-          copy.id = nanoid();
-          if (note.type === 'Text') {
-            return { ...copy, value: '' };
-          }
-          if (note.type === 'Graph') {
-            (copy as SessionGraphNote).config.layout.annotations = [];
-            return { ...copy, start: null, end: null };
-          }
-          return copy;
-        });
+      return source.value.notes.map((note) => {
+        const copy = deepCopy(note);
+        copy.id = nanoid();
+        if (note.type === 'Text') {
+          return { ...copy, value: '' };
+        }
+        if (note.type === 'Graph') {
+          (copy as SessionGraphNote).config.layout.annotations = [];
+          return { ...copy, start: null, end: null };
+        }
+        return copy;
+      });
     }
 
     async function save(): Promise<void> {
@@ -203,9 +194,7 @@ export default defineComponent({
             class="self-center"
             @click="resetTags()"
           >
-            <q-tooltip>
-              Undo tag changes
-            </q-tooltip>
+            <q-tooltip> Undo tag changes </q-tooltip>
           </q-btn>
         </template>
       </TagSelectField>
@@ -216,7 +205,6 @@ export default defineComponent({
     </DialogCard>
   </q-dialog>
 </template>
-
 
 <style>
 .tag-select .q-field__append {

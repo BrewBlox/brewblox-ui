@@ -3,8 +3,8 @@ import { Plugin } from 'vue';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
-import { featureStore, WidgetFeature } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { useServiceStore } from '@/store/services';
 import { autoRegister, cref } from '@/utils/component-ref';
 
 import { sparkType } from './const';
@@ -12,7 +12,7 @@ import features from './features';
 import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
-import { sparkStore } from './store';
+import { useBlockSnippetStore, useSparkStore } from './store';
 import { isSparkState } from './utils';
 
 // Allows lookups based on the old type ID
@@ -29,6 +29,11 @@ const deprecated: WidgetFeature[] = [
 
 const plugin: Plugin = {
   install(app) {
+    const serviceStore = useServiceStore();
+    const featureStore = useFeatureStore();
+    const sparkStore = useSparkStore();
+    const snippetStore = useBlockSnippetStore();
+
     autoRegister(app, require.context('./components', true));
 
     deprecated.forEach(featureStore.addWidgetFeature);
@@ -45,9 +50,9 @@ const plugin: Plugin = {
       title: 'Spark Service',
       pageComponent: cref(app, SparkPage),
       configComponent: cref(app, SparkActions),
-      onStart: service => sparkStore.addService(service.id),
-      onRemove: service => sparkStore.removeService(service.id),
-      wizard: stub => ({
+      onStart: (service) => sparkStore.addService(service.id),
+      onRemove: (service) => sparkStore.removeService(service.id),
+      wizard: (stub) => ({
         ...stub,
         title: stub.id,
         order: 0,
@@ -68,7 +73,7 @@ const plugin: Plugin = {
       }
     });
 
-    startup.onStart(() => sparkStore.start());
+    startup.onStart(() => snippetStore.start());
   },
 };
 

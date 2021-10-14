@@ -1,13 +1,13 @@
 import { nanoid } from 'nanoid';
 
-import { builderStore } from '@/plugins/builder/store';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout, PersistentPart } from '@/plugins/builder/types';
 
 import { withPrefix } from '../utils';
 import { GlycolConfig } from './types';
 
-
 export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
+  const builderStore = useBuilderStore();
   const { serviceId, names } = config;
   const heatingParts: PersistentPart[] = [];
   const glycolParts: PersistentPart[] = [];
@@ -37,7 +37,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         type: 'PwmDisplay',
         x: 2,
         y: 6,
-      });
+      },
+    );
   }
 
   if (config.glycolControl === 'Control') {
@@ -65,19 +66,18 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         type: 'PidDisplay',
         x: 7,
         y: 6,
-      });
-  }
-  else if (config.glycolControl === 'Measure') {
-    glycolParts.push(
-      {
-        id: nanoid(),
-        rotate: 0,
-        settings: { sensor: { serviceId, blockId: names.glycolSensor } },
-        flipped: false,
-        type: 'SensorDisplay',
-        x: 7,
-        y: 7,
-      });
+      },
+    );
+  } else if (config.glycolControl === 'Measure') {
+    glycolParts.push({
+      id: nanoid(),
+      rotate: 0,
+      settings: { sensor: { serviceId, blockId: names.glycolSensor } },
+      flipped: false,
+      type: 'SensorDisplay',
+      x: 7,
+      y: 7,
+    });
   }
 
   return [

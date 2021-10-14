@@ -43,6 +43,22 @@ export interface ApiSparkStatus {
 }
 // #endregion ApiSparkStatus
 
+// #region BlockRelation
+export interface BlockRelation {
+  source: string;
+  target: string;
+  relation: string[];
+}
+// #endregion BlockRelation
+
+// #region BlockDriveChain
+export interface BlockDriveChain {
+  source: string;
+  target: string;
+  intermediate: string[];
+}
+// #endregion BlockDriveChain
+
 // #region SparkStateEvent
 export interface SparkStateEvent {
   key: string; // Service ID
@@ -50,6 +66,8 @@ export interface SparkStateEvent {
   data: {
     status: ApiSparkStatus | null;
     blocks: Block[];
+    relations: BlockRelation[];
+    drive_chains: BlockDriveChain[];
   };
 }
 // #endregion SparkStateEvent

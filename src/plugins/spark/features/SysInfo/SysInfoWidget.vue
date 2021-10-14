@@ -1,9 +1,8 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   SparkService,
   SysInfoBlock,
@@ -11,26 +10,23 @@ import {
   WiFiSettingsBlock,
 } from '@/plugins/spark/types';
 import { getTicksBlock, getWiFiSettingsBlock } from '@/plugins/spark/utils';
-import { serviceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { shortDateString } from '@/utils/formatting';
 import { durationString } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SysInfoWidget',
   setup() {
-    const { inDialog } = useContext.setup();
+    const serviceStore = useServiceStore();
+    const sparkStore = useSparkStore();
     const { block, serviceId } = useBlockWidget.setup<SysInfoBlock>();
 
     const service = computed<SparkService | null>(() =>
       serviceStore.serviceById(serviceId),
     );
 
-    const sparkModule = computed<SparkServiceModule | null>(() =>
-      sparkStore.moduleById(serviceId),
-    );
-
     const lastBlocks = computed<string>(() =>
-      shortDateString(sparkModule.value?.lastBlocks, 'Unknown'),
+      shortDateString(sparkStore.lastBlocksAtByService(serviceId), 'Unknown'),
     );
 
     const sysInfo = computed<SysInfoBlock>(() => block.value);
@@ -60,12 +56,10 @@ export default defineComponent({
     const ready = computed<boolean>(
       () =>
         service.value !== null &&
-        sparkModule.value !== null &&
-        sparkModule.value.lastBlocks !== null,
+        sparkStore.lastBlocksAtByService(serviceId) != null,
     );
 
     return {
-      inDialog,
       serviceId,
       ready,
       lastBlocks,

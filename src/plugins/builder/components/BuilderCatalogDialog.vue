@@ -3,10 +3,10 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
-import { builderStore } from '../store';
 import { FlowPart, PartSpec, PersistentPart } from '../types';
 import { asStatePart, coord2grid } from '../utils';
 
@@ -28,41 +28,33 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
+    const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const partFilter = ref<string | null>(null);
 
-    const available = computed<PartDisplay[]>(
-      () => {
-        const filter = new RegExp(partFilter.value || '', 'i');
-        return builderStore.specs
-          .filter(spec => `${spec.id}|${spec.title}`.match(filter))
-          .sort(makeObjectSorter('title'))
-          .map(spec => ({
-            spec,
-            part: asFlowPart({
-              type: spec.id,
-              id: nanoid(),
-              x: 0,
-              y: 0,
-              rotate: 0,
-              settings: {},
-              flipped: false,
-            }),
-          }));
-      },
-    );
+    const available = computed<PartDisplay[]>(() => {
+      const filter = new RegExp(partFilter.value || '', 'i');
+      return builderStore.specs
+        .filter((spec) => `${spec.id}|${spec.title}`.match(filter))
+        .sort(makeObjectSorter('title'))
+        .map((spec) => ({
+          spec,
+          part: asFlowPart({
+            type: spec.id,
+            id: nanoid(),
+            x: 0,
+            y: 0,
+            rotate: 0,
+            settings: {},
+            flipped: false,
+          }),
+        }));
+    });
 
     function partViewBox(display: PartDisplay): string {
       return display.part.size.map(coord2grid).join(' ');
@@ -78,8 +70,7 @@ export default defineComponent({
         componentProps: {
           modelValue: partFilter.value,
         },
-      })
-        .onOk((v: string) => partFilter.value = v);
+      }).onOk((v: string) => (partFilter.value = v));
     }
 
     return {
@@ -115,7 +106,12 @@ export default defineComponent({
       <div class="fit column q-pb-md">
         <q-item class="q-mb-md">
           <q-item-section>
-            <q-input v-model="partFilter" placeholder="Search Parts" clearable autofocus>
+            <q-input
+              v-model="partFilter"
+              placeholder="Search Parts"
+              clearable
+              autofocus
+            >
               <template #append>
                 <KeyboardButton @click="showSearchKeyboard" />
                 <q-icon name="search" />

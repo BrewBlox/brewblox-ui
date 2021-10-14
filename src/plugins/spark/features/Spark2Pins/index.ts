@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { systemBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   BlockSpec,
   BlockType,
@@ -9,7 +9,7 @@ import {
   Spark2PinsBlock,
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 
 import widget from './Spark2PinsWidget.vue';
 
@@ -17,6 +17,9 @@ const type = BlockType.Spark2Pins;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
+
     const blockSpec: BlockSpec<Spark2PinsBlock> = {
       type,
       generate: () => ({
@@ -38,7 +41,7 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
+    specStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

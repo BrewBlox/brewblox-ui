@@ -301,6 +301,10 @@ export default defineComponent({
       />
       <div style="grid-column: 9 / span 2" class="power">
         Power
+        <div class="text-bold text-h5 row full-width justify-around">
+          <div>-</div>
+          <div>+</div>
+        </div>
       </div>
     </div>
     <!-- Unassigned -->

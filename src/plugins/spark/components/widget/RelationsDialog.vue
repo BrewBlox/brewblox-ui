@@ -2,7 +2,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import { useDialog } from '@/composables';
-import { RelationEdge, RelationNode } from '@/plugins/spark/types';
+import { BlockRelation, BlockRelationNode } from '@/plugins/spark/types';
 
 export default defineComponent({
   name: 'RelationsDialog',
@@ -13,11 +13,11 @@ export default defineComponent({
       required: true,
     },
     nodes: {
-      type: Array as PropType<RelationNode[]>,
+      type: Array as PropType<BlockRelationNode[]>,
       required: true,
     },
     edges: {
-      type: Array as PropType<RelationEdge[]>,
+      type: Array as PropType<BlockRelation[]>,
       required: true,
     },
     title: {

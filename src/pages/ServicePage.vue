@@ -1,8 +1,8 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import { featureStore } from '@/store/features';
-import { Service, serviceStore } from '@/store/services';
+import { useFeatureStore } from '@/store/features';
+import { Service, useServiceStore } from '@/store/services';
 
 export default defineComponent({
   name: 'ServicePage',
@@ -13,16 +13,16 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const serviceId = computed<string>(
-      () => props.routeId,
+    const featureStore = useFeatureStore();
+    const serviceStore = useServiceStore();
+    const serviceId = computed<string>(() => props.routeId);
+
+    const service = computed<Service | null>(() =>
+      serviceStore.serviceById(serviceId.value),
     );
 
-    const service = computed<Service | null>(
-      () => serviceStore.serviceById(serviceId.value),
-    );
-
-    const pageComponent = computed<string | null>(
-      () => service.value !== null
+    const pageComponent = computed<string | null>(() =>
+      service.value !== null
         ? featureStore.serviceById(service.value.type)?.pageComponent ?? null
         : null,
     );

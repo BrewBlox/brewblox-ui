@@ -1,17 +1,18 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 
-import { LogEntry, loggingStore } from '@/store/logging';
+import { LogEntry, useLoggingStore } from '@/store/logging';
 import { shortDateString } from '@/utils/formatting';
 import { notifyColors, notifyIcons } from '@/utils/notify';
 
 export default defineComponent({
   name: 'LayoutFooter',
   setup() {
+    const loggingStore = useLoggingStore();
     const logButtonColor = ref<string>('');
 
-    const logEntries = computed<LogEntry[]>(
-      () => loggingStore.entries.slice().reverse(),
+    const logEntries = computed<LogEntry[]>(() =>
+      loggingStore.entries.slice().reverse(),
     );
 
     function color(entry: LogEntry): string {
@@ -50,13 +51,11 @@ export default defineComponent({
         <q-menu>
           <q-list bordered>
             <q-item v-if="logEntries.length === 0">
-              <q-item-section>
-                No messages
-              </q-item-section>
+              <q-item-section> No messages </q-item-section>
             </q-item>
-            <q-item v-for="(entry, idx) in logEntries" :key="'entry-'+idx">
+            <q-item v-for="(entry, idx) in logEntries" :key="'entry-' + idx">
               <q-item-section avatar>
-                <q-icon :name="icon(entry)" />
+                <q-icon :name="icon(entry)" :color="color" />
               </q-item-section>
               <q-item-section>
                 <q-item-label caption>

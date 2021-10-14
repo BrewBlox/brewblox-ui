@@ -1,17 +1,18 @@
 import { Plugin } from 'vue';
 
 import { startup } from '@/startup';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { autoRegister, cref } from '@/utils/component-ref';
 
 import BuilderWidget from './BuilderWidget.vue';
 import specs from './specs';
-import { builderStore } from './store';
+import { useBuilderStore } from './store';
 import { BuilderConfig } from './types';
-
 
 const plugin: Plugin = {
   install(app) {
+    const featureStore = useFeatureStore();
+    const builderStore = useBuilderStore();
 
     const widget: WidgetFeature<BuilderConfig> = {
       id: 'Builder',
@@ -34,7 +35,6 @@ const plugin: Plugin = {
     builderStore.specs = Object.values(specs);
     featureStore.addWidgetFeature(widget);
   },
-
 };
 
 export default plugin;

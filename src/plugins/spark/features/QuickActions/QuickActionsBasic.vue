@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, ref } from 'vue';
 
 import { useGlobals, useWidget } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
@@ -43,6 +43,8 @@ interface ActionDisplay extends ChangeAction {
 export default defineComponent({
   name: 'QuickActionsBasic',
   setup() {
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
     const { touch } = useGlobals.setup();
     const { widgetId, config, saveConfig } =
       useWidget.setup<QuickActionsWidget>();
@@ -86,7 +88,7 @@ export default defineComponent({
       value: any,
     ): Promise<any> {
       return new Promise((resolve, reject) => {
-        const specField = sparkStore
+        const specField = specStore
           .fieldSpecsByType(block.type)
           .find((field) => field.key === key && !field.readonly);
         if (!specField) {
@@ -127,7 +129,7 @@ export default defineComponent({
       const actualChanges: [Block, any][] = [];
       for (const change of changes) {
         const block = blockByChange(change)!;
-        const fieldSpecs = sparkStore.fieldSpecsByType(block.type);
+        const fieldSpecs = specStore.fieldSpecsByType(block.type);
         const actualData = deepCopy(change.data);
         for (const key in change.data) {
           if (!fieldSpecs.some((c) => c.key === key)) {
@@ -167,9 +169,7 @@ export default defineComponent({
             action.changes
               .map((v) => v.serviceId)
               .filter(uniqueFilter)
-              .map((serviceId) =>
-                sparkStore.moduleById(serviceId)!.fetchBlocks(),
-              ),
+              .map((serviceId) => sparkStore.fetchBlocks(serviceId)),
           ),
         )
         .catch((e) => notify.warn(`Failed to apply ${action.name}: ${e}`))
@@ -198,7 +198,7 @@ export default defineComponent({
         };
       }
 
-      const fieldSpecs = sparkStore.fieldSpecsByType(block.type);
+      const fieldSpecs = specStore.fieldSpecsByType(block.type);
       const diffs = Object.entries(change.data).map(([key, val]) => {
         const specChange = fieldSpecs.find((s) => s.key === key);
         const pretty = specChange?.pretty ?? prettyAny;

@@ -4,7 +4,7 @@ import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useContext, useGlobals, useWidget } from '@/composables';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
@@ -12,56 +12,50 @@ import { uniqueFilter } from '@/utils/functional';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH } from './const';
-import { builderStore } from './store';
-import { BuilderConfig, BuilderLayout, FlowPart, PersistentPart } from './types';
+import { useBuilderStore } from './store';
+import {
+  BuilderConfig,
+  BuilderLayout,
+  FlowPart,
+  PersistentPart,
+} from './types';
 import { coord2grid } from './utils';
 
 export default defineComponent({
   name: 'BuilderWidget',
   setup() {
+    const systemStore = useSystemStore();
+    const builderStore = useBuilderStore();
     const router = useRouter();
     const { inDialog } = useContext.setup();
     const { dense } = useGlobals.setup();
-    const {
-      widget,
-      config,
-      saveConfig,
-    } = useWidget.setup<Widget<BuilderConfig>>();
+    const { widget, config, saveConfig } =
+      useWidget.setup<Widget<BuilderConfig>>();
 
     const pending = ref<FlowPart | null>(null);
     const zoomEnabled = ref<boolean>(inDialog.value);
 
-    const storeLayouts = computed<BuilderLayout[]>(
-      () => builderStore.layouts,
-    );
+    const storeLayouts = computed<BuilderLayout[]>(() => builderStore.layouts);
 
     const layoutId = computed<string | null>(
       () => config.value.currentLayoutId,
     );
 
-    const {
-      layout,
-      parts,
-      flowParts,
-      flowPartsRevision,
-      calculateFlowParts,
-    } = useFlowParts.setup(layoutId);
+    const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
+      useFlowParts.setup(layoutId);
 
-    const gridDimensions = computed<UseSvgZoomDimensions>(
-      () => ({
-        width: coord2grid(layout.value?.width || 10),
-        height: coord2grid(layout.value?.height || 10),
-      }),
+    const gridDimensions = computed<UseSvgZoomDimensions>(() => ({
+      width: coord2grid(layout.value?.width || 10),
+      height: coord2grid(layout.value?.height || 10),
+    }));
+
+    const { svgRef, svgContentRef, resetZoom } = useSvgZoom.setup(
+      gridDimensions,
+      {
+        dragEnabled: zoomEnabled,
+        wheelEnabled: zoomEnabled,
+      },
     );
-
-    const {
-      svgRef,
-      svgContentRef,
-      resetZoom,
-    } = useSvgZoom.setup(gridDimensions, {
-      dragEnabled: zoomEnabled,
-      wheelEnabled: zoomEnabled,
-    });
 
     function startSelectLayout(): void {
       createDialog({
@@ -69,16 +63,17 @@ export default defineComponent({
         componentProps: {
           modelValue: config.value.currentLayoutId,
         },
-      })
-        .onOk(id => {
-          config.value.currentLayoutId = id;
-          saveConfig();
-        });
+      }).onOk((id) => {
+        config.value.currentLayoutId = id;
+        saveConfig();
+      });
     }
 
     function selectLayout(id: string | null): void {
       if (id) {
-        config.value.layoutIds = [...config.value.layoutIds, id].filter(uniqueFilter);
+        config.value.layoutIds = [...config.value.layoutIds, id].filter(
+          uniqueFilter,
+        );
       }
       config.value.currentLayoutId = id;
       saveConfig(config.value);
@@ -94,13 +89,13 @@ export default defineComponent({
       parts.value = concatById(parts.value, part);
     }
 
-    const delayTouch = computed<boolean>(
-      () => {
-        const { builderTouchDelayed } = systemStore.config;
-        return builderTouchDelayed === 'always'
-          || (builderTouchDelayed === 'dense' && dense.value);
-      },
-    );
+    const delayTouch = computed<boolean>(() => {
+      const { builderTouchDelayed } = systemStore.config;
+      return (
+        builderTouchDelayed === 'always' ||
+        (builderTouchDelayed === 'dense' && dense.value)
+      );
+    });
 
     function interact(part: FlowPart | null): void {
       if (!part) {
@@ -113,11 +108,9 @@ export default defineComponent({
       if (pending.value && pending.value.id === part.id) {
         handler(part, { savePart });
         pending.value = null;
-      }
-      else if (delayTouch.value) {
+      } else if (delayTouch.value) {
         pending.value = part;
-      }
-      else {
+      } else {
         handler(part, { savePart });
       }
     }
@@ -199,10 +192,7 @@ export default defineComponent({
     </template>
 
     <div class="fit" @click="pending = null">
-      <span
-        v-if="parts.length === 0"
-        class="absolute-center q-gutter-y-sm"
-      >
+      <span v-if="parts.length === 0" class="absolute-center q-gutter-y-sm">
         <div class="text-center">
           {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
         </div>
@@ -241,11 +231,13 @@ export default defineComponent({
           <g
             v-for="part in flowParts"
             :key="`${flowPartsRevision}-${part.id}`"
-            :transform="`translate(${coord2grid(part.x)}, ${coord2grid(part.y)})`"
+            :transform="`translate(${coord2grid(part.x)}, ${coord2grid(
+              part.y,
+            )})`"
             :class="{
               [part.type]: true,
               pointer: part.canInteract,
-              inactive: !!pending
+              inactive: !!pending,
             }"
             @click.stop="interact(part)"
             @dblclick.stop
@@ -265,7 +257,9 @@ export default defineComponent({
               @click.stop="pending = null"
             />
             <g
-              :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(pending.y)})`"
+              :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(
+                pending.y,
+              )})`"
               class="pointer"
               @click.stop="interact(pending)"
             >

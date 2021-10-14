@@ -1,3 +1,5 @@
+import { AxiosResponse } from 'axios';
+
 import { http, intercept } from '@/utils/http';
 import { notify } from '@/utils/notify';
 
@@ -18,18 +20,26 @@ export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
 
 export const fetchBlock = ({ id, serviceId }: Block): Promise<Block> =>
   http
-    .post<Block>(`/${encodeURIComponent(serviceId)}/blocks/read`, { id })
+    .post<BlockIds, AxiosResponse<Block>>(
+      `/${encodeURIComponent(serviceId)}/blocks/read`,
+      { id },
+    )
     .then((resp) => resp.data)
     .catch(intercept(`Failed to fetch ${id}`));
 
 export const fetchStoredBlock = (
   serviceId: string,
-  id: BlockIds,
+  nid: number,
 ): Promise<Block> =>
   http
-    .post<Block>(`/${encodeURIComponent(serviceId)}/blocks/read/stored`, { id })
+    .post<BlockIds, AxiosResponse<Block>>(
+      `/${encodeURIComponent(serviceId)}/blocks/read/stored`,
+      {
+        nid,
+      },
+    )
     .then((resp) => resp.data)
-    .catch(intercept(`Failed to fetch stored block ${id}`));
+    .catch(intercept(`Failed to fetch stored block ${nid}`));
 
 export const createBlock = (block: Block): Promise<Block> =>
   http
@@ -128,7 +138,7 @@ export const serviceImport = (
   exported: SparkExported,
 ): Promise<string[]> =>
   http
-    .post<{ messages: string[] }>(
+    .post<SparkExported, AxiosResponse<{ messages: string[] }>>(
       `/${encodeURIComponent(serviceId)}/blocks/backup/load`,
       exported,
     )
