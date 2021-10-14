@@ -267,20 +267,23 @@ export default defineComponent({
   width: 150px
   background-color: #fff
   cursor: pointer
+  display: flex
+  flex-flow: column nowrap
+  justify-content: space-around
   > div
     width: 100%
     text-align: center
     font-weight: 300
+    padding: 0px 10px
+    overflow: hidden
+    white-space: nowrap
+    text-overflow: ellipsis
   > .title
     font-size: 12px
     color: green
   > .name
     font-size: 14px
     color: black
-    padding: 10px
-    overflow: hidden
-    white-space: nowrap
-    text-overflow: ellipsis
 
 .relation-edge
   stroke: #aaa
