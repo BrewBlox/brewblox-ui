@@ -38,10 +38,6 @@ export default defineComponent({
 
     const serviceId = computed<string | null>(() => config.value.serviceId);
 
-    // const module = computed<SparkServiceModule | null>(
-    //   () => sparkStore.moduleById(serviceId.value),
-    // );
-
     const tempMode = computed<TempControlMode | null>(
       () =>
         config.value.modes.find((v) => v.id === config.value.activeMode) ??
