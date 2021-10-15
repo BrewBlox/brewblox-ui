@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 import { sparkType } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockType } from '@/plugins/spark/types';
-import { Service, ServiceStub,useServiceStore } from '@/store/services';
+import { Service, ServiceStub, useServiceStore } from '@/store/services';
 import { startCreateService } from '@/utils/services';
 
 import { QuickstartConfig } from '../types';
@@ -54,7 +54,7 @@ export default defineComponent({
 
     const ready = computed<boolean>(
       () =>
-        sparkStore.has(serviceId.value) &&
+        sparkStore.has(service.value?.id) &&
         (!hasBlocks.value || handleExisting.value !== null),
     );
 
