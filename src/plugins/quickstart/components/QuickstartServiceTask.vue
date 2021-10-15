@@ -48,7 +48,7 @@ export default defineComponent({
       // Any previous control chain will have included a PID
       () =>
         sparkStore
-          .blocksByService(serviceId.value)
+          .blocksByService(service.value?.id)
           .find((v) => v.type === BlockType.Pid) !== undefined,
     );
 
@@ -62,13 +62,11 @@ export default defineComponent({
       if (!service.value || !ready.value) {
         return;
       }
+      const serviceId = service.value.id;
       if (handleExisting.value === 'clear') {
-        sparkStore.clearBlocks(serviceId.value);
+        sparkStore.clearBlocks(serviceId);
       }
-      emit('update:config', {
-        ...props.config,
-        serviceId: serviceId.value,
-      });
+      emit('update:config', { ...props.config, serviceId });
       emit('next');
     }
 
