@@ -79,9 +79,9 @@ export function asStatePart(part: PersistentPart): StatePart {
 }
 
 export function verticalChevrons(
-  cX: number,
-  cY: number,
-): { up: string[]; down: string[]; straight: string[] } {
+  centerX: number,
+  centerY: number,
+): { up: string; down: string; straight: string } {
   const d1 = 4;
   const d2 = 5.8;
   const d3 = 7.5;
@@ -89,43 +89,51 @@ export function verticalChevrons(
   const upDist = 6; // large -> medium -> small
   return {
     up: [
-      `${cX - d1},${cY - upDist + d1}  ${cX},${cY - upDist}  ${cX + d1},${
-        cY - upDist + d1
-      }`,
-      `${cX - d2},${cY + d2}           ${cX},${cY}           ${cX + d2},${
-        cY + d2
-      }`,
-      `${cX - d3},${cY + upDist + d3}  ${cX},${cY + upDist}  ${cX + d3},${
-        cY + upDist + d3
-      }`,
-    ],
+      `M${centerX - d1},${centerY - upDist + d1}`,
+      `L${centerX},${centerY - upDist}`,
+      `L${centerX + d1},${centerY - upDist + d1}`,
+
+      `M${centerX - d2},${centerY + d2}`,
+      `L${centerX},${centerY}`,
+      `L${centerX + d2},${centerY + d2}`,
+
+      `M${centerX - d3},${centerY + upDist + d3}`,
+      `L${centerX},${centerY + upDist}`,
+      `L${centerX + d3},${centerY + upDist + d3}`,
+    ].join(' '),
     down: [
-      `${cX - d1},${cY - downDist}  ${cX},${cY - downDist + d1}  ${cX + d1},${
-        cY - downDist
-      }`,
-      `${cX - d2},${cY}             ${cX},${cY + d2}             ${
-        cX + d2
-      },${cY}`,
-      `${cX - d3},${cY + downDist}  ${cX},${cY + downDist + d3}  ${cX + d3},${
-        cY + downDist
-      }`,
-    ],
+      `M${centerX - d1},${centerY - downDist}`,
+      `L${centerX},${centerY - downDist + d1}`,
+      `L${centerX + d1},${centerY - downDist}`,
+
+      `M${centerX - d2},${centerY}`,
+      `L${centerX},${centerY + d2}`,
+      `L${centerX + d2},${centerY}`,
+
+      `M${centerX - d3},${centerY + downDist}`,
+      `L${centerX},${centerY + downDist + d3}`,
+      `L${centerX + d3},${centerY + downDist}`,
+    ].join(' '),
     straight: [
-      `${cX - d1},${cY - downDist}  ${cX},${cY - downDist}  ${cX + d1},${
-        cY - downDist
-      }`,
-      `${cX - d2},${cY}             ${cX},${cY}             ${cX + d2},${cY}`,
-      `${cX - d3},${cY + downDist}  ${cX},${cY + downDist}  ${cX + d3},${
-        cY + downDist
-      }`,
-    ],
+      `M${centerX - d1},${centerY - downDist}`,
+      `L${centerX},${centerY - downDist}`,
+      `L${centerX + d1},${centerY - downDist}`,
+
+      `M${centerX - d2},${centerY}`,
+      `L${centerX},${centerY}`,
+      `L${centerX + d2},${centerY}`,
+
+      `M${centerX - d3},${centerY + downDist}`,
+      `L${centerX},${centerY + downDist}`,
+      `L${centerX + d3},${centerY + downDist}`,
+    ].join(' '),
   };
 }
 
 export function horizontalChevrons(
-  cX: number,
-  cY: number,
-): { left: string[]; right: string[]; straight: string[] } {
+  centerX: number,
+  centerY: number,
+): { left: string; right: string; straight: string } {
   const d1 = 4;
   const d2 = 5.8;
   const d3 = 7.5;
@@ -133,32 +141,44 @@ export function horizontalChevrons(
   const rdist = 6; // large -> medium -> small
   return {
     left: [
-      `${cX + ldist},${cY - d1}  ${cX + ldist - d1},${cY}  ${cX + ldist},${
-        cY + d1
-      }`,
-      `${cX}        ,${cY - d2}  ${cX - d2}        ,${cY}  ${cX}        ,${
-        cY + d2
-      }`,
-      `${cX - ldist},${cY - d3}  ${cX - ldist - d3},${cY}  ${cX - ldist},${
-        cY + d3
-      }`,
-    ],
+      `M${centerX + ldist},${centerY - d1}`,
+      `L${centerX + ldist - d1},${centerY}`,
+      `L${centerX + ldist},${centerY + d1}`,
+
+      `M${centerX},${centerY - d2}`,
+      `L${centerX - d2},${centerY}`,
+      `L${centerX},${centerY + d2}`,
+
+      `M${centerX - ldist},${centerY - d3}`,
+      `L${centerX - ldist - d3},${centerY}`,
+      `L${centerX - ldist},${centerY + d3}`,
+    ].join(' '),
     right: [
-      `${cX + rdist - d1},${cY - d1}  ${cX + rdist},${cY}  ${cX + rdist - d1},${
-        cY + d1
-      }`,
-      `${cX - d2}        ,${cY - d2}  ${cX}        ,${cY}  ${cX - d2}        ,${
-        cY + d2
-      }`,
-      `${cX - rdist - d3},${cY - d3}  ${cX - rdist},${cY}  ${cX - rdist - d3},${
-        cY + d3
-      }`,
-    ],
+      `M${centerX + rdist - d1},${centerY - d1}`,
+      `L${centerX + rdist},${centerY}`,
+      `L${centerX + rdist - d1},${centerY + d1}`,
+
+      `M${centerX - d2},${centerY - d2}`,
+      `L${centerX},${centerY}`,
+      `L${centerX - d2},${centerY + d2}`,
+
+      `M${centerX - rdist - d3},${centerY - d3}`,
+      `L${centerX - rdist},${centerY}`,
+      `L${centerX - rdist - d3},${centerY + d3}`,
+    ].join(' '),
     straight: [
-      `${cX + ldist},${cY - d1}  ${cX + ldist},${cY}  ${cX + ldist},${cY + d1}`,
-      `${cX}        ,${cY - d2}  ${cX}        ,${cY}  ${cX}        ,${cY + d2}`,
-      `${cX - ldist},${cY - d3}  ${cX - ldist},${cY}  ${cX - ldist},${cY + d3}`,
-    ],
+      `M${centerX + ldist},${centerY - d1}`,
+      `L${centerX + ldist},${centerY}`,
+      `L${centerX + ldist},${centerY + d1}`,
+
+      `M${centerX},${centerY - d2}`,
+      `L${centerX},${centerY}`,
+      `L${centerX},${centerY + d2}`,
+
+      `M${centerX - ldist},${centerY - d3}`,
+      `L${centerX - ldist},${centerY}`,
+      `L${centerX - ldist},${centerY + d3}`,
+    ].join(' '),
   };
 }
 
