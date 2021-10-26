@@ -20,6 +20,7 @@ import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
 import { clampRotation } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
+import { loadFile } from '@/utils/import-export';
 import { deepCopy } from '@/utils/objects';
 
 import {
@@ -177,6 +178,14 @@ export default defineComponent({
       if (id) {
         selectLayout(id);
       }
+    }
+
+    async function importLayout(): Promise<void> {
+      loadFile<BuilderLayout>(async (layout) => {
+        const id = nanoid();
+        await builderStore.createLayout({ ...layout, id });
+        selectLayout(id);
+      });
     }
 
     function saveParts(updated: PersistentPart[], saveHistory = true): void {
@@ -915,6 +924,7 @@ export default defineComponent({
       editTitle,
       selectLayout,
       createLayout,
+      importLayout,
       savePart,
       removePart,
 
@@ -967,6 +977,11 @@ export default defineComponent({
         </template>
         <template #actions>
           <ActionItem label="New layout" icon="add" @click="createLayout" />
+          <ActionItem
+            icon="mdi-file-import"
+            label="Import Layout"
+            @click="importLayout"
+          />
           <ActionItem
             label="Reset zoom"
             icon="mdi-stretch-to-page-outline"
