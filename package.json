@@ -70,7 +70,6 @@
     "@types/js-quantities": "^1.6.2",
     "@types/lodash": "^4.14.172",
     "@types/marked": "^3.0.1",
-    "@types/nanoid": "^3.0.0",
     "@types/node": "16.10.2",
     "@types/plotly.js": "^1.54.14",
     "@types/webpack-env": "^1.16.2",
