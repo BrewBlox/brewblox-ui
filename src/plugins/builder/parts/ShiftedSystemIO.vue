@@ -1,8 +1,12 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { CENTER } from '@/plugins/builder/const';
-import { flowOnCoord, liquidOnCoord, verticalChevrons } from '@/plugins/builder/utils';
+import { UP } from '@/plugins/builder/const';
+import {
+  flowOnCoord,
+  liquidOnCoord,
+  verticalChevrons,
+} from '@/plugins/builder/utils';
 
 import { FlowPart } from '../types';
 
@@ -25,13 +29,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const flowSpeed = computed<number>(
-      () => flowOnCoord(props.part, CENTER),
-    );
+    const flowSpeed = computed<number>(() => -flowOnCoord(props.part, UP));
 
-    const liquids = computed<string[]>(
-      () => liquidOnCoord(props.part, CENTER),
-    );
+    const liquids = computed<string[]>(() => liquidOnCoord(props.part, UP));
 
     return {
       chevrons,
@@ -48,15 +48,9 @@ export default defineComponent({
     <g class="outline">
       <path :d="paths.borders[0]" />
       <path :d="paths.borders[1]" />
-      <g v-if="flowSpeed > 0">
-        <polyline v-for="line in chevrons.down" :key="line" :points="line" />
-      </g>
-      <g v-else-if="flowSpeed < 0">
-        <polyline v-for="line in chevrons.up" :key="line" :points="line" />
-      </g>
-      <g v-else>
-        <polyline v-for="line in chevrons.straight" :key="line" :points="line" />
-      </g>
+      <path v-if="flowSpeed > 0" :d="chevrons.down" />
+      <path v-else-if="flowSpeed < 0" :d="chevrons.up" />
+      <path v-else :d="chevrons.straight" />
     </g>
     <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
     <AnimatedArrows :speed="flowSpeed" :path="paths.arrows" />

@@ -45,6 +45,13 @@ const plugin: Plugin = {
     const fieldSpecs: BlockFieldSpec<ActuatorLogicBlock>[] = [
       {
         type,
+        key: 'enabled',
+        title: 'Enabled',
+        component: 'BoolValEdit',
+        generate: () => true,
+      },
+      {
+        type,
         key: 'result',
         title: 'Result',
         component: 'EnumValEdit',

@@ -6,6 +6,7 @@ import { addBlockGraph } from '@/plugins/history/Graph/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, DisplayOpts } from '@/plugins/spark/types';
 import { createWidgetWizard } from '@/plugins/wizardry';
+import { WizardOutput } from '@/plugins/wizardry/types';
 import {
   Block,
   BlockIntfType,
@@ -148,7 +149,7 @@ export async function startAddBlockToGraphWidget(
         .onDismiss(() => resolve(null));
     } else {
       createWidgetWizard(graphType)
-        .onOk((output) => resolve(output.widget?.id ?? null))
+        .onOk((output: WizardOutput) => resolve(output.widget?.id ?? null))
         .onCancel(() => resolve(null))
         .onDismiss(() => resolve(null));
     }

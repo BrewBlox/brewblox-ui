@@ -10,6 +10,7 @@ import type {
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
+import { WizardOutput } from '@/plugins/wizardry/types';
 import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
@@ -121,7 +122,7 @@ export default defineComponent({
       createBlockWizard(
         serviceId.value,
         props.compatible ?? props.modelValue.type,
-      ).onOk(({ block }) => {
+      ).onOk(({ block }: WizardOutput) => {
         if (block) {
           local.value = asAddr(block);
         }
@@ -182,7 +183,7 @@ export default defineComponent({
         :options="addressOpts"
         :clearable="clearable"
         :label="label"
-        :error="local && local.id && !block"
+        :error="Boolean(local && local.id && !block)"
         error-message="Block not found"
         autofocus
         item-aligned

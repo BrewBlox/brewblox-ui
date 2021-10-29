@@ -4,6 +4,7 @@ import { computed, defineComponent, nextTick, ref } from 'vue';
 
 import { useElementRefs, useGlobals } from '@/composables';
 import { createBlockWizard } from '@/plugins/wizardry';
+import { WizardOutput } from '@/plugins/wizardry/types';
 import { BlockType } from '@/shared-types';
 import { useFeatureStore, WidgetRole } from '@/store/features';
 import { useServiceStore } from '@/store/services';
@@ -156,7 +157,7 @@ export default defineComponent({
     }
 
     function startCreateBlock(): void {
-      createBlockWizard(props.serviceId).onOk(({ block }) => {
+      createBlockWizard(props.serviceId).onOk(({ block }: WizardOutput) => {
         if (block) {
           setExpanded(block.id, true);
         }

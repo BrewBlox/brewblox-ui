@@ -1,11 +1,11 @@
+import { DialogChainObject } from 'quasar';
+
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
-
-import { WizardDialogResult } from './types';
 
 export async function tryCreateWidget<T>(
   widget: Widget<T>,
@@ -40,7 +40,7 @@ export async function tryCreateBlock(block: Block): Promise<Block | null> {
 export function createBlockWizard(
   serviceId: string | null,
   compatible: ComparedBlockType = null,
-): WizardDialogResult {
+): DialogChainObject {
   return createDialog({
     component: 'WizardDialog',
     componentProps: {
@@ -56,7 +56,7 @@ export function createBlockWizard(
   });
 }
 
-export function createWidgetWizard(featureId: string): WizardDialogResult {
+export function createWidgetWizard(featureId: string): DialogChainObject {
   return createDialog({
     component: 'WizardDialog',
     componentProps: {
