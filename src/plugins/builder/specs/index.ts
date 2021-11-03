@@ -6,6 +6,7 @@ import BuilderLabel from './BuilderLabel';
 import Carboy from './Carboy';
 import CheckValve from './CheckValve';
 import Coil from './Coil';
+import Condenser from './Condenser';
 import Conical from './Conical';
 import CounterflowChiller from './CounterflowChiller';
 import CrossTube from './CrossTube';
@@ -45,6 +46,7 @@ const specs: { [key: string]: PartSpec } = {
   Carboy,
   CheckValve,
   Coil,
+  Condenser,
   Conical,
   CounterflowChiller,
   CrossTube,
