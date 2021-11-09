@@ -1,12 +1,19 @@
 <script lang="ts">
 import clamp from 'lodash/clamp';
-import { computed, defineComponent, PropType, reactive } from 'vue';
+import { computed, defineComponent, PropType, reactive, watch } from 'vue';
 
 import { useDialog } from '@/composables';
 import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
 
-type EditingKind = 'UNKNOWN' | 'SSR' | 'MOTOR' | 'SOLENOID' | 'MECH_RELAY';
-type EditingMode = 'BOTH' | 'PLUS' | 'MINUS' | 'BIDIRECTIONAL';
+type EditingKind =
+  | 'UNKNOWN'
+  | 'SSR'
+  | 'MOTOR'
+  | 'SOLENOID'
+  | 'MECH_RELAY'
+  | 'GROUND'
+  | 'POWER';
+type EditingMode = 'BOTH' | 'PLUS' | 'MINUS' | 'BIDIRECTIONAL' | 'NONE';
 
 interface EditingChannel {
   name: string;
@@ -24,6 +31,10 @@ function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
     return 'SOLENOID';
   } else if (deviceType.startsWith('GPIO_DEV_MECHANICAL_RELAY')) {
     return 'MECH_RELAY';
+  } else if (deviceType.startsWith('GPIO_DEV_POWER')) {
+    return 'POWER';
+  } else if (deviceType.startsWith('GPIO_DEV_GND')) {
+    return 'GROUND';
   } else {
     return 'UNKNOWN';
   }
@@ -36,6 +47,8 @@ function inferEditingMode({ deviceType }: GpioModuleChannel): EditingMode {
     return 'PLUS';
   } else if (/_1P_LOW_SIDE/.test(deviceType)) {
     return 'MINUS';
+  } else if (/(POWER|GND)_1P/.test(deviceType)) {
+    return 'NONE';
   } else {
     return 'BOTH';
   }
@@ -87,6 +100,12 @@ function inferChannelDeviceType({
     } else if (mode === 'MINUS') {
       return GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_1P_LOW_SIDE;
     }
+  } else if (kind === 'POWER') {
+    // Mode is always NONE
+    return GpioDeviceType.GPIO_DEV_POWER_1P;
+  } else if (kind === 'GROUND') {
+    // Mode is always NONE
+    return GpioDeviceType.GPIO_DEV_GND_1P;
   }
   // Return NONE for all invalid combinations of kind and mode
   return GpioDeviceType.GPIO_DEV_NONE;
@@ -126,9 +145,15 @@ export default defineComponent({
       { value: 'MOTOR', label: 'Motor' },
       { value: 'SOLENOID', label: 'Solenoid' },
       { value: 'MECH_RELAY', label: 'Mechanical Relay' },
+      { value: 'POWER', label: 'Power (always on)' },
+      { value: 'GROUND', label: 'Ground' },
     ];
 
     const modeOpts = computed<SelectOption<EditingMode>[]>(() => {
+      if (local.kind === 'POWER' || local.kind === 'GROUND') {
+        return [{ value: 'NONE', label: 'N/A' }];
+      }
+
       const opts: SelectOption<EditingMode>[] = [
         { value: 'BOTH', label: '- and +' },
         { value: 'PLUS', label: 'Only +' },
@@ -187,6 +212,15 @@ export default defineComponent({
 
       onDialogOK(channel);
     }
+
+    watch(
+      () => local.kind,
+      () => {
+        if (!modeOpts.value.find((opt) => opt.value === local.mode)) {
+          local.mode = modeOpts.value[0].value;
+        }
+      },
+    );
 
     return {
       dialogRef,
@@ -254,7 +288,7 @@ export default defineComponent({
           label="Pin mode"
           emit-value
           map-options
-          class="col-grow"
+          class="col-5"
           @keyup.enter.stop
         />
       </div>
