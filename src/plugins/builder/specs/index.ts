@@ -35,6 +35,7 @@ import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
 import SystemIO from './SystemIO';
 import TeeTube from './TeeTube';
+import TiltDisplay from './TiltDisplay';
 import UrlDisplay from './UrlDisplay';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
@@ -75,6 +76,7 @@ const specs: { [key: string]: PartSpec } = {
   SystemIO,
   Fridge,
   TeeTube,
+  TiltDisplay,
   UrlDisplay,
   Valve,
   WhirlpoolInlet,
