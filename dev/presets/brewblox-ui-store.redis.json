@@ -1153,7 +1153,7 @@
     },
     "order": 3,
     "feature": "QuickActions",
-    "rows": 2,
+    "rows": 3,
     "title": "Charles",
     "dashboard": "dashboard-home",
     "cols": 4
