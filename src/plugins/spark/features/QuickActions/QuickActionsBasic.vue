@@ -55,6 +55,10 @@ export default defineComponent({
       deserialize(config.value.actions ?? config.value.steps),
     );
 
+    const lastActionId = computed<string | null>(
+      () => config.value.lastActionId ?? null,
+    );
+
     function saveActions(values: ChangeAction[] = actions.value): void {
       config.value.actions = values;
       saveConfig();
@@ -162,7 +166,11 @@ export default defineComponent({
     function applyAction(action: ChangeAction): void {
       applying.value = true;
       applyChanges(action)
-        .then(() => notify.done(`Applied ${action.name}`))
+        .then(() => {
+          notify.done(`Applied ${action.name}`);
+          config.value.lastActionId = action.id;
+          return saveConfig();
+        })
         .then(() =>
           // Fetch all blocks to show secondary effects
           Promise.all(
@@ -225,6 +233,7 @@ export default defineComponent({
       applying,
       applyAction,
       actionDisplays,
+      lastActionId,
       showActionDialog,
     };
   },
@@ -238,7 +247,10 @@ export default defineComponent({
     <div class="widget-body column">
       <div v-for="action in actionDisplays" :key="action.id" class="row">
         <div
-          class="col-grow q-py-xs q-px-sm rounded-borders clickable"
+          :class="[
+            'col-grow q-py-xs q-px-sm rounded-borders clickable',
+            lastActionId === action.id && 'dashed',
+          ]"
           style="min-width: 100px"
           @click="showActionDialog(action)"
         >
@@ -251,6 +263,9 @@ export default defineComponent({
           <q-tooltip v-if="action.applicable">
             <div class="column" style="max-width: 400px">
               <div class="col-auto text-italic" style="font-size: 120%">
+                <div v-if="lastActionId === action.id">
+                  This is the last used action.
+                </div>
                 {{ action.active ? 'No fields will be changed' : 'Changes' }}
               </div>
               <div
@@ -285,21 +300,22 @@ export default defineComponent({
             Action can't be applied. Do all changed blocks exist?
           </q-tooltip>
         </div>
-        <q-btn
-          flat
-          round
-          icon="mdi-play-circle"
-          :disable="!action.applicable"
-          :loading="applying"
-          :color="action.active ? 'positive' : ''"
-          class="col-auto q-ml-sm"
-          @click="applyAction(action)"
-        >
-          <q-tooltip v-if="!touch">
-            Apply action
-            <span v-if="action.active">(no fields will be changed)</span>
-          </q-tooltip>
-        </q-btn>
+        <div class="col-auto q-ml-sm">
+          <q-btn
+            flat
+            round
+            icon="mdi-play-circle"
+            :disable="!action.applicable"
+            :loading="applying"
+            :color="action.active ? 'positive' : ''"
+            @click="applyAction(action)"
+          >
+            <q-tooltip v-if="!touch">
+              Apply action
+              <span v-if="action.active">(no fields will be changed)</span>
+            </q-tooltip>
+          </q-btn>
+        </div>
       </div>
       <slot name="below" />
     </div>
