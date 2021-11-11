@@ -11,7 +11,9 @@ services:
     labels:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
     volumes:
-      - ./dev/victoria:/victoria-metrics-data
+      - type: bind
+        source: ./dev/victoria
+        target: /victoria-metrics-data
     command: >-
       --retentionPeriod=100y
       --influxMeasurementFieldSeparator=/
@@ -22,7 +24,9 @@ services:
     labels:
       - traefik.enable=false
     volumes:
-      - ./dev/redis:/data
+      - type: bind
+        source: ./dev/redis
+        target: /data
     command: --appendonly yes
 
   history:
@@ -31,14 +35,18 @@ services:
   node-red:
     image: brewblox/node-red:develop
     volumes:
-      - ./dev/node-red:/data
+      - type: bind
+        source: ./dev/node-red
+        target: /data
 
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
     volumes:
-      - ./dev/simulator__sparkey:/app/simulator
+      - type: bind
+        source: ./dev/simulator__sparkey
+        target: /app/simulator
     command: --name=sparkey --simulation --device-id=123456789012345678901234
 
   spock:
@@ -46,7 +54,9 @@ services:
     restart: unless-stopped
     privileged: true
     volumes:
-      - ./dev/simulator__spock:/app/simulator
+      - type: bind
+        source: ./dev/simulator__spock
+        target: /app/simulator
     command: --name=spock --simulation --device-id=432109876543210987654321
 
   tilt:
@@ -66,8 +76,13 @@ services:
       - traefik.http.routers.api.service=api@internal
       - traefik.http.middlewares.prefix-strip.stripprefixregex.regex=/[^/]+
     volumes:
-      - ./dev/traefik:/config
-      - /var/run/docker.sock:/var/run/docker.sock
+      - type: bind
+        source: ./dev/traefik
+        target: /config
+        read_only: true
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
     command: >-
       --api.dashboard=true
       --providers.docker=true
