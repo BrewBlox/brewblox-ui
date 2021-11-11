@@ -7,6 +7,8 @@ import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 
+import { WizardDialogResult } from './types';
+
 export async function tryCreateWidget<T>(
   widget: Widget<T>,
 ): Promise<Widget<T> | null> {
@@ -40,7 +42,7 @@ export async function tryCreateBlock(block: Block): Promise<Block | null> {
 export function createBlockWizard(
   serviceId: string | null,
   compatible: ComparedBlockType = null,
-): DialogChainObject {
+): WizardDialogResult {
   return createDialog({
     component: 'WizardDialog',
     componentProps: {
@@ -56,7 +58,7 @@ export function createBlockWizard(
   });
 }
 
-export function createWidgetWizard(featureId: string): DialogChainObject {
+export function createWidgetWizard(featureId: string): WizardDialogResult {
   return createDialog({
     component: 'WizardDialog',
     componentProps: {
