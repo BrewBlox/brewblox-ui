@@ -45,4 +45,4 @@ export type TiltFieldIndex = {
 } & {
   timestamp: boolean;
   color: boolean;
-}
+};

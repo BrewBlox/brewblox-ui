@@ -1,5 +1,3 @@
-import { DialogChainObject } from 'quasar';
-
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';

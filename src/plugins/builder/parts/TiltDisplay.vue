@@ -10,7 +10,8 @@ import {
 } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
-import { Quantity } from '@/shared-types';
+import { GravityUnit, Quantity } from '@/shared-types';
+import { useSystemStore } from '@/store/system';
 import { fixedNumber, prettyQty, prettyUnit } from '@/utils/formatting';
 import { bloxQty, tempQty } from '@/utils/quantity';
 
@@ -29,6 +30,7 @@ export default defineComponent({
   setup(props) {
     const { bordered, scale } = usePart.setup(props.part);
     const tiltStore = useTiltStore();
+    const systemStore = useSystemStore();
 
     const tiltColor = computed<string | null>(
       () => props.part.settings[TILT_COLOR_KEY] ?? null,
@@ -65,6 +67,8 @@ export default defineComponent({
       return calibratedPlato.value != null ? calibratedPlato : plato;
     });
 
+    const gravityUnit = computed<GravityUnit>(() => systemStore.units.gravity);
+
     const color = computed<string>(
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',
     );
@@ -81,6 +85,7 @@ export default defineComponent({
       temperature,
       sg,
       plato,
+      gravityUnit,
       color,
       bordered,
       scale,
@@ -93,18 +98,22 @@ export default defineComponent({
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded :width="coord2grid(SIZE_X)" :height="coord2grid(SIZE_Y)">
       <div class="q-ma-xs">
-        <div class="row q-gutter-x-xs">
+        <div class="row q-gutter-x-xs text-bold">
           <q-icon :name="mdiThermometer" size="20px" class="static col-auto" />
           <q-space />
-          <div class="col-auto text-bold">
-            {{ fixedNumber(temperature.value, 1) }}
-            <small>{{ prettyUnit(temperature) }}</small>
-          </div>
+          {{ fixedNumber(temperature.value, 1) }}
+          <small class="self-center">{{ prettyUnit(temperature) }}</small>
         </div>
-        <div class="row text-bold">
+        <div class="row q-gutter-x-xs text-bold">
           SG
           <q-space />
-          {{ fixedNumber(sg, 3) }}
+          <template v-if="gravityUnit === 'G'">
+            {{ fixedNumber(sg, 3) }}
+          </template>
+          <template v-if="gravityUnit === 'degP'">
+            {{ fixedNumber(plato.value, 1) }}
+            <small class="self-center">{{ prettyUnit(plato) }}</small>
+          </template>
         </div>
       </div>
     </SvgEmbedded>

@@ -7,6 +7,7 @@ import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import {
+  startChangeGravityUnit,
   startChangeKeyboardLayout,
   startChangeTempUnit,
   startChangeTimezone,
@@ -71,6 +72,7 @@ export default defineComponent({
       createDialog,
       startChangeKeyboardLayout,
       startChangeTempUnit,
+      startChangeGravityUnit,
       startChangeTimezone,
       startEditBuilderTouchDelay,
       startupDone,
@@ -127,6 +129,11 @@ export default defineComponent({
             icon="mdi-temperature-celsius"
             label="Temperature units"
             @click="startChangeTempUnit"
+          />
+          <ActionItem
+            icon="mdi-weight-gram"
+            label="Gravity units"
+            @click="startChangeGravityUnit"
           />
           <ActionItem
             icon="mdi-map-clock"

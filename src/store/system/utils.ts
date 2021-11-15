@@ -78,6 +78,31 @@ export function startChangeTempUnit(): DialogChainObject {
   }).onOk((temperature) => systemStore.saveUnits({ temperature }));
 }
 
+export function startChangeGravityUnit(): DialogChainObject {
+  const systemStore = useSystemStore();
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: [
+        { value: 'G', label: 'Specific gravity' },
+        { value: 'degP', label: 'Plato' },
+      ],
+      modelValue: systemStore.units.gravity,
+      title: 'Choose gravity unit',
+      message: `
+      <p>
+        Choose gravity units for all your services. <br>
+        This will affect how specific gravity measurements are displayed and logged.
+      </p>
+      `,
+      html: true,
+      selectProps: {
+        label: 'Unit',
+      },
+    },
+  }).onOk((gravity) => systemStore.saveUnits({ gravity }));
+}
+
 export function startChangeTimezone(): DialogChainObject {
   const systemStore = useSystemStore();
   return createDialog({
