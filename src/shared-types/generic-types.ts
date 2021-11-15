@@ -4,9 +4,18 @@
 export type UUID = string;
 
 /**
- * The default config notation for celsius/fahrenheit.
+ * The notation for temperature units.
  */
-export type TempUnit = 'degC' | 'degF';
+export type TempUnit =
+  | 'degC' // Celsius
+  | 'degF'; // Fahrenheit
+
+/**
+ * The notation for specific gravity units.
+ */
+export type GravityUnit =
+  | 'G' // Specific gravity (technically dimensionless, but we need something)
+  | 'degP'; // Plato
 
 /**
  * Required fields for an object to be stored in the datastore.
