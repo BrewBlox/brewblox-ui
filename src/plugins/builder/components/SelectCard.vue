@@ -1,4 +1,5 @@
 <script lang="ts">
+import isArray from 'lodash/isArray';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { FlowPart } from '../types';
@@ -19,7 +20,9 @@ export default defineComponent({
       default: 'Block',
     },
     opts: {
-      type: Array as PropType<SelectOption[]>,
+      type: [Array, Function] as PropType<
+        SelectOption[] | (() => SelectOption[])
+      >,
       required: true,
     },
   },
@@ -37,8 +40,17 @@ export default defineComponent({
         }),
     });
 
+    const options = computed<SelectOption[]>(() => {
+      if (isArray(props.opts)) {
+        return props.opts;
+      } else {
+        return props.opts();
+      }
+    });
+
     return {
       model,
+      options,
     };
   },
 });
@@ -47,7 +59,7 @@ export default defineComponent({
 <template>
   <SelectField
     v-model="model"
-    :options="opts"
+    :options="options"
     :title="label"
     :label="label"
     item-aligned

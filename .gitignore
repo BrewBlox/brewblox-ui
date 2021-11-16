@@ -26,6 +26,10 @@ dev/*/
 
 !dev/presets
 
+!dev/tilt_share
+dev/tilt_share/*
+!dev/tilt_share/.gitkeep
+
 !dev/traefik
 dev/traefik/brewblox.crt
 dev/traefik/brewblox.key

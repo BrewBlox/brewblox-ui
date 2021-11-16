@@ -1,13 +1,13 @@
 import { PartSpec } from '@/plugins/builder/types';
 import { universalTransitions } from '@/plugins/builder/utils';
-import { colorOpts } from '@/plugins/tilt/const';
+import { useTiltStore } from '@/plugins/tilt/store';
 
 import { SCALE_KEY } from '../const';
 
 export const SIZE_X = 2;
 export const SIZE_Y = 1;
 export const FLOW_TOGGLE_KEY = 'flowEnabled';
-export const TILT_COLOR_KEY = 'tiltColor';
+export const TILT_ID_KEY = 'tiltId';
 
 const size: PartSpec['size'] = ({ settings }) => {
   const scale = settings[SCALE_KEY] ?? 1;
@@ -22,8 +22,9 @@ const spec: PartSpec = {
       component: 'SelectCard',
       props: {
         label: 'Tilt',
-        settingsKey: TILT_COLOR_KEY,
-        opts: colorOpts,
+        settingsKey: TILT_ID_KEY,
+        opts: (): SelectOption<string>[] =>
+          useTiltStore().values.map((v) => ({ label: v.name, value: v.id })),
         clearable: true,
       },
     },

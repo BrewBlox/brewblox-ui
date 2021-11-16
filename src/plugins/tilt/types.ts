@@ -7,36 +7,40 @@ export type TiltService = Service<Record<string, never>>;
 export interface TiltStateEvent {
   key: string; // Service ID
   type: 'Tilt.state';
-  colour: string;
   timestamp: number; // ms date
+  color: string;
+  mac: string;
+  name: string;
   data: {
-    'Temperature[degF]': number;
-    'Temperature[degC]': number;
-    'Specific gravity': number;
-    'Signal strength[dBm]': number;
-    'Plato[degP]': number;
+    'temperature[degF]': number;
+    'temperature[degC]': number;
+    specificGravity: number;
+    'rssi[dBm]': number;
+    'plato[degP]': number;
 
     // Present if calibration values are provided
-    'Calibrated temperature[degF]'?: number;
-    'Calibrated temperature[degC]'?: number;
-    'Calibrated specific gravity'?: number;
-    'Calibrated plato[degP]'?: number;
+    'uncalibratedTemperature[degF]'?: number;
+    'uncalibratedTemperature[degC]'?: number;
+    uncalibratedSpecificGravity?: number;
+    'uncalibratedPlato[degP]'?: number;
   };
 }
 
 export interface TiltStateValue {
   id: string;
   serviceId: string;
-  color: string;
   timestamp: Date;
+  color: string;
+  mac: string;
+  name: string;
   data: {
     temperature: Quantity;
     specificGravity: number;
-    signalStrength: Quantity;
+    rssi: Quantity;
     plato: Quantity;
-    calibratedTemperature: Quantity;
-    calibratedSpecificGravity: number | null;
-    calibratedPlato: Quantity;
+    uncalibratedTemperature: Quantity;
+    uncalibratedSpecificGravity: number | null;
+    uncalibratedPlato: Quantity;
   };
 }
 
@@ -45,4 +49,6 @@ export type TiltFieldIndex = {
 } & {
   timestamp: boolean;
   color: boolean;
+  mac: boolean;
+  name: boolean;
 };

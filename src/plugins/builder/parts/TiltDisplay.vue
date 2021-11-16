@@ -16,7 +16,7 @@ import { fixedNumber, prettyQty, prettyUnit } from '@/utils/formatting';
 import { bloxQty, tempQty } from '@/utils/quantity';
 
 import { usePart } from '../composables';
-import { SIZE_X, SIZE_Y, TILT_COLOR_KEY } from '../specs/TiltDisplay';
+import { SIZE_X, SIZE_Y, TILT_ID_KEY } from '../specs/TiltDisplay';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -32,40 +32,25 @@ export default defineComponent({
     const tiltStore = useTiltStore();
     const systemStore = useSystemStore();
 
-    const tiltColor = computed<string | null>(
-      () => props.part.settings[TILT_COLOR_KEY] ?? null,
+    const tiltId = computed<string | null>(
+      () => props.part.settings[TILT_ID_KEY] ?? null,
     );
 
     const tiltState = computed<TiltStateValue | null>(
-      () => tiltStore.values.find((v) => v.color === tiltColor.value) ?? null,
+      () => tiltStore.values.find((v) => v.id === tiltId.value) ?? null,
     );
 
-    const temperature = computed<Quantity>(() => {
-      if (tiltState.value == null) {
-        return tempQty(null);
-      }
-      const { temperature, calibratedTemperature } = tiltState.value.data;
-      return calibratedTemperature.value != null
-        ? calibratedTemperature
-        : temperature;
-    });
+    const temperature = computed<Quantity>(
+      () => tiltState.value?.data.temperature ?? tempQty(null),
+    );
 
-    const sg = computed<number | null>(() => {
-      if (tiltState.value == null) {
-        return null;
-      }
-      const { specificGravity, calibratedSpecificGravity } =
-        tiltState.value.data;
-      return calibratedSpecificGravity ?? specificGravity;
-    });
+    const sg = computed<number | null>(
+      () => tiltState.value?.data.specificGravity ?? null,
+    );
 
-    const plato = computed<Quantity>(() => {
-      if (tiltState.value == null) {
-        return bloxQty(null, 'degP');
-      }
-      const { plato, calibratedPlato } = tiltState.value.data;
-      return calibratedPlato.value != null ? calibratedPlato : plato;
-    });
+    const plato = computed<Quantity>(
+      () => tiltState.value?.data.plato ?? bloxQty(null, 'degP'),
+    );
 
     const gravityUnit = computed<GravityUnit>(() => systemStore.units.gravity);
 

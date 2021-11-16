@@ -33,8 +33,8 @@ const plugin: Plugin = {
 
     app.use(TiltWidget);
 
-    eventbus.subscribe(`${STATE_TOPIC}/+/+`); // id/colour
-    eventbus.addListener(`${STATE_TOPIC}/+/+`, (_, data) => {
+    eventbus.subscribe(`${STATE_TOPIC}/+/+/+`); // service/color/mac
+    eventbus.addListener(`${STATE_TOPIC}/+/+/+`, (_, data) => {
       if (isTiltState(data)) {
         serviceStore.ensureStub({ id: data.key, type: 'Tilt' });
         tiltStore.parseStateEvent(data);
