@@ -81,7 +81,7 @@ export default defineComponent({
       <div v-for="value in values" :key="value.id" style="max-width: 500px">
         <Card>
           <template #toolbar>
-            <Toolbar :title="value.color" subtitle="Tilt" />
+            <Toolbar :title="value.name" subtitle="Tilt" />
           </template>
           <TiltValues :state="value" class="widget-body" />
         </Card>

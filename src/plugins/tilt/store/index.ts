@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 
+import { eventbus } from '@/eventbus';
 import { useSystemStore } from '@/store/system';
-import { concatById } from '@/utils/collections';
+import { concatById, findById } from '@/utils/collections';
 import { bloxQty } from '@/utils/quantity';
 
 import type { TiltStateEvent, TiltStateValue } from '../types';
+import { makeTiltId, splitTiltId } from '../utils';
 
 interface TiltStoreState {
   values: TiltStateValue[];
@@ -19,30 +21,44 @@ export const useTiltStore = defineStore('tiltStore', {
       this.values = concatById(this.values, value);
     },
 
+    saveDeviceName(id: string, name: string): void {
+      const [serviceId, mac] = splitTiltId(id);
+      eventbus.publish(`brewcast/tilt/${serviceId}/names`, {
+        [mac]: name,
+      });
+      const state = findById(this.values, id);
+      if (state) {
+        this.setValue({ ...state, name });
+      }
+    },
+
     async parseStateEvent(evt: TiltStateEvent): Promise<void> {
       const systemStore = useSystemStore();
       const tempUnit = systemStore.units.temperature;
-      const temp = evt.data[`Temperature[${tempUnit}]`];
-      const sg = evt.data['Specific gravity'];
-      const signalStrength = evt.data['Signal strength[dBm]'];
-      const plato = evt.data['Plato[degP]'];
-      const calTemp = evt.data[`Calibrated temperature[${tempUnit}]`] ?? null;
-      const calSg = evt.data['Calibrated specific gravity'] ?? null;
-      const calPlato = evt.data['Calibrated plato[degP]'] ?? null;
+      const temp = evt.data[`temperature[${tempUnit}]`];
+      const sg = evt.data['specificGravity'];
+      const rssi = evt.data['rssi[dBm]'];
+      const plato = evt.data['plato[degP]'];
+      const uncalTemp =
+        evt.data[`uncalibratedTemperature[${tempUnit}]`] ?? null;
+      const uncalSG = evt.data['uncalibratedSpecificGravity'] ?? null;
+      const uncalPlato = evt.data['uncalibratedPlato[degP]'] ?? null;
 
       this.setValue({
-        id: `${evt.key}__${evt.colour}`,
+        id: makeTiltId(evt.key, evt.mac),
         serviceId: evt.key,
-        color: evt.colour,
         timestamp: new Date(evt.timestamp),
+        color: evt.color,
+        mac: evt.mac,
+        name: evt.name,
         data: {
           temperature: bloxQty(temp, tempUnit),
           specificGravity: sg,
-          signalStrength: bloxQty(signalStrength, 'dBm'),
+          rssi: bloxQty(rssi, 'dBm'),
           plato: bloxQty(plato, 'degP'),
-          calibratedTemperature: bloxQty(calTemp, tempUnit),
-          calibratedSpecificGravity: calSg,
-          calibratedPlato: bloxQty(calPlato, 'degP'),
+          uncalibratedTemperature: bloxQty(uncalTemp, tempUnit),
+          uncalibratedSpecificGravity: uncalSG,
+          uncalibratedPlato: bloxQty(uncalPlato, 'degP'),
         },
       });
     },

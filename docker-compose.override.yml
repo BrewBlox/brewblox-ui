@@ -80,3 +80,6 @@ services:
   #       source: ../brewblox-tilt
   #       target: /app
   #       read_only: true
+  #     - type: bind
+  #       source: ./dev/tilt_share
+  #       target: /share
