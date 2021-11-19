@@ -63,8 +63,14 @@ services:
     image: brewblox/brewblox-tilt:develop
     labels:
       - traefik.enable=false
+    volumes:
+      - type: bind
+        source: ./dev/tilt_share
+        target: /share
     restart: unless-stopped
-    command: --simulate=Pink --mqtt-host=eventbus --mqtt-protocol=mqtt
+    network_mode: host
+    privileged: true
+    command: --mqtt-port=9001 --simulate=Pink
 
   traefik:
     image: traefik:2.2
