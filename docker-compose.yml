@@ -7,7 +7,7 @@ services:
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
   victoria:
-    image: victoriametrics/victoria-metrics:v1.63.0
+    image: victoriametrics/victoria-metrics:v1.69.0
     labels:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
     volumes:
@@ -20,7 +20,7 @@ services:
       --http.pathPrefix=/victoria
 
   redis:
-    image: redis:6.0
+    image: redis:6.2
     labels:
       - traefik.enable=false
     volumes:
