@@ -20,7 +20,7 @@ services:
       --http.pathPrefix=/victoria
 
   redis:
-    image: redis:6.2
+    image: redis:6.0
     labels:
       - traefik.enable=false
     volumes:
