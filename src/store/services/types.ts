@@ -21,6 +21,11 @@ export interface Service<ConfigT = any> extends StoreObject {
   order: number;
 
   /**
+   * Whether the service is shown in the sidebar. Defaults to true.
+   */
+  listed?: boolean;
+
+  /**
    * Foreign key to `ServiceFeature.id`
    */
   type: string;
@@ -31,7 +36,6 @@ export interface Service<ConfigT = any> extends StoreObject {
    */
   config: ConfigT;
 }
-
 
 /**
  * Pending / not yet configured service.
@@ -51,7 +55,6 @@ export interface ServiceStub {
    */
   type: string;
 }
-
 
 /**
  * Volatile status info for services.

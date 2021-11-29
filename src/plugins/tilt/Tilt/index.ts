@@ -21,7 +21,7 @@ const plugin: Plugin = {
       },
       generateConfig: () => ({
         serviceId: null,
-        color: null,
+        mac: null,
         hidden: {},
       }),
     };

@@ -26,6 +26,7 @@ const defaultConfig = (): StoreObjectImpl<SystemConfig> => ({
 const defaultUnits = (): StoreObjectImpl<UserUnits> => ({
   id: UNITS_ID,
   temperature: 'degC',
+  gravity: 'G',
 });
 
 const defaultTimeZone = (): StoreObjectImpl<UserTimeZone> => ({

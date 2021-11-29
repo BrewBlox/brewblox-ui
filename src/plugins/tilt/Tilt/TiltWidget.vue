@@ -3,36 +3,44 @@ import { debounce } from 'quasar';
 import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
-import { useServiceStore } from '@/store/services';
+import { findById } from '@/utils/collections';
 
-import { colorOpts, fieldLabels } from '../const';
+import { fieldLabels } from '../const';
 import { useTiltStore } from '../store';
 import { TiltStateValue } from '../types';
+import { makeTiltId, splitTiltId } from '../utils';
 import { TiltWidget } from './types';
 
 export default defineComponent({
   name: 'TiltWidget',
   setup() {
     const tiltStore = useTiltStore();
-    const serviceStore = useServiceStore();
     const { context } = useContext.setup();
-    const { widget, config, saveConfig } = useWidget.setup<TiltWidget>();
+    const { config, saveConfig } = useWidget.setup<TiltWidget>();
 
     const debouncedSaveConfig = debounce(saveConfig, 100, false);
 
-    const serviceOpts = computed<SelectOption<string>[]>(() =>
-      serviceStore.services
-        .filter((v) => v.type === 'Tilt')
-        .map((v) => ({ label: v.title, value: v.id })),
+    const tiltOpts = computed<SelectOption<string>[]>(() =>
+      tiltStore.values.map((v) => ({ label: v.name, value: v.id })),
     );
 
-    const value = computed<TiltStateValue | null>(
-      () =>
-        tiltStore.values.find(
-          (v) =>
-            v.serviceId === config.value.serviceId &&
-            v.color === config.value.color,
-        ) ?? null,
+    const tiltId = computed<string | null>({
+      get: () => {
+        const { serviceId, mac } = config.value;
+        return serviceId && mac ? makeTiltId(serviceId, mac) : null;
+      },
+      set: (id) => {
+        if (id) {
+          const [serviceId, mac] = splitTiltId(id);
+          saveConfig({ ...config.value, serviceId, mac });
+        } else {
+          saveConfig({ ...config.value, serviceId: null, mac: null });
+        }
+      },
+    });
+
+    const value = computed<TiltStateValue | null>(() =>
+      findById(tiltStore.values, tiltId.value),
     );
 
     function setShown(key: string, value: boolean): void {
@@ -41,13 +49,11 @@ export default defineComponent({
     }
 
     return {
-      colorOpts,
+      tiltOpts,
+      tiltId,
       fieldLabels,
       context,
-      widget,
       config,
-      saveConfig,
-      serviceOpts,
       value,
       setShown,
     };
@@ -63,7 +69,7 @@ export default defineComponent({
 
     <div v-if="context.mode === 'Basic'" class="widget-body">
       <TiltValues v-if="value" :state="value" :hidden="config.hidden" />
-      <CardWarning v-else-if="config.serviceId && config.color">
+      <CardWarning v-else-if="config.serviceId && config.mac">
         <template #message>
           Tilt not found
         </template>
@@ -76,28 +82,7 @@ export default defineComponent({
     </div>
 
     <div v-if="context.mode === 'Full'" class="widget-body column q-mt-none">
-      <SelectField
-        label="Service"
-        :options="serviceOpts"
-        :model-value="config.serviceId"
-        @update:model-value="
-          (v) => {
-            config.serviceId = v;
-            saveConfig();
-          }
-        "
-      />
-      <SelectField
-        label="Color"
-        :options="colorOpts"
-        :model-value="config.color"
-        @update:model-value="
-          (v) => {
-            config.color = v;
-            saveConfig();
-          }
-        "
-      />
+      <SelectField v-model="tiltId" label="Tilt" :options="tiltOpts" />
       <ActionSubmenu label="Shown values">
         <ToggleAction
           v-for="(label, key) in fieldLabels"

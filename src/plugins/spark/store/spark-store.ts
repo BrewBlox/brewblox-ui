@@ -82,7 +82,7 @@ export const useSparkStore = defineStore('sparkStore', {
     },
 
     blocksByService(serviceId: Maybe<string>): Block[] {
-      if (!serviceId) {
+      if (!this.has(serviceId)) {
         return [];
       }
       return this.blocks[serviceId];
@@ -92,7 +92,7 @@ export const useSparkStore = defineStore('sparkStore', {
       serviceId: Maybe<string>,
       type: T['type'],
     ): T[] {
-      if (!serviceId) {
+      if (!this.has(serviceId)) {
         return [];
       }
       return this.blocks[serviceId].filter(makeTypeFilter<T>(type));
@@ -102,7 +102,7 @@ export const useSparkStore = defineStore('sparkStore', {
       serviceId: Maybe<string>,
       blockId: Maybe<string>,
     ): T | null {
-      if (!serviceId || !blockId) {
+      if (!this.has(serviceId) || !blockId) {
         return null;
       }
       return (
@@ -113,7 +113,7 @@ export const useSparkStore = defineStore('sparkStore', {
 
     blockByAddress<T extends Block>(addr: T | Maybe<BlockAddress>): T | null {
       const serviceId = addr?.serviceId;
-      if (!serviceId) {
+      if (!this.has(serviceId)) {
         return null;
       }
       return (
@@ -127,7 +127,7 @@ export const useSparkStore = defineStore('sparkStore', {
       link: Maybe<Link>,
     ): T | null {
       const blockId = link?.id;
-      if (!serviceId || !blockId) {
+      if (!this.has(serviceId) || !blockId) {
         return null;
       }
       return (
@@ -138,7 +138,7 @@ export const useSparkStore = defineStore('sparkStore', {
 
     fieldByAddress(addr: Maybe<BlockFieldAddress>): any {
       const serviceId = addr?.serviceId;
-      if (!serviceId) {
+      if (!this.has(serviceId)) {
         return null;
       }
       return (
@@ -194,7 +194,7 @@ export const useSparkStore = defineStore('sparkStore', {
     },
 
     removeVolatileBlock({ serviceId, id }: BlockAddress): void {
-      if (!serviceId || !id) {
+      if (!this.has(serviceId) || !id) {
         return;
       }
       this.volatileBlocks[serviceId] = filterById(
@@ -234,6 +234,10 @@ export const useSparkStore = defineStore('sparkStore', {
       currentId: string,
       newId: string,
     ): Promise<void> {
+      if (!this.has(serviceId)) {
+        throw new Error(`Unknown service: '${serviceId}'`);
+      }
+
       if (findBlockById(this.blocks[serviceId], newId)) {
         throw new Error(`Block ${newId} already exists`);
       }

@@ -10,7 +10,6 @@ import type {
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { WizardOutput } from '@/plugins/wizardry/types';
 import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
@@ -122,7 +121,7 @@ export default defineComponent({
       createBlockWizard(
         serviceId.value,
         props.compatible ?? props.modelValue.type,
-      ).onOk(({ block }: WizardOutput) => {
+      ).onOk(({ block }) => {
         if (block) {
           local.value = asAddr(block);
         }

@@ -4,7 +4,7 @@ import { TiltFieldIndex } from '../types';
 
 export interface TiltWidgetConfig {
   serviceId: string | null;
-  color: string | null;
+  mac: string | null;
   hidden: Partial<TiltFieldIndex>;
 }
 

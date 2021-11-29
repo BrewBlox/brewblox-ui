@@ -7,7 +7,7 @@ export interface BlockChange<BlockT extends Block = Block> {
   serviceId: string;
   blockId: string;
   data: Partial<BlockT['data']>;
-  confirmed: { [k in keyof BlockT['data']]?: boolean; };
+  confirmed: { [k in keyof BlockT['data']]?: boolean };
 }
 
 export interface ChangeAction {
@@ -20,6 +20,7 @@ export interface QuickActionsConfig {
   serviceId?: string; // deprecated
   steps?: ChangeAction[]; // deprecated
   actions: ChangeAction[];
+  lastActionId?: string;
   changeIdMigrated: boolean;
   serviceIdMigrated: boolean;
 }
@@ -41,7 +42,7 @@ export interface QuickActionsSpec {
   componentProps?: AnyDict;
 }
 
-export type QuickActionsWidget = Widget<QuickActionsConfig>
+export type QuickActionsWidget = Widget<QuickActionsConfig>;
 
 export interface EditableBlockField {
   id: string;

@@ -13,7 +13,6 @@ import {
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { WizardOutput } from '@/plugins/wizardry/types';
 import { createBlockDialog } from '@/utils/dialog';
 
 export default defineComponent({
@@ -151,15 +150,13 @@ export default defineComponent({
     }
 
     function createBlock(): void {
-      createBlockWizard(serviceId.value, validTypes.value).onOk(
-        ({ block }: WizardOutput) => {
-          if (block) {
-            serviceId.value = block.serviceId;
-            blockId.value = block.id;
-            fieldId.value = null;
-          }
-        },
-      );
+      createBlockWizard(serviceId.value, validTypes.value).onOk(({ block }) => {
+        if (block) {
+          serviceId.value = block.serviceId;
+          blockId.value = block.id;
+          fieldId.value = null;
+        }
+      });
     }
 
     function save(): void {

@@ -1,4 +1,4 @@
-import { TempUnit } from '@/shared-types';
+import { GravityUnit,TempUnit } from '@/shared-types';
 
 export interface SystemConfig {
   keyboardLayout: string;
@@ -10,6 +10,7 @@ export interface SystemConfig {
 
 export interface UserUnits {
   temperature: TempUnit;
+  gravity: GravityUnit;
 }
 
 export interface UserTimeZone {
