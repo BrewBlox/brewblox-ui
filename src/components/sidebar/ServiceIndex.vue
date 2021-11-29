@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
@@ -34,11 +34,13 @@ export default defineComponent({
     const featureStore = useFeatureStore();
     const router = useRouter();
     const { dense } = useGlobals.setup();
-    const dragging = ref(false);
 
     const services = computed<Service[]>({
       // avoid modifying the store object
-      get: () => [...serviceStore.services].sort(serviceSorter),
+      get: () =>
+        [...serviceStore.services]
+          .filter((service) => service.listed ?? true)
+          .sort(serviceSorter),
       set: (services) =>
         serviceStore.updateServiceOrder(services.map((v) => v.id)),
     });
@@ -62,7 +64,6 @@ export default defineComponent({
 
     return {
       dense,
-      dragging,
       services,
       suggestions,
       status,
@@ -73,13 +74,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <draggable
-    v-model="services"
-    :disabled="dense || !editing"
-    item-key="id"
-    @start="dragging = true"
-    @end="dragging = false"
-  >
+  <draggable v-model="services" :disabled="dense || !editing" item-key="id">
     <template #header>
       <q-item class="q-pb-none">
         <q-item-section>

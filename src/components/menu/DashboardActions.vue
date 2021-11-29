@@ -36,6 +36,15 @@ export default defineComponent({
       () => systemStore.config.homePage === `/dashboard/${props.dashboardId}`,
     );
 
+    const listed = computed<boolean>({
+      get: () => dashboard.value?.listed ?? true,
+      set: (v) => {
+        if (dashboard.value) {
+          dashboardStore.saveDashboard({ ...dashboard.value, listed: v });
+        }
+      },
+    });
+
     function showWizard(): void {
       createDialog({
         component: 'WizardDialog',
@@ -83,6 +92,7 @@ export default defineComponent({
       dashboard,
       title,
       isHomePage,
+      listed,
       showWizard,
       changeDashboardId,
       changeDashboardTitle,
@@ -101,6 +111,7 @@ export default defineComponent({
         icon="home"
         :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
+      <ToggleAction v-model="listed" label="Show in sidebar" />
       <ActionItem
         icon="edit"
         label="Change dashboard URL"

@@ -18,4 +18,9 @@ export interface Dashboard extends StoreObject {
    * Sorting order among other dashboards.
    */
   order: number;
+
+  /**
+   * Whether the dashboard is shown in the sidebar. Defaults to true.
+   */
+  listed?: boolean;
 }

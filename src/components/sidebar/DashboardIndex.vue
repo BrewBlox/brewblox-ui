@@ -20,11 +20,13 @@ export default defineComponent({
   setup() {
     const dashboardStore = useDashboardStore();
     const { dense } = useGlobals.setup();
-    const dragging = ref(false);
 
     const dashboards = computed<Dashboard[]>({
       // Avoid modifying the store object when calling sort()
-      get: () => [...dashboardStore.dashboards].sort(dashboardSorter),
+      get: () =>
+        [...dashboardStore.dashboards]
+          .filter((dashboard) => dashboard.listed ?? true)
+          .sort(dashboardSorter),
       set: (dashboards) =>
         dashboardStore.updateDashboardOrder(dashboards.map((v) => v.id)),
     });
@@ -40,7 +42,6 @@ export default defineComponent({
 
     return {
       dense,
-      dragging,
       dashboards,
       startWizard,
     };
@@ -74,13 +75,7 @@ export default defineComponent({
       </q-item-section>
     </q-item>
 
-    <draggable
-      v-model="dashboards"
-      :disabled="dense || !editing"
-      item-key="id"
-      @start="dragging = true"
-      @end="dragging = false"
-    >
+    <draggable v-model="dashboards" :disabled="dense || !editing" item-key="id">
       <template #item="{ element }">
         <q-item
           :to="editing ? undefined : `/dashboard/${element.id}`"

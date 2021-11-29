@@ -37,6 +37,15 @@ export default defineComponent({
       },
     });
 
+    const listed = computed<boolean>({
+      get: () => service.value?.listed ?? true,
+      set: (v) => {
+        if (service.value) {
+          serviceStore.saveService({ ...service.value, listed: v });
+        }
+      },
+    });
+
     function removeService(service: Maybe<Service>): void {
       startRemoveService(service, router);
     }
@@ -47,18 +56,20 @@ export default defineComponent({
       service,
       serviceTitle,
       isHomePage,
+      listed,
     };
   },
 });
 </script>
 
 <template>
-  <ActionSubmenu :label="serviceTitle">
+  <ActionSubmenu>
     <ToggleAction
       v-model="isHomePage"
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
+    <ToggleAction v-model="listed" label="Show in sidebar" />
     <ActionItem
       icon="edit"
       label="Rename service"
