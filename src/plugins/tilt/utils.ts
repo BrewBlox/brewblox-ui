@@ -1,4 +1,9 @@
-import { TiltStateEvent } from '@/plugins/tilt/types';
+import { TiltServiceStateEvent, TiltStateEvent } from '@/plugins/tilt/types';
+
+export const isTiltServiceState = (
+  data: unknown,
+): data is TiltServiceStateEvent =>
+  (data as TiltServiceStateEvent).type === 'Tilt.state.service';
 
 export const isTiltState = (data: unknown): data is TiltStateEvent =>
   (data as TiltStateEvent).type === 'Tilt.state';

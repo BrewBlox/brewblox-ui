@@ -77,15 +77,17 @@ export default defineComponent({
         </template>
       </ActionMenu>
     </ButtonsTeleport>
-    <div class="q-pa-lg q-gutter-md row">
-      <div v-for="value in values" :key="value.id" style="max-width: 500px">
-        <Card>
-          <template #toolbar>
-            <Toolbar :title="value.name" subtitle="Tilt" />
-          </template>
-          <TiltValues :state="value" class="widget-body" />
-        </Card>
+    <q-scroll-area class="fit">
+      <div class="q-pa-lg q-gutter-md row">
+        <div v-for="value in values" :key="value.id" style="max-width: 500px">
+          <Card>
+            <template #toolbar>
+              <Toolbar :title="value.name" subtitle="Tilt" />
+            </template>
+            <TiltValues :state="value" class="widget-body" />
+          </Card>
+        </div>
       </div>
-    </div>
+    </q-scroll-area>
   </q-page>
 </template>
