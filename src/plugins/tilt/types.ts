@@ -4,6 +4,12 @@ import { Quantity } from '../spark/types';
 
 export type TiltService = Service<Record<string, never>>;
 
+export interface TiltServiceStateEvent {
+  key: string; // Service ID
+  type: 'Tilt.state.service';
+  timestamp: number; // ms date
+}
+
 export interface TiltStateEvent {
   key: string; // Service ID
   type: 'Tilt.state';
