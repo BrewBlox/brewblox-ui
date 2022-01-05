@@ -60,7 +60,11 @@ export default defineComponent({
     );
 
     function saveActions(values: ChangeAction[] = actions.value): void {
-      config.value.actions = values;
+      config.value.actions = values.map(({ id, name, changes }) => ({
+        id,
+        name,
+        changes,
+      }));
       saveConfig();
     }
 
