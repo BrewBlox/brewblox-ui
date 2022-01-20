@@ -3,6 +3,7 @@ import last from 'lodash/last';
 import parseDuration from 'parse-duration';
 
 import { DEFAULT_PRECISION, MAX_POINTS } from '@/plugins/history/const';
+import { defaultLabel } from '@/plugins/history/nodes';
 import { useHistoryStore } from '@/plugins/history/store';
 import {
   DisplayNames,
@@ -41,7 +42,7 @@ function fieldLabel(
   key: string,
   value: number | undefined,
 ): string {
-  const label = source.renames[key] || key;
+  const label = source.renames[key] || defaultLabel(key);
   const precision = source.precision[key] ?? DEFAULT_PRECISION;
   const prop = source.axes[key] === 'y2' ? 'style="color: #aef"' : '';
   return `<span ${prop}>${label}</span><br>${fixedNumber(value, precision)}`;

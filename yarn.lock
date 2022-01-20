@@ -1937,10 +1937,10 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.177.tgz#f70c0d19c30fab101cad46b52be60363c43c4578"
   integrity sha512-0fDwydE2clKe9MNfvXHBHF9WEahRuj+msTuQqOmAApNORFvhMYZKNGGJdCzuhheVjMps/ti0Ak/iJPACMaevvw==
 
-"@types/marked@^3.0.1":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@types/marked/-/marked-3.0.3.tgz#37878f405d5f0cff0e6128cea330bd0aa8df8cb3"
-  integrity sha512-ZgAr847Wl68W+B0sWH7F4fDPxTzerLnRuUXjUpp1n4NjGSs8hgPAjAp7NQIXblG34MXTrf5wWkAK8PVJ2LIlVg==
+"@types/marked@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/marked/-/marked-4.0.1.tgz#d588a7bbc4d6551c5e75249bc106ffda96ae33c5"
+  integrity sha512-ZigEmCWdNUU7IjZEuQ/iaimYdDHWHfTe3kg8ORfKjyGYd9RWumPoOJRQXB0bO+XLkNwzCthW3wUIQtANaEZ1ag==
 
 "@types/mime@^1":
   version "1.3.2"
@@ -2254,10 +2254,10 @@
   resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.0-beta.20.1.tgz#5b499647e929c35baf2a66a399578f9aa4601142"
   integrity sha512-R2rfiRY+kZugzWh9ZyITaovx+jpU4vgivAEAiz80kvh3yviiTU3CBuGuyWpSwGz9/C7TkSWVM/FtQRGlZ16n8Q==
 
-"@vue/devtools@^6.0.0-beta.15":
-  version "6.0.0-beta.20"
-  resolved "https://registry.yarnpkg.com/@vue/devtools/-/devtools-6.0.0-beta.20.tgz#dbb474923bad05f8bc9519088060f71bd2df27f5"
-  integrity sha512-mC+55Kc0u/0pjBOSvguKkz2PIZK2T9zvBTPCtPwZF8VvhqnFdSO+U47UqhofPcbSsJNsQ9qjwoSBVX6sZjl5vw==
+"@vue/devtools@^6.0.0-beta.21":
+  version "6.0.0-beta.21"
+  resolved "https://registry.yarnpkg.com/@vue/devtools/-/devtools-6.0.0-beta.21.tgz#cc524bd75f19c6551eb0bc62555ebedb83d87a5e"
+  integrity sha512-QVN+iLW6bLoeul4KSRftwgjWBQ/5Q6+gmSuPRNAzZZouUlck+8ebIkOHpkFiH3Gqea6msI8C2jNxZRufHibvRQ==
   dependencies:
     cross-spawn "^7.0.3"
     electron "^12.0.6"

@@ -1,6 +1,6 @@
 <script lang="ts">
 import DOMPurify from 'dompurify';
-import marked from 'marked';
+import { marked } from 'marked';
 import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
@@ -115,7 +115,7 @@ export default defineComponent({
       )}`;
       const lines: string[] = [name, ...sessionLines()];
       saveFile(
-        DOMPurify.sanitize(marked(lines.join('\n'))),
+        DOMPurify.sanitize(marked.parse(lines.join('\n'))),
         `${name}.html`,
         true,
       );
