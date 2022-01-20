@@ -33,7 +33,7 @@ export default defineComponent({
     }
 
     function renamed(node: QuasarNode): string {
-      return props.config.renames[node.value] || node.label;
+      return props.config.renames[node.value] || node.title;
     }
 
     function freshDuration(node: QuasarNode): string {

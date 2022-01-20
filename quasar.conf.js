@@ -43,6 +43,7 @@ module.exports = configure(function (ctx) {
         'Dialog',
         'LocalStorage',
         'SessionStorage',
+        'Meta',
       ],
 
       config: {

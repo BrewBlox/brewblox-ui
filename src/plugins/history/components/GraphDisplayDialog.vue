@@ -20,17 +20,10 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogProps, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
 
     const local = reactive(deepCopy(props.config));
     const axisOpts: SelectOption<GraphAxis>[] = [
@@ -44,24 +37,32 @@ export default defineComponent({
       },
     ];
 
-    const rename = computed<string>({
-      get: () => local.renames[props.field] ?? defaultLabel(props.field),
-      set: v => local.renames[props.field] = v ?? defaultLabel(props.field),
+    const label = computed<string>(() => defaultLabel(props.field));
+
+    const rename = computed<string | null>({
+      get: () => local.renames[props.field] ?? label.value,
+      set: (v) => {
+        if (v) {
+          local.renames[props.field] = v;
+        } else {
+          delete local.renames[props.field];
+        }
+      },
     });
 
     const axis = computed<GraphAxis>({
       get: () => local.axes[props.field] || 'y',
-      set: v => local.axes[props.field] = v,
+      set: (v) => (local.axes[props.field] = v),
     });
 
     const color = computed<string>({
       get: () => local.colors[props.field] || '',
-      set: v => local.colors[props.field] = v,
+      set: (v) => (local.colors[props.field] = v),
     });
 
     const precision = computed<number>({
       get: () => local.precision[props.field] ?? 2,
-      set: v => local.precision[props.field] = v,
+      set: (v) => (local.precision[props.field] = v),
     });
 
     function save(): void {
@@ -69,6 +70,7 @@ export default defineComponent({
     }
 
     return {
+      defaultLabel,
       dialogRef,
       dialogProps,
       onDialogHide,
@@ -84,7 +86,6 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <q-dialog
     ref="dialogRef"
@@ -92,17 +93,13 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <div class="column q-gutter-xs">
-        <InputField
-          v-model="rename"
-          title="Label"
-          label="Label"
-        />
+        <InputField v-model="rename" title="Label" label="Label" />
         <InputField
           v-model="precision"
           :decimals="0"
-          :rules="[v => v >= 0 || 'Must be 0 or more']"
+          :rules="[(v) => v >= 0 || 'Must be 0 or more']"
           type="number"
           title="Decimals in label"
           label="Decimals in label"
