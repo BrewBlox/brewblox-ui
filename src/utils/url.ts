@@ -1,4 +1,3 @@
-
 /**
  * Check if a given string looks like an absolute URL.
  * No check is done whether the full URL is syntactically correct.

@@ -1,7 +1,4 @@
-import { useRouter } from 'vue-router';
-
 import { PartSpec, PersistentPart } from '@/plugins/builder/types';
-import { isAbsoluteUrl } from '@/utils/url';
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 1;
@@ -53,14 +50,10 @@ const spec: PartSpec = {
     part.settings.sizeY || DEFAULT_SIZE_Y,
   ],
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart) => {
+  interactHandler: (part: PersistentPart, { navigate }) => {
     const { url } = part.settings;
     if (url) {
-      if (isAbsoluteUrl(url)) {
-        window.open(url, '_blank');
-      } else {
-        useRouter().push(url);
-      }
+      navigate(url);
     }
   },
 };

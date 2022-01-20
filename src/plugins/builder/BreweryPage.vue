@@ -1,10 +1,12 @@
 <script lang="ts">
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
 import { useSystemStore } from '@/store/system';
 import { concatById } from '@/utils/collections';
+import { isAbsoluteUrl } from '@/utils/url';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useBuilderStore } from './store';
@@ -24,6 +26,7 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const { localStorage } = useQuasar();
+    const router = useRouter();
 
     const pending = ref<FlowPart | null>(null);
 
@@ -54,6 +57,14 @@ export default defineComponent({
       () => layout.value?.title ?? 'Builder layout',
     );
 
+    function navigate(url: string): void {
+      if (isAbsoluteUrl(url)) {
+        window.open(url, '_blank');
+      } else {
+        router.push(url);
+      }
+    }
+
     function savePart(part: PersistentPart): void {
       parts.value = concatById(parts.value, part);
     }
@@ -71,12 +82,12 @@ export default defineComponent({
         return;
       }
       if (pending.value && pending.value.id === part.id) {
-        handler(part, { savePart });
+        handler(part, { savePart, navigate });
         pending.value = null;
       } else if (delayTouch.value) {
         pending.value = part;
       } else {
-        handler(part, { savePart });
+        handler(part, { savePart, navigate });
       }
     }
 
