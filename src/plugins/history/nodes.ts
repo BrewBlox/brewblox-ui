@@ -57,7 +57,7 @@ function nodeRecurser(
   return {
     value,
     label: key,
-    title: key,
+    title: '',
     children: Object.entries(val).map(([k, v]) =>
       nodeRecurser([...parent, key], k, v, partial),
     ),
