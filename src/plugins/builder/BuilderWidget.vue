@@ -9,6 +9,7 @@ import { Widget } from '@/store/widgets';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
+import { isAbsoluteUrl } from '@/utils/url';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH } from './const';
@@ -56,6 +57,14 @@ export default defineComponent({
         wheelEnabled: zoomEnabled,
       },
     );
+
+    function navigate(url: string): void {
+      if (isAbsoluteUrl(url)) {
+        window.open(url, '_blank');
+      } else {
+        router.push(url);
+      }
+    }
 
     function startSelectLayout(): void {
       createDialog({
@@ -106,12 +115,12 @@ export default defineComponent({
         return;
       }
       if (pending.value && pending.value.id === part.id) {
-        handler(part, { savePart });
+        handler(part, { savePart, navigate });
         pending.value = null;
       } else if (delayTouch.value) {
         pending.value = part;
       } else {
-        handler(part, { savePart });
+        handler(part, { savePart, navigate });
       }
     }
 

@@ -49,6 +49,7 @@ export interface FlowPart extends StatePart {
 
 export interface PartApi {
   savePart: (part: PersistentPart) => unknown;
+  navigate: (url: string) => void;
 }
 
 export interface CardSpec {
@@ -103,7 +104,7 @@ export type BuilderToolName =
   | 'interact'
   | 'delete'
   | 'undo'
-  | 'redo'
+  | 'redo';
 
 export interface BuilderTool {
   value: BuilderToolName;
