@@ -1,6 +1,6 @@
 <script lang="ts">
 import DOMPurify from 'dompurify';
-import marked from 'marked';
+import { marked } from 'marked';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
@@ -12,8 +12,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const rendered = computed<string>(
-      () => DOMPurify.sanitize(marked(props.text)),
+    const rendered = computed<string>(() =>
+      DOMPurify.sanitize(marked.parse(props.text)),
     );
     return {
       rendered,

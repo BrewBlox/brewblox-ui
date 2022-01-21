@@ -9,7 +9,7 @@ import { autoRegister } from '@/utils/component-ref';
 import { useTiltStore } from './store';
 import TiltWidget from './Tilt';
 import { TiltService } from './types';
-import { isTiltState } from './utils';
+import { isTiltServiceState, isTiltState } from './utils';
 
 const plugin: Plugin = {
   install(app) {
@@ -33,10 +33,16 @@ const plugin: Plugin = {
 
     app.use(TiltWidget);
 
+    eventbus.subscribe(`${STATE_TOPIC}/+`); // service
+    eventbus.addListener(`${STATE_TOPIC}/+`, (_, data) => {
+      if (isTiltServiceState(data)) {
+        serviceStore.ensureStub({ id: data.key, type: 'Tilt' });
+      }
+    });
+
     eventbus.subscribe(`${STATE_TOPIC}/+/+/+`); // service/color/mac
     eventbus.addListener(`${STATE_TOPIC}/+/+/+`, (_, data) => {
       if (isTiltState(data)) {
-        serviceStore.ensureStub({ id: data.key, type: 'Tilt' });
         tiltStore.parseStateEvent(data);
       }
     });

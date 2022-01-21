@@ -20,7 +20,6 @@ export default defineComponent({
   },
   emits: ['update:config'],
   setup(props, { emit }) {
-
     function saveConfig(config: GraphConfig): void {
       emit('update:config', config);
     }
@@ -33,8 +32,7 @@ export default defineComponent({
           field: node.value,
           title: node.value,
         },
-      })
-        .onOk(config => saveConfig(config));
+      }).onOk((config) => saveConfig(config));
     }
 
     return {
@@ -55,13 +53,13 @@ export default defineComponent({
         @update:config="saveConfig"
       />
     </template>
-    <template #leaf="{node}">
+    <template #leaf="{ node }">
       <div @click="editLeaf(node)">
         {{ node.label }}
         <q-tooltip class="q-gutter-y-sm">
           <i>Click to edit</i>
           <LabeledField
-            :model-value="config.renames[node.value] || node.label"
+            :model-value="config.renames[node.value] || node.title"
             label="Label"
             dense
           />

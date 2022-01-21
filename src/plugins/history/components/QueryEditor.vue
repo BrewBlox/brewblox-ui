@@ -1,7 +1,6 @@
 <script lang="ts">
 import isEqual from 'lodash/isEqual';
-import set from 'lodash/set';
-import { QTree } from 'quasar';
+import { LooseDictionary, QTree } from 'quasar';
 import {
   computed,
   defineComponent,
@@ -13,7 +12,6 @@ import {
 } from 'vue';
 
 import {
-  defaultLabel,
   filteredNodes,
   nodeBuilder,
   targetBuilder,
@@ -36,7 +34,7 @@ export default defineComponent({
   emits: ['update:config'],
   setup(props, { emit }) {
     const historyStore = useHistoryStore();
-    const selectFilter = ref<string | null>(null);
+    const selectFilter = ref<string>();
     const expandedKeys = ref<string[]>([]);
     const treeRef = ref<QTree>();
 
@@ -45,7 +43,7 @@ export default defineComponent({
 
     watch(
       () => selectFilter.value,
-      (filter: string | null) => {
+      (filter: string | undefined) => {
         if (filter) {
           expandedKeys.value = filteredNodes(nodes.value, filter);
         }
@@ -124,8 +122,10 @@ export default defineComponent({
       }
     }
 
-    function nodeFilter(node: QuasarNode, filter: string): boolean {
-      return node && node.value.toLowerCase().match(filter.toLowerCase());
+    function nodeFilter(node: LooseDictionary, filter: string): boolean {
+      return (
+        node?.value?.toLowerCase().match(filter.toLowerCase()) !== undefined
+      );
     }
 
     const fieldsDuration = computed<Quantity>({
@@ -151,19 +151,11 @@ export default defineComponent({
 
     const ticked = computed<string[]>({
       get: () => targetSplitter(props.config.targets),
-      set: (vals) => {
-        const targets = targetBuilder(vals, fields.value);
-        const renames = vals
-          .filter((key) => props.config.renames[key] === undefined)
-          .reduce((acc, key) => set(acc, key, defaultLabel(key)), {
-            ...props.config.renames,
-          });
+      set: (vals) =>
         saveConfig({
           ...props.config,
-          targets,
-          renames,
-        });
-      },
+          targets: targetBuilder(vals, fields.value),
+        }),
     });
 
     return {
@@ -174,7 +166,6 @@ export default defineComponent({
       expand,
       collapse,
       saveConfig,
-      nodeHandler,
       nodeFilter,
       fieldsDuration,
       fields,

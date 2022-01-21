@@ -22,6 +22,7 @@ import { clampRotation } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { loadFile } from '@/utils/import-export';
 import { deepCopy } from '@/utils/objects';
+import { isAbsoluteUrl } from '@/utils/url';
 
 import {
   normalizeSelectArea,
@@ -99,6 +100,14 @@ export default defineComponent({
 
     const focusRef = ref<HTMLElement>();
     const hasFocus = ref<boolean>(true);
+
+    function navigate(url: string): void {
+      if (isAbsoluteUrl(url)) {
+        window.open(url, '_blank');
+      } else {
+        router.push(url);
+      }
+    }
 
     function checkFocus(): void {
       nextTick(() => {
@@ -510,7 +519,9 @@ export default defineComponent({
       } else {
         const part = findHoveredPart();
         if (part) {
-          builderStore.spec(part).interactHandler?.(part, { savePart });
+          builderStore
+            .spec(part)
+            .interactHandler?.(part, { savePart, navigate });
         }
       }
     }

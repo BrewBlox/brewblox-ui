@@ -60,8 +60,9 @@ interface HasType {
 type Patch<T> = HasId & Partial<T>;
 
 interface QuasarNode {
-  label: string;
   value: any;
+  label: string;
+  title: string;
   children?: QuasarNode[];
 
   icon?: string;

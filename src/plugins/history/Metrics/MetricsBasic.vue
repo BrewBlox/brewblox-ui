@@ -10,6 +10,7 @@ import {
 } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
+import { defaultLabel } from '@/plugins/history/nodes';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { useHistoryStore } from '@/plugins/history/store';
 import { MetricsSource, MetricValue } from '@/plugins/history/types';
@@ -65,7 +66,8 @@ export default defineComponent({
       return (
         source.value?.values.map((result) => ({
           ...result,
-          name: config.value.renames[result.field] || result.field,
+          name:
+            config.value.renames[result.field] || defaultLabel(result.field),
           stale:
             !!result.time &&
             ((now - result.time) as number) > fieldFreshDuration(result.field),

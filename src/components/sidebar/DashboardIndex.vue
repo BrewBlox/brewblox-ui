@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 
 import { useGlobals } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
