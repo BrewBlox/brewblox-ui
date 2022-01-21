@@ -22,8 +22,11 @@ export function deepCopy<T>(obj: T): T {
  * @returns Whether `left` and `right` are equal in their serialized form.
  */
 export function isJsonEqual(left: unknown, right: unknown): boolean {
-  return (left != null && right != null)
-    ? isEqual(JSON.parse(JSON.stringify(left)), JSON.parse(JSON.stringify(right)))
+  return left != null && right != null
+    ? isEqual(
+        JSON.parse(JSON.stringify(left)),
+        JSON.parse(JSON.stringify(right)),
+      )
     : (left == null) === (right == null);
 }
 
@@ -55,6 +58,9 @@ export function isJsonEqual(left: unknown, right: unknown): boolean {
  * @param type
  * @param obj
  */
-export function matchesType<T extends HasType>(type: T['type'], obj: HasType): obj is T {
-  return obj.type === type;
+export function matchesType<T extends HasType>(
+  type: T['type'],
+  obj: Maybe<HasType>,
+): obj is T {
+  return obj?.type === type;
 }
