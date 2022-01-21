@@ -9,9 +9,11 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { isBlockDriven, prettyBlock } from '@/plugins/spark/utils';
+import { ActuatorOffsetBlock, BlockType } from '@/shared-types';
 import { createBlockDialog } from '@/utils/dialog';
 import { fixedNumber, prettyQty } from '@/utils/formatting';
-import { tempQty } from '@/utils/quantity';
+import { matchesType } from '@/utils/objects';
+import { bloxQty, tempQty } from '@/utils/quantity';
 
 import { useSparkStore } from '../../store';
 
@@ -48,6 +50,13 @@ export default defineComponent({
       sparkStore.blockByLink(serviceId, block.value.data.outputId),
     );
 
+    const offsetOutput = computed<boolean>(() =>
+      matchesType<ActuatorOffsetBlock>(
+        BlockType.ActuatorOffset,
+        outputBlock.value,
+      ),
+    );
+
     const baseOutput = computed<number>(() => {
       const { p, i, d } = block.value.data;
       return p + i + d;
@@ -60,6 +69,37 @@ export default defineComponent({
     );
 
     const waterBoilTemp = computed<Quantity>(() => tempQty(100));
+
+    const boilPoint = computed<Quantity>({
+      get: () => {
+        const qty = bloxQty(block.value.data.boilPointAdjust);
+        qty.value = (qty.value ?? 0) + waterBoilTemp.value.value!;
+        return qty;
+      },
+      set: (qty) => {
+        if (qty.value != null) {
+          qty.value -= waterBoilTemp.value.value!;
+        } else {
+          qty.value = 0;
+        }
+        block.value.data.boilPointAdjust = qty;
+        saveBlock();
+      },
+    });
+
+    const boilMinOutputQty = computed<Quantity>({
+      get: () =>
+        offsetOutput.value
+          ? tempQty(block.value.data.boilMinOutput)
+          : bloxQty(block.value.data.boilMinOutput, '%'),
+      set: (qty) => {
+        const numV = offsetOutput.value
+          ? bloxQty(qty).to('degC').value
+          : qty.value;
+        block.value.data.boilMinOutput = numV ?? 0;
+        saveBlock();
+      },
+    });
 
     function showInput(): void {
       createBlockDialog(inputBlock.value);
@@ -90,7 +130,8 @@ export default defineComponent({
       baseOutput,
       boiling,
       boilAdjustment,
-      waterBoilTemp,
+      boilMinOutputQty,
+      boilPoint,
       showInput,
       showOutput,
       grid,
@@ -469,43 +510,23 @@ export default defineComponent({
     <q-separator inset />
 
     <div class="widget-body row">
-      <SliderField
-        :model-value="block.data.boilMinOutput"
-        :decimals="0"
-        :quick-actions="[
-          { label: '0%', value: 0 },
-          { label: '50%', value: 50 },
-          { label: '100%', value: 100 },
-        ]"
+      <QuantityField
+        v-model="boilMinOutputQty"
         title="Minimum output"
         label="Minimum output when boiling"
-        suffix="%"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.boilMinOutput = v;
-            saveBlock();
-          }
-        "
       />
       <QuantityField
-        :model-value="block.data.boilPointAdjust"
-        title="Boil point adjustment"
-        label="Boil temperature setting"
+        v-model="boilPoint"
+        title="Boil temperature"
+        label="Boiling point"
+        message="
+              When the Setpoint setting is at or above this temperature,
+              the <i>Minimum output when boiling</i> setting will apply.
+            "
+        :html="true"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.boilPointAdjust = v;
-            saveBlock();
-          }
-        "
-      >
-        <template #value>
-          <span class="darkish">{{ fixedNumber(waterBoilTemp.value, 0) }}</span>
-          +
-          <b>{{ fixedNumber(block.data.boilPointAdjust.value) }}</b>
-        </template>
-      </QuantityField>
+      />
     </div>
   </div>
 </template>
