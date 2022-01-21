@@ -27,17 +27,10 @@ export default defineComponent({
       default: 'Value',
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const local = ref<number | null>(
       props.modelValue.value !== null
@@ -49,9 +42,7 @@ export default defineComponent({
       onDialogOK(bloxQty(props.modelValue).copy(local.value));
     }
 
-    const notation = computed<string>(
-      () => prettyUnit(props.modelValue),
-    );
+    const notation = computed<string>(() => prettyUnit(props.modelValue));
 
     function showKeyboard(): void {
       createDialog({
@@ -61,8 +52,7 @@ export default defineComponent({
           type: 'number',
           suffix: notation.value,
         },
-      })
-        .onOk(v => local.value = v);
+      }).onOk((v) => (local.value = v));
     }
 
     return {
@@ -86,7 +76,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-input
         v-model.number="local"
         :label="label"
@@ -95,7 +85,6 @@ export default defineComponent({
         inputmode="numeric"
         pattern="[0-9\.]*"
         autofocus
-        clearable
         item-aligned
       >
         <template #append>
