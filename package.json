@@ -45,7 +45,7 @@
     "lodash": "^4.17.21",
     "marked": "^4.0.10",
     "mqtt": "^4.2.8",
-    "nanoid": "^3.1.25",
+    "nanoid": "^3.1.31",
     "parse-duration": "^1.0.0",
     "pinia": "^2.0.0-rc.10",
     "plotly.js": "^2.4.1",
