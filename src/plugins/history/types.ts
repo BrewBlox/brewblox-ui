@@ -25,11 +25,7 @@ export interface ApiQuery {
   fields: string[];
 }
 
-export type CsvPrecision =
-  | 'ns'
-  | 'ms'
-  | 's'
-  | 'ISO8601'
+export type CsvPrecision = 'ns' | 'ms' | 's' | 'ISO8601';
 
 export interface CsvQuery extends ApiQuery {
   precision: CsvPrecision;
@@ -62,8 +58,8 @@ export interface LabelPrecision {
 export interface TimeSeriesRange {
   metric: {
     __name__: string;
-  }
-  values: [timestamp: number, value: string][]
+  };
+  values: [timestamp: number, value: string][];
 }
 
 export interface TimeSeriesMetric {
@@ -107,7 +103,10 @@ export interface HistorySource {
 }
 
 export interface GraphSource extends HistorySource {
-  transformer: (source: GraphSource, result: TimeSeriesRangesResult) => HistorySource;
+  transformer: (
+    source: GraphSource,
+    result: TimeSeriesRangesResult,
+  ) => HistorySource;
   axes: GraphValueAxes;
   colors: LineColors;
   precision: LabelPrecision;
@@ -115,7 +114,10 @@ export interface GraphSource extends HistorySource {
 }
 
 export interface MetricsSource extends HistorySource {
-  transformer: (source: MetricsSource, result: TimeSeriesMetricsResult) => HistorySource;
+  transformer: (
+    source: MetricsSource,
+    result: TimeSeriesMetricsResult,
+  ) => HistorySource;
   updated: Date;
   values: MetricValue[];
 }

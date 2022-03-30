@@ -44,7 +44,7 @@
     "js-quantities": "^1.7.6",
     "lodash": "^4.17.21",
     "marked": "^4.0.10",
-    "mqtt": "^4.2.8",
+    "mqtt": "^4.3.7",
     "nanoid": "^3.1.31",
     "parse-duration": "^1.0.0",
     "pinia": "^2.0.0-rc.10",
@@ -57,6 +57,8 @@
     "svg-path-properties": "^1.0.11",
     "timezones": "nayarsystems/posix_tz_db#master",
     "typescript-string-enums": "^1.0.0",
+    "url": "^0.11.0",
+    "vue": "^3.0.0",
     "vue-router": "^4.0.11",
     "vuedraggable": "^4.1.0"
   },

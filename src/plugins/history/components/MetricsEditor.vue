@@ -1,4 +1,5 @@
 <script lang="ts">
+import { QTreeNode } from 'quasar';
 import { defineComponent, PropType } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
@@ -21,7 +22,7 @@ export default defineComponent({
       emit('update:config', config);
     }
 
-    function editLeaf(node: QuasarNode): void {
+    function editLeaf(node: QTreeNode): void {
       createDialog({
         component: 'MetricsDisplayDialog',
         componentProps: {
@@ -32,17 +33,17 @@ export default defineComponent({
       }).onOk((config) => saveConfig(config));
     }
 
-    function renamed(node: QuasarNode): string {
+    function renamed(node: QTreeNode): string {
       return props.config.renames[node.value] || node.title;
     }
 
-    function freshDuration(node: QuasarNode): string {
+    function freshDuration(node: QTreeNode): string {
       return durationString(
         props.config.freshDuration[node.value] ?? DEFAULT_FRESH_DURATION,
       );
     }
 
-    function decimals(node: QuasarNode): number {
+    function decimals(node: QTreeNode): number {
       return props.config.decimals[node.value] ?? DEFAULT_DECIMALS;
     }
 

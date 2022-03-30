@@ -58,25 +58,3 @@ interface HasType {
 }
 
 type Patch<T> = HasId & Partial<T>;
-
-interface QuasarNode {
-  value: any;
-  label: string;
-  title: string;
-  children?: QuasarNode[];
-
-  icon?: string;
-  iconColor?: string;
-  img?: string;
-  avatar?: string;
-  disabled?: boolean;
-  expandable?: boolean;
-  selectable?: boolean;
-  handler?: (node: QuasarNode) => void;
-  tickable?: boolean;
-  noTick?: boolean;
-  tickStrategy?: string;
-  lazy?: boolean;
-  header?: string;
-  body?: string;
-}
