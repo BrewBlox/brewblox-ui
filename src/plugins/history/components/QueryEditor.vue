@@ -1,6 +1,6 @@
 <script lang="ts">
 import isEqual from 'lodash/isEqual';
-import { LooseDictionary, QTree } from 'quasar';
+import { QTree, QTreeNode } from 'quasar';
 import {
   computed,
   defineComponent,
@@ -116,13 +116,13 @@ export default defineComponent({
       emit('update:config', config);
     }
 
-    function nodeHandler(node: QuasarNode): void {
+    function nodeHandler(node: QTreeNode): void {
       if (!treeRef.value!.isTicked(node.value)) {
         treeRef.value?.setTicked([node.value], true);
       }
     }
 
-    function nodeFilter(node: LooseDictionary, filter: string): boolean {
+    function nodeFilter(node: QTreeNode, filter: string): boolean {
       return (
         node?.value?.toLowerCase().match(filter.toLowerCase()) !== undefined
       );
@@ -141,7 +141,7 @@ export default defineComponent({
 
     const fields = computed<Mapped<string[]>>(() => historyStore.fields);
 
-    const nodes = computed<QuasarNode[]>(() =>
+    const nodes = computed<QTreeNode[]>(() =>
       nodeBuilder(fields.value, {
         selectable: true,
         handler: nodeHandler,

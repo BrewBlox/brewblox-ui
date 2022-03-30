@@ -75,7 +75,7 @@ export default defineComponent({
       </q-item-section>
     </q-item>
 
-    <draggable v-model="dashboards" :disabled="dense || !editing" item-key="id">
+    <vue-draggable v-model="dashboards" :disabled="dense || !editing" item-key="id">
       <template #item="{ element }">
         <q-item
           :to="editing ? undefined : `/dashboard/${element.id}`"
@@ -89,7 +89,7 @@ export default defineComponent({
           </q-item-section>
         </q-item>
       </template>
-    </draggable>
+    </vue-draggable>
   </div>
 </template>
 

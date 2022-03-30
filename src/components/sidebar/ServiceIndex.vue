@@ -74,7 +74,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <draggable v-model="services" :disabled="dense || !editing" item-key="id">
+  <vue-draggable v-model="services" :disabled="dense || !editing" item-key="id">
     <template #header>
       <q-item class="q-pb-none">
         <q-item-section>
@@ -146,7 +146,7 @@ export default defineComponent({
         </q-tooltip>
       </q-item>
     </template>
-  </draggable>
+  </vue-draggable>
 </template>
 
 <style scoped>

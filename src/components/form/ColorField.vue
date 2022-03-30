@@ -21,36 +21,28 @@ export default defineComponent({
       default: '<not set>',
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
 
-    const color = computed<string>(
-      () => {
-        const c = props.modelValue || '#ffffff';
-        return c.startsWith('#') ? c : `#${c}`;
-      },
+    const color = computed<string>(() => {
+      const c = props.modelValue || '#ffffff';
+      return c.startsWith('#') ? c : `#${c}`;
+    });
+
+    const colorDesc = computed<string>(() =>
+      !!props.modelValue ? color.value : props.nullText,
     );
 
-    const colorDesc = computed<string>(
-      () => !!props.modelValue
-        ? color.value
-        : props.nullText,
-    );
-
-    const colorStyle = computed<Mapped<string | null>>(
-      () => ({
-        color: color.value,
-        backgroundColor: props.modelValue ? color.value : null,
-        border: `1px ${props.modelValue ? 'solid' : 'dashed'} ${color.value}`,
-        borderRadius: '50%',
-        height: '20px',
-        width: '20px',
-        display: 'inline-block',
-      }),
-    );
+    const colorStyle = computed<Mapped<string | null>>(() => ({
+      color: color.value,
+      backgroundColor: props.modelValue ? color.value : null,
+      border: `1px ${props.modelValue ? 'solid' : 'dashed'} ${color.value}`,
+      borderRadius: '50%',
+      height: '20px',
+      width: '20px',
+      display: 'inline-block',
+    }));
 
     function change(c: string | null): void {
       emit('update:modelValue', c?.replace('#', '') ?? null);
@@ -70,8 +62,7 @@ export default defineComponent({
           html: props.html,
           clearable: props.clearable,
         },
-      })
-        .onOk(change);
+      }).onOk(change);
     }
 
     return {
@@ -86,7 +77,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
     <slot name="value">
       {{ colorDesc }}
     </slot>
@@ -96,7 +87,7 @@ export default defineComponent({
       </slot>
     </template>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template v-for="slot in activeSlots" #[slot]>
       <slot :name="slot" />
     </template>
   </LabeledField>

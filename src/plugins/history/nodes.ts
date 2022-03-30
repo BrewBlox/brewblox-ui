@@ -3,6 +3,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import flatMap from 'lodash/flatMap';
 import set from 'lodash/set';
 import startCase from 'lodash/startCase';
+import { QTreeNode } from 'quasar';
 
 import { prettyUnit } from '@/utils/formatting';
 import { splitPostfixed } from '@/utils/parsing';
@@ -39,8 +40,8 @@ function nodeRecurser(
   parent: string[],
   key: string,
   val: string | any,
-  partial: Partial<QuasarNode>,
-): QuasarNode {
+  partial: Partial<QTreeNode>,
+): QTreeNode {
   const value = [...parent, key].join('/');
 
   // Leaf nodes
@@ -66,8 +67,8 @@ function nodeRecurser(
 
 export function nodeBuilder(
   fields: { [measurement: string]: string[] },
-  partial: Partial<QuasarNode> = {},
-): QuasarNode[] {
+  partial: Partial<QTreeNode<any>> = {},
+): QTreeNode[] {
   const raw = Object.entries(fields).reduce((acc, [k, fieldKeys]) => {
     fieldKeys.forEach((fkey) => {
       const splitKeys = fkey
@@ -88,13 +89,13 @@ export function nodeBuilder(
   return Object.entries(raw).map(([k, v]) => nodeRecurser([], k, v, partial));
 }
 
-export function filteredNodes(nodes: QuasarNode[], filter: string): string[] {
+export function filteredNodes(nodes: QTreeNode[], filter: string): string[] {
   const exp = new RegExp(escapeRegExp(filter), 'i');
 
-  const compare = (node: QuasarNode): boolean =>
-    exp.test(node.label) || exp.test(node.value);
+  const compare = (node: QTreeNode): boolean =>
+    exp.test(node.label ?? '') || exp.test(node.value);
 
-  const checkNode = (node: QuasarNode): string[] => {
+  const checkNode = (node: QTreeNode): string[] => {
     const selected = (node.children ?? []).flatMap(checkNode);
     if (selected.length > 0 || compare(node)) {
       selected.push(node.value);

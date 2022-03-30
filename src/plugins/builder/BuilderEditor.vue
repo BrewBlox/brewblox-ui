@@ -891,17 +891,17 @@ export default defineComponent({
 
     watch(
       [svgContentRef, activeToolId, flowPartsRevision],
-      ([el, tool]) =>
-        nextTick(() => {
-          if (el) {
-            selectPartHandlers(el, tool);
-          }
-          if (configuredPart.value) {
-            const id = configuredPart.value.id;
-            configuredPart.value =
-              flowParts.value.find((v) => v.id === id) ?? null;
-          }
-        }),
+      async ([el, tool]) => {
+        await nextTick();
+        if (el) {
+          selectPartHandlers(el, tool);
+        }
+        if (configuredPart.value) {
+          const id = configuredPart.value.id;
+          configuredPart.value =
+            flowParts.value.find((v) => v.id === id) ?? null;
+        }
+      },
       { immediate: true },
     );
 

@@ -28,15 +28,15 @@ export class BrewbloxEventbus {
       path: '/eventbus',
       rejectUnauthorized: false,
     };
-    const client = mqtt.connect(undefined, opts);
+    const client = mqtt.connect(opts);
     this.client = client;
     this.checkIOSBug();
 
-    client.on('error', e => {
+    client.on('error', (e) => {
       notify.error(`mqtt error: ${e}`);
     });
     client.on('connect', () => {
-      this.topics.forEach(topic => client.subscribe(topic));
+      this.topics.forEach((topic) => client.subscribe(topic));
     });
     client.on('message', (topic, body: Buffer) => {
       if (body.length === 0) {
@@ -44,17 +44,19 @@ export class BrewbloxEventbus {
       }
       const data = JSON.parse(body.toString());
       this.listeners
-        .filter(listener => listener.exp.test(topic))
-        .forEach(listener => listener.callback(topic, data));
+        .filter((listener) => listener.exp.test(topic))
+        .forEach((listener) => listener.callback(topic, data));
     });
   }
 
   private checkIOSBug(): void {
     if (IS_IOS && WS_PROTOCOL === 'wss') {
       setTimeout(
-        () => this.client?.connected || notify.error({
-          timeout: 0,
-          message: `
+        () =>
+          this.client?.connected ||
+          notify.error({
+            timeout: 0,
+            message: `
           Failed to connect to the eventbus.
           <a
             href="https://brewblox.netlify.app/user/troubleshooting.html#known-issues-workarounds"
@@ -64,20 +66,21 @@ export class BrewbloxEventbus {
             This may be caused by an iOS bug.
           </a>
           `,
-          html: true,
-          actions: [
-            {
-              label: 'Dismiss',
-              textColor: 'white',
-            },
-            {
-              label: 'Switch to HTTP',
-              textColor: 'white',
-              handler: () => location.protocol = 'http:',
-            },
-          ],
-        }),
-        5000);
+            html: true,
+            actions: [
+              {
+                label: 'Dismiss',
+                textColor: 'white',
+              },
+              {
+                label: 'Switch to HTTP',
+                textColor: 'white',
+                handler: () => (location.protocol = 'http:'),
+              },
+            ],
+          }),
+        5000,
+      );
     }
   }
 

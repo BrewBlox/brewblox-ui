@@ -198,7 +198,7 @@ export default defineComponent({
         @update:session="saveSession"
       />
 
-      <draggable
+      <vue-draggable
         ref="noteboxRef"
         v-model="notes"
         :disabled="dense"
@@ -284,7 +284,7 @@ export default defineComponent({
             </div>
           </div>
         </template>
-      </draggable>
+      </vue-draggable>
 
       <div class="col row justify-end q-mt-sm">
         <q-btn fab-mini color="secondary" icon="add">

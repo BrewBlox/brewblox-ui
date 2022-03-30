@@ -82,7 +82,7 @@ export default defineComponent({
       </q-item-section>
     </q-item>
 
-    <draggable
+    <vue-draggable
       v-model="layouts"
       :disabled="dense || !editing"
       item-key="id"
@@ -101,7 +101,7 @@ export default defineComponent({
           </q-item-section>
         </q-item>
       </template>
-    </draggable>
+    </vue-draggable>
   </div>
 </template>
 

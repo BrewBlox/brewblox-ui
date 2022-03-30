@@ -1,4 +1,5 @@
 <script lang="ts">
+import { QTreeNode } from 'quasar';
 import { defineComponent, PropType } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
@@ -24,7 +25,7 @@ export default defineComponent({
       emit('update:config', config);
     }
 
-    function editLeaf(node: QuasarNode): void {
+    function editLeaf(node: QTreeNode): void {
       createDialog({
         component: 'GraphDisplayDialog',
         componentProps: {

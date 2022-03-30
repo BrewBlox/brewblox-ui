@@ -1,3 +1,5 @@
+import { QTreeNode } from 'quasar';
+
 import {
   defaultLabel,
   nodeBuilder,
@@ -54,7 +56,7 @@ const knownFields = (): Mapped<string[]> => ({
   ],
 });
 
-const nodes = (): QuasarNode[] => [
+const nodes = (): QTreeNode[] => [
   {
     label: 'sparkey',
     title: '',
