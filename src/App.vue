@@ -35,5 +35,5 @@ export default defineComponent({
 
 <template>
   <router-view />
-  <Watchers />
+  <WatcherContainer />
 </template>

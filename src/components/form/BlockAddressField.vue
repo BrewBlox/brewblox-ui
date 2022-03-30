@@ -140,7 +140,7 @@ export default defineComponent({
       <q-icon v-if="broken" name="error" color="negative" />
     </template>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template v-for="slot in activeSlots" #[slot]>
       <slot :name="slot" />
     </template>
   </LabeledField>

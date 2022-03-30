@@ -34,9 +34,7 @@ export default defineComponent({
       default: '',
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
 
@@ -44,16 +42,14 @@ export default defineComponent({
       emit('update:modelValue', v);
     }
 
-    const displayValue = computed<string>(
-      () => {
-        if (props.modelValue == null || props.modelValue === '') {
-          return '<not set>';
-        }
-        return props.type === 'number'
-          ? fixedNumber(Number(props.modelValue), props.decimals)
-          : `${props.modelValue}`;
-      },
-    );
+    const displayValue = computed<string>(() => {
+      if (props.modelValue == null || props.modelValue === '') {
+        return '<not set>';
+      }
+      return props.type === 'number'
+        ? fixedNumber(Number(props.modelValue), props.decimals)
+        : `${props.modelValue}`;
+    });
 
     function openDialog(): void {
       if (props.readonly) {
@@ -76,8 +72,7 @@ export default defineComponent({
           suffix: props.suffix,
           ...props.dialogProps,
         },
-      })
-        .onOk(change);
+      }).onOk(change);
     }
 
     return {
@@ -90,12 +85,12 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
     <slot name="value">
       {{ displayValue }}
     </slot>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template v-for="slot in activeSlots" #[slot]>
       <slot :name="slot" />
     </template>
   </LabeledField>

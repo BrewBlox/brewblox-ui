@@ -175,7 +175,7 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body column">
-      <draggable
+      <vue-draggable
         v-if="actions.length > 0"
         :disabled="dense"
         :model-value="actions"
@@ -194,7 +194,7 @@ export default defineComponent({
             icon="mdi-format-list-checks"
             class="action-container q-mr-md q-mb-sm depth-1"
           >
-            <draggable
+            <vue-draggable
               :disabled="dense"
               :model-value="action.element.changes"
               item-key="id"
@@ -209,7 +209,7 @@ export default defineComponent({
                   @switch="startSwitchBlock(action.element, change.element)"
                 />
               </template>
-            </draggable>
+            </vue-draggable>
             <div class="row justify-end q-px-md q-py-sm action-actions">
               <q-btn
                 size="sm"
@@ -242,7 +242,7 @@ export default defineComponent({
             </div>
           </q-expansion-item>
         </template>
-      </draggable>
+      </vue-draggable>
       <slot name="below" />
     </div>
   </div>

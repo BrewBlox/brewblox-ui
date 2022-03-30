@@ -9,7 +9,7 @@ import api from './api';
 const fallbackSpec = (): PartSpec => ({
   id: '',
   title: 'Unknown Part',
-  component: 'UnknownPart',
+  component: 'UnknownPartComponent',
   cards: [],
   size: () => [1, 1],
   transitions: () => ({}),
@@ -44,7 +44,7 @@ export const useBuilderStore = defineStore('builderStore', {
 
     component({ type }: { type: string }): string {
       const spec = this.spec({ type });
-      return spec.component || spec.id;
+      return spec.component || `${spec.id}PartComponent`;
     },
 
     async createLayout(layout: BuilderLayout): Promise<void> {

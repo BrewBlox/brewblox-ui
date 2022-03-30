@@ -30,26 +30,22 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    'click',
-  ],
+  emits: ['click'],
   setup(props, { slots, emit }) {
     const fieldRef = ref<QField>();
     const { activeSlots } = useField.setup();
 
-    const displayValue = computed<string>(
-      () => {
-        if (slots.control || slots.default) {
-          return ''; // parent has custom implementation
-        }
-        if (props.modelValue == null || props.modelValue === '') {
-          return '<not set>';
-        }
-        return props.number
-          ? fixedNumber(props.modelValue, props.decimals)
-          : `${props.modelValue}`;
-      },
-    );
+    const displayValue = computed<string>(() => {
+      if (slots.control || slots.default) {
+        return ''; // parent has custom implementation
+      }
+      if (props.modelValue == null || props.modelValue === '') {
+        return '<not set>';
+      }
+      return props.number
+        ? fixedNumber(props.modelValue, props.decimals)
+        : `${props.modelValue}`;
+    });
 
     onMounted(() => {
       if (fieldRef.value) {
@@ -85,11 +81,7 @@ export default defineComponent({
 
     <template #control>
       <slot name="control">
-        <component
-          :is="tag"
-          :class="['q-mt-sm', tagClass]"
-          :style="tagStyle"
-        >
+        <component :is="tag" :class="['q-mt-sm', tagClass]" :style="tagStyle">
           <slot>
             {{ displayValue }}
           </slot>
@@ -98,7 +90,7 @@ export default defineComponent({
       </slot>
     </template>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template v-for="slot in activeSlots" #[slot]>
       <slot :name="slot" />
     </template>
 

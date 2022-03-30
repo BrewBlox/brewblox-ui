@@ -42,38 +42,36 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
 
-    const displayValue = computed<string>(
-      () => {
-        if (props.selectProps.multiple) {
-          if (!isArray(props.modelValue)) {
-            return `Invalid value: ${props.modelValue}`;
-          }
-
-          const text = props.modelValue
-            .map((v: any) => props.options.find((opt: any) => opt[props.optionValue] === v))
-            .map((v: any) => v[props.optionLabel])
-            .join(', ');
-          return text || 'Click to set';
+    const displayValue = computed<string>(() => {
+      if (props.selectProps.multiple) {
+        if (!isArray(props.modelValue)) {
+          return `Invalid value: ${props.modelValue}`;
         }
 
-        for (const opt of props.options) {
-          if (opt === props.modelValue) {
-            return opt;
-          }
-          if (opt[props.optionValue] === props.modelValue) {
-            return opt[props.optionLabel];
-          }
-        }
+        const text = props.modelValue
+          .map((v: any) =>
+            props.options.find((opt: any) => opt[props.optionValue] === v),
+          )
+          .map((v: any) => v[props.optionLabel])
+          .join(', ');
+        return text || 'Click to set';
+      }
 
-        return 'Click to set';
-      },
-    );
+      for (const opt of props.options) {
+        if (opt === props.modelValue) {
+          return opt;
+        }
+        if (opt[props.optionValue] === props.modelValue) {
+          return opt[props.optionLabel];
+        }
+      }
+
+      return 'Click to set';
+    });
 
     function change(v: any): void {
       emit('update:modelValue', v);
@@ -100,8 +98,7 @@ export default defineComponent({
             clearable: props.clearable,
           },
         },
-      })
-        .onOk(change);
+      }).onOk(change);
     }
 
     return {
@@ -114,12 +111,12 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
     <slot name="value">
       {{ displayValue }}
     </slot>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template v-for="slot in activeSlots" #[slot]>
       <slot :name="slot" />
     </template>
   </LabeledField>

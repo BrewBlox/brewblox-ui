@@ -16,9 +16,7 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
     const suggestions = ref<string[]>([]);
@@ -29,14 +27,14 @@ export default defineComponent({
 
     function onInput(val, update): void {
       if (val === '') {
-        update(() => suggestions.value = []);
+        update(() => (suggestions.value = []));
         return;
       }
       update(() => {
         const needle = val.toLowerCase();
         suggestions.value = props.existing
-          .filter(t => !props.modelValue.includes(t))
-          .filter(t => t.toLowerCase().match(needle))
+          .filter((t) => !props.modelValue.includes(t))
+          .filter((t) => t.toLowerCase().match(needle))
           .slice(0, 5);
       });
     }
@@ -79,11 +77,15 @@ export default defineComponent({
           {{ scope.opt }}
         </q-chip>
       </template>
-      <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <template v-for="slot in activeSlots" #[slot]>
         <slot :name="slot" />
       </template>
     </q-select>
-    <LabeledField v-if="suggestions.length > 0" label="Add existing tag" item-aligned>
+    <LabeledField
+      v-if="suggestions.length > 0"
+      label="Add existing tag"
+      item-aligned
+    >
       <div class="row wrap q-gutter-xs">
         <q-chip
           v-for="tag in suggestions"

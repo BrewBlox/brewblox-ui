@@ -16,12 +16,12 @@ import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
 
 import SparkListView from './SparkListView.vue';
-import Troubleshooter from './Troubleshooter.vue';
+import SparkTroubleshooter from './SparkTroubleshooter.vue';
 
 export default defineComponent({
   name: 'SparkPage',
   components: {
-    Troubleshooter,
+    SparkTroubleshooter,
     SparkListView,
   },
   props: {
@@ -161,7 +161,7 @@ export default defineComponent({
 
     <!-- Troubleshooter -->
     <div v-if="statusNok" class="q-pa-lg row">
-      <Troubleshooter :service-id="serviceId" />
+      <SparkTroubleshooter :service-id="serviceId" />
     </div>
 
     <!-- Relations graph display -->

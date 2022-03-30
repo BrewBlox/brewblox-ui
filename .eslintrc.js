@@ -43,9 +43,7 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 0,
     '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/camelcase': 0,
-    '@typescript-eslint/explicit-function-return-type': [
-      'warn',
-      {
+    '@typescript-eslint/explicit-function-return-type': ['warn', {
         allowExpressions: true,
         allowTypedFunctionExpressions: true,
         allowHigherOrderFunctions: true,
@@ -53,16 +51,17 @@ module.exports = {
     ],
     'quasar/check-valid-props': 'warn',
     'vue/no-v-html': 0,
-    'vue/max-attributes-per-line': [
-      'warn',
-      {
+    'vue/max-attributes-per-line': ['warn', {
         singleline: 8,
-        multiline: {
-          max: 1,
-          allowFirstLine: false,
-        },
+        multiline: 1,
       },
     ],
+    'vue/multi-word-component-names': ['error', {
+      'ignores': [
+        'Card',
+        'Toolbar',
+      ],
+    }],
   },
   overrides: [
     {
