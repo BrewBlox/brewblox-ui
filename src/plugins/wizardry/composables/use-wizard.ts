@@ -4,17 +4,12 @@ import { WizardOutput } from '../types';
 
 export interface UseWizardProps {
   activeDashboardId: {
-    type: PropType<string>,
-    default: null,
-  }
+    type: PropType<string>;
+    default: null;
+  };
 }
 
-export type UseWizardEmits = [
-  'back',
-  'close',
-  'done',
-  'title',
-]
+export type UseWizardEmits = ['back', 'close', 'done', 'title'];
 
 export interface UseWizardComponent {
   onBack(): void;
@@ -36,26 +31,21 @@ export const useWizard: UseWizardComposable = {
       default: null,
     },
   },
-  emits: [
-    'back',
-    'close',
-    'done',
-    'title',
-  ],
+  emits: ['back', 'close', 'done', 'title'],
   setup() {
-    const { emit } = getCurrentInstance()!;
+    const instance = getCurrentInstance()!;
 
     function onBack(): void {
-      emit('back');
+      instance.emit('back');
     }
     function onClose(): void {
-      emit('close');
+      instance.emit('close');
     }
     function onDone(output: WizardOutput): void {
-      emit('done', output);
+      instance.emit('done', output);
     }
     function setDialogTitle(title: string): void {
-      emit('title', title);
+      instance.emit('title', title);
     }
 
     return {

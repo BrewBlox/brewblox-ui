@@ -9,14 +9,9 @@ export default defineComponent({
   props: {
     ...useValEdit.props,
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<number>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<number>();
     const local = ref<number>(field.value);
 
     function showKeyboard(): void {
@@ -26,8 +21,7 @@ export default defineComponent({
           modelValue: field.value,
           type: 'number',
         },
-      })
-        .onOk(v => field.value = v);
+      }).onOk((v) => (field.value = v));
     }
 
     function syncField(): void {
@@ -60,11 +54,7 @@ export default defineComponent({
       <KeyboardButton @click="showKeyboard" />
     </template>
   </q-input>
-  <div
-    v-else
-    class="clickable q-pa-sm rounded-borders"
-    @click="startEdit"
-  >
+  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
     {{ local }}
   </div>
 </template>

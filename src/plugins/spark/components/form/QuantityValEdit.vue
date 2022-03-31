@@ -12,14 +12,9 @@ export default defineComponent({
   props: {
     ...useValEdit.props,
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<Quantity>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<Quantity>();
     const local = ref<number | null>(roundedNumber(field.value.value));
 
     function syncField(): void {
@@ -28,13 +23,9 @@ export default defineComponent({
       }
     }
 
-    const displayValue = computed<string>(
-      () => prettyQty(field.value),
-    );
+    const displayValue = computed<string>(() => prettyQty(field.value));
 
-    const notation = computed<string>(
-      () => prettyUnit(field.value),
-    );
+    const notation = computed<string>(() => prettyUnit(field.value));
 
     function showKeyboard(): void {
       createDialog({
@@ -44,11 +35,10 @@ export default defineComponent({
           type: 'number',
           suffix: notation.value,
         },
-      })
-        .onOk(v => {
-          local.value = v;
-          syncField();
-        });
+      }).onOk((v) => {
+        local.value = v;
+        syncField();
+      });
     }
 
     return {
@@ -82,11 +72,7 @@ export default defineComponent({
       </template>
     </q-input>
   </div>
-  <div
-    v-else
-    class="clickable q-pa-sm rounded-borders"
-    @click="startEdit"
-  >
+  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
     {{ displayValue }}
   </div>
 </template>

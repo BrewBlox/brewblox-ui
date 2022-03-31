@@ -1,37 +1,38 @@
-import { computed, getCurrentInstance, PropType, WritableComputedRef } from 'vue';
-
+import {
+  computed,
+  getCurrentInstance,
+  PropType,
+  WritableComputedRef,
+} from 'vue';
 
 export interface UseValEditProps<T = any> {
   modelValue: {
-    type: PropType<T>,
-    required: true,
-  },
+    type: PropType<T>;
+    required: true;
+  };
   serviceId: {
-    type: PropType<string>,
-    required: true,
-  },
+    type: PropType<string>;
+    required: true;
+  };
   blockId: {
-    type: PropType<string>,
-    required: true,
-  },
+    type: PropType<string>;
+    required: true;
+  };
   editable: {
-    type: PropType<boolean>,
-    default: boolean,
-  },
+    type: PropType<boolean>;
+    default: boolean;
+  };
   dense: {
-    type: PropType<boolean>,
-    default: boolean,
-  },
+    type: PropType<boolean>;
+    default: boolean;
+  };
   comparison: {
-    type: PropType<boolean>,
-    default: boolean,
-  }
+    type: PropType<boolean>;
+    default: boolean;
+  };
 }
 
-export type UseValEditEmits = [
-  'update:modelValue',
-  'edit',
-]
+export type UseValEditEmits = ['update:modelValue', 'edit'];
 
 export interface UseValEditComponent<T> {
   field: WritableComputedRef<T>;
@@ -41,7 +42,7 @@ export interface UseValEditComponent<T> {
 export interface UseValEditComposable {
   props: UseValEditProps;
   emits: UseValEditEmits;
-  setup<T>(modelValue: unknown): UseValEditComponent<T>;
+  setup<T>(): UseValEditComponent<T>;
 }
 
 export const useValEdit: UseValEditComposable = {
@@ -71,20 +72,17 @@ export const useValEdit: UseValEditComposable = {
       default: false,
     },
   },
-  emits: [
-    'update:modelValue',
-    'edit',
-  ],
-  setup<T>(modelValue: unknown): UseValEditComponent<T> {
-    const { emit } = getCurrentInstance()!;
+  emits: ['update:modelValue', 'edit'],
+  setup<T>(): UseValEditComponent<T> {
+    const instance = getCurrentInstance()!;
 
     const field = computed<T>({
-      get: () => modelValue as T,
-      set: v => emit('update:modelValue', v),
+      get: () => instance.props.modelValue as T,
+      set: (v) => instance.emit('update:modelValue', v),
     });
 
     function startEdit(): void {
-      emit('edit');
+      instance.emit('edit');
     }
 
     return {

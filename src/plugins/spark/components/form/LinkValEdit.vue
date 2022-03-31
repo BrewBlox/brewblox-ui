@@ -14,7 +14,7 @@ export default defineComponent({
   emits: [...useValEdit.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { field, startEdit } = useValEdit.setup<Link>(props.modelValue);
+    const { field, startEdit } = useValEdit.setup<Link>();
 
     const blockIdOpts = computed<string[]>(() =>
       sparkStore
