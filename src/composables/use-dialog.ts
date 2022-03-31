@@ -64,7 +64,7 @@ export const useDialog: UseDialogComposable = {
   },
   emits: ['ok', 'hide'],
   setup(): UseDialogComponent {
-    const { emit, proxy } = getCurrentInstance()!;
+    const instance = getCurrentInstance()!;
 
     const hashId = `.${nanoid(6)}.`;
     const dialogRef = ref<QDialog | null>(null);
@@ -79,7 +79,7 @@ export const useDialog: UseDialogComposable = {
     }
 
     function onDialogHide(): void {
-      emit('hide');
+      instance.emit('hide');
     }
 
     function onDialogCancel(): void {
@@ -87,7 +87,7 @@ export const useDialog: UseDialogComposable = {
     }
 
     function onDialogOK(payload: unknown): void {
-      emit('ok', payload);
+      instance.emit('ok', payload);
       hide();
     }
 
@@ -106,7 +106,7 @@ export const useDialog: UseDialogComposable = {
     provide(InvalidateKey, hide);
 
     // expose public methods required by Dialog plugin
-    Object.assign(proxy, { show, hide });
+    Object.assign(instance.proxy, { show, hide });
 
     // We want the dialog to be part of the navigation stack.
     // This lets mobile users close dialogs by using the back button.

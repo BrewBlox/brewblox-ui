@@ -13,26 +13,21 @@ export default defineComponent({
       default: 1,
     },
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
+  emits: [...useValEdit.emits],
   setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<number>(props.modelValue);
+    const { field, startEdit } = useValEdit.setup<number>();
 
     const scaledField = computed<number>({
       get: () => field.value * props.timeScale,
-      set: v => field.value = Math.round(v / props.timeScale),
+      set: (v) => (field.value = Math.round(v / props.timeScale)),
     });
 
-    const displayVal = computed<string>(
-      () => shortDateString(scaledField.value),
+    const displayVal = computed<string>(() =>
+      shortDateString(scaledField.value),
     );
 
     onMounted(() => {
-      if (field.value === 0) {
+      if (scaledField.value === 0) {
         scaledField.value = new Date().getTime();
       }
     });
@@ -47,16 +42,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <DatetimeField
-    v-if="editable"
-    v-model="scaledField"
-    emit-number
-  />
-  <div
-    v-else
-    class="clickable q-pa-sm rounded-borders"
-    @click="startEdit"
-  >
+  <DatetimeField v-if="editable" v-model="scaledField" emit-number />
+  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
     {{ displayVal }}
   </div>
 </template>

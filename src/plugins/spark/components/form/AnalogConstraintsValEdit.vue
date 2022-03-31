@@ -10,17 +10,12 @@ export default defineComponent({
   props: {
     ...useValEdit.props,
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<AnalogConstraintsObj>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<AnalogConstraintsObj>();
 
-    const displayString = computed<string>(
-      () => prettifyConstraints(field.value),
+    const displayString = computed<string>(() =>
+      prettifyConstraints(field.value),
     );
 
     return {
@@ -37,16 +32,9 @@ export default defineComponent({
     <div v-if="!comparison" class="text-warning q-mb-sm">
       Values will replace all existing constraints on <i>{{ blockId }}</i>.
     </div>
-    <AnalogConstraints
-      v-model="field"
-      v-bind="{serviceId}"
-    />
+    <AnalogConstraints v-model="field" v-bind="{ serviceId }" />
   </div>
-  <div
-    v-else
-    class="clickable q-pa-sm rounded-borders"
-    @click="startEdit"
-  >
+  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
     {{ displayString }}
   </div>
 </template>

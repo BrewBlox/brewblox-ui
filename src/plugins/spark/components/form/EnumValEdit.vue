@@ -3,7 +3,6 @@ import { defineComponent, PropType } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
 
-
 export default defineComponent({
   name: 'EnumValEdit',
   props: {
@@ -17,14 +16,9 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<string>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<string>();
 
     return {
       field,
@@ -46,11 +40,7 @@ export default defineComponent({
       item-aligned
     />
   </div>
-  <div
-    v-else
-    class="clickable q-pa-sm rounded-borders"
-    @click="startEdit"
-  >
+  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
     {{ field }}
   </div>
 </template>

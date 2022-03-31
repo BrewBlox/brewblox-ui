@@ -25,21 +25,14 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
     const local = ref<Date | null>(props.modelValue);
 
-    const valid = computed<boolean>(
-      () => makeRuleValidator(props.rules)(local.value),
+    const valid = computed<boolean>(() =>
+      makeRuleValidator(props.rules)(local.value),
     );
 
     function save(): void {
@@ -68,23 +61,14 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <DatetimeInput v-model="local" output="date" />
       <template #actions>
-        <q-btn
-          :icon="resetIcon"
-          flat
-          @click="local = new Date()"
-        >
+        <q-btn :icon="resetIcon" flat @click="local = new Date()">
           <q-tooltip>Reset to current date and time</q-tooltip>
         </q-btn>
         <q-space />
-        <q-btn
-          flat
-          color="primary"
-          label="Cancel"
-          @click="onDialogCancel"
-        />
+        <q-btn flat color="primary" label="Cancel" @click="onDialogCancel" />
         <q-btn
           :disable="!valid"
           flat

@@ -4,24 +4,16 @@ import { computed, defineComponent } from 'vue';
 import { useValEdit } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 
-
 export default defineComponent({
   name: 'StringValEdit',
   props: {
     ...useValEdit.props,
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<string>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<string>();
 
-    const displayValue = computed<string>(
-      () => field.value || '<not set>',
-    );
+    const displayValue = computed<string>(() => field.value || '<not set>');
 
     function showKeyboard(): void {
       createDialog({
@@ -29,8 +21,7 @@ export default defineComponent({
         componentProps: {
           modelValue: field.value,
         },
-      })
-        .onOk(v => field.value = v);
+      }).onOk((v) => (field.value = v));
     }
 
     return {
@@ -44,20 +35,12 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-input
-    v-if="editable"
-    v-model="field"
-    dense
-  >
+  <q-input v-if="editable" v-model="field" dense>
     <template #append>
       <KeyboardButton @click="showKeyboard" />
     </template>
   </q-input>
-  <div
-    v-else
-    class="clickable q-pa-sm rounded-borders"
-    @click="startEdit"
-  >
+  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
     {{ displayValue }}
   </div>
 </template>
