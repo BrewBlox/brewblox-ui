@@ -43,7 +43,7 @@ function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
 function inferEditingMode({ deviceType }: GpioModuleChannel): EditingMode {
   if (/_2P_BIDIRECTIONAL/.test(deviceType)) {
     return 'BIDIRECTIONAL';
-  } else if (/_1P_HIGH_SIDE/.test(deviceType)) {
+  } else if (/(_1P_HIGH_SIDE|_SSR_1P)/.test(deviceType)) {
     return 'PLUS';
   } else if (/_1P_LOW_SIDE/.test(deviceType)) {
     return 'MINUS';
