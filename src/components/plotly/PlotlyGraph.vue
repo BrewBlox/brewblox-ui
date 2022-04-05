@@ -60,7 +60,7 @@ export default defineComponent({
       default: () => [],
     },
     layout: {
-      type: Object as PropType<Layout>,
+      type: Object as PropType<Partial<Layout>>,
       default: () => ({}),
     },
     config: {
@@ -134,7 +134,7 @@ export default defineComponent({
       };
     }
 
-    function resizedLayout(): Plotly.Layout {
+    function resizedLayout(): Partial<Layout> {
       return props.autoFit
         ? Object.assign({}, props.layout, getSize())
         : props.layout;
