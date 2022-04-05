@@ -87,13 +87,10 @@ export const useHistoryStore = defineStore('historyStore', {
           : this.transform(data);
       };
       this.stream.onclose = () => {
+        this.streamConnected = false;
         setTimeout(() => this.connect(), 2000);
       };
       this.stream.onerror = () => {
-        if (this.streamConnected) {
-          notify.error('History connection closed. Retrying...');
-          this.streamConnected = false;
-        }
         this.stream?.close();
         this.stream = null;
       };

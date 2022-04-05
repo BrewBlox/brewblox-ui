@@ -1,5 +1,6 @@
 import mqtt from 'mqtt';
 import { nanoid } from 'nanoid';
+import { Ref, ref } from 'vue';
 
 import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';
 import { popById } from '@/utils/collections';
@@ -19,6 +20,7 @@ export class BrewbloxEventbus {
   private client: mqtt.MqttClient | null = null;
   private topics: Set<string> = new Set();
   private listeners: EventListener[] = [];
+  public readonly connected: Ref<boolean> = ref(false);
 
   public async connect(): Promise<void> {
     const opts: mqtt.IClientOptions = {
@@ -37,6 +39,10 @@ export class BrewbloxEventbus {
     });
     client.on('connect', () => {
       this.topics.forEach((topic) => client.subscribe(topic));
+      this.connected.value = true;
+    });
+    client.on('close', () => {
+      this.connected.value = false;
     });
     client.on('message', (topic, body: Buffer) => {
       if (body.length === 0) {
