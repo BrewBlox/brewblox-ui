@@ -50,7 +50,6 @@ export function defineChangedBlocks(config: RimsConfig): Block[] {
 }
 
 export function defineCreatedBlocks(config: RimsConfig): Block[] {
-  const groups = [0];
   const { serviceId, names } = config;
 
   const blocks: [
@@ -68,7 +67,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       id: names.kettleSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.kettleSensor),
         storedSetting: tempQty(67.7),
@@ -85,7 +83,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       id: names.tubeSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.tubeSensor),
         storedSetting: tempQty(67.7),
@@ -103,7 +100,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       id: names.tubeDriver,
       type: BlockType.ActuatorOffset,
       serviceId,
-      groups,
       data: {
         targetId: bloxLink(names.tubeSetpoint),
         drivenTargetId: bloxLink(names.tubeSetpoint),
@@ -128,7 +124,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       id: names.tubeAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.tubeChannel.blockId),
         channel: config.tubeChannel.channelId,
@@ -142,7 +137,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       id: names.pumpAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.pumpChannel.blockId),
         channel: config.pumpChannel.channelId,
@@ -157,7 +151,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       id: names.tubePwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('10s'),
@@ -174,7 +167,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       id: names.kettlePid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         kp: inverseTempQty(10),
@@ -189,7 +181,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       id: names.tubePid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         kp: inverseTempQty(30),

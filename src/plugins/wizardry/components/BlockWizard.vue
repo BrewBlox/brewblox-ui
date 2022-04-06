@@ -163,7 +163,6 @@ export default defineComponent({
           id: blockId.value,
           serviceId: serviceId.value,
           type: selected.value.value,
-          groups: [0],
           data: specStore.blockSpecByType(selected.value.value).generate(),
         });
         activeBlock.value = sparkStore.blockById(

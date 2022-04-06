@@ -26,7 +26,6 @@ export interface Block {
   id: string;
   nid?: number;
   serviceId: string;
-  groups: number[];
   type: BlockType;
   data: any;
   meta?: { [k: string]: any };
@@ -335,15 +334,6 @@ export interface InactiveObjectBlock extends Block {
   };
 }
 // #endregion InactiveObject
-
-// #region Groups
-export interface GroupsBlock extends Block {
-  type: 'Groups';
-  data: {
-    active: number[];
-  };
-}
-// #endregion Groups
 
 // #region MockPins
 export interface MockPinsBlock extends Block {

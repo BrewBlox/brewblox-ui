@@ -24,7 +24,6 @@ export const BlockIntfType = Enum(
 
 export const SystemBlockType = Enum(
   'DisplaySettings',
-  'Groups',
   'OneWireBus',
   'SysInfo',
   'Ticks',

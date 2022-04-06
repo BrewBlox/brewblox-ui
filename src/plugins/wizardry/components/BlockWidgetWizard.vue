@@ -134,7 +134,6 @@ export default defineComponent({
           id: newBlockId.value,
           serviceId: serviceId.value,
           type: props.featureId,
-          groups: [0],
           data: newBlockData.value,
         });
       }

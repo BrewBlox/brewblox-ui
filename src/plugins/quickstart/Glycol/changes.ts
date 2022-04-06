@@ -68,7 +68,6 @@ export function defineChangedBlocks(config: GlycolConfig): Block[] {
 export function defineCreatedBlocks(config: GlycolConfig): Block[] {
   const { serviceId, names } = config;
   const { beerSetting, glycolSetting } = config.glycolOpts;
-  const groups = [0];
 
   const heatingBlocks = [names.heatPid, names.heatPwm, names.heatAct];
 
@@ -88,7 +87,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.beerSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.beerSensor),
         storedSetting: beerSetting,
@@ -106,7 +104,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.beerProfile,
       type: BlockType.SetpointProfile,
       serviceId,
-      groups,
       data: {
         start: new Date().getTime() / 1000,
         enabled: false,
@@ -133,7 +130,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
-      groups,
       data: {
         differentActuatorWait: bloxQty('5m'),
         waitRemaining: bloxQty('0s'),
@@ -144,7 +140,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.coolAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.coolChannel.blockId),
         channel: config.coolChannel.channelId,
@@ -174,7 +169,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.heatAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.heatChannel?.blockId ?? null),
         channel: config.heatChannel?.channelId ?? 0,
@@ -201,7 +195,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.coolPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('10m'),
@@ -217,7 +210,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.heatPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('10s'),
@@ -233,7 +225,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.coolPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         ...makeGlycolBeerCoolConfig(),
@@ -246,7 +237,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       id: names.heatPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         ...makeGlycolBeerHeatConfig(),
@@ -269,7 +259,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         id: names.glycolSetpoint,
         type: BlockType.SetpointSensorPair,
         serviceId,
-        groups,
         data: {
           sensorId: bloxLink(names.glycolSensor),
           storedSetting: glycolSetting,
@@ -287,7 +276,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         id: names.glycolAct,
         type: BlockType.DigitalActuator,
         serviceId,
-        groups,
         data: {
           hwDevice: bloxLink(config.glycolChannel!.blockId),
           channel: config.glycolChannel!.channelId,
@@ -307,7 +295,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         id: names.glycolPwm,
         type: BlockType.ActuatorPwm,
         serviceId,
-        groups,
         data: {
           enabled: true,
           period: bloxQty('30m'),
@@ -323,7 +310,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         id: names.glycolPid,
         type: BlockType.Pid,
         serviceId,
-        groups,
         data: {
           ...pidDefaults(),
           ...makeGlycolConfig(),

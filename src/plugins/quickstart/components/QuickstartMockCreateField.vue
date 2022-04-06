@@ -46,7 +46,6 @@ export default defineComponent({
         const block: TempSensorMockBlock = {
           id: suggestId(name, validator),
           serviceId: props.serviceId,
-          groups: [0],
           type: BlockType.TempSensorMock,
           data: spec.generate(),
         };

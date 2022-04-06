@@ -48,7 +48,6 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
 }
 
 export function defineCreatedBlocks(config: HermsConfig): Block[] {
-  const groups = [0];
   const { serviceId, names, hermsOpts } = config;
 
   const pwmConstraints: AnalogConstraint[] = [];
@@ -79,14 +78,12 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.balancer,
       type: BlockType.Balancer,
       serviceId,
-      groups,
       data: { clients: [] },
     },
     {
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
-      groups,
       data: {
         differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
@@ -112,7 +109,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.hltSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.hltSensor),
         storedSetting: tempQty(70),
@@ -129,7 +125,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.mtSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.mtSensor),
         storedSetting: tempQty(67),
@@ -146,7 +141,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.bkSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.bkSensor),
         storedSetting: tempQty(70),
@@ -164,7 +158,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.hltDriver,
       type: BlockType.ActuatorOffset,
       serviceId,
-      groups,
       data: {
         targetId: bloxLink(names.hltSetpoint),
         drivenTargetId: bloxLink(names.hltSetpoint),
@@ -189,7 +182,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.hltAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.hltChannel.blockId),
         channel: config.hltChannel.channelId,
@@ -205,7 +197,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.bkAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.bkChannel.blockId),
         channel: config.bkChannel.channelId,
@@ -222,7 +213,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.hltPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('2s'),
@@ -240,7 +230,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.bkPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('2s'),
@@ -259,7 +248,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.hltPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         enabled: true,
@@ -275,7 +263,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.mtPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         enabled: true,
@@ -290,7 +277,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       id: names.bkPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         enabled: true,

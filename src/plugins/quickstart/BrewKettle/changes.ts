@@ -37,7 +37,6 @@ export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
 }
 
 export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
-  const groups = [0];
   const { serviceId, names } = config;
 
   const blocks: [
@@ -50,7 +49,6 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
       id: names.kettleSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.kettleSensor),
         storedSetting: tempQty(70),
@@ -67,7 +65,6 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
       id: names.kettleAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.kettleChannel.blockId),
         channel: config.kettleChannel.channelId,
@@ -83,7 +80,6 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
       id: names.kettlePwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('2s'),
@@ -101,7 +97,6 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
       id: names.kettlePid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         enabled: true,

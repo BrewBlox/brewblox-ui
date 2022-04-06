@@ -48,7 +48,6 @@ export function defineChangedBlocks(config: FermentConfig): Block[] {
 }
 
 export function defineCreatedBlocks(config: FermentConfig): Block[] {
-  const groups = [0];
   const { serviceId, names } = config;
   const { fridgeSetting, beerSetting, activeSetpoint } = config.fermentOpts;
   const isBeer = activeSetpoint === 'beer';
@@ -80,7 +79,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.fridgeSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.fridgeSensor),
         storedSetting: fridgeSetting,
@@ -97,7 +95,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.beerSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.beerSensor),
         storedSetting: beerSetting,
@@ -115,7 +112,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
-      groups,
       data: {
         differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
@@ -126,7 +122,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.coolAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.coolChannel.blockId),
         channel: config.coolChannel.channelId,
@@ -160,7 +155,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.heatAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.heatChannel.blockId),
         channel: config.heatChannel.channelId,
@@ -187,7 +181,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.coolPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('30m'),
@@ -203,7 +196,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.heatPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('10s'),
@@ -220,7 +212,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.tempProfile,
       type: BlockType.SetpointProfile,
       serviceId,
-      groups,
       data: {
         start: new Date().getTime() / 1000,
         enabled: false,
@@ -249,7 +240,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.coolPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         ...coolPidConfig,
@@ -262,7 +252,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       id: names.heatPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         ...heatPidConfig,
