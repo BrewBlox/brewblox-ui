@@ -7,8 +7,8 @@ import { useHistoryStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
 import { useWidgetStore, Widget } from '@/store/widgets';
 
+import { WIDGET_KEY } from '../blueprints/SessionLogDisplay';
 import { usePart } from '../composables';
-import { WIDGET_KEY } from '../specs/SessionLogDisplay';
 import { FlowPart } from '../types';
 import { coord2grid, textTransformation } from '../utils';
 

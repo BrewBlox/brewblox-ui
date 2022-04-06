@@ -520,7 +520,7 @@ export default defineComponent({
         const part = findHoveredPart();
         if (part) {
           builderStore
-            .spec(part)
+            .blueprintByType(part.type)
             .interactHandler?.(part, { savePart, navigate });
         }
       }

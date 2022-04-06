@@ -3,8 +3,8 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER } from '@/plugins/builder/const';
 
+import { PWM_KEY } from '../blueprints/PwmDisplay';
 import { usePart } from '../composables';
-import { PWM_KEY } from '../specs/PwmDisplay';
 import { FlowPart } from '../types';
 import { liquidOnCoord } from '../utils';
 
@@ -17,9 +17,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      scale,
-    } = usePart.setup(props.part);
+    const { scale } = usePart.setup(props.part);
 
     const color = computed<string>(
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',

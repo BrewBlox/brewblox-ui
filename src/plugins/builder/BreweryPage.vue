@@ -70,14 +70,16 @@ export default defineComponent({
     }
 
     function isClickable(part: FlowPart): boolean {
-      return builderStore.spec(part).interactHandler !== undefined;
+      return (
+        builderStore.blueprintByType(part.type).interactHandler !== undefined
+      );
     }
 
     function interact(part: FlowPart | null): void {
       if (!part) {
         return;
       }
-      const handler = builderStore.spec(part).interactHandler;
+      const handler = builderStore.blueprintByType(part.type).interactHandler;
       if (!handler) {
         return;
       }

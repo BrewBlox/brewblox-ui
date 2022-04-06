@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 
-import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
+import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
 import { concatById, filterById, findById } from '@/utils/collections';
 import { nullFilter } from '@/utils/functional';
 
 import api from './api';
 
-const fallbackSpec = (): PartSpec => ({
-  id: '',
+const fallbackBlueprint = (): BuilderBlueprint => ({
+  type: '',
   title: 'Unknown Part',
   component: 'UnknownPartComponent',
   cards: [],
@@ -16,7 +16,7 @@ const fallbackSpec = (): PartSpec => ({
 });
 
 interface BuilderStoreState {
-  specs: PartSpec[];
+  blueprints: BuilderBlueprint[];
   focusWarningEnabled: boolean;
   lastLayoutId: string | null;
   layouts: BuilderLayout[];
@@ -24,27 +24,29 @@ interface BuilderStoreState {
 
 export const useBuilderStore = defineStore('builderStore', {
   state: (): BuilderStoreState => ({
-    specs: [],
+    blueprints: [],
     focusWarningEnabled: true,
     lastLayoutId: null,
     layouts: [],
   }),
   getters: {
     layoutIds: (state): string[] => state.layouts.map((v) => v.id),
-    specIds: (state): string[] => state.specs.map((v) => v.id),
+    blueprintTypes: (state): string[] => state.blueprints.map((v) => v.type),
   },
   actions: {
     layoutById(id: Maybe<string>): BuilderLayout | null {
       return findById(this.layouts, id);
     },
 
-    spec({ type }: { type: string }): PartSpec {
-      return this.specs.find((v) => v.id === type) ?? fallbackSpec();
+    blueprintByType(type: string): BuilderBlueprint {
+      return (
+        this.blueprints.find((v) => v.type === type) ?? fallbackBlueprint()
+      );
     },
 
-    component({ type }: { type: string }): string {
-      const spec = this.spec({ type });
-      return spec.component || `${spec.id}PartComponent`;
+    componentByType(type: string): string {
+      const blueprint = this.blueprintByType(type);
+      return blueprint.component ?? `${blueprint.type}PartComponent`;
     },
 
     async createLayout(layout: BuilderLayout): Promise<void> {

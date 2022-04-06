@@ -7,8 +7,8 @@ import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
 import { fixedNumber } from '@/utils/formatting';
 import { makeObjectSorter } from '@/utils/functional';
 
+import { PROFILE_KEY, PROFILE_TYPES } from '../blueprints/ProfileDisplay';
 import { usePart, useSettingsBlock } from '../composables';
-import { PROFILE_KEY, PROFILE_TYPES } from '../specs/ProfileDisplay';
 import { FlowPart } from '../types';
 
 export default defineComponent({

@@ -4,8 +4,8 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { colorString, coord2grid } from '@/plugins/builder/utils';
 
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/Carboy';
 import { usePart } from '../composables';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../specs/Carboy';
 import { FlowPart } from '../types';
 
 const basePath = `
@@ -33,34 +33,25 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      sizeX,
-      sizeY,
-    } = usePart.setup(props.part);
+    const { sizeX, sizeY } = usePart.setup(props.part);
 
-    const color = computed<string>(
-      () => colorString(props.part.settings.color),
+    const color = computed<string>(() =>
+      colorString(props.part.settings.color),
     );
 
-    const scaleX = computed<number>(
-      () => sizeX.value / DEFAULT_SIZE_X,
-    );
+    const scaleX = computed<number>(() => sizeX.value / DEFAULT_SIZE_X);
 
-    const scaleY = computed<number>(
-      () => sizeY.value / DEFAULT_SIZE_Y,
-    );
+    const scaleY = computed<number>(() => sizeY.value / DEFAULT_SIZE_Y);
 
-    const valueY = computed<number>(
-      () => Math.round(sizeY.value / 4),
-    );
+    const valueY = computed<number>(() => Math.round(sizeY.value / 4));
 
-    const path = computed<string>(
-      () => scaleX.value === 1 && scaleY.value === 1
+    const path = computed<string>(() =>
+      scaleX.value === 1 && scaleY.value === 1
         ? basePath
         : svgpath(basePath)
-          .transform(`scale(${scaleX.value} ${scaleY.value})`)
-          .round(1)
-          .toString(),
+            .transform(`scale(${scaleX.value} ${scaleY.value})`)
+            .round(1)
+            .toString(),
     );
 
     return {
@@ -82,7 +73,7 @@ export default defineComponent({
     <rect
       :y="coord2grid(1)"
       :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY-1)-2"
+      :height="coord2grid(sizeY - 1) - 2"
       :fill="color"
       rx="8"
       ry="8"

@@ -52,16 +52,16 @@ export interface PartApi {
   navigate: (url: string) => void;
 }
 
-export interface CardSpec {
+export interface PartSettingsCard {
   component: string;
   props?: Mapped<any>;
 }
 
-export interface PartSpec {
-  id: string;
+export interface BuilderBlueprint {
+  type: string;
   title: string;
-  component?: string; // ID is used by default
-  cards: CardSpec[];
+  component?: string; // defaults to `${type}PartComponent`
+  cards: PartSettingsCard[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
   interactHandler?: (part: PersistentPart, api: PartApi) => void;

@@ -110,7 +110,7 @@ export default defineComponent({
       if (!part) {
         return;
       }
-      const handler = builderStore.spec(part).interactHandler;
+      const handler = builderStore.blueprintByType(part.type).interactHandler;
       if (!handler) {
         return;
       }

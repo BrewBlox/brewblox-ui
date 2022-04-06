@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import { createPinia, setActivePinia } from 'pinia';
 
+import blueprints from '@/plugins/builder/blueprints';
 import {
   asFlowParts,
   calculateFlows,
@@ -9,7 +10,6 @@ import {
 } from '@/plugins/builder/calculateFlows';
 import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
-import specs from '@/plugins/builder/specs';
 import {
   FlowPart,
   FlowRoute,
@@ -18,12 +18,12 @@ import {
 } from '@/plugins/builder/types';
 
 function asStatePart(part: PersistentPart): StatePart {
-  const spec = specs[part.type];
+  const blueprint = blueprints[part.type];
   return {
     ...part,
-    transitions: spec.transitions(part),
-    size: spec.size(part),
-    canInteract: spec.interactHandler !== undefined,
+    transitions: blueprint.transitions(part),
+    size: blueprint.size(part),
+    canInteract: blueprint.interactHandler !== undefined,
   };
 }
 
