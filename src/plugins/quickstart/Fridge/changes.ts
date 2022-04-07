@@ -274,20 +274,16 @@ export const defineWidgets = (
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.fridgeSensor}/value[${tempUnit}]`,
-            `${names.fridgeSetpoint}/setting[${tempUnit}]`,
-            `${names.coolPwm}/value`,
-            `${names.heatPwm}/value`,
-            `${names.coolAct}/state`,
-            `${names.heatAct}/state`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.fridgeSensor}/value[${tempUnit}]`,
+        `${serviceId}/${names.fridgeSetpoint}/setting[${tempUnit}]`,
+        `${serviceId}/${names.coolPwm}/value`,
+        `${serviceId}/${names.heatPwm}/value`,
+        `${serviceId}/${names.coolAct}/state`,
+        `${serviceId}/${names.heatAct}/state`,
       ],
       renames: {
         [`${serviceId}/${names.fridgeSensor}/value[${tempUnit}]`]:

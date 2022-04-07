@@ -52,7 +52,7 @@ export default defineComponent({
     const applying = ref(false);
 
     const actions = computed<ChangeAction[]>(() =>
-      deserialize(config.value.actions ?? config.value.steps),
+      deserialize(config.value.actions),
     );
 
     const lastActionId = computed<string | null>(

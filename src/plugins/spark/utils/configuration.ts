@@ -68,20 +68,17 @@ export function makeBlockGraphConfig<BlockT extends Block = Block>(
       `${f.graphName ?? f.title} ${prettyUnit(postfix(block.data[f.key]))}`,
   );
 
-  const targets = [
-    {
-      measurement: block.serviceId,
-      fields: graphedFields.map(
-        (f) => `${block.id}/${f.key}${postfix(block.data[f.key])}`,
-      ),
-    },
-  ];
+  const fields = graphedFields.map(
+    (f) =>
+      `${block.serviceId}/${block.id}/${f.key}${postfix(block.data[f.key])}`,
+  );
 
   return {
+    version: '1.0',
     params: queryParams,
     axes: defaults(graphAxes, fieldAxes),
     layout: defaults({ title: block.id }, graphLayout),
-    targets,
+    fields,
     renames,
     colors: {},
     precision: {},

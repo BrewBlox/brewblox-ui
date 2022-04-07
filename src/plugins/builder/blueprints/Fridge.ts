@@ -7,7 +7,12 @@ const blueprint: BuilderBlueprint = {
   type: 'Fridge',
   title: 'Fridge',
   cards: [
-    { component: 'TextCard' },
+    {
+      component: 'TextCard',
+      props: {
+        settingsKey: 'text',
+      },
+    },
     {
       component: 'SizeCard',
       props: {

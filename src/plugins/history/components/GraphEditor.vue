@@ -4,7 +4,7 @@ import { defineComponent, PropType } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
 
-import { DEFAULT_PRECISION } from '../const';
+import { DEFAULT_GRAPH_DECIMALS } from '../const';
 import { GraphConfig } from '../types';
 
 export default defineComponent({
@@ -37,7 +37,7 @@ export default defineComponent({
     }
 
     return {
-      DEFAULT_PRECISION,
+      DEFAULT_GRAPH_DECIMALS,
       saveConfig,
       editLeaf,
     };
@@ -65,7 +65,9 @@ export default defineComponent({
             dense
           />
           <LabeledField
-            :model-value="config.precision[node.value] || DEFAULT_PRECISION"
+            :model-value="
+              config.precision[node.value] || DEFAULT_GRAPH_DECIMALS
+            "
             label="Decimals in label"
             dense
           />

@@ -21,6 +21,7 @@ import Keg from './Keg';
 import Kettle from './Kettle';
 import Lauterhexe from './Lauterhexe';
 import LValve from './LValve';
+import MetricsDisplay from './MetricsDisplay';
 import PidDisplay from './PidDisplay';
 import ProfileDisplay from './ProfileDisplay';
 import Pump from './Pump';
@@ -61,6 +62,7 @@ const blueprints: { [key: string]: BuilderBlueprint } = {
   Kettle,
   Lauterhexe,
   LValve,
+  MetricsDisplay,
   PidDisplay,
   ProfileDisplay,
   Pump,

@@ -35,9 +35,16 @@ export interface DisplayNames {
   [key: string]: string;
 }
 
-export interface QueryConfig {
+// Deprecated
+export interface QueryConfigV0 {
   params: QueryParams;
   targets: QueryTarget[];
+  renames: DisplayNames;
+}
+
+export interface QueryConfig {
+  params: QueryParams;
+  fields: string[];
   renames: DisplayNames;
 }
 
@@ -125,6 +132,7 @@ export interface MetricsSource extends HistorySource {
 export type GraphAnnotation = Partial<Annotations>;
 
 export interface GraphConfig extends QueryConfig {
+  version: '1.0';
   layout: Partial<Layout>;
   axes: GraphValueAxes;
   colors: LineColors;
@@ -135,6 +143,12 @@ export interface SharedGraphConfig {
   id: string;
   title: string;
   config: GraphConfig;
+}
+
+export interface MetricsConfig extends QueryConfig {
+  version: '1.0';
+  freshDuration: Mapped<number>;
+  decimals: Mapped<number>;
 }
 
 export interface SessionNoteBase {

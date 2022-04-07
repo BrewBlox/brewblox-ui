@@ -1,3 +1,5 @@
+import '@/store/system'; // prevents circular import
+
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { createPinia, setActivePinia } from 'pinia';

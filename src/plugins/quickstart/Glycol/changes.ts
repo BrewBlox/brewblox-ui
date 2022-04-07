@@ -367,18 +367,14 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.beerSensor}/value[${tempUnit}]`,
-            `${names.beerSetpoint}/setting[${tempUnit}]`,
-            `${names.coolPwm}/value`,
-            `${names.coolAct}/state`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.beerSensor}/value[${tempUnit}]`,
+        `${serviceId}/${names.beerSetpoint}/setting[${tempUnit}]`,
+        `${serviceId}/${names.coolPwm}/value`,
+        `${serviceId}/${names.coolAct}/state`,
       ],
       renames: {
         [`${serviceId}/${names.beerSensor}/value[${tempUnit}]`]:
@@ -398,9 +394,9 @@ export function defineWidgets(
   };
 
   if (config.heated) {
-    graph.config.targets[0].fields.push(
-      `${names.heatPwm}/value`,
-      `${names.heatAct}/state`,
+    graph.config.fields.push(
+      `${serviceId}/${names.heatPwm}/value`,
+      `${serviceId}/${names.heatAct}/state`,
     );
     Object.assign(graph.config.renames, {
       [`${serviceId}/${names.heatPwm}/value`]: 'Heat PWM value',

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 
 import { concatById, filterById, findById } from '@/utils/collections';
 
+import { useFeatureStore } from '../features';
 import api from './api';
 import type { Widget } from './types';
 
@@ -74,6 +75,17 @@ export const useWidgetStore = defineStore('widgetStore', {
 
     async start(): Promise<void> {
       this.widgets = await api.fetch();
+
+      const featureStore = useFeatureStore();
+      [...this.widgets].forEach((widget) => {
+        const upgraded = featureStore.upgradeWidget(widget);
+        if (upgraded) {
+          // Immediately set upgraded widget, to prevent rendering with invalid data
+          concatById(this.widgets, widget);
+          this.saveWidget(upgraded);
+        }
+      });
+
       api.subscribe(
         (widget) => (this.widgets = concatById(this.widgets, widget)),
         (id) => (this.widgets = filterById(this.widgets, { id })),

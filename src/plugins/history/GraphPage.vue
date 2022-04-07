@@ -5,9 +5,9 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { emptyGraphConfig } from '@/plugins/history/const';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { useWidgetStore,Widget } from '@/store/widgets';
+import { emptyGraphConfig } from '@/plugins/history/utils';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { isJsonEqual } from '@/utils/objects';
 
 export default defineComponent({

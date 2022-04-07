@@ -5,9 +5,9 @@ import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
 import { durationMs, durationString } from '@/utils/quantity';
 
-import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/const';
-import { MetricsConfig } from '../Metrics/types';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { defaultLabel } from '../nodes';
+import { MetricsConfig } from '../types';
 
 export default defineComponent({
   name: 'MetricsDisplayDialog',
@@ -22,38 +22,33 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
 
     const local = reactive(deepCopy(props.config));
 
     const rename = computed<string>({
       get: () => local.renames[props.field] ?? defaultLabel(props.field),
-      set: v => local.renames[props.field] = v ?? defaultLabel(props.field),
+      set: (v) => (local.renames[props.field] = v ?? defaultLabel(props.field)),
     });
 
     const fresh = computed<string>({
-      get: () => durationString(
-        local.freshDuration[props.field] ?? DEFAULT_FRESH_DURATION),
-      set: val => {
-        const ms = durationMs(val) ?? DEFAULT_FRESH_DURATION;
+      get: () =>
+        durationString(
+          local.freshDuration[props.field] ?? DEFAULT_METRICS_EXPIRY,
+        ),
+      set: (val) => {
+        const ms = durationMs(val) ?? DEFAULT_METRICS_EXPIRY;
         local.freshDuration[props.field] = ms;
       },
     });
 
     const decimals = computed<number>({
-      get: () => local.decimals[props.field] ?? DEFAULT_DECIMALS,
-      set: v => {
-        const numV = v !== null ? v : DEFAULT_DECIMALS;
+      get: () => local.decimals[props.field] ?? DEFAULT_METRICS_DECIMALS,
+      set: (v) => {
+        const numV = v !== null ? v : DEFAULT_METRICS_DECIMALS;
         local.decimals[props.field] = numV;
       },
     });
@@ -76,7 +71,6 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <q-dialog
     ref="dialogRef"
@@ -84,14 +78,18 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <div class="column q-gutter-xs">
         <InputField v-model="rename" title="Label" label="Label" />
-        <InputField v-model="fresh" title="Warn when older than" label="Warn when older than" />
+        <InputField
+          v-model="fresh"
+          title="Warn when older than"
+          label="Warn when older than"
+        />
         <InputField
           v-model="decimals"
           :decimals="0"
-          :rules="[v => v >= 0 || 'Must be 0 or more']"
+          :rules="[(v) => v >= 0 || 'Must be 0 or more']"
           type="number"
           title="Number of decimals"
           label="Number of decimals"

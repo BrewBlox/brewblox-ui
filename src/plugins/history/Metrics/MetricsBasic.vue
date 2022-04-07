@@ -13,14 +13,18 @@ import { useContext, useWidget } from '@/composables';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { useHistoryStore } from '@/plugins/history/store';
-import { MetricsSource, MetricValue } from '@/plugins/history/types';
+import {
+  MetricsConfig,
+  MetricsSource,
+  MetricValue,
+} from '@/plugins/history/types';
+import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { fixedNumber } from '@/utils/formatting';
 import { isJsonEqual } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
 
-import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './const';
-import { MetricsConfig, MetricsWidget } from './types';
-import { emptyMetricsConfig } from './utils';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { MetricsWidget } from './types';
 
 interface CurrentValue extends MetricValue {
   name: string;
@@ -50,11 +54,11 @@ export default defineComponent({
     );
 
     function fieldFreshDuration(field: string): number {
-      return config.value.freshDuration[field] ?? DEFAULT_FRESH_DURATION;
+      return config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
     }
 
     function fieldDecimals(field: string): number {
-      return config.value.decimals[field] ?? DEFAULT_DECIMALS;
+      return config.value.decimals[field] ?? DEFAULT_METRICS_DECIMALS;
     }
 
     function fixedValue(value: CurrentValue): string {
@@ -80,9 +84,7 @@ export default defineComponent({
         metricsId,
         config.value.params,
         config.value.renames,
-        config.value.targets.flatMap((t) =>
-          t.fields.map((f) => `${t.measurement}/${f}`),
-        ),
+        config.value.fields,
       );
     }
 
@@ -128,7 +130,7 @@ export default defineComponent({
 
 <template>
   <div>
-    <div v-if="config.targets.length === 0">
+    <div v-if="config.fields.length === 0">
       <div class="text-italic text-h6 q-pa-md darkened text-center">
         Add metrics to get started.
       </div>

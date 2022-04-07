@@ -86,6 +86,10 @@ export const useFeatureStore = defineStore('featureStore', {
     widgetRemoveActions(id: string): WidgetRemoveAction[] {
       return this.widgetById(id)?.removeActions ?? [];
     },
+    upgradeWidget(widget: Widget): Widget | null {
+      const func = this.widgetById(widget.feature)?.upgrade;
+      return func ? func(widget) : null;
+    },
     addWidgetFeature(feature: WidgetFeature): void {
       if (feature.wizard === true && feature.generateConfig === undefined) {
         throw new Error(

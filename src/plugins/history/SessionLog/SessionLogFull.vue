@@ -8,7 +8,6 @@ import { useGlobals, useWidget } from '@/composables';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 
-import { emptyGraphConfig } from '../const';
 import { useHistoryStore } from '../store';
 import {
   LoggedSession,
@@ -16,7 +15,7 @@ import {
   SessionNote,
   SharedGraphConfig,
 } from '../types';
-import { sharedWidgetConfigs } from '../utils';
+import { emptyGraphConfig, sharedWidgetConfigs } from '../utils';
 import SessionHeaderField from './SessionHeaderField.vue';
 import { SessionLogWidget } from './types';
 

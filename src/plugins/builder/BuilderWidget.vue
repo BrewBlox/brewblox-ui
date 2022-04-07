@@ -12,6 +12,7 @@ import { uniqueFilter } from '@/utils/functional';
 import { isAbsoluteUrl } from '@/utils/url';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
+import { useMetrics } from './composables/use-metrics';
 import { DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH } from './const';
 import { useBuilderStore } from './store';
 import {
@@ -42,6 +43,7 @@ export default defineComponent({
       () => config.value.currentLayoutId,
     );
 
+    useMetrics.setup(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 

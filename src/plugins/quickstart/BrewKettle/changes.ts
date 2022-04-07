@@ -158,17 +158,13 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.kettleSensor}/value[${userTemp}]`,
-            `${names.kettleSetpoint}/setting[${userTemp}]`,
-            `${names.kettlePwm}/value`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.kettleSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.kettleSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.kettlePwm}/value`,
       ],
       renames: {
         [`${serviceId}/${names.kettleSensor}/value[${userTemp}]`]:

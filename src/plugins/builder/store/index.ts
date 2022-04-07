@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
 import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
+import { upgradeMetricsConfig } from '@/plugins/history/utils';
 import { concatById, filterById, findById } from '@/utils/collections';
 import { nullFilter } from '@/utils/functional';
 
@@ -79,15 +80,35 @@ export const useBuilderStore = defineStore('builderStore', {
     },
 
     async start(): Promise<void> {
-      const onChange = async (layout: BuilderLayout): Promise<void> => {
-        this.layouts = concatById(this.layouts, layout);
-      };
-      const onDelete = (id: string): void => {
-        this.layouts = filterById(this.layouts, { id });
-      };
-
       this.layouts = await api.fetch();
-      api.subscribe(onChange, onDelete);
+
+      // check if any layouts must be upgraded
+      [...this.layouts].forEach((layout) => {
+        let dirty = false;
+        layout.parts.forEach((part) => {
+          if (part.metrics) {
+            const upgraded = upgradeMetricsConfig(part.metrics);
+            if (upgraded) {
+              dirty = true;
+              part.metrics = upgraded;
+            }
+          }
+        });
+        if (dirty) {
+          // Immediately set upgraded layout, to prevent rendering with invalid data
+          concatById(this.layouts, layout);
+          this.saveLayout(layout);
+        }
+      });
+
+      api.subscribe(
+        (layout: BuilderLayout) => {
+          this.layouts = concatById(this.layouts, layout);
+        },
+        (id: string) => {
+          this.layouts = filterById(this.layouts, { id });
+        },
+      );
     },
   },
 });

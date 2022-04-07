@@ -1,14 +1,11 @@
 import capitalize from 'lodash/capitalize';
 import escapeRegExp from 'lodash/escapeRegExp';
-import flatMap from 'lodash/flatMap';
 import set from 'lodash/set';
 import startCase from 'lodash/startCase';
 import { QTreeNode } from 'quasar';
 
 import { prettyUnit } from '@/utils/formatting';
 import { splitPostfixed } from '@/utils/parsing';
-
-import { QueryTarget } from './types';
 
 function sentenceCased(s: string): string {
   return capitalize(startCase(s));
@@ -104,30 +101,4 @@ export function filteredNodes(nodes: QTreeNode[], filter: string): string[] {
   };
 
   return nodes.flatMap((n) => checkNode(n));
-}
-
-export function targetSplitter(targets: QueryTarget[]): string[] {
-  return flatMap(targets, (tar) =>
-    tar.fields.map((f) => `${tar.measurement}/${f}`),
-  );
-}
-
-export function targetBuilder(
-  vals: string[],
-  knownFields: Mapped<string[]>,
-): QueryTarget[] {
-  return vals.reduce((acc: QueryTarget[], v: string) => {
-    const [measurement, ...keys] = v.split('/');
-    const field = keys.join('/');
-    const existing = acc.find((t) => t.measurement === measurement);
-    if (!knownFields[measurement]?.includes(field)) {
-      return acc;
-    }
-    if (existing) {
-      existing.fields.push(field);
-      return acc;
-    }
-    acc.push({ measurement, fields: [field] });
-    return acc;
-  }, []);
 }

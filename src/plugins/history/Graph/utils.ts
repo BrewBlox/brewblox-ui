@@ -44,7 +44,6 @@ export function addBlockGraph(
         : undefined;
     });
     await widgetStore.saveWidget({ ...widget, config: merged });
-    const numFields = cfg.targets.reduce((acc, v) => acc + v.fields.length, 0);
-    notify.done(`Added ${numFields} fields to <b>${widget.title}</b>`);
+    notify.done(`Added ${cfg.fields.length} fields to <b>${widget.title}</b>`);
   });
 }

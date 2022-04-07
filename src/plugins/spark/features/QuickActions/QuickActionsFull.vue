@@ -33,7 +33,7 @@ export default defineComponent({
     const draggingStep = ref(false);
 
     const actions = computed<ChangeAction[]>(() =>
-      deserialize(config.value.actions ?? config.value.steps),
+      deserialize(config.value.actions),
     );
 
     function saveActions(acs: ChangeAction[] = actions.value): void {

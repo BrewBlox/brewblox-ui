@@ -1,3 +1,4 @@
+import { MetricsConfig } from '@/plugins/history/types';
 import { StoreObject } from '@/shared-types';
 
 export interface FlowRoute {
@@ -35,6 +36,7 @@ export interface PersistentPart {
   rotate: number;
   flipped?: boolean;
   settings: Mapped<any>;
+  metrics?: MetricsConfig;
 }
 
 export interface StatePart extends PersistentPart {

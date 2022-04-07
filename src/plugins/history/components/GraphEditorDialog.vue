@@ -6,9 +6,8 @@ import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 
-import { emptyGraphConfig } from '../const';
 import { GraphConfig, SharedGraphConfig } from '../types';
-
+import { emptyGraphConfig } from '../utils';
 
 export default defineComponent({
   name: 'GraphEditorDialog',
@@ -27,19 +26,14 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
 
-    const local = ref<GraphConfig>(defaults(deepCopy(props.config), emptyGraphConfig()));
+    const local = ref<GraphConfig>(
+      defaults(deepCopy(props.config), emptyGraphConfig()),
+    );
 
     function loadShared(): void {
       createDialog({
@@ -48,16 +42,18 @@ export default defineComponent({
         options: {
           type: 'radio',
           model: '',
-          items: props.shared.map(shared => ({ label: shared.title, value: shared.id })),
+          items: props.shared.map((shared) => ({
+            label: shared.title,
+            value: shared.id,
+          })),
         },
         cancel: true,
-      } as any)
-        .onOk(id => {
-          const shared = props.shared.find(s => s.id === id);
-          if (shared) {
-            local.value = defaults(deepCopy(shared.config), emptyGraphConfig());
-          }
-        });
+      } as any).onOk((id) => {
+        const shared = props.shared.find((s) => s.id === id);
+        if (shared) {
+          local.value = defaults(deepCopy(shared.config), emptyGraphConfig());
+        }
+      });
     }
 
     function save(): void {
@@ -76,7 +72,6 @@ export default defineComponent({
   },
 });
 </script>
-
 
 <template>
   <q-dialog
@@ -97,7 +92,12 @@ export default defineComponent({
         <q-card-actions class="col-auto" style="border-top: 1px solid silver">
           <q-btn flat label="Cancel" @click="onDialogCancel" />
           <q-space />
-          <q-btn :disable="shared.length === 0" flat label="Import config" @click="loadShared">
+          <q-btn
+            :disable="shared.length === 0"
+            flat
+            label="Import config"
+            @click="loadShared"
+          >
             <q-tooltip>Copy configuration from another graph</q-tooltip>
           </q-btn>
           <q-btn unelevated label="Save" color="primary" @click="save" />

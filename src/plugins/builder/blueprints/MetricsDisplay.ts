@@ -1,9 +1,10 @@
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
-import { containerTransitions } from '@/plugins/builder/utils';
+import { universalTransitions } from '@/plugins/builder/utils';
 
-export const DEFAULT_FILL_PCT = 85;
 export const DEFAULT_SIZE_X = 4;
-export const DEFAULT_SIZE_Y = 6;
+export const DEFAULT_SIZE_Y = 2;
+export const FLOW_TOGGLE_KEY = 'flowEnabled';
+export const FLEX_ROW_KEY = 'flexRow';
 
 const size = (part: PersistentPart): [number, number] => [
   part.settings.sizeX || DEFAULT_SIZE_X,
@@ -11,16 +12,9 @@ const size = (part: PersistentPart): [number, number] => [
 ];
 
 const blueprint: BuilderBlueprint = {
-  type: 'Kettle',
-  title: 'Kettle',
+  type: 'MetricsDisplay',
+  title: 'Display: Metrics',
   cards: [
-    {
-      component: 'TextCard',
-      props: {
-        settingsKey: 'text',
-      },
-    },
-    { component: 'ColorCard' },
     {
       component: 'SizeCard',
       props: {
@@ -37,24 +31,34 @@ const blueprint: BuilderBlueprint = {
         settingsKey: 'sizeY',
         defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
-        min: 2,
+        min: 1,
         max: 10,
       },
     },
     {
-      component: 'SizeCard',
+      component: 'ToggleCard',
       props: {
-        settingsKey: 'fillPct',
-        defaultSize: DEFAULT_FILL_PCT,
-        label: 'Liquid level (%)',
-        min: 0,
-        max: 100,
+        settingsKey: FLOW_TOGGLE_KEY,
+        label: 'Allow liquid to flow through this part',
       },
+    },
+    {
+      component: 'ToggleCard',
+      props: {
+        settingsKey: FLEX_ROW_KEY,
+        label: 'Use horizontal layout',
+      },
+    },
+    {
+      component: 'BorderCard',
+    },
+    {
+      component: 'MetricsCard',
     },
   ],
   size,
-  transitions: (part: PersistentPart) =>
-    containerTransitions(size(part), part.settings.color),
+  transitions: (part) =>
+    universalTransitions(size(part), part.settings[FLOW_TOGGLE_KEY]),
 };
 
 export default blueprint;

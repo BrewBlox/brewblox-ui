@@ -1,9 +1,4 @@
-import { QueryConfig } from '@/plugins/history/types';
+import { MetricsConfig } from '@/plugins/history/types';
 import { Widget } from '@/store/widgets';
 
-export interface MetricsConfig extends QueryConfig {
-  freshDuration: Mapped<number>;
-  decimals: Mapped<number>;
-}
-
-export type MetricsWidget = Widget<MetricsConfig>
+export type MetricsWidget = Widget<MetricsConfig>;
