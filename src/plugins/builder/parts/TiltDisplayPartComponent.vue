@@ -15,8 +15,8 @@ import { useSystemStore } from '@/store/system';
 import { fixedNumber, prettyQty, prettyUnit } from '@/utils/formatting';
 import { bloxQty, tempQty } from '@/utils/quantity';
 
+import { SIZE_X, SIZE_Y, TILT_ID_KEY } from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';
-import { SIZE_X, SIZE_Y, TILT_ID_KEY } from '../specs/TiltDisplay';
 import { FlowPart } from '../types';
 
 export default defineComponent({

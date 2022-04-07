@@ -234,21 +234,17 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 6, y: 1 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.kettleSensor}/value[${userTemp}]`,
-            `${names.tubeSensor}/value[${userTemp}]`,
-            `${names.kettleSetpoint}/setting[${userTemp}]`,
-            `${names.tubeSetpoint}/setting[${userTemp}]`,
-            `${names.tubePwm}/value`,
-            `${names.tubeAct}/state`,
-            `${names.pumpAct}/state`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.kettleSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.tubeSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.kettleSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.tubeSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.tubePwm}/value`,
+        `${serviceId}/${names.tubeAct}/state`,
+        `${serviceId}/${names.pumpAct}/state`,
       ],
       renames: {
         [`${serviceId}/${names.kettleSensor}/value[${userTemp}]`]:
@@ -279,9 +275,7 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
-      serviceId,
-      changeIdMigrated: true,
-      serviceIdMigrated: true,
+      version: '1.0',
       actions: [
         {
           name: 'Enable pump and heater',

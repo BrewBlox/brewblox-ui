@@ -21,8 +21,8 @@ import { prettyAny } from '@/utils/formatting';
 import { isQuantity } from '@/utils/identity';
 import { deltaTempQty } from '@/utils/quantity';
 
+import { DRIVER_KEY, DRIVER_TYPES } from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
-import { DRIVER_KEY, DRIVER_TYPES } from '../specs/SetpointDriverDisplay';
 import { FlowPart } from '../types';
 
 const icons = {

@@ -10,8 +10,8 @@ import {
 } from '@/plugins/builder/utils';
 import { DigitalState } from '@/plugins/spark/types';
 
+import { VALVE_KEY, VALVE_TYPES, ValveT } from '../blueprints/LValve';
 import { usePart, useSettingsBlock } from '../composables';
-import { VALVE_KEY, VALVE_TYPES, ValveT } from '../specs/LValve';
 import { FlowPart } from '../types';
 
 const paths = {

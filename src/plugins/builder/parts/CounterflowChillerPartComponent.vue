@@ -1,7 +1,10 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { CFC_BOTTOM_LEFT, CFC_TOP_RIGHT } from '../specs/CounterflowChiller';
+import {
+  CFC_BOTTOM_LEFT,
+  CFC_TOP_RIGHT,
+} from '../blueprints/CounterflowChiller';
 import { FlowPart } from '../types';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
@@ -26,16 +29,12 @@ const paths = {
     'M 0,25 h 4.1 c 2.2,0,5.7,2.2,7.6,4.8 l 2.7,3.6 c 2,2.6,5.1,4.8,7,4.8 h 4.5',
     'M 150,25 H 146 c -2.2,0-5.7,2.2-7.6,4.8 l -2.7,3.6 c -2,2.6-5.1,4.8-7,4.8 h -4.5',
   ],
-  topBulbLiquid: [
-    'M 36.8,37.5 L 113.3,37.5',
-  ],
+  topBulbLiquid: ['M 36.8,37.5 L 113.3,37.5'],
   bottomTubeLiquid: [
     'M 25.9,61.8 h-5.1 c -2.2,0-5.7,2.2-7.6,4.8 l -2.7,3.6 c -2,2.6-5.1,4.8-7,4.8 H 0',
     'M 124.2,61.8 h 5.1 c 2.2,0,5.7,2.2,7.6,4.8 l 2.7,3.6 c 2,2.6,5.1,4.8,7,4.8 h 3.5',
   ],
-  bottomBulbLiquid: [
-    'M 36.8,62.5 L 113.3,62.5',
-  ],
+  bottomBulbLiquid: ['M 36.8,62.5 L 113.3,62.5'],
   topArrows: `
       M 0,25 h 4.1 c 2.2,0,5.7,2.2,7.6,4.8 l 2.7,3.6 c 2,2.6,5.1,4.8,7,4.8 h 4.5
       L 124.2,38.1 L 128.7,38.2 C 130.6,38.2 133.7,36.0 135.7,33.4 L 138.4,29.8
@@ -57,20 +56,20 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const topFlowSpeed = computed<number>(
-      () => flowOnCoord(props.part, CFC_TOP_RIGHT),
+    const topFlowSpeed = computed<number>(() =>
+      flowOnCoord(props.part, CFC_TOP_RIGHT),
     );
 
-    const bottomFlowSpeed = computed<number>(
-      () => flowOnCoord(props.part, CFC_BOTTOM_LEFT),
+    const bottomFlowSpeed = computed<number>(() =>
+      flowOnCoord(props.part, CFC_BOTTOM_LEFT),
     );
 
-    const topLiquids = computed<string[]>(
-      () => liquidOnCoord(props.part, CFC_TOP_RIGHT),
+    const topLiquids = computed<string[]>(() =>
+      liquidOnCoord(props.part, CFC_TOP_RIGHT),
     );
 
-    const bottomLiquids = computed<string[]>(
-      () => liquidOnCoord(props.part, CFC_BOTTOM_LEFT),
+    const bottomLiquids = computed<string[]>(() =>
+      liquidOnCoord(props.part, CFC_BOTTOM_LEFT),
     );
 
     return {
@@ -86,15 +85,31 @@ export default defineComponent({
 
 <template>
   <g>
-    <LiquidStroke :paths="paths.topBulbLiquid" :colors="topLiquids" class="bulbLiquid" />
-    <LiquidStroke :paths="paths.bottomBulbLiquid" :colors="bottomLiquids" class="bulbLiquid" />
+    <LiquidStroke
+      :paths="paths.topBulbLiquid"
+      :colors="topLiquids"
+      class="bulbLiquid"
+    />
+    <LiquidStroke
+      :paths="paths.bottomBulbLiquid"
+      :colors="bottomLiquids"
+      class="bulbLiquid"
+    />
     <g class="outline">
       <path v-for="border in paths.borders" :key="border" :d="border" />
     </g>
     <LiquidStroke :paths="paths.topTubeLiquid" :colors="topLiquids" />
     <LiquidStroke :paths="paths.bottomTubeLiquid" :colors="bottomLiquids" />
-    <AnimatedArrows :speed="topFlowSpeed" :path="paths.topArrows" :num-arrows="5" />
-    <AnimatedArrows :speed="bottomFlowSpeed" :path="paths.bottomArrows" :num-arrows="5" />
+    <AnimatedArrows
+      :speed="topFlowSpeed"
+      :path="paths.topArrows"
+      :num-arrows="5"
+    />
+    <AnimatedArrows
+      :speed="bottomFlowSpeed"
+      :path="paths.bottomArrows"
+      :num-arrows="5"
+    />
   </g>
 </template>
 

@@ -3,7 +3,6 @@ import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 import { defaultLabel } from '@/plugins/history/nodes';
 
-import { targetSplitter } from '../nodes';
 import { GraphAxis, GraphConfig } from '../types';
 
 export default defineComponent({
@@ -28,15 +27,15 @@ export default defineComponent({
     ];
 
     const local = ref<GraphConfig>({ ...props.config });
-    watch(props.config, cfg => { local.value = { ...cfg }; });
+    watch(props.config, (cfg) => {
+      local.value = { ...cfg };
+    });
 
     function saveConfig(config: GraphConfig = local.value): void {
       emit('update:config', config);
     }
 
-    const selected = computed<string[]>(
-      () => targetSplitter(props.config.targets),
-    );
+    const selected = computed<string[]>(() => props.config.fields);
 
     function saveAxis(field: string, value: GraphAxis): void {
       local.value.axes[field] = value;
@@ -81,7 +80,7 @@ export default defineComponent({
         <InputField
           :model-value="fieldRename(field)"
           title="Legend"
-          @update:model-value="v => saveRename(field, v)"
+          @update:model-value="(v) => saveRename(field, v)"
         />
       </q-item-section>
       <q-space />
@@ -108,7 +107,7 @@ export default defineComponent({
                 :model-value="local.colors[field] || ''"
                 title="Line color"
                 clearable
-                @update:model-value="v => saveColor(field, v)"
+                @update:model-value="(v) => saveColor(field, v)"
               />
             </q-item-section>
           </q-item>
@@ -124,7 +123,7 @@ export default defineComponent({
                 :options="axisOpts"
                 flat
                 stretch
-                @update:model-value="v => saveAxis(field, v)"
+                @update:model-value="(v) => saveAxis(field, v)"
               />
             </q-item-section>
           </q-item>

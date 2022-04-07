@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { COIL_TOP_RIGHT } from '../specs/ImmersionCoil';
+import { COIL_TOP_RIGHT } from '../blueprints/ImmersionCoil';
 import { FlowPart } from '../types';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
@@ -51,12 +51,12 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const flowSpeed = computed<number>(
-      () => flowOnCoord(props.part, COIL_TOP_RIGHT),
+    const flowSpeed = computed<number>(() =>
+      flowOnCoord(props.part, COIL_TOP_RIGHT),
     );
 
-    const liquids = computed<string[]>(
-      () => liquidOnCoord(props.part, COIL_TOP_RIGHT),
+    const liquids = computed<string[]>(() =>
+      liquidOnCoord(props.part, COIL_TOP_RIGHT),
     );
 
     return {

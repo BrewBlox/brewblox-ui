@@ -11,12 +11,7 @@ import {
   watch,
 } from 'vue';
 
-import {
-  filteredNodes,
-  nodeBuilder,
-  targetBuilder,
-  targetSplitter,
-} from '@/plugins/history/nodes';
+import { filteredNodes, nodeBuilder } from '@/plugins/history/nodes';
 import { useHistoryStore } from '@/plugins/history/store';
 import type { QueryConfig } from '@/plugins/history/types';
 import { Quantity } from '@/shared-types';
@@ -150,11 +145,11 @@ export default defineComponent({
     );
 
     const ticked = computed<string[]>({
-      get: () => targetSplitter(props.config.targets),
-      set: (vals) =>
+      get: () => props.config.fields,
+      set: (fields) =>
         saveConfig({
           ...props.config,
-          targets: targetBuilder(vals, fields.value),
+          fields,
         }),
     });
 

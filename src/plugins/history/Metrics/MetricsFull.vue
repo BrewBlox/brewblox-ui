@@ -4,20 +4,18 @@ import { computed, defineComponent } from 'vue';
 
 import { useWidget } from '@/composables';
 
-import { MetricsConfig, MetricsWidget } from './types';
-import { emptyMetricsConfig } from './utils';
+import { MetricsConfig } from '../types';
+import { emptyMetricsConfig } from '../utils';
+import { MetricsWidget } from './types';
 
 export default defineComponent({
   name: 'MetricsFull',
   setup() {
-    const {
-      widget,
-      saveConfig,
-    } = useWidget.setup<MetricsWidget>();
+    const { widget, saveConfig } = useWidget.setup<MetricsWidget>();
 
     const config = computed<MetricsConfig>({
       get: () => defaults(widget.value.config, emptyMetricsConfig()),
-      set: cfg => saveConfig(cfg),
+      set: (cfg) => saveConfig(cfg),
     });
 
     return {

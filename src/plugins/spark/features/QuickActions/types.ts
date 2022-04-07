@@ -16,13 +16,15 @@ export interface ChangeAction {
   changes: BlockChange[];
 }
 
+export interface QuickActionsConfigOld {
+  serviceId?: string;
+  steps?: ChangeAction[];
+}
+
 export interface QuickActionsConfig {
-  serviceId?: string; // deprecated
-  steps?: ChangeAction[]; // deprecated
+  version: '1.0';
   actions: ChangeAction[];
   lastActionId?: string;
-  changeIdMigrated: boolean;
-  serviceIdMigrated: boolean;
 }
 
 export interface QuickActionsChange {

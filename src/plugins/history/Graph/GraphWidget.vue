@@ -7,8 +7,8 @@ import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useContext, useWidget } from '@/composables';
-import { defaultPresets, emptyGraphConfig } from '@/plugins/history/const';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
 import { Quantity } from '@/shared-types';
 import { Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
@@ -22,17 +22,10 @@ export default defineComponent({
   setup() {
     const router = useRouter();
 
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
+    const { context, inDialog } = useContext.setup();
 
-    const {
-      widgetId,
-      widget,
-      config,
-      saveWidget,
-    } = useWidget.setup<Widget<GraphConfig>>();
+    const { widgetId, widget, config, saveWidget } =
+      useWidget.setup<Widget<GraphConfig>>();
 
     function cloned(): GraphConfig {
       return cloneDeep(defaults(config.value, emptyGraphConfig()));
@@ -63,9 +56,7 @@ export default defineComponent({
       sourceRevision.value = new Date();
     }
 
-    const title = computed<string>(
-      () => widget.value.title,
-    );
+    const title = computed<string>(() => widget.value.title);
 
     async function saveConfig(config: GraphConfig): Promise<void> {
       delete config.layout.title;
@@ -93,8 +84,7 @@ export default defineComponent({
           title: 'Custom graph duration',
           label: 'Duration',
         },
-      })
-        .onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
+      }).onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
     }
 
     function showGraphPage(): void {
@@ -155,7 +145,7 @@ export default defineComponent({
         v-bind="{
           config,
           sourceRevision,
-          renderRevision
+          renderRevision,
         }"
         use-presets
         use-range
@@ -167,8 +157,16 @@ export default defineComponent({
     <template #toolbar>
       <WidgetToolbar has-mode-toggle>
         <template #actions>
-          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphPage" />
-          <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />
+          <ActionItem
+            icon="mdi-chart-line"
+            label="Show maximized"
+            @click="showGraphPage"
+          />
+          <ActionItem
+            icon="add"
+            label="Add block to graph"
+            @click="startAddBlockGraph"
+          />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
         </template>
@@ -176,7 +174,7 @@ export default defineComponent({
           <WidgetActions />
           <GraphRangeSubmenu
             :layout="config.layout"
-            :save="v => saveLayout(v)"
+            :save="(v) => saveLayout(v)"
           />
           <ActionSubmenu label="Timespan">
             <div class="row wrap" style="max-width: 200px">
@@ -203,10 +201,7 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
 
-    <div
-      v-if="context.mode === 'Basic'"
-      class="fit"
-    >
+    <div v-if="context.mode === 'Basic'" class="fit">
       <q-resize-observer :debounce="200" @resize="refresh" />
       <HistoryGraph
         ref="widgetGraphRef"
@@ -214,17 +209,12 @@ export default defineComponent({
         v-bind="{
           config,
           sourceRevision,
-          renderRevision
+          renderRevision,
         }"
       />
     </div>
-    <div
-      v-if="context.mode === 'Full'"
-    >
-      <GraphEditor
-        :config="config"
-        @update:config="saveConfig"
-      />
+    <div v-if="context.mode === 'Full'">
+      <GraphEditor :config="config" @update:config="saveConfig" />
     </div>
   </PreviewCard>
 </template>

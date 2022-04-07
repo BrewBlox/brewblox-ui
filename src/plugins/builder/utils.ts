@@ -69,12 +69,12 @@ export function asPersistentPart(
 }
 
 export function asStatePart(part: PersistentPart): StatePart {
-  const spec = useBuilderStore().spec(part);
+  const blueprint = useBuilderStore().blueprintByType(part.type);
   return {
     ...part,
-    transitions: spec.transitions(part),
-    size: spec.size(part),
-    canInteract: spec.interactHandler !== undefined,
+    transitions: blueprint.transitions(part),
+    size: blueprint.size(part),
+    canInteract: blueprint.interactHandler !== undefined,
   };
 }
 
@@ -386,7 +386,9 @@ export function vivifyParts(
         part.id = part.id ?? nanoid();
         part.type = deprecatedTypes[part.type] ?? part.type;
 
-        const [sizeX, sizeY] = builderStore.spec(part).size(part);
+        const [sizeX, sizeY] = builderStore
+          .blueprintByType(part.type)
+          .size(part);
         sizes[part.id] = sizeX * sizeY;
         return part;
       })

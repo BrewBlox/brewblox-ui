@@ -7,7 +7,7 @@ export type WidgetRole =
   | 'Output'
   | 'Constraint'
   | 'Display'
-  | 'Other'
+  | 'Other';
 
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
@@ -82,6 +82,12 @@ export interface WidgetFeature<ConfigT = any> {
    * Required if `WidgetFeature.wizard` === true.
    */
   generateConfig?: () => ConfigT;
+
+  /**
+   * Is called once per widget on first load to allow for data upgrades.
+   * Should return null if no changes are required.
+   */
+  upgrade?: (widget: Widget<unknown>) => Widget<ConfigT> | null;
 
   /**
    * Wizard should only be shown if experimental features are enabled.

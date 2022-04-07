@@ -5,8 +5,8 @@ import { defineComponent, PropType } from 'vue';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/quantity';
 
-import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/const';
-import { MetricsConfig } from '../Metrics/types';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { MetricsConfig } from '../types';
 
 export default defineComponent({
   name: 'MetricsEditor',
@@ -39,12 +39,12 @@ export default defineComponent({
 
     function freshDuration(node: QTreeNode): string {
       return durationString(
-        props.config.freshDuration[node.value] ?? DEFAULT_FRESH_DURATION,
+        props.config.freshDuration[node.value] ?? DEFAULT_METRICS_EXPIRY,
       );
     }
 
     function decimals(node: QTreeNode): number {
-      return props.config.decimals[node.value] ?? DEFAULT_DECIMALS;
+      return props.config.decimals[node.value] ?? DEFAULT_METRICS_DECIMALS;
     }
 
     return {

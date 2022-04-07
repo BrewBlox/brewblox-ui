@@ -9,6 +9,7 @@ import { concatById } from '@/utils/collections';
 import { isAbsoluteUrl } from '@/utils/url';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
+import { useMetrics } from './composables/use-metrics';
 import { useBuilderStore } from './store';
 import { FlowPart, PersistentPart } from './types';
 import { coord2grid, startChangeLayoutTitle } from './utils';
@@ -42,6 +43,7 @@ export default defineComponent({
 
     const layoutId = computed<string | null>(() => props.routeId);
 
+    useMetrics.setup(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 
@@ -70,14 +72,16 @@ export default defineComponent({
     }
 
     function isClickable(part: FlowPart): boolean {
-      return builderStore.spec(part).interactHandler !== undefined;
+      return (
+        builderStore.blueprintByType(part.type).interactHandler !== undefined
+      );
     }
 
     function interact(part: FlowPart | null): void {
       if (!part) {
         return;
       }
-      const handler = builderStore.spec(part).interactHandler;
+      const handler = builderStore.blueprintByType(part.type).interactHandler;
       if (!handler) {
         return;
       }

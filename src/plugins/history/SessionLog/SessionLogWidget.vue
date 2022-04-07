@@ -128,7 +128,7 @@ export default defineComponent({
       const sessionDate = renderDate(session.value.date);
       const validNotes = notes.value
         .filter(graphFilter)
-        .filter((v) => v.config.targets.length);
+        .filter((v) => v.config.fields.length);
 
       if (!validNotes.length) {
         notify.warn('No valid graph notes found');

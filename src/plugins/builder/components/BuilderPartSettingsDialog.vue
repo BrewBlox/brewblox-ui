@@ -5,7 +5,7 @@ import { useDialog, useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { clampRotation } from '@/utils/formatting';
 
-import { CardSpec, FlowPart, PartSpec } from '../types';
+import { BuilderBlueprint, FlowPart,PartSettingsCard } from '../types';
 import { coord2grid } from '../utils';
 
 export default defineComponent({
@@ -27,15 +27,17 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const { dialogRef, onDialogHide } = useDialog.setup();
 
-    const spec = computed<PartSpec>(() => builderStore.spec(props.part));
+    const blueprint = computed<BuilderBlueprint>(() =>
+      builderStore.blueprintByType(props.part.type),
+    );
 
-    const cards = computed<CardSpec[]>(() => [
+    const cards = computed<PartSettingsCard[]>(() => [
       { component: 'PlacementCard' },
-      ...spec.value.cards,
+      ...blueprint.value.cards,
     ]);
 
     const partTitle = computed<string>(
-      () => `${spec.value.title} ${props.part.x},${props.part.y}`,
+      () => `${blueprint.value.title} ${props.part.x},${props.part.y}`,
     );
 
     const rotatedSize = computed<[number, number]>(() => {

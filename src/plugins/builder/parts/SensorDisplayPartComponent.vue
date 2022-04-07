@@ -3,11 +3,15 @@ import { mdiThermometer } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER } from '@/plugins/builder/const';
-import { coord2grid, liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import {
+  coord2grid,
+  liquidOnCoord,
+  textTransformation,
+} from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/formatting';
 
+import { SENSOR_KEY, SENSOR_TYPES, SensorT } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
-import { SENSOR_KEY, SENSOR_TYPES, SensorT } from '../specs/SensorDisplay';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -19,22 +23,20 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      bordered,
-      scale,
-    } = usePart.setup(props.part);
+    const { bordered, scale } = usePart.setup(props.part);
 
-    const {
-      block,
-      isBroken,
-    } = useSettingsBlock.setup<SensorT>(props.part, SENSOR_KEY, SENSOR_TYPES);
+    const { block, isBroken } = useSettingsBlock.setup<SensorT>(
+      props.part,
+      SENSOR_KEY,
+      SENSOR_TYPES,
+    );
 
     const temperature = computed<number | null>(
       () => block.value?.data.value?.value ?? null,
     );
 
-    const tempUnit = computed<string>(
-      () => prettyUnit(block.value?.data.value),
+    const tempUnit = computed<string>(() =>
+      prettyUnit(block.value?.data.value),
     );
 
     const color = computed<string>(
@@ -61,7 +63,7 @@ export default defineComponent({
 <template>
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
-      :transform="textTransformation(part, [1,1])"
+      :transform="textTransformation(part, [1, 1])"
       :width="coord2grid(1)"
       :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
@@ -70,11 +72,7 @@ export default defineComponent({
       <UnlinkedIcon v-else-if="!block" class="col" />
       <template v-else>
         <div class="col row q-pt-xs">
-          <q-icon
-            :name="mdiThermometer"
-            class="static"
-            size="20px"
-          />
+          <q-icon :name="mdiThermometer" class="static" size="20px" />
           <small>{{ tempUnit }}</small>
         </div>
         <div class="col text-bold text-center">
@@ -85,8 +83,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(1)-2"
-        :height="coord2grid(1)-2"
+        :width="coord2grid(1) - 2"
+        :height="coord2grid(1) - 2"
         :stroke="color"
         stroke-width="2px"
         x="1"

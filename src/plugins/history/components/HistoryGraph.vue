@@ -12,7 +12,6 @@ import {
   watch,
 } from 'vue';
 
-import { defaultPresets } from '@/plugins/history/const';
 import { addSource } from '@/plugins/history/sources/graph';
 import { useHistoryStore } from '@/plugins/history/store';
 import {
@@ -21,6 +20,7 @@ import {
   QueryParams,
   QueryTarget,
 } from '@/plugins/history/types';
+import { defaultPresets } from '@/plugins/history/utils';
 import { isJsonEqual } from '@/utils/objects';
 
 export default defineComponent({
@@ -82,14 +82,6 @@ export default defineComponent({
       return `${props.graphId}/${target.measurement}`;
     }
 
-    const targets = computed<QueryTarget[]>(() => props.config.targets ?? []);
-
-    const fields = computed<string[]>(() =>
-      targets.value.flatMap((t) =>
-        t.fields.map((f) => `${t.measurement}/${f}`),
-      ),
-    );
-
     const layout = computed<Partial<Layout>>(() => props.config.layout ?? {});
 
     const source = computed<GraphSource | null>(
@@ -98,7 +90,7 @@ export default defineComponent({
 
     const error = computed<string | null>(() => {
       if (!source.value) {
-        return fields.value.length > 0
+        return props.config.fields.length > 0
           ? 'No data sources'
           : 'No fields selected';
       }
@@ -115,12 +107,12 @@ export default defineComponent({
     function createSource(): void {
       addSource(
         props.graphId,
-        props.config.params ?? {},
-        props.config.renames ?? {},
-        props.config.axes ?? {},
-        props.config.colors ?? {},
-        props.config.precision ?? {},
-        fields.value,
+        props.config.params,
+        props.config.renames,
+        props.config.axes,
+        props.config.colors,
+        props.config.precision,
+        props.config.fields,
       );
     }
 

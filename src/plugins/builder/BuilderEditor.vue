@@ -31,6 +31,7 @@ import {
   useSvgZoom,
   UseSvgZoomDimensions,
 } from './composables';
+import { useMetrics } from './composables/use-metrics';
 import { builderTools, SQUARE_SIZE } from './const';
 import { useBuilderStore } from './store';
 import {
@@ -131,6 +132,7 @@ export default defineComponent({
 
     const layoutId = computed<string | null>(() => props.routeId || null);
 
+    useMetrics.setup(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 
@@ -520,7 +522,7 @@ export default defineComponent({
         const part = findHoveredPart();
         if (part) {
           builderStore
-            .spec(part)
+            .blueprintByType(part.type)
             .interactHandler?.(part, { savePart, navigate });
         }
       }

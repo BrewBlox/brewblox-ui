@@ -14,6 +14,7 @@ import type {
   LoggedSession,
   QueryParams,
 } from '../types';
+import { upgradeGraphConfig } from '../utils';
 import { historyApi, sessionApi } from './api';
 
 function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
@@ -173,16 +174,35 @@ export const useHistoryStore = defineStore('historyStore', {
     },
 
     async start(): Promise<void> {
-      const onChange = (session: LoggedSession): void => {
-        this.sessions = concatById(this.sessions, session);
-      };
-      const onDelete = (id: string): void => {
-        this.sessions = filterById(this.sessions, { id });
-      };
-
       this.sessions = await sessionApi.fetch();
-      sessionApi.subscribe(onChange, onDelete);
 
+      // check if any sessions must be upgraded
+      [...this.sessions].forEach((session) => {
+        let dirty = false;
+        session.notes.forEach((note) => {
+          if (note.type === 'Graph') {
+            const upgraded = upgradeGraphConfig(note.config);
+            if (upgraded) {
+              dirty = true;
+              note.config = upgraded;
+            }
+          }
+        });
+        if (dirty) {
+          // Immediately set upgraded session, to prevent rendering with invalid data
+          concatById(this.sessions, session);
+          this.saveSession(session);
+        }
+      });
+
+      sessionApi.subscribe(
+        (session: LoggedSession): void => {
+          this.sessions = concatById(this.sessions, session);
+        },
+        (id: string): void => {
+          this.sessions = filterById(this.sessions, { id });
+        },
+      );
       this.connect();
     },
   },

@@ -31,10 +31,7 @@ export default defineComponent({
   setup(props) {
     const builderStore = useBuilderStore();
     const { sizeX, sizeY } = usePart.setup(props.part);
-
-    const component = computed<string>(() =>
-      builderStore.component(props.part),
-    );
+    const component = builderStore.componentByType(props.part.type);
 
     const rotateTransform = computed<string>(() => {
       const [partSizeX, partSizeY] = props.part.size;

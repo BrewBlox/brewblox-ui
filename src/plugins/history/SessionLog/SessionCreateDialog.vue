@@ -6,9 +6,9 @@ import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 
-import { emptyGraphConfig } from '../const';
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
+import { emptyGraphConfig } from '../utils';
 import SessionSelectField from './SessionSelectField.vue';
 
 export default defineComponent({

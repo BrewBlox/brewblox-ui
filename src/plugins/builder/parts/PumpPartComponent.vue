@@ -10,7 +10,7 @@ import {
   DigitalState,
 } from '@/plugins/spark/types';
 
-import { PUMP_KEY, PUMP_TYPES, PumpT } from '../specs/Pump';
+import { PUMP_KEY, PUMP_TYPES, PumpT } from '../blueprints/Pump';
 import { FlowPart } from '../types';
 
 export default defineComponent({

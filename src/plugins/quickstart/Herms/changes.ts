@@ -338,22 +338,18 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.hltSensor}/value[${userTemp}]`,
-            `${names.mtSensor}/value[${userTemp}]`,
-            `${names.bkSensor}/value[${userTemp}]`,
-            `${names.hltSetpoint}/setting[${userTemp}]`,
-            `${names.mtSetpoint}/setting[${userTemp}]`,
-            `${names.bkSetpoint}/setting[${userTemp}]`,
-            `${names.hltPwm}/value`,
-            `${names.bkPwm}/value`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.hltSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.mtSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.bkSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.hltSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.mtSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.bkSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.hltPwm}/value`,
+        `${serviceId}/${names.bkPwm}/value`,
       ],
       renames: {
         [`${serviceId}/${names.hltSensor}/value[${userTemp}]`]:
@@ -382,9 +378,7 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
     config: {
-      serviceId,
-      changeIdMigrated: true,
-      serviceIdMigrated: true,
+      version: '1.0',
       actions: [
         {
           name: 'Disable all setpoints',

@@ -14,8 +14,8 @@ import { useSystemStore } from '@/store/system';
 import { preciseNumber, prettyUnit } from '@/utils/formatting';
 import { deltaTempQty } from '@/utils/quantity';
 
+import { PID_KEY, PID_TYPES } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';
-import { PID_KEY, PID_TYPES } from '../specs/PidDisplay';
 import { FlowPart } from '../types';
 
 export default defineComponent({

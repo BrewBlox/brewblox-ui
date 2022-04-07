@@ -4,8 +4,8 @@ import { startup } from '@/startup';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { autoRegister, cref } from '@/utils/component-ref';
 
+import blueprints from './blueprints';
 import BuilderWidget from './BuilderWidget.vue';
-import specs from './specs';
 import { useBuilderStore } from './store';
 import { BuilderConfig } from './types';
 
@@ -32,7 +32,7 @@ const plugin: Plugin = {
     startup.onStart(() => builderStore.start());
     autoRegister(app, require.context('./components', true));
 
-    builderStore.specs = Object.values(specs);
+    builderStore.blueprints = Object.values(blueprints);
     featureStore.addWidgetFeature(widget);
   },
 };
