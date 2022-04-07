@@ -9,7 +9,6 @@ import { defaultLabel } from '@/plugins/history/nodes';
 import { fixedNumber, shortDateString } from '@/utils/formatting';
 import { durationString } from '@/utils/quantity';
 
-import { FLEX_ROW_KEY } from '../blueprints/MetricsDisplay';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
 import { CENTER } from '../const';
@@ -66,10 +65,6 @@ export default defineComponent({
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',
     );
 
-    const flexRow = computed<boolean>(() =>
-      Boolean(props.part.settings[FLEX_ROW_KEY]),
-    );
-
     return {
       durationString,
       textTransformation,
@@ -77,7 +72,6 @@ export default defineComponent({
       sizeX,
       sizeY,
       color,
-      flexRow,
       bordered,
       values,
     };
@@ -93,7 +87,7 @@ export default defineComponent({
       :height="coord2grid(sizeY)"
       class="column"
     >
-      <div :class="['full-width', flexRow ? 'row' : 'column']">
+      <div class="full-width column">
         <LabeledField
           v-for="d in values"
           :key="d.field"

@@ -4,7 +4,6 @@ import { universalTransitions } from '@/plugins/builder/utils';
 export const DEFAULT_SIZE_X = 4;
 export const DEFAULT_SIZE_Y = 2;
 export const FLOW_TOGGLE_KEY = 'flowEnabled';
-export const FLEX_ROW_KEY = 'flexRow';
 
 const size = (part: PersistentPart): [number, number] => [
   part.settings.sizeX || DEFAULT_SIZE_X,
@@ -40,13 +39,6 @@ const blueprint: BuilderBlueprint = {
       props: {
         settingsKey: FLOW_TOGGLE_KEY,
         label: 'Allow liquid to flow through this part',
-      },
-    },
-    {
-      component: 'ToggleCard',
-      props: {
-        settingsKey: FLEX_ROW_KEY,
-        label: 'Use horizontal layout',
       },
     },
     {
