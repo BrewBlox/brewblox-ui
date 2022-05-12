@@ -143,6 +143,16 @@ export default defineComponent({
       () => resetSource(),
     );
 
+    watch(
+      () => source.value,
+      (newV: GraphSource | null) => {
+        if (newV?.truncated) {
+          resetSource();
+        }
+      },
+      { deep: true },
+    );
+
     onMounted(() => {
       if (!props.sharedSources) {
         createSource();

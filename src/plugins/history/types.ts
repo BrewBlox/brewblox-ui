@@ -118,6 +118,7 @@ export interface GraphSource extends HistorySource {
   colors: LineColors;
   precision: LabelPrecision;
   values: Mapped<RangeValue>;
+  truncated: boolean;
 }
 
 export interface MetricsSource extends HistorySource {
