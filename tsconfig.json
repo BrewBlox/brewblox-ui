@@ -6,6 +6,7 @@
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
+    "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
       "@/*": [
