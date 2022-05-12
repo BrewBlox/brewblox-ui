@@ -95,6 +95,10 @@ function transformer(
         }
       });
     }
+
+    source.truncated = Object.values(source.values).some(
+      (vals) => vals.x.length === MAX_GRAPH_POINTS,
+    );
   }
   return source;
 }
@@ -123,6 +127,7 @@ export async function addSource(
     command: 'ranges',
     fields: validFields,
     values: {},
+    truncated: false,
   };
   await useHistoryStore().addSource(source);
 }
