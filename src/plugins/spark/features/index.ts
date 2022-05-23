@@ -18,6 +18,7 @@ import OneWireGpioModule from './OneWireGpioModule';
 import Pid from './Pid';
 import QuickActions from './QuickActions';
 import QuickValues from './QuickValues';
+import Sequence from './Sequence';
 import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
 import Spark2Pins from './Spark2Pins';
@@ -45,6 +46,7 @@ const plugins: Plugin[] = [
   MotorValve,
   Mutex,
   OneWireGpioModule,
+  Sequence,
   SetpointProfile,
   SetpointSensorPair,
   Spark2Pins,
