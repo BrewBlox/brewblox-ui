@@ -14,24 +14,20 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
     const { dense } = useGlobals.setup();
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const local = ref<string>(props.modelValue);
     const editorRef = ref<QInput>();
     const preview = ref<boolean>(false);
 
-    if (local.value.length && local.value.charAt(local.value.length - 1) !== '\n') {
+    if (
+      local.value.length &&
+      local.value.charAt(local.value.length - 1) !== '\n'
+    ) {
       local.value += '\n';
     }
 
@@ -45,8 +41,7 @@ export default defineComponent({
         componentProps: {
           modelValue: local.value,
         },
-      })
-        .onOk(v => local.value = v);
+      }).onOk((v) => (local.value = v));
     }
 
     function insertDate(): void {
@@ -56,39 +51,39 @@ export default defineComponent({
           modelValue: new Date(),
           title: 'Pick a date',
         },
-      })
-        .onOk((date: Date) => {
-          // Get the textarea wrapped by the q-input
-          const native = editorRef.value!.$el.querySelector('textarea');
-          const prev = local.value;
+      }).onOk((date: Date) => {
+        // Get the textarea wrapped by the q-input
+        const native = editorRef.value!.$el.querySelector('textarea');
+        const prev = local.value;
 
-          // We want to mirror ctrl+v behaviour
-          // Insert at cursor, overwrite any selection
-          const [start, end] = native !== null
+        // We want to mirror ctrl+v behaviour
+        // Insert at cursor, overwrite any selection
+        const [start, end] =
+          native !== null
             ? [native.selectionStart, native.selectionEnd]
             : [prev.length, prev.length];
 
-          // [Fri 11/15/2019, 2:00:23 PM]
-          const day = date.toLocaleString(undefined, { weekday: 'short' });
-          const insert = `[${day} ${date.toLocaleString()}] `;
+        // [Fri 11/15/2019, 2:00:23 PM]
+        const day = date.toLocaleString(undefined, { weekday: 'short' });
+        const insert = `[${day} ${date.toLocaleString()}] `;
 
-          // Splice into current string
-          local.value = [
-            prev.slice(0, start),
-            insert,
-            prev.slice(end, prev.length),
-          ].join('');
+        // Splice into current string
+        local.value = [
+          prev.slice(0, start),
+          insert,
+          prev.slice(end, prev.length),
+        ].join('');
 
-          // We lost focus when pressing the button
-          // Reset focus to the editor, at the correct position
-          nextTick(() => {
-            if (native !== null) {
-              editorRef.value?.focus();
-              native.selectionStart = start + insert.length;
-              native.selectionEnd = start + insert.length;
-            }
-          });
+        // We lost focus when pressing the button
+        // Reset focus to the editor, at the correct position
+        nextTick(() => {
+          if (native !== null) {
+            editorRef.value?.focus();
+            native.selectionStart = start + insert.length;
+            native.selectionEnd = start + insert.length;
+          }
         });
+      });
     }
 
     return {
@@ -123,10 +118,7 @@ export default defineComponent({
 
       <template #preview>
         <q-scroll-area visible class="fit">
-          <MarkdownView
-            :text="local"
-            class="q-pa-lg"
-          />
+          <MarkdownView :text="local" class="q-pa-lg" />
         </q-scroll-area>
       </template>
 
@@ -160,7 +152,7 @@ export default defineComponent({
   </q-dialog>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .editor-input textarea
   min-height: 200px !important
 </style>
