@@ -958,7 +958,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-page class="page-height" @keydown="keyHandler">
+  <q-page
+    class="page-height"
+    @keydown="keyHandler"
+  >
     <BuilderPartSettingsDialog
       v-if="configuredPart"
       :part="configuredPart"
@@ -970,7 +973,12 @@ export default defineComponent({
     />
 
     <TitleTeleport v-if="layout">
-      <span class="cursor-pointer" @click="editTitle">{{ layoutTitle }}</span>
+      <span
+        class="cursor-pointer"
+        @click="editTitle"
+      >
+        {{ layoutTitle }}
+      </span>
     </TitleTeleport>
 
     <ButtonsTeleport v-if="layout">
@@ -984,12 +992,20 @@ export default defineComponent({
       >
         <q-tooltip>Leave editor</q-tooltip>
       </q-btn>
-      <ActionMenu round class="self-center" label="Builder actions">
+      <ActionMenu
+        round
+        class="self-center"
+        label="Builder actions"
+      >
         <template #menus>
           <LayoutActions :layout="layout" />
         </template>
         <template #actions>
-          <ActionItem label="New layout" icon="add" @click="createLayout" />
+          <ActionItem
+            label="New layout"
+            icon="add"
+            @click="createLayout"
+          />
           <ActionItem
             icon="mdi-file-import"
             label="Import Layout"
@@ -1043,10 +1059,23 @@ export default defineComponent({
     </PageError>
 
     <!-- Grid -->
-    <div v-else ref="focusRef" class="fit" tabindex="-1" @focusout="checkFocus">
-      <svg ref="svgRef" class="fit" :style="{ cursor }">
+    <div
+      v-else
+      ref="focusRef"
+      class="fit"
+      tabindex="-1"
+      @focusout="checkFocus"
+    >
+      <svg
+        ref="svgRef"
+        class="fit"
+        :style="{ cursor }"
+      >
         <g ref="svgContentRef">
-          <EditorBackground :width="layout.width" :height="layout.height" />
+          <EditorBackground
+            :width="layout.width"
+            :height="layout.height"
+          />
           <!-- All parts, hidden if selected or floating -->
           <g
             v-for="part in flowParts"
@@ -1081,7 +1110,10 @@ export default defineComponent({
               )})`"
               :class="[part.type, partClass(part)]"
             >
-              <PartWrapper :part="part" selected />
+              <PartWrapper
+                :part="part"
+                selected
+              />
             </g>
           </g>
           <!-- Indicators for multiple parts sharing the same top/left coordinates-->
@@ -1109,7 +1141,10 @@ export default defineComponent({
         class="unfocus-overlay row items-center justify-center"
         @click.stop="setFocus"
       >
-        <transition appear name="fade">
+        <transition
+          appear
+          name="fade"
+        >
           <div class="text-h5 text-white q-pa-lg unfocus-message col-auto">
             Click to resume editing
           </div>
@@ -1119,7 +1154,10 @@ export default defineComponent({
   </q-page>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .q-page-container
   max-height: 100vh
   max-width: 100vw

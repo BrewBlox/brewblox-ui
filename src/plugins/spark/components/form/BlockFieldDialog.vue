@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, onBeforeMount,PropType, ref } from 'vue';
+import { defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
@@ -69,8 +69,18 @@ export default defineComponent({
         @update:model-value="(v) => (local = v)"
       />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

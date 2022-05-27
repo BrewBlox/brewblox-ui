@@ -81,10 +81,17 @@ export default defineComponent({
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
-    <SvgEmbedded :width="coord2grid(SIZE_X)" :height="coord2grid(SIZE_Y)">
+    <SvgEmbedded
+      :width="coord2grid(SIZE_X)"
+      :height="coord2grid(SIZE_Y)"
+    >
       <div class="q-ma-xs">
         <div class="row q-gutter-x-xs text-bold">
-          <q-icon :name="mdiThermometer" size="20px" class="static col-auto" />
+          <q-icon
+            :name="mdiThermometer"
+            size="20px"
+            class="static col-auto"
+          />
           <q-space />
           {{ fixedNumber(temperature.value, 1) }}
           <small class="self-center">{{ prettyUnit(temperature) }}</small>

@@ -14,10 +14,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      sizeX,
-      sizeY,
-    } = usePart.setup(props.part);
+    const { sizeX, sizeY } = usePart.setup(props.part);
 
     return {
       textTransformation,
@@ -36,9 +33,7 @@ export default defineComponent({
       :width="coord2grid(sizeX)"
       :height="coord2grid(sizeY)"
     >
-      <div class="col text-bold text-h3 q-mt-xs">
-        ?
-      </div>
+      <div class="col text-bold text-h3 q-mt-xs">?</div>
     </SvgEmbedded>
   </g>
 </template>

@@ -249,7 +249,11 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body column">
-      <div v-for="action in actionDisplays" :key="action.id" class="row">
+      <div
+        v-for="action in actionDisplays"
+        :key="action.id"
+        class="row"
+      >
         <div
           :class="[
             'col-grow q-py-xs q-px-sm rounded-borders clickable',
@@ -261,12 +265,21 @@ export default defineComponent({
           <div :class="action.active ? 'text-positive' : ''">
             {{ action.name }}
           </div>
-          <q-item-label caption class="darkened">
+          <q-item-label
+            caption
+            class="darkened"
+          >
             {{ action.changes.length }} blocks changed
           </q-item-label>
           <q-tooltip v-if="action.applicable">
-            <div class="column" style="max-width: 400px">
-              <div class="col-auto text-italic" style="font-size: 120%">
+            <div
+              class="column"
+              style="max-width: 400px"
+            >
+              <div
+                class="col-auto text-italic"
+                style="font-size: 120%"
+              >
                 <div v-if="lastActionId === action.id">
                   This is the last used action.
                 </div>

@@ -19,7 +19,7 @@ export default defineComponent({
   },
   setup(props) {
     const valid = ref(true);
-    const invalidateParent = inject(InvalidateKey, () => { });
+    const invalidateParent = inject(InvalidateKey, () => {});
 
     function invalidate(): void {
       valid.value = false;

@@ -96,7 +96,10 @@ export default defineComponent({
     <q-card-section>
       <q-item>
         <q-item-section>
-          <q-input v-model="dashboardTitle" label="Dashboard Title">
+          <q-input
+            v-model="dashboardTitle"
+            label="Dashboard Title"
+          >
             <template #append>
               <KeyboardButton @click="showTitleKeyboard" />
             </template>
@@ -105,7 +108,11 @@ export default defineComponent({
       </q-item>
       <q-item>
         <q-item-section>
-          <q-input v-model="dashboardId" :rules="idRules" label="Dashboard URL">
+          <q-input
+            v-model="dashboardId"
+            :rules="idRules"
+            label="Dashboard URL"
+          >
             <template #append>
               <KeyboardButton @click="showIdKeyboard" />
             </template>
@@ -127,7 +134,11 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="onBack" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <q-btn
         :disable="!valid"

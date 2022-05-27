@@ -3,7 +3,6 @@ import { defineComponent } from 'vue';
 
 import { coord2grid } from '../utils';
 
-
 export default defineComponent({
   name: 'EditorBackground',
   props: {
@@ -35,27 +34,30 @@ export default defineComponent({
     <text
       v-for="x in width"
       :key="`edge-x-${x}`"
-      :x="coord2grid(x-1)+20"
+      :x="coord2grid(x - 1) + 20"
       :y="8"
       fill="white"
       class="grid-square-text"
     >
-      {{ x-1 }}
+      {{ x - 1 }}
     </text>
     <text
       v-for="y in height"
       :key="`edge-y-${y}`"
       :x="0"
-      :y="coord2grid(y-1)+28"
+      :y="coord2grid(y - 1) + 28"
       fill="white"
       class="grid-square-text"
     >
-      {{ y-1 }}
+      {{ y - 1 }}
     </text>
   </g>
 </template>
 
-<style lang="scss" scoped>
+<style
+  lang="scss"
+  scoped
+>
 $grid-line: rgba(255, 255, 255, 0.15);
 
 .grid-background {

@@ -32,5 +32,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionItem v-bind="{ ...$attrs, icon, label }" @click="startExport" />
+  <ActionItem
+    v-bind="{ ...$attrs, icon, label }"
+    @click="startExport"
+  />
 </template>

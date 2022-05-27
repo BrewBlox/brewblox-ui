@@ -65,7 +65,10 @@ export default defineComponent({
 
 <template>
   <g>
-    <SvgEmbedded :width="coord2grid(sizeX)" :height="coord2grid(sizeY)">
+    <SvgEmbedded
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
+    >
       <div class="col row no-wrap items-center q-pa-sm full-width">
         <BrokenIcon v-if="isBroken" />
         <q-icon

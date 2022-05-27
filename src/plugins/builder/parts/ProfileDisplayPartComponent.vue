@@ -98,16 +98,29 @@ export default defineComponent({
       :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
-      <BrokenIcon v-if="isBroken" class="col" />
-      <UnlinkedIcon v-else-if="!block" class="col" />
-      <div v-else class="col column q-ma-xs">
+      <BrokenIcon
+        v-if="isBroken"
+        class="col"
+      />
+      <UnlinkedIcon
+        v-else-if="!block"
+        class="col"
+      />
+      <div
+        v-else
+        class="col column q-ma-xs"
+      >
         <small class="col-auto"> Setpoint Profile </small>
         <div class="col row">
           <div class="col">
             {{ fixedNumber(currentValue, 0) }}
           </div>
           <div class="col">
-            <q-icon :name="mdiArrowRightBold" size="20px" class="static" />
+            <q-icon
+              :name="mdiArrowRightBold"
+              size="20px"
+              class="static"
+            />
           </div>
           <div class="col">
             {{ fixedNumber(nextValue, 0) }}

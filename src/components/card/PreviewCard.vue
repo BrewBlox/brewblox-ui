@@ -49,7 +49,10 @@ export default defineComponent({
         <slot name="toolbar" />
       </template>
       <slot />
-      <template v-if="$slots.actions" #actions>
+      <template
+        v-if="$slots.actions"
+        #actions
+      >
         <slot name="actions" />
       </template>
     </Card>
@@ -58,12 +61,15 @@ export default defineComponent({
       dense
       stack
       :icon="toggleIcon"
-      :class="['col-auto toggle-tab self-center',{collapsed}]"
+      :class="['col-auto toggle-tab self-center', { collapsed }]"
       :label="collapsed ? expandLabel : collapseLabel"
       @click="collapsed = !collapsed"
     />
     <!-- The preview pane -->
-    <div v-if="!collapsed" class="col-5 bg-dark">
+    <div
+      v-if="!collapsed"
+      class="col-5 bg-dark"
+    >
       <div class="preview-pane fit">
         <slot name="preview" />
       </div>
@@ -81,13 +87,19 @@ export default defineComponent({
       <slot name="toolbar" />
     </template>
     <slot />
-    <template v-if="$slots.actions" #actions>
+    <template
+      v-if="$slots.actions"
+      #actions
+    >
       <slot name="actions" />
     </template>
   </Card>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .combined-wrapper
   height: 800px
   max-height: 90vh

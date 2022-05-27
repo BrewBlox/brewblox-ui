@@ -62,13 +62,19 @@ export default defineComponent({
           class="hoverable q-pa-sm q-item--dark"
           @click="showDialog"
         >
-          <q-item-label caption>
-            Slot {{ idx + 1 }}
-          </q-item-label>
-          <span v-if="slot" class="text-bold ellipsis">{{
-            slot.name || '---'
-          }}</span>
-          <span v-else class="darkened">Not set</span>
+          <q-item-label caption> Slot {{ idx + 1 }} </q-item-label>
+          <span
+            v-if="slot"
+            class="text-bold ellipsis"
+          >
+            {{ slot.name || '---' }}
+          </span>
+          <span
+            v-else
+            class="darkened"
+          >
+            Not set
+          </span>
         </div>
       </div>
 
@@ -88,7 +94,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style scoped lang="sass">
+<style
+  scoped
+  lang="sass"
+>
 .grid-container
   display: grid
   grid-template-columns: repeat(3, 1fr)

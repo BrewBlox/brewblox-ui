@@ -216,7 +216,12 @@ export default defineComponent({
       </q-input>
       <div class="simple-keyboard" />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!valid"
           flat

@@ -35,10 +35,11 @@ export default defineComponent({
 <template>
   <q-item class="q-ma-none q-mt-xs">
     <q-item-section>
-      <q-item-label caption>
-        Metrics
-      </q-item-label>
-      <MetricsEditor :config="config" @update:config="saveConfig" />
+      <q-item-label caption> Metrics </q-item-label>
+      <MetricsEditor
+        :config="config"
+        @update:config="saveConfig"
+      />
     </q-item-section>
   </q-item>
 </template>

@@ -114,12 +114,28 @@ export default defineComponent({
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
-    <SvgEmbedded :width="coord2grid(2)" :height="coord2grid(1)">
-      <BrokenIcon v-if="isBroken" class="col" />
-      <UnlinkedIcon v-else-if="!block" class="col" />
-      <div v-else class="col column q-ma-xs">
+    <SvgEmbedded
+      :width="coord2grid(2)"
+      :height="coord2grid(1)"
+    >
+      <BrokenIcon
+        v-if="isBroken"
+        class="col"
+      />
+      <UnlinkedIcon
+        v-else-if="!block"
+        class="col"
+      />
+      <div
+        v-else
+        class="col column q-ma-xs"
+      >
         <div class="col row q-gutter-x-xs">
-          <q-icon :name="icons[refIcon]" size="20px" class="static col-auto" />
+          <q-icon
+            :name="icons[refIcon]"
+            size="20px"
+            class="static col-auto"
+          />
           <q-space />
           <div class="col-auto text-bold">
             {{ prettyAny(refAmount) }}

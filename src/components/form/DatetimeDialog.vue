@@ -62,13 +62,25 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{ title, message, html }">
-      <DatetimeInput v-model="local" output="date" />
+      <DatetimeInput
+        v-model="local"
+        output="date"
+      />
       <template #actions>
-        <q-btn :icon="resetIcon" flat @click="local = new Date()">
+        <q-btn
+          :icon="resetIcon"
+          flat
+          @click="local = new Date()"
+        >
           <q-tooltip>Reset to current date and time</q-tooltip>
         </q-btn>
         <q-space />
-        <q-btn flat color="primary" label="Cancel" @click="onDialogCancel" />
+        <q-btn
+          flat
+          color="primary"
+          label="Cancel"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!valid"
           flat

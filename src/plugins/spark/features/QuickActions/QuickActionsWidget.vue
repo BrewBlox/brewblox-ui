@@ -70,8 +70,14 @@ export default defineComponent({
         </template>
       </WidgetToolbar>
     </template>
-    <component :is="context.mode" :active-id="activeId">
-      <template v-if="actions.length === 0" #warnings>
+    <component
+      :is="context.mode"
+      :active-id="activeId"
+    >
+      <template
+        v-if="actions.length === 0"
+        #warnings
+      >
         <div class="text-italic text-h6 q-pa-md darkened text-center">
           Create an action to get started.
         </div>

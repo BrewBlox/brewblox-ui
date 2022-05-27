@@ -190,7 +190,10 @@ export default defineComponent({
   <div>
     <slot name="warnings" />
 
-    <div v-if="session !== null" class="column q-ma-md">
+    <div
+      v-if="session !== null"
+      class="column q-ma-md"
+    >
       <SessionHeaderField
         :session="session"
         class="col q-mb-sm"
@@ -238,7 +241,10 @@ export default defineComponent({
                     />
                   </template>
                 </InputField>
-                <div v-if="element.type === 'Graph'" class="col-auto row">
+                <div
+                  v-if="element.type === 'Graph'"
+                  class="col-auto row"
+                >
                   <q-btn
                     icon="settings"
                     flat
@@ -286,11 +292,21 @@ export default defineComponent({
       </vue-draggable>
 
       <div class="col row justify-end q-mt-sm">
-        <q-btn fab-mini color="secondary" icon="add">
+        <q-btn
+          fab-mini
+          color="secondary"
+          icon="add"
+        >
           <q-menu>
             <q-list>
-              <ActionItem label="Add text note" @click="addTextNote" />
-              <ActionItem label="Add graph" @click="addGraphNote" />
+              <ActionItem
+                label="Add text note"
+                @click="addTextNote"
+              />
+              <ActionItem
+                label="Add graph"
+                @click="addGraphNote"
+              />
             </q-list>
           </q-menu>
         </q-btn>

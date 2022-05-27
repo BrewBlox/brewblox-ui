@@ -95,18 +95,17 @@ export default defineComponent({
 
     <div>
       <CardWarning v-if="sensors.length === 0">
-        <template #message>
-          No sensors set.
-        </template>
+        <template #message> No sensors set. </template>
       </CardWarning>
       <CardWarning v-else-if="!hasValue">
-        <template #message>
-          No sensors could be read.
-        </template>
+        <template #message> No sensors could be read. </template>
       </CardWarning>
 
       <div class="q-ma-md row justify-center">
-        <div v-if="hasValue" class="col-auto row items-center">
+        <div
+          v-if="hasValue"
+          class="col-auto row items-center"
+        >
           <q-icon
             name="mdi-thermometer"
             size="md"
@@ -156,7 +155,10 @@ export default defineComponent({
               class="col-grow"
               @update:model-value="(v) => updateSensor(idx, v)"
             />
-            <LabeledField label="Value" class="col-auto min-width-sm">
+            <LabeledField
+              label="Value"
+              class="col-auto min-width-sm"
+            >
               {{ sensorValue(link) }}
             </LabeledField>
             <q-btn

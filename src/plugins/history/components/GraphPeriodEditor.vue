@@ -58,7 +58,9 @@ export default defineComponent({
 
     watch(
       () => props.config.params,
-      params => { period.value = makePeriod(params); },
+      (params) => {
+        period.value = makePeriod(params);
+      },
     );
 
     function makePeriod(params: QueryParams): PeriodDisplay {
@@ -67,8 +69,8 @@ export default defineComponent({
         duration: params?.duration !== undefined,
         end: params?.end !== undefined,
       };
-      const opts = periodOptions.map(opt => opt.value);
-      const matching = opts.some(v => isEqual(v, period));
+      const opts = periodOptions.map((opt) => opt.value);
+      const matching = opts.some((v) => isEqual(v, period));
       return matching ? period : opts[0];
     }
 
@@ -81,19 +83,19 @@ export default defineComponent({
       const { params } = local.value;
       local.value.params = {
         ...params,
-        start: !period.start ? undefined : (params.start ?? defaults.start),
-        duration: !period.duration ? undefined : (params.duration ?? defaults.duration),
-        end: !period.end ? undefined : (params.end ?? defaults.end),
+        start: !period.start ? undefined : params.start ?? defaults.start,
+        duration: !period.duration
+          ? undefined
+          : params.duration ?? defaults.duration,
+        end: !period.end ? undefined : params.end ?? defaults.end,
       };
       saveConfig(local.value);
     }
 
-    const isLive = computed<boolean>(
-      () => {
-        const opt = find(periodOptions, matches({ value: period.value }));
-        return opt !== undefined && opt.label.startsWith('Live');
-      },
-    );
+    const isLive = computed<boolean>(() => {
+      const opt = find(periodOptions, matches({ value: period.value }));
+      return opt !== undefined && opt.label.startsWith('Live');
+    });
 
     function saveStart(val: number): void {
       local.value.params.start = val;

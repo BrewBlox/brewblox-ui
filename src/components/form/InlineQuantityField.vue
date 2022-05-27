@@ -25,12 +25,10 @@ export default defineComponent({
       default: 2,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const displayValue = computed<string>(
-      () => prettyQty(props.modelValue, props.decimals),
+    const displayValue = computed<string>(() =>
+      prettyQty(props.modelValue, props.decimals),
     );
 
     function change(v: Quantity): void {
@@ -50,8 +48,7 @@ export default defineComponent({
           html: props.html,
           label: props.label,
         },
-      })
-        .onOk(change);
+      }).onOk(change);
     }
 
     return {

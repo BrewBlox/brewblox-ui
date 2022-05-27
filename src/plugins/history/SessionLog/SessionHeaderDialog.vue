@@ -67,10 +67,23 @@ export default defineComponent({
         dense
         item-aligned
       />
-      <TagSelectField v-model="local.tags" :existing="knownTags" />
+      <TagSelectField
+        v-model="local.tags"
+        :existing="knownTags"
+      />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

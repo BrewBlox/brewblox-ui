@@ -97,22 +97,44 @@ export default defineComponent({
 
 <template>
   <g>
-    <SvgEmbedded v-if="isBroken" height="15" width="15">
-      <UnlinkedIcon size="15px" class="self-end" />
+    <SvgEmbedded
+      v-if="isBroken"
+      height="15"
+      width="15"
+    >
+      <UnlinkedIcon
+        size="15px"
+        class="self-end"
+      />
     </SvgEmbedded>
     <SvgEmbedded
       v-else-if="pending"
       :height="coord2grid(1)"
       :width="coord2grid(1)"
     >
-      <q-spinner size="44px" class="col" color="blue-grey-5" />
+      <q-spinner
+        size="44px"
+        class="col"
+        color="blue-grey-5"
+      />
     </SvgEmbedded>
-    <g key="valve-outer" class="outline">
+    <g
+      key="valve-outer"
+      class="outline"
+    >
       <path :d="paths.outerValve[0]" />
       <path :d="paths.outerValve[1]" />
     </g>
-    <LiquidStroke v-if="closed" :paths="paths.closedLiquid" :colors="liquids" />
-    <LiquidStroke v-else :paths="paths.openLiquid" :colors="liquids" />
+    <LiquidStroke
+      v-if="closed"
+      :paths="paths.closedLiquid"
+      :colors="liquids"
+    />
+    <LiquidStroke
+      v-else
+      :paths="paths.openLiquid"
+      :colors="liquids"
+    />
     <g
       key="valve-inner"
       :transform="`rotate(${valveRotation}, 25, 25)`"
@@ -120,7 +142,10 @@ export default defineComponent({
     >
       <path :d="paths.innerValve[0]" />
       <path :d="paths.innerValve[1]" />
-      <PowerIcon v-if="hasAddress" color="black" />
+      <PowerIcon
+        v-if="hasAddress"
+        color="black"
+      />
     </g>
     <AnimatedArrows
       key="valve-arrows"

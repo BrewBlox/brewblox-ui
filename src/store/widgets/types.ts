@@ -1,6 +1,5 @@
 import { StoreObject } from '@/shared-types';
 
-
 /**
  * Persistent data for dashboard widgets.
  */

@@ -355,7 +355,7 @@ export default defineComponent({
           <q-icon name="mdi-information">
             <q-tooltip>
               The name of the Spark Controller block.
-              <br>Multiple widgets can display the same block. <br>Rules:
+              <br />Multiple widgets can display the same block. <br />Rules:
               <ul>
                 <li>The name must not be empty.</li>
                 <li>The name must be unique.</li>
@@ -370,7 +370,11 @@ export default defineComponent({
           </q-icon>
         </template>
       </q-input>
-      <q-btn flat label="Back" @click="onBack" />
+      <q-btn
+        flat
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <template v-if="discoveredType">
         <q-btn

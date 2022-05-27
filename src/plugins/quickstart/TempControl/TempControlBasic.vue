@@ -304,7 +304,11 @@ export default defineComponent({
         tag-class="text-secondary"
       />
 
-      <LabeledField v-if="!setpoint" label="Setpoint setting" class="col-grow">
+      <LabeledField
+        v-if="!setpoint"
+        label="Setpoint setting"
+        class="col-grow"
+      >
         <b>{{
           differentSetpoints ? 'PID setpoints mismatched' : 'No setpoint set'
         }}</b>
@@ -324,17 +328,30 @@ export default defineComponent({
         <span v-else> --- </span>
       </LabeledField>
 
-      <LabeledField v-if="!profile" label="Setpoint Profile" class="col-grow">
+      <LabeledField
+        v-if="!profile"
+        label="Setpoint Profile"
+        class="col-grow"
+      >
         Not set
       </LabeledField>
     </div>
 
-    <q-item tag="label" @click="selectControlMode">
+    <q-item
+      tag="label"
+      @click="selectControlMode"
+    >
       <q-item-section>
         <q-item-label>Control mode</q-item-label>
       </q-item-section>
-      <q-item-section avatar class="q-pr-sm text-big">
-        <span v-if="tempMode" class="text-primary">
+      <q-item-section
+        avatar
+        class="q-pr-sm text-big"
+      >
+        <span
+          v-if="tempMode"
+          class="text-primary"
+        >
           {{ tempMode.title }}
         </span>
         <span v-else> Manual </span>
@@ -350,28 +367,47 @@ export default defineComponent({
       </q-item-section>
     </q-item>
 
-    <q-item tag="label" :disable="!profile">
+    <q-item
+      tag="label"
+      :disable="!profile"
+    >
       <q-item-section>
         <q-item-label>Setpoint driven by Profile</q-item-label>
       </q-item-section>
       <q-item-section avatar>
-        <q-toggle v-model="profileEnabled" :disable="!profile" />
+        <q-toggle
+          v-model="profileEnabled"
+          :disable="!profile"
+        />
       </q-item-section>
     </q-item>
 
-    <q-item tag="label" class="col-grow" @click="troubleshoot">
+    <q-item
+      tag="label"
+      class="col-grow"
+      @click="troubleshoot"
+    >
       <q-item-section>
         <q-item-label>Check for problems</q-item-label>
       </q-item-section>
-      <q-item-section v-if="detected" class="fade-4 col-auto">
+      <q-item-section
+        v-if="detected"
+        class="fade-4 col-auto"
+      >
         Last checked: {{ shortDateString(detected) }}
       </q-item-section>
       <q-item-section avatar>
-        <q-icon name="mdi-refresh" class="q-pr-md" />
+        <q-icon
+          name="mdi-refresh"
+          class="q-pr-md"
+        />
       </q-item-section>
     </q-item>
 
-    <div v-if="detected" class="column q-gutter-y-sm q-px-sm">
+    <div
+      v-if="detected"
+      class="column q-gutter-y-sm q-px-sm"
+    >
       <LabeledField
         v-for="(problem, idx) in problems"
         :key="`problem-${detected}-${idx}`"
@@ -385,7 +421,11 @@ export default defineComponent({
         @click="autofix(problem)"
       >
         <template #before>
-          <q-icon name="warning" color="warning" size="lg" />
+          <q-icon
+            name="warning"
+            color="warning"
+            size="lg"
+          />
         </template>
         <div v-html="problem.desc" />
       </LabeledField>

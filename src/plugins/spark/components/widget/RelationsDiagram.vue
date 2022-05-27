@@ -243,7 +243,11 @@ export default defineComponent({
 
 <template>
   <div class="fit">
-    <svg ref="svgRef" class="fit" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <svg
+      ref="svgRef"
+      class="fit"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    >
       <g ref="gRef" />
     </svg>
     <q-btn

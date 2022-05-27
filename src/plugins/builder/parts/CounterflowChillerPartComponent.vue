@@ -96,10 +96,20 @@ export default defineComponent({
       class="bulbLiquid"
     />
     <g class="outline">
-      <path v-for="border in paths.borders" :key="border" :d="border" />
+      <path
+        v-for="border in paths.borders"
+        :key="border"
+        :d="border"
+      />
     </g>
-    <LiquidStroke :paths="paths.topTubeLiquid" :colors="topLiquids" />
-    <LiquidStroke :paths="paths.bottomTubeLiquid" :colors="bottomLiquids" />
+    <LiquidStroke
+      :paths="paths.topTubeLiquid"
+      :colors="topLiquids"
+    />
+    <LiquidStroke
+      :paths="paths.bottomTubeLiquid"
+      :colors="bottomLiquids"
+    />
     <AnimatedArrows
       :speed="topFlowSpeed"
       :path="paths.topArrows"
@@ -113,7 +123,10 @@ export default defineComponent({
   </g>
 </template>
 
-<style lang="scss" scoped>
+<style
+  lang="scss"
+  scoped
+>
 :deep(.bulbLiquid path) {
   stroke-width: 18pt !important;
   stroke-linecap: round;

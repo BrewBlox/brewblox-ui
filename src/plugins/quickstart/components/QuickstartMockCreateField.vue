@@ -80,7 +80,7 @@ export default defineComponent({
         />
         <div class="col-grow text-italic">
           '{{ serviceId }}' is a simulation service without physical sensors.
-          <br>
+          <br />
           Click here to create Temp Sensor (Mock) blocks.
         </div>
       </div>

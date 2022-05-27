@@ -67,10 +67,19 @@ export default defineComponent({
 <template>
   <q-page class="page-height">
     <TitleTeleport>
-      <span class="cursor-pointer" @click="editTitle">{{ title }}</span>
+      <span
+        class="cursor-pointer"
+        @click="editTitle"
+      >
+        {{ title }}
+      </span>
     </TitleTeleport>
     <ButtonsTeleport>
-      <ActionMenu round size="12px" class="self-center">
+      <ActionMenu
+        round
+        size="12px"
+        class="self-center"
+      >
         <q-tooltip> Service actions </q-tooltip>
         <template #menus>
           <TiltActions :service-id="serviceId" />
@@ -79,12 +88,22 @@ export default defineComponent({
     </ButtonsTeleport>
     <q-scroll-area class="fit">
       <div class="q-pa-lg q-gutter-md row">
-        <div v-for="value in values" :key="value.id" style="max-width: 500px">
+        <div
+          v-for="value in values"
+          :key="value.id"
+          style="max-width: 500px"
+        >
           <Card>
             <template #toolbar>
-              <Toolbar :title="value.name" subtitle="Tilt" />
+              <Toolbar
+                :title="value.name"
+                subtitle="Tilt"
+              />
             </template>
-            <TiltValues :state="value" class="widget-body" />
+            <TiltValues
+              :state="value"
+              class="widget-body"
+            />
           </Card>
         </div>
       </div>

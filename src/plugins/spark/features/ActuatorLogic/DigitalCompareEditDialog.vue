@@ -8,8 +8,9 @@ import { deepCopy } from '@/utils/objects';
 
 import { digitalOpTitles } from './const';
 
-const operatorOpts: SelectOption[] = Enum.values(DigitalCompareOp)
-  .map(value => ({ value, label: digitalOpTitles[value] }));
+const operatorOpts: SelectOption[] = Enum.values(DigitalCompareOp).map(
+  (value) => ({ value, label: digitalOpTitles[value] }),
+);
 
 export default defineComponent({
   name: 'DigitalCompareEditDialog',
@@ -24,17 +25,10 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
     const local = ref<DigitalCompare>(deepCopy(props.modelValue));
 
     function save(): void {
@@ -61,7 +55,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <LinkField
         v-model="local.id"
         :service-id="serviceId"
@@ -85,8 +79,18 @@ export default defineComponent({
         />
       </div>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

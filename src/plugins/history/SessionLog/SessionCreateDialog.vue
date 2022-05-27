@@ -185,7 +185,10 @@ export default defineComponent({
         class="tag-select"
         @update:model-value="saveTags"
       >
-        <template v-if="customTags" #append>
+        <template
+          v-if="customTags"
+          #append
+        >
           <q-btn
             icon="mdi-backup-restore"
             flat
@@ -199,8 +202,18 @@ export default defineComponent({
         </template>
       </TagSelectField>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

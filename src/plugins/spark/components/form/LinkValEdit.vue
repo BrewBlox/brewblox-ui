@@ -63,7 +63,11 @@ export default defineComponent({
     item-aligned
     @filter="filterFn"
   />
-  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ displayVal }}
   </div>
 </template>

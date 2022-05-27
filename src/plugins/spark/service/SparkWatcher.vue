@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed,defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 
 import { sparkType } from '@/plugins/spark/const';
 import { SparkService } from '@/plugins/spark/types';

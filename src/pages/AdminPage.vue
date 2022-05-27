@@ -90,10 +90,11 @@ export default defineComponent({
 <template>
   <q-page class="page-height overflow-auto">
     <PageError v-if="!startupDone" />
-    <div v-else class="column q-pa-lg">
-      <div class="text-h5">
-        System
-      </div>
+    <div
+      v-else
+      class="column q-pa-lg"
+    >
+      <div class="text-h5">System</div>
 
       <ActionItem
         label="Start a wizard"
@@ -161,9 +162,7 @@ export default defineComponent({
               <q-icon name="mdi-factory" />
             </q-item-section>
             <q-item-section>
-              <q-item-label caption>
-                Build date
-              </q-item-label>
+              <q-item-label caption> Build date </q-item-label>
               {{ buildDate }}
             </q-item-section>
           </q-item>
@@ -175,11 +174,12 @@ export default defineComponent({
         <q-separator />
       </div>
 
-      <div class="text-h5">
-        Dashboards
-      </div>
+      <div class="text-h5">Dashboards</div>
 
-      <div v-if="dashboards.length === 0" class="text-italic fade-2">
+      <div
+        v-if="dashboards.length === 0"
+        class="text-italic fade-2"
+      >
         There are no dashboards
       </div>
 
@@ -192,18 +192,22 @@ export default defineComponent({
         expand-icon-class="fade-4"
         switch-toggle-side
       >
-        <DashboardActions :dashboard-id="dash.id" class="q-ml-md" />
+        <DashboardActions
+          :dashboard-id="dash.id"
+          class="q-ml-md"
+        />
       </q-expansion-item>
 
       <div class="q-my-md">
         <q-separator />
       </div>
 
-      <div class="text-h5">
-        Services
-      </div>
+      <div class="text-h5">Services</div>
 
-      <div v-if="serviceComponents.length === 0" class="text-italic fade-2">
+      <div
+        v-if="serviceComponents.length === 0"
+        class="text-italic fade-2"
+      >
         There are no services
       </div>
 
@@ -227,11 +231,12 @@ export default defineComponent({
         <q-separator />
       </div>
 
-      <div class="text-h5">
-        Builder layouts
-      </div>
+      <div class="text-h5">Builder layouts</div>
 
-      <div v-if="layouts.length === 0" class="text-italic fade-2">
+      <div
+        v-if="layouts.length === 0"
+        class="text-italic fade-2"
+      >
         There are no builder layouts
       </div>
 
@@ -244,7 +249,11 @@ export default defineComponent({
         expand-icon-class="fade-4"
         switch-toggle-side
       >
-        <LayoutActions class="q-ml-md" :layout="layout" no-label>
+        <LayoutActions
+          class="q-ml-md"
+          :layout="layout"
+          no-label
+        >
           <ActionItem
             :to="`/builder/${layout.id}`"
             icon="mdi-tools"

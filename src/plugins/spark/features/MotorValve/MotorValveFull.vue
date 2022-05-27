@@ -127,7 +127,10 @@ export default defineComponent({
         @update:model-value="claimChannel"
       />
       <div class="col-break" />
-      <LabeledField label="State" class="col-grow">
+      <LabeledField
+        label="State"
+        class="col-grow"
+      >
         <DigitalStateButton
           :model-value="block.data.desiredState"
           :pending="block.data.state !== block.data.desiredState"

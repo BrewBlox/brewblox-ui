@@ -3,8 +3,15 @@ import isString from 'lodash/isString';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
-import { analogConstraintLabels, digitalConstraintLabels } from '@/plugins/spark/const';
-import type { AnalogConstraint, AnyConstraintsObj, DigitalConstraint } from '@/plugins/spark/types';
+import {
+  analogConstraintLabels,
+  digitalConstraintLabels,
+} from '@/plugins/spark/const';
+import type {
+  AnalogConstraint,
+  AnyConstraintsObj,
+  DigitalConstraint,
+} from '@/plugins/spark/types';
 import { prettifyConstraints } from '@/plugins/spark/utils';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/formatting';
@@ -40,9 +47,7 @@ export default defineComponent({
       validator: typeValidator,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     function change(obj: AnyConstraintsObj): void {
       emit('update:modelValue', obj);
@@ -52,36 +57,36 @@ export default defineComponent({
       () => props.modelValue.constraints.length,
     );
 
-    const limiters = computed<string[]>(
-      () => {
-        if (props.type === 'analog') {
-          return (props.modelValue.constraints as AnalogConstraint[])
-            .filter(c => c.limiting)
-            .map(c => Object.keys(c).find(k => k !== 'limiting') ?? 'Unknown')
-            .map(k => constraintLabels[k] ?? k);
-        }
-        else {
-          return (props.modelValue.constraints as DigitalConstraint[])
-            .filter(c => c.remaining.value)
-            .map(c => {
-              const key = Object.keys(c).find(k => k !== 'remaining') ?? 'Unknown';
-              const label = constraintLabels[key] ?? key;
-              return `${label} (${prettyQty(c.remaining)})`;
-            });
-        }
-      },
-    );
+    const limiters = computed<string[]>(() => {
+      if (props.type === 'analog') {
+        return (props.modelValue.constraints as AnalogConstraint[])
+          .filter((c) => c.limiting)
+          .map((c) => Object.keys(c).find((k) => k !== 'limiting') ?? 'Unknown')
+          .map((k) => constraintLabels[k] ?? k);
+      } else {
+        return (props.modelValue.constraints as DigitalConstraint[])
+          .filter((c) => c.remaining.value)
+          .map((c) => {
+            const key =
+              Object.keys(c).find((k) => k !== 'remaining') ?? 'Unknown';
+            const label = constraintLabels[key] ?? key;
+            return `${label} (${prettyQty(c.remaining)})`;
+          });
+      }
+    });
 
-    const textColor = computed<string>(
-      () => {
-        if (limiters.value.length > 0) { return 'text-pink-4'; }
-        if (numConstraints.value > 0) { return 'text-indigo-4'; }
-        return 'darkish';
-      },
-    );
+    const textColor = computed<string>(() => {
+      if (limiters.value.length > 0) {
+        return 'text-pink-4';
+      }
+      if (numConstraints.value > 0) {
+        return 'text-indigo-4';
+      }
+      return 'darkish';
+    });
 
-    const displayString = computed<string>(
-      () => prettifyConstraints(props.modelValue),
+    const displayString = computed<string>(() =>
+      prettifyConstraints(props.modelValue),
     );
 
     function openDialog(): void {
@@ -95,8 +100,7 @@ export default defineComponent({
           serviceId: props.serviceId,
           type: props.type,
         },
-      })
-        .onOk(change);
+      }).onOk(change);
     }
 
     return {
@@ -114,20 +118,24 @@ export default defineComponent({
   <div
     :class="[
       'q-ma-sm q-pa-sm q-gutter-x-sm row clickable rounded-borders',
-      textColor
+      textColor,
     ]"
     @click="openDialog"
   >
-    <q-icon name="mdi-border-outside" class="col-auto" size="sm" />
+    <q-icon
+      name="mdi-border-outside"
+      class="col-auto"
+      size="sm"
+    />
     <div class="col-auto">
       <small v-if="limiters.length">
         Limited by:
         <i>{{ limiters.join(', ') }}</i>
       </small>
       <small v-else-if="numConstraints > 0">
-        {{ numConstraints }} constraint(s), not limited</small>
-      <small v-else>
-        No constraints configured</small>
+        {{ numConstraints }} constraint(s), not limited
+      </small>
+      <small v-else> No constraints configured</small>
     </div>
     <q-tooltip v-if="numConstraints > 0">
       {{ displayString }}

@@ -54,7 +54,11 @@ export default defineComponent({
       <KeyboardButton @click="showKeyboard" />
     </template>
   </q-input>
-  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ local }}
   </div>
 </template>

@@ -61,7 +61,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-layout view="hHh Lpr fFf" style="overflow: hidden">
+  <q-layout
+    view="hHh Lpr fFf"
+    style="overflow: hidden"
+  >
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
         <portal-target name="toolbar-title" />
@@ -74,7 +77,11 @@ export default defineComponent({
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="drawerOpen" class="column" elevated>
+    <q-drawer
+      v-model="drawerOpen"
+      class="column"
+      elevated
+    >
       <SidebarNavigator />
 
       <q-scroll-area
@@ -102,7 +109,10 @@ export default defineComponent({
       </div>
     </q-drawer>
 
-    <q-page-container style="overflow: hidden" @click="stopEditing">
+    <q-page-container
+      style="overflow: hidden"
+      @click="stopEditing"
+    >
       <router-view />
     </q-page-container>
   </q-layout>

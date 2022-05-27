@@ -26,14 +26,16 @@ export interface DatabaseApiArgs {
   parsed?: boolean;
 }
 
-export function createApi<T extends StoreObject>(args: DatabaseApiArgs): DatabaseApi<T> {
-  const hydrate: ((v: any) => any) = args.parsed ? deserialize : (v => v);
+export function createApi<T extends StoreObject>(
+  args: DatabaseApiArgs,
+): DatabaseApi<T> {
+  const hydrate: (v: any) => any = args.parsed ? deserialize : (v) => v;
   const { namespace } = args;
   return {
     subscribe(onChanged: ChangeCb<T>, onDeleted: DeleteCb): void {
       database.subscribe({
         namespace,
-        onChanged: v => onChanged(hydrate(v)),
+        onChanged: (v) => onChanged(hydrate(v)),
         onDeleted,
       });
     },

@@ -25,9 +25,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'close',
-  ],
+  emits: ['close'],
   setup(props) {
     const router = useRouter();
     const busy = ref(true);
@@ -69,9 +67,7 @@ export default defineComponent({
 <template>
   <WizardBody>
     <q-card-section>
-      <q-item class="text-big">
-        About your new RIMS dashboard
-      </q-item>
+      <q-item class="text-big"> About your new RIMS dashboard </q-item>
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
@@ -79,23 +75,26 @@ export default defineComponent({
             here is a quick explanation of what we set up.
           </p>
           <p>
-            On the controller we created two PIDs to dynamically control the tube heater element.
+            On the controller we created two PIDs to dynamically control the
+            tube heater element.
           </p>
           <p>
-            We did not put every controller block on your new dashboard.
-            You can find all blocks and their relations on the Spark controller service page.
+            We did not put every controller block on your new dashboard. You can
+            find all blocks and their relations on the Spark controller service
+            page.
           </p>
-          <p>
-            On your new dashboard, you will find:
-            <ul>
-              <li>
-                A graphical representation of your setup.
-                Parts are clickable for quick access to settings.
-              </li>
-              <li>A graph with the most important metrics.</li>
-              <li>Actions that reconfigure your blocks for the various brewing steps.</li>
-            </ul>
-          </p>
+          <p>On your new dashboard, you will find:</p>
+          <ul>
+            <li>
+              A graphical representation of your setup. Parts are clickable for
+              quick access to settings.
+            </li>
+            <li>A graph with the most important metrics.</li>
+            <li>
+              Actions that reconfigure your blocks for the various brewing
+              steps.
+            </li>
+          </ul>
         </q-item-section>
       </q-item>
     </q-card-section>
@@ -108,9 +107,7 @@ export default defineComponent({
         color="primary"
         @click="done"
       >
-        <q-tooltip v-if="busy">
-          Creating everything...
-        </q-tooltip>
+        <q-tooltip v-if="busy"> Creating everything... </q-tooltip>
       </q-btn>
     </template>
   </WizardBody>

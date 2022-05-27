@@ -18,25 +18,17 @@ const quickValues: SelectOption<number>[] = [
 export default defineComponent({
   name: 'ActuatorPwmWidget',
   setup() {
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
+    const { context, inDialog } = useContext.setup();
 
-    const {
-      serviceId,
-      block,
-      saveBlock,
-      isDriven,
-    } = useBlockWidget.setup<ActuatorPwmBlock>();
+    const { serviceId, block, saveBlock, isDriven } =
+      useBlockWidget.setup<ActuatorPwmBlock>();
 
-    const outputLink = computed<Link>(
-      () => block.value.data.actuatorId,
-    );
+    const outputLink = computed<Link>(() => block.value.data.actuatorId);
 
     const isLimited = computed<boolean>(
-      () => block.value.data.enabled
-        && block.value.data.setting !== block.value.data.desiredSetting,
+      () =>
+        block.value.data.enabled &&
+        block.value.data.setting !== block.value.data.desiredSetting,
     );
 
     function updateSetting(value: number): void {
@@ -44,14 +36,10 @@ export default defineComponent({
       saveBlock();
     }
 
-    const pwmDesired = computed<number | null>(
-      () => {
-        const v = block.value.data.desiredSetting;
-        return v
-          ? roundedNumber(v, 0)
-          : v;
-      },
-    );
+    const pwmDesired = computed<number | null>(() => {
+      const v = block.value.data.desiredSetting;
+      return v ? roundedNumber(v, 0) : v;
+    });
 
     return {
       prettyLink,
@@ -84,18 +72,14 @@ export default defineComponent({
 
     <div class="q-mx-auto">
       <CardWarning v-if="!outputLink.id">
-        <template #message>
-          PWM has no target actuator configured.
-        </template>
+        <template #message> PWM has no target actuator configured. </template>
       </CardWarning>
-      <BlockEnableToggle
-        :hide-enabled="context.mode === 'Basic'"
-      >
+      <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
         <template #enabled>
-          PWM is enabled and driving <i>{{ prettyLink(outputLink) }}</i>.
+          PWM is enabled and driving <i> {{ prettyLink(outputLink) }} </i>.
         </template>
         <template #disabled>
-          PWM is disabled and not driving <i>{{ prettyLink(outputLink) }}</i>.
+          PWM is disabled and not driving <i> {{ prettyLink(outputLink) }} </i>.
         </template>
       </BlockEnableToggle>
 
@@ -106,7 +90,7 @@ export default defineComponent({
         >
           <div
             v-for="q in quickValues"
-            :key="'quick'+q.value"
+            :key="'quick' + q.value"
             class="col-auto clickable rounded-borders"
           >
             <q-btn
@@ -127,8 +111,11 @@ export default defineComponent({
           color="primary"
           @change="updateSetting"
         />
-        <div v-else class="col-grow text-center text-italic fade-3">
-          This PWM is driven by a PID block. <br>
+        <div
+          v-else
+          class="col-grow text-center text-italic fade-3"
+        >
+          This PWM is driven by a PID block. <br />
           Manual settings are disabled.
         </div>
 
@@ -159,7 +146,12 @@ export default defineComponent({
           :service-id="serviceId"
           type="analog"
           class="col-grow"
-          @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
+          @update:model-value="
+            (v) => {
+              block.data.constrainedBy = v;
+              saveBlock();
+            }
+          "
         />
       </div>
 
@@ -173,7 +165,12 @@ export default defineComponent({
             label="Period"
             tag="big"
             class="col-grow"
-            @update:model-value="v => { block.data.period = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.period = v;
+                saveBlock();
+              }
+            "
           />
           <LinkField
             :model-value="block.data.actuatorId"
@@ -181,7 +178,12 @@ export default defineComponent({
             title="target"
             label="Digital Actuator Target"
             class="col-grow"
-            @update:model-value="v => { block.data.actuatorId = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.actuatorId = v;
+                saveBlock();
+              }
+            "
           />
         </div>
       </template>

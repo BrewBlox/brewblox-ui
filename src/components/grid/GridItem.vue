@@ -383,7 +383,10 @@ export default defineComponent({
       v-touch-pan.mouse="resizePanHandler"
       class="grid-item-resize-handle"
     >
-      <q-icon name="mdi-resize-bottom-right" size="30px" />
+      <q-icon
+        name="mdi-resize-bottom-right"
+        size="30px"
+      />
     </button>
     <!-- Item drag button -->
     <button
@@ -392,7 +395,10 @@ export default defineComponent({
       class="grid-item-move-handle grid-item-movable"
     >
       <div class="column q-gutter-sm items-center">
-        <q-icon name="mdi-gesture-swipe-horizontal" size="50px" />
+        <q-icon
+          name="mdi-gesture-swipe-horizontal"
+          size="50px"
+        />
         <div>Drag to reposition</div>
         <q-btn
           :icon="localWidget.pinnedPosition ? 'mdi-pin' : undefined"
@@ -409,7 +415,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .grid-item
   position: relative
 

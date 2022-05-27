@@ -257,7 +257,10 @@ export default defineComponent({
         <div>{{ err ? err.message : '---' }}</div>
       </div>
 
-      <LabeledField label="Active comparisons" tag-class="col-grow">
+      <LabeledField
+        label="Active comparisons"
+        tag-class="col-grow"
+      >
         <div class="row q-gutter-xs col-grow">
           <q-chip
             v-for="{ key, cmp, pretty } in digital"
@@ -270,7 +273,10 @@ export default defineComponent({
             @remove="removeDigital(key)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div class="text-lime-6 text-bold col-auto" style="width: 1em">
+              <div
+                class="text-lime-6 text-bold col-auto"
+                style="width: 1em"
+              >
                 {{ key }}
               </div>
               <q-icon
@@ -298,7 +304,10 @@ export default defineComponent({
             @remove="removeAnalog(key)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div class="text-orange-6 text-bold col-auto" style="width: 1em">
+              <div
+                class="text-orange-6 text-bold col-auto"
+                style="width: 1em"
+              >
                 {{ key }}
               </div>
               <q-icon

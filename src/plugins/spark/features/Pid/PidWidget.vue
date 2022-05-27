@@ -19,18 +19,11 @@ export default defineComponent({
   },
   setup() {
     const { context, inDialog } = useContext.setup();
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<PidBlock>();
+    const { block, saveBlock } = useBlockWidget.setup<PidBlock>();
 
-    const inputLink = computed<Link>(
-      () => block.value.data.inputId,
-    );
+    const inputLink = computed<Link>(() => block.value.data.inputId);
 
-    const outputLink = computed<Link>(
-      () => block.value.data.outputId,
-    );
+    const outputLink = computed<Link>(() => block.value.data.outputId);
 
     function enable(): void {
       block.value.data.enabled = true;
@@ -76,33 +69,29 @@ export default defineComponent({
     <component :is="context.mode">
       <template #warnings>
         <CardWarning v-if="!inputLink.id">
-          <template #message>
-            PID has no input block configured.
-          </template>
+          <template #message> PID has no input block configured. </template>
         </CardWarning>
 
         <CardWarning v-if="!outputLink.id">
-          <template #message>
-            PID has no output block configured.
-          </template>
+          <template #message> PID has no output block configured. </template>
         </CardWarning>
 
         <template v-if="inputLink.id && outputLink.id">
           <CardWarning v-if="block.data.enabled && !block.data.active">
             <template #message>
               <span>
-                PID is inactive and not driving <i>{{ prettyLink(outputLink) }}</i>.
+                PID is inactive and not driving
+                <i> {{ prettyLink(outputLink) }} </i>.
               </span>
             </template>
           </CardWarning>
-          <BlockEnableToggle
-            :hide-enabled="context.mode === 'Basic'"
-          >
+          <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
             <template #enabled>
-              PID is enabled and driving <i>{{ prettyLink(outputLink) }}</i>.
+              PID is enabled and driving <i> {{ prettyLink(outputLink) }} </i>.
             </template>
             <template #disabled>
-              PID is disabled and not driving <i>{{ prettyLink(outputLink) }}</i>.
+              PID is disabled and not driving
+              <i> {{ prettyLink(outputLink) }} </i>.
             </template>
           </BlockEnableToggle>
         </template>

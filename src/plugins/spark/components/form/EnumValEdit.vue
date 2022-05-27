@@ -29,7 +29,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <div v-if="editable" class="row no-wrap q-gutter-x-xs">
+  <div
+    v-if="editable"
+    class="row no-wrap q-gutter-x-xs"
+  >
     <q-select
       v-model="field"
       :options="options"
@@ -40,7 +43,11 @@ export default defineComponent({
       item-aligned
     />
   </div>
-  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ field }}
   </div>
 </template>

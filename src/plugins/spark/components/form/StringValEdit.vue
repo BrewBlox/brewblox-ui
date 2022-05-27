@@ -35,12 +35,20 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-input v-if="editable" v-model="field" dense>
+  <q-input
+    v-if="editable"
+    v-model="field"
+    dense
+  >
     <template #append>
       <KeyboardButton @click="showKeyboard" />
     </template>
   </q-input>
-  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ displayValue }}
   </div>
 </template>

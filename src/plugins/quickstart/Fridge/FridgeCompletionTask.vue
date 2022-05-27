@@ -66,9 +66,7 @@ export default defineComponent({
 <template>
   <WizardBody>
     <q-card-section>
-      <q-item class="text-big">
-        About your new fridge dashboard
-      </q-item>
+      <q-item class="text-big"> About your new fridge dashboard </q-item>
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
@@ -78,7 +76,7 @@ export default defineComponent({
           <p>
             On the controller we created two PIDs to drive the heater and the
             cooler.
-            <br>They both use the <i>Fridge Setpoint</i> as input.
+            <br />They both use the <i>Fridge Setpoint</i> as input.
           </p>
           <p>
             We did not put every controller block on your new dashboard. You can
@@ -110,9 +108,7 @@ export default defineComponent({
         color="primary"
         @click="done"
       >
-        <q-tooltip v-if="busy">
-          Creating everything...
-        </q-tooltip>
+        <q-tooltip v-if="busy"> Creating everything... </q-tooltip>
       </q-btn>
     </template>
   </WizardBody>

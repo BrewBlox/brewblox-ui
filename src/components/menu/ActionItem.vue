@@ -33,18 +33,14 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'click',
-  ],
+  emits: ['click'],
   setup(props, { attrs, emit }) {
-    const combinedProps = computed<AnyDict>(
-      () => ({
-        clickable: !props.disabled,
-        active: props.active && !props.disabled,
-        ...props.itemProps,
-        ...attrs,
-      }),
-    );
+    const combinedProps = computed<AnyDict>(() => ({
+      clickable: !props.disabled,
+      active: props.active && !props.disabled,
+      ...props.itemProps,
+      ...attrs,
+    }));
 
     function onClick(evt: MouseEvent | TouchEvent): void {
       if (!props.disabled) {
@@ -64,13 +60,16 @@ export default defineComponent({
   <q-item
     v-close-popup="noClose || disabled ? 0 : 1"
     v-bind="combinedProps"
-    :class="{darkened: disabled}"
+    :class="{ darkened: disabled }"
     @click="onClick"
   >
     <q-tooltip v-if="tooltip && !disabled">
       {{ tooltip }}
     </q-tooltip>
-    <q-item-section v-if="icon" avatar>
+    <q-item-section
+      v-if="icon"
+      avatar
+    >
       <q-icon :name="icon" />
     </q-item-section>
     <q-item-section v-if="label">

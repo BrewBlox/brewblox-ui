@@ -195,16 +195,14 @@ export default defineComponent({
       </q-item>
       <q-item>
         <q-item-section>
-          <q-item-label class="text-subtitle1">
-            Mash tun heating
-          </q-item-label>
+          <q-item-label class="text-subtitle1"> Mash tun heating </q-item-label>
           <p>
             To heat the wort in your mash tun, it is pumped through a coil in
             the HLT.
-            <br>
+            <br />
             We don't want to use a static HLT temperature a bit higher than the
             mash tun.
-            <br>
+            <br />
             We can do better than that, by using a third PID to change the HLT
             setpoint dynamically.
           </p>
@@ -286,9 +284,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="done"
+      />
     </template>
   </WizardBody>
 </template>

@@ -88,9 +88,7 @@ export default defineComponent({
         <q-list dense>
           <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Key
-              </q-item-label>
+              <q-item-label caption> Key </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
               {{ field }}
@@ -98,9 +96,7 @@ export default defineComponent({
           </q-item>
           <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Line color
-              </q-item-label>
+              <q-item-label caption> Line color </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
               <ColorField
@@ -113,9 +109,7 @@ export default defineComponent({
           </q-item>
           <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Y-axis
-              </q-item-label>
+              <q-item-label caption> Y-axis </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
               <q-btn-toggle
@@ -132,14 +126,16 @@ export default defineComponent({
       </q-item-section>
     </div>
     <q-item v-if="!selected || selected.length === 0">
-      <q-item-section side>
-        No metrics selected
-      </q-item-section>
+      <q-item-section side> No metrics selected </q-item-section>
     </q-item>
     <q-item>
       <q-space />
       <q-item-section class="col-auto">
-        <q-btn outline round icon="edit">
+        <q-btn
+          outline
+          round
+          icon="edit"
+        >
           <q-tooltip>Edit targets</q-tooltip>
         </q-btn>
       </q-item-section>

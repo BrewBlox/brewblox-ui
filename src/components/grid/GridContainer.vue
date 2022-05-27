@@ -108,7 +108,10 @@ export default defineComponent({
       @size="updateItemSize"
       @position="updateItemPosition"
     >
-      <WidgetProvider :context="context" :widget-id="item.widget.id">
+      <WidgetProvider
+        :context="context"
+        :widget-id="item.widget.id"
+      >
         <component
           :is="item.component"
           :error="item.error"
@@ -117,13 +120,19 @@ export default defineComponent({
         />
       </WidgetProvider>
     </GridItem>
-    <div v-if="editable" class="grid-container-overlay">
+    <div
+      v-if="editable"
+      class="grid-container-overlay"
+    >
       <div class="grid-container-overlay-grid" />
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style
+  scoped
+  lang="scss"
+>
 // Grid square / gap size values are hardcoded here at 100px/20px
 
 .grid-container {

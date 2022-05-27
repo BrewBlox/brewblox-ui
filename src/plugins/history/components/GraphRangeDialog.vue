@@ -13,36 +13,25 @@ export default defineComponent({
       default: () => [null, null],
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
 
     const minV = ref(props.value[0] ?? -10);
     const maxV = ref(props.value[1] ?? 20);
 
-    const minVRules = computed<InputRule[]>(
-      () => [
-        v => Number(v) < maxV.value || 'Lower bound must be less than upper bound',
-      ],
-    );
+    const minVRules = computed<InputRule[]>(() => [
+      (v) =>
+        Number(v) < maxV.value || 'Lower bound must be less than upper bound',
+    ]);
 
-    const maxVRules = computed<InputRule[]>(
-      () => [
-        v => Number(v) > maxV.value || 'Upper bound must be more than lower bound',
-      ],
-    );
+    const maxVRules = computed<InputRule[]>(() => [
+      (v) =>
+        Number(v) > maxV.value || 'Upper bound must be more than lower bound',
+    ]);
 
-    const valuesOk = computed<boolean>(
-      () => minV.value < maxV.value,
-    );
+    const valuesOk = computed<boolean>(() => minV.value < maxV.value);
 
     function showMinVKeyboard(): void {
       createDialog({
@@ -52,8 +41,7 @@ export default defineComponent({
           rules: minVRules.value,
           type: 'number',
         },
-      })
-        .onOk(v => minV.value = v);
+      }).onOk((v) => (minV.value = v));
     }
 
     function showMaxVKeyboard(): void {
@@ -64,8 +52,7 @@ export default defineComponent({
           rules: maxVRules.value,
           type: 'number',
         },
-      })
-        .onOk(v => maxV.value = v);
+      }).onOk((v) => (maxV.value = v));
     }
 
     function save(): void {
@@ -104,7 +91,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <div class="row q-gutter-sm">
         <q-input
           v-model.number="minV"
@@ -133,10 +120,26 @@ export default defineComponent({
         </q-input>
       </div>
       <template #actions>
-        <q-btn flat label="Auto" color="primary" @click="clear" />
+        <q-btn
+          flat
+          label="Auto"
+          color="primary"
+          @click="clear"
+        />
         <q-space />
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn :disable="!valuesOk" flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          :disable="!valuesOk"
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

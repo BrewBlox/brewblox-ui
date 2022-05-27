@@ -29,12 +29,23 @@ export default defineComponent({
 
 <template>
   <div v-if="editable">
-    <div v-if="!comparison" class="text-warning q-mb-sm">
-      Values will replace all existing constraints on <i>{{ blockId }}</i>.
+    <div
+      v-if="!comparison"
+      class="text-warning q-mb-sm"
+    >
+      Values will replace all existing constraints on
+      <i> {{ blockId }} </i>.
     </div>
-    <DigitalConstraints v-model="field" :service-id="serviceId" />
+    <DigitalConstraints
+      v-model="field"
+      :service-id="serviceId"
+    />
   </div>
-  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ displayString }}
   </div>
 </template>

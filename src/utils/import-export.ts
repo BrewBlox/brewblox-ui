@@ -35,14 +35,14 @@ export function loadFile<T>(onSelected: (val: T) => void, raw = false): void {
   input.setAttribute('type', 'file');
   input.setAttribute('id', 'import-input');
 
-  reader.onload = evt => {
+  reader.onload = (evt) => {
     const str = get(evt, 'target.result');
     if (str) {
       onSelected(raw ? str : deserialize(JSON.parse(str)));
     }
   };
 
-  input.onchange = evt => {
+  input.onchange = (evt) => {
     const file = get(evt, 'target.files[0]');
     if (file) {
       reader.readAsText(file);

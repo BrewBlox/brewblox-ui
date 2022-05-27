@@ -23,19 +23,19 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'update:part',
-  ],
+  emits: ['update:part'],
   setup(props, { emit }) {
     const value = computed<boolean>({
-      get: () => Boolean(props.part.settings[props.settingsKey] ?? props.defaultValue),
-      set: v => emit('update:part', {
-        ...props.part,
-        settings: {
-          ...props.part.settings,
-          [props.settingsKey]: v,
-        },
-      }),
+      get: () =>
+        Boolean(props.part.settings[props.settingsKey] ?? props.defaultValue),
+      set: (v) =>
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            [props.settingsKey]: v,
+          },
+        }),
     });
 
     return {

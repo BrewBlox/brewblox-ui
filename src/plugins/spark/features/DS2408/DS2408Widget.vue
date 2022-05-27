@@ -89,9 +89,7 @@ export default defineComponent({
 
     <div>
       <CardWarning v-if="!block.data.connected">
-        <template #message>
-          DS2408 is not connected
-        </template>
+        <template #message> DS2408 is not connected </template>
       </CardWarning>
       <div class="column">
         <q-btn-toggle

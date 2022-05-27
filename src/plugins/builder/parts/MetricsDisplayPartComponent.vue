@@ -98,7 +98,10 @@ export default defineComponent({
         >
           {{ d.value }}
         </LabeledField>
-        <div v-if="!values.length" class="self-center q-pt-sm">
+        <div
+          v-if="!values.length"
+          class="self-center q-pt-sm"
+        >
           No metrics
         </div>
       </div>

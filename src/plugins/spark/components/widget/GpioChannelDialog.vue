@@ -271,7 +271,10 @@ export default defineComponent({
 
         <div class="col-break" />
 
-        <LabeledField label="Multiply pins" class="col-6">
+        <LabeledField
+          label="Multiply pins"
+          class="col-6"
+        >
           <div class="text-weight-light">
             Control parallel devices or deliver more power to a single device.
           </div>
@@ -293,7 +296,12 @@ export default defineComponent({
         />
       </div>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           flat
           label="OK"

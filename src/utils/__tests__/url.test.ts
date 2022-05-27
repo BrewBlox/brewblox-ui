@@ -1,11 +1,6 @@
-import {
-  isAbsoluteUrl,
-  isUrlSafe,
-  makeUrlSafe,
-} from '@/utils/url';
+import { isAbsoluteUrl, isUrlSafe, makeUrlSafe } from '@/utils/url';
 
 describe('URL utils', () => {
-
   it('Should recognize absolute URLs', () => {
     expect(isAbsoluteUrl('http://test')).toBe(true);
     expect(isAbsoluteUrl('localhost')).toBe(false);

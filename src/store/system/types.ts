@@ -1,4 +1,4 @@
-import { GravityUnit,TempUnit } from '@/shared-types';
+import { GravityUnit, TempUnit } from '@/shared-types';
 
 export interface SystemConfig {
   keyboardLayout: string;

@@ -92,7 +92,10 @@ export default defineComponent({
 
 <template>
   <q-page class="page-height">
-    <q-resize-observer :debounce="200" @resize="refresh" />
+    <q-resize-observer
+      :debounce="200"
+      @resize="refresh"
+    />
     <TitleTeleport>
       {{ title }}
     </TitleTeleport>

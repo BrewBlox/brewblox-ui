@@ -19,19 +19,18 @@ export default defineComponent({
       default: 'Text field',
     },
   },
-  emits: [
-    'update:part',
-  ],
+  emits: ['update:part'],
   setup(props, { emit }) {
     const text = computed<string>({
       get: () => props.part.settings[props.settingsKey] ?? '',
-      set: val => emit('update:part', {
-        ...props.part,
-        settings: {
-          ...props.part.settings,
-          [props.settingsKey]: val,
-        },
-      }),
+      set: (val) =>
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            [props.settingsKey]: val,
+          },
+        }),
     });
 
     return {

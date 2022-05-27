@@ -6,11 +6,9 @@ import { DenseKey, NowKey, TouchKey } from '@/symbols';
 
 export default boot(({ app }) => {
   const now = ref<Date>(new Date());
-  setInterval(() => now.value = new Date(), 10 * 1000);
+  setInterval(() => (now.value = new Date()), 10 * 1000);
 
-  const dense = computed<boolean>(
-    () => Screen.lt.md,
-  );
+  const dense = computed<boolean>(() => Screen.lt.md);
 
   app.provide(DenseKey, dense);
   app.provide(TouchKey, ref(document.body.classList.contains('touch')));

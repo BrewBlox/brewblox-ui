@@ -70,14 +70,25 @@ export default defineComponent({
 
 <template>
   <g>
-    <LiquidStroke :paths="paths.liquid" :colors="liquids" class="coil-liquid" />
+    <LiquidStroke
+      :paths="paths.liquid"
+      :colors="liquids"
+      class="coil-liquid"
+    />
     <g class="outline">
-      <path v-for="border in paths.borders" :key="border" :d="border" />
+      <path
+        v-for="border in paths.borders"
+        :key="border"
+        :d="border"
+      />
     </g>
   </g>
 </template>
 
-<style lang="scss" scoped>
+<style
+  lang="scss"
+  scoped
+>
 :deep(.coil-liquid path) {
   stroke-linecap: round;
 }

@@ -43,5 +43,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionItem v-bind="{...$attrs, ...$props}" @click="exportData" />
+  <ActionItem
+    v-bind="{ ...$attrs, ...$props }"
+    @click="exportData"
+  />
 </template>

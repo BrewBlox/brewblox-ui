@@ -189,12 +189,21 @@ export default defineComponent({
       :is="useTeleport ? 'ButtonsTeleport' : 'div'"
       :class="useTeleport ? '' : 'col-auto row justify-end z-top'"
     >
-      <ActionMenu v-if="useRange" icon="mdi-arrow-expand-vertical">
+      <ActionMenu
+        v-if="useRange"
+        icon="mdi-arrow-expand-vertical"
+      >
         <template #menus>
-          <GraphRangeSubmenu :layout="layout" :save="(v) => saveLayout(v)" />
+          <GraphRangeSubmenu
+            :layout="layout"
+            :save="(v) => saveLayout(v)"
+          />
         </template>
       </ActionMenu>
-      <ActionMenu v-if="usePresets" icon="mdi-timelapse">
+      <ActionMenu
+        v-if="usePresets"
+        icon="mdi-timelapse"
+      >
         <template #menus>
           <ActionSubmenu label="Presets">
             <ActionItem
@@ -213,12 +222,18 @@ export default defineComponent({
       v-if="error"
       class="col row justify-center items-center text-h5 q-gutter-x-md"
     >
-      <q-icon name="warning" color="negative" />
+      <q-icon
+        name="warning"
+        color="negative"
+      />
       <div class="col-auto">
         {{ error }}
       </div>
     </div>
-    <div v-else class="col">
+    <div
+      v-else
+      class="col"
+    >
       <GenericGraph
         ref="displayRef"
         :data="graphData"
