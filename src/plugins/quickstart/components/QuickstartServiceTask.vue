@@ -110,7 +110,12 @@ export default defineComponent({
         :key="'stub-' + stub.id"
         class="q-mt-lg q-pa-md column items-center q-gutter-md"
       >
-        <q-icon name="warning" color="warning" size="md" class="col-auto" />
+        <q-icon
+          name="warning"
+          color="warning"
+          size="md"
+          class="col-auto"
+        />
         <span>
           Detected new Spark service <i>{{ stub.id }}</i>
         </span>
@@ -127,7 +132,12 @@ export default defineComponent({
         v-if="service && hasBlocks"
         class="q-mt-lg q-pa-md column items-center q-gutter-md"
       >
-        <q-icon name="warning" color="warning" size="md" class="col-auto" />
+        <q-icon
+          name="warning"
+          color="warning"
+          size="md"
+          class="col-auto"
+        />
         <span class="no-select">
           You already have blocks on <i>{{ service.title }}</i>
         </span>
@@ -149,7 +159,11 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
       <q-btn
         :disable="!ready"

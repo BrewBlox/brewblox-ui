@@ -68,11 +68,21 @@ export default defineComponent({
       :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
-      <BrokenIcon v-if="isBroken" class="col" />
-      <UnlinkedIcon v-else-if="!block" class="col" />
+      <BrokenIcon
+        v-if="isBroken"
+        class="col"
+      />
+      <UnlinkedIcon
+        v-else-if="!block"
+        class="col"
+      />
       <template v-else>
         <div class="col row q-pt-xs">
-          <q-icon :name="mdiThermometer" class="static" size="20px" />
+          <q-icon
+            :name="mdiThermometer"
+            class="static"
+            size="20px"
+          />
           <small>{{ tempUnit }}</small>
         </div>
         <div class="col text-bold text-center">

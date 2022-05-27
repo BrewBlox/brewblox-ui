@@ -125,7 +125,10 @@ export default defineComponent({
   >
     <DialogCard v-bind="{ title, message, html }">
       <div class="q-pa-sm q-gutter-md">
-        <div v-if="services.length === 0" class="text-italic fade-2">
+        <div
+          v-if="services.length === 0"
+          class="text-italic fade-2"
+        >
           No Spark services found
         </div>
         <ListSelect
@@ -148,9 +151,7 @@ export default defineComponent({
         >
           <template #no-option>
             <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
+              <q-item-section class="text-grey"> No results </q-item-section>
             </q-item>
           </template>
           <template #after>
@@ -174,7 +175,12 @@ export default defineComponent({
         />
       </div>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!block || !selectedFields.length"
           flat

@@ -108,12 +108,17 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
-      <SettingValueField editable class="col-grow" @click="editInput">
-        <template #header>
-          Input
-        </template>
+      <SettingValueField
+        editable
+        class="col-grow"
+        @click="editInput"
+      >
+        <template #header> Input </template>
         <template #valueIcon>
-          <q-icon name="mdi-thermometer" color="green-3" />
+          <q-icon
+            name="mdi-thermometer"
+            color="green-3"
+          />
         </template>
         <template #value>
           {{ prettyQty(block.data.inputValue) }}
@@ -122,12 +127,17 @@ export default defineComponent({
           {{ prettyQty(block.data.inputSetting) }}
         </template>
       </SettingValueField>
-      <SettingValueField editable class="col-grow" @click="showOutput">
-        <template #header>
-          Output
-        </template>
+      <SettingValueField
+        editable
+        class="col-grow"
+        @click="showOutput"
+      >
+        <template #header> Output </template>
         <template #valueIcon>
-          <q-icon v-if="kp === null" name="mdi-calculator-variant" />
+          <q-icon
+            v-if="kp === null"
+            name="mdi-calculator-variant"
+          />
           <HeatingIcon
             v-else-if="kp > 0"
             color="red"
@@ -150,9 +160,7 @@ export default defineComponent({
       <div class="col-break" />
 
       <div class="col row no-wrap q-gutter-x-sm q-mr-md">
-        <div class="col-auto self-center text-bold">
-          P
-        </div>
+        <div class="col-auto self-center text-bold">P</div>
         <q-slider
           :model-value="fit(block.data.p)"
           readonly
@@ -160,9 +168,7 @@ export default defineComponent({
           thumb-path=""
         />
 
-        <div class="col-auto self-center text-bold">
-          I
-        </div>
+        <div class="col-auto self-center text-bold">I</div>
         <q-slider
           :model-value="fit(block.data.i)"
           :max="100"
@@ -171,9 +177,7 @@ export default defineComponent({
           thumb-path=""
         />
 
-        <div class="col-auto self-center text-bold">
-          D
-        </div>
+        <div class="col-auto self-center text-bold">D</div>
         <q-slider
           :model-value="fit(block.data.d)"
           :max="100"

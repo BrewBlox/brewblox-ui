@@ -11,14 +11,8 @@ import { bloxQty, deltaTempQty } from '@/utils/quantity';
 export default defineComponent({
   name: 'TempSensorMockWidget',
   setup() {
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<TempSensorMockBlock>();
+    const { context, inDialog } = useContext.setup();
+    const { block, saveBlock } = useBlockWidget.setup<TempSensorMockBlock>();
 
     function addFluctuation(): void {
       block.value.data.fluctuations.push({
@@ -46,11 +40,10 @@ export default defineComponent({
           title: 'Setting',
           label: 'Setting',
         },
-      })
-        .onOk(v => {
-          block.value.data.setting = v;
-          saveBlock();
-        });
+      }).onOk((v) => {
+        block.value.data.setting = v;
+        saveBlock();
+      });
     }
 
     return {
@@ -86,7 +79,10 @@ export default defineComponent({
           @click="editSetting"
         >
           <template #valueIcon>
-            <q-icon name="mdi-thermometer" color="green-3" />
+            <q-icon
+              name="mdi-thermometer"
+              color="green-3"
+            />
           </template>
           <template #value>
             {{ prettyQty(block.data.value) }}
@@ -107,12 +103,15 @@ export default defineComponent({
             dense
             :model-value="block.data.connected"
             class="q-pl-md"
-            @update:model-value="v => { block.data.connected = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.connected = v;
+                saveBlock();
+              }
+            "
           />
         </LabeledField>
-        <div class="text-h6 text-italic q-pl-sm">
-          Fluctuations
-        </div>
+        <div class="text-h6 text-italic q-pl-sm">Fluctuations</div>
         <p
           v-if="block.data.fluctuations.length === 0"
           class="text-italic q-pl-sm"
@@ -129,14 +128,18 @@ export default defineComponent({
             title="Amplitude"
             label="Amplitude"
             class="col-grow"
-            @update:model-value="amplitude => updateFluctuation(idx, {...fluct, amplitude})"
+            @update:model-value="
+              (amplitude) => updateFluctuation(idx, { ...fluct, amplitude })
+            "
           />
           <DurationField
             :model-value="fluct.period"
             title="Period"
             label="Period"
             class="col-grow"
-            @update:model-value="period => updateFluctuation(idx, {...fluct, period})"
+            @update:model-value="
+              (period) => updateFluctuation(idx, { ...fluct, period })
+            "
           />
           <q-btn
             flat
@@ -147,7 +150,13 @@ export default defineComponent({
           />
         </div>
         <div class="row justify-end q-pr-md">
-          <q-btn fab-mini icon="add" color="indigo-4" class="self-center" @click="addFluctuation">
+          <q-btn
+            fab-mini
+            icon="add"
+            color="indigo-4"
+            class="self-center"
+            @click="addFluctuation"
+          >
             <q-tooltip>Add fluctuation</q-tooltip>
           </q-btn>
         </div>
@@ -156,7 +165,10 @@ export default defineComponent({
   </PreviewCard>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .fluctuation:nth-child(even) > label
   background: rgba($green-5, 0.05)
 

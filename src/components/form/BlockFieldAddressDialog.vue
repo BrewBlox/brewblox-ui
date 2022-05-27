@@ -223,9 +223,20 @@ export default defineComponent({
           >
             <q-tooltip>Show {{ blockId }}</q-tooltip>
           </q-btn>
-          <q-btn v-else flat round disable icon="mdi-launch" />
+          <q-btn
+            v-else
+            flat
+            round
+            disable
+            icon="mdi-launch"
+          />
 
-          <q-btn flat round icon="add" @click="createBlock">
+          <q-btn
+            flat
+            round
+            icon="add"
+            @click="createBlock"
+          >
             <q-tooltip>Create new block</q-tooltip>
           </q-btn>
         </template>
@@ -243,7 +254,12 @@ export default defineComponent({
       />
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!localOk"
           flat

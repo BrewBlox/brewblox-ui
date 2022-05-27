@@ -9,9 +9,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'click',
-  ],
+  emits: ['click'],
   setup(props, { emit }) {
     function edit(): void {
       if (props.editable) {
@@ -29,12 +27,15 @@ export default defineComponent({
   <div
     :class="[
       'col-auto row justify-center q-py-sm rounded-borders',
-      {clickable: editable}
+      { clickable: editable },
     ]"
     @click="edit"
   >
     <div class="col-auto grid-container">
-      <div v-if="$slots.header" class="grid-value text-h5 text-purple-3">
+      <div
+        v-if="$slots.header"
+        class="grid-value text-h5 text-purple-3"
+      >
         <slot name="header" />
       </div>
 
@@ -57,7 +58,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .grid-container
   display: grid
   grid-template-columns: repeat(3, 50px)

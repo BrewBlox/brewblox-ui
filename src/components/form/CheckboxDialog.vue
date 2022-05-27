@@ -24,23 +24,14 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
     const local = ref<any[]>([...props.modelValue]);
 
-    const cancelLabel = computed<string>(
-      () => typeof props.cancel === 'string'
-        ? props.cancel
-        : 'Cancel',
+    const cancelLabel = computed<string>(() =>
+      typeof props.cancel === 'string' ? props.cancel : 'Cancel',
     );
 
     function save(): void {
@@ -67,11 +58,11 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <div class="q-gutter-sm column">
         <q-checkbox
           v-for="(opt, idx) in selectOptions"
-          :key="'opt-'+idx"
+          :key="'opt-' + idx"
           v-model="local"
           :val="opt.value"
           :label="opt.label"

@@ -15,44 +15,32 @@ const referenceOpts: SelectOption<ReferenceKind>[] = [
 export default defineComponent({
   name: 'ActuatorOffsetWidget',
   setup() {
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
-    const {
-      serviceId,
-      block,
-      saveBlock,
-      isDriven,
-    } = useBlockWidget.setup<ActuatorOffsetBlock>();
+    const { context, inDialog } = useContext.setup();
+    const { serviceId, block, saveBlock, isDriven } =
+      useBlockWidget.setup<ActuatorOffsetBlock>();
 
     function enable(): void {
       block.value.data.enabled = true;
       saveBlock();
     }
 
-    const target = computed<Link>(
-      () => block.value.data.targetId,
-    );
+    const target = computed<Link>(() => block.value.data.targetId);
 
-    const reference = computed<Link>(
-      () => block.value.data.referenceId,
-    );
+    const reference = computed<Link>(() => block.value.data.referenceId);
 
     const refKind = computed<string>(
-      () => referenceOpts
-        .find(v => v.value === block.value.data.referenceSettingOrValue)
-        ?.label
-        ?? '???',
+      () =>
+        referenceOpts.find(
+          (v) => v.value === block.value.data.referenceSettingOrValue,
+        )?.label ?? '???',
     );
 
-    const isLimited = computed<boolean>(
-      () => {
-        const { enabled, desiredSetting, setting } = block.value.data;
-        return enabled
-          && fixedNumber(desiredSetting, 1) !== fixedNumber(setting, 1);
-      },
-    );
+    const isLimited = computed<boolean>(() => {
+      const { enabled, desiredSetting, setting } = block.value.data;
+      return (
+        enabled && fixedNumber(desiredSetting, 1) !== fixedNumber(setting, 1)
+      );
+    });
 
     return {
       prettyLink,
@@ -94,15 +82,13 @@ export default defineComponent({
           Setpoint Driver has no reference Setpoint configured.
         </template>
       </CardWarning>
-      <BlockEnableToggle
-        :hide-enabled="context.mode === 'Basic'"
-      >
+      <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
         <template #enabled>
-          Driver is enabled and driving <i>{{ prettyLink(target) }}</i>, based on the
-          {{ refKind }} of <i>{{ prettyLink(reference) }}</i>.
+          Driver is enabled and driving <i> {{ prettyLink(target) }} </i>, based
+          on the {{ refKind }} of <i> {{ prettyLink(reference) }} </i>.
         </template>
         <template #disabled>
-          Driver is disabled and not driving <i>{{ prettyLink(target) }}</i>.
+          Driver is disabled and not driving <i> {{ prettyLink(target) }} </i>.
         </template>
       </BlockEnableToggle>
 
@@ -116,7 +102,12 @@ export default defineComponent({
           type="number"
           class="col-grow"
           tag-class="text-primary"
-          @update:model-value="v => { block.data.desiredSetting = v; saveBlock(); }"
+          @update:model-value="
+            (v) => {
+              block.data.desiredSetting = v;
+              saveBlock();
+            }
+          "
         />
         <LabeledField
           :model-value="block.data.setting"
@@ -144,7 +135,12 @@ export default defineComponent({
             title="Driven block"
             label="Driven block"
             class="col-grow"
-            @update:model-value="v => { block.data.targetId = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.targetId = v;
+                saveBlock();
+              }
+            "
           />
           <LinkField
             :model-value="block.data.referenceId"
@@ -152,7 +148,12 @@ export default defineComponent({
             title="Reference block"
             label="Reference block"
             class="col-grow"
-            @update:model-value="v => { block.data.referenceId = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.referenceId = v;
+                saveBlock();
+              }
+            "
           />
           <SelectField
             :model-value="block.data.referenceSettingOrValue"
@@ -160,7 +161,12 @@ export default defineComponent({
             title="Reference field"
             label="Reference field"
             class="col-grow"
-            @update:model-value="v => { block.data.referenceSettingOrValue = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.referenceSettingOrValue = v;
+                saveBlock();
+              }
+            "
           />
         </template>
 
@@ -176,7 +182,12 @@ export default defineComponent({
           :service-id="serviceId"
           type="analog"
           class="col-grow"
-          @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
+          @update:model-value="
+            (v) => {
+              block.data.constrainedBy = v;
+              saveBlock();
+            }
+          "
         />
       </div>
     </div>

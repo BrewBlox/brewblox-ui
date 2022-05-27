@@ -44,12 +44,10 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      scale,
-    } = usePart.setup(props.part);
+    const { scale } = usePart.setup(props.part);
 
-    const color = computed<string>(
-      () => colorString(props.part.settings.color),
+    const color = computed<string>(() =>
+      colorString(props.part.settings.color),
     );
 
     return {
@@ -64,7 +62,11 @@ export default defineComponent({
 <template>
   <g :transform="`scale(${scale} ${scale})`">
     <g transform="translate(5, 24)">
-      <path :d="paths.liquid" :fill="color" :stroke="color" />
+      <path
+        :d="paths.liquid"
+        :fill="color"
+        :stroke="color"
+      />
       <g class="outline">
         <path :d="paths.edge" />
       </g>

@@ -304,13 +304,19 @@ export default defineComponent({
       v-if="context.mode === 'Basic' && error"
       class="col row justify-center items-center text-h5 q-gutter-x-md q-my-lg"
     >
-      <q-icon name="warning" color="warning" />
+      <q-icon
+        name="warning"
+        color="warning"
+      />
       <div class="col-auto">
         {{ error }}
       </div>
     </div>
 
-    <div v-if="context.mode === 'Full'" class="widget-body row">
+    <div
+      v-if="context.mode === 'Full'"
+      class="widget-body row"
+    >
       <q-select
         v-model="serviceId"
         :options="serviceIds"
@@ -323,7 +329,10 @@ export default defineComponent({
   </Card>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .display
   margin: 0 auto
 

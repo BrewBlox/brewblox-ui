@@ -9,10 +9,7 @@ export default defineComponent({
   name: 'DS2413Widget',
   setup() {
     const { context } = useContext.setup();
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<DS2413Block>();
+    const { block, saveBlock } = useBlockWidget.setup<DS2413Block>();
 
     return {
       context,
@@ -31,9 +28,7 @@ export default defineComponent({
 
     <div>
       <CardWarning v-if="!block.data.connected">
-        <template #message>
-          DS2413 is not connected
-        </template>
+        <template #message> DS2413 is not connected </template>
       </CardWarning>
       <IoArray />
 
@@ -51,7 +46,12 @@ export default defineComponent({
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="v => { block.data.address = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.address = v;
+                saveBlock();
+              }
+            "
           />
         </div>
       </template>

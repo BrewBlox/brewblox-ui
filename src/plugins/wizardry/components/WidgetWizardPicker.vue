@@ -119,7 +119,10 @@ export default defineComponent({
     @done="onDone"
   />
 
-  <WizardBody v-else @keyup.ctrl.enter="next">
+  <WizardBody
+    v-else
+    @keyup.ctrl.enter="next"
+  >
     <div class="widget-body column">
       <q-input
         v-model="filter"
@@ -143,7 +146,11 @@ export default defineComponent({
     </div>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="onBack" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <q-btn
         :disable="!valuesOk"

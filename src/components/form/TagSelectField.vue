@@ -77,7 +77,10 @@ export default defineComponent({
           {{ scope.opt }}
         </q-chip>
       </template>
-      <template v-for="slot in activeSlots" #[slot]>
+      <template
+        v-for="slot in activeSlots"
+        #[slot]
+      >
         <slot :name="slot" />
       </template>
     </q-select>

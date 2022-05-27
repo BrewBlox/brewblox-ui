@@ -6,7 +6,6 @@ import { Coordinates } from '@/utils/coordinates';
 import { FlowPart } from '../types';
 import { coord2grid } from '../utils';
 
-
 export default defineComponent({
   name: 'OverlapIndicators',
   props: {
@@ -16,19 +15,16 @@ export default defineComponent({
     },
   },
   setup(props) {
-
-    const overlaps = computed<[Coordinates, number][]>(
-      () => {
-        const counts: Mapped<number> = {};
-        for (const part of props.parts) {
-          const key = new Coordinates([part.x, part.y, 0]).toString();
-          counts[key] = (counts[key] || 0) + 1;
-        }
-        return Object.entries(counts)
-          .filter(([, v]) => v > 1)
-          .map(([k, v]) => [new Coordinates(k), v] as [Coordinates, number]);
-      },
-    );
+    const overlaps = computed<[Coordinates, number][]>(() => {
+      const counts: Mapped<number> = {};
+      for (const part of props.parts) {
+        const key = new Coordinates([part.x, part.y, 0]).toString();
+        counts[key] = (counts[key] || 0) + 1;
+      }
+      return Object.entries(counts)
+        .filter(([, v]) => v > 1)
+        .map(([k, v]) => [new Coordinates(k), v] as [Coordinates, number]);
+    });
 
     return {
       coord2grid,
@@ -42,9 +38,14 @@ export default defineComponent({
   <g
     v-for="([coord, val], idx) in overlaps"
     :key="idx"
-    :transform="`translate(${coord2grid(coord.x) + 40}, ${coord2grid(coord.y) + 4})`"
+    :transform="`translate(${coord2grid(coord.x) + 40}, ${
+      coord2grid(coord.y) + 4
+    })`"
   >
-    <circle r="8" fill="dodgerblue" />
+    <circle
+      r="8"
+      fill="dodgerblue"
+    />
     <text
       y="4"
       text-anchor="middle"

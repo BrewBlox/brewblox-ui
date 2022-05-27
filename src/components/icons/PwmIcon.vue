@@ -17,7 +17,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-icon :size="size" class="static">
+  <q-icon
+    :size="size"
+    class="static"
+  >
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 50 50"

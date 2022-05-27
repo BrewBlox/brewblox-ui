@@ -1,6 +1,5 @@
 import { mqttTopicExp } from '@/utils/misc';
 
-
 describe('MQTT helpers', () => {
   it('mqttTopicExp()', () => {
     let exp = mqttTopicExp('base/test');

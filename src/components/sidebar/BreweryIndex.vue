@@ -59,11 +59,15 @@ export default defineComponent({
 <template>
   <div>
     <q-item class="q-pb-none">
-      <q-item-section class="text-bold">
-        Builder layouts
-      </q-item-section>
+      <q-item-section class="text-bold"> Builder layouts </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn icon="add" round flat size="sm" @click="createLayout">
+        <q-btn
+          icon="add"
+          round
+          flat
+          size="sm"
+          @click="createLayout"
+        >
           <q-tooltip>Add layout</q-tooltip>
         </q-btn>
       </q-item-section>

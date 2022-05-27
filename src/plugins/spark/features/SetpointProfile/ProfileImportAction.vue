@@ -6,7 +6,6 @@ import { SetpointProfileBlock } from '@/plugins/spark/types';
 import { loadFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
 
-
 export default defineComponent({
   name: 'ProfileImportAction',
   props: {
@@ -20,10 +19,7 @@ export default defineComponent({
     },
   },
   setup() {
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<SetpointProfileBlock>();
+    const { block, saveBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
     async function showDialog(): Promise<void> {
       loadFile((cfg: Pick<SetpointProfileBlock['data'], 'points'>) => {
@@ -44,5 +40,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionItem v-bind="{...$attrs, ...$props}" @click="showDialog" />
+  <ActionItem
+    v-bind="{ ...$attrs, ...$props }"
+    @click="showDialog"
+  />
 </template>

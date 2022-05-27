@@ -22,7 +22,10 @@ export default defineComponent({
 
     function startExport(): void {
       const { points } = block.value.data;
-      saveFile({ points }, `${block.value.serviceId}-${block.value.id}.profile.json`);
+      saveFile(
+        { points },
+        `${block.value.serviceId}-${block.value.id}.profile.json`,
+      );
     }
 
     return {
@@ -33,5 +36,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionItem v-bind="{...$attrs, ...$props}" @click="startExport" />
+  <ActionItem
+    v-bind="{ ...$attrs, ...$props }"
+    @click="startExport"
+  />
 </template>

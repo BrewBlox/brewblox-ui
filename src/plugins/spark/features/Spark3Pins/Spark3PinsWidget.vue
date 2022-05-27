@@ -30,7 +30,10 @@ export default defineComponent({
     <div>
       <IoArray />
 
-      <div v-if="context.mode === 'Full'" class="widget-body row">
+      <div
+        v-if="context.mode === 'Full'"
+        class="widget-body row"
+      >
         <q-separator inset />
         <div class="col-break" />
 
@@ -41,9 +44,14 @@ export default defineComponent({
           <q-toggle
             :model-value="block.data.enableIoSupply5V"
             dense
-            @update:model-value="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.enableIoSupply5V = v;
+                saveBlock();
+              }
+            "
           />
-        </labeledfield>
+        </LabeledField>
         <LabeledField
           label="Enable 12V"
           class="col-grow"
@@ -51,7 +59,12 @@ export default defineComponent({
           <q-toggle
             :model-value="block.data.enableIoSupply12V"
             dense
-            @update:model-value="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.enableIoSupply12V = v;
+                saveBlock();
+              }
+            "
           />
         </LabeledField>
 

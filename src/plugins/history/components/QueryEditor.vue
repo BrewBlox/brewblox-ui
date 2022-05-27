@@ -204,7 +204,13 @@ export default defineComponent({
       class="col-auto min-width-sm"
     />
 
-    <q-btn flat dense icon="mdi-expand-all" class="self-end" @click="expand">
+    <q-btn
+      flat
+      dense
+      icon="mdi-expand-all"
+      class="self-end"
+      @click="expand"
+    >
       <q-tooltip>Expand</q-tooltip>
     </q-btn>
     <q-btn
@@ -241,7 +247,10 @@ export default defineComponent({
     >
       <template #header-leaf="props">
         <div class="q-pa-xs full-width editable hoverable rounded-borders">
-          <slot name="leaf" :node="props.node" />
+          <slot
+            name="leaf"
+            :node="props.node"
+          />
         </div>
       </template>
     </q-tree>

@@ -16,10 +16,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      scale,
-      bordered,
-    } = usePart.setup(props.part);
+    const { scale, bordered } = usePart.setup(props.part);
 
     const color = computed<string>(
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',
@@ -37,12 +34,15 @@ export default defineComponent({
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
-    <SetpointValues :part="part" settings-key="setpoint" />
+    <SetpointValues
+      :part="part"
+      settings-key="setpoint"
+    />
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(2)-2"
-        :height="coord2grid(1)-2"
+        :width="coord2grid(2) - 2"
+        :height="coord2grid(1) - 2"
         :stroke="color"
         stroke-width="2px"
         x="1"

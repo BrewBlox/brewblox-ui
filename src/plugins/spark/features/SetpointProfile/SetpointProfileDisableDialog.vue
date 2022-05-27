@@ -100,13 +100,11 @@ export default defineComponent({
     @keyup.enter="confirm"
   >
     <DialogCard v-bind="{ title, message, html }">
-      <template #title>
-        Desired Setpoint settings
-      </template>
+      <template #title> Desired Setpoint settings </template>
       <template #message>
-        Your Setpoint Profile will now stop driving the Setpoint. <br>
-        <br>
-        Please confirm the new settings for <i>{{ setpointId }}</i>.
+        Your Setpoint Profile will now stop driving the Setpoint. <br />
+        <br />
+        Please confirm the new settings for <i> {{ setpointId }} </i>.
       </template>
 
       <q-toggle
@@ -131,8 +129,18 @@ export default defineComponent({
       </q-input>
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="confirm" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="confirm"
+        />
       </template>
     </DialogCard>
   </q-dialog>

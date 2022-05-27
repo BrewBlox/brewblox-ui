@@ -3,7 +3,6 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { useContext, useGlobals } from '@/composables';
 
-
 export default defineComponent({
   name: 'Card',
   props: {
@@ -28,33 +27,29 @@ export default defineComponent({
       () => !props.noScroll && context.size === 'Fixed',
     );
 
-    const cardClass = computed<string>(
-      () => {
-        const listed = [
-          `card__${context.container}`,
-          `card__${props.size}`,
-          'depth-2',
-        ];
-        if (dense.value) {
-          listed.push('card__dense');
-        }
-        if (props.noScroll) {
-          listed.push('card__no-scroll');
-        }
-        return listed.join(' ');
-      },
-    );
+    const cardClass = computed<string>(() => {
+      const listed = [
+        `card__${context.container}`,
+        `card__${props.size}`,
+        'depth-2',
+      ];
+      if (dense.value) {
+        listed.push('card__dense');
+      }
+      if (props.noScroll) {
+        listed.push('card__no-scroll');
+      }
+      return listed.join(' ');
+    });
 
     const toolbarClass = computed<string>(
       () => `toolbar__${context.container}`,
     );
 
-    const bodyClass = computed<string>(
-      () => `content__${context.container}`,
-    );
+    const bodyClass = computed<string>(() => `content__${context.container}`);
 
-    const contentComponent = computed<string>(
-      () => scrollable.value ? 'q-scroll-area' : 'div',
+    const contentComponent = computed<string>(() =>
+      scrollable.value ? 'q-scroll-area' : 'div',
     );
 
     return {

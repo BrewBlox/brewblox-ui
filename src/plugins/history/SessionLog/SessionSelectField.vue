@@ -83,7 +83,11 @@ export default defineComponent({
     @keyup.enter.exact.stop
   >
     <template #option="{ opt, selected, toggleOption }">
-      <q-item :active="selected" clickable @click="toggleOption(opt)">
+      <q-item
+        :active="selected"
+        clickable
+        @click="toggleOption(opt)"
+      >
         <q-item-section style="max-width: 300px">
           {{ opt.label }}
           <q-item-label
@@ -105,9 +109,7 @@ export default defineComponent({
     </template>
     <template #no-option>
       <q-item>
-        <q-item-section class="text-grey">
-          No results
-        </q-item-section>
+        <q-item-section class="text-grey"> No results </q-item-section>
       </q-item>
     </template>
   </q-select>

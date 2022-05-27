@@ -190,9 +190,21 @@ export default defineComponent({
         {{ time }}
       </div>
       <div class="col-break" />
-      <q-btn flat label="Start" @click="start" />
-      <q-btn flat label="Stop" @click="pause" />
-      <q-btn flat label="Reset" @click="reset" />
+      <q-btn
+        flat
+        label="Start"
+        @click="start"
+      />
+      <q-btn
+        flat
+        label="Stop"
+        @click="pause"
+      />
+      <q-btn
+        flat
+        label="Reset"
+        @click="reset"
+      />
     </div>
   </Card>
 </template>

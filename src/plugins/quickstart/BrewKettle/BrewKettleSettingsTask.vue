@@ -73,9 +73,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="taskDone" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="taskDone"
+      />
     </template>
   </WizardBody>
 </template>

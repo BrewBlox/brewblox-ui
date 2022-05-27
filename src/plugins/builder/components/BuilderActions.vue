@@ -53,7 +53,11 @@ export default defineComponent({
   <ActionMenu>
     <template #actions>
       <slot name="actions" />
-      <ActionItem icon="add" label="New Layout" @click="createLayout" />
+      <ActionItem
+        icon="add"
+        label="New Layout"
+        @click="createLayout"
+      />
       <ActionItem
         icon="mdi-file-import"
         label="Import Layout"
@@ -61,7 +65,10 @@ export default defineComponent({
       />
     </template>
     <template #menus>
-      <LayoutActions :layout="layout" @selected="selectLayout" />
+      <LayoutActions
+        :layout="layout"
+        @selected="selectLayout"
+      />
       <slot name="menus" />
     </template>
     <slot />

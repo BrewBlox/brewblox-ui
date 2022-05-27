@@ -10,7 +10,6 @@ import { canSerialize, isBloxField } from './identity';
 import { rawLink } from './link';
 import { rawQty } from './quantity';
 
-
 // string start
 // then any characters (captured)
 // then a left bracket (captured)
@@ -48,7 +47,10 @@ export function splitPostfixed(name: string): [string, string | null] {
  * @param val
  * @returns
  */
-export function parsePostfixed(key: string, val: unknown): [string, Quantity | Link] | null {
+export function parsePostfixed(
+  key: string,
+  val: unknown,
+): [string, Quantity | Link] | null {
   try {
     if (key.endsWith(']') || key.endsWith('>')) {
       const matched = key.match(postfixExpr);
@@ -56,15 +58,16 @@ export function parsePostfixed(key: string, val: unknown): [string, Quantity | L
         const [, name, leftBracket, bracketed] = matched;
         if (leftBracket === '<') {
           const [type, driven] = bracketed.split(',');
-          return [name, rawLink(val as string | null, type as BlockOrIntfType, !!driven)];
-        }
-        else if (leftBracket === '[') {
+          return [
+            name,
+            rawLink(val as string | null, type as BlockOrIntfType, !!driven),
+          ];
+        } else if (leftBracket === '[') {
           return [name, rawQty(val as number | null, bracketed)];
         }
       }
     }
-  }
-  catch (e) { }
+  } catch (e) {}
   return null;
 }
 
@@ -84,8 +87,9 @@ export function deserialize<T>(obj: T): T {
     return obj;
   }
   if (isObject(obj)) {
-    const parsed = toPairs(obj)
-      .map(([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]);
+    const parsed = toPairs(obj).map(
+      ([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)],
+    );
     return fromPairs(parsed) as T;
   }
   return obj;

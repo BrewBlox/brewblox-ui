@@ -119,15 +119,23 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-page class="page-height" @dblclick="showWizard(true)">
+  <q-page
+    class="page-height"
+    @dblclick="showWizard(true)"
+  >
     <PageError v-if="!dashboard">
-      <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
+      <span>
+        Unknown dashboard: <b>{{ dashboardId }}</b>
+      </span>
     </PageError>
     <template v-else>
       <TitleTeleport>
-        <span class="cursor-pointer" @click="editTitle">{{
-          dashboard.title
-        }}</span>
+        <span
+          class="cursor-pointer"
+          @click="editTitle"
+        >
+          {{ dashboard.title }}
+        </span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn
@@ -139,11 +147,12 @@ export default defineComponent({
           class="self-center"
           @click="widgetEditable = !widgetEditable"
         >
-          <q-tooltip v-if="!widgetEditable">
-            Rearrange widgets
-          </q-tooltip>
+          <q-tooltip v-if="!widgetEditable"> Rearrange widgets </q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center">
+        <ActionMenu
+          round
+          class="self-center"
+        >
           <q-tooltip> Dashboard actions </q-tooltip>
           <template #menus>
             <DashboardActions :dashboard-id="dashboardId" />
@@ -152,7 +161,10 @@ export default defineComponent({
       </ButtonsTeleport>
 
       <q-scroll-area class="fit">
-        <div v-if="dashboardItems.length === 0" class="absolute-center">
+        <div
+          v-if="dashboardItems.length === 0"
+          class="absolute-center"
+        >
           <q-btn
             unelevated
             color="secondary"

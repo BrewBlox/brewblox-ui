@@ -21,9 +21,7 @@ export const useContext: UseContextComposable = {
       throw new Error('No widget context injected');
     }
 
-    const inDialog = computed<boolean>(
-      () => context.container === 'Dialog',
-    );
+    const inDialog = computed<boolean>(() => context.container === 'Dialog');
 
     function toggleMode(): void {
       context.mode = context.mode === 'Basic' ? 'Full' : 'Basic';

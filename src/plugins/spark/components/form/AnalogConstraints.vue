@@ -146,20 +146,33 @@ export default defineComponent({
       />
 
       <div class="col-auto column justify-center darkish">
-        <q-btn icon="delete" flat round @click="remove(idx)">
+        <q-btn
+          icon="delete"
+          flat
+          round
+          @click="remove(idx)"
+        >
           <q-tooltip>Remove constraint</q-tooltip>
         </q-btn>
       </div>
     </div>
     <div class="col row justify-end">
-      <q-btn icon="add" round outline @click="add">
+      <q-btn
+        icon="add"
+        round
+        outline
+        @click="add"
+      >
         <q-tooltip>Add constraint</q-tooltip>
       </q-btn>
     </div>
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .limiting
   color: orange
 

@@ -22,5 +22,6 @@ export const DEVICE_TOPIC = 'brewcast/device';
 export const UI_NAMESPACE = 'brewblox-ui-store';
 export const GLOBAL_NAMESPACE = 'brewblox-global';
 
-export const IS_IOS = /iPad|iPhone|iPod/.test(navigator.platform)
-  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+export const IS_IOS =
+  /iPad|iPhone|iPod/.test(navigator.platform) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

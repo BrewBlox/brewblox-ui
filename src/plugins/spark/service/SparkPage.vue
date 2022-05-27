@@ -122,10 +122,19 @@ export default defineComponent({
 <template>
   <q-page class="page-height">
     <TitleTeleport>
-      <span class="cursor-pointer" @click="editTitle">{{ title }}</span>
+      <span
+        class="cursor-pointer"
+        @click="editTitle"
+      >
+        {{ title }}
+      </span>
     </TitleTeleport>
     <ButtonsTeleport>
-      <q-btn-group rounded outline class="q-pa-xs self-center">
+      <q-btn-group
+        rounded
+        outline
+        class="q-pa-xs self-center"
+      >
         <q-btn
           :unelevated="pageMode === 'List'"
           :outline="pageMode !== 'List'"
@@ -160,7 +169,10 @@ export default defineComponent({
     </ButtonsTeleport>
 
     <!-- Troubleshooter -->
-    <div v-if="statusNok" class="q-pa-lg row">
+    <div
+      v-if="statusNok"
+      class="q-pa-lg row"
+    >
       <SparkTroubleshooter :service-id="serviceId" />
     </div>
 
@@ -175,6 +187,9 @@ export default defineComponent({
     />
 
     <!-- Block list display -->
-    <SparkListView v-else-if="pageMode === 'List'" :service-id="serviceId" />
+    <SparkListView
+      v-else-if="pageMode === 'List'"
+      :service-id="serviceId"
+    />
   </q-page>
 </template>

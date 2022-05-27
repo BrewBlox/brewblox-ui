@@ -111,14 +111,26 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <PreviewCard enabled toggle-icon="mdi-file-document-edit-outline">
+    <PreviewCard
+      enabled
+      toggle-icon="mdi-file-document-edit-outline"
+    >
       <template #toolbar>
-        <Toolbar :title="title" subtitle="Edit text note" />
+        <Toolbar
+          :title="title"
+          subtitle="Edit text note"
+        />
       </template>
 
       <template #preview>
-        <q-scroll-area visible class="fit">
-          <MarkdownView :text="local" class="q-pa-lg" />
+        <q-scroll-area
+          visible
+          class="fit"
+        >
+          <MarkdownView
+            :text="local"
+            class="q-pa-lg"
+          />
         </q-scroll-area>
       </template>
 
@@ -143,16 +155,33 @@ export default defineComponent({
       </div>
 
       <template #actions>
-        <q-btn flat label="Insert date" @click="insertDate" />
+        <q-btn
+          flat
+          label="Insert date"
+          @click="insertDate"
+        />
         <q-space />
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </PreviewCard>
   </q-dialog>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .editor-input textarea
   min-height: 200px !important
 </style>

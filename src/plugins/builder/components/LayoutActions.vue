@@ -185,16 +185,30 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionSubmenu v-if="!!layout" v-bind="{ label, ...$attrs }">
+  <ActionSubmenu
+    v-if="!!layout"
+    v-bind="{ label, ...$attrs }"
+  >
     <slot />
     <ToggleAction
       v-model="isHomePage"
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
-    <ToggleAction v-model="listed" label="Show in sidebar" />
-    <ActionItem icon="file_copy" label="Copy layout" @click="copyLayout()" />
-    <ActionItem icon="edit" label="Rename layout" @click="renameLayout" />
+    <ToggleAction
+      v-model="listed"
+      label="Show in sidebar"
+    />
+    <ActionItem
+      icon="file_copy"
+      label="Copy layout"
+      @click="copyLayout()"
+    />
+    <ActionItem
+      icon="edit"
+      label="Rename layout"
+      @click="renameLayout"
+    />
     <ActionItem
       icon="dashboard"
       label="Show layout on dashboard"
@@ -205,7 +219,15 @@ export default defineComponent({
       label="Export layout"
       @click="exportLayout"
     />
-    <ActionItem icon="delete" label="Remove all parts" @click="clearParts" />
-    <ActionItem icon="delete" label="Remove layout" @click="removeLayout" />
+    <ActionItem
+      icon="delete"
+      label="Remove all parts"
+      @click="clearParts"
+    />
+    <ActionItem
+      icon="delete"
+      label="Remove layout"
+      @click="removeLayout"
+    />
   </ActionSubmenu>
 </template>

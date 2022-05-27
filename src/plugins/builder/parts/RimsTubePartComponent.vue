@@ -71,13 +71,19 @@ export default defineComponent({
 
 <template>
   <g>
-    <PwmValues :part="part" settings-key="pwm" />
+    <PwmValues
+      :part="part"
+      settings-key="pwm"
+    />
     <LiquidStroke
       :paths="[paths.content]"
       :colors="liquids"
       class="contentLiquid"
     />
-    <LiquidStroke :paths="[paths.flowPath]" :colors="liquids" />
+    <LiquidStroke
+      :paths="[paths.flowPath]"
+      :colors="liquids"
+    />
     <AnimatedArrows
       :num-arrows="(sizeX - 1) * 2"
       :speed="flowSpeed"
@@ -92,7 +98,10 @@ export default defineComponent({
   </g>
 </template>
 
-<style lang="scss" scoped>
+<style
+  lang="scss"
+  scoped
+>
 :deep(.contentLiquid path) {
   stroke-width: 30 !important;
   stroke-linecap: butt;

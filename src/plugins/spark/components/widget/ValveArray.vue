@@ -118,13 +118,7 @@ export default defineComponent({
     <div
       v-for="channel in channels"
       :key="`channel-${channel.id}`"
-      class="
-        col
-        row
-        q-gutter-x-sm q-gutter-y-xs q-mt-none
-        items-stretch
-        justify-start
-      "
+      class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
     >
       <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
         {{ channel.name }}
@@ -141,7 +135,10 @@ export default defineComponent({
           class="col-auto self-center"
           @update:model-value="(v) => saveState(channel, v)"
         />
-        <div v-else class="darkened text-italic q-pa-sm">
+        <div
+          v-else
+          class="darkened text-italic q-pa-sm"
+        >
           Not set
         </div>
       </div>

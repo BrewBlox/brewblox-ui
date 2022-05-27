@@ -128,7 +128,10 @@ export default defineComponent({
       </CardWarning>
 
       <div class="widget-body row">
-        <LabeledField class="col" tag-class="full-width row justify-center">
+        <LabeledField
+          class="col"
+          tag-class="full-width row justify-center"
+        >
           <DigitalStateButton
             :model-value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
@@ -173,7 +176,10 @@ export default defineComponent({
             class="col-grow"
             @update:model-value="claimChannel"
           />
-          <LabeledField label="Invert" class="col-grow">
+          <LabeledField
+            label="Invert"
+            class="col-grow"
+          >
             <q-toggle
               :model-value="block.data.invert"
               dense

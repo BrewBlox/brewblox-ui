@@ -162,16 +162,34 @@ export default defineComponent({
 <template>
   <Card style="max-width: 500px">
     <template #toolbar>
-      <Toolbar :title="serviceId" subtitle="Troubleshooter">
+      <Toolbar
+        :title="serviceId"
+        subtitle="Troubleshooter"
+      >
         <template #buttons>
-          <q-btn flat dense icon="refresh" @click="refresh" />
+          <q-btn
+            flat
+            dense
+            icon="refresh"
+            @click="refresh"
+          />
         </template>
       </Toolbar>
     </template>
 
-    <div v-if="status" class="widget-body row items-center">
-      <q-spinner size="24px" class="col-auto self-center" />
-      <LabeledField label="Last update" tag="big" class="col-grow">
+    <div
+      v-if="status"
+      class="widget-body row items-center"
+    >
+      <q-spinner
+        size="24px"
+        class="col-auto self-center"
+      />
+      <LabeledField
+        label="Last update"
+        tag="big"
+        class="col-grow"
+      >
         {{ lastStatus }}
       </LabeledField>
 
@@ -209,7 +227,11 @@ export default defineComponent({
             "
             @click="toggleAutoconnecting"
           />
-          <q-btn flat label="Reboot service" @click="serviceReboot" />
+          <q-btn
+            flat
+            label="Reboot service"
+            @click="serviceReboot"
+          />
         </div>
       </template>
 
@@ -271,7 +293,7 @@ export default defineComponent({
         <!-- not autoconnecting -->
         <span v-else-if="!status.isAutoconnecting">
           Your Spark service is paused, and not automatically connecting to your
-          controller.<br>
+          controller.<br />
           This status can be toggled manually.
         </span>
         <!-- not connected -->
@@ -292,29 +314,29 @@ export default defineComponent({
         <!-- awaiting handshake -->
         <span v-else-if="!status.isAcknowledged">
           Your Spark service is waiting for the controller handshake.
-          <br>
+          <br />
           <b>This status is usually temporary</b>
-          <br>
-          <br>
+          <br />
+          <br />
           If your Spark is showing a blank screen, you may need to flash the
           bootloader.
-          <br>
+          <br />
           To do so, run
-          <span
-            class="monospace"
-          >brewblox-ctl particle -c flash-bootloader</span>
+          <span class="monospace">
+            brewblox-ctl particle -c flash-bootloader
+          </span>
         </span>
         <!-- not compatible -->
         <span v-else-if="!status.isCompatibleFirmware">
           Your Spark service is not compatible with the firmware
-          <br>
+          <br />
           <b>Please update your firmware</b>
         </span>
         <!-- not valid -->
         <span v-else-if="!status.isValidDeviceId">
           The controller device ID doesn't match the service
           <i>--device-id</i> setting.
-          <br>
+          <br />
           <b>Please check your connection settings</b>
         </span>
         <!-- not synchronized -->

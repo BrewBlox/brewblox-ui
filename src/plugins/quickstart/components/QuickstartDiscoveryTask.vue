@@ -138,12 +138,12 @@ export default defineComponent({
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
-            OneWire devices are discovered after they are plugged in. <br>
+            OneWire devices are discovered after they are plugged in. <br />
             Here you can give your discovered blocks a meaningful name.
           </p>
           <p>
             If you unplug a discovered device, it will be shown as disconnected.
-            <br>
+            <br />
             Use this to quickly identify its block.
           </p>
           <p>
@@ -165,7 +165,10 @@ export default defineComponent({
           >
             <q-item>
               <q-item-section>
-                <q-item-label caption class="text-italic darkish">
+                <q-item-label
+                  caption
+                  class="text-italic darkish"
+                >
                   {{ widgetTitle(block) }}
                 </q-item-label>
                 <div style="font-size: larger">
@@ -192,9 +195,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Next" color="primary" @click="$emit('next')" />
+      <q-btn
+        unelevated
+        label="Next"
+        color="primary"
+        @click="$emit('next')"
+      />
     </template>
   </WizardBody>
 </template>

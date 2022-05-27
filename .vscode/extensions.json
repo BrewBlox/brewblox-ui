@@ -5,6 +5,6 @@
     "syler.sass-indented",
     "orta.vscode-jest",
     "dbaeumer.vscode-eslint",
-    "rvest.vs-code-prettier-eslint"
+    "esbenp.prettier-vscode"
   ]
 }

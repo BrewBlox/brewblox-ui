@@ -59,7 +59,10 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row items-start">
-      <LabeledField label="Clients" class="col-grow">
+      <LabeledField
+        label="Clients"
+        class="col-grow"
+      >
         <div
           v-for="{ id, limited, hasLock } in mutexClients"
           :key="id"
@@ -69,12 +72,21 @@ export default defineComponent({
             hasLock && 'text-green',
           ]"
         >
-          <q-icon v-if="hasLock" name="mdi-lock" />
-          <q-icon v-else name="" />
+          <q-icon
+            v-if="hasLock"
+            name="mdi-lock"
+          />
+          <q-icon
+            v-else
+            name=""
+          />
           {{ id }}
         </div>
       </LabeledField>
-      <LabeledField label="Lock time remaining" class="col-grow">
+      <LabeledField
+        label="Lock time remaining"
+        class="col-grow"
+      >
         {{ durationString(block.data.waitRemaining) }}
       </LabeledField>
     </div>

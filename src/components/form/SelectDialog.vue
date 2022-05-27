@@ -24,17 +24,10 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const local = ref<any>(props.modelValue);
 
@@ -63,7 +56,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save(local)"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <ListSelect
         v-if="listSelect"
         v-model="local"
@@ -72,7 +65,7 @@ export default defineComponent({
         option-value="value"
         option-label="label"
         v-bind="selectProps"
-        @confirm="v => save(v)"
+        @confirm="(v) => save(v)"
       />
       <q-select
         v-else
@@ -86,9 +79,7 @@ export default defineComponent({
       >
         <template #no-option>
           <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
+            <q-item-section class="text-grey"> No results </q-item-section>
           </q-item>
         </template>
       </q-select>

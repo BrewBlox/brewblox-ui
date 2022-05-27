@@ -57,7 +57,10 @@ export default defineComponent({
       <template #message>
         <span>{{ reason.message }}</span>
       </template>
-      <template v-if="reason.temporary" #actions>
+      <template
+        v-if="reason.temporary"
+        #actions
+      >
         <q-spinner size="25px" />
       </template>
     </CardWarning>

@@ -154,7 +154,10 @@ export default defineComponent({
           }
         "
       />
-      <LabeledField label="Input for:" class="col-grow">
+      <LabeledField
+        label="Input for:"
+        class="col-grow"
+      >
         <div class="row">
           <q-btn
             v-for="userBlock in usedBy"

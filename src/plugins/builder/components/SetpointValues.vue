@@ -115,12 +115,29 @@ export default defineComponent({
     v-if="block || !hideUnset"
     :transform="`translate(${coord2grid(startX)}, ${coord2grid(startY)})`"
   >
-    <SvgEmbedded :width="coord2grid(2)" :height="coord2grid(1)">
-      <BrokenIcon v-if="isBroken" class="col" />
-      <UnlinkedIcon v-else-if="!block" class="col" />
-      <div v-else class="col column q-ma-xs" :style="{ color: textColor }">
+    <SvgEmbedded
+      :width="coord2grid(2)"
+      :height="coord2grid(1)"
+    >
+      <BrokenIcon
+        v-if="isBroken"
+        class="col"
+      />
+      <UnlinkedIcon
+        v-else-if="!block"
+        class="col"
+      />
+      <div
+        v-else
+        class="col column q-ma-xs"
+        :style="{ color: textColor }"
+      >
         <div class="col row q-gutter-x-xs">
-          <q-icon :name="mdiThermometer" size="20px" class="static col-auto" />
+          <q-icon
+            :name="mdiThermometer"
+            size="20px"
+            class="static col-auto"
+          />
           <q-space />
           <div class="col-auto text-bold">
             {{ fixedNumber(setpointValue, 1) }}

@@ -85,13 +85,7 @@ export default defineComponent({
   >
     <DialogCard v-bind="{ title, message, html }">
       <div
-        class="
-          row
-          items-center
-          q-gutter-x-md q-mx-md q-py-sm q-mt-sm
-          clickable
-          rounded-borders
-        "
+        class="row items-center q-gutter-x-md q-mx-md q-py-sm q-mt-sm clickable rounded-borders"
         @click="enabled = !enabled"
       >
         <q-icon
@@ -102,15 +96,17 @@ export default defineComponent({
         />
         <div class="col">
           <small class="col fade-5">Click to toggle</small>
-          <div v-show="enabled" class="col">
-            <slot name="enabled">
-              Setpoint is enabled.
-            </slot>
+          <div
+            v-show="enabled"
+            class="col"
+          >
+            <slot name="enabled"> Setpoint is enabled. </slot>
           </div>
-          <div v-show="!enabled" class="col">
-            <slot name="disabled">
-              Setpoint is disabled.
-            </slot>
+          <div
+            v-show="!enabled"
+            class="col"
+          >
+            <slot name="disabled"> Setpoint is disabled. </slot>
           </div>
         </div>
       </div>
@@ -132,7 +128,12 @@ export default defineComponent({
       </q-input>
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!isValid"
           flat

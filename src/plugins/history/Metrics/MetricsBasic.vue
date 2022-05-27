@@ -136,9 +136,7 @@ export default defineComponent({
       </div>
     </div>
     <CardWarning v-else-if="values.length === 0">
-      <template #message>
-        Waiting for data...
-      </template>
+      <template #message> Waiting for data... </template>
     </CardWarning>
 
     <div class="widget-body column">
@@ -151,18 +149,27 @@ export default defineComponent({
         <div :class="['text-big col-auto', val.stale && 'darkened']">
           {{ fixedValue(val) }}
         </div>
-        <div v-if="val.stale" class="col-auto">
-          <q-icon name="warning" size="24px" />
+        <div
+          v-if="val.stale"
+          class="col-auto"
+        >
+          <q-icon
+            name="warning"
+            size="24px"
+          />
           <q-tooltip>
             {{ val.name }} was updated more than
             {{ durationString(fieldFreshDuration(val.field)) }} ago.
-            <br>
+            <br />
             Last update: {{ new Date(val.time).toLocaleString() }}.
           </q-tooltip>
         </div>
       </LabeledField>
     </div>
-    <div v-if="values.length === 0" class="column q-px-md">
+    <div
+      v-if="values.length === 0"
+      class="column q-px-md"
+    >
       <q-btn
         flat
         dense

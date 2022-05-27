@@ -6,8 +6,6 @@
 // The original plotly can be accessed as 'plotly-dist'
 const Plotly = require('plotly-dist/lib/core');
 
-Plotly.register([
-  require('plotly-dist/lib/scatter'),
-]);
+Plotly.register([require('plotly-dist/lib/scatter')]);
 
 module.exports = Plotly;

@@ -122,7 +122,10 @@ export default defineComponent({
   >
     <Card>
       <template #toolbar>
-        <Toolbar :title="serviceId" subtitle="Import/Export blocks" />
+        <Toolbar
+          :title="serviceId"
+          subtitle="Import/Export blocks"
+        />
       </template>
 
       <q-card-section>
@@ -153,7 +156,10 @@ export default defineComponent({
           <q-item-section>
             Reported problems during last import:
             <ul>
-              <li v-for="(msg, idx) in messages" :key="idx">
+              <li
+                v-for="(msg, idx) in messages"
+                :key="idx"
+              >
                 {{ msg }}
               </li>
             </ul>

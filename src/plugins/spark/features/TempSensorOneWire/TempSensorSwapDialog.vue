@@ -115,7 +115,12 @@ export default defineComponent({
         title="Choose sensor B"
       />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!valid"
           flat

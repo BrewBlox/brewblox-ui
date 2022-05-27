@@ -105,8 +105,15 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-dialog v-model="dialogOpen" transition-show="fade" maximized>
-    <q-card v-if="dialogOpen" class="text-white">
+  <q-dialog
+    v-model="dialogOpen"
+    transition-show="fade"
+    maximized
+  >
+    <q-card
+      v-if="dialogOpen"
+      class="text-white"
+    >
       <HistoryGraph
         :graph-id="id"
         :config="graphConfig"
@@ -118,7 +125,11 @@ export default defineComponent({
         @layout="saveLayout"
       >
         <template #controls>
-          <q-btn-dropdown flat icon="settings" :auto-close="true">
+          <q-btn-dropdown
+            flat
+            icon="settings"
+            :auto-close="true"
+          >
             <ExportGraphAction
               :config="graphConfig"
               :header="graphConfig.layout.title"
@@ -145,7 +156,10 @@ export default defineComponent({
   </q-dialog>
 </template>
 
-<style scoped lang="sass">
+<style
+  scoped
+  lang="sass"
+>
 .mirrored
   -webkit-transform: scaleX(-1)
   transform: scaleX(-1)

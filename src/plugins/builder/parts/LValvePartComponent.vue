@@ -88,9 +88,15 @@ export default defineComponent({
 
 <template>
   <g>
-    <LiquidStroke :paths="[liquidPath]" :colors="liquidColor" />
+    <LiquidStroke
+      :paths="[liquidPath]"
+      :colors="liquidColor"
+    />
     <g class="outline">
-      <AnimatedArrows :path="liquidPath" :speed="liquidSpeed" />
+      <AnimatedArrows
+        :path="liquidPath"
+        :speed="liquidSpeed"
+      />
     </g>
     <g
       class="outline fill"

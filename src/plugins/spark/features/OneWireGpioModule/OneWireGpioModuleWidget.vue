@@ -60,7 +60,10 @@ export default defineComponent({
 
     <div class="widget-body">
       <div class="row q-gutter-sm">
-        <LabeledField label="Module position" class="col-grow">
+        <LabeledField
+          label="Module position"
+          class="col-grow"
+        >
           {{ block.data.modulePosition }}
         </LabeledField>
       </div>
@@ -78,14 +81,26 @@ export default defineComponent({
           <div>
             There are two ways to attach an external power source: connected to
             the two right-most pins in any GPIO module, or using a Power over
-            Ethernet (PoE) adapter. <br>
+            Ethernet (PoE) adapter. <br />
             Any external power supply is a valid source for all modules.
           </div>
         </div>
         <LabeledField label="Module power source">
-          <q-btn-group outline class="fit" @click="power = !power">
-            <q-btn outline label="5V" :color="power ? '' : 'primary'" />
-            <q-btn outline label="External" :color="power ? 'primary' : ''" />
+          <q-btn-group
+            outline
+            class="fit"
+            @click="power = !power"
+          >
+            <q-btn
+              outline
+              label="5V"
+              :color="power ? '' : 'primary'"
+            />
+            <q-btn
+              outline
+              label="External"
+              :color="power ? 'primary' : ''"
+            />
           </q-btn-group>
         </LabeledField>
       </template>

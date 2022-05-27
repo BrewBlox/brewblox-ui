@@ -16,10 +16,7 @@ export default defineComponent({
   },
   setup() {
     const { context } = useContext.setup();
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<DisplaySettingsBlock>();
+    const { block, saveBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
 
     function clearSlots(): void {
       block.value.data.widgets = [];
@@ -39,7 +36,11 @@ export default defineComponent({
     <template #toolbar>
       <BlockWidgetToolbar has-mode-toggle>
         <template #actions>
-          <ActionItem icon="clear" label="Clear slots" @click="clearSlots" />
+          <ActionItem
+            icon="clear"
+            label="Clear slots"
+            @click="clearSlots"
+          />
         </template>
       </BlockWidgetToolbar>
     </template>

@@ -21,7 +21,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-btn v-bind="{...$attrs, flat, icon}">
+  <q-btn v-bind="{ ...$attrs, flat, icon }">
     <q-menu
       class="row q-gutter-x-sm bordered action-menu"
       anchor="bottom right"

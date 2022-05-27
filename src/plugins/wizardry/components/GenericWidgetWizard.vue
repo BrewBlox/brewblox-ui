@@ -103,7 +103,10 @@ export default defineComponent({
         :default-value="activeDashboardId"
       />
 
-      <q-input v-model="widgetTitle" label="Widget name">
+      <q-input
+        v-model="widgetTitle"
+        label="Widget name"
+      >
         <template #append>
           <KeyboardButton @click="showKeyboard" />
         </template>
@@ -111,9 +114,17 @@ export default defineComponent({
     </div>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="onBack" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
-      <q-btn unelevated label="Configure" @click="showWidget" />
+      <q-btn
+        unelevated
+        label="Configure"
+        @click="showWidget"
+      />
       <q-btn
         :disable="!canCreate"
         unelevated

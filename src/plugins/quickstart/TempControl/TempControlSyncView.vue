@@ -1,5 +1,4 @@
 <script lang="ts">
-
 import { defineComponent, PropType } from 'vue';
 
 import { PidConfig } from '../types';
@@ -20,9 +19,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'apply',
-  ],
+  emits: ['apply'],
   setup(props, { emit }) {
     function apply(leading: 'pid' | 'mode'): void {
       emit('apply', leading);
@@ -36,9 +33,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div
-    class="row q-ma-md q-mt-lg q-gutter-sm q-pr-sm q-pb-sm"
-  >
+  <div class="row q-ma-md q-mt-lg q-gutter-sm q-pr-sm q-pb-sm">
     <q-icon
       name="warning"
       color="warning"

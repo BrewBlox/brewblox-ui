@@ -40,12 +40,33 @@ export default defineComponent({
 
 <template>
   <g>
-    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
+    <LiquidStroke
+      :paths="[paths.liquid]"
+      :colors="liquids"
+    />
     <g class="outline">
-      <rect y="12" width="8" height="8" fill="white" />
-      <rect y="30" width="8" height="8" fill="white" />
-      <path v-for="border in paths.borders" :key="border" :d="border" />
+      <rect
+        y="12"
+        width="8"
+        height="8"
+        fill="white"
+      />
+      <rect
+        y="30"
+        width="8"
+        height="8"
+        fill="white"
+      />
+      <path
+        v-for="border in paths.borders"
+        :key="border"
+        :d="border"
+      />
     </g>
-    <AnimatedArrows :speed="flowSpeed" :path="paths.liquid" :num-arrows="8" />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      :path="paths.liquid"
+      :num-arrows="8"
+    />
   </g>
 </template>

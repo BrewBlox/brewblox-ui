@@ -59,7 +59,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <QueryEditor :config="config" @update:config="saveConfig">
+  <QueryEditor
+    :config="config"
+    @update:config="saveConfig"
+  >
     <template #leaf="{ node }">
       <div @click="editLeaf(node)">
         {{ node.label }}

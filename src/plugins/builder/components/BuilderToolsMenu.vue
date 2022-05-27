@@ -6,7 +6,6 @@ import { useGlobals } from '@/composables';
 import { builderTools } from '../const';
 import { BuilderToolName } from '../types';
 
-
 export default defineComponent({
   name: 'BuilderToolsMenu',
   props: {
@@ -23,15 +22,12 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: [
-    'update:expanded',
-    'use',
-  ],
+  emits: ['update:expanded', 'use'],
   setup(props, { emit }) {
     const { dense } = useGlobals.setup();
 
     function handleSwipe(args: SwipeArguments): void {
-      const desiredState = (args.direction === 'left');
+      const desiredState = args.direction === 'left';
       if (props.expanded !== desiredState) {
         emit('update:expanded', desiredState);
       }
@@ -52,7 +48,10 @@ export default defineComponent({
     class="absolute-right full-height scroll bg-dark"
     @click="$emit('update:expanded', !expanded)"
   >
-    <div class="column no-wrap" @click.stop>
+    <div
+      class="column no-wrap"
+      @click.stop
+    >
       <!-- <div
         class="no-select q-py-sm q-pl-md text-italic text-grey-5"
         style="font-size: 120%"

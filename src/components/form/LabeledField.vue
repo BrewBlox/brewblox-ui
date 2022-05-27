@@ -81,16 +81,28 @@ export default defineComponent({
 
     <template #control>
       <slot name="control">
-        <component :is="tag" :class="['q-mt-sm', tagClass]" :style="tagStyle">
+        <component
+          :is="tag"
+          :class="['q-mt-sm', tagClass]"
+          :style="tagStyle"
+        >
           <slot>
             {{ displayValue }}
           </slot>
-          <small v-if="!!suffix" class="q-ml-xs darkish">{{ suffix }}</small>
+          <small
+            v-if="!!suffix"
+            class="q-ml-xs darkish"
+          >
+            {{ suffix }}
+          </small>
         </component>
       </slot>
     </template>
 
-    <template v-for="slot in activeSlots" #[slot]>
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
 

@@ -154,7 +154,12 @@ export default defineComponent({
     </div>
     <template v-else>
       <TitleTeleport>
-        <span class="cursor-pointer" @click="editTitle">{{ layoutTitle }}</span>
+        <span
+          class="cursor-pointer"
+          @click="editTitle"
+        >
+          {{ layoutTitle }}
+        </span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn
@@ -166,7 +171,11 @@ export default defineComponent({
         >
           <q-tooltip>Open editor</q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center" label="Layout actions">
+        <ActionMenu
+          round
+          class="self-center"
+          label="Layout actions"
+        >
           <template #menus>
             <LayoutActions :layout="layout" />
           </template>
@@ -180,11 +189,20 @@ export default defineComponent({
         </ActionMenu>
       </ButtonsTeleport>
 
-      <div class="fit" @click="pending = null">
-        <span v-if="parts.length === 0" class="absolute-center">
+      <div
+        class="fit"
+        @click="pending = null"
+      >
+        <span
+          v-if="parts.length === 0"
+          class="absolute-center"
+        >
           {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
         </span>
-        <svg ref="svgRef" class="fit">
+        <svg
+          ref="svgRef"
+          class="fit"
+        >
           <g ref="svgContentRef">
             <g
               v-for="part in flowParts"
@@ -236,7 +254,10 @@ export default defineComponent({
   </q-page>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 @import './grid.sass'
 
 .inactive

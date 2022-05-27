@@ -34,12 +34,10 @@ export default defineComponent({
     const usedData = ref<SetpointProfileData>(deepCopy(block.value.data));
     const revision = ref<Date>(new Date());
 
-    const target = computed<Link>(
-      () => block.value.data.targetId,
-    );
+    const target = computed<Link>(() => block.value.data.targetId);
 
-    const graphProps = computed<GraphProps>(
-      () => profileGraphProps(block.value),
+    const graphProps = computed<GraphProps>(() =>
+      profileGraphProps(block.value),
     );
 
     function refresh(): void {
@@ -51,8 +49,7 @@ export default defineComponent({
       if (enabled) {
         block.value.data.enabled = enabled;
         saveBlock();
-      }
-      else {
+      } else {
         createDialog({
           component: SetpointProfileDisableDialog,
           componentProps: {
@@ -88,11 +85,14 @@ export default defineComponent({
 <template>
   <PreviewCard
     show-initial
-    :enabled="inDialog && context.mode ==='Full'"
+    :enabled="inDialog && context.mode === 'Full'"
     :no-scroll="context.mode === 'Basic'"
   >
     <template #preview>
-      <GenericGraph v-bind="graphProps" :revision="revision" />
+      <GenericGraph
+        v-bind="graphProps"
+        :revision="revision"
+      />
     </template>
 
     <template #toolbar>
@@ -119,10 +119,12 @@ export default defineComponent({
           @change="changeEnabled"
         >
           <template #enabled>
-            Setpoint Profile is enabled and driving <i>{{ prettyLink(target) }}</i>.
+            Setpoint Profile is enabled and driving
+            <i> {{ prettyLink(target) }} </i>.
           </template>
           <template #disabled>
-            Setpoint Profile is disabled and not driving <i>{{ prettyLink(target) }}</i>.
+            Setpoint Profile is disabled and not driving
+            <i> {{ prettyLink(target) }} </i>.
           </template>
         </BlockEnableToggle>
       </template>

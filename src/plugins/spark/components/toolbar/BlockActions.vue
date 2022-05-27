@@ -61,9 +61,7 @@ export default defineComponent({
         <q-icon name="mdi-cloud" />
       </q-item-section>
       <q-item-section>
-        <q-item-label caption>
-          Service
-        </q-item-label>
+        <q-item-label caption> Service </q-item-label>
         {{ serviceTitle }}
       </q-item-section>
     </q-item>
@@ -74,7 +72,11 @@ export default defineComponent({
       label="Show on dashboard"
       @click="startCopyWidget(widget)"
     />
-    <ActionItem icon="edit" label="Rename" @click="startChangeBlockId(block)" />
+    <ActionItem
+      icon="edit"
+      label="Rename"
+      @click="startChangeBlockId(block)"
+    />
     <ActionItem
       v-if="hasGraph"
       icon="mdi-chart-line"
@@ -87,7 +89,11 @@ export default defineComponent({
       label="Add to Spark display"
       @click="startAddBlockToDisplay(block)"
     />
-    <ActionItem icon="mdi-file-export" label="Export" @click="exportBlock" />
+    <ActionItem
+      icon="mdi-file-export"
+      label="Export"
+      @click="exportBlock"
+    />
     <ActionItem
       v-if="canRemove"
       icon="delete"

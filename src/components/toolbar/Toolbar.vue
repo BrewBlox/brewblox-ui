@@ -23,9 +23,7 @@ export default defineComponent({
       default: null,
     },
   },
-  emits: [
-    'close',
-  ],
+  emits: ['close'],
   setup() {
     const toolbarRef = ref<Element>();
 
@@ -36,9 +34,7 @@ export default defineComponent({
       () => toolbarRef.value?.closest('.q-dialog') != null,
     );
 
-    const numDialogs = computed<number>(
-      () => getNumDialogs(),
-    );
+    const numDialogs = computed<number>(() => getNumDialogs());
 
     return {
       toolbarRef,
@@ -62,7 +58,7 @@ export default defineComponent({
     />
     <div class="col row no-wrap ellipsis q-px-xs text-h6 items-center">
       <div
-        :class="{pointer: !!changeTitleFn}"
+        :class="{ pointer: !!changeTitleFn }"
         @click="changeTitleFn && changeTitleFn()"
       >
         {{ title }}
@@ -83,16 +79,17 @@ export default defineComponent({
       flat
       round
       dense
-      :icon="numDialogs > 1
-        ? 'mdi-arrow-left-circle'
-        : 'mdi-close-circle'"
+      :icon="numDialogs > 1 ? 'mdi-arrow-left-circle' : 'mdi-close-circle'"
       class="close-button"
       @click="$emit('close')"
     />
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .subtitle
   opacity: 0.8
   font-style: italic

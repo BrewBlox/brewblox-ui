@@ -164,13 +164,21 @@ export default defineComponent({
           />
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn flat label="Load" @click="startImport" />
+          <q-btn
+            flat
+            label="Load"
+            @click="startImport"
+          />
         </q-item-section>
       </q-item>
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="onBack" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <q-btn
         :disable="!valuesOk"

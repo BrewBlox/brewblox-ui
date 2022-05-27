@@ -14,7 +14,10 @@ export default defineComponent({
 
 <template>
   <foreignObject>
-    <div :class="contentClass" style="position: static">
+    <div
+      :class="contentClass"
+      style="position: static"
+    >
       <slot />
     </div>
   </foreignObject>

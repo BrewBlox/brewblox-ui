@@ -203,7 +203,13 @@ export default defineComponent({
       >
         <q-tooltip>Edit {{ prettyBlock(inputBlock) }}</q-tooltip>
       </q-btn>
-      <q-btn v-else disable flat class="col-auto" icon="mdi-cancel" />
+      <q-btn
+        v-else
+        disable
+        flat
+        class="col-auto"
+        icon="mdi-cancel"
+      />
 
       <!-- Output row -->
       <div class="col-break" />
@@ -257,7 +263,13 @@ export default defineComponent({
       >
         <q-tooltip>Edit {{ prettyBlock(outputBlock) }}</q-tooltip>
       </q-btn>
-      <q-btn v-else disable flat icon="mdi-cancel" class="col-auto" />
+      <q-btn
+        v-else
+        disable
+        flat
+        icon="mdi-cancel"
+        class="col-auto"
+      />
     </div>
 
     <q-separator inset />
@@ -270,9 +282,7 @@ export default defineComponent({
         </LabeledField>
       </div>
 
-      <div class="span-1 self-center text-center">
-        *
-      </div>
+      <div class="span-1 self-center text-center">*</div>
 
       <div class="span-2">
         <QuantityField
@@ -298,7 +308,10 @@ export default defineComponent({
         />
       </div>
 
-      <div :style="grid({ start: 9 })" class="self-center text-center">
+      <div
+        :style="grid({ start: 9 })"
+        class="self-center text-center"
+      >
         =
       </div>
 
@@ -316,9 +329,7 @@ export default defineComponent({
         </LabeledField>
       </div>
 
-      <div class="span-1 self-center text-center">
-        *
-      </div>
+      <div class="span-1 self-center text-center">*</div>
 
       <div class="span-2">
         <QuantityField
@@ -329,9 +340,7 @@ export default defineComponent({
         />
       </div>
 
-      <div class="span-1 self-center text-center">
-        /
-      </div>
+      <div class="span-1 self-center text-center">/</div>
 
       <div class="span-2">
         <DurationField
@@ -374,9 +383,7 @@ export default defineComponent({
         />
       </div>
 
-      <div class="span-1 self-center text-center">
-        =
-      </div>
+      <div class="span-1 self-center text-center">=</div>
 
       <div class="span-2">
         <InputField
@@ -416,9 +423,7 @@ export default defineComponent({
         </LabeledField>
       </div>
 
-      <div class="span-1 self-center text-center">
-        *
-      </div>
+      <div class="span-1 self-center text-center">*</div>
 
       <div class="span-2">
         <QuantityField
@@ -429,9 +434,7 @@ export default defineComponent({
         />
       </div>
 
-      <div class="span-1 self-center text-center">
-        *
-      </div>
+      <div class="span-1 self-center text-center">*</div>
 
       <div class="span-2">
         <DurationField
@@ -470,9 +473,7 @@ export default defineComponent({
         />
       </div>
 
-      <div class="span-1 q-pt-sm self-center text-center">
-        =
-      </div>
+      <div class="span-1 q-pt-sm self-center text-center">=</div>
 
       <div class="span-2 calc-line">
         <LabeledField label="D">
@@ -531,7 +532,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .grid-container
   display: grid
   grid-template-columns: repeat(11, 1fr)

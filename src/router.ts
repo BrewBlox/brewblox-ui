@@ -45,7 +45,8 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
-  { // Always leave this as last one
+  {
+    // Always leave this as last one
     path: '/:catchAll(.*)',
     component: () => import('@/pages/404Page.vue'),
   },

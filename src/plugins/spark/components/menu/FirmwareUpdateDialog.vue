@@ -111,25 +111,35 @@ export default defineComponent({
   >
     <Card>
       <template #toolbar>
-        <Toolbar :title="serviceId" subtitle="Firmware update" />
+        <Toolbar
+          :title="serviceId"
+          subtitle="Firmware update"
+        />
       </template>
 
       <q-card-section>
-        <div v-if="error" class="text-negative q-pa-md">
+        <div
+          v-if="error"
+          class="text-negative q-pa-md"
+        >
           <div>Update failed: {{ error }}</div>
-          Please retry. <br>
+          Please retry. <br />
           If the retry fails, run `brewblox-ctl flash`
         </div>
 
-        <div v-if="messages.length === 0" class="q-pa-md">
+        <div
+          v-if="messages.length === 0"
+          class="q-pa-md"
+        >
           {{ updateAvailableText }}
         </div>
         <template v-else>
-          <div class="text-h6 q-pa-md">
-            Log messages
-          </div>
+          <div class="text-h6 q-pa-md">Log messages</div>
           <div class="q-gutter-sm q-px-md monospace">
-            <div v-for="(msg, idx) in messages" :key="`msg-${idx}`">
+            <div
+              v-for="(msg, idx) in messages"
+              :key="`msg-${idx}`"
+            >
               {{ msg }}
             </div>
           </div>

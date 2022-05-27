@@ -38,7 +38,10 @@ export default defineComponent({
 <template>
   <Card>
     <template #toolbar>
-      <Toolbar :title="widget.title" :subtitle="featureTitle" />
+      <Toolbar
+        :title="widget.title"
+        :subtitle="featureTitle"
+      />
     </template>
 
     <div class="widget-body">
@@ -52,7 +55,12 @@ export default defineComponent({
         label="Type"
         class="col-grow"
       />
-      <q-btn icon="delete" flat class="col-grow" @click="removeBlock" />
+      <q-btn
+        icon="delete"
+        flat
+        class="col-grow"
+        @click="removeBlock"
+      />
     </div>
   </Card>
 </template>

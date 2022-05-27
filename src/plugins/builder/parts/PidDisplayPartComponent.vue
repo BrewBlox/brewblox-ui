@@ -118,9 +118,18 @@ export default defineComponent({
       :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
-      <BrokenIcon v-if="isBroken" class="col" />
-      <UnlinkedIcon v-else-if="!block" class="col" />
-      <SleepingIcon v-else-if="!block.data.enabled" class="col" />
+      <BrokenIcon
+        v-if="isBroken"
+        class="col"
+      />
+      <UnlinkedIcon
+        v-else-if="!block"
+        class="col"
+      />
+      <SleepingIcon
+        v-else-if="!block.data.enabled"
+        class="col"
+      />
       <template v-else>
         <q-icon
           v-if="kp === null"

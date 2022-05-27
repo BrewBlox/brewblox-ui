@@ -299,7 +299,10 @@ export default defineComponent({
         }"
         @click="clickUnused(slot)"
       />
-      <div style="grid-column: 9 / span 2" class="power">
+      <div
+        style="grid-column: 9 / span 2"
+        class="power"
+      >
         Power
         <div class="text-bold text-h5 row full-width justify-around">
           <div>-</div>
@@ -352,7 +355,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .container
   display: grid
   grid-template-columns: repeat(10, 1fr)

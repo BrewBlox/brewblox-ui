@@ -17,12 +17,13 @@ export default defineComponent({
 <template>
   <Card>
     <template #toolbar>
-      <Toolbar :title="serviceId" subtitle="Wifi Configuration" />
+      <Toolbar
+        :title="serviceId"
+        subtitle="Wifi Configuration"
+      />
     </template>
     <q-card-section class="text-weight-light">
-      <p class="text-h5">
-        Setting up Wifi on a Spark 4
-      </p>
+      <p class="text-h5">Setting up Wifi on a Spark 4</p>
       <p>
         Wifi credentials for the Spark 4 are set over Bluetooth, using the
         <b>ESP BLE Provisioning</b> app. The app is available for both Android
@@ -33,7 +34,7 @@ export default defineComponent({
         <li>Press the <b>(R)ESET</b> button on your Spark.</li>
         <li>
           While the Spark restarts, press and hold the
-          <b>OK</b> button for five seconds. <br>
+          <b>OK</b> button for five seconds. <br />
         </li>
         <li>
           The Spark is ready for provisioning if its buttons are blinking blue.
@@ -53,7 +54,11 @@ export default defineComponent({
     </q-card-section>
     <template #actions>
       <q-space />
-      <q-btn flat label="Close" @click="$emit('cancel')" />
+      <q-btn
+        flat
+        label="Close"
+        @click="$emit('cancel')"
+      />
     </template>
   </Card>
 </template>

@@ -122,9 +122,16 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
+  <LabeledField
+    v-bind="{ ...$attrs, ...$props }"
+    @click="openDialog"
+  >
     {{ displayValue }}
-    <q-item-label v-if="broken" caption class="text-negative q-mt-xs">
+    <q-item-label
+      v-if="broken"
+      caption
+      class="text-negative q-mt-xs"
+    >
       Block {{ modelValue.id }} not found
     </q-item-label>
     <template #append>
@@ -137,10 +144,17 @@ export default defineComponent({
       >
         <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
-      <q-icon v-if="broken" name="error" color="negative" />
+      <q-icon
+        v-if="broken"
+        name="error"
+        color="negative"
+      />
     </template>
 
-    <template v-for="slot in activeSlots" #[slot]>
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
   </LabeledField>

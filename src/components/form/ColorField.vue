@@ -77,17 +77,26 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
+  <LabeledField
+    v-bind="{ ...$attrs, ...$props }"
+    @click="openDialog"
+  >
     <slot name="value">
       {{ colorDesc }}
     </slot>
     <template #after>
       <slot name="indicator">
-        <span class="self-end q-mb-sm" :style="colorStyle" />
+        <span
+          class="self-end q-mb-sm"
+          :style="colorStyle"
+        />
       </slot>
     </template>
 
-    <template v-for="slot in activeSlots" #[slot]>
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
   </LabeledField>

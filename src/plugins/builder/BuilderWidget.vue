@@ -202,8 +202,14 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
 
-    <div class="fit" @click="pending = null">
-      <span v-if="parts.length === 0" class="absolute-center q-gutter-y-sm">
+    <div
+      class="fit"
+      @click="pending = null"
+    >
+      <span
+        v-if="parts.length === 0"
+        class="absolute-center q-gutter-y-sm"
+      >
         <div class="text-center">
           {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
         </div>
@@ -237,7 +243,10 @@ export default defineComponent({
           </q-btn>
         </div>
       </span>
-      <svg ref="svgRef" class="fit">
+      <svg
+        ref="svgRef"
+        class="fit"
+      >
         <g ref="svgContentRef">
           <g
             v-for="part in flowParts"
@@ -294,7 +303,10 @@ export default defineComponent({
   </Card>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 @import './grid.sass'
 
 .inactive

@@ -87,10 +87,20 @@ export default defineComponent({
 
       <div class="fit column">
         <q-scroll-area class="col">
-          <GraphEditor v-model:config="local" :no-period="noPeriod" />
+          <GraphEditor
+            v-model:config="local"
+            :no-period="noPeriod"
+          />
         </q-scroll-area>
-        <q-card-actions class="col-auto" style="border-top: 1px solid silver">
-          <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-card-actions
+          class="col-auto"
+          style="border-top: 1px solid silver"
+        >
+          <q-btn
+            flat
+            label="Cancel"
+            @click="onDialogCancel"
+          />
           <q-space />
           <q-btn
             :disable="shared.length === 0"
@@ -100,7 +110,12 @@ export default defineComponent({
           >
             <q-tooltip>Copy configuration from another graph</q-tooltip>
           </q-btn>
-          <q-btn unelevated label="Save" color="primary" @click="save" />
+          <q-btn
+            unelevated
+            label="Save"
+            color="primary"
+            @click="save"
+          />
         </q-card-actions>
       </div>
     </Card>

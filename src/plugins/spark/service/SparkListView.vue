@@ -200,12 +200,22 @@ export default defineComponent({
     class="q-pa-lg row no-wrap justify-start page-height"
     @dblclick="startCreateBlock"
   >
-    <q-scroll-area visible class="content-column rounded-borders bg-dark">
-      <q-list class="q-pr-md" @dblclick.stop.prevent>
+    <q-scroll-area
+      visible
+      class="content-column rounded-borders bg-dark"
+    >
+      <q-list
+        class="q-pr-md"
+        @dblclick.stop.prevent
+      >
         <!-- Selection controls -->
         <q-item class="q-mb-md">
           <q-item-section>
-            <q-input v-model="searchText" placeholder="Search blocks" clearable>
+            <q-input
+              v-model="searchText"
+              placeholder="Search blocks"
+              clearable
+            >
               <template #append>
                 <KeyboardButton @click="showSearchKeyboard" />
                 <q-icon name="search" />
@@ -213,7 +223,10 @@ export default defineComponent({
             </q-input>
           </q-item-section>
           <q-item-section class="col-auto">
-            <q-btn icon="mdi-sort" flat>
+            <q-btn
+              icon="mdi-sort"
+              flat
+            >
               <q-tooltip>Sort blocks</q-tooltip>
               <q-menu>
                 <q-list>
@@ -228,7 +241,10 @@ export default defineComponent({
               </q-menu>
             </q-btn>
           </q-item-section>
-          <q-item-section v-if="!dense" class="col-auto">
+          <q-item-section
+            v-if="!dense"
+            class="col-auto"
+          >
             <q-btn
               flat
               round
@@ -238,7 +254,10 @@ export default defineComponent({
               <q-tooltip>Unselect all</q-tooltip>
             </q-btn>
           </q-item-section>
-          <q-item-section v-if="!dense" class="col-auto">
+          <q-item-section
+            v-if="!dense"
+            class="col-auto"
+          >
             <q-btn
               flat
               round
@@ -256,7 +275,11 @@ export default defineComponent({
           :key="`filtered-${val.id}`"
           class="non-selectable text-white widget-index"
         >
-          <q-item-section v-if="!dense" side class="q-px-sm">
+          <q-item-section
+            v-if="!dense"
+            side
+            class="q-px-sm"
+          >
             <ToggleButton
               :model-value="expanded.includes(val.id)"
               flat
@@ -264,13 +287,19 @@ export default defineComponent({
             />
           </q-item-section>
           <q-item-section>
-            <q-item clickable @click="onItemClick(val)">
+            <q-item
+              clickable
+              @click="onItemClick(val)"
+            >
               <q-item-section avatar>
                 <q-icon :name="roleIcons[val.role]" />
                 <q-tooltip>{{ val.role }}</q-tooltip>
               </q-item-section>
               <q-item-section>
-                <q-item-label caption class="text-italic darkish">
+                <q-item-label
+                  caption
+                  class="text-italic darkish"
+                >
                   {{ val.title }}
                 </q-item-label>
                 <div style="font-size: larger">
@@ -284,8 +313,15 @@ export default defineComponent({
     </q-scroll-area>
 
     <!-- Widget List -->
-    <q-scroll-area v-if="!dense" visible class="content-column">
-      <q-list class="q-ml-lg q-pr-none" @dblclick.stop.prevent>
+    <q-scroll-area
+      v-if="!dense"
+      visible
+      class="content-column"
+    >
+      <q-list
+        class="q-ml-lg q-pr-none"
+        @dblclick.stop.prevent
+      >
         <q-item
           v-for="item in expandedRenderItems"
           :ref="(el) => setElementRef(item.id, el)"
@@ -297,13 +333,19 @@ export default defineComponent({
           </q-item-section>
         </q-item>
         <!-- Blank space to always be able to show a widget at the top -->
-        <q-item class="page-height" @dblclick="startCreateBlock" />
+        <q-item
+          class="page-height"
+          @dblclick="startCreateBlock"
+        />
       </q-list>
     </q-scroll-area>
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .widget-index
   padding: 0
 

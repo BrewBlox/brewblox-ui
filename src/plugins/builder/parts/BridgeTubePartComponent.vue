@@ -7,10 +7,7 @@ import { FlowPart } from '../types';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const lowPaths = {
-  borders: [
-    'M 21,50 L 21,21 M 21,10 L 21,0',
-    'M 29,50 L 29,21 M 29,10 L 29,0',
-  ],
+  borders: ['M 21,50 L 21,21 M 21,10 L 21,0', 'M 29,50 L 29,21 M 29,10 L 29,0'],
   liquid: 'M 25,50 L 25,21 M 25,11 L 25,0',
 };
 const highPaths = {
@@ -35,21 +32,15 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const lowLiquid = computed<string[]>(
-      () => liquidOnCoord(props.part, UP),
+    const lowLiquid = computed<string[]>(() => liquidOnCoord(props.part, UP));
+
+    const highLiquid = computed<string[]>(() =>
+      liquidOnCoord(props.part, LEFT),
     );
 
-    const highLiquid = computed<string[]>(
-      () => liquidOnCoord(props.part, LEFT),
-    );
+    const lowFlowSpeed = computed<number>(() => flowOnCoord(props.part, UP));
 
-    const lowFlowSpeed = computed<number>(
-      () => flowOnCoord(props.part, UP),
-    );
-
-    const highFlowSpeed = computed<number>(
-      () => flowOnCoord(props.part, LEFT),
-    );
+    const highFlowSpeed = computed<number>(() => flowOnCoord(props.part, LEFT));
 
     return {
       lowPaths,
@@ -67,15 +58,35 @@ export default defineComponent({
   <g>
     <!-- low -->
     <g class="outline">
-      <path v-for="border in lowPaths.borders" :key="border" :d="border" />
+      <path
+        v-for="border in lowPaths.borders"
+        :key="border"
+        :d="border"
+      />
     </g>
-    <LiquidStroke :paths="[lowPaths.liquid]" :colors="lowLiquid" />
-    <AnimatedArrows :speed="lowFlowSpeed" :path="lowPaths.liquid" />
+    <LiquidStroke
+      :paths="[lowPaths.liquid]"
+      :colors="lowLiquid"
+    />
+    <AnimatedArrows
+      :speed="lowFlowSpeed"
+      :path="lowPaths.liquid"
+    />
     <!-- high -->
     <g class="outline">
-      <path v-for="border in highPaths.borders" :key="border" :d="border" />
+      <path
+        v-for="border in highPaths.borders"
+        :key="border"
+        :d="border"
+      />
     </g>
-    <LiquidStroke :paths="[highPaths.liquid]" :colors="highLiquid" />
-    <AnimatedArrows :speed="highFlowSpeed" :path="highPaths.liquid" />
+    <LiquidStroke
+      :paths="[highPaths.liquid]"
+      :colors="highLiquid"
+    />
+    <AnimatedArrows
+      :speed="highFlowSpeed"
+      :path="highPaths.liquid"
+    />
   </g>
 </template>

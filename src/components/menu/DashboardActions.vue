@@ -105,13 +105,20 @@ export default defineComponent({
 <template>
   <ActionSubmenu>
     <template v-if="dashboard">
-      <ActionItem icon="add" label="New widget" @click="showWizard" />
+      <ActionItem
+        icon="add"
+        label="New widget"
+        @click="showWizard"
+      />
       <ToggleAction
         v-model="isHomePage"
         icon="home"
         :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
-      <ToggleAction v-model="listed" label="Show in sidebar" />
+      <ToggleAction
+        v-model="listed"
+        label="Show in sidebar"
+      />
       <ActionItem
         icon="edit"
         label="Change dashboard URL"

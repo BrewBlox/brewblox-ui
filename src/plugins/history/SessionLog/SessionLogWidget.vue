@@ -244,7 +244,10 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
     <component :is="context.mode">
-      <template v-if="session === null" #warnings>
+      <template
+        v-if="session === null"
+        #warnings
+      >
         <div class="column">
           <div class="text-italic text-h6 q-pa-md darkened text-center">
             Open or create a session to get started.
