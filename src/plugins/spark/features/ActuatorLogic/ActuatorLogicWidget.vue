@@ -12,28 +12,20 @@ import ActuatorLogicFull from './ActuatorLogicFull.vue';
 export default defineComponent({
   name: 'ActuatorLogicWidget',
   components: {
-    'Basic': ActuatorLogicBasic,
-    'Full': ActuatorLogicFull,
+    Basic: ActuatorLogicBasic,
+    Full: ActuatorLogicFull,
   },
   setup() {
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
-    const {
-      widgetId,
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<ActuatorLogicBlock>();
+    const { context, inDialog } = useContext.setup();
+    const { widgetId, block, saveBlock } =
+      useBlockWidget.setup<ActuatorLogicBlock>();
 
     function enable(): void {
       block.value.data.enabled = true;
       saveBlock();
     }
 
-    const target = computed<Link>(
-      () => block.value.data.targetId,
-    );
+    const target = computed<Link>(() => block.value.data.targetId);
     return {
       prettyLink,
       context,
@@ -46,7 +38,6 @@ export default defineComponent({
   },
 });
 </script>
-
 
 <template>
   <PreviewCard :enabled="inDialog">
@@ -70,10 +61,12 @@ export default defineComponent({
           :hide-enabled="context.mode === 'Basic'"
         >
           <template #enabled>
-            Logic Actuator is enabled and driving <i>{{ prettyLink(target) }}</i>.
+            Logic Actuator is enabled and driving
+            <i> {{ prettyLink(target) }} </i>.
           </template>
           <template #disabled>
-            Logic Actuator is disabled and not driving <i>{{ prettyLink(target) }}</i>.
+            Logic Actuator is disabled and not driving
+            <i> {{ prettyLink(target) }} </i>.
           </template>
         </BlockEnableToggle>
       </template>

@@ -142,7 +142,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-dialog ref="dialogRef" v-bind="dialogProps" @hide="onDialogHide">
+  <q-dialog
+    ref="dialogRef"
+    v-bind="dialogProps"
+    @hide="onDialogHide"
+  >
     <DialogCard v-bind="{ title, message, html }">
       <q-select
         v-model="selected"
@@ -153,23 +157,38 @@ export default defineComponent({
       >
         <template #no-option>
           <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
+            <q-item-section class="text-grey"> No results </q-item-section>
           </q-item>
         </template>
-        <template v-if="!!selected" #after>
-          <q-btn flat round icon="edit" @click="editSelected">
+        <template
+          v-if="!!selected"
+          #after
+        >
+          <q-btn
+            flat
+            round
+            icon="edit"
+            @click="editSelected"
+          >
             <q-tooltip>Rename profile</q-tooltip>
           </q-btn>
-          <q-btn flat round icon="delete" @click="removeSelected">
+          <q-btn
+            flat
+            round
+            icon="delete"
+            @click="removeSelected"
+          >
             <q-tooltip>Remove profile</q-tooltip>
           </q-btn>
         </template>
       </q-select>
 
       <template #actions>
-        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          @click="onDialogCancel"
+        />
         <q-space />
         <q-btn
           :disable="!selected"
@@ -185,7 +204,12 @@ export default defineComponent({
           label="save"
           @click="saveSelected"
         />
-        <q-btn color="primary" flat label="New" @click="createSnippet" />
+        <q-btn
+          color="primary"
+          flat
+          label="New"
+          @click="createSnippet"
+        />
       </template>
     </DialogCard>
   </q-dialog>

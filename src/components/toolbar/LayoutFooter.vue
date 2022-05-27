@@ -49,13 +49,23 @@ export default defineComponent({
 <template>
   <q-footer class="bg-dark shadow-up-1">
     <q-bar class="bg-transparent q-px-none row justify-end">
-      <div v-if="!eventbusConnected" class="text-negative">
+      <div
+        v-if="!eventbusConnected"
+        class="text-negative"
+      >
         No eventbus
       </div>
-      <div v-if="!historyConnected" class="text-negative">
+      <div
+        v-if="!historyConnected"
+        class="text-negative"
+      >
         No history
       </div>
-      <q-btn flat stretch icon="mdi-bell">
+      <q-btn
+        flat
+        stretch
+        icon="mdi-bell"
+      >
         <div v-if="logEntries.length">
           {{ logEntries.length }}
         </div>
@@ -64,9 +74,15 @@ export default defineComponent({
             <q-item v-if="logEntries.length === 0">
               <q-item-section> No messages </q-item-section>
             </q-item>
-            <q-item v-for="(entry, idx) in logEntries" :key="'entry-' + idx">
+            <q-item
+              v-for="(entry, idx) in logEntries"
+              :key="'entry-' + idx"
+            >
               <q-item-section avatar>
-                <q-icon :name="entry.icon" :color="entry.color" />
+                <q-icon
+                  :name="entry.icon"
+                  :color="entry.color"
+                />
               </q-item-section>
               <q-item-section>
                 <q-item-label caption>

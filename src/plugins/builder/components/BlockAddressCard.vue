@@ -30,19 +30,18 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    'update:part',
-  ],
+  emits: ['update:part'],
   setup(props, { emit }) {
     const address = computed<BlockAddress>({
       get: () => settingsAddress(props.part, props.settingsKey),
-      set: addr => emit('update:part', {
-        ...props.part,
-        settings: {
-          ...props.part.settings,
-          [props.settingsKey]: addr,
-        },
-      }),
+      set: (addr) =>
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            [props.settingsKey]: addr,
+          },
+        }),
     });
 
     return {
@@ -55,7 +54,7 @@ export default defineComponent({
 <template>
   <BlockAddressField
     v-model="address"
-    v-bind="{label, compatible, creatable}"
+    v-bind="{ label, compatible, creatable }"
     item-aligned
     any-service
   />

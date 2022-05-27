@@ -34,9 +34,7 @@ export default defineComponent({
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
-          <q-item-label class="text-subtitle1">
-            Output channels
-          </q-item-label>
+          <q-item-label class="text-subtitle1"> Output channels </q-item-label>
         </q-item-section>
       </q-item>
       <q-item class="text-weight-light">
@@ -44,7 +42,7 @@ export default defineComponent({
           <p>These are your selected output channels.</p>
           <p v-if="changedGpio.length">
             To assign a GPIO channel to pins, click the channel, and then click
-            on the left-most pin you want to use. <br>
+            on the left-most pin you want to use. <br />
             If you are not using an SSR for an actuator, click the
             <b>Edit Channel</b> button to change the device type.
           </p>
@@ -65,9 +63,18 @@ export default defineComponent({
       <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Next" color="primary" @click="taskDone" />
+      <q-btn
+        unelevated
+        label="Next"
+        color="primary"
+        @click="taskDone"
+      />
     </template>
   </WizardBody>
 </template>

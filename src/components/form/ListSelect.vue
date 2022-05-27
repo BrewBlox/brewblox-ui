@@ -34,20 +34,17 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'update:modelValue',
-    'confirm',
-  ],
+  emits: ['update:modelValue', 'confirm'],
   setup(props, { emit }) {
-    const mappedOptions = computed<any[]>(
-      () => props.options
-        .map(opt => isObject(opt)
+    const mappedOptions = computed<any[]>(() =>
+      props.options.map((opt) =>
+        isObject(opt)
           ? opt
           : {
-            [props.optionValue]: opt,
-            [props.optionLabel]: opt,
-          },
-        ),
+              [props.optionValue]: opt,
+              [props.optionLabel]: opt,
+            },
+      ),
     );
 
     function matches(opt: any): boolean {
@@ -55,8 +52,7 @@ export default defineComponent({
       const optValue = opt[props.optionValue];
       if (model === null) {
         return false;
-      }
-      else {
+      } else {
         return props.emitValue
           ? optValue === model
           : optValue === model[props.optionValue];
@@ -67,11 +63,9 @@ export default defineComponent({
       const value = props.emitValue ? opt[props.optionValue] : opt;
       if (save) {
         emit('confirm', value);
-      }
-      else if (matches(opt)) {
+      } else if (matches(opt)) {
         emit('update:modelValue', null);
-      }
-      else {
+      } else {
         emit('update:modelValue', value);
       }
     }
@@ -93,15 +87,21 @@ export default defineComponent({
       :class="[
         'col clickable q-px-sm rounded-borders text-h6',
         optionClass,
-        {'q-py-sm': !dense, 'depth-24': matches(opt)}
+        { 'q-py-sm': !dense, 'depth-24': matches(opt) },
       ]"
       @click="selectValue(opt, false)"
       @dblclick="selectValue(opt, true)"
     >
-      <slot name="body" :opt="opt">
+      <slot
+        name="body"
+        :opt="opt"
+      >
         {{ opt[optionLabel] }}
         <template v-if="opt.badge">
-          <q-badge class="q-ml-sm" color="info">
+          <q-badge
+            class="q-ml-sm"
+            color="info"
+          >
             {{ opt.badge }}
           </q-badge>
         </template>

@@ -65,20 +65,61 @@ export default defineComponent({
 
 <template>
   <g>
-    <LiquidStroke :paths="paths.liquid" :colors="liquids" class="coil-liquid" />
+    <LiquidStroke
+      :paths="paths.liquid"
+      :colors="liquids"
+      class="coil-liquid"
+    />
     <g class="outline">
-      <rect fill="white" x="1" y="12.5" width="8" height="8" />
-      <rect fill="white" x="1" y="30" width="8" height="8" />
-      <rect fill="white" x="1" y="62.5" width="8" height="8" />
-      <rect fill="white" x="1" y="80" width="8" height="8" />
-      <path v-for="border in paths.borders" :key="border" :d="border" />
+      <rect
+        fill="white"
+        x="1"
+        y="12.5"
+        width="8"
+        height="8"
+      />
+      <rect
+        fill="white"
+        x="1"
+        y="30"
+        width="8"
+        height="8"
+      />
+      <rect
+        fill="white"
+        x="1"
+        y="62.5"
+        width="8"
+        height="8"
+      />
+      <rect
+        fill="white"
+        x="1"
+        y="80"
+        width="8"
+        height="8"
+      />
+      <path
+        v-for="border in paths.borders"
+        :key="border"
+        :d="border"
+      />
     </g>
-    <AnimatedArrows :speed="flowSpeed" path="M0,25H50" />
-    <AnimatedArrows :speed="flowSpeed" path="M50,75H0" />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      path="M0,25H50"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      path="M50,75H0"
+    />
   </g>
 </template>
 
-<style lang="scss" scoped>
+<style
+  lang="scss"
+  scoped
+>
 :deep(.coil-liquid path) {
   stroke-linecap: round;
 }

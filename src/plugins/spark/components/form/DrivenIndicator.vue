@@ -57,7 +57,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-list :class="[{ clickable: isDriven }]" class="rounded-borders">
+  <q-list
+    :class="[{ clickable: isDriven }]"
+    class="rounded-borders"
+  >
     <div
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"
@@ -65,14 +68,27 @@ export default defineComponent({
       @click="showDialog(chainIdx)"
     >
       <q-tooltip>Edit {{ driveChains[chainIdx].source }}</q-tooltip>
-      <q-icon name="mdi-fast-forward-outline" class="col-auto" size="sm" />
+      <q-icon
+        name="mdi-fast-forward-outline"
+        class="col-auto"
+        size="sm"
+      />
       <div class="col-auto">
-        <div v-for="text in chain" :key="text">
-          <small class="darkish" v-html="text" />
+        <div
+          v-for="text in chain"
+          :key="text"
+        >
+          <small
+            class="darkish"
+            v-html="text"
+          />
         </div>
       </div>
     </div>
-    <div v-if="!isDriven" class="col-auto q-pa-sm darkish text-italic">
+    <div
+      v-if="!isDriven"
+      class="col-auto q-pa-sm darkish text-italic"
+    >
       <small>Not driven</small>
     </div>
   </q-list>

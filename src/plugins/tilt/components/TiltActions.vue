@@ -69,7 +69,10 @@ export default defineComponent({
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
-    <ToggleAction v-model="listed" label="Show in sidebar" />
+    <ToggleAction
+      v-model="listed"
+      label="Show in sidebar"
+    />
     <ActionItem
       icon="edit"
       label="Rename service"

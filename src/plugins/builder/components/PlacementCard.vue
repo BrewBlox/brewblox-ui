@@ -13,10 +13,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:part',
-    'remove:part',
-  ],
+  emits: ['update:part', 'remove:part'],
   setup(props, { emit }) {
     function rotate(rotation: number): void {
       const rotate = clampRotation(props.part.rotate + rotation);

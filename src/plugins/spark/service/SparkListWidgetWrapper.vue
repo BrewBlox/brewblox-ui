@@ -74,7 +74,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <WidgetProvider :widget-id="widgetId" :context="context">
+  <WidgetProvider
+    :widget-id="widgetId"
+    :context="context"
+  >
     <component
       :is="widgetComponent.component"
       v-if="widgetComponent"

@@ -20,17 +20,10 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     async function done(save: boolean): Promise<void> {
       if (save) {
@@ -57,12 +50,26 @@ export default defineComponent({
     no-esc-dismiss
     @hide="onDialogHide"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <template #actions>
-        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          @click="onDialogCancel"
+        />
         <q-space />
-        <q-btn flat label="No" color="primary" @click="done(false)" />
-        <q-btn flat label="Yes" color="primary" @click="done(true)" />
+        <q-btn
+          flat
+          label="No"
+          color="primary"
+          @click="done(false)"
+        />
+        <q-btn
+          flat
+          label="Yes"
+          color="primary"
+          @click="done(true)"
+        />
       </template>
     </DialogCard>
   </q-dialog>

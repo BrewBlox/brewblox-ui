@@ -55,7 +55,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <div v-if="editable" class="row no-wrap">
+  <div
+    v-if="editable"
+    class="row no-wrap"
+  >
     <q-input
       v-model.number="local"
       :dense="dense"
@@ -72,7 +75,11 @@ export default defineComponent({
       </template>
     </q-input>
   </div>
-  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ displayValue }}
   </div>
 </template>

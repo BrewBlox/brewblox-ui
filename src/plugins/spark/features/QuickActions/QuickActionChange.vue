@@ -153,7 +153,10 @@ export default defineComponent({
         {{ change.blockId }}
         <q-tooltip>Service: {{ change.serviceId }}</q-tooltip>
       </div>
-      <ActionMenu dense round>
+      <ActionMenu
+        dense
+        round
+      >
         <template #actions>
           <ActionItem
             label="Remove block change"
@@ -202,7 +205,10 @@ export default defineComponent({
       <div class="col-shrink">
         {{ field.specField.title }}
       </div>
-      <div v-if="field.value !== null" class="col row justify-end q-pr-md">
+      <div
+        v-if="field.value !== null"
+        class="col row justify-end q-pr-md"
+      >
         <component
           :is="field.specField.component"
           v-bind="field.specField.componentProps"
@@ -221,18 +227,28 @@ export default defineComponent({
     </div>
     <q-item v-if="unknownValues.length">
       <q-item-section avatar>
-        <q-icon name="warning" color="warning" />
+        <q-icon
+          name="warning"
+          color="warning"
+        />
       </q-item-section>
       <q-item-section>
         Unknown fields: {{ unknownValues.map((v) => `'${v}'`).join(', ') }}
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn flat label="Remove" @click="saveChange()" />
+        <q-btn
+          flat
+          label="Remove"
+          @click="saveChange()"
+        />
       </q-item-section>
     </q-item>
     <q-item v-if="!block">
       <q-item-section avatar>
-        <q-icon name="warning" color="warning" />
+        <q-icon
+          name="warning"
+          color="warning"
+        />
       </q-item-section>
       <q-item-section> Block not found </q-item-section>
     </q-item>

@@ -26,7 +26,10 @@ export default defineComponent({
 
 <template>
   <q-card class="q-dialog-plugin q-dialog-plugin--dark overflow-auto">
-    <q-card-section v-if="title" class="q-dialog__title">
+    <q-card-section
+      v-if="title"
+      class="q-dialog__title"
+    >
       {{ title }}
     </q-card-section>
     <template v-if="$slots.message">
@@ -36,8 +39,15 @@ export default defineComponent({
       </q-card-section>
     </template>
     <template v-else-if="!message" />
-    <q-card-section v-else-if="html" class="q-dialog__message scroll" v-html="message" />
-    <q-card-section v-else class="q-dialog__message scroll">
+    <q-card-section
+      v-else-if="html"
+      class="q-dialog__message scroll"
+      v-html="message"
+    />
+    <q-card-section
+      v-else
+      class="q-dialog__message scroll"
+    >
       {{ message }}
     </q-card-section>
     <slot name="body">
@@ -46,7 +56,10 @@ export default defineComponent({
       </q-card-section>
     </slot>
     <q-separator v-if="separated" />
-    <q-card-actions v-if="$slots.actions" align="right">
+    <q-card-actions
+      v-if="$slots.actions"
+      align="right"
+    >
       <slot name="actions" />
     </q-card-actions>
   </q-card>

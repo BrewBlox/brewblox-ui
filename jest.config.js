@@ -7,9 +7,7 @@ module.exports = {
     '^.+\\js$': 'babel-jest',
   },
   moduleFileExtensions: ['vue', 'js', 'json', 'jsx', 'ts', 'tsx', 'node'],
-  testMatch: [
-    '<rootDir>/(test|src)/**/__tests__/**.(spec|test).+(ts|js)',
-  ],
+  testMatch: ['<rootDir>/(test|src)/**/__tests__/**.(spec|test).+(ts|js)'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },

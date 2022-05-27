@@ -127,7 +127,10 @@ export default defineComponent({
       <WidgetToolbar has-mode-toggle />
     </template>
 
-    <div v-if="context.mode === 'Basic'" class="widget-body row justify-center">
+    <div
+      v-if="context.mode === 'Basic'"
+      class="widget-body row justify-center"
+    >
       <template v-if="widget.rows > 2 && widget.cols > 2">
         <BlockFieldAddressField
           :model-value="config.addr"
@@ -168,7 +171,10 @@ export default defineComponent({
         :key="`slider-${idx}_${min}_${max}_${step}`"
         class="col-11 q-mr-xs row q-gutter-x-sm"
       >
-        <div class="col-auto self-center fade-3" style="min-width: 15pt">
+        <div
+          class="col-auto self-center fade-3"
+          style="min-width: 15pt"
+        >
           {{ min }}
         </div>
         <q-slider
@@ -180,13 +186,19 @@ export default defineComponent({
           class="col-grow"
           @change="debouncedSave"
         />
-        <div class="col-auto self-center fade-3" style="min-width: 15pt">
+        <div
+          class="col-auto self-center fade-3"
+          style="min-width: 15pt"
+        >
           {{ max }}
         </div>
       </div>
     </div>
 
-    <div v-if="context.mode === 'Full'" class="widget-body column">
+    <div
+      v-if="context.mode === 'Full'"
+      class="widget-body column"
+    >
       <BlockFieldAddressField
         :model-value="config.addr"
         :block-filter="blockFilter"

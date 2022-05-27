@@ -3,7 +3,6 @@ import { JSLink } from '../link';
 import { deserialize, serialize } from '../parsing';
 import { bloxQty } from '../quantity';
 
-
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {
     const input: any = {

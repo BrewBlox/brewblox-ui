@@ -23,13 +23,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const flowSpeed = computed<number>(
-      () => flowOnCoord(props.part, RIGHT),
-    );
+    const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
 
-    const liquids = computed<string[]>(
-      () => liquidOnCoord(props.part, RIGHT),
-    );
+    const liquids = computed<string[]>(() => liquidOnCoord(props.part, RIGHT));
 
     return {
       paths,
@@ -42,8 +38,14 @@ export default defineComponent({
 
 <template>
   <g>
-    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
-    <AnimatedArrows :speed="flowSpeed" :path="paths.liquid" />
+    <LiquidStroke
+      :paths="[paths.liquid]"
+      :colors="liquids"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      :path="paths.liquid"
+    />
     <g class="outline">
       <path :d="paths.borders[0]" />
       <path :d="paths.borders[1]" />

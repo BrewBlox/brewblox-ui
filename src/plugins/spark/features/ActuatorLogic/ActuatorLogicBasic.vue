@@ -151,7 +151,10 @@ export default defineComponent({
 
     <div class="widget-body">
       <div class="row wrap q-pa-sm">
-        <LabeledField label="Expression" class="col-grow">
+        <LabeledField
+          label="Expression"
+          class="col-grow"
+        >
           <span
             v-for="({ char, color }, idx) in expression"
             :key="`expression-${idx}`"
@@ -160,14 +163,20 @@ export default defineComponent({
             {{ char }}
           </span>
         </LabeledField>
-        <LabeledField label="Result" class="col-grow">
+        <LabeledField
+          label="Result"
+          class="col-grow"
+        >
           <div :class="err && 'text-negative'">
             {{ result }}
           </div>
         </LabeledField>
       </div>
 
-      <LabeledField label="Active comparisons" tag-class="col-grow">
+      <LabeledField
+        label="Active comparisons"
+        tag-class="col-grow"
+      >
         <div class="row q-gutter-xs col-grow">
           <q-chip
             v-for="{ key, cmp, pretty } in digital"
@@ -178,7 +187,10 @@ export default defineComponent({
             @click="editDigital(key, cmp)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div class="text-lime-6 text-bold col-auto" style="width: 1em">
+              <div
+                class="text-lime-6 text-bold col-auto"
+                style="width: 1em"
+              >
                 {{ key }}
               </div>
               <q-icon
@@ -204,7 +216,10 @@ export default defineComponent({
             @click="editAnalog(key, cmp)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div class="text-orange-6 text-bold col-auto" style="width: 1em">
+              <div
+                class="text-orange-6 text-bold col-auto"
+                style="width: 1em"
+              >
                 {{ key }}
               </div>
               <q-icon

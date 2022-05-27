@@ -14,18 +14,13 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      sizeX,
-      sizeY,
-    } = usePart.setup(props.part);
+    const { sizeX, sizeY } = usePart.setup(props.part);
 
     const text = computed<string>(
       () => props.part.settings.text || '<edit to set text>',
     );
 
-    const fontSize = computed<number>(
-      () => props.part.settings.fontSize || 16,
-    );
+    const fontSize = computed<number>(() => props.part.settings.fontSize || 16);
 
     return {
       textTransformation,
@@ -48,7 +43,7 @@ export default defineComponent({
     >
       <div
         class="col-auto text-bold full-width q-pa-sm"
-        :style="{'font-size': `${fontSize}pt`}"
+        :style="{ 'font-size': `${fontSize}pt` }"
       >
         {{ text }}
       </div>

@@ -50,15 +50,9 @@ export default defineComponent({
 
     <div class="column q-ma-md q-gutter-y-sm">
       <div class="col-auto row q-gutter-x-sm darkened">
-        <div class="col">
-          Client
-        </div>
-        <div class="col">
-          Granted
-        </div>
-        <div class="col">
-          Requested
-        </div>
+        <div class="col">Client</div>
+        <div class="col">Granted</div>
+        <div class="col">Requested</div>
       </div>
 
       <div

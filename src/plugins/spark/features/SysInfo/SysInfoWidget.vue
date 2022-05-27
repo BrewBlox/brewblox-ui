@@ -80,22 +80,37 @@ export default defineComponent({
 
     <div>
       <div class="widget-body row">
-        <LabeledField label="Firmware version" class="col-lg-5 col-11">
+        <LabeledField
+          label="Firmware version"
+          class="col-lg-5 col-11"
+        >
           {{
             /* We only use first 8 characters of version hash */
             sysInfo.data.version.substring(0, 8)
           }}
         </LabeledField>
-        <LabeledField label="Firmware release date" class="col-lg-5 col-11">
+        <LabeledField
+          label="Firmware release date"
+          class="col-lg-5 col-11"
+        >
           {{ sysInfo.data.releaseDate }}
         </LabeledField>
-        <LabeledField label="Controller date / time" class="col-lg-5 col-11">
+        <LabeledField
+          label="Controller date / time"
+          class="col-lg-5 col-11"
+        >
           {{ sysDate }}
         </LabeledField>
-        <LabeledField label="Controller uptime" class="col-lg-5 col-11">
+        <LabeledField
+          label="Controller uptime"
+          class="col-lg-5 col-11"
+        >
           {{ uptime }}
         </LabeledField>
-        <LabeledField label="Service ID" class="col-lg-5 col-11">
+        <LabeledField
+          label="Service ID"
+          class="col-lg-5 col-11"
+        >
           {{ serviceId }}
         </LabeledField>
         <LabeledField
@@ -105,10 +120,16 @@ export default defineComponent({
         >
           {{ sysInfo.data.deviceId }}
         </LabeledField>
-        <LabeledField label="IP address" class="col-lg-5 col-11">
+        <LabeledField
+          label="IP address"
+          class="col-lg-5 col-11"
+        >
           {{ ipAddress }}
         </LabeledField>
-        <LabeledField label="Last blocks update" class="col-lg-5 col-11">
+        <LabeledField
+          label="Last blocks update"
+          class="col-lg-5 col-11"
+        >
           {{ lastBlocks }}
         </LabeledField>
       </div>

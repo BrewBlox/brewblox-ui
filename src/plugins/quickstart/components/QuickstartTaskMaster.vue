@@ -3,7 +3,6 @@ import { defineComponent, PropType, ref } from 'vue';
 
 import { QuickstartAction } from '../types';
 
-
 export default defineComponent({
   name: 'QuickstartTaskMaster',
   props: {
@@ -12,10 +11,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'back',
-    'close',
-  ],
+  emits: ['back', 'close'],
   setup(props, { emit }) {
     const config = ref<AnyDict>({});
     const actions = ref<QuickstartAction[]>([]);

@@ -91,13 +91,20 @@ export default defineComponent({
 <template>
   <Card>
     <template #toolbar>
-      <Toolbar :title="serviceId" subtitle="Wifi Configuration" />
+      <Toolbar
+        :title="serviceId"
+        subtitle="Wifi Configuration"
+      />
     </template>
 
     <q-card-section>
       <q-item>
         <q-item-section>
-          <q-input v-model="values.ssid" label="SSID" autofocus>
+          <q-input
+            v-model="values.ssid"
+            label="SSID"
+            autofocus
+          >
             <template #append>
               <KeyboardButton @click="showKeyboard('ssid')" />
             </template>
@@ -147,7 +154,11 @@ export default defineComponent({
       </q-item>
     </q-card-section>
     <template #actions>
-      <q-btn flat label="Cancel" @click="$emit('cancel')" />
+      <q-btn
+        flat
+        label="Cancel"
+        @click="$emit('cancel')"
+      />
       <q-space />
       <q-btn
         :loading="busy"

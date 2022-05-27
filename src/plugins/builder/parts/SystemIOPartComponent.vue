@@ -42,12 +42,28 @@ export default defineComponent({
 
 <template>
   <g>
-    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
-    <AnimatedArrows :num-arrows="1" :speed="flowSpeed" :path="paths.arrows" />
+    <LiquidStroke
+      :paths="[paths.liquid]"
+      :colors="liquids"
+    />
+    <AnimatedArrows
+      :num-arrows="1"
+      :speed="flowSpeed"
+      :path="paths.arrows"
+    />
     <g class="outline">
-      <path v-if="flowSpeed > 0" :d="chevrons.right" />
-      <path v-else-if="flowSpeed < 0" :d="chevrons.left" />
-      <path v-else :d="chevrons.straight" />
+      <path
+        v-if="flowSpeed > 0"
+        :d="chevrons.right"
+      />
+      <path
+        v-else-if="flowSpeed < 0"
+        :d="chevrons.left"
+      />
+      <path
+        v-else
+        :d="chevrons.straight"
+      />
       <path :d="paths.borders[0]" />
       <path :d="paths.borders[1]" />
     </g>

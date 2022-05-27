@@ -14,8 +14,8 @@ import { TempControlMode } from './types';
 
 const setpointFilter = makeTypeFilter(BlockType.SetpointSensorPair);
 const durationRules: InputRule[] = [
-  v => v >= 0 || 'Value must be positive',
-  v => v < (2 ** 16 * 1000) || 'Value is too large to be stored in firmware',
+  (v) => v >= 0 || 'Value must be positive',
+  (v) => v < 2 ** 16 * 1000 || 'Value is too large to be stored in firmware',
 ];
 
 export default defineComponent({
@@ -43,20 +43,11 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dense,
-    } = useGlobals.setup();
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dense } = useGlobals.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
     const tempMode = reactive<TempControlMode>(deepCopy(props.modelValue));
     const sparkStore = useSparkStore();
 
@@ -64,8 +55,8 @@ export default defineComponent({
       props.saveMode(tempMode);
     }
 
-    const setpoint = computed<SetpointSensorPairBlock | null>(
-      () => sparkStore.blockByLink(props.serviceId, tempMode.setpoint),
+    const setpoint = computed<SetpointSensorPairBlock | null>(() =>
+      sparkStore.blockByLink(props.serviceId, tempMode.setpoint),
     );
 
     function removeConfig(kind: 'cool' | 'heat'): void {
@@ -73,18 +64,22 @@ export default defineComponent({
         component: 'ConfirmDialog',
         componentProps: {
           title: `Remove ${kind} config`,
-          message: `Are you sure you want to remove the ${kind} ` +
-          `config from the ${tempMode.title} mode?`,
+          message:
+            `Are you sure you want to remove the ${kind} ` +
+            `config from the ${tempMode.title} mode?`,
           noBackdropDismiss: true,
         },
-      })
-        .onOk(() => {
-          tempMode[kind + 'Config'] = null;
-          save();
-        });
+      }).onOk(() => {
+        tempMode[kind + 'Config'] = null;
+        save();
+      });
     }
 
-    function updateConfig(cfg: 'cool' | 'heat', key: keyof PidConfig, value: Quantity): void {
+    function updateConfig(
+      cfg: 'cool' | 'heat',
+      key: keyof PidConfig,
+      value: Quantity,
+    ): void {
       const config: PidConfig | undefined = tempMode[cfg + 'Config'];
       if (config) {
         config[key] = value;
@@ -140,18 +135,24 @@ export default defineComponent({
   >
     <Card>
       <template #toolbar>
-        <Toolbar :title="title" subtitle="Temperature control mode" />
+        <Toolbar
+          :title="title"
+          subtitle="Temperature control mode"
+        />
       </template>
 
-      <q-card-section
-        class="row q-gutter-xs"
-      >
+      <q-card-section class="row q-gutter-xs">
         <InputField
           :model-value="tempMode.title"
           label="Mode name"
           title="Mode name"
           class="col-grow"
-          @update:model-value="v => { tempMode.title = v; save(); }"
+          @update:model-value="
+            (v: string) => {
+              tempMode.title = v;
+              save();
+            }
+          "
         />
 
         <LinkField
@@ -162,7 +163,12 @@ export default defineComponent({
           title="PID input Setpoint"
           label="PID input Setpoint"
           class="col-grow"
-          @update:model-value="v => { tempMode.setpoint = v; save(); }"
+          @update:model-value="
+            (v) => {
+              tempMode.setpoint = v;
+              save();
+            }
+          "
         />
 
         <div class="col-break" />
@@ -173,7 +179,7 @@ export default defineComponent({
             title="Cool Kp"
             label="Cool Kp"
             class="col cool-field"
-            @update:model-value="v => updateConfig('cool', 'kp', v)"
+            @update:model-value="(v) => updateConfig('cool', 'kp', v)"
           />
           <DurationField
             :model-value="tempMode.coolConfig.ti"
@@ -181,7 +187,7 @@ export default defineComponent({
             title="Cool Ti"
             label="Cool Ti"
             class="col cool-field"
-            @update:model-value="v => updateConfig('cool', 'ti', v)"
+            @update:model-value="(v) => updateConfig('cool', 'ti', v)"
           />
           <DurationField
             :model-value="tempMode.coolConfig.td"
@@ -189,16 +195,14 @@ export default defineComponent({
             title="Cool Td"
             label="Cool Td"
             class="col cool-field"
-            @update:model-value="v => updateConfig('cool', 'td', v)"
+            @update:model-value="(v) => updateConfig('cool', 'td', v)"
           />
           <q-btn
             flat
             icon="delete"
             @click="removeConfig('cool')"
           >
-            <q-tooltip>
-              Remove cool config from this mode.
-            </q-tooltip>
+            <q-tooltip> Remove cool config from this mode. </q-tooltip>
           </q-btn>
         </template>
         <q-btn
@@ -217,7 +221,7 @@ export default defineComponent({
             title="Heat Kp"
             label="Heat Kp"
             class="col heat-field"
-            @update:model-value="v => updateConfig('heat', 'kp', v)"
+            @update:model-value="(v) => updateConfig('heat', 'kp', v)"
           />
           <DurationField
             :model-value="tempMode.heatConfig.ti"
@@ -225,7 +229,7 @@ export default defineComponent({
             title="Heat Ti"
             label="Heat Ti"
             class="col heat-field"
-            @update:model-value="v => updateConfig('heat', 'ti', v)"
+            @update:model-value="(v) => updateConfig('heat', 'ti', v)"
           />
           <DurationField
             :model-value="tempMode.heatConfig.td"
@@ -233,16 +237,14 @@ export default defineComponent({
             title="Heat Td"
             label="Heat Td"
             class="col heat-field"
-            @update:model-value="v => updateConfig('heat', 'td', v)"
+            @update:model-value="(v) => updateConfig('heat', 'td', v)"
           />
           <q-btn
             flat
             icon="delete"
             @click="removeConfig('heat')"
           >
-            <q-tooltip>
-              Remove heat config from this mode.
-            </q-tooltip>
+            <q-tooltip> Remove heat config from this mode. </q-tooltip>
           </q-btn>
         </template>
         <q-btn
@@ -258,55 +260,54 @@ export default defineComponent({
         <q-item-label class="text-subtitle1">
           Temperature control with PID
         </q-item-label>
-        <p>
-          The minimal building blocks for a control system are:
-          <ul>
-            <li>A sensor, to measure what you want to control.</li>
-            <li>A setpoint, the target value for the sensor.</li>
-            <li>An actuator, to drive the sensor value towards the setpoint.</li>
-            <li>
-              A controller, in our case a PID,
-              to calculate what the value for the actuator should be
-              from the sensor and setpoint value.
-            </li>
-          </ul>
-        </p>
+        <p>The minimal building blocks for a control system are:</p>
+        <ul>
+          <li>A sensor, to measure what you want to control.</li>
+          <li>A setpoint, the target value for the sensor.</li>
+          <li>An actuator, to drive the sensor value towards the setpoint.</li>
+          <li>
+            A controller, in our case a PID, to calculate what the value for the
+            actuator should be from the sensor and setpoint value.
+          </li>
+        </ul>
 
         <p>
-          Because the system can respond differently
-          to the heater and the cooler, each has its own PID. <br>
-          For more information, visit our <a
+          Because the system can respond differently to the heater and the
+          cooler, each has its own PID. <br />
+          For more information, visit our
+          <a
             href="https://brewblox.netlify.app/user/control_chains.html"
             target="_blank"
             style="color: white"
-          >control chains guide</a>.
+          >
+            control chains guide.
+          </a>
         </p>
 
-        <q-item-label class="text-subtitle1">
-          Control modes
-        </q-item-label>
+        <q-item-label class="text-subtitle1"> Control modes </q-item-label>
+        <p>Control modes let you toggle between PID configurations.</p>
         <p>
-          Control modes let you toggle between PID configurations.
+          When you control fridge air temperature, the measured temperature will
+          change more quickly than when you control a large volume of beer.
+          <br />
+          This requires different PID settings. By using control modes, you can
+          store the settings, and switch between them.
         </p>
         <p>
-          When you control fridge air temperature,
-          the measured temperature will change more quickly
-          than when you control a large volume of beer. <br>
-          This requires different PID settings.
-          By using control modes, you can store the settings, and switch between them.
+          PID settings can still be tuned by changing the block settings. This
+          widget detects changes, and will offer to either update or re-apply
+          the mode settings.
         </p>
         <p>
-          PID settings can still be tuned by changing the block settings.
-          This widget detects changes,
-          and will offer to either update or re-apply the mode settings.
-        </p>
-        <p>
-          Each mode uses its own Setpoint and Temperature Sensor.
-          When applying a mode, the PID input Setpoint is changed.
+          Each mode uses its own Setpoint and Temperature Sensor. When applying
+          a mode, the PID input Setpoint is changed.
         </p>
       </q-card-section>
 
-      <template v-if="showConfirm" #actions>
+      <template
+        v-if="showConfirm"
+        #actions
+      >
         <q-btn
           unelevated
           label="Cancel"
@@ -324,7 +325,10 @@ export default defineComponent({
   </q-dialog>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .heat-field
   background: rgba($red, 0.1)
 

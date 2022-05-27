@@ -56,8 +56,15 @@ export default defineComponent({
 <template>
   <g>
     <g class="outline">
-      <path :d="paths.fixture" fill="#fff" />
-      <path v-for="(border, idx) in paths.borders" :key="idx" :d="border" />
+      <path
+        :d="paths.fixture"
+        fill="#fff"
+      />
+      <path
+        v-for="(border, idx) in paths.borders"
+        :key="idx"
+        :d="border"
+      />
     </g>
   </g>
 </template>

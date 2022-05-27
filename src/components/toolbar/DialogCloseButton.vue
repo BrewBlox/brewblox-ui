@@ -7,5 +7,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-btn v-close-popup flat icon="mdi-close-circle" />
+  <q-btn
+    v-close-popup
+    flat
+    icon="mdi-close-circle"
+  />
 </template>

@@ -29,7 +29,7 @@ export default defineComponent({
     </template>
     <CardWarning>
       <template #message>
-        This {{ actualFeatureTitle }} block is disabled. <br>To enable it,
+        This {{ actualFeatureTitle }} block is disabled. <br />To enable it,
         ensure that it is in an enabled group.
       </template>
     </CardWarning>

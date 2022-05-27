@@ -167,8 +167,15 @@ export default defineComponent({
             label="Add block to graph"
             @click="startAddBlockGraph"
           />
-          <ExportGraphAction :config="config" :header="widget.title" />
-          <ActionItem icon="refresh" label="Refresh" @click="regraph" />
+          <ExportGraphAction
+            :config="config"
+            :header="widget.title"
+          />
+          <ActionItem
+            icon="refresh"
+            label="Refresh"
+            @click="regraph"
+          />
         </template>
         <template #menus>
           <WidgetActions />
@@ -177,7 +184,10 @@ export default defineComponent({
             :save="(v) => saveLayout(v)"
           />
           <ActionSubmenu label="Timespan">
-            <div class="row wrap" style="max-width: 200px">
+            <div
+              class="row wrap"
+              style="max-width: 200px"
+            >
               <q-btn
                 v-for="(preset, idx) in presets"
                 :key="idx"
@@ -201,8 +211,14 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
 
-    <div v-if="context.mode === 'Basic'" class="fit">
-      <q-resize-observer :debounce="200" @resize="refresh" />
+    <div
+      v-if="context.mode === 'Basic'"
+      class="fit"
+    >
+      <q-resize-observer
+        :debounce="200"
+        @resize="refresh"
+      />
       <HistoryGraph
         ref="widgetGraphRef"
         :graph-id="widgetGraphId"
@@ -214,7 +230,10 @@ export default defineComponent({
       />
     </div>
     <div v-if="context.mode === 'Full'">
-      <GraphEditor :config="config" @update:config="saveConfig" />
+      <GraphEditor
+        :config="config"
+        @update:config="saveConfig"
+      />
     </div>
   </PreviewCard>
 </template>

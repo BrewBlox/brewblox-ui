@@ -9,15 +9,13 @@ import { prettyQty } from '@/utils/formatting';
 export default defineComponent({
   name: 'SetpointSensorPairBasic',
   setup() {
-    const {
-      serviceId,
-      block,
-      saveBlock,
-      isDriven,
-    } = useBlockWidget.setup<SetpointSensorPairBlock>();
+    const { serviceId, block, saveBlock, isDriven } =
+      useBlockWidget.setup<SetpointSensorPairBlock>();
 
     function editSetting(): void {
-      if (isDriven.value) { return; }
+      if (isDriven.value) {
+        return;
+      }
       createDialog({
         component: 'QuantityDialog',
         componentProps: {
@@ -25,11 +23,10 @@ export default defineComponent({
           label: 'Setting',
           modelValue: block.value.data.storedSetting,
         },
-      })
-        .onOk(v => {
-          block.value.data.storedSetting = v;
-          saveBlock();
-        });
+      }).onOk((v) => {
+        block.value.data.storedSetting = v;
+        saveBlock();
+      });
     }
 
     return {
@@ -48,9 +45,16 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
-      <SettingValueField :editable="!isDriven" class="col-auto" @click="editSetting">
+      <SettingValueField
+        :editable="!isDriven"
+        class="col-auto"
+        @click="editSetting"
+      >
         <template #valueIcon>
-          <q-icon name="mdi-thermometer" color="green-3" />
+          <q-icon
+            name="mdi-thermometer"
+            color="green-3"
+          />
         </template>
         <template #value>
           {{ prettyQty(block.data.value) }}

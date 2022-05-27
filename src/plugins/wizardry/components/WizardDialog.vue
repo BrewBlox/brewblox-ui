@@ -116,7 +116,10 @@ export default defineComponent({
   >
     <Card no-scroll>
       <template #toolbar>
-        <Toolbar icon="mdi-creation" :title="dialogTitle" />
+        <Toolbar
+          icon="mdi-creation"
+          :title="dialogTitle"
+        />
       </template>
 
       <component
@@ -137,13 +140,12 @@ export default defineComponent({
             clickable
             @click="pickWizard('QuickstartWizardPicker')"
           >
-            <q-item-section side class="col-4">
-              <q-item-label class="text-h6">
-                Quick Start
-              </q-item-label>
-              <q-item-label caption>
-                Add a brewing process
-              </q-item-label>
+            <q-item-section
+              side
+              class="col-4"
+            >
+              <q-item-label class="text-h6"> Quick Start </q-item-label>
+              <q-item-label caption> Add a brewing process </q-item-label>
             </q-item-section>
             <q-item-section>
               <p>
@@ -164,14 +166,16 @@ export default defineComponent({
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('DashboardWizard')">
-            <q-item-section side class="col-4">
-              <q-item-label class="text-h6">
-                New Dashboard
-              </q-item-label>
-              <q-item-label caption>
-                Add an empty dashboard
-              </q-item-label>
+          <q-item
+            clickable
+            @click="pickWizard('DashboardWizard')"
+          >
+            <q-item-section
+              side
+              class="col-4"
+            >
+              <q-item-label class="text-h6"> New Dashboard </q-item-label>
+              <q-item-label caption> Add an empty dashboard </q-item-label>
             </q-item-section>
             <q-item-section>
               <p>
@@ -185,14 +189,16 @@ export default defineComponent({
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('WidgetWizardPicker')">
-            <q-item-section side class="col-4">
-              <q-item-label class="text-h6">
-                New Widget
-              </q-item-label>
-              <q-item-label caption>
-                Add a widget to a dashboard
-              </q-item-label>
+          <q-item
+            clickable
+            @click="pickWizard('WidgetWizardPicker')"
+          >
+            <q-item-section
+              side
+              class="col-4"
+            >
+              <q-item-label class="text-h6"> New Widget </q-item-label>
+              <q-item-label caption> Add a widget to a dashboard </q-item-label>
             </q-item-section>
             <q-item-section>
               <p>
@@ -215,10 +221,11 @@ export default defineComponent({
             clickable
             @click="pickWizard('BlockWizard')"
           >
-            <q-item-section side class="col-4">
-              <q-item-label class="text-h6">
-                New Block
-              </q-item-label>
+            <q-item-section
+              side
+              class="col-4"
+            >
+              <q-item-label class="text-h6"> New Block </q-item-label>
               <q-item-label caption>
                 Add a block to a Spark controller
               </q-item-label>
@@ -242,14 +249,16 @@ export default defineComponent({
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('ImportWizard')">
-            <q-item-section side class="col-4">
-              <q-item-label class="text-h6">
-                Import Widget
-              </q-item-label>
-              <q-item-label caption>
-                Add a widget from a file
-              </q-item-label>
+          <q-item
+            clickable
+            @click="pickWizard('ImportWizard')"
+          >
+            <q-item-section
+              side
+              class="col-4"
+            >
+              <q-item-label class="text-h6"> Import Widget </q-item-label>
+              <q-item-label caption> Add a widget from a file </q-item-label>
             </q-item-section>
             <q-item-section>
               <p>Import a previously exported widget from a file.</p>
@@ -260,14 +269,16 @@ export default defineComponent({
         <q-separator inset />
 
         <q-card-section>
-          <q-item class="darkish text-italic" style="cursor: not-allowed">
-            <q-item-section side class="col-4">
-              <q-item-label class="text-h6">
-                Services
-              </q-item-label>
-              <q-item-label caption>
-                (No longer a wizard)
-              </q-item-label>
+          <q-item
+            class="darkish text-italic"
+            style="cursor: not-allowed"
+          >
+            <q-item-section
+              side
+              class="col-4"
+            >
+              <q-item-label class="text-h6"> Services </q-item-label>
+              <q-item-label caption> (No longer a wizard) </q-item-label>
             </q-item-section>
             <q-item-section>
               Discovered services automatically appear in the sidebar. Click on

@@ -27,5 +27,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <ToggleCard v-bind="{...$attrs, ...$props}" />
+  <ToggleCard v-bind="{ ...$attrs, ...$props }" />
 </template>

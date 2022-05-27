@@ -30,21 +30,18 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
     const localConfig = computed<HermsConfig>({
       get: () => props.config,
-      set: cfg => emit('update:config', {
-        ...cfg,
-        widgets: [],
-        createdBlocks: [],
-        changedBlocks: [],
-        renamedBlocks: {},
-      }),
+      set: (cfg) =>
+        emit('update:config', {
+          ...cfg,
+          widgets: [],
+          createdBlocks: [],
+          changedBlocks: [],
+          renamedBlocks: {},
+        }),
     });
 
     return {

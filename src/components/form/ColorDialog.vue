@@ -16,17 +16,10 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
     const local = ref<string>(props.modelValue);
 
     function save(): void {
@@ -57,8 +50,11 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
-      <q-color v-model="local" format-model="hex" />
+    <DialogCard v-bind="{ title, message, html }">
+      <q-color
+        v-model="local"
+        format-model="hex"
+      />
       <template #actions>
         <q-btn
           color="primary"

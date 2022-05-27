@@ -6,12 +6,7 @@ import { colorString } from '@/plugins/builder/utils';
 
 import { FlowPart } from '../types';
 
-const presetColors: string[] = [
-  COLD_WATER,
-  HOT_WATER,
-  BEER,
-  WORT,
-];
+const presetColors: string[] = [COLD_WATER, HOT_WATER, BEER, WORT];
 
 export default defineComponent({
   name: 'LiquidSourceCard',
@@ -21,25 +16,24 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:part',
-  ],
+  emits: ['update:part'],
   setup(props, { emit }) {
-
     const pressured = computed<boolean>({
-      get: () => props.part.settings.enabled ?? Boolean(props.part.settings.pressure),
-      set: enabled => emit('update:part', {
-        ...props.part,
-        settings: {
-          ...props.part.settings,
-          enabled,
-        },
-      }),
+      get: () =>
+        props.part.settings.enabled ?? Boolean(props.part.settings.pressure),
+      set: (enabled) =>
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            enabled,
+          },
+        }),
     });
 
     const color = computed<string | null>({
       get: () => props.part.settings.liquids?.[0] ?? null,
-      set: v => {
+      set: (v) => {
         const liquids = v ? [colorString(v)] : [];
         emit('update:part', {
           ...props.part,
@@ -71,7 +65,10 @@ export default defineComponent({
       label="Enabled"
       class="col-auto min-width-sm"
     >
-      <q-toggle v-model="pressured" dense />
+      <q-toggle
+        v-model="pressured"
+        dense
+      />
     </LabeledField>
     <ColorField
       v-model="color"

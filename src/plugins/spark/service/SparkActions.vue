@@ -98,9 +98,7 @@ export default defineComponent({
 <template>
   <ActionSubmenu>
     <CardWarning v-if="!service">
-      <template #message>
-        Service is not available
-      </template>
+      <template #message> Service is not available </template>
     </CardWarning>
     <template v-else>
       <ActionItem
@@ -158,7 +156,10 @@ export default defineComponent({
         icon="home"
         :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
-      <ToggleAction v-model="listed" label="Show in sidebar" />
+      <ToggleAction
+        v-model="listed"
+        label="Show in sidebar"
+      />
       <ActionItem
         icon="edit"
         label="Rename service"

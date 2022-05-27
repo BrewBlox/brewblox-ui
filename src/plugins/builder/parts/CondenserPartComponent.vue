@@ -46,10 +46,18 @@ export default defineComponent({
 
 <template>
   <g>
-    <path :d="smokeArea" fill="lightgrey" fill-opacity="0.3" />
+    <path
+      :d="smokeArea"
+      fill="lightgrey"
+      fill-opacity="0.3"
+    />
     <g class="outline">
       <path :d="casing" />
-      <AnimatedArrows path="M25,0 V90" :num-arrows="4" :speed="1" />
+      <AnimatedArrows
+        path="M25,0 V90"
+        :num-arrows="4"
+        :speed="1"
+      />
     </g>
   </g>
 </template>

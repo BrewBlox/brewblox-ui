@@ -132,9 +132,21 @@ export default defineComponent({
       </div>
       <div class="col-break" />
       <div class="col row justify-center">
-        <q-btn flat label="Start" @click="start" />
-        <q-btn flat label="Stop" @click="stop" />
-        <q-btn flat label="Reset" @click="reset" />
+        <q-btn
+          flat
+          label="Start"
+          @click="start"
+        />
+        <q-btn
+          flat
+          label="Stop"
+          @click="stop"
+        />
+        <q-btn
+          flat
+          label="Reset"
+          @click="reset"
+        />
       </div>
     </div>
   </Card>

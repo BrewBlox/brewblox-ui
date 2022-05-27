@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 
 services:
   eventbus:
@@ -75,8 +75,8 @@ services:
   traefik:
     image: traefik:2.2
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     labels:
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
       - traefik.http.routers.api.service=api@internal

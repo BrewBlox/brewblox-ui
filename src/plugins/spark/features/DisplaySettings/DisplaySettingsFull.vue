@@ -234,7 +234,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style scoped lang="sass">
+<style
+  scoped
+  lang="sass"
+>
 .grid-container
   display: grid
   grid-template-columns: repeat(3, 1fr)

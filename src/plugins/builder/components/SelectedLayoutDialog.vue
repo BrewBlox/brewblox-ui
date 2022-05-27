@@ -62,8 +62,18 @@ export default defineComponent({
         @confirm="(v) => save(v)"
       />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save(local)" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save(local)"
+        />
       </template>
     </DialogCard>
   </q-dialog>

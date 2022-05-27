@@ -9,13 +9,8 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 export default defineComponent({
   name: 'BlockHistoryGraph',
   setup() {
-    const {
-      context,
-    } = useContext.setup();
-    const {
-      widgetId,
-      graphConfig,
-    } = useBlockWidget.setup();
+    const { context } = useContext.setup();
+    const { widgetId, graphConfig } = useBlockWidget.setup();
 
     const sourceRevision = ref<Date>(new Date());
     const renderRevision = ref<Date>(new Date());

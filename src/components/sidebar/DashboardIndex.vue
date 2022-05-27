@@ -52,11 +52,15 @@ export default defineComponent({
 <template>
   <div>
     <q-item class="q-pb-none">
-      <q-item-section class="text-bold">
-        Dashboards
-      </q-item-section>
+      <q-item-section class="text-bold"> Dashboards </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn icon="add" round flat size="sm" @click="startWizard">
+        <q-btn
+          icon="add"
+          round
+          flat
+          size="sm"
+          @click="startWizard"
+        >
           <q-tooltip>Add dashboard</q-tooltip>
         </q-btn>
       </q-item-section>
@@ -75,7 +79,11 @@ export default defineComponent({
       </q-item-section>
     </q-item>
 
-    <vue-draggable v-model="dashboards" :disabled="dense || !editing" item-key="id">
+    <vue-draggable
+      v-model="dashboards"
+      :disabled="dense || !editing"
+      item-key="id"
+    >
       <template #item="{ element }">
         <q-item
           :to="editing ? undefined : `/dashboard/${element.id}`"

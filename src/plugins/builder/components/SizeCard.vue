@@ -32,27 +32,27 @@ export default defineComponent({
       default: 'Size',
     },
   },
-  emits: [
-    'update:part',
-  ],
+  emits: ['update:part'],
   setup(props, { emit }) {
-    const size = computed<number>(
-      () => {
-        const val = props.part.settings[props.settingsKey];
-        return (typeof val === 'number') ? val : props.defaultSize;
-      },
-    );
+    const size = computed<number>(() => {
+      const val = props.part.settings[props.settingsKey];
+      return typeof val === 'number' ? val : props.defaultSize;
+    });
 
-    const save = debounce((val: number): void => {
-      const size = (typeof val === 'number') ? val : props.defaultSize;
-      emit('update:part', {
-        ...props.part,
-        settings: {
-          ...props.part.settings,
-          [props.settingsKey]: size,
-        },
-      });
-    }, 50, true);
+    const save = debounce(
+      (val: number): void => {
+        const size = typeof val === 'number' ? val : props.defaultSize;
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            [props.settingsKey]: size,
+          },
+        });
+      },
+      50,
+      true,
+    );
 
     return {
       size,
@@ -68,7 +68,13 @@ export default defineComponent({
       <q-item-label caption>
         {{ label }}
       </q-item-label>
-      <q-slider :model-value="size" :min="min" :max="max" label @change="save" />
+      <q-slider
+        :model-value="size"
+        :min="min"
+        :max="max"
+        label
+        @change="save"
+      />
     </q-item-section>
   </q-item>
 </template>

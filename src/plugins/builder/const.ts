@@ -54,7 +54,7 @@ export const builderTools: BuilderTool[] = [
     icon: 'mdi-select-drag',
     shortcut: 's',
     cursor: 'crosshair',
-    partClass: part => part != null ? 'pointer' : '',
+    partClass: (part) => (part != null ? 'pointer' : ''),
   },
   {
     value: 'gridresize',

@@ -39,6 +39,9 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
 
-    <component :is="context.mode" :revision="revision" />
+    <component
+      :is="context.mode"
+      :revision="revision"
+    />
   </Card>
 </template>

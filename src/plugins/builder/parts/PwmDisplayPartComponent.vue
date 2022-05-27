@@ -34,6 +34,10 @@ export default defineComponent({
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
-    <PwmValues :part="part" :settings-key="PWM_KEY" :color="color" />
+    <PwmValues
+      :part="part"
+      :settings-key="PWM_KEY"
+      :color="color"
+    />
   </g>
 </template>

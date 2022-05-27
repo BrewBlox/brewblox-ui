@@ -5,7 +5,7 @@ import { useDialog, useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { clampRotation } from '@/utils/formatting';
 
-import { BuilderBlueprint, FlowPart,PartSettingsCard } from '../types';
+import { BuilderBlueprint, FlowPart, PartSettingsCard } from '../types';
 import { coord2grid } from '../utils';
 
 export default defineComponent({
@@ -111,7 +111,10 @@ export default defineComponent({
             )}`"
             class="col-auto"
           >
-            <PartWrapper :key="`menu-${part.id}-${rev}`" :part="part" />
+            <PartWrapper
+              :key="`menu-${part.id}-${rev}`"
+              :part="part"
+            />
           </svg>
         </div>
 

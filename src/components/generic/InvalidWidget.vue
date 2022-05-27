@@ -18,7 +18,10 @@ export default defineComponent({
       <WidgetToolbar />
     </template>
 
-    <CardWarning color="negative" class="items-center">
+    <CardWarning
+      color="negative"
+      class="items-center"
+    >
       <template #message>
         {{ error }}
       </template>

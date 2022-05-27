@@ -18,7 +18,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-
     function label(side: 'Y1' | 'Y2'): string {
       const key = { Y1: 'yaxis', Y2: 'yaxis2' }[side];
       const obj = props.layout[key];
@@ -34,14 +33,12 @@ export default defineComponent({
           title: `Set ${side} range`,
           modelValue: props.layout[key]?.range,
         },
-      })
-        .onOk(range =>
-          props.save({
-            ...deepCopy(props.layout),
-            [key]: range
-              ? { range, autorange: false }
-              : undefined,
-          }));
+      }).onOk((range) =>
+        props.save({
+          ...deepCopy(props.layout),
+          [key]: range ? { range, autorange: false } : undefined,
+        }),
+      );
     }
 
     return {

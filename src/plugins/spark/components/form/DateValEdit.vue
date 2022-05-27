@@ -42,8 +42,16 @@ export default defineComponent({
 </script>
 
 <template>
-  <DatetimeField v-if="editable" v-model="scaledField" emit-number />
-  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
+  <DatetimeField
+    v-if="editable"
+    v-model="scaledField"
+    emit-number
+  />
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ displayVal }}
   </div>
 </template>

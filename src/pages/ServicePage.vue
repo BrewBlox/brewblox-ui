@@ -42,10 +42,13 @@ export default defineComponent({
     v-if="pageComponent !== null"
     :service-id="serviceId"
   />
-  <q-page v-else class="page-height text-h5 darkened">
+  <q-page
+    v-else
+    class="page-height text-h5 darkened"
+  >
     <PageError>
       <span v-if="service !== null">
-        Invalid service page for <b>{{ serviceId }}</b>.
+        Invalid service page for <b>{{ serviceId }} </b>.
       </span>
       <span v-else>
         Service <b>{{ serviceId }}</b> not found.

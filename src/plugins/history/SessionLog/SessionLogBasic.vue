@@ -133,7 +133,10 @@ export default defineComponent({
   <div>
     <slot name="warnings" />
 
-    <div v-if="session !== null" class="row q-ma-md">
+    <div
+      v-if="session !== null"
+      class="row q-ma-md"
+    >
       <SessionHeaderField
         :session="session"
         class="col q-mb-sm"
@@ -154,7 +157,10 @@ export default defineComponent({
           <!-- Text note -->
           <template v-if="note.type === 'Text'">
             <div class="col-grow">
-              <q-item-label caption class="text-secondary">
+              <q-item-label
+                caption
+                class="text-secondary"
+              >
                 <q-icon name="mdi-text-subject" />
                 {{ note.title }}
               </q-item-label>
@@ -167,7 +173,10 @@ export default defineComponent({
 
           <template v-if="note.type === 'Graph'">
             <div class="col-grow">
-              <q-item-label caption class="text-secondary">
+              <q-item-label
+                caption
+                class="text-secondary"
+              >
                 <q-icon name="mdi-chart-line" />
                 {{ note.title }}
               </q-item-label>

@@ -32,22 +32,16 @@ export default defineComponent({
     },
     saveAnnotations: {
       type: Function as PropType<(a: GraphAnnotation[]) => unknown>,
-      default: () => { },
+      default: () => {},
     },
     saveParams: {
       type: Function as PropType<(v: QueryParams) => unknown>,
-      default: () => { },
+      default: () => {},
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
 
     const sourceRevision = ref<Date>(new Date());
 

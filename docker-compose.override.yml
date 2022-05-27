@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 
 # Configuration in this file is merged with docker-compose.yml
 # You can use it to make local changes to the configuration

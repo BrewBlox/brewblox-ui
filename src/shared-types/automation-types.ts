@@ -7,24 +7,33 @@ export interface ReqBlockAddress {
 }
 
 export type Method =
-  | 'get' | 'GET'
-  | 'delete' | 'DELETE'
-  | 'head' | 'HEAD'
-  | 'options' | 'OPTIONS'
-  | 'post' | 'POST'
-  | 'put' | 'PUT'
-  | 'patch' | 'PATCH'
-  | 'link' | 'LINK'
-  | 'unlink' | 'UNLINK'
+  | 'get'
+  | 'GET'
+  | 'delete'
+  | 'DELETE'
+  | 'head'
+  | 'HEAD'
+  | 'options'
+  | 'OPTIONS'
+  | 'post'
+  | 'POST'
+  | 'put'
+  | 'PUT'
+  | 'patch'
+  | 'PATCH'
+  | 'link'
+  | 'LINK'
+  | 'unlink'
+  | 'UNLINK';
 
 export type AutomationStatus =
-  | 'Invalid'     // Configuration missing or invalid.
-  | 'Created'     // In progress. Not yet evaluated.
-  | 'Active'      // In progress.
-  | 'Retrying'    // In progress. Attempting to automatically recover from error.
-  | 'Paused'      // In progress. Execution temporarily halted.
-  | 'Finished'    // End state. Success.
-  | 'Cancelled'   // End state. Execution prematurely ended.
+  | 'Invalid' // Configuration missing or invalid.
+  | 'Created' // In progress. Not yet evaluated.
+  | 'Active' // In progress.
+  | 'Retrying' // In progress. Attempting to automatically recover from error.
+  | 'Paused' // In progress. Execution temporarily halted.
+  | 'Finished' // End state. Success.
+  | 'Cancelled'; // End state. Execution prematurely ended.
 
 /**
  * Serialized Date value (number in ms, or ISO-8601)
@@ -199,14 +208,14 @@ export type ActionImpl =
   | BlockPatchImpl
   | TaskEditImpl
   | WebhookImpl
-  | JSApplyImpl
+  | JSApplyImpl;
 
 export type ConditionImpl =
   | TimeAbsoluteImpl
   | TimeElapsedImpl
   | BlockValueImpl
   | JSCheckImpl
-  | TaskStatusImpl
+  | TaskStatusImpl;
 
 export interface AutomationItem<T extends AutomationImpl = AutomationImpl> {
   id: string;
@@ -215,8 +224,10 @@ export interface AutomationItem<T extends AutomationImpl = AutomationImpl> {
   impl: T;
 }
 
-export type AutomationAction<T extends ActionImpl = ActionImpl> = AutomationItem<T>;
-export type AutomationCondition<T extends ConditionImpl = ConditionImpl> = AutomationItem<T>;
+export type AutomationAction<T extends ActionImpl = ActionImpl> =
+  AutomationItem<T>;
+export type AutomationCondition<T extends ConditionImpl = ConditionImpl> =
+  AutomationItem<T>;
 
 /**
  * Object defining how a process can move from one step to another.
@@ -259,16 +270,16 @@ export interface AutomationTemplate extends StoreObject {
 }
 
 export type AutomationStepActivePhase =
-  | 'Created'           // In progress. Not yet evaluated.
-  | 'Preconditions'     // In progress. Checking preconditions.
-  | 'Actions'           // In progress. Applying actions.
-  | 'Transitions'       // In progress. Checking transitions.
+  | 'Created' // In progress. Not yet evaluated.
+  | 'Preconditions' // In progress. Checking preconditions.
+  | 'Actions' // In progress. Applying actions.
+  | 'Transitions'; // In progress. Checking transitions.
 
 export type AutomationStepPhase =
   | AutomationStepActivePhase
-  | 'Invalid'           // Configuration missing or invalid.
-  | 'Finished'          // End state. Success.
-  | 'Cancelled'         // End state. Execution prematurely ended.
+  | 'Invalid' // Configuration missing or invalid.
+  | 'Finished' // End state. Success.
+  | 'Cancelled'; // End state. Execution prematurely ended.
 
 /**
  * A single result from process execution.

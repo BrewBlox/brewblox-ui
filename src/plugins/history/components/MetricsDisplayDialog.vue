@@ -80,7 +80,11 @@ export default defineComponent({
   >
     <DialogCard v-bind="{ title, message, html }">
       <div class="column q-gutter-xs">
-        <InputField v-model="rename" title="Label" label="Label" />
+        <InputField
+          v-model="rename"
+          title="Label"
+          label="Label"
+        />
         <InputField
           v-model="fresh"
           title="Warn when older than"
@@ -97,8 +101,18 @@ export default defineComponent({
       </div>
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

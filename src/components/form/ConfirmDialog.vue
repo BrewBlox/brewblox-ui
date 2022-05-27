@@ -20,28 +20,17 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
 
-    const cancelLabel = computed<string>(
-      () => typeof props.cancel === 'string'
-        ? props.cancel
-        : 'Cancel',
+    const cancelLabel = computed<string>(() =>
+      typeof props.cancel === 'string' ? props.cancel : 'Cancel',
     );
 
-    const nokLabel = computed<string>(
-      () => typeof props.nok === 'string'
-        ? props.nok
-        : 'No',
+    const nokLabel = computed<string>(() =>
+      typeof props.nok === 'string' ? props.nok : 'No',
     );
 
     return {
@@ -64,7 +53,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="onDialogOK(true)"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <template #actions>
         <q-btn
           v-if="cancel"

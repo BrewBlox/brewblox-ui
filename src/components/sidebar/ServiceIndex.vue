@@ -74,13 +74,15 @@ export default defineComponent({
 </script>
 
 <template>
-  <vue-draggable v-model="services" :disabled="dense || !editing" item-key="id">
+  <vue-draggable
+    v-model="services"
+    :disabled="dense || !editing"
+    item-key="id"
+  >
     <template #header>
       <q-item class="q-pb-none">
         <q-item-section>
-          <q-item-section class="text-bold">
-            Services
-          </q-item-section>
+          <q-item-section class="text-bold"> Services </q-item-section>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn
@@ -133,7 +135,10 @@ export default defineComponent({
         @click="createService(stub)"
       >
         <q-item-section class="col-auto">
-          <q-icon name="add" size="xs" />
+          <q-icon
+            name="add"
+            size="xs"
+          />
         </q-item-section>
         <q-item-section class="ellipsis">
           {{ stub.id }}
