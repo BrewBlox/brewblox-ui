@@ -1,9 +1,10 @@
 <script lang="ts">
+import { computed, defineComponent, ref } from 'vue';
+
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { SequenceBlock, SequenceError, SequenceStatus } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent, ref } from 'vue';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.NONE]: null,
@@ -22,6 +23,7 @@ export default defineComponent({
     const { context } = useContext.setup();
     const { block, saveBlock } = useBlockWidget.setup<SequenceBlock>();
     const local = ref<string>(block.value.data.instructions.join('\n'));
+    const configError = ref<string | undefined>();
 
     const dirty = computed<boolean>(
       () => local.value !== block.value.data.instructions.join('\n'),
@@ -33,7 +35,18 @@ export default defineComponent({
         block.value.data.status !== SequenceStatus.PAUSED,
     );
 
-    const error = computed<string | null>(() => {
+    const runtimeDesc = computed<string>(() => {
+      const { status, instructions, activeInstruction } = block.value.data;
+      if (stopped.value || !instructions.length) {
+        return '---';
+      }
+      if (status === SequenceStatus.END) {
+        return 'Done';
+      }
+      return `${activeInstruction + 1} / ${instructions.length}`;
+    });
+
+    const runtimeError = computed<string | null>(() => {
       const msg = ERROR_TEXT[block.value.data.error];
       const instruction =
         block.value.data.instructions[block.value.data.activeInstruction];
@@ -55,11 +68,20 @@ export default defineComponent({
 
     function revertLocal(): void {
       local.value = block.value.data.instructions.join('\n');
+      configError.value = undefined;
     }
 
-    function saveLocal(): void {
-      block.value.data.instructions = local.value.split('\n');
-      saveBlock();
+    async function saveLocal(): Promise<void> {
+      block.value.data.instructions = local.value
+        .trim()
+        .split('\n')
+        .filter((s) => !!s.trim());
+      try {
+        await saveBlock();
+        configError.value = undefined;
+      } catch (e) {
+        configError.value = (e as any).response?.data?.error;
+      }
     }
 
     function play(): void {
@@ -93,7 +115,10 @@ export default defineComponent({
       block,
       local,
       dirty,
-      error,
+      configError,
+      stopped,
+      runtimeDesc,
+      runtimeError,
       showKeyboard,
       revertLocal,
       saveLocal,
@@ -113,6 +138,20 @@ export default defineComponent({
 
     <div class="column q-ma-md q-gutter-y-sm">
       <div class="row justify-center">
+        <q-circular-progress
+          :value="block.data.activeInstruction"
+          :max="block.data.instructions.length"
+          :indeterminate="!block.data.enabled && !stopped"
+          show-value
+          size="100px"
+          :color="block.data.enabled ? 'primary' : 'grey'"
+          class="q-ma-md"
+        >
+          {{ runtimeDesc }}
+        </q-circular-progress>
+      </div>
+
+      <div class="row justify-center">
         <q-btn
           :disable="block.data.enabled"
           flat
@@ -128,30 +167,32 @@ export default defineComponent({
         <q-btn
           flat
           label="Reset"
-          :disable="!block.data.enabled && block.data.status !== 'PAUSED'"
+          :disable="stopped"
           @click="stop"
         />
       </div>
 
-      <CardWarning v-if="error">
+      <CardWarning v-if="runtimeError">
         <template #message>
-          {{ error }}
+          {{ runtimeError }}
         </template>
       </CardWarning>
 
       <template v-if="context.mode === 'Basic'">
-        <LabeledField label="Instructions">
+        <div class="q-pa-md">
           <div
             v-for="(ins, idx) in block.data.instructions"
             :key="`${idx}-${ins}`"
             :class="[
-              block.data.activeInstruction === idx && 'text-primary',
+              !stopped &&
+                block.data.activeInstruction === idx &&
+                'text-primary',
               'monospace q-my-xs',
             ]"
           >
             {{ ins }}
           </div>
-        </LabeledField>
+        </div>
       </template>
 
       <template v-if="context.mode === 'Full'">
@@ -164,6 +205,8 @@ export default defineComponent({
             label="Instructions"
             stack-label
             class="editor-input"
+            :error="!!configError"
+            :error-message="configError"
             @keyup.enter.exact.stop
             @keyup.enter.shift.stop
           >
