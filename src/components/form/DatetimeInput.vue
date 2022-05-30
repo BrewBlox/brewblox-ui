@@ -3,7 +3,7 @@ import format from 'date-fns/format';
 import isEqual from 'date-fns/isEqual';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
+import { PropType, computed, defineComponent, ref, watch } from 'vue';
 
 type DateFormatType = 'date' | 'number' | 'string';
 

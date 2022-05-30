@@ -4,10 +4,10 @@ import { PropType } from 'vue';
 import { useFeatureStore } from '@/store/features';
 
 import {
-  useWizard,
   UseWizardComponent,
   UseWizardEmits,
   UseWizardProps,
+  useWizard,
 } from './use-wizard';
 
 export interface UseWidgetWizardProps extends UseWizardProps {

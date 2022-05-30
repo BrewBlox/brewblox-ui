@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, PropType, ref, watch } from 'vue';
+import { PropType, defineComponent, ref, watch } from 'vue';
 
 import { analogConstraintLabels } from '@/plugins/spark/const';
 import {

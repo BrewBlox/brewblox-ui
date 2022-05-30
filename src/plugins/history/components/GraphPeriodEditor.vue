@@ -2,7 +2,7 @@
 import find from 'lodash/find';
 import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
+import { PropType, computed, defineComponent, ref, watch } from 'vue';
 
 import { durationMs, durationString } from '@/utils/quantity';
 

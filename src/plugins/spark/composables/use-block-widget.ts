@@ -1,15 +1,15 @@
 import debounce from 'lodash/debounce';
 import {
-  computed,
   ComputedRef,
   Ref,
-  ref,
   UnwrapRef,
-  watch,
   WritableComputedRef,
+  computed,
+  ref,
+  watch,
 } from 'vue';
 
-import { useWidget, UseWidgetComponent } from '@/composables';
+import { UseWidgetComponent, useWidget } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { Block } from '@/shared-types';
 import { useWidgetStore } from '@/store/widgets';

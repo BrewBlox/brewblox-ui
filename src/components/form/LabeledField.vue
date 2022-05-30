@@ -1,6 +1,6 @@
 <script lang="ts">
 import { QField } from 'quasar';
-import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
+import { PropType, computed, defineComponent, onMounted, ref } from 'vue';
 
 import { useField } from '@/composables';
 import { fixedNumber } from '@/utils/formatting';

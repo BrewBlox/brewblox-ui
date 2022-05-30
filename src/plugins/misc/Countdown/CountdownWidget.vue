@@ -3,7 +3,7 @@ import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
 import { useWidget } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { bloxQty, JSQuantity } from '@/utils/quantity';
+import { JSQuantity, bloxQty } from '@/utils/quantity';
 
 import { CountdownSession, CountdownWidget } from './types';
 

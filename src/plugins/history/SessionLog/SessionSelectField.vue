@@ -1,6 +1,6 @@
 <script lang="ts">
 import escapeRegExp from 'lodash/escapeRegExp';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { useField } from '@/composables';
 

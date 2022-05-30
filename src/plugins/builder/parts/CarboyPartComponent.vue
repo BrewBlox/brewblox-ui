@@ -1,6 +1,6 @@
 <script lang="ts">
 import svgpath from 'svgpath';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { colorString, coord2grid } from '@/plugins/builder/utils';
 

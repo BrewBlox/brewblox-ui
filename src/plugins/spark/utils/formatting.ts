@@ -14,9 +14,9 @@ import {
   AnyConstraintKey,
   Block,
   BlockType,
+  DS2408Block,
   DigitalConstraint,
   DigitalConstraintKey,
-  DS2408Block,
   OneWireGpioModuleBlock,
 } from '@/shared-types';
 import { prettyLink } from '@/utils/formatting';

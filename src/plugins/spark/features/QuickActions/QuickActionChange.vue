@@ -1,7 +1,7 @@
 <script lang="ts">
 import difference from 'lodash/difference';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
+import { PropType, computed, defineComponent, reactive, ref, watch } from 'vue';
 
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';

@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { Plugin } from 'vue';
 
 import { BlockType } from '@/shared-types';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 

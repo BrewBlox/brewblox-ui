@@ -1,8 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { useDashboardStore } from '@/store/dashboards';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 import { makeObjectSorter } from '@/utils/functional';
 
 import { FlowPart } from '../types';

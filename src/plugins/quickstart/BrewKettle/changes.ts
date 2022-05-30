@@ -24,8 +24,8 @@ import {
   changedIoModules,
   pidDefaults,
   unlinkedActuators,
-  withoutPrefix,
   withPrefix,
+  withoutPrefix,
 } from '../utils';
 import { BrewKettleConfig } from './types';
 

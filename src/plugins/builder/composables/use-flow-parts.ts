@@ -1,6 +1,6 @@
 import debounce from 'lodash/debounce';
 import { nanoid } from 'nanoid';
-import { computed, Ref, ref, watch, WritableComputedRef } from 'vue';
+import { Ref, WritableComputedRef, computed, ref, watch } from 'vue';
 
 import { useBuilderStore } from '@/plugins/builder/store';
 import { deepCopy } from '@/utils/objects';

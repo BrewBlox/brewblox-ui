@@ -32,8 +32,8 @@ import {
   changedIoModules,
   pidDefaults,
   unlinkedActuators,
-  withoutPrefix,
   withPrefix,
+  withoutPrefix,
 } from '../utils';
 import { HermsConfig } from './types';
 

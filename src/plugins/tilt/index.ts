@@ -6,8 +6,8 @@ import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { autoRegister } from '@/utils/component-ref';
 
-import { useTiltStore } from './store';
 import TiltWidget from './Tilt';
+import { useTiltStore } from './store';
 import { TiltService } from './types';
 import { isTiltServiceState, isTiltState } from './utils';
 

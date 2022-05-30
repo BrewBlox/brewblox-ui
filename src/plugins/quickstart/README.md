@@ -14,7 +14,7 @@ New Quickstart runs will be initialized with empty objects for both, and are exp
 An example Task component:
 
 ```ts
-import { defineComponent, PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 interface ExampleConfig {
   name: string;

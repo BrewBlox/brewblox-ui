@@ -1,6 +1,6 @@
 <script lang="ts">
 import truncate from 'lodash/truncate';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { useField } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';

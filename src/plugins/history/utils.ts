@@ -1,7 +1,7 @@
 import defaults from 'lodash/defaults';
 
 import { useDashboardStore } from '@/store/dashboards';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 import { createDialogPromise } from '@/utils/dialog';
 
 import { typeName as graphType } from './Graph/const';

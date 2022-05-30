@@ -1,4 +1,4 @@
-import { computed, ComputedRef, inject, UnwrapRef } from 'vue';
+import { ComputedRef, UnwrapRef, computed, inject } from 'vue';
 
 import { WidgetContext } from '@/store/features';
 import { ContextKey } from '@/symbols';

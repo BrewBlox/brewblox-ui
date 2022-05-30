@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, watch } from 'vue';
+import { PropType, computed, defineComponent, watch } from 'vue';
 
 import { RIGHT } from '@/plugins/builder/const';
 import { DigitalState } from '@/shared-types';

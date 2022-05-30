@@ -1,6 +1,6 @@
 <script lang="ts">
 import isString from 'lodash/isString';
-import { defineComponent, PropType, ref } from 'vue';
+import { PropType, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import {

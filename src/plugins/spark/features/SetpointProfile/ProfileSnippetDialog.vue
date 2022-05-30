@@ -1,6 +1,6 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';

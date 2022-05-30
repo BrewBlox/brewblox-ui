@@ -34,8 +34,8 @@ import {
   changedIoModules,
   pidDefaults,
   unlinkedActuators,
-  withoutPrefix,
   withPrefix,
+  withoutPrefix,
 } from '../utils';
 import { RimsConfig } from './types';
 

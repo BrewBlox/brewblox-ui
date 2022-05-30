@@ -8,7 +8,7 @@ import {
   PlotData,
   PlotMouseEvent,
 } from 'plotly.js';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { useGlobals } from '@/composables';
 import { GraphAnnotation } from '@/plugins/history/types';

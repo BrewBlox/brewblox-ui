@@ -6,7 +6,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
 import { useSystemStore } from '@/store/system';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 import { loadFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator } from '@/utils/rules';

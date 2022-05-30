@@ -8,7 +8,7 @@ import { useSystemStore } from '@/store/system';
 import { concatById } from '@/utils/collections';
 import { isAbsoluteUrl } from '@/utils/url';
 
-import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
+import { UseSvgZoomDimensions, useFlowParts, useSvgZoom } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { useBuilderStore } from './store';
 import { FlowPart, PersistentPart } from './types';
