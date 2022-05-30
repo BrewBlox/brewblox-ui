@@ -2,5 +2,3 @@ node_modules/
 dist/
 devdist/
 dev/
-
-calculateFlows.test.ts

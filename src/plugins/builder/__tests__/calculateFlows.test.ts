@@ -1,5 +1,5 @@
 // prevents circular import
-// TODO(Bob): remove from prettierignore after fix is released:
+// TODO(Bob): revert to trivago/prettier-plugin-sort-imports when side-effect imports are handled
 // https://github.com/trivago/prettier-plugin-sort-imports/pull/111
 import '@/store/system';
 
