@@ -1,6 +1,6 @@
 <script lang="ts">
 import clamp from 'lodash/clamp';
-import { computed, defineComponent, PropType, reactive, watch } from 'vue';
+import { PropType, computed, defineComponent, reactive, watch } from 'vue';
 
 import { useDialog } from '@/composables';
 import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';

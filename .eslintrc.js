@@ -9,12 +9,12 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     '@vue/typescript',
     'plugin:quasar/standard',
+    'prettier',
   ],
-  plugins: ['@typescript-eslint', 'simple-import-sort', 'quasar'],
+  plugins: ['@typescript-eslint', 'quasar'],
   rules: {
     quotes: ['error', 'single', { avoidEscape: true }],
     'class-methods-use-this': 0,
-    'simple-import-sort/imports': 'error',
     'sort-imports': 'off',
     'import/order': 'off',
     'import/first': 0,
@@ -66,8 +66,6 @@ module.exports = {
         ignores: ['Card', 'Toolbar'],
       },
     ],
-    'vue/singleline-html-element-content-newline': 0,
-    'vue/html-self-closing': 0,
   },
   overrides: [
     {

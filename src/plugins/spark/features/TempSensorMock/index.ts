@@ -9,7 +9,7 @@ import {
   TempSensorMockBlock,
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { tempQty } from '@/utils/quantity';
 
 import widget from './TempSensorMockWidget.vue';

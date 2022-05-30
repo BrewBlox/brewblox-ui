@@ -1,4 +1,4 @@
-import { inject, Ref } from 'vue';
+import { Ref, inject } from 'vue';
 
 import { DenseKey, NowKey, TouchKey } from '@/symbols';
 

@@ -2,12 +2,12 @@
 import debounce from 'lodash/debounce';
 import { Layout, PlotData } from 'plotly.js';
 import {
+  PropType,
   computed,
   defineComponent,
   nextTick,
   onBeforeUnmount,
   onMounted,
-  PropType,
   ref,
   watch,
 } from 'vue';

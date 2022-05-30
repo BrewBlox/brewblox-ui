@@ -1,9 +1,9 @@
 <script lang="ts">
 import {
+  PropType,
   computed,
   defineComponent,
   onBeforeMount,
-  PropType,
   reactive,
   ref,
 } from 'vue';

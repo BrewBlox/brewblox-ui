@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
+import { PropType, defineComponent, ref } from 'vue';
 
 import { Quantity } from '@/shared-types';
 import { tempQty } from '@/utils/quantity';

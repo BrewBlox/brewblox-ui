@@ -1,6 +1,6 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { useBuilderStore } from '@/plugins/builder/store';
@@ -11,7 +11,7 @@ import {
 } from '@/plugins/builder/utils';
 import { useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';

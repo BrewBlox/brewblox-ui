@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import ELK, { ElkExtendedEdge, ElkNode } from 'elkjs/lib/elk.bundled';
 import debounce from 'lodash/debounce';
 import toFinite from 'lodash/toFinite';
-import { defineComponent, onMounted, PropType, ref, watch } from 'vue';
+import { PropType, defineComponent, onMounted, ref, watch } from 'vue';
 
 import { BlockRelation, BlockRelationNode } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/dialog';

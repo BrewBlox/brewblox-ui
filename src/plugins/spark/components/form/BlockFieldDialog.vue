@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, onBeforeMount, PropType, ref } from 'vue';
+import { PropType, defineComponent, onBeforeMount, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';

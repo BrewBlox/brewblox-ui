@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useQuasar } from 'quasar';
-import { computed, defineComponent, inject, PropType, ref, watch } from 'vue';
+import { PropType, computed, defineComponent, inject, ref, watch } from 'vue';
 
 import { useSparkStore } from '@/plugins/spark/store';
 import type { SparkService, SparkStatus } from '@/plugins/spark/types';

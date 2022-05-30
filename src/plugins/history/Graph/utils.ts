@@ -4,7 +4,7 @@ import uniq from 'lodash/uniq';
 
 import { GraphConfig, QueryTarget } from '@/plugins/history/types';
 import { BlockAddress } from '@/plugins/spark/types';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 

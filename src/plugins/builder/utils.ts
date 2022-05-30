@@ -24,8 +24,8 @@ import {
   CENTER,
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
-  deprecatedTypes,
   SQUARE_SIZE,
+  deprecatedTypes,
 } from './const';
 import { useBuilderStore } from './store';
 import {

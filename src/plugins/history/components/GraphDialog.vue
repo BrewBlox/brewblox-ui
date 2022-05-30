@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, PropType, reactive, ref } from 'vue';
+import { PropType, defineComponent, reactive, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';

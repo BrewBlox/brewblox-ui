@@ -4,7 +4,7 @@ import {
   mdiSwapVerticalBold,
   mdiThermometer,
 } from '@quasar/extras/mdi-v5';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';

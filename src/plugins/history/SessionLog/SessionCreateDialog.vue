@@ -1,6 +1,6 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
+import { PropType, computed, defineComponent, ref, watch } from 'vue';
 
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';

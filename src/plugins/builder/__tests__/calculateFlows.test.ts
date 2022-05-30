@@ -1,9 +1,9 @@
-import '@/store/system'; // prevents circular import
-
+// prevents circular import
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { createPinia, setActivePinia } from 'pinia';
 
+import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import blueprints from '@/plugins/builder/blueprints';
 import {
   asFlowParts,
@@ -11,13 +11,13 @@ import {
   findPathsFromSources,
 } from '@/plugins/builder/calculateFlows';
 import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
-import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import {
   FlowPart,
   FlowRoute,
   PersistentPart,
   StatePart,
 } from '@/plugins/builder/types';
+import '@/store/system';
 
 function asStatePart(part: PersistentPart): StatePart {
   const blueprint = blueprints[part.type];

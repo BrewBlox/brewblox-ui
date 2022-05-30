@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from 'vue';
+import { ComputedRef, computed } from 'vue';
 
 import { Block, BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 

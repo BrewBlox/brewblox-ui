@@ -8,13 +8,13 @@ import { createDialog } from '@/utils/dialog';
 import { prettyLink } from '@/utils/formatting';
 import { deepCopy, isJsonEqual } from '@/utils/objects';
 
-import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';
 import ProfilePresetAction from './ProfilePresetAction.vue';
 import SetpointProfileBasic from './SetpointProfileBasic.vue';
 import SetpointProfileDisableDialog from './SetpointProfileDisableDialog.vue';
 import SetpointProfileFull from './SetpointProfileFull.vue';
+import { GraphProps, profileGraphProps } from './helpers';
 
 type SetpointProfileData = SetpointProfileBlock['data'];
 

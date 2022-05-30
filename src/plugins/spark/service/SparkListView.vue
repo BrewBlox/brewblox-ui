@@ -5,7 +5,7 @@ import { computed, defineComponent, nextTick, ref } from 'vue';
 import { useElementRefs, useGlobals } from '@/composables';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { BlockType } from '@/shared-types';
-import { useFeatureStore, WidgetRole } from '@/store/features';
+import { WidgetRole, useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Layout } from 'plotly.js';
-import { defineComponent, PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';

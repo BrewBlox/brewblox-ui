@@ -5,7 +5,7 @@ import { concatById, filterById, findById } from '@/utils/collections';
 import { isoDateString } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
-import { bloxQty, JSQuantity } from '@/utils/quantity';
+import { JSQuantity, bloxQty } from '@/utils/quantity';
 
 import type {
   ApiQuery,

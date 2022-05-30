@@ -4,11 +4,11 @@ import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
 import {
+  UnwrapRef,
   computed,
   defineComponent,
   nextTick,
   ref,
-  UnwrapRef,
   watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
@@ -25,14 +25,14 @@ import { deepCopy } from '@/utils/objects';
 import { isAbsoluteUrl } from '@/utils/url';
 
 import {
+  UseSvgZoomDimensions,
   normalizeSelectArea,
   useDragSelect,
   useFlowParts,
   useSvgZoom,
-  UseSvgZoomDimensions,
 } from './composables';
 import { useMetrics } from './composables/use-metrics';
-import { builderTools, SQUARE_SIZE } from './const';
+import { SQUARE_SIZE, builderTools } from './const';
 import { useBuilderStore } from './store';
 import {
   BuilderLayout,

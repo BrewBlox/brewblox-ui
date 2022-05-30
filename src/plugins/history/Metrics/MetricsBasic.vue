@@ -14,9 +14,9 @@ import { defaultLabel } from '@/plugins/history/nodes';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { useHistoryStore } from '@/plugins/history/store';
 import {
+  MetricValue,
   MetricsConfig,
   MetricsSource,
-  MetricValue,
 } from '@/plugins/history/types';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { fixedNumber } from '@/utils/formatting';

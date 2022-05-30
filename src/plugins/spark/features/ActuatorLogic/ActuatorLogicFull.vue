@@ -20,8 +20,8 @@ import { bloxLink } from '@/utils/link';
 
 import { useSparkStore } from '../../store';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
-import { characterTitles, logicResultTitles, nonErrorResults } from './const';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
+import { characterTitles, logicResultTitles, nonErrorResults } from './const';
 import { ExpressionError } from './types';
 import {
   analogIdx,

@@ -2,7 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import { nanoid } from 'nanoid';
 import { Plugin } from 'vue';
 
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
 import { cref } from '@/utils/component-ref';

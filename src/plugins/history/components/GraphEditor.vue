@@ -1,6 +1,6 @@
 <script lang="ts">
 import { QTreeNode } from 'quasar';
-import { defineComponent, PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
 

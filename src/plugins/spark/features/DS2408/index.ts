@@ -9,7 +9,7 @@ import {
   DS2408ConnectMode,
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 
 import widget from './DS2408Widget.vue';
 

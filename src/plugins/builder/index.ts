@@ -1,11 +1,11 @@
 import { Plugin } from 'vue';
 
 import { startup } from '@/startup';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { autoRegister, cref } from '@/utils/component-ref';
 
-import blueprints from './blueprints';
 import BuilderWidget from './BuilderWidget.vue';
+import blueprints from './blueprints';
 import { useBuilderStore } from './store';
 import { BuilderConfig } from './types';
 

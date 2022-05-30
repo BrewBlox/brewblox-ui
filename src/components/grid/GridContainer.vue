@@ -1,12 +1,12 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { WidgetContext } from '@/store/features';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 import { nullFilter } from '@/utils/functional';
 
-import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import GridItem from './GridItem.vue';
+import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import { RenderedItem } from './types';
 
 export default defineComponent({

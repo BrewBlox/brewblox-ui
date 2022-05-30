@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Enum } from 'typescript-string-enums';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { DigitalState } from '@/plugins/spark/types';
 

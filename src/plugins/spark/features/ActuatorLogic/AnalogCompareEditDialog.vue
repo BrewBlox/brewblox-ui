@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Enum } from 'typescript-string-enums';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';

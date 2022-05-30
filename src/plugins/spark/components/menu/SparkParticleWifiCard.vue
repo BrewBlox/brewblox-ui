@@ -3,9 +3,9 @@ import { computed, defineComponent, reactive, ref } from 'vue';
 
 import { useSparkStore } from '@/plugins/spark/store';
 import {
+  WiFiSettingsBlock,
   WifiCipherType,
   WifiSecurityType,
-  WiFiSettingsBlock,
 } from '@/plugins/spark/types';
 import { getWiFiSettingsBlock } from '@/plugins/spark/utils';
 import { createDialog } from '@/utils/dialog';

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import { useFeatureStore, WatcherFeature } from '@/store/features';
+import { WatcherFeature, useFeatureStore } from '@/store/features';
 
 export default defineComponent({
   name: 'WatcherContainer',

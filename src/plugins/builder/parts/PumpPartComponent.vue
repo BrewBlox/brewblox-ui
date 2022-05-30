@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, PropType, watch } from 'vue';
+import { PropType, computed, defineComponent, onBeforeMount, watch } from 'vue';
 
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
 import { liquidOnCoord, settingsBlock } from '@/plugins/builder/utils';

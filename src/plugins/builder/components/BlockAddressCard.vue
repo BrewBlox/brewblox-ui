@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { settingsAddress } from '@/plugins/builder/utils';
 import { BlockAddress } from '@/plugins/spark/types';

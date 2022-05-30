@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 import { fieldLabels } from '@/plugins/tilt/const';
 import { useTiltStore } from '@/plugins/tilt/store';
