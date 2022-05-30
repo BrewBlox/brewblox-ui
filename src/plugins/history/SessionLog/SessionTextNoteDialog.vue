@@ -178,10 +178,7 @@ export default defineComponent({
   </q-dialog>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass">
 .editor-input textarea
   min-height: 200px !important
 </style>

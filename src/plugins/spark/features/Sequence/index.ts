@@ -19,7 +19,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<SequenceBlock> = {
       type,
       generate: () => ({
-        enabled: true,
+        enabled: false,
         overrideState: false,
         activeInstruction: 0,
         activeInstructionStartedAt: 0,
