@@ -1,4 +1,8 @@
 // prevents circular import
+// TODO(Bob): remove from prettierignore after fix is released:
+// https://github.com/trivago/prettier-plugin-sort-imports/pull/111
+import '@/store/system';
+
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { createPinia, setActivePinia } from 'pinia';
@@ -17,7 +21,6 @@ import {
   PersistentPart,
   StatePart,
 } from '@/plugins/builder/types';
-import '@/store/system';
 
 function asStatePart(part: PersistentPart): StatePart {
   const blueprint = blueprints[part.type];
