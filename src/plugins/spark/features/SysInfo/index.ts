@@ -5,7 +5,7 @@ import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { SparkPlatform, SysInfoBlock } from '@/shared-types';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 
 import widget from './SysInfoWidget.vue';
 

@@ -5,9 +5,9 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
   BlockIntfType,
-  DigitalActuatorBlock,
   DS2408Block,
   DS2408ConnectMode,
+  DigitalActuatorBlock,
   MotorValveBlock,
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';

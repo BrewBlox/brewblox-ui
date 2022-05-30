@@ -11,7 +11,7 @@ import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
 import { isAbsoluteUrl } from '@/utils/url';
 
-import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
+import { UseSvgZoomDimensions, useFlowParts, useSvgZoom } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH } from './const';
 import { useBuilderStore } from './store';

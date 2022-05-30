@@ -1,12 +1,12 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, watch } from 'vue';
+import { PropType, computed, defineComponent, watch } from 'vue';
 
 import {
   ComponentResult,
-  useFeatureStore,
   WidgetContext,
+  useFeatureStore,
 } from '@/store/features';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 
 import { BlockConfig } from '../types';
 import { ListRenderAddress } from './types';

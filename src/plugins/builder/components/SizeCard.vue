@@ -1,6 +1,6 @@
 <script lang="ts">
 import { debounce } from 'quasar';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { FlowPart } from '../types';
 

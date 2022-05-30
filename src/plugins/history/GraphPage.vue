@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router';
 
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { emptyGraphConfig } from '@/plugins/history/utils';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 import { isJsonEqual } from '@/utils/objects';
 
 export default defineComponent({

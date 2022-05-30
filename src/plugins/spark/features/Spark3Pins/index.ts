@@ -9,7 +9,7 @@ import {
   Spark3PinsBlock,
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 
 import widget from './Spark3PinsWidget.vue';
 

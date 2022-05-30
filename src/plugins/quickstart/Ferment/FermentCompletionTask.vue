@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, onMounted, PropType, ref } from 'vue';
+import { PropType, defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { QuickstartAction } from '../types';

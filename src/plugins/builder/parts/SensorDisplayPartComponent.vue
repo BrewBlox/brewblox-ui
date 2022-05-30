@@ -1,6 +1,6 @@
 <script lang="ts">
 import { mdiThermometer } from '@quasar/extras/mdi-v5';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { CENTER } from '@/plugins/builder/const';
 import {

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
+import { PropType, computed, defineComponent, ref, watch } from 'vue';
 
 import { defaultLabel } from '@/plugins/history/nodes';
 

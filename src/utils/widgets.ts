@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 
 import { useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { Widget, useWidgetStore } from '@/store/widgets';
 
 import { createDialog } from './dialog';
 import { notify } from './notify';

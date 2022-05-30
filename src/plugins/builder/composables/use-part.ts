@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from 'vue';
+import { ComputedRef, computed } from 'vue';
 
 import { BORDER_KEY, SCALE_KEY } from '../const';
 import { FlowPart } from '../types';

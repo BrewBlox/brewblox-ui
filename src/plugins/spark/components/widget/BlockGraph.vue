@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Layout } from 'plotly.js';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
+import { PropType, computed, defineComponent, ref, watch } from 'vue';
 
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';

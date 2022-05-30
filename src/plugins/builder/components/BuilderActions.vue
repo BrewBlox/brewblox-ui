@@ -1,6 +1,6 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
-import { defineComponent, PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useBuilderStore } from '@/plugins/builder/store';

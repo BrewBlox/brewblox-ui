@@ -1,6 +1,6 @@
 <script lang="ts">
 import mapValues from 'lodash/mapValues';
-import { computed, defineComponent, PropType, reactive } from 'vue';
+import { PropType, computed, defineComponent, reactive } from 'vue';
 
 import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { makeDashboardIdRules } from '@/utils/dashboards';

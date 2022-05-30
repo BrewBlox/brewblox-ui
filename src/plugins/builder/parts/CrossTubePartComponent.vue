@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { DOWN, LEFT, RIGHT, UP } from '@/plugins/builder/const';
 

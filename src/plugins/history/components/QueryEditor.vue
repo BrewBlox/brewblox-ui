@@ -2,11 +2,11 @@
 import isEqual from 'lodash/isEqual';
 import { QTree, QTreeNode } from 'quasar';
 import {
+  PropType,
   computed,
   defineComponent,
   onBeforeMount,
   onMounted,
-  PropType,
   ref,
   watch,
 } from 'vue';

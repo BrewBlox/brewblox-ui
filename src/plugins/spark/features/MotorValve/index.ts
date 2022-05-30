@@ -17,7 +17,7 @@ import {
   enumHint,
   prettifyConstraints,
 } from '@/plugins/spark/utils';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 
 import widget from './MotorValveWidget.vue';

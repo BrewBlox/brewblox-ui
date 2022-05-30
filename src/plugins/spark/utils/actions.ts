@@ -10,9 +10,9 @@ import {
   Block,
   BlockIntfType,
   BlockType,
+  DS2408Block,
   DigitalActuatorBlock,
   DisplaySlot,
-  DS2408Block,
   IoArrayBlock,
   MotorValveBlock,
 } from '@/shared-types';
@@ -27,8 +27,8 @@ import { matchesType } from '@/utils/objects';
 import { makeBlockIdRules } from './configuration';
 import { channelName } from './formatting';
 import {
-  isBlockDisplayed,
   isBlockDisplayReady,
+  isBlockDisplayed,
   isBlockVolatile,
   isCompatible,
 } from './info';

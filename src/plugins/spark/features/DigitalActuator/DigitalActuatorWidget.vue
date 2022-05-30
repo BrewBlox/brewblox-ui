@@ -6,9 +6,9 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import {
   Block,
   BlockType,
-  DigitalActuatorBlock,
   DS2408Block,
   DS2408ConnectMode,
+  DigitalActuatorBlock,
 } from '@/plugins/spark/types';
 import { channelName } from '@/plugins/spark/utils/formatting';
 import { IoArrayBlock } from '@/shared-types';

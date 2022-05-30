@@ -4,9 +4,9 @@ import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
 import {
-  useFeatureStore,
   WatcherFeature,
   WidgetFeature,
+  useFeatureStore,
 } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { deserialize } from '@/utils/parsing';

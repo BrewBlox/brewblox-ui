@@ -1,6 +1,6 @@
 <script lang="ts">
 import { mdiArrowRightBold } from '@quasar/extras/mdi-v5';
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { coord2grid } from '@/plugins/builder/utils';
 import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';

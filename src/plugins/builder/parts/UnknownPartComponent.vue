@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 import { usePart } from '../composables';
 import { FlowPart } from '../types';

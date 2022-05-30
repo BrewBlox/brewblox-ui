@@ -21,7 +21,7 @@ import { PidConfig } from '../types';
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlSyncView from './TempControlSyncView.vue';
 import { TempControlMode, TempControlWidget } from './types';
-import { applyMode, findControlProblems, TempControlProblem } from './utils';
+import { TempControlProblem, applyMode, findControlProblems } from './utils';
 
 export default defineComponent({
   name: 'TempControlBasic',

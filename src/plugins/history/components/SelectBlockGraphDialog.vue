@@ -1,6 +1,6 @@
 <script lang="ts">
 import mapValues from 'lodash/mapValues';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { sparkType } from '@/plugins/spark/const';

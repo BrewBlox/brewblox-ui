@@ -1,14 +1,14 @@
 import { nanoid } from 'nanoid';
 import { QDialog, QDialogOptions } from 'quasar';
 import {
+  PropType,
+  Ref,
   getCurrentInstance,
   nextTick,
   onBeforeUnmount,
   onMounted,
-  PropType,
   provide,
   reactive,
-  Ref,
   ref,
   watch,
 } from 'vue';

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { PropType, computed, defineComponent } from 'vue';
 
 import { useBuilderStore } from '@/plugins/builder/store';
 import { FlowPart } from '@/plugins/builder/types';

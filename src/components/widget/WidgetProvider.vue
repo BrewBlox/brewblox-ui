@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, inject, PropType, provide, reactive, ref } from 'vue';
+import { PropType, defineComponent, inject, provide, reactive, ref } from 'vue';
 
 import { WidgetContext } from '@/store/features';
 import { ContextKey, InvalidateKey, WidgetIdKey } from '@/symbols';

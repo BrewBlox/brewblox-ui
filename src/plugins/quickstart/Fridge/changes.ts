@@ -28,8 +28,8 @@ import {
   makeFridgeHeatConfig,
   pidDefaults,
   unlinkedActuators,
-  withoutPrefix,
   withPrefix,
+  withoutPrefix,
 } from '../utils';
 import { FridgeConfig } from './types';
 

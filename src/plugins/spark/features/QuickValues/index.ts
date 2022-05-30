@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 
 import widget from './QuickValuesWidget.vue';
