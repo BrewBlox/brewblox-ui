@@ -1,5 +1,4 @@
 <script lang="ts">
-import { useMeta } from 'quasar';
 import { defineComponent } from 'vue';
 
 import { database } from '@/database';
@@ -22,11 +21,6 @@ async function onAppSetup(): Promise<void> {
 export default defineComponent({
   name: 'App',
   setup() {
-    useMeta({
-      script: process.env.DEV
-        ? { devtools: { src: 'http://localhost:8098' } }
-        : {},
-    });
     onAppSetup();
     return {};
   },
