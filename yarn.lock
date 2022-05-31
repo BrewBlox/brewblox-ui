@@ -10542,10 +10542,10 @@ simple-keyboard-layouts@^3.0.194:
   resolved "https://registry.yarnpkg.com/simple-keyboard-layouts/-/simple-keyboard-layouts-3.1.80.tgz#7fa2bbc2f6d14ed2a514263a5b51a3864de7a10f"
   integrity sha512-MPOXEvWbtuMw+IvpSjXVo4y21KUo8JjUkW8BP1mLf/WIf5E3ocvP0tAY+rIoQU7xmI14P7NI/qV8Y76pHsoxXg==
 
-simple-keyboard@^3.2.64:
-  version "3.4.73"
-  resolved "https://registry.yarnpkg.com/simple-keyboard/-/simple-keyboard-3.4.73.tgz#88cd9c1cb37bb4709d5eebe5f20132bba440cbbb"
-  integrity sha512-ZNklwxf3FV1c5vvfepCd2cFiZ3VRVWesXHnk2I+quQCR5vbrztAl2b3rhKWehwhsZVQzS9vsq0kzYm51aqF/oQ==
+simple-keyboard@^3.4.107:
+  version "3.4.107"
+  resolved "https://registry.yarnpkg.com/simple-keyboard/-/simple-keyboard-3.4.107.tgz#34778d699a6aa29dd1a8615ab2c9d05a3084a127"
+  integrity sha512-WfuGMZqfDUX2xFtbk+q51sEl3W5O7//snTYvYO7hVWdKSLWi/yPTc3r6kBMBePxPOxRdQX0Yfo+lPGqJ/6VsVA==
 
 sirv@^1.0.7:
   version "1.0.19"
