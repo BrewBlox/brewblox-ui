@@ -40,10 +40,6 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    canCreate: {
-      type: Boolean,
-      default: false,
-    },
   },
   setup(props) {
     const elk = new ELK();
@@ -244,6 +240,7 @@ export default defineComponent({
 <template>
   <div class="fit">
     <svg
+      :key="`relations-svg-${serviceId}`"
       ref="svgRef"
       class="fit"
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
