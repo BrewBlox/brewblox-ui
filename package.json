@@ -57,7 +57,7 @@
     "posix_tz_db": "https://github.com/nayarsystems/posix_tz_db.git#master",
     "process": "^0.11.10",
     "quasar": "^2.0.4",
-    "simple-keyboard": "^3.2.64",
+    "simple-keyboard": "^3.4.107",
     "simple-keyboard-layouts": "^3.0.194",
     "svg-path-properties": "^1.0.11",
     "typescript-string-enums": "^1.0.0",

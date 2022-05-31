@@ -182,7 +182,6 @@ export default defineComponent({
       :service-id="serviceId"
       :nodes="nodes"
       :edges="edges"
-      can-create
       class="fit"
     />
 
