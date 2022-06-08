@@ -141,34 +141,36 @@ export default defineComponent({
         <q-circular-progress
           :value="block.data.activeInstruction"
           :max="block.data.instructions.length"
-          :indeterminate="!block.data.enabled && !stopped"
+          :indeterminate="!block.data.enabled && !stopped && false"
           show-value
           size="100px"
           :color="block.data.enabled ? 'primary' : 'grey'"
-          class="q-ma-md"
+          :class="['q-ma-md', !block.data.enabled && !stopped && 'fade-7']"
         >
           {{ runtimeDesc }}
         </q-circular-progress>
       </div>
 
-      <div class="row justify-center">
-        <q-btn
-          :disable="block.data.enabled"
-          flat
-          label="Start"
-          @click="play"
-        />
-        <q-btn
-          :disable="!block.data.enabled"
-          flat
-          label="Stop"
-          @click="pause"
-        />
+      <div class="row justify-center q-gutter-sm">
         <q-btn
           flat
           label="Reset"
-          :disable="stopped"
+          :disable="stopped || block.data.enabled"
           @click="stop"
+        />
+        <q-btn
+          v-if="!block.data.enabled"
+          flat
+          color="primary"
+          :label="stopped ? 'Start' : 'Resume'"
+          @click="play"
+        />
+        <q-btn
+          v-else
+          flat
+          color="primary"
+          label="Stop"
+          @click="pause"
         />
       </div>
 
