@@ -13,6 +13,8 @@ import type {
   LogicResult,
   ReferenceKind,
   SensorCombiFunc,
+  SequenceError,
+  SequenceStatus,
   Spark2Hardware,
   SparkPlatform,
   TouchCalibrated,
@@ -454,6 +456,23 @@ export interface PidBlock extends Block {
   };
 }
 // #endregion Pid
+
+// #region Sequence
+export interface SequenceBlock extends Block {
+  type: 'Sequence';
+  data: {
+    enabled: boolean;
+    overrideState: boolean;
+    activeInstruction: number;
+    activeInstructionStartedAt: number; // seconds since 1970/1/1
+    disabledAt: number; // seconds since 1970/1/1
+    disabledDuration: number; // seconds
+    status: SequenceStatus;
+    error: SequenceError;
+    instructions: string[];
+  };
+}
+// #endregion Sequence
 
 // #region SetpointProfile
 export interface Setpoint {

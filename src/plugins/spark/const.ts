@@ -89,6 +89,15 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
     BlockType.MockPins,
   ],
   DS2408Interface: [BlockType.DS2408],
+  EnablerInterface: [
+    BlockType.ActuatorOffset,
+    BlockType.ActuatorLogic,
+    BlockType.Pid,
+    BlockType.Sequence,
+    BlockType.ActuatorPwm,
+    BlockType.SetpointSensorPair,
+    BlockType.SetpointProfile,
+  ],
 };
 
 export const ioChannelNames = {

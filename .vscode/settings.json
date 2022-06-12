@@ -3,7 +3,7 @@
   "volar.autoCompleteRefs": false,
   "volar.codeLens.scriptSetupTools": false,
   "volar.codeLens.pugTools": false,
-  "volar.takeOverMode.enabled": false,
+  "volar.takeOverMode.enabled": true,
   "volar.vueserver.useSecondServer": true,
   "eslint.run": "onType",
   "html.autoClosingTags": true,

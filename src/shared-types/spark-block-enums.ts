@@ -20,6 +20,7 @@ export const BlockIntfType = Enum(
   'IoModuleInterface',
   'IoArrayInterface',
   'DS2408Interface',
+  'EnablerInterface',
 );
 
 export const SystemBlockType = Enum(
@@ -49,6 +50,7 @@ export const UserBlockType = Enum(
   'MotorValve',
   'Mutex',
   'Pid',
+  'Sequence',
   'SetpointProfile',
   'SetpointSensorPair',
   'TempSensorCombi',
@@ -217,6 +219,30 @@ export const SensorCombiFunc = Enum(
 );
 // #endregion SensorCombiFunc
 
+// #region SequenceStatus
+export const SequenceStatus = Enum(
+  'UNKNOWN',
+  'DISABLED',
+  'PAUSED',
+  'NEXT',
+  'WAITING',
+  'END',
+  'RESTART',
+  'ERROR',
+);
+// #endregion SequenceStatus
+
+// #region SequenceError
+export const SequenceError = Enum(
+  'NONE',
+  'INVALID_ARGUMENT',
+  'INVALID_TARGET',
+  'INACTIVE_TARGET',
+  'DISABLED_TARGET',
+  'SYSTEM_TIME_NOT_AVAILABLE',
+);
+// #endregion SequenceError
+
 // #region Spark2Hardware
 export const Spark2Hardware = Enum('HW_UNKNOWN', 'HW_SPARK1', 'HW_SPARK2');
 // #endregion Spark2Hardware
@@ -278,6 +304,8 @@ export type DS2408ConnectMode = Enum<typeof DS2408ConnectMode>;
 export type ValveState = Enum<typeof ValveState>;
 export type FilterChoice = Enum<typeof FilterChoice>;
 export type SensorCombiFunc = Enum<typeof SensorCombiFunc>;
+export type SequenceStatus = Enum<typeof SequenceStatus>;
+export type SequenceError = Enum<typeof SequenceError>;
 export type Spark2Hardware = Enum<typeof Spark2Hardware>;
 export type SparkPlatform = Enum<typeof SparkPlatform>;
 export type TouchCalibrated = Enum<typeof TouchCalibrated>;

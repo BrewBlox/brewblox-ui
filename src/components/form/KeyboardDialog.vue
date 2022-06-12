@@ -4,15 +4,7 @@ import KeyboardLayouts from 'simple-keyboard-layouts';
 
 import 'simple-keyboard/build/css/index.css';
 
-import {
-  PropType,
-  computed,
-  defineComponent,
-  nextTick,
-  onMounted,
-  ref,
-  watch,
-} from 'vue';
+import { PropType, computed, defineComponent, ref, watch } from 'vue';
 
 import { useDialog } from '@/composables';
 import { useSystemStore } from '@/store/system';
