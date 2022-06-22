@@ -53,6 +53,18 @@ export const persistBlock = (block: Block): Promise<Block> =>
     .then((resp) => resp.data)
     .catch(intercept(`Failed to persist ${block.id}`));
 
+export const patchBlock = <T extends Block>(
+  block: T,
+  data: Partial<T['data']>,
+): Promise<T> =>
+  http
+    .post<T>(`/${encodeURIComponent(block.serviceId)}/blocks/patch`, {
+      ...block,
+      data,
+    })
+    .then((resp) => resp.data)
+    .catch(intercept(`Failed to patch ${block.id}`));
+
 export const renameBlock = (
   serviceId: string,
   existing: string,

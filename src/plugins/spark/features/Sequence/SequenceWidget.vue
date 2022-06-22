@@ -1,5 +1,17 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { Transaction } from '@codemirror/state';
+import { EditorView, lineNumbers, placeholder } from '@codemirror/view';
+import { basicDark } from 'cm6-theme-basic-dark';
+import { minimalSetup } from 'codemirror';
+import {
+  computed,
+  defineComponent,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
@@ -21,19 +33,31 @@ export default defineComponent({
   name: 'SequenceWidget',
   setup() {
     const { context } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<SequenceBlock>();
+    const { block, saveBlock, patchBlock } =
+      useBlockWidget.setup<SequenceBlock>();
     const local = ref<string>(block.value.data.instructions.join('\n'));
     const configError = ref<string | undefined>();
 
-    const dirty = computed<boolean>(
-      () => local.value !== block.value.data.instructions.join('\n'),
+    const editor = ref<HTMLDivElement>();
+    let view: EditorView;
+
+    const actual = computed<string>(() =>
+      block.value.data.instructions.join('\n'),
     );
+
+    const dirty = computed<boolean>(() => local.value !== actual.value);
 
     const stopped = computed<boolean>(
       () =>
         !block.value.data.enabled &&
         block.value.data.status !== SequenceStatus.PAUSED,
     );
+
+    watch(actual, (newV, oldV) => {
+      if (local.value === oldV) {
+        revertLocal();
+      }
+    });
 
     const runtimeDesc = computed<string>(() => {
       const { status, instructions, activeInstruction } = block.value.data;
@@ -67,17 +91,21 @@ export default defineComponent({
     }
 
     function revertLocal(): void {
-      local.value = block.value.data.instructions.join('\n');
+      local.value = actual.value;
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: local.value },
+      });
       configError.value = undefined;
     }
 
     async function saveLocal(): Promise<void> {
-      block.value.data.instructions = local.value
-        .trim()
-        .split('\n')
-        .filter((s) => !!s.trim());
       try {
-        await saveBlock();
+        await patchBlock({
+          instructions: local.value
+            .trim()
+            .split('\n')
+            .filter((s) => !!s.trim()),
+        });
         configError.value = undefined;
       } catch (e) {
         configError.value = (e as any).response?.data?.error;
@@ -110,10 +138,35 @@ export default defineComponent({
       saveBlock();
     }
 
+    onMounted(async () => {
+      view = new EditorView({
+        doc: local.value,
+        extensions: [
+          minimalSetup,
+          basicDark,
+          EditorView.lineWrapping,
+          lineNumbers(),
+          placeholder('Edit your sequence'),
+        ],
+        parent: editor.value,
+        dispatch: (tr: Transaction) => {
+          view.update([tr]);
+          if (tr.changes.empty) {
+            return;
+          }
+          local.value = view.state.doc.toString();
+        },
+      });
+      await nextTick();
+    });
+
+    onUnmounted(() => view.destroy());
+
     return {
       context,
       block,
       local,
+      editor,
       dirty,
       configError,
       stopped,
@@ -133,7 +186,7 @@ export default defineComponent({
 <template>
   <Card>
     <template #toolbar>
-      <BlockWidgetToolbar has-mode-toggle />
+      <BlockWidgetToolbar />
     </template>
 
     <div class="column q-ma-md q-gutter-y-sm">
@@ -180,66 +233,37 @@ export default defineComponent({
         </template>
       </CardWarning>
 
-      <template v-if="context.mode === 'Basic'">
-        <div class="q-pa-md">
-          <div
-            v-for="(ins, idx) in block.data.instructions"
-            :key="`${idx}-${ins}`"
-            :class="[
-              !stopped &&
-                block.data.activeInstruction === idx &&
-                'text-primary',
-              'monospace q-my-xs',
-            ]"
-          >
-            {{ ins }}
-          </div>
-        </div>
-      </template>
+      <div
+        ref="editor"
+        class="codemirror-editor col"
+      />
 
-      <template v-if="context.mode === 'Full'">
-        <div class="q-pa-md">
-          <q-input
-            v-model="local"
-            autogrow
-            autofocus
-            filled
-            label="Instructions"
-            stack-label
-            class="editor-input"
-            :error="!!configError"
-            :error-message="configError"
-            @keyup.enter.exact.stop
-            @keyup.enter.shift.stop
-          >
-            <template #append>
-              <KeyboardButton @click="showKeyboard" />
-            </template>
-          </q-input>
-        </div>
-        <div class="row">
-          <q-space />
-          <q-btn
-            flat
-            label="Revert"
-            :disable="!dirty"
-            color="primary"
-            @click="revertLocal"
-          />
-          <q-btn
-            flat
-            label="Save"
-            :disable="!dirty"
-            color="primary"
-            @click="saveLocal"
-          />
-        </div>
-      </template>
+      <div class="text-red">
+        {{ configError }}
+      </div>
+
+      <div class="row">
+        <q-space />
+        <q-btn
+          flat
+          label="Revert"
+          :disable="!dirty && !configError"
+          color="primary"
+          @click="revertLocal"
+        />
+        <q-btn
+          flat
+          label="Save"
+          :disable="!dirty"
+          color="primary"
+          @click="saveLocal"
+        />
+      </div>
     </div>
   </Card>
 </template>
 
 <style lang="sass">
-.editor-input textarea
-  min-height: 200px !important
+.cm-editor
+  border: 1px solid grey
 </style>
