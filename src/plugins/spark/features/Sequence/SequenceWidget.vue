@@ -1,6 +1,22 @@
 <script lang="ts">
-import { Transaction } from '@codemirror/state';
-import { EditorView, lineNumbers, placeholder } from '@codemirror/view';
+import {
+  EditorState,
+  Extension,
+  Facet,
+  RangeSet,
+  RangeSetBuilder,
+  Transaction,
+} from '@codemirror/state';
+import {
+  Decoration,
+  DecorationSet,
+  EditorView,
+  ViewPlugin,
+  ViewUpdate,
+  highlightActiveLine,
+  lineNumbers,
+  placeholder,
+} from '@codemirror/view';
 import { basicDark } from 'cm6-theme-basic-dark';
 import { minimalSetup } from 'codemirror';
 import {
@@ -52,6 +68,37 @@ export default defineComponent({
         !block.value.data.enabled &&
         block.value.data.status !== SequenceStatus.PAUSED,
     );
+
+    // const activeIdx = Facet.define<number, number>({
+    //   combine: (values) =>
+    //     values.reduce((v, result) => Math.min(v, result), -1),
+    // });
+
+    // const highlight = Decoration.line({
+    //   attributes: { class: 'cm-active-line' },
+    // });
+
+    // function highlightDecorations(view: EditorView): DecorationSet {
+    //   const idx = view.state.facet(activeIdx);
+    //   const builder = new RangeSetBuilder<Decoration>();
+    // }
+
+    // const showActive = ViewPlugin.fromClass(
+    //   class {
+    //     decorations: DecorationSet;
+
+    //     constructor(view: EditorView) {
+    //       this.decorations = highlightDecoration();
+    //     }
+
+    //     update(update: ViewUpdate) {
+
+    //     }
+    //   },
+    //   {
+    //     decorations: (v) => v.decorations,
+    //   },
+    // );
 
     watch(actual, (newV, oldV) => {
       if (local.value === oldV) {
@@ -145,8 +192,17 @@ export default defineComponent({
           minimalSetup,
           basicDark,
           EditorView.lineWrapping,
-          lineNumbers(),
+          lineNumbers({
+            formatNumber: (lineNo: number, state: EditorState) => {
+              if (lineNo === block.value.data.activeInstruction + 1) {
+                return `> ${lineNo}`;
+              } else {
+                return `${lineNo}`;
+              }
+            },
+          }),
           placeholder('Edit your sequence'),
+          highlightActiveLine(),
         ],
         parent: editor.value,
         dispatch: (tr: Transaction) => {
