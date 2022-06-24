@@ -1,9 +1,7 @@
 <script lang="ts">
 import {
+  Compartment,
   EditorState,
-  Extension,
-  Facet,
-  RangeSet,
   RangeSetBuilder,
   Transaction,
 } from '@codemirror/state';
@@ -13,12 +11,12 @@ import {
   EditorView,
   ViewPlugin,
   ViewUpdate,
-  highlightActiveLine,
   lineNumbers,
   placeholder,
 } from '@codemirror/view';
 import { basicDark } from 'cm6-theme-basic-dark';
 import { minimalSetup } from 'codemirror';
+import { colors } from 'quasar';
 import {
   computed,
   defineComponent,
@@ -49,73 +47,153 @@ export default defineComponent({
   name: 'SequenceWidget',
   setup() {
     const { context } = useContext.setup();
-    const { block, saveBlock, patchBlock } =
-      useBlockWidget.setup<SequenceBlock>();
-    const local = ref<string>(block.value.data.instructions.join('\n'));
-    const configError = ref<string | undefined>();
-
+    const { block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
     const editor = ref<HTMLDivElement>();
-    let view: EditorView;
+    const configError = ref<string | undefined>();
+    let view: EditorView; // Set when mounted
 
-    const actual = computed<string>(() =>
+    const localInstructionString = ref<string>(
+      block.value.data.instructions.join('\n'),
+    );
+    const activeInstructionString = computed<string>(() =>
       block.value.data.instructions.join('\n'),
     );
 
-    const dirty = computed<boolean>(() => local.value !== actual.value);
+    const _editing = ref<boolean>(false);
+    const editing = computed<boolean>({
+      get: () => _editing.value,
+      set: (v) => {
+        _editing.value = v;
+        view.dispatch({
+          effects: [
+            editableSetting.reconfigure(EditorView.editable.of(v)),
+            readonlySetting.reconfigure(EditorState.readOnly.of(!v)),
+          ],
+        });
+      },
+    });
 
-    const stopped = computed<boolean>(
-      () =>
-        !block.value.data.enabled &&
-        block.value.data.status !== SequenceStatus.PAUSED,
+    const dirty = computed<boolean>(
+      () => localInstructionString.value !== activeInstructionString.value,
     );
 
-    // const activeIdx = Facet.define<number, number>({
-    //   combine: (values) =>
-    //     values.reduce((v, result) => Math.min(v, result), -1),
-    // });
+    // not started
+    const inactive = computed<boolean>(
+      () =>
+        !block.value.data.enabled &&
+        block.value.data.status !== SequenceStatus.PAUSED &&
+        block.value.data.status !== SequenceStatus.END,
+    );
 
-    // const highlight = Decoration.line({
-    //   attributes: { class: 'cm-active-line' },
-    // });
+    const stopped = computed<boolean>(
+      () => block.value.data.status === SequenceStatus.PAUSED,
+    );
 
-    // function highlightDecorations(view: EditorView): DecorationSet {
-    //   const idx = view.state.facet(activeIdx);
-    //   const builder = new RangeSetBuilder<Decoration>();
-    // }
+    const ended = computed<boolean>(
+      () => block.value.data.status === SequenceStatus.END,
+    );
 
-    // const showActive = ViewPlugin.fromClass(
-    //   class {
-    //     decorations: DecorationSet;
+    const activeInstruction = computed<number>(
+      () => block.value.data.activeInstruction,
+    );
 
-    //     constructor(view: EditorView) {
-    //       this.decorations = highlightDecoration();
-    //     }
+    const activeInstructionTheme = EditorView.baseTheme({
+      '&dark .cm-activeInstruction': {
+        backgroundColor: colors.getPaletteColor('secondary'),
+      },
+    });
 
-    //     update(update: ViewUpdate) {
+    const activeInstructionAttributes = Decoration.line({
+      attributes: { class: 'cm-activeInstruction' },
+    });
 
-    //     }
-    //   },
-    //   {
-    //     decorations: (v) => v.decorations,
-    //   },
-    // );
+    function activeInstructionDecorations(
+      view: EditorView,
+      shown: boolean,
+      lineNo: number,
+    ): DecorationSet {
+      const builder = new RangeSetBuilder<Decoration>();
+      if (shown && lineNo > 0 && lineNo <= view.state.doc.lines) {
+        const line = view.state.doc.line(lineNo);
+        builder.add(line.from, line.from, activeInstructionAttributes);
+      }
+      return builder.finish();
+    }
 
-    watch(actual, (newV, oldV) => {
-      if (local.value === oldV) {
+    const highlightActiveInstruction = ViewPlugin.fromClass(
+      class {
+        decorations: DecorationSet;
+        shown: boolean;
+        lineNo: number;
+
+        constructor(view: EditorView) {
+          this.shown = block.value.data.enabled;
+          this.lineNo = activeInstruction.value + 1;
+          this.decorations = activeInstructionDecorations(
+            view,
+            this.shown,
+            this.lineNo,
+          );
+        }
+
+        update(update: ViewUpdate): void {
+          const shown = block.value.data.enabled && !editing.value;
+          const lineNo = activeInstruction.value + 1;
+          if (shown !== this.shown || lineNo !== this.lineNo) {
+            this.shown = shown;
+            this.lineNo = lineNo;
+            this.decorations = activeInstructionDecorations(
+              update.view,
+              this.shown,
+              this.lineNo,
+            );
+          }
+        }
+      },
+      {
+        decorations: (v) => v.decorations,
+      },
+    );
+
+    const editableSetting = new Compartment();
+    const readonlySetting = new Compartment();
+
+    watch(activeInstructionString, (newV, oldV) => {
+      // Apply external changes to instructions if we weren't actively editing them
+      if (localInstructionString.value === oldV) {
         revertLocal();
       }
     });
 
-    const runtimeDesc = computed<string>(() => {
-      const { status, instructions, activeInstruction } = block.value.data;
-      if (stopped.value || !instructions.length) {
-        return '---';
-      }
-      if (status === SequenceStatus.END) {
-        return 'Done';
-      }
-      return `${activeInstruction + 1} / ${instructions.length}`;
+    watch(activeInstruction, () => view.dispatch());
+
+    onMounted(async () => {
+      view = new EditorView({
+        parent: editor.value,
+        doc: localInstructionString.value,
+        extensions: [
+          editableSetting.of(EditorView.editable.of(editing.value)),
+          readonlySetting.of(EditorState.readOnly.of(!editing.value)),
+          minimalSetup,
+          basicDark,
+          EditorView.lineWrapping,
+          lineNumbers(),
+          placeholder('No instructions defined'),
+          activeInstructionTheme,
+          highlightActiveInstruction,
+        ],
+        dispatch: (tr: Transaction) => {
+          view.update([tr]);
+          if (tr.changes.empty) {
+            return;
+          }
+          localInstructionString.value = view.state.doc.toString();
+        },
+      });
+      await nextTick();
     });
+
+    onUnmounted(() => view?.destroy());
 
     const runtimeError = computed<string | null>(() => {
       const msg = ERROR_TEXT[block.value.data.error];
@@ -132,15 +210,19 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          modelValue: local.value,
+          modelValue: localInstructionString.value,
         },
-      }).onOk((v) => (local.value = v));
+      }).onOk((v) => (localInstructionString.value = v));
     }
 
     function revertLocal(): void {
-      local.value = actual.value;
+      localInstructionString.value = activeInstructionString.value;
       view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: local.value },
+        changes: {
+          from: 0,
+          to: view.state.doc.length,
+          insert: localInstructionString.value,
+        },
       });
       configError.value = undefined;
     }
@@ -148,7 +230,7 @@ export default defineComponent({
     async function saveLocal(): Promise<void> {
       try {
         await patchBlock({
-          instructions: local.value
+          instructions: localInstructionString.value
             .trim()
             .split('\n')
             .filter((s) => !!s.trim()),
@@ -159,81 +241,46 @@ export default defineComponent({
       }
     }
 
+    // Start or resume execution, starting with activeInstruction.
     function play(): void {
-      block.value.data.enabled = true;
-      saveBlock();
+      patchBlock({ enabled: true });
     }
 
-    function pause(): void {
-      block.value.data.enabled = false;
-      saveBlock();
-    }
-
+    // Stop execution, but retain activeInstruction
     function stop(): void {
-      const { instructions } = block.value.data;
-      block.value.data = {
-        instructions,
-        enabled: false,
+      patchBlock({ enabled: false });
+    }
+
+    // Reset activeInstruction to 0
+    // Optionally stop execution
+    function reset(enabled: boolean): void {
+      patchBlock({
+        enabled,
         overrideState: true,
         activeInstruction: 0,
         activeInstructionStartedAt: 0,
         disabledAt: 0,
         disabledDuration: 0,
-        error: 'NONE',
-        status: 'DISABLED',
-      };
-      saveBlock();
-    }
-
-    onMounted(async () => {
-      view = new EditorView({
-        doc: local.value,
-        extensions: [
-          minimalSetup,
-          basicDark,
-          EditorView.lineWrapping,
-          lineNumbers({
-            formatNumber: (lineNo: number, state: EditorState) => {
-              if (lineNo === block.value.data.activeInstruction + 1) {
-                return `> ${lineNo}`;
-              } else {
-                return `${lineNo}`;
-              }
-            },
-          }),
-          placeholder('Edit your sequence'),
-          highlightActiveLine(),
-        ],
-        parent: editor.value,
-        dispatch: (tr: Transaction) => {
-          view.update([tr]);
-          if (tr.changes.empty) {
-            return;
-          }
-          local.value = view.state.doc.toString();
-        },
       });
-      await nextTick();
-    });
-
-    onUnmounted(() => view.destroy());
+    }
 
     return {
       context,
       block,
-      local,
       editor,
+      editing,
       dirty,
       configError,
+      inactive,
       stopped,
-      runtimeDesc,
+      ended,
       runtimeError,
       showKeyboard,
       revertLocal,
       saveLocal,
       play,
-      pause,
       stop,
+      reset,
     };
   },
 });
@@ -246,52 +293,46 @@ export default defineComponent({
     </template>
 
     <div class="column q-ma-md q-gutter-y-sm">
-      <div class="row justify-center">
-        <q-circular-progress
-          :value="block.data.activeInstruction"
-          :max="block.data.instructions.length"
-          :indeterminate="!block.data.enabled && !stopped && false"
-          show-value
-          size="100px"
-          :color="block.data.enabled ? 'primary' : 'grey'"
-          :class="['q-ma-md', !block.data.enabled && !stopped && 'fade-7']"
-        >
-          {{ runtimeDesc }}
-        </q-circular-progress>
-      </div>
-
-      <div class="row justify-center q-gutter-sm">
-        <q-btn
-          flat
-          label="Reset"
-          :disable="stopped || block.data.enabled"
-          @click="stop"
-        />
-        <q-btn
-          v-if="!block.data.enabled"
-          flat
-          color="primary"
-          :label="stopped ? 'Start' : 'Resume'"
-          @click="play"
-        />
-        <q-btn
-          v-else
-          flat
-          color="primary"
-          label="Stop"
-          @click="pause"
-        />
-      </div>
-
       <CardWarning v-if="runtimeError">
         <template #message>
           {{ runtimeError }}
         </template>
       </CardWarning>
 
+      <div class="row justify-center q-gutter-sm">
+        <q-btn
+          flat
+          label="Reset"
+          :disable="inactive || (block.data.enabled && !ended)"
+          @click="reset(false)"
+        />
+        <q-btn
+          v-if="!block.data.enabled"
+          flat
+          color="primary"
+          :label="stopped ? 'Resume' : 'Start'"
+          @click="play"
+        />
+        <q-btn
+          v-else-if="ended"
+          flat
+          color="primary"
+          label="Restart"
+          @click="reset(true)"
+        />
+        <q-btn
+          v-else
+          :disable="ended"
+          flat
+          color="primary"
+          label="Stop"
+          @click="stop"
+        />
+      </div>
+
       <div
         ref="editor"
-        class="codemirror-editor col"
+        :style="{ border: editing ? '1px solid grey' : '' }"
       />
 
       <div class="text-red">
@@ -300,26 +341,30 @@ export default defineComponent({
 
       <div class="row">
         <q-space />
+        <template v-if="editing">
+          <q-btn
+            flat
+            label="Revert"
+            :disable="!dirty && !configError"
+            color="primary"
+            @click="revertLocal"
+          />
+          <q-btn
+            flat
+            label="Save"
+            :disable="!dirty"
+            color="primary"
+            @click="saveLocal"
+          />
+        </template>
         <q-btn
           flat
-          label="Revert"
-          :disable="!dirty && !configError"
-          color="primary"
-          @click="revertLocal"
-        />
-        <q-btn
-          flat
-          label="Save"
-          :disable="!dirty"
-          color="primary"
-          @click="saveLocal"
+          :label="editing ? 'Stop editing' : 'Edit instructions'"
+          icon="edit"
+          color="secondary"
+          @click="editing = !editing"
         />
       </div>
     </div>
   </Card>
 </template>
-
-<style lang="sass">
-.cm-editor
-  border: 1px solid grey
-</style>
