@@ -30,7 +30,6 @@ import {
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { SequenceBlock, SequenceError, SequenceStatus } from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.NONE]: null,
@@ -43,6 +42,16 @@ const ERROR_TEXT: Record<SequenceError, string | null> = {
     'System time not set on controller',
 };
 
+const activeInstructionTheme = EditorView.baseTheme({
+  '&dark .cm-activeInstruction': {
+    backgroundColor: colors.getPaletteColor('secondary'),
+  },
+});
+
+const activeInstructionAttributes = Decoration.line({
+  attributes: { class: 'cm-activeInstruction' },
+});
+
 export default defineComponent({
   name: 'SequenceWidget',
   setup() {
@@ -50,12 +59,16 @@ export default defineComponent({
     const { block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
     const editor = ref<HTMLDivElement>();
     const configError = ref<string | undefined>();
+
+    const editableSetting = new Compartment();
+    const readonlySetting = new Compartment();
     let view: EditorView; // Set when mounted
 
-    const localInstructionString = ref<string>(
+    const localInstructionsText = ref<string>(
       block.value.data.instructions.join('\n'),
     );
-    const activeInstructionString = computed<string>(() =>
+
+    const blockInstructionsText = computed<string>(() =>
       block.value.data.instructions.join('\n'),
     );
 
@@ -74,10 +87,17 @@ export default defineComponent({
     });
 
     const dirty = computed<boolean>(
-      () => localInstructionString.value !== activeInstructionString.value,
+      () => localInstructionsText.value !== blockInstructionsText.value,
     );
 
-    // not started
+    const activeInstruction = computed<number>(
+      () => block.value.data.activeInstruction,
+    );
+
+    const numInstructions = computed<number>(
+      () => block.value.data.instructions.length,
+    );
+
     const inactive = computed<boolean>(
       () =>
         !block.value.data.enabled &&
@@ -85,7 +105,13 @@ export default defineComponent({
         block.value.data.status !== SequenceStatus.END,
     );
 
-    const stopped = computed<boolean>(
+    const playing = computed<boolean>(
+      () =>
+        block.value.data.enabled &&
+        block.value.data.status !== SequenceStatus.END,
+    );
+
+    const paused = computed<boolean>(
       () => block.value.data.status === SequenceStatus.PAUSED,
     );
 
@@ -93,18 +119,18 @@ export default defineComponent({
       () => block.value.data.status === SequenceStatus.END,
     );
 
-    const activeInstruction = computed<number>(
-      () => block.value.data.activeInstruction,
-    );
-
-    const activeInstructionTheme = EditorView.baseTheme({
-      '&dark .cm-activeInstruction': {
-        backgroundColor: colors.getPaletteColor('secondary'),
-      },
-    });
-
-    const activeInstructionAttributes = Decoration.line({
-      attributes: { class: 'cm-activeInstruction' },
+    const runtimeError = computed<string | null>(() => {
+      const { error, instructions, activeInstruction } = block.value.data;
+      const msg = ERROR_TEXT[error];
+      if (msg == null) {
+        return null;
+      }
+      const instruction = instructions[activeInstruction];
+      if (!instruction) {
+        return msg;
+      }
+      const [opcode] = instruction.split(' ', 1);
+      return `${opcode}: ${msg}`;
     });
 
     function activeInstructionDecorations(
@@ -127,7 +153,7 @@ export default defineComponent({
         lineNo: number;
 
         constructor(view: EditorView) {
-          this.shown = block.value.data.enabled;
+          this.shown = !editing.value && !inactive.value;
           this.lineNo = activeInstruction.value + 1;
           this.decorations = activeInstructionDecorations(
             view,
@@ -137,7 +163,7 @@ export default defineComponent({
         }
 
         update(update: ViewUpdate): void {
-          const shown = block.value.data.enabled && !editing.value;
+          const shown = !editing.value && !inactive.value;
           const lineNo = activeInstruction.value + 1;
           if (shown !== this.shown || lineNo !== this.lineNo) {
             this.shown = shown;
@@ -155,39 +181,43 @@ export default defineComponent({
       },
     );
 
-    const editableSetting = new Compartment();
-    const readonlySetting = new Compartment();
-
-    watch(activeInstructionString, (newV, oldV) => {
+    watch(blockInstructionsText, (newV, oldV) => {
       // Apply external changes to instructions if we weren't actively editing them
-      if (localInstructionString.value === oldV) {
+      if (localInstructionsText.value === oldV) {
         revertLocal();
       }
     });
 
-    watch(activeInstruction, () => view.dispatch());
+    watch(activeInstruction, (idx: number) => {
+      if (!editing.value && idx >= 0 && idx < numInstructions.value) {
+        view.dispatch({
+          effects: [EditorView.scrollIntoView(view.state.doc.line(idx).from)],
+        });
+      } else {
+        view.dispatch();
+      }
+    });
 
     onMounted(async () => {
       view = new EditorView({
         parent: editor.value,
-        doc: localInstructionString.value,
+        doc: localInstructionsText.value,
         extensions: [
-          editableSetting.of(EditorView.editable.of(editing.value)),
-          readonlySetting.of(EditorState.readOnly.of(!editing.value)),
           minimalSetup,
           basicDark,
-          EditorView.lineWrapping,
-          lineNumbers(),
           placeholder('No instructions defined'),
+          lineNumbers(),
+          EditorView.lineWrapping,
+          editableSetting.of(EditorView.editable.of(editing.value)),
+          readonlySetting.of(EditorState.readOnly.of(!editing.value)),
           activeInstructionTheme,
           highlightActiveInstruction,
         ],
         dispatch: (tr: Transaction) => {
           view.update([tr]);
-          if (tr.changes.empty) {
-            return;
+          if (!tr.changes.empty) {
+            localInstructionsText.value = view.state.doc.toString();
           }
-          localInstructionString.value = view.state.doc.toString();
         },
       });
       await nextTick();
@@ -195,42 +225,22 @@ export default defineComponent({
 
     onUnmounted(() => view?.destroy());
 
-    const runtimeError = computed<string | null>(() => {
-      const msg = ERROR_TEXT[block.value.data.error];
-      const instruction =
-        block.value.data.instructions[block.value.data.activeInstruction];
-      if (!msg || !instruction) {
-        return msg;
-      }
-      const [opcode] = instruction.split(' ', 1);
-      return `${opcode}: ${msg}`;
-    });
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: localInstructionString.value,
-        },
-      }).onOk((v) => (localInstructionString.value = v));
-    }
-
     function revertLocal(): void {
-      localInstructionString.value = activeInstructionString.value;
+      localInstructionsText.value = blockInstructionsText.value;
+      configError.value = undefined;
       view.dispatch({
         changes: {
           from: 0,
           to: view.state.doc.length,
-          insert: localInstructionString.value,
+          insert: localInstructionsText.value,
         },
       });
-      configError.value = undefined;
     }
 
     async function saveLocal(): Promise<void> {
       try {
         await patchBlock({
-          instructions: localInstructionString.value
+          instructions: localInstructionsText.value
             .trim()
             .split('\n')
             .filter((s) => !!s.trim()),
@@ -241,18 +251,8 @@ export default defineComponent({
       }
     }
 
-    // Start or resume execution, starting with activeInstruction.
-    function play(): void {
-      patchBlock({ enabled: true });
-    }
-
-    // Stop execution, but retain activeInstruction
-    function stop(): void {
-      patchBlock({ enabled: false });
-    }
-
     // Reset activeInstruction to 0
-    // Optionally stop execution
+    // Optionally halt execution
     function reset(enabled: boolean): void {
       patchBlock({
         enabled,
@@ -264,6 +264,36 @@ export default defineComponent({
       });
     }
 
+    // If inactive: start
+    // If paused: resume
+    // If ended: restart
+    function play(): void {
+      if (ended.value) {
+        reset(true);
+      } else {
+        patchBlock({ enabled: true });
+      }
+    }
+
+    // Halt execution, but retain activeInstruction
+    function pause(): void {
+      patchBlock({ enabled: false });
+    }
+
+    // Retain current enabled state
+    // Set active instruction to idx if it's within range
+    function skipTo(idx: number): void {
+      if (idx >= 0 && idx < numInstructions.value) {
+        patchBlock({
+          overrideState: true,
+          activeInstruction: idx,
+          activeInstructionStartedAt: 0,
+          disabledAt: 0,
+          disabledDuration: 0,
+        });
+      }
+    }
+
     return {
       context,
       block,
@@ -272,15 +302,18 @@ export default defineComponent({
       dirty,
       configError,
       inactive,
-      stopped,
+      playing,
+      paused,
       ended,
+      activeInstruction,
+      numInstructions,
       runtimeError,
-      showKeyboard,
       revertLocal,
       saveLocal,
-      play,
-      stop,
       reset,
+      play,
+      pause,
+      skipTo,
     };
   },
 });
@@ -302,37 +335,41 @@ export default defineComponent({
       <div class="row justify-center q-gutter-sm">
         <q-btn
           flat
-          label="Reset"
-          :disable="inactive || (block.data.enabled && !ended)"
+          icon="mdi-skip-previous"
+          :disable="editing || ended || activeInstruction === 0"
+          @click="skipTo(activeInstruction - 1)"
+        />
+        <q-btn
+          flat
+          icon="mdi-stop"
+          :disable="inactive || playing"
           @click="reset(false)"
         />
         <q-btn
-          v-if="!block.data.enabled"
+          v-if="playing"
           flat
-          color="primary"
-          :label="stopped ? 'Resume' : 'Start'"
-          @click="play"
-        />
-        <q-btn
-          v-else-if="ended"
-          flat
-          color="primary"
-          label="Restart"
-          @click="reset(true)"
+          icon="mdi-pause"
+          @click="pause"
         />
         <q-btn
           v-else
-          :disable="ended"
           flat
-          color="primary"
-          label="Stop"
-          @click="stop"
+          icon="mdi-play"
+          @click="play"
+        />
+        <q-btn
+          flat
+          icon="mdi-skip-next"
+          :disable="editing || activeInstruction + 1 >= numInstructions"
+          @click="skipTo(activeInstruction + 1)"
         />
       </div>
 
       <div
         ref="editor"
-        :style="{ border: editing ? '1px solid grey' : '' }"
+        :style="{
+          border: editing ? '1px solid grey' : '',
+        }"
       />
 
       <div class="text-red">
