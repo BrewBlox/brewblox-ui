@@ -5,6 +5,7 @@ import {
   Block,
   BlockIntfType,
   BlockType,
+  COMPATIBLE_TYPES,
   SparkPatchEvent,
   SparkStateEvent,
   SparkUpdateEvent,
@@ -13,7 +14,6 @@ import {
 import { useFeatureStore } from '@/store/features';
 import { isLink } from '@/utils/identity';
 
-import { compatibleTypes } from '../const';
 import { useSparkStore } from '../store';
 import { BlockAddress, ComparedBlockType } from '../types';
 import { getDisplaySettingsBlock } from './system';
@@ -34,7 +34,7 @@ export function isCompatible(
   if (isArray(intf)) {
     return intf.some((i) => isCompatible(type, i));
   }
-  return Boolean(compatibleTypes[intf]?.includes(type));
+  return Boolean(COMPATIBLE_TYPES[intf]?.includes(type));
 }
 
 export function ifCompatible<T extends Block>(

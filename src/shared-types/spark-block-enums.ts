@@ -7,6 +7,7 @@ import { Enum } from 'typescript-string-enums';
 //   export type MyEnum = Enum<typeof MyEnum>;
 //
 
+// #region BlockIntfType
 export const BlockIntfType = Enum(
   'ProcessValueInterface',
   'TempSensorInterface',
@@ -22,7 +23,9 @@ export const BlockIntfType = Enum(
   'DS2408Interface',
   'EnablerInterface',
 );
+// #endregion BlockIntfType
 
+// #region BlockType
 export const SystemBlockType = Enum(
   'DisplaySettings',
   'OneWireBus',
@@ -62,11 +65,61 @@ export const BlockType = Enum(
   ...Enum.values(SystemBlockType),
   ...Enum.values(UserBlockType),
 );
+// #endregion BlockType
 
 export const BlockOrIntfType = Enum(
   ...Enum.values(BlockType),
   ...Enum.values(BlockIntfType),
 );
+
+// #region COMPATIBLE_TYPES
+export const COMPATIBLE_TYPES: Record<BlockIntfType, BlockType[]> = {
+  ProcessValueInterface: [
+    BlockType.ActuatorAnalogMock,
+    BlockType.ActuatorPwm,
+    BlockType.SetpointSensorPair,
+  ],
+  TempSensorInterface: [
+    BlockType.TempSensorCombi,
+    BlockType.TempSensorMock,
+    BlockType.TempSensorOneWire,
+  ],
+  SetpointSensorPairInterface: [BlockType.SetpointSensorPair],
+  ActuatorAnalogInterface: [
+    BlockType.ActuatorAnalogMock,
+    BlockType.ActuatorOffset,
+    BlockType.ActuatorPwm,
+  ],
+  ActuatorDigitalInterface: [BlockType.DigitalActuator, BlockType.MotorValve],
+  BalancerInterface: [BlockType.Balancer],
+  MutexInterface: [BlockType.Mutex],
+  OneWireBusInterface: [BlockType.OneWireGpioModule],
+  OneWireDeviceInterface: [
+    BlockType.TempSensorOneWire,
+    BlockType.DS2408,
+    BlockType.DS2413,
+  ],
+  IoModuleInterface: [],
+  IoArrayInterface: [
+    BlockType.DS2408,
+    BlockType.DS2413,
+    BlockType.Spark2Pins,
+    BlockType.Spark3Pins,
+    BlockType.OneWireGpioModule,
+    BlockType.MockPins,
+  ],
+  DS2408Interface: [BlockType.DS2408],
+  EnablerInterface: [
+    BlockType.ActuatorOffset,
+    BlockType.ActuatorLogic,
+    BlockType.Pid,
+    BlockType.Sequence,
+    BlockType.ActuatorPwm,
+    BlockType.SetpointSensorPair,
+    BlockType.SetpointProfile,
+  ],
+};
+// #endregion COMPATIBLE_TYPES
 
 export const DigitalConstraintKey = Enum(
   'mutexed',

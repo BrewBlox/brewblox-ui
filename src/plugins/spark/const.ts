@@ -2,7 +2,6 @@ import { DS2408ConnectMode } from '@/shared-types';
 
 import {
   AnalogConstraintKey,
-  BlockIntfType,
   BlockType,
   DigitalConstraintKey,
   DisplayTempUnit,
@@ -51,53 +50,6 @@ export const combineFuncLabels: Record<SensorCombiFunc, string> = {
 export const displayTempLabels: Record<DisplayTempUnit, string> = {
   [DisplayTempUnit.TEMP_CELSIUS]: 'Celsius',
   [DisplayTempUnit.TEMP_FAHRENHEIT]: 'Fahrenheit',
-};
-
-export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
-  ProcessValueInterface: [
-    BlockType.ActuatorAnalogMock,
-    BlockType.ActuatorPwm,
-    BlockType.SetpointSensorPair,
-  ],
-  TempSensorInterface: [
-    BlockType.TempSensorCombi,
-    BlockType.TempSensorMock,
-    BlockType.TempSensorOneWire,
-  ],
-  SetpointSensorPairInterface: [BlockType.SetpointSensorPair],
-  ActuatorAnalogInterface: [
-    BlockType.ActuatorAnalogMock,
-    BlockType.ActuatorOffset,
-    BlockType.ActuatorPwm,
-  ],
-  ActuatorDigitalInterface: [BlockType.DigitalActuator, BlockType.MotorValve],
-  BalancerInterface: [BlockType.Balancer],
-  MutexInterface: [BlockType.Mutex],
-  OneWireBusInterface: [BlockType.OneWireGpioModule],
-  OneWireDeviceInterface: [
-    BlockType.TempSensorOneWire,
-    BlockType.DS2408,
-    BlockType.DS2413,
-  ],
-  IoModuleInterface: [],
-  IoArrayInterface: [
-    BlockType.DS2408,
-    BlockType.DS2413,
-    BlockType.Spark2Pins,
-    BlockType.Spark3Pins,
-    BlockType.OneWireGpioModule,
-    BlockType.MockPins,
-  ],
-  DS2408Interface: [BlockType.DS2408],
-  EnablerInterface: [
-    BlockType.ActuatorOffset,
-    BlockType.ActuatorLogic,
-    BlockType.Pid,
-    BlockType.Sequence,
-    BlockType.ActuatorPwm,
-    BlockType.SetpointSensorPair,
-    BlockType.SetpointProfile,
-  ],
 };
 
 export const ioChannelNames = {
