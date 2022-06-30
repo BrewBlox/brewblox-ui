@@ -33,6 +33,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   isVolatileBlock: ComputedRef<boolean>;
 
   saveBlock(block?: BlockT): Promise<void>;
+  patchBlock(data: Partial<BlockT['data']>);
 
   hasGraph: boolean;
   isDriven: ComputedRef<boolean>;
@@ -105,6 +106,10 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       await sparkStore.saveBlock(v);
     }
 
+    async function patchBlock(data: Partial<BlockT['data']>): Promise<void> {
+      await sparkStore.patchBlock(block.value, data);
+    }
+
     const limitations = computed<string | null>(() =>
       limitationString(findLimitations(block.value)),
     );
@@ -148,6 +153,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       blockSpec,
       isVolatileBlock,
       saveBlock,
+      patchBlock,
       limitations,
       graphConfig,
       hasGraph,
