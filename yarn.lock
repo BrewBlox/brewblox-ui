@@ -1161,16 +1161,6 @@
   resolved "https://registry.yarnpkg.com/@codemirror/state/-/state-6.0.1.tgz#a1994f14c49e2f77cb9e26aef35f63a8b3707c6c"
   integrity sha512-6vYgaXc4KjSY0BUfSVDJooGcoswg/RJZpq/ZGjsUYmY0KN1lmB8u03nv+jiG1ncUV5qoggyxFT5AGD5Ak+5Zrw==
 
-"@codemirror/theme-one-dark@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@codemirror/theme-one-dark/-/theme-one-dark-6.0.0.tgz#81a999a568217f68522bd8846cbf7210ca2a59df"
-  integrity sha512-jTCfi1I8QT++3m21Ui6sU8qwu3F/hLv161KLxfvkV1cYWSBwyUanmQFs89ChobQjBHi2x7s2k71wF9WYvE8fdw==
-  dependencies:
-    "@codemirror/language" "^6.0.0"
-    "@codemirror/state" "^6.0.0"
-    "@codemirror/view" "^6.0.0"
-    "@lezer/highlight" "^1.0.0"
-
 "@codemirror/view@^6.0.0":
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/@codemirror/view/-/view-6.0.1.tgz#f56327a5cd241eff5393cfdfbceea897b5266967"
@@ -3725,21 +3715,6 @@ cm6-theme-basic-dark@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/cm6-theme-basic-dark/-/cm6-theme-basic-dark-0.2.0.tgz#8b672c60bedc5c8b577f9e69196a00ec5a5da669"
   integrity sha512-+mNNJecRtxS/KkloMDCQF0oTrT6aFGRZTjnBcdT5UG1pcDO4Brq8l1+0KR/8dZ7hub2gOGOzoi3rGFD8GzlH7Q==
-
-cm6-theme-gruvbox-dark@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/cm6-theme-gruvbox-dark/-/cm6-theme-gruvbox-dark-0.2.0.tgz#9aab54346d0632bbcbeca02457c5f931ded007db"
-  integrity sha512-xyqsG19qV+nb7ZHTMocSNWwZHMExfQxDm0FlbNMqEGKeQR96WryssXJH/IZZQudwrPpWU2dCoyOgMFhti2UTYA==
-
-cm6-theme-material-dark@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/cm6-theme-material-dark/-/cm6-theme-material-dark-0.2.0.tgz#c733243a8a31da5d953fa551b2548f358aa37a64"
-  integrity sha512-H09JZihzg4w0mTtOqo5bQdxItkQWw+ergKlk7BSfwYjaR2nOi+wIN0R+ByAo7bON8GbFODvjTxH3EIqdhovFeA==
-
-cm6-theme-solarized-dark@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/cm6-theme-solarized-dark/-/cm6-theme-solarized-dark-0.2.0.tgz#f4238aa74289b6c4cb8aedb70e430acb18b774c7"
-  integrity sha512-FWtYHcX8NLzNSs21yGbkLF+q/5m2u80ug0JytKoI9nMZWPP5dcnsFYp1iZBEegLehiZnpv1qcmTsLTUG2KD39w==
 
 co@^4.6.0:
   version "4.6.0"
