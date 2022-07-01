@@ -24,7 +24,7 @@ export default defineComponent({
   setup() {
     const { context, inDialog } = useContext.setup();
     const sparkStore = useSparkStore();
-    const { serviceId, block, saveBlock } =
+    const { serviceId, block, patchBlock } =
       useBlockWidget.setup<TempSensorCombiBlock>();
 
     const hasValue = computed<boolean>(
@@ -44,20 +44,19 @@ export default defineComponent({
           label: 'Sensor',
           serviceId,
         },
-      }).onOk((value: Link) => {
-        block.value.data.sensors.push(value);
-        saveBlock();
+      }).onOk((sensor: Link) => {
+        patchBlock({ sensors: [...block.value.data.sensors, sensor] });
       });
     }
 
-    function removeSensor(idx): void {
-      block.value.data.sensors.splice(idx, 1);
-      saveBlock();
+    function removeSensor(idx: number): void {
+      patchBlock({ sensors: [...block.value.data.sensors].splice(idx, 1) });
     }
 
     function updateSensor(idx: number, value: Link): void {
-      block.value.data.sensors.splice(idx, 1, value);
-      saveBlock();
+      patchBlock({
+        sensors: [...block.value.data.sensors].splice(idx, 1, value),
+      });
     }
 
     function sensorValue(link: Link): string {
@@ -71,7 +70,7 @@ export default defineComponent({
       inDialog,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       sensors,
       hasValue,
       addSensor,
@@ -131,12 +130,7 @@ export default defineComponent({
             title="Select function"
             label="Value calculation"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.combineFunc = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ combineFunc: v })"
           />
 
           <div class="col-break" />

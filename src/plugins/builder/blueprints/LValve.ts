@@ -51,11 +51,12 @@ const blueprint: BuilderBlueprint = {
   interactHandler: (part: PersistentPart, { savePart }) => {
     const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
     if (block) {
-      block.data.desiredState =
-        block.data.state === DigitalState.STATE_ACTIVE
-          ? DigitalState.STATE_INACTIVE
-          : DigitalState.STATE_ACTIVE;
-      useSparkStore().saveBlock(block);
+      useSparkStore().patchBlock(block, {
+        desiredState:
+          block.data.state === DigitalState.STATE_ACTIVE
+            ? DigitalState.STATE_INACTIVE
+            : DigitalState.STATE_ACTIVE,
+      });
     } else {
       part.settings.closed = !part.settings.closed;
       savePart(part);

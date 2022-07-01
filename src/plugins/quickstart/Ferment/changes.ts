@@ -21,7 +21,7 @@ import { bloxLink } from '@/utils/link';
 import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock, PidConfig } from '../types';
+import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
@@ -37,7 +37,9 @@ import {
 } from '../utils';
 import { FermentConfig } from './types';
 
-export function defineChangedBlocks(config: FermentConfig): Block[] {
+export function defineChangedBlocks(
+  config: FermentConfig,
+): QuickstartPatch<Block>[] {
   return [
     ...unlinkedActuators(config.serviceId, [
       config.heatChannel,

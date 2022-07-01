@@ -26,12 +26,7 @@ import { matchesType } from '@/utils/objects';
 
 import { makeBlockIdRules } from './configuration';
 import { channelName } from './formatting';
-import {
-  isBlockDisplayReady,
-  isBlockDisplayed,
-  isBlockVolatile,
-  isCompatible,
-} from './info';
+import { isBlockDisplayReady, isBlockDisplayed, isCompatible } from './info';
 import { getDisplaySettingsBlock } from './system';
 
 export function startChangeBlockId(block: Block | null): void {
@@ -50,13 +45,7 @@ export function startChangeBlockId(block: Block | null): void {
     },
   }).onOk((newId: string) => {
     const sparkStore = useSparkStore();
-    if (!sparkStore.has(block.serviceId)) {
-      return;
-    } else if (isBlockVolatile(block)) {
-      sparkStore.saveBlock({ ...block, id: newId });
-    } else {
-      sparkStore.renameBlock(block.serviceId, block.id, newId).catch(() => {});
-    }
+    sparkStore.renameBlock(block.serviceId, block.id, newId).catch(() => {});
   });
 }
 
@@ -210,11 +199,9 @@ export async function startAddBlockToDisplay(
       slot.pid = link;
     }
 
-    display.data.widgets = [
-      slot,
-      ...display.data.widgets.filter((w) => w.pos !== opts.pos),
-    ];
-    await useSparkStore().saveBlock(display);
+    await useSparkStore().patchBlock(display, {
+      widgets: [slot, ...widgets.filter((w) => w.pos !== opts.pos)],
+    });
     notify.info(`Added <i>${addr.id}</i> to the Spark display`, {
       shown: opts.showNotify,
     });

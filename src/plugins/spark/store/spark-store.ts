@@ -219,24 +219,16 @@ export const useSparkStore = defineStore('sparkStore', {
     },
 
     async patchBlock<T extends Block>(
-      block: T,
+      block: Maybe<T>,
       data: Partial<T['data']>,
     ): Promise<void> {
+      if (block == null) {
+        return;
+      }
       if (isBlockVolatile(block)) {
         this.setVolatileBlock({ ...block, data: { ...block.data, ...data } });
       } else {
         await sparkApi.patchBlock(block, data); // triggers patch event
-      }
-    },
-
-    async modifyBlock<T extends Block>(
-      block: T,
-      func: (actual: T) => Awaitable<unknown>,
-    ): Promise<void> {
-      const actual = deepCopy(this.blockByAddress<T>(block));
-      if (actual) {
-        await func(actual);
-        return this.saveBlock(actual);
       }
     },
 

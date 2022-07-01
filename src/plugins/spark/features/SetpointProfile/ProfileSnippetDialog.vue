@@ -79,14 +79,16 @@ export default defineComponent({
         },
       })
         .onOk(async () => {
-          block.value.data.start = new Date().getTime() / 1000;
-          block.value.data.points = points;
-          await sparkStore.saveBlock(block.value);
+          await sparkStore.patchBlock(block.value, {
+            points,
+            start: new Date().getTime() / 1000,
+          });
           onDialogOK();
         })
         .onCancel(async () => {
-          block.value.data.points = points;
-          await sparkStore.saveBlock(block.value);
+          await sparkStore.patchBlock(block.value, {
+            points,
+          });
           onDialogOK();
         });
     }

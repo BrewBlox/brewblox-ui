@@ -19,7 +19,7 @@ import { bloxLink } from '@/utils/link';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock } from '../types';
+import { DisplayBlock, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
@@ -29,7 +29,9 @@ import {
 } from '../utils';
 import { BrewKettleConfig } from './types';
 
-export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
+export function defineChangedBlocks(
+  config: BrewKettleConfig,
+): QuickstartPatch<Block>[] {
   return [
     ...unlinkedActuators(config.serviceId, [config.kettleChannel]),
     ...changedIoModules(config.serviceId, config.changedGpio),

@@ -17,8 +17,7 @@ export default defineComponent({
   name: 'PidBasic',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, blockId, block, saveBlock } =
-      useBlockWidget.setup<PidBlock>();
+    const { serviceId, blockId, block } = useBlockWidget.setup<PidBlock>();
 
     const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
       sparkStore.blockByLink(serviceId, block.value.data.inputId),
@@ -36,11 +35,6 @@ export default defineComponent({
 
     function fit(v: number): number {
       return Math.min(v, 100);
-    }
-
-    function enable(): void {
-      block.value.data.enabled = true;
-      saveBlock();
     }
 
     function showInput(): void {
@@ -88,13 +82,11 @@ export default defineComponent({
       prettyQty,
       fixedNumber,
       block,
-      saveBlock,
       inputBlock,
       inputDriven,
       outputBlock,
       kp,
       fit,
-      enable,
       showInput,
       editInput,
       showOutput,

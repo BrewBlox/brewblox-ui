@@ -7,13 +7,13 @@ import { MotorValveBlock } from '@/plugins/spark/types';
 export default defineComponent({
   name: 'MotorValveBasic',
   setup() {
-    const { serviceId, block, saveBlock, limitations, isDriven } =
+    const { serviceId, block, patchBlock, limitations, isDriven } =
       useBlockWidget.setup<MotorValveBlock>();
 
     return {
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       limitations,
       isDriven,
     };
@@ -34,12 +34,7 @@ export default defineComponent({
             :pending="block.data.state !== block.data.desiredState"
             :pending-reason="limitations"
             :disable="isDriven"
-            @update:model-value="
-              (v) => {
-                block.data.desiredState = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ desiredState: v })"
           />
         </LabeledField>
         <LabeledField
@@ -58,12 +53,7 @@ export default defineComponent({
           :service-id="serviceId"
           type="digital"
           class="col-grow"
-          @update:model-value="
-            (v) => {
-              block.data.constrainedBy = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(v) => patchBlock({ constrainedBy: v })"
         />
       </div>
     </slot>

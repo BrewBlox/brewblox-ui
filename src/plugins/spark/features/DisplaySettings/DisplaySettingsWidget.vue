@@ -16,11 +16,10 @@ export default defineComponent({
   },
   setup() {
     const { context } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
+    const { patchBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
 
     function clearSlots(): void {
-      block.value.data.widgets = [];
-      saveBlock();
+      patchBlock({ widgets: [] });
     }
 
     return {

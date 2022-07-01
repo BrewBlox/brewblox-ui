@@ -12,7 +12,7 @@ const footerRules: InputRule[] = [
 export default defineComponent({
   name: 'DisplaySettingsBasic',
   setup() {
-    const { block, saveBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
+    const { block, patchBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
 
     const slots = computed<(DisplaySlot | null)[]>(() => {
       const slots = Array(6).fill(null);
@@ -40,7 +40,7 @@ export default defineComponent({
     return {
       footerRules,
       block,
-      saveBlock,
+      patchBlock,
       slots,
       slotStyle,
       showDialog,
@@ -83,12 +83,7 @@ export default defineComponent({
         :rules="footerRules"
         label="Footer text"
         title="footer text"
-        @update:model-value="
-          (v) => {
-            block.data.name = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ name: v })"
       />
     </div>
   </div>

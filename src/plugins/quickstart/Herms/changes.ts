@@ -27,7 +27,7 @@ import { Widget } from '@/store/widgets';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
-import { DisplayBlock } from '../types';
+import { DisplayBlock, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
@@ -37,7 +37,9 @@ import {
 } from '../utils';
 import { HermsConfig } from './types';
 
-export function defineChangedBlocks(config: HermsConfig): Block[] {
+export function defineChangedBlocks(
+  config: HermsConfig,
+): QuickstartPatch<Block>[] {
   return [
     ...unlinkedActuators(config.serviceId, [
       config.hltChannel,

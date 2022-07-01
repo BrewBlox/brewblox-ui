@@ -33,7 +33,7 @@ export default defineComponent({
   name: 'ActuatorLogicBasic',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block, saveBlock } =
+    const { serviceId, block, patchBlock } =
       useBlockWidget.setup<ActuatorLogicBlock>();
 
     const digital = computed<
@@ -112,8 +112,10 @@ export default defineComponent({
           title: 'Edit comparison',
         },
       }).onOk((cmp) => {
-        block.value.data.digital.splice(digitalIdx(key), 1, cmp);
-        saveBlock();
+        const { digital } = block.value.data;
+        patchBlock({
+          digital: [...digital].splice(digitalIdx(key), 1, cmp),
+        });
       });
     }
 
@@ -126,8 +128,8 @@ export default defineComponent({
           title: 'Edit comparison',
         },
       }).onOk((cmp) => {
-        block.value.data.analog.splice(analogIdx(key), 1, cmp);
-        saveBlock();
+        const { analog } = block.value.data;
+        patchBlock({ analog: [...analog].splice(analogIdx(key), 1, cmp) });
       });
     }
 

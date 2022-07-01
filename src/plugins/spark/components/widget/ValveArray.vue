@@ -75,28 +75,27 @@ export default defineComponent({
         return;
       }
       if (channel.driver) {
-        channel.driver.data.startChannel = 0;
-        await sparkStore.saveBlock(channel.driver);
+        await sparkStore.patchBlock(channel.driver, { startChannel: 0 });
       }
       if (link.id) {
         const newDriver = sparkStore.blockById<MotorValveBlock>(
           serviceId,
           link.id,
-        )!;
+        );
         const { id, type } = block.value;
-        newDriver.data.hwDevice = bloxLink(id, type);
-        newDriver.data.startChannel = channel.id;
-        await sparkStore.saveBlock(newDriver);
+        await sparkStore.patchBlock(newDriver, {
+          hwDevice: bloxLink(id, type),
+          startChannel: channel.id,
+        });
       }
     }
 
     async function saveState(
       channel: EditableChannel,
-      state: DigitalState,
+      desiredState: DigitalState,
     ): Promise<void> {
       if (channel.driver) {
-        channel.driver.data.desiredState = state;
-        await sparkStore.saveBlock(channel.driver);
+        await sparkStore.patchBlock(channel.driver, { desiredState });
       }
     }
 

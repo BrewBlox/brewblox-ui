@@ -19,7 +19,7 @@ export default defineComponent({
     },
   },
   setup() {
-    const { block, saveBlock } = useBlockWidget.setup<SetpointProfileBlock>();
+    const { patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
     async function showDialog(): Promise<void> {
       loadFile((cfg: Pick<SetpointProfileBlock['data'], 'points'>) => {
@@ -27,8 +27,7 @@ export default defineComponent({
           notify.error('Invalid configuration file');
           return;
         }
-        block.value.data.points = cfg.points;
-        saveBlock();
+        patchBlock({ points: cfg.points });
       });
     }
 

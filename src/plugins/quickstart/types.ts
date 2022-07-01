@@ -16,6 +16,11 @@ export interface GpioChange {
   channels: GpioModuleChannel[];
 }
 
+export interface QuickstartPatch<T extends Block> {
+  blockId: string;
+  patch: Partial<T['data']>;
+}
+
 export interface DisplayBlock {
   blockId: string;
   opts: Partial<DisplayOpts>;
@@ -31,7 +36,7 @@ export interface QuickstartConfig {
   widgets: Widget[];
   changedGpio: GpioChange[];
   createdBlocks: Block[];
-  changedBlocks: Block[];
+  changedBlocks: QuickstartPatch<Block>[];
   renamedBlocks: { [old: string]: string };
   displayedBlocks: DisplayBlock[];
 }

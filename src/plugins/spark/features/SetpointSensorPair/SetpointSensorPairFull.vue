@@ -16,7 +16,7 @@ export default defineComponent({
   name: 'SetpointSensorPairFull',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, blockId, block, saveBlock, isVolatileBlock, isDriven } =
+    const { serviceId, blockId, block, patchBlock, isVolatileBlock, isDriven } =
       useBlockWidget.setup<SetpointSensorPairBlock>();
 
     const usedBy = computed<Block[]>(() => {
@@ -33,7 +33,7 @@ export default defineComponent({
       filterOpts,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       isDriven,
       usedBy,
     };
@@ -54,12 +54,7 @@ export default defineComponent({
         label="Setting"
         tag="big"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.storedSetting = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ storedSetting: v })"
       />
       <QuantityField
         :model-value="block.data.value"
@@ -95,12 +90,7 @@ export default defineComponent({
               </p>
               "
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.filter = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ filter: v })"
       />
       <QuantityField
         :model-value="block.data.filterThreshold"
@@ -115,12 +105,7 @@ export default defineComponent({
               </p>
               "
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.filterThreshold = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ filterThreshold: v })"
       >
         <template #append>
           <q-btn
@@ -128,10 +113,7 @@ export default defineComponent({
             round
             icon="mdi-skip-forward"
             class="self-end"
-            @click.stop="
-              block.data.resetFilter = true;
-              saveBlock();
-            "
+            @click.stop="patchBlock({ resetFilter: true })"
           >
             <q-tooltip>Bypass filter now</q-tooltip>
           </q-btn>
@@ -147,12 +129,7 @@ export default defineComponent({
         label="Sensor Block"
         tag="span"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.sensorId = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ sensorId: v })"
       />
       <LabeledField
         label="Input for:"

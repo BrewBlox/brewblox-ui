@@ -9,12 +9,12 @@ export default defineComponent({
   name: 'DS2413Widget',
   setup() {
     const { context } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<DS2413Block>();
+    const { block, patchBlock } = useBlockWidget.setup<DS2413Block>();
 
     return {
       context,
       block,
-      saveBlock,
+      patchBlock,
     };
   },
 });
@@ -46,12 +46,7 @@ export default defineComponent({
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.address = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ address: v })"
           />
         </div>
       </template>

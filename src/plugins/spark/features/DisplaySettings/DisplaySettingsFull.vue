@@ -32,7 +32,7 @@ const validTypes: BlockOrIntfType[] = [
 export default defineComponent({
   name: 'DisplaySettingsFull',
   setup() {
-    const { serviceId, block, saveBlock } =
+    const { serviceId, block, patchBlock } =
       useBlockWidget.setup<DisplaySettingsBlock>();
 
     const slots = computed<(DisplaySlot | null)[]>(() => {
@@ -65,11 +65,9 @@ export default defineComponent({
     async function updateSlotLink(idx: number, link: Link): Promise<void> {
       const pos = idx + 1;
       if (!link.id) {
-        block.value.data.widgets = block.value.data.widgets.filter(
-          (w) => w.pos !== pos,
-        );
-        saveBlock();
-        return;
+        return patchBlock({
+          widgets: block.value.data.widgets.filter((w) => w.pos !== pos),
+        });
       }
 
       const { type } = link;
@@ -111,27 +109,30 @@ export default defineComponent({
         obj.pid = link;
       }
 
-      block.value.data.widgets = [
-        ...block.value.data.widgets.filter((w) => w.pos !== pos),
-        obj,
-      ];
-      saveBlock();
+      return patchBlock({
+        widgets: [
+          ...block.value.data.widgets.filter((w) => w.pos !== pos),
+          obj,
+        ],
+      });
     }
 
     function updateSlotName(idx: number, name: string): void {
       const pos = idx + 1;
-      block.value.data.widgets = block.value.data.widgets.map((w) =>
-        w.pos === pos ? { ...w, name } : w,
-      );
-      saveBlock();
+      patchBlock({
+        widgets: block.value.data.widgets.map((w) =>
+          w.pos === pos ? { ...w, name } : w,
+        ),
+      });
     }
 
     function updateSlotColor(idx: number, color: string): void {
       const pos = idx + 1;
-      block.value.data.widgets = block.value.data.widgets.map((w) =>
-        w.pos === pos ? { ...w, color: color.replace('#', '') } : w,
-      );
-      saveBlock();
+      patchBlock({
+        widgets: block.value.data.widgets.map((w) =>
+          w.pos === pos ? { ...w, color: color.replace('#', '') } : w,
+        ),
+      });
     }
 
     return {
@@ -140,7 +141,7 @@ export default defineComponent({
       validTypes,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       slots,
       slotLink,
       slotColor,
@@ -203,12 +204,7 @@ export default defineComponent({
           class="col-grow"
           label="Footer text"
           title="footer text"
-          @update:model-value="
-            (v) => {
-              block.data.name = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(v) => patchBlock({ name: v })"
         />
         <q-field
           label="Display brightness"
@@ -221,12 +217,7 @@ export default defineComponent({
             :model-value="block.data.brightness || 255"
             :min="20"
             :max="255"
-            @change="
-              (v) => {
-                block.data.brightness = v;
-                saveBlock();
-              }
-            "
+            @change="(v) => patchBlock({ brightness: v })"
           />
         </q-field>
       </div>

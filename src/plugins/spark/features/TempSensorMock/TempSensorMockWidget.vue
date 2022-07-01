@@ -12,24 +12,30 @@ export default defineComponent({
   name: 'TempSensorMockWidget',
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<TempSensorMockBlock>();
+    const { block, patchBlock } = useBlockWidget.setup<TempSensorMockBlock>();
 
     function addFluctuation(): void {
-      block.value.data.fluctuations.push({
-        amplitude: deltaTempQty(1),
-        period: bloxQty('6h'),
+      patchBlock({
+        fluctuations: [
+          ...block.value.data.fluctuations,
+          {
+            amplitude: deltaTempQty(1),
+            period: bloxQty('6h'),
+          },
+        ],
       });
-      saveBlock();
     }
 
     function updateFluctuation(idx: number, fluct: Fluctuation): void {
-      block.value.data.fluctuations.splice(idx, 1, fluct);
-      saveBlock();
+      patchBlock({
+        fluctuations: [...block.value.data.fluctuations].splice(idx, 1, fluct),
+      });
     }
 
     function removeFluctuation(idx: number): void {
-      block.value.data.fluctuations.splice(idx, 1);
-      saveBlock();
+      patchBlock({
+        fluctuations: [...block.value.data.fluctuations].splice(idx, 1),
+      });
     }
 
     function editSetting(): void {
@@ -41,8 +47,7 @@ export default defineComponent({
           label: 'Setting',
         },
       }).onOk((v) => {
-        block.value.data.setting = v;
-        saveBlock();
+        patchBlock({ setting: v });
       });
     }
 
@@ -51,7 +56,7 @@ export default defineComponent({
       context,
       inDialog,
       block,
-      saveBlock,
+      patchBlock,
       addFluctuation,
       updateFluctuation,
       removeFluctuation,
@@ -103,12 +108,7 @@ export default defineComponent({
             dense
             :model-value="block.data.connected"
             class="q-pl-md"
-            @update:model-value="
-              (v) => {
-                block.data.connected = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ connected: v })"
           />
         </LabeledField>
         <div class="text-h6 text-italic q-pl-sm">Fluctuations</div>

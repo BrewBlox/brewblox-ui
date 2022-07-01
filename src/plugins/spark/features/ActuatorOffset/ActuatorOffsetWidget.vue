@@ -4,7 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
-import { Link } from '@/shared-types';
+import { AnalogConstraintsObj, Link } from '@/shared-types';
 import { fixedNumber, prettyLink } from '@/utils/formatting';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
@@ -16,24 +16,38 @@ export default defineComponent({
   name: 'ActuatorOffsetWidget',
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { serviceId, block, saveBlock, isDriven } =
+    const { serviceId, block, patchBlock, isDriven } =
       useBlockWidget.setup<ActuatorOffsetBlock>();
 
-    function enable(): void {
-      block.value.data.enabled = true;
-      saveBlock();
-    }
+    const target = computed<Link>({
+      get: () => block.value.data.targetId,
+      set: (v) => patchBlock({ targetId: v }),
+    });
 
-    const target = computed<Link>(() => block.value.data.targetId);
+    const reference = computed<Link>({
+      get: () => block.value.data.referenceId,
+      set: (v) => patchBlock({ referenceId: v }),
+    });
 
-    const reference = computed<Link>(() => block.value.data.referenceId);
+    const refKind = computed<ReferenceKind>({
+      get: () => block.value.data.referenceSettingOrValue,
+      set: (v) => patchBlock({ referenceSettingOrValue: v }),
+    });
 
-    const refKind = computed<string>(
+    const refKindLabel = computed<string>(
       () =>
-        referenceOpts.find(
-          (v) => v.value === block.value.data.referenceSettingOrValue,
-        )?.label ?? '???',
+        referenceOpts.find((v) => v.value === refKind.value)?.label ?? '???',
     );
+
+    const desiredSetting = computed<number>({
+      get: () => block.value.data.desiredSetting,
+      set: (v) => patchBlock({ desiredSetting: v }),
+    });
+
+    const constrainedBy = computed<AnalogConstraintsObj>({
+      get: () => block.value.data.constrainedBy,
+      set: (v) => patchBlock({ constrainedBy: v }),
+    });
 
     const isLimited = computed<boolean>(() => {
       const { enabled, desiredSetting, setting } = block.value.data;
@@ -49,12 +63,13 @@ export default defineComponent({
       inDialog,
       serviceId,
       block,
-      saveBlock,
       isDriven,
-      enable,
       target,
       reference,
       refKind,
+      refKindLabel,
+      desiredSetting,
+      constrainedBy,
       isLimited,
     };
   },
@@ -85,7 +100,7 @@ export default defineComponent({
       <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
         <template #enabled>
           Driver is enabled and driving <i> {{ prettyLink(target) }} </i>, based
-          on the {{ refKind }} of <i> {{ prettyLink(reference) }} </i>.
+          on the {{ refKindLabel }} of <i> {{ prettyLink(reference) }} </i>.
         </template>
         <template #disabled>
           Driver is disabled and not driving <i> {{ prettyLink(target) }} </i>.
@@ -94,20 +109,14 @@ export default defineComponent({
 
       <div class="widget-body row">
         <InputField
+          v-model="desiredSetting"
           :readonly="isDriven"
-          :model-value="block.data.desiredSetting"
           tag="big"
           title="Desired offset"
           label="Desired offset"
           type="number"
           class="col-grow"
           tag-class="text-primary"
-          @update:model-value="
-            (v) => {
-              block.data.desiredSetting = v;
-              saveBlock();
-            }
-          "
         />
         <LabeledField
           :model-value="block.data.setting"
@@ -130,43 +139,25 @@ export default defineComponent({
           <div class="col-break" />
 
           <LinkField
-            :model-value="block.data.targetId"
+            v-model="target"
             :service-id="serviceId"
             title="Driven block"
             label="Driven block"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.targetId = v;
-                saveBlock();
-              }
-            "
           />
           <LinkField
-            :model-value="block.data.referenceId"
+            v-model="reference"
             :service-id="serviceId"
             title="Reference block"
             label="Reference block"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.referenceId = v;
-                saveBlock();
-              }
-            "
           />
           <SelectField
-            :model-value="block.data.referenceSettingOrValue"
+            v-model="refKind"
             :options="referenceOpts"
             title="Reference field"
             label="Reference field"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.referenceSettingOrValue = v;
-                saveBlock();
-              }
-            "
           />
         </template>
 
@@ -178,16 +169,10 @@ export default defineComponent({
           class="col-grow"
         />
         <ConstraintsField
-          :model-value="block.data.constrainedBy"
+          v-model="constrainedBy"
           :service-id="serviceId"
           type="analog"
           class="col-grow"
-          @update:model-value="
-            (v) => {
-              block.data.constrainedBy = v;
-              saveBlock();
-            }
-          "
         />
       </div>
     </div>

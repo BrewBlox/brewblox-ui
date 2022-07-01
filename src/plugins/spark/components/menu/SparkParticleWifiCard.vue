@@ -59,7 +59,7 @@ export default defineComponent({
     async function save(): Promise<void> {
       busy.value = true;
       await sparkStore
-        .saveBlock({ ...block.value, data: values })
+        .patchBlock(block.value, values)
         .then(() => notify.done('Wifi settings updated!'))
         .finally(() => (busy.value = false));
     }

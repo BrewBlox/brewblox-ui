@@ -34,7 +34,7 @@ export default defineComponent({
   name: 'MotorValveFull',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block, saveBlock, limitations, isDriven } =
+    const { serviceId, block, patchBlock, limitations, isDriven } =
       useBlockWidget.setup<MotorValveBlock>();
 
     const hwBlock = computed<DS2408Block | null>(() =>
@@ -75,17 +75,15 @@ export default defineComponent({
           serviceId,
           claim.driverId,
         )!;
-        driver.data.startChannel = 0;
-        await sparkStore.saveBlock(driver);
+        await sparkStore.patchBlock(driver, { startChannel: 0 });
       }
-      block.value.data.startChannel = channelId;
-      await saveBlock();
+      await patchBlock({ startChannel: channelId });
     }
 
     return {
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       limitations,
       isDriven,
       channelOpts,
@@ -110,11 +108,7 @@ export default defineComponent({
         label="Target DS2408 Chip"
         class="col-grow"
         @update:model-value="
-          (v) => {
-            block.data.hwDevice = v;
-            block.data.startChannel = 0;
-            saveBlock();
-          }
+          (v) => patchBlock({ hwDevice: v, startChannel: 0 })
         "
       />
       <SelectField
@@ -136,12 +130,7 @@ export default defineComponent({
           :pending="block.data.state !== block.data.desiredState"
           :pending-reason="limitations"
           :disable="isDriven"
-          @update:model-value="
-            (v) => {
-              block.data.desiredState = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(v) => patchBlock({ desiredState: v })"
         />
       </LabeledField>
       <LabeledField
@@ -160,12 +149,7 @@ export default defineComponent({
         :service-id="serviceId"
         type="digital"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.constrainedBy = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ constrainedBy: v })"
       />
     </div>
   </div>

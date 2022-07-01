@@ -29,7 +29,7 @@ export default defineComponent({
   },
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<SetpointProfileBlock>();
+    const { block, patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
     const usedData = ref<SetpointProfileData>(deepCopy(block.value.data));
     const revision = ref<Date>(new Date());
@@ -47,8 +47,7 @@ export default defineComponent({
 
     function changeEnabled(enabled: boolean): void {
       if (enabled) {
-        block.value.data.enabled = enabled;
-        saveBlock();
+        patchBlock({ enabled });
       } else {
         createDialog({
           component: SetpointProfileDisableDialog,

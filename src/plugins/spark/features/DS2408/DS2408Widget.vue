@@ -25,7 +25,8 @@ export default defineComponent({
   setup() {
     const sparkStore = useSparkStore();
     const { context } = useContext.setup();
-    const { serviceId, block, saveBlock } = useBlockWidget.setup<DS2408Block>();
+    const { serviceId, block, patchBlock } =
+      useBlockWidget.setup<DS2408Block>();
 
     const valveMode = computed<boolean>(
       () => block.value.data.connectMode === DS2408ConnectMode.CONNECT_VALVE,
@@ -55,17 +56,16 @@ export default defineComponent({
             message,
             saveFunc: () =>
               linked.forEach((block) => {
-                block.data.hwDevice.id = null;
-                sparkStore.saveBlock(block);
+                sparkStore.patchBlock(block, {
+                  hwDevice: { ...block.data.hwDevice, id: null },
+                });
               }),
           },
         }).onOk(() => {
-          block.value.data.connectMode = mode;
-          saveBlock();
+          patchBlock({ connectMode: mode });
         });
       } else {
-        block.value.data.connectMode = mode;
-        saveBlock();
+        patchBlock({ connectMode: mode });
       }
     }
 
@@ -73,7 +73,7 @@ export default defineComponent({
       connectModeOpts,
       context,
       block,
-      saveBlock,
+      patchBlock,
       valveMode,
       setConnectMode,
     };
@@ -117,12 +117,7 @@ export default defineComponent({
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.address = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ address: v })"
           />
         </div>
       </template>

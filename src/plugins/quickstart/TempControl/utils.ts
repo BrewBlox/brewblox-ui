@@ -66,14 +66,13 @@ function linkStr(...blocks: (Block | Link)[]): string {
 
 function adjust<T extends Block>(
   block: T,
-  func: (v: T) => unknown,
+  func: (v: T) => Partial<T['data']>,
 ): () => Awaitable<unknown> {
   return () => {
     const sparkStore = useSparkStore();
     const actual = sparkStore.blockByAddress<T>(block);
     if (actual) {
-      func(actual);
-      return sparkStore.saveBlock(actual);
+      return sparkStore.patchBlock(actual, func(actual));
     }
   };
 }
@@ -158,13 +157,8 @@ export async function applyMode(
     throw new Error('No heat PID defined');
   }
 
-  setpoint.data.settingEnabled = false;
-  await sparkStore.saveBlock(setpoint);
-
-  if (profile) {
-    profile.data.targetId = bloxLink(setpoint.id);
-    await sparkStore.saveBlock(profile);
-  }
+  await sparkStore.patchBlock(setpoint, { settingEnabled: false });
+  await sparkStore.patchBlock(profile, { targetId: bloxLink(setpoint.id) });
 
   // Disable all blocks driving target setpoint
   await Promise.all(
@@ -172,28 +166,21 @@ export async function applyMode(
       .blocksByService(serviceId)
       .filter(isDriver)
       .filter((block) => block.data.targetId.id === setpoint.id)
-      .map((block) => {
-        block.data.enabled = false;
-        return sparkStore.saveBlock(block);
-      }),
+      .map((block) => sparkStore.patchBlock(block, { enabled: false })),
   );
 
   if (coolPid && mode.coolConfig) {
-    coolPid.data = {
-      ...coolPid.data,
+    await sparkStore.patchBlock(coolPid, {
       ...mode.coolConfig,
       inputId: mode.setpoint,
-    };
-    await sparkStore.saveBlock(coolPid);
+    });
   }
 
   if (heatPid && mode.heatConfig) {
-    heatPid.data = {
-      ...heatPid.data,
+    await sparkStore.patchBlock(heatPid, {
       ...mode.heatConfig,
       inputId: mode.setpoint,
-    };
-    await sparkStore.saveBlock(heatPid);
+    });
   }
 }
 
@@ -205,7 +192,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
   if (!pid.data.enabled) {
     issues.push({
       desc: `PID is disabled: ${linkStr(pid)}`,
-      autofix: adjust(pid, (block) => (block.data.enabled = true)),
+      autofix: adjust(pid, () => ({ enabled: true })),
     });
   }
 
@@ -231,7 +218,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (!analog.data.enabled) {
       issues.push({
         desc: `PWM is disabled: ${linkStr(pid, analog)}`,
-        autofix: adjust(analog, (block) => (block.data.enabled = true)),
+        autofix: adjust(analog, () => ({ enabled: true })),
       });
     }
 
@@ -291,7 +278,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (!analog.data.enabled) {
       issues.push({
         desc: `Setpoint Driver is disabled: ${linkStr(pid, analog)}`,
-        autofix: adjust(analog, (block) => (block.data.enabled = true)),
+        autofix: adjust(analog, () => ({ enabled: true })),
       });
     }
 
@@ -321,7 +308,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (reference.data.enabled === false) {
       issues.push({
         desc: `Reference block is disabled: ${linkStr(pid, analog, reference)}`,
-        autofix: adjust(reference, (block) => (block.data.enabled = true)),
+        autofix: adjust(reference, () => ({ enabled: true })),
       });
     }
 
@@ -347,7 +334,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (driven.data.enabled === false) {
       issues.push({
         desc: `Driven block is disabled: ${linkStr(pid, analog, driven)}`,
-        autofix: adjust(driven, (block) => (block.data.enabled = true)),
+        autofix: adjust(driven, () => ({ enabled: true })),
       });
     }
   }
@@ -457,19 +444,19 @@ export function findControlProblems(
   if (coolPid && !linkEq(setpointLink, coolSetpointLink)) {
     issues.push({
       desc: `Cool PID Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(coolPid, (block) => (block.data.inputId = setpointLink)),
+      autofix: adjust(coolPid, () => ({ inputId: setpointLink })),
     });
   }
   if (heatPid && !linkEq(setpointLink, heatSetpointLink)) {
     issues.push({
       desc: `Heat PID Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(heatPid, (block) => (block.data.inputId = setpointLink)),
+      autofix: adjust(heatPid, () => ({ inputId: setpointLink })),
     });
   }
   if (profile && !linkEq(setpointLink, profile.data.targetId)) {
     issues.push({
       desc: `Profile Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(profile, (block) => (block.data.targetId = setpointLink)),
+      autofix: adjust(profile, () => ({ targetId: setpointLink })),
     });
   }
 

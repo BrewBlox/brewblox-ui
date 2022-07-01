@@ -90,11 +90,12 @@ const blueprint: BuilderBlueprint = {
     } else if (driven) {
       showDrivingBlockDialog(part, PUMP_KEY, PUMP_TYPES);
     } else if (block.type === BlockType.DigitalActuator) {
-      block.data.desiredState =
-        block.data.state === DigitalState.STATE_ACTIVE
-          ? DigitalState.STATE_INACTIVE
-          : DigitalState.STATE_ACTIVE;
-      sparkStore.saveBlock(block);
+      sparkStore.patchBlock(block, {
+        desiredState:
+          block.data.state === DigitalState.STATE_ACTIVE
+            ? DigitalState.STATE_INACTIVE
+            : DigitalState.STATE_ACTIVE,
+      });
     } else if (block.type === BlockType.ActuatorPwm) {
       const limiterWarning = block.data.constrainedBy?.constraints.length
         ? 'The value may be limited by constraints'
@@ -113,8 +114,7 @@ const blueprint: BuilderBlueprint = {
           ],
         },
       }).onOk((value: number) => {
-        block.data.desiredSetting = value;
-        sparkStore.saveBlock(block);
+        sparkStore.patchBlock(block, { desiredSetting: value });
       });
     }
   },

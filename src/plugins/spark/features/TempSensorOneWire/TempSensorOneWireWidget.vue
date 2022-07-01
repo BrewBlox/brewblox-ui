@@ -12,7 +12,7 @@ export default defineComponent({
   name: 'TempSensorOneWireWidget',
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { serviceId, blockId, block, saveBlock } =
+    const { serviceId, blockId, block, patchBlock } =
       useBlockWidget.setup<TempSensorOneWireBlock>();
 
     const hasValue = computed<boolean>(
@@ -33,7 +33,7 @@ export default defineComponent({
       context,
       inDialog,
       block,
-      saveBlock,
+      patchBlock,
       hasValue,
       startSwap,
     };
@@ -93,24 +93,14 @@ export default defineComponent({
             title="Offset"
             label="Offset"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.offset = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ offset: v })"
           />
           <InputField
             :model-value="block.data.address"
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.address = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ address: v })"
           />
         </div>
       </template>

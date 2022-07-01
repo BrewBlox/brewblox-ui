@@ -20,7 +20,7 @@ export default defineComponent({
   setup() {
     const { context, inDialog } = useContext.setup();
 
-    const { serviceId, block, saveBlock, isDriven } =
+    const { serviceId, block, patchBlock, isDriven } =
       useBlockWidget.setup<ActuatorPwmBlock>();
 
     const outputLink = computed<Link>(() => block.value.data.actuatorId);
@@ -30,11 +30,6 @@ export default defineComponent({
         block.value.data.enabled &&
         block.value.data.setting !== block.value.data.desiredSetting,
     );
-
-    function updateSetting(value: number): void {
-      block.value.data.desiredSetting = value;
-      saveBlock();
-    }
 
     const pwmDesired = computed<number | null>(() => {
       const v = block.value.data.desiredSetting;
@@ -49,11 +44,10 @@ export default defineComponent({
       inDialog,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       isDriven,
       outputLink,
       isLimited,
-      updateSetting,
       pwmDesired,
     };
   },
@@ -96,7 +90,7 @@ export default defineComponent({
             <q-btn
               :label="q.label"
               unelevated
-              @click="updateSetting(q.value)"
+              @click="patchBlock({ desiredSetting: q.value })"
             />
           </div>
         </div>
@@ -109,7 +103,7 @@ export default defineComponent({
           class="col-grow q-mt-md q-mx-md'"
           label-always
           color="primary"
-          @change="updateSetting"
+          @change="(v) => patchBlock({ desiredSetting: v })"
         />
         <div
           v-else
@@ -146,12 +140,7 @@ export default defineComponent({
           :service-id="serviceId"
           type="analog"
           class="col-grow"
-          @update:model-value="
-            (v) => {
-              block.data.constrainedBy = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(v) => patchBlock({ constrainedBy: v })"
         />
       </div>
 
@@ -165,12 +154,7 @@ export default defineComponent({
             label="Period"
             tag="big"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.period = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ period: v })"
           />
           <LinkField
             :model-value="block.data.actuatorId"
@@ -178,12 +162,7 @@ export default defineComponent({
             title="target"
             label="Digital Actuator Target"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.actuatorId = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ actuatorId: v })"
           />
         </div>
       </template>

@@ -22,7 +22,7 @@ interface DisplaySetpoint {
 export default defineComponent({
   name: 'SetpointProfileFull',
   setup() {
-    const { serviceId, block, saveBlock } =
+    const { serviceId, block, patchBlock } =
       useBlockWidget.setup<SetpointProfileBlock>();
 
     const start = computed<number>(() => (block.value.data.start || 0) * 1000);
@@ -38,13 +38,14 @@ export default defineComponent({
     );
 
     function savePoints(pts: DisplaySetpoint[] = points.value): void {
-      block.value.data.points = [...pts]
-        .sort(makeObjectSorter('offsetMs'))
-        .map((point: DisplaySetpoint) => ({
-          time: point.offsetMs / 1000,
-          temperature: point.temperature,
-        }));
-      saveBlock();
+      patchBlock({
+        points: [...pts]
+          .sort(makeObjectSorter('offsetMs'))
+          .map((point: DisplaySetpoint) => ({
+            time: point.offsetMs / 1000,
+            temperature: point.temperature,
+          })),
+      });
     }
 
     function defaultPoint(): DisplaySetpoint {
@@ -70,8 +71,7 @@ export default defineComponent({
     }
 
     function updateStartTime(startDate: Date): void {
-      block.value.data.start = startDate.getTime() / 1000;
-      saveBlock();
+      patchBlock({ start: startDate.getTime() / 1000 });
     }
 
     function notifyInvalidTime(): void {
@@ -199,7 +199,7 @@ export default defineComponent({
       bloxQty,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       start,
       updateStartTime,
       points,
@@ -236,12 +236,7 @@ export default defineComponent({
         label="Driven Setpoint"
         title="Driven Setpoint/Sensor pair"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.targetId = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ targetId: v })"
       />
 
       <div class="col-break" />
