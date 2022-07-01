@@ -7,13 +7,13 @@ import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
 export default defineComponent({
   name: 'ActuatorAnalogMockFull',
   setup() {
-    const { serviceId, block, saveBlock, isDriven } =
+    const { serviceId, block, patchBlock, isDriven } =
       useBlockWidget.setup<ActuatorAnalogMockBlock>();
 
     return {
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       isDriven,
     };
   },
@@ -33,12 +33,7 @@ export default defineComponent({
         title="Target"
         tag="big"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.desiredSetting = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ desiredSetting: v })"
       />
       <InputField
         :model-value="block.data.minSetting"
@@ -47,12 +42,7 @@ export default defineComponent({
         type="number"
         tag="big"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.minSetting = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ minSetting: v })"
       />
       <InputField
         :model-value="block.data.maxSetting"
@@ -61,12 +51,7 @@ export default defineComponent({
         label="Clip to max"
         tag="big"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.maxSetting = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ maxSetting: v })"
       />
       <div class="col-break" />
       <LabeledField
@@ -83,12 +68,7 @@ export default defineComponent({
         label="Clip to min"
         tag="big"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.minValue = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ minValue: v })"
       />
       <InputField
         :model-value="block.data.maxValue"
@@ -97,12 +77,7 @@ export default defineComponent({
         label="Clip to max"
         tag="big"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.maxValue = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ maxValue: v })"
       />
       <div class="col-break" />
       <DrivenIndicator
@@ -115,12 +90,7 @@ export default defineComponent({
         :service-id="serviceId"
         type="analog"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.constrainedBy = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ constrainedBy: v })"
       />
     </div>
   </div>

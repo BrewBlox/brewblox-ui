@@ -56,8 +56,7 @@ export default defineComponent({
         const { field } = config.value.addr;
         const block = sparkStore.blockByAddress(config.value.addr);
         if (block && field) {
-          block.data[field] = appliedValue(value);
-          sparkStore.saveBlock(block);
+          sparkStore.patchBlock(block, { [field]: appliedValue(value) });
         }
       },
       300,

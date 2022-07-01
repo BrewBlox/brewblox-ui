@@ -20,6 +20,7 @@ import {
   PidConfig,
   QuickstartAction,
   QuickstartConfig,
+  QuickstartPatch,
 } from './types';
 
 const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
@@ -45,7 +46,7 @@ export function resetGpioChanges(serviceId: string): GpioChange[] {
 export function unlinkedActuators(
   serviceId: string,
   channels: IoChannelAddress[],
-): DigitalActuatorBlock[] {
+): QuickstartPatch<DigitalActuatorBlock>[] {
   return (
     useSparkStore()
       .blocksByService(serviceId)
@@ -59,30 +60,21 @@ export function unlinkedActuators(
         ),
       )
       // Unlink them from channel
-      .map((block) => {
-        block.data.channel = 0;
-        return block;
-      })
+      .map((block) => ({
+        blockId: block.id,
+        patch: { channel: 0 },
+      }))
   );
 }
 
 export function changedIoModules(
   serviceId: string,
   changes: GpioChange[],
-): OneWireGpioModuleBlock[] {
-  const sparkStore = useSparkStore();
-  return changes
-    .map((change) => {
-      const block = sparkStore.blockById<OneWireGpioModuleBlock>(
-        serviceId,
-        change.blockId,
-      );
-      if (block) {
-        block.data.channels = change.channels;
-      }
-      return block;
-    })
-    .filter(nullFilter);
+): QuickstartPatch<OneWireGpioModuleBlock>[] {
+  return changes.map((change) => {
+    const { blockId, channels } = change;
+    return { blockId, patch: { channels } };
+  });
 }
 
 export function createOutputActions(): QuickstartAction[] {
@@ -109,7 +101,12 @@ export function createOutputActions(): QuickstartAction[] {
     // Change blocks
     async (config: QuickstartConfig) => {
       await Promise.all(
-        config.changedBlocks.map((block) => sparkStore.saveBlock(block)),
+        config.changedBlocks.map((change) =>
+          sparkStore.patchBlock(
+            sparkStore.blockById(config.serviceId, change.blockId),
+            change.patch,
+          ),
+        ),
       );
     },
 

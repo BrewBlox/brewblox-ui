@@ -17,22 +17,16 @@ export default defineComponent({
   },
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { widgetId, block, saveBlock } =
-      useBlockWidget.setup<ActuatorLogicBlock>();
-
-    function enable(): void {
-      block.value.data.enabled = true;
-      saveBlock();
-    }
+    const { widgetId, block } = useBlockWidget.setup<ActuatorLogicBlock>();
 
     const target = computed<Link>(() => block.value.data.targetId);
+
     return {
       prettyLink,
       context,
       inDialog,
       widgetId,
       block,
-      enable,
       target,
     };
   },

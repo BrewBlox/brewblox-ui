@@ -70,14 +70,25 @@ export default defineComponent({
       if (valid.value && leftBlock.value && rightBlock.value) {
         const leftData = leftBlock.value.data;
         const rightData = rightBlock.value.data;
-        const addresses = [leftData.address, rightData.address];
-        const busIds = [leftData.oneWireBusId, rightData.oneWireBusId];
-        leftData.address = addresses[1];
-        leftData.oneWireBusId = busIds[1];
-        rightData.address = addresses[0];
-        rightData.oneWireBusId = busIds[0];
-        sparkStore.saveBlock(leftBlock.value);
-        sparkStore.saveBlock(rightBlock.value);
+
+        const [leftAddress, rightAddress] = [
+          leftData.address,
+          rightData.address,
+        ];
+        const [leftBusId, rightBusId] = [
+          leftData.oneWireBusId,
+          rightData.oneWireBusId,
+        ];
+
+        sparkStore.patchBlock(leftBlock.value, {
+          address: rightAddress,
+          oneWireBusId: rightBusId,
+        });
+        sparkStore.patchBlock(rightBlock.value, {
+          address: leftAddress,
+          oneWireBusId: leftBusId,
+        });
+
         onDialogOK();
       }
     }

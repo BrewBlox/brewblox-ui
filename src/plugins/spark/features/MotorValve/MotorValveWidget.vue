@@ -31,10 +31,7 @@ export default defineComponent({
     );
 
     function enable12V(): void {
-      if (spark3Pins.value) {
-        spark3Pins.value.data.enableIoSupply12V = true;
-        sparkStore.saveBlock(spark3Pins.value);
-      }
+      sparkStore.patchBlock(spark3Pins.value, { enableIoSupply12V: true });
     }
 
     return {

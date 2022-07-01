@@ -52,9 +52,9 @@ export default defineComponent({
 
     function save(): void {
       if (block) {
-        sparkStore.modifyBlock(block, (actual) => {
-          actual.data.settingEnabled = enabled.value;
-          actual.data.storedSetting = setting.value;
+        sparkStore.patchBlock(block, {
+          settingEnabled: enabled.value,
+          storedSetting: setting.value,
         });
         onDialogOK();
       }

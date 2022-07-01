@@ -12,6 +12,18 @@ import { durationString } from './quantity';
 type DateCompatible = Date | number | string;
 
 /**
+ * Converts generic value to string.
+ *
+ * Null and undefined values are replaced with the nullLabel param.
+ *
+ * @param value
+ * @param nullLabel
+ */
+export function nonNullString(value: unknown, nullLabel = ''): string {
+  return `${value ?? nullLabel}`;
+}
+
+/**
  * Converts date-compatible value to date/time string.
  *
  * "date-compatible" is defined as "valid argument for `new Date()`"

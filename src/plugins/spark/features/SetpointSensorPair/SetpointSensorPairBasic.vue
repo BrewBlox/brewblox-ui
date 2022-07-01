@@ -9,7 +9,7 @@ import { prettyQty } from '@/utils/formatting';
 export default defineComponent({
   name: 'SetpointSensorPairBasic',
   setup() {
-    const { serviceId, block, saveBlock, isDriven } =
+    const { serviceId, block, patchBlock, isDriven } =
       useBlockWidget.setup<SetpointSensorPairBlock>();
 
     function editSetting(): void {
@@ -24,8 +24,7 @@ export default defineComponent({
           modelValue: block.value.data.storedSetting,
         },
       }).onOk((v) => {
-        block.value.data.storedSetting = v;
-        saveBlock();
+        patchBlock({ storedSetting: v });
       });
     }
 

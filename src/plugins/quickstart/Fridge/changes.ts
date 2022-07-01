@@ -21,7 +21,7 @@ import { bloxLink } from '@/utils/link';
 import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock } from '../types';
+import { DisplayBlock, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   makeFridgeCoolConfig,
@@ -33,7 +33,9 @@ import {
 } from '../utils';
 import { FridgeConfig } from './types';
 
-export function defineChangedBlocks(config: FridgeConfig): Block[] {
+export function defineChangedBlocks(
+  config: FridgeConfig,
+): QuickstartPatch<Block>[] {
   const channels = [config.heatChannel, config.coolChannel];
   return [
     ...unlinkedActuators(config.serviceId, channels),

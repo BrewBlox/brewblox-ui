@@ -41,7 +41,7 @@ export default defineComponent({
   setup() {
     const sparkStore = useSparkStore();
     const { inDialog, context } = useContext.setup();
-    const { serviceId, block, saveBlock, isDriven, limitations } =
+    const { serviceId, block, patchBlock, isDriven, limitations } =
       useBlockWidget.setup<DigitalActuatorBlock>();
 
     const hwBlock = computed<IoArrayBlock | null>(() =>
@@ -87,11 +87,9 @@ export default defineComponent({
           serviceId,
           claim.driverId,
         )!;
-        driver.data.channel = 0;
-        await sparkStore.saveBlock(driver);
+        await sparkStore.patchBlock(driver, { channel: 0 });
       }
-      block.value.data.channel = channelId;
-      await saveBlock();
+      await patchBlock({ channel: channelId });
     }
 
     return {
@@ -99,7 +97,7 @@ export default defineComponent({
       context,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       isDriven,
       limitations,
       channelOpts,
@@ -139,12 +137,7 @@ export default defineComponent({
             :disable="isDriven"
             dense
             class="col-auto"
-            @update:model-value="
-              (v) => {
-                block.data.desiredState = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ desiredState: v })"
           />
         </LabeledField>
 
@@ -160,11 +153,11 @@ export default defineComponent({
             label="Target Pin Array"
             class="col-grow"
             @update:model-value="
-              (v) => {
-                block.data.hwDevice = v;
-                block.data.channel = 0;
-                saveBlock();
-              }
+              (v) =>
+                patchBlock({
+                  hwDevice: v,
+                  channel: 0,
+                })
             "
           />
           <SelectField
@@ -183,12 +176,7 @@ export default defineComponent({
             <q-toggle
               :model-value="block.data.invert"
               dense
-              @update:model-value="
-                (v) => {
-                  block.data.invert = v;
-                  saveBlock();
-                }
-              "
+              @update:model-value="(v) => patchBlock({ invert: v })"
             />
           </LabeledField>
         </template>
@@ -205,12 +193,7 @@ export default defineComponent({
           :service-id="serviceId"
           type="digital"
           class="col-grow"
-          @update:model-value="
-            (v) => {
-              block.data.constrainedBy = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(v) => patchBlock({ constrainedBy: v })"
         />
       </div>
     </div>

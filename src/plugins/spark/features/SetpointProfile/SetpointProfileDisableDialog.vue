@@ -39,8 +39,7 @@ export default defineComponent({
     );
 
     if (!setpoint) {
-      profile.data.enabled = false;
-      sparkStore.saveBlock(profile);
+      sparkStore.patchBlock(profile, { enabled: false });
       onDialogOK();
     }
 
@@ -66,13 +65,13 @@ export default defineComponent({
     }
 
     function confirm(): void {
-      if (setpoint) {
-        sparkStore.modifyBlock(setpoint, (block) => {
-          block.data.settingEnabled = setpointEnabled.value;
-          block.data.storedSetting = setpointSetting.value;
-        });
-      }
-      sparkStore.modifyBlock(profile, (block) => (block.data.enabled = false));
+      sparkStore.patchBlock(setpoint, {
+        settingEnabled: setpointEnabled.value,
+        storedSetting: setpointSetting.value,
+      });
+      sparkStore.patchBlock(profile, {
+        enabled: false,
+      });
       onDialogOK();
     }
 

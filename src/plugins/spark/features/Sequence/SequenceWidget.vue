@@ -191,7 +191,9 @@ export default defineComponent({
     watch(activeInstruction, (idx: number) => {
       if (!editing.value && idx >= 0 && idx < numInstructions.value) {
         view.dispatch({
-          effects: [EditorView.scrollIntoView(view.state.doc.line(idx + 1).from)],
+          effects: [
+            EditorView.scrollIntoView(view.state.doc.line(idx + 1).from),
+          ],
         });
       } else {
         view.dispatch();

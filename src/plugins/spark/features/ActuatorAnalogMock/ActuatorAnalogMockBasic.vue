@@ -7,14 +7,14 @@ import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
 export default defineComponent({
   name: 'ActuatorAnalogMockBasic',
   setup() {
-    const { serviceId, block, isDriven, saveBlock } =
+    const { serviceId, block, isDriven, patchBlock } =
       useBlockWidget.setup<ActuatorAnalogMockBlock>();
 
     return {
       serviceId,
       block,
       isDriven,
-      saveBlock,
+      patchBlock,
     };
   },
 });
@@ -35,12 +35,7 @@ export default defineComponent({
         :tag-class="{
           'text-orange': block.data.setting !== block.data.desiredSetting,
         }"
-        @update:model-value="
-          (v) => {
-            block.data.desiredSetting = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ desiredSetting: v })"
       />
       <LabeledField
         :model-value="block.data.value"
@@ -60,12 +55,7 @@ export default defineComponent({
         :service-id="serviceId"
         type="analog"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.constrainedBy = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ constrainedBy: v })"
       />
     </div>
   </div>

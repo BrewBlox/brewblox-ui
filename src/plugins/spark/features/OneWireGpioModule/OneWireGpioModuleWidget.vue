@@ -11,7 +11,8 @@ export default defineComponent({
   name: 'OneWireGpioModuleWidget',
   setup() {
     const { context } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<OneWireGpioModuleBlock>();
+    const { block, patchBlock } =
+      useBlockWidget.setup<OneWireGpioModuleBlock>();
 
     const power = computed<boolean>({
       get: () => block.value.data.useExternalPower,
@@ -28,18 +29,14 @@ export default defineComponent({
             },
           }));
         if (ok) {
-          block.value.data.useExternalPower = useExternalPower;
-          saveBlock();
+          patchBlock({ useExternalPower });
         }
       },
     });
 
     const channels = computed<GpioModuleChannel[]>({
       get: () => block.value.data.channels,
-      set: (channels) => {
-        block.value.data.channels = channels;
-        saveBlock();
-      },
+      set: (channels) => patchBlock({ channels }),
     });
 
     return {

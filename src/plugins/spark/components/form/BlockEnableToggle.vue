@@ -21,7 +21,7 @@ export default defineComponent({
   },
   emits: ['change'],
   setup(props, { emit }) {
-    const { block, saveBlock } = useBlockWidget.setup();
+    const { block, patchBlock } = useBlockWidget.setup();
 
     const enabled = computed<boolean>(() =>
       Boolean(block.value?.data[props.dataKey]),
@@ -31,8 +31,7 @@ export default defineComponent({
       if (props.emitToggle) {
         emit('change', !enabled.value);
       } else {
-        block.value.data[props.dataKey] = !enabled.value;
-        saveBlock();
+        patchBlock({ [props.dataKey]: !enabled.value });
       }
     }
 

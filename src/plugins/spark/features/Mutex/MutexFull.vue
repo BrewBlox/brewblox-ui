@@ -7,11 +7,11 @@ import { MutexBlock } from '@/plugins/spark/types';
 export default defineComponent({
   name: 'MutexFull',
   setup() {
-    const { block, saveBlock } = useBlockWidget.setup<MutexBlock>();
+    const { block, patchBlock } = useBlockWidget.setup<MutexBlock>();
 
     return {
       block,
-      saveBlock,
+      patchBlock,
     };
   },
 });
@@ -62,10 +62,7 @@ export default defineComponent({
             title="Extra lock time"
             label="Extra lock time after an actuator turns off"
             @update:model-value="
-              (v) => {
-                block.data.differentActuatorWait = v;
-                saveBlock();
-              }
+              (v) => patchBlock({ differentActuatorWait: v })
             "
           />
         </q-item-section>

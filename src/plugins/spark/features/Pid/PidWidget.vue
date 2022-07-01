@@ -19,16 +19,11 @@ export default defineComponent({
   },
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<PidBlock>();
+    const { block } = useBlockWidget.setup<PidBlock>();
 
     const inputLink = computed<Link>(() => block.value.data.inputId);
 
     const outputLink = computed<Link>(() => block.value.data.outputId);
-
-    function enable(): void {
-      block.value.data.enabled = true;
-      saveBlock();
-    }
 
     function showRelations(): void {
       startRelationsDialog(block.value);
@@ -41,7 +36,6 @@ export default defineComponent({
       block,
       inputLink,
       outputLink,
-      enable,
       showRelations,
     };
   },

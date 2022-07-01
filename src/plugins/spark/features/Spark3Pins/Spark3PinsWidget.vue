@@ -10,12 +10,13 @@ export default defineComponent({
   name: 'Spark3PinsWidget',
   setup() {
     const { context } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<Spark3PinsBlock>();
+    const { block, patchBlock } = useBlockWidget.setup<Spark3PinsBlock>();
+
     return {
       fixedNumber,
       context,
       block,
-      saveBlock,
+      patchBlock,
     };
   },
 });
@@ -44,12 +45,7 @@ export default defineComponent({
           <q-toggle
             :model-value="block.data.enableIoSupply5V"
             dense
-            @update:model-value="
-              (v) => {
-                block.data.enableIoSupply5V = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ enableIoSupply5V: v })"
           />
         </LabeledField>
         <LabeledField
@@ -59,12 +55,7 @@ export default defineComponent({
           <q-toggle
             :model-value="block.data.enableIoSupply12V"
             dense
-            @update:model-value="
-              (v) => {
-                block.data.enableIoSupply12V = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ enableIoSupply12V: v })"
           />
         </LabeledField>
 

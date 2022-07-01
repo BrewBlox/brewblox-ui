@@ -154,10 +154,7 @@ export default defineComponent({
         actualChanges.push([block, actualData]);
       }
       for (const [block, actualData] of actualChanges) {
-        await sparkStore.saveBlock({
-          ...block,
-          data: { ...block.data, ...actualData },
-        });
+        await sparkStore.patchBlock(block, actualData);
       }
       action.changes = action.changes.map((change, idx) => ({
         ...change,

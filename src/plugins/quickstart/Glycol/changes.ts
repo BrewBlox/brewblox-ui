@@ -27,7 +27,7 @@ import {
 } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock, PidConfig } from '../types';
+import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
@@ -55,7 +55,9 @@ const makeGlycolConfig = (): PidConfig => ({
   td: bloxQty('5m'),
 });
 
-export function defineChangedBlocks(config: GlycolConfig): Block[] {
+export function defineChangedBlocks(
+  config: GlycolConfig,
+): QuickstartPatch<Block>[] {
   const channels = config.heated
     ? [config.heatChannel!, config.coolChannel]
     : [config.coolChannel];

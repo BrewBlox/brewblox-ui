@@ -26,7 +26,7 @@ export default defineComponent({
   name: 'PidFull',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block, saveBlock } = useBlockWidget.setup<PidBlock>();
+    const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();
 
     const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
       sparkStore.blockByLink(serviceId, block.value.data.inputId),
@@ -40,8 +40,7 @@ export default defineComponent({
       get: () => inputBlock.value?.data.storedSetting ?? null,
       set: (q) => {
         if (inputBlock.value && q) {
-          inputBlock.value.data.storedSetting = q;
-          sparkStore.saveBlock(inputBlock.value);
+          sparkStore.patchBlock(inputBlock.value, { storedSetting: q });
         }
       },
     });
@@ -82,8 +81,7 @@ export default defineComponent({
         } else {
           qty.value = 0;
         }
-        block.value.data.boilPointAdjust = qty;
-        saveBlock();
+        patchBlock({ boilPointAdjust: qty });
       },
     });
 
@@ -96,8 +94,7 @@ export default defineComponent({
         const numV = offsetOutput.value
           ? bloxQty(qty).to('degC').value
           : qty.value;
-        block.value.data.boilMinOutput = numV ?? 0;
-        saveBlock();
+        patchBlock({ boilMinOutput: numV ?? 0 });
       },
     });
 
@@ -122,7 +119,7 @@ export default defineComponent({
       fixedNumber,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       inputBlock,
       inputDriven,
       inputStoredSetting,
@@ -163,12 +160,7 @@ export default defineComponent({
               <p>The input target minus the input value is called the error</p>
               "
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.inputId = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ inputId: v })"
       />
       <div class="col-grow">
         <QuantityField
@@ -233,12 +225,7 @@ export default defineComponent({
               </p>
               "
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.outputId = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ outputId: v })"
       />
       <LabeledField
         :model-value="block.data.outputSetting"
@@ -299,12 +286,7 @@ export default defineComponent({
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
               "
           borderless
-          @update:model-value="
-            (v) => {
-              block.data.kp = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(kp) => patchBlock({ kp })"
         />
       </div>
 
@@ -374,12 +356,7 @@ export default defineComponent({
               <p>Setting Ti to zero will disable the integrator.</p>
               "
           borderless
-          @update:model-value="
-            (v) => {
-              block.data.ti = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(ti) => patchBlock({ ti })"
         />
       </div>
 
@@ -403,12 +380,7 @@ export default defineComponent({
               </p>
               "
           borderless
-          @update:model-value="
-            (v) => {
-              block.data.integralReset = v || 0.001;
-              saveBlock();
-            }
-          "
+          @update:model-value="(v) => patchBlock({ integralReset: v || 0.001 })"
         />
       </div>
 
@@ -464,12 +436,7 @@ export default defineComponent({
               </p>
               "
           borderless
-          @update:model-value="
-            (v) => {
-              block.data.td = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(td) => patchBlock({ td })"
         />
       </div>
 

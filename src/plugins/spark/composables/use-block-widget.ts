@@ -32,8 +32,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   blockSpec: ComputedRef<BlockSpec<BlockT>>;
   isVolatileBlock: ComputedRef<boolean>;
 
-  saveBlock(block?: BlockT): Promise<void>;
-  patchBlock(data: Partial<BlockT['data']>);
+  patchBlock(data: Partial<BlockT['data']>): Promise<void>;
 
   hasGraph: boolean;
   isDriven: ComputedRef<boolean>;
@@ -102,10 +101,6 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       isBlockVolatile(block.value),
     );
 
-    async function saveBlock(v: BlockT = block.value): Promise<void> {
-      await sparkStore.saveBlock(v);
-    }
-
     async function patchBlock(data: Partial<BlockT['data']>): Promise<void> {
       await sparkStore.patchBlock(block.value, data);
     }
@@ -152,7 +147,6 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       block,
       blockSpec,
       isVolatileBlock,
-      saveBlock,
       patchBlock,
       limitations,
       graphConfig,

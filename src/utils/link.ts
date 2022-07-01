@@ -81,6 +81,11 @@ export class JSLink implements Link {
       isLink(other) && this.id === other.id && !!this.driven === !!other.driven
     );
   }
+
+  public withId(id: string | null): JSLink {
+    this.id = id;
+    return this;
+  }
 }
 
 /**

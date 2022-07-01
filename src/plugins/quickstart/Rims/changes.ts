@@ -29,7 +29,7 @@ import {
   tempQty,
 } from '@/utils/quantity';
 
-import { DisplayBlock } from '../types';
+import { DisplayBlock, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
@@ -39,7 +39,9 @@ import {
 } from '../utils';
 import { RimsConfig } from './types';
 
-export function defineChangedBlocks(config: RimsConfig): Block[] {
+export function defineChangedBlocks(
+  config: RimsConfig,
+): QuickstartPatch<Block>[] {
   return [
     ...unlinkedActuators(config.serviceId, [
       config.tubeChannel,

@@ -75,10 +75,7 @@ export default defineComponent({
         return value ?? tempQty(null);
       },
       set: (value) => {
-        if (setpoint.value) {
-          setpoint.value.data.storedSetting = value;
-          sparkStore.saveBlock(setpoint.value);
-        }
+        sparkStore.patchBlock(setpoint.value, { storedSetting: value });
       },
     });
 
@@ -99,8 +96,7 @@ export default defineComponent({
         }
 
         if (!value) {
-          profile.value.data.enabled = false;
-          sparkStore.saveBlock(profile.value);
+          sparkStore.patchBlock(profile.value, { enabled: false });
           return;
         }
 
@@ -120,14 +116,14 @@ export default defineComponent({
           if (!profile.value || !setpoint.value) {
             return;
           }
-          if (reset) {
-            profile.value.data.start = new Date().getTime() / 1000;
-          }
-          profile.value.data.enabled = true;
-          setpoint.value.data.settingEnabled = true;
 
-          await sparkStore.saveBlock(setpoint.value);
-          await sparkStore.saveBlock(profile.value);
+          await sparkStore.patchBlock(setpoint.value, {
+            settingEnabled: true,
+          });
+          await sparkStore.patchBlock(profile.value, {
+            enabled: true,
+            start: reset ? new Date().getTime() / 1000 : undefined,
+          });
         });
       },
     });
@@ -170,8 +166,7 @@ export default defineComponent({
       if (leading === 'mode') {
         const config = tempMode.value[`${kind}Config`];
         if (config) {
-          pid.data = { ...pid.data, ...config };
-          sparkStore.saveBlock(pid);
+          sparkStore.patchBlock(pid, config);
         }
       }
     }
@@ -186,13 +181,15 @@ export default defineComponent({
 
     async function setControl(enabled: boolean): Promise<void> {
       if (profile.value && !enabled) {
-        profile.value.data.enabled = false;
-        await sparkStore.saveBlock(profile.value);
+        await sparkStore.patchBlock(profile.value, {
+          enabled: false,
+        });
       }
 
       if (setpoint.value) {
-        setpoint.value.data.settingEnabled = enabled;
-        await sparkStore.saveBlock(setpoint.value);
+        await sparkStore.patchBlock(setpoint.value, {
+          settingEnabled: enabled,
+        });
       }
     }
 
