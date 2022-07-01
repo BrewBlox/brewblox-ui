@@ -29,33 +29,33 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const { dense } = useGlobals.setup();
-    const { config, saveConfig } = useWidget.setup<QuickActionsWidget>();
+    const { config, patchConfig } = useWidget.setup<QuickActionsWidget>();
     const draggingStep = ref(false);
 
     const actions = computed<ChangeAction[]>(() =>
       deserialize(config.value.actions),
     );
 
-    function saveActions(acs: ChangeAction[] = actions.value): void {
-      config.value.actions = acs;
-      saveConfig();
+    function saveActions(acs: ChangeAction[]): void {
+      patchConfig({ actions: acs });
     }
 
     function saveAction(action: ChangeAction): void {
-      spliceById(actions.value, action);
-      saveActions();
+      saveActions(spliceById([...actions.value], action));
     }
 
     function duplicateAction(action: ChangeAction): void {
-      actions.value.push({
-        id: nanoid(),
-        name: `${action.name} (copy)`,
-        changes: action.changes.map((change) => ({
-          ...deepCopy(change),
+      saveActions([
+        ...actions.value,
+        {
           id: nanoid(),
-        })),
-      });
-      saveActions();
+          name: `${action.name} (copy)`,
+          changes: action.changes.map((change) => ({
+            ...deepCopy(change),
+            id: nanoid(),
+          })),
+        },
+      ]);
     }
 
     function renameAction(action: ChangeAction): void {
@@ -67,10 +67,9 @@ export default defineComponent({
           title: 'Change ChangeAction name',
           message: `Choose a new name for '${action.name}'`,
         },
-      }).onOk((newName) => {
-        if (newName !== stepName) {
-          action.name = newName;
-          saveAction(action);
+      }).onOk((name) => {
+        if (name !== stepName) {
+          saveAction({ ...action, name });
         }
       });
     }

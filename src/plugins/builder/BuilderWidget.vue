@@ -1,6 +1,5 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useContext, useGlobals, useWidget } from '@/composables';
@@ -13,7 +12,6 @@ import { isAbsoluteUrl } from '@/utils/url';
 
 import { UseSvgZoomDimensions, useFlowParts, useSvgZoom } from './composables';
 import { useMetrics } from './composables/use-metrics';
-import { DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH } from './const';
 import { useBuilderStore } from './store';
 import {
   BuilderConfig,
@@ -31,8 +29,7 @@ export default defineComponent({
     const router = useRouter();
     const { inDialog } = useContext.setup();
     const { dense } = useGlobals.setup();
-    const { widget, config, saveConfig } =
-      useWidget.setup<Widget<BuilderConfig>>();
+    const { config, patchConfig } = useWidget.setup<Widget<BuilderConfig>>();
 
     const pending = ref<FlowPart | null>(null);
     const zoomEnabled = ref<boolean>(inDialog.value);
@@ -75,8 +72,7 @@ export default defineComponent({
           modelValue: config.value.currentLayoutId,
         },
       }).onOk((id) => {
-        config.value.currentLayoutId = id;
-        saveConfig();
+        patchConfig({ currentLayoutId: id });
       });
     }
 
@@ -86,8 +82,7 @@ export default defineComponent({
           uniqueFilter,
         );
       }
-      config.value.currentLayoutId = id;
-      saveConfig(config.value);
+      patchConfig({ currentLayoutId: id });
     }
 
     function startEditor(): void {
@@ -125,27 +120,6 @@ export default defineComponent({
         handler(part, { savePart, navigate });
       }
     }
-
-    async function migrate(): Promise<void> {
-      const oldParts: PersistentPart[] = (config.value as any).parts;
-      if (oldParts) {
-        const id = nanoid();
-        await builderStore.createLayout({
-          id,
-          title: `${widget.value.title} layout`,
-          width: DEFAULT_LAYOUT_WIDTH,
-          height: DEFAULT_LAYOUT_HEIGHT,
-          parts: oldParts,
-          order: builderStore.layouts.length + 1,
-        });
-        config.value.layoutIds.push(id);
-        config.value.currentLayoutId = id;
-        config.value['parts'] = undefined;
-        saveConfig();
-      }
-    }
-
-    onBeforeMount(() => migrate());
 
     return {
       coord2grid,

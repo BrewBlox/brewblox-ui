@@ -1,11 +1,9 @@
 <script lang="ts">
-import defaults from 'lodash/defaults';
 import { computed, defineComponent } from 'vue';
 
 import { useWidget } from '@/composables';
 
 import { MetricsConfig } from '../types';
-import { emptyMetricsConfig } from '../utils';
 import { MetricsWidget } from './types';
 
 export default defineComponent({
@@ -14,7 +12,7 @@ export default defineComponent({
     const { widget, saveConfig } = useWidget.setup<MetricsWidget>();
 
     const config = computed<MetricsConfig>({
-      get: () => defaults(widget.value.config, emptyMetricsConfig()),
+      get: () => widget.value.config,
       set: (cfg) => saveConfig(cfg),
     });
 

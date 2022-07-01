@@ -15,7 +15,7 @@ export default defineComponent({
   setup() {
     const sparkStore = useSparkStore();
     const { context } = useContext.setup();
-    const { config, saveConfig } = useWidget.setup<SparkDisplayWidget>();
+    const { config, patchConfig } = useWidget.setup<SparkDisplayWidget>();
 
     const connected = ref(true);
     let preventReconnection = false;
@@ -33,7 +33,7 @@ export default defineComponent({
 
     const serviceId = computed<string | null>({
       get: () => config.value.serviceId,
-      set: (serviceId) => saveConfig({ ...config.value, serviceId }),
+      set: (serviceId) => patchConfig({ serviceId }),
     });
 
     const url = computed<string>(
