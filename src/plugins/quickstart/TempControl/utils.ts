@@ -64,19 +64,6 @@ function linkStr(...blocks: (Block | Link)[]): string {
   return blocks.map((v) => `<i>${v?.id ?? '[not set]'}</i>`).join(' -> ');
 }
 
-function adjust<T extends Block>(
-  block: T,
-  func: (v: T) => Partial<T['data']>,
-): () => Awaitable<unknown> {
-  return () => {
-    const sparkStore = useSparkStore();
-    const actual = sparkStore.blockByAddress<T>(block);
-    if (actual) {
-      return sparkStore.patchBlock(actual, func(actual));
-    }
-  };
-}
-
 function getBlocks(
   config: TempControlConfig,
   mode: TempControlMode | null = null,
@@ -192,7 +179,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
   if (!pid.data.enabled) {
     issues.push({
       desc: `PID is disabled: ${linkStr(pid)}`,
-      autofix: adjust(pid, () => ({ enabled: true })),
+      autofix: () => sparkStore.patchBlock(pid, { enabled: true }),
     });
   }
 
@@ -218,7 +205,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (!analog.data.enabled) {
       issues.push({
         desc: `PWM is disabled: ${linkStr(pid, analog)}`,
-        autofix: adjust(analog, () => ({ enabled: true })),
+        autofix: () => sparkStore.patchBlock(analog, { enabled: true }),
       });
     }
 
@@ -278,7 +265,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (!analog.data.enabled) {
       issues.push({
         desc: `Setpoint Driver is disabled: ${linkStr(pid, analog)}`,
-        autofix: adjust(analog, () => ({ enabled: true })),
+        autofix: () => sparkStore.patchBlock(analog, { enabled: true }),
       });
     }
 
@@ -308,7 +295,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (reference.data.enabled === false) {
       issues.push({
         desc: `Reference block is disabled: ${linkStr(pid, analog, reference)}`,
-        autofix: adjust(reference, () => ({ enabled: true })),
+        autofix: () => sparkStore.patchBlock(reference, { enabled: true }),
       });
     }
 
@@ -334,7 +321,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (driven.data.enabled === false) {
       issues.push({
         desc: `Driven block is disabled: ${linkStr(pid, analog, driven)}`,
-        autofix: adjust(driven, () => ({ enabled: true })),
+        autofix: () => sparkStore.patchBlock(driven, { enabled: true }),
       });
     }
   }
@@ -444,19 +431,19 @@ export function findControlProblems(
   if (coolPid && !linkEq(setpointLink, coolSetpointLink)) {
     issues.push({
       desc: `Cool PID Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(coolPid, () => ({ inputId: setpointLink })),
+      autofix: () => sparkStore.patchBlock(coolPid, { inputId: setpointLink }),
     });
   }
   if (heatPid && !linkEq(setpointLink, heatSetpointLink)) {
     issues.push({
       desc: `Heat PID Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(heatPid, () => ({ inputId: setpointLink })),
+      autofix: () => sparkStore.patchBlock(heatPid, { inputId: setpointLink }),
     });
   }
   if (profile && !linkEq(setpointLink, profile.data.targetId)) {
     issues.push({
       desc: `Profile Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(profile, () => ({ targetId: setpointLink })),
+      autofix: () => sparkStore.patchBlock(profile, { targetId: setpointLink }),
     });
   }
 
