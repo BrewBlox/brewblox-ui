@@ -12,19 +12,20 @@ const DEFAULT_DURATION = 10 * 60 * 1000;
 export default defineComponent({
   name: 'CountdownWidget',
   setup() {
-    const { widget, config, saveConfig } = useWidget.setup<CountdownWidget>();
+    const { widget, config, saveConfig, patchConfig } =
+      useWidget.setup<CountdownWidget>();
 
     const remaining = ref<number>(0);
     let tickTimer: NodeJS.Timer | null = null;
 
     const session = computed<CountdownSession | null>({
       get: () => config.value.session,
-      set: (session) => saveConfig({ ...config.value, session }),
+      set: (session) => patchConfig({ session }),
     });
 
     const baseDuration = computed<number>({
       get: () => config.value.baseDuration,
-      set: (baseDuration) => saveConfig({ ...config.value, baseDuration }),
+      set: (baseDuration) => patchConfig({ baseDuration }),
     });
 
     const time = computed<string>(() => formatTime(remaining.value));

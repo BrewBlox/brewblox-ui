@@ -8,12 +8,12 @@ import { WebframeWidget } from './types';
 export default defineComponent({
   name: 'WebframeWidget',
   setup() {
-    const { config, saveConfig } = useWidget.setup<WebframeWidget>();
+    const { config, patchConfig } = useWidget.setup<WebframeWidget>();
     const { context } = useContext.setup();
 
     const scale = computed<number>({
       get: () => config.value.scale || 1,
-      set: (scale) => saveConfig({ ...config.value, scale }),
+      set: (scale) => patchConfig({ scale }),
     });
 
     const pctScale = computed<number>({
@@ -23,7 +23,7 @@ export default defineComponent({
 
     const url = computed<string>({
       get: () => config.value.url,
-      set: (url) => saveConfig({ ...config.value, url }),
+      set: (url) => patchConfig({ url }),
     });
 
     const counterScale = computed<number>(
@@ -33,7 +33,6 @@ export default defineComponent({
 
     return {
       config,
-      saveConfig,
       context,
       url,
       scale,

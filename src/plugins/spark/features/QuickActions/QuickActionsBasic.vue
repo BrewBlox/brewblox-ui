@@ -46,7 +46,7 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const { touch } = useGlobals.setup();
-    const { widgetId, config, saveConfig } =
+    const { widgetId, config, patchConfig } =
       useWidget.setup<QuickActionsWidget>();
 
     const applying = ref(false);
@@ -60,12 +60,13 @@ export default defineComponent({
     );
 
     function saveActions(values: ChangeAction[] = actions.value): void {
-      config.value.actions = values.map(({ id, name, changes }) => ({
-        id,
-        name,
-        changes,
-      }));
-      saveConfig();
+      patchConfig({
+        actions: values.map(({ id, name, changes }) => ({
+          id,
+          name,
+          changes,
+        })),
+      });
     }
 
     function blockByChange(change: BlockChange): Block | null {
@@ -169,8 +170,7 @@ export default defineComponent({
       applyChanges(action)
         .then(() => {
           notify.done(`Applied ${action.name}`);
-          config.value.lastActionId = action.id;
-          return saveConfig();
+          return patchConfig({ lastActionId: action.id });
         })
         .then(() =>
           // Fetch all blocks to show secondary effects

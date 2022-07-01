@@ -19,7 +19,8 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const { context } = useContext.setup();
-    const { widget, config, saveConfig } = useWidget.setup<QuickValuesWidget>();
+    const { widget, config, patchConfig } =
+      useWidget.setup<QuickValuesWidget>();
 
     const fieldValue = computed<Quantity | number | null>(() =>
       sparkStore.fieldByAddress(config.value.addr),
@@ -106,7 +107,7 @@ export default defineComponent({
       context,
       widget,
       config,
-      saveConfig,
+      patchConfig,
       fieldValue,
       numValue,
       blockFilter,
@@ -137,12 +138,7 @@ export default defineComponent({
           :field-filter="fieldFilter"
           class="col-grow fade-2"
           show-value
-          @update:model-value="
-            (v) => {
-              config.addr = v;
-              saveConfig();
-            }
-          "
+          @update:model-value="(addr) => patchConfig({ addr })"
         />
       </template>
       <template v-else>
@@ -204,12 +200,7 @@ export default defineComponent({
         :field-filter="fieldFilter"
         class="col-grow"
         show-value
-        @update:model-value="
-          (v) => {
-            config.addr = v;
-            saveConfig();
-          }
-        "
+        @update:model-value="(addr) => patchConfig({ addr })"
       />
       <q-select
         :model-value="config.values"
@@ -220,12 +211,7 @@ export default defineComponent({
         hide-dropdown-icon
         class="col-grow"
         @new-value="addValue"
-        @update:model-value="
-          (v) => {
-            config.values = v;
-            saveConfig();
-          }
-        "
+        @update:model-value="(values) => patchConfig({ values })"
       >
         <q-tooltip> Add a new value, and press ENTER. </q-tooltip>
       </q-select>
@@ -238,12 +224,7 @@ export default defineComponent({
         hide-dropdown-icon
         class="col-grow"
         @new-value="addSliderValue"
-        @update:model-value="
-          (v) => {
-            config.sliders = v;
-            saveConfig();
-          }
-        "
+        @update:model-value="(sliders) => patchConfig({ sliders })"
       >
         <template #selected-item="scope">
           <q-chip

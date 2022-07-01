@@ -31,7 +31,7 @@ export default defineComponent({
       local.value = { ...cfg };
     });
 
-    function saveConfig(config: GraphConfig = local.value): void {
+    function saveLocalConfig(config: GraphConfig = local.value): void {
       emit('update:config', config);
     }
 
@@ -39,12 +39,12 @@ export default defineComponent({
 
     function saveAxis(field: string, value: GraphAxis): void {
       local.value.axes[field] = value;
-      saveConfig();
+      saveLocalConfig();
     }
 
     function saveColor(field: string, color: string | null): void {
       local.value.colors[field] = color || '';
-      saveConfig();
+      saveLocalConfig();
     }
 
     function fieldRename(field: string): string {
@@ -53,7 +53,7 @@ export default defineComponent({
 
     function saveRename(field: string, label: string | null): void {
       local.value.renames[field] = label ?? defaultLabel(field);
-      saveConfig();
+      saveLocalConfig();
     }
 
     return {

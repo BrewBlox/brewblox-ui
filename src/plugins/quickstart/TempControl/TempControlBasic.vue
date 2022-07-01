@@ -30,7 +30,7 @@ export default defineComponent({
   },
   setup() {
     const { context } = useContext.setup();
-    const { config, saveConfig } = useWidget.setup<TempControlWidget>();
+    const { config, patchConfig } = useWidget.setup<TempControlWidget>();
     const sparkStore = useSparkStore();
 
     const problems = ref<TempControlProblem[]>([]);
@@ -159,8 +159,7 @@ export default defineComponent({
       if (leading === 'pid') {
         const { kp, td, ti } = pid.data;
         tempMode.value[`${kind}Config`] = { kp, td, ti };
-        config.value.modes = concatById(config.value.modes, tempMode.value);
-        saveConfig();
+        patchConfig({ modes: concatById(config.value.modes, tempMode.value) });
       }
 
       if (leading === 'mode') {
@@ -197,8 +196,7 @@ export default defineComponent({
       const mode = config.value.modes.find((v) => v.id === id);
 
       if (!mode) {
-        config.value.activeMode = null;
-        saveConfig();
+        patchConfig({ activeMode: null });
         return;
       }
 
@@ -210,20 +208,20 @@ export default defineComponent({
           title: `Apply ${mode.title} mode`,
           showConfirm: true,
           saveMode: (mode: TempControlMode) => {
-            config.value.modes = concatById(config.value.modes, mode);
-            saveConfig();
+            patchConfig({ modes: concatById(config.value.modes, mode) });
           },
         },
       }).onOk(async () => {
+        let activeMode: string | null = null;
         try {
           await applyMode(config.value, mode);
-          config.value.activeMode = mode.id;
+          activeMode = mode.id;
           notify.done(`Applied ${mode.title} mode`);
         } catch (e: any) {
-          config.value.activeMode = null;
+          activeMode = null;
           notify.error(e.message);
         } finally {
-          await saveConfig();
+          patchConfig({ activeMode });
         }
       });
     }

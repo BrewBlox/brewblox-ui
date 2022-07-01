@@ -33,7 +33,7 @@ export default defineComponent({
     const historyStore = useHistoryStore();
     const dashboardStore = useDashboardStore();
     const { context } = useContext.setup();
-    const { widget, config, saveConfig } = useWidget.setup<SessionLogWidget>();
+    const { widget, config, patchConfig } = useWidget.setup<SessionLogWidget>();
 
     const sessions = computed<LoggedSession[]>(() => historyStore.sessions);
 
@@ -60,8 +60,7 @@ export default defineComponent({
           ],
         },
       }).onOk((session: LoggedSession) => {
-        config.value.currentSession = session.id;
-        saveConfig();
+        patchConfig({ currentSession: session.id });
       });
     }
 
@@ -72,14 +71,12 @@ export default defineComponent({
           title: 'Open existing session',
         },
       }).onOk((session: LoggedSession) => {
-        config.value.currentSession = session?.id ?? null;
-        saveConfig();
+        patchConfig({ currentSession: session?.id ?? null });
       });
     }
 
     function exitSession(): void {
-      config.value.currentSession = null;
-      saveConfig();
+      patchConfig({ currentSession: null });
     }
 
     function renderDate(date: number | null): string {
@@ -175,9 +172,10 @@ export default defineComponent({
           message: `Do you want remove session '${activeSession.title}'?`,
         },
       }).onOk(() => {
-        config.value.currentSession =
-          sessions.value.find((s) => s.id !== activeSession?.id)?.id ?? null;
-        saveConfig();
+        const active = sessions.value.find((s) => s.id !== activeSession?.id);
+        patchConfig({
+          currentSession: active?.id ?? null,
+        });
         historyStore.removeSession(activeSession);
       });
     }

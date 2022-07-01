@@ -23,7 +23,7 @@ export default defineComponent({
     TempControlPidView,
   },
   setup() {
-    const { config, saveConfig } = useWidget.setup<TempControlWidget>();
+    const { config, patchConfig } = useWidget.setup<TempControlWidget>();
     const sparkStore = useSparkStore();
 
     const serviceOpts = computed<string[]>(() => sparkStore.serviceIds);
@@ -38,8 +38,7 @@ export default defineComponent({
           title: `Edit ${mode.title} mode`,
           serviceId: serviceId.value,
           saveMode: (mode: TempControlMode) => {
-            config.value.modes = concatById(config.value.modes, mode);
-            saveConfig();
+            patchConfig({ modes: concatById(config.value.modes, mode) });
           },
         },
       });
@@ -49,7 +48,7 @@ export default defineComponent({
       serviceId,
       serviceOpts,
       config,
-      saveConfig,
+      patchConfig,
       pidFilter,
       profileFilter,
       showMode,
@@ -69,12 +68,7 @@ export default defineComponent({
       message="Which Spark controls your fermentation?"
       list-select
       clearable
-      @update:model-value="
-        (v) => {
-          config.serviceId = v;
-          saveConfig();
-        }
-      "
+      @update:model-value="(v) => patchConfig({ serviceId: v })"
     />
     <LinkField
       :model-value="config.coolPid"
@@ -83,12 +77,7 @@ export default defineComponent({
       title="Cool PID"
       label="Cool PID"
       class="col-grow"
-      @update:model-value="
-        (v) => {
-          config.coolPid = v;
-          saveConfig();
-        }
-      "
+      @update:model-value="(v) => patchConfig({ coolPid: v })"
     />
     <LinkField
       :model-value="config.heatPid"
@@ -97,12 +86,7 @@ export default defineComponent({
       title="Heat PID"
       label="Heat PID"
       class="col-grow"
-      @update:model-value="
-        (v) => {
-          config.heatPid = v;
-          saveConfig();
-        }
-      "
+      @update:model-value="(v) => patchConfig({ heatPid: v })"
     />
     <LinkField
       :model-value="config.profile"
@@ -111,12 +95,7 @@ export default defineComponent({
       title="Setpoint Profile"
       label="Setpoint Profile"
       class="col-grow"
-      @update:model-value="
-        (v) => {
-          config.profile = v;
-          saveConfig();
-        }
-      "
+      @update:model-value="(v) => patchConfig({ profile: v })"
     />
     <LabeledField
       v-for="mode in config.modes"

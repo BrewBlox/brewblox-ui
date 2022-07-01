@@ -24,16 +24,11 @@ export default defineComponent({
   },
   setup() {
     const { context } = useContext.setup();
-    const { config, saveConfig } = useWidget.setup<QuickActionsWidget>();
+    const { config, patchConfig } = useWidget.setup<QuickActionsWidget>();
 
     const actions = computed<ChangeAction[]>(() =>
       deserialize(config.value.actions),
     );
-
-    function saveActions(acs: ChangeAction[] = actions.value): void {
-      config.value.actions = acs;
-      saveConfig();
-    }
 
     function addAction(): void {
       createDialog({
@@ -45,8 +40,9 @@ export default defineComponent({
           modelValue: 'New action',
         },
       }).onOk((name) => {
-        actions.value.push({ name, id: nanoid(), changes: [] });
-        saveActions();
+        patchConfig({
+          actions: [...actions.value, { name, id: nanoid(), changes: [] }],
+        });
       });
     }
 
