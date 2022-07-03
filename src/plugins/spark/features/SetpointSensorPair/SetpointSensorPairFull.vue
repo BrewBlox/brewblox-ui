@@ -82,7 +82,7 @@ export default defineComponent({
         message="
               <p>
                 A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
-                Changes faster than the filter period will be filted out.
+                Changes faster than the filter period will be filtered out.
               </p>
               <p>
                 A longer period will give a smoother output at the cost of a delay in response.
