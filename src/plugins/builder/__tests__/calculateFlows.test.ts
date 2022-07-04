@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 // prevents circular import
 // TODO(Bob): revert to trivago/prettier-plugin-sort-imports when side-effect imports are handled
 // https://github.com/trivago/prettier-plugin-sort-imports/pull/111
@@ -6,6 +9,7 @@ import '@/store/system';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { createPinia, setActivePinia } from 'pinia';
+import { describe, expect, it } from 'vitest';
 
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import blueprints from '@/plugins/builder/blueprints';

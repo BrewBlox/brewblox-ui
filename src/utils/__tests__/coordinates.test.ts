@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { Coordinates } from '@/utils/coordinates';
 
 describe('coordinates', () => {

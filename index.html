@@ -61,16 +61,16 @@
   </head>
 
   <script>
-    /**
-     * this is a hack for plotly
-     * error: global is not defined
-     */
-    var global = global || window
-    </script>
+    // A hack for libraries that rely on the Node.JS `global` property.
+    var global = global || window;
+  </script>
 
   <body>
     <!-- DO NOT touch the following DIV -->
     <div id="q-app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <script
+      type="module"
+      src="/src/main.ts"
+    ></script>
   </body>
 </html>

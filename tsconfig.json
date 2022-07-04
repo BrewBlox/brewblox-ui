@@ -29,7 +29,6 @@
     ],
     "types": [
       "quasar",
-      "jest",
       "vite/client"
     ]
   },

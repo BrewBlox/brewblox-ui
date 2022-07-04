@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
 import inject from '@rollup/plugin-inject';
 import vue from '@vitejs/plugin-vue';
@@ -6,15 +7,25 @@ import * as path from 'path';
 import { UserConfig, defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command }): UserConfig => {
+export default defineConfig(({ command, mode }): UserConfig => {
   const buildDate = new Date().toISOString();
   const performanceEnabled = false;
-  const devEnabled = command === 'serve';
 
   // Replace these values when using a remote backend
   // Host/port are also defined in dev/utils.js
-  const apiHost: string | undefined = undefined;
-  const apiPort: number | undefined = devEnabled ? 9001 : undefined;
+  let apiProtocol: 'http' | 'https' | undefined = undefined;
+  let apiHost: string | undefined = undefined;
+  let apiPort: number | undefined = undefined;
+
+  if (command === 'serve') {
+    apiPort = 9001;
+  }
+
+  if (mode === 'test') {
+    apiProtocol = 'http';
+    apiHost = 'localhost';
+    apiPort = 9001;
+  }
 
   return {
     plugins: [
@@ -42,10 +53,10 @@ export default defineConfig(({ command }): UserConfig => {
 
     define: {
       __BREWBLOX_BUILD_DATE: JSON.stringify(buildDate),
-      __BREWBLOX_PERFORMANCE: performanceEnabled,
-      __BREWBLOX_API_HOST: apiHost,
-      __BREWBLOX_API_PORT: apiPort,
-      __BREWBLOX_API_DEV: devEnabled,
+      __BREWBLOX_PERFORMANCE: JSON.stringify(performanceEnabled),
+      __BREWBLOX_API_PROTOCOL: JSON.stringify(apiProtocol),
+      __BREWBLOX_API_HOST: JSON.stringify(apiHost),
+      __BREWBLOX_API_PORT: JSON.stringify(apiPort),
     },
 
     base: '/ui/',
@@ -67,6 +78,10 @@ export default defineConfig(({ command }): UserConfig => {
           inject({ Buffer: ['buffer', 'Buffer'], process: 'process/browser' }),
         ],
       },
+    },
+
+    test: {
+      environment: 'jsdom',
     },
   };
 });

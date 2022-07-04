@@ -10,6 +10,9 @@
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -21,17 +24,5 @@
   },
   "[dockercompose]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "jest.autoRun": {
-    "watch": false,
-    "onSave": "test-file"
-  },
-  "files.watcherExclude": {
-    "dev/node-red/**": true,
-    "dev/redis/**": true,
-    "dev/simulator__*/**": true,
-    "dev/tilt_share/**": true,
-    "dev/traefik/brewblox.*": true,
-    "dev/victoria/**": true
   }
 }

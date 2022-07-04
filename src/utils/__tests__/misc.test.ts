@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { mqttTopicExp } from '@/utils/misc';
 
 describe('MQTT helpers', () => {
