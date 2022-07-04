@@ -46,7 +46,7 @@ export default defineComponent({
     });
 
     const buildDate = computed<string>(
-      () => process.env.BLOX_DATE ?? 'UNKNOWN',
+      () => __BREWBLOX_BUILD_DATE ?? 'UNKNOWN',
     );
 
     const dashboards = computed<Dashboard[]>(() =>

@@ -4,7 +4,7 @@ import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
-import { autoRegister } from '@/utils/component-ref';
+import { globRegister } from '@/utils/component-ref';
 
 import TiltWidget from './Tilt';
 import { useTiltStore } from './store';
@@ -16,7 +16,7 @@ const plugin: Plugin = {
     const tiltStore = useTiltStore();
     const featureStore = useFeatureStore();
     const serviceStore = useServiceStore();
-    autoRegister(app, require.context('./components', true));
+    globRegister(app, import.meta.globEager('./components/**/*.vue'));
 
     featureStore.addServiceFeature({
       id: 'Tilt',

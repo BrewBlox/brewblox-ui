@@ -1,3 +1,9 @@
+declare const __BREWBLOX_BUILD_DATE: string;
+declare const __BREWBLOX_API_DEV: boolean;
+declare const __BREWBLOX_PERFORMANCE: boolean;
+declare const __BREWBLOX_API_HOST: string | undefined;
+declare const __BREWBLOX_API_PORT: number | undefined;
+
 interface PanArguments {
   evt: MouseEvent | TouchEvent;
   position: { top: number; left: number };

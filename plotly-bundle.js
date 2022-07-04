@@ -4,8 +4,10 @@
 //
 // In webpack configuration (quasar.conf.js) we add an alias to redirect imports
 // The original plotly can be accessed as 'plotly-dist'
-const Plotly = require('plotly-dist/lib/core');
+// const Plotly = require('plotly-dist/lib/core');
+import Plotly from 'plotly-dist/lib/core';
+import scatter from 'plotly-dist/lib/scatter';
 
-Plotly.register([require('plotly-dist/lib/scatter')]);
+Plotly.register([scatter]);
 
-module.exports = Plotly;
+export default Plotly;

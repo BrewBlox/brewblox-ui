@@ -13,7 +13,7 @@ Due to limitations in the way Docker is handled on Windows, Linux or Mac is requ
 
 ## Installation
 
-**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at https://brewblox.netlify.app/**
+**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at <https://brewblox.netlify.app/>**
 
 Note: this is tested on Ubuntu, and may or may not work on other distros. Please let us know if there are any issues.
 
@@ -43,7 +43,6 @@ reboot
 After the reboot, run the following commands in the `brewblox-ui` directory:
 
 ``` bash
-yarn global add @quasar/cli
 yarn ci
 docker-compose pull
 ```
@@ -54,7 +53,7 @@ docker-compose pull
 yarn start
 ```
 
-The UI will be served with hot reloading at https://localhost:8080/ui
+The UI will be served with hot reloading at <https://localhost:8080/ui>
 
 ## Additional dev commands
 
@@ -68,9 +67,8 @@ yarn datastore:load
 # Reset Spark blocks
 yarn spark:load
 
-# Build a production version of the software
-# This is served at https://localhost:9001
-yarn devbuild
+# Build output is hosted at :9001/ui
+yarn build
 ```
 
 ## Loading and saving backend data
@@ -81,6 +79,7 @@ The default data can be found in dev/presets/.
 The dev scripts allow for partially applying data, or replacing the defaults.
 
 Some examples:
+
 * `yarn redis` only resets widgets
 * `yarn spark` only resets blocks
 * `yarn spark -- sparkey` only resets blocks on Sparkey
@@ -90,10 +89,9 @@ The files are indexed in git. Commit them to make the change permanent.
 
 ---
 
+## Architecture
 
-# Architecture
-
-## Directory structure
+### Directory structure
 
 Brewblox uses and extends the [Quasar application structure](https://next.quasar.dev/quasar-cli/directory-structure).
 
@@ -101,11 +99,11 @@ Notable new directories:
 
 **src/utils/** - Stateless utility functions.
 
-**src/plugins/** - Application submodules. Plugins behave like [Vue plugins](https://v3.vuejs.org/guide/plugins.html) in that they have an `install(app: App)` function. <br>
-Plugins may have their own `components/`, `utils/`, and `store/` subdirectories. <br>
+**src/plugins/** - Application submodules. Plugins behave like [Vue plugins](https://v3.vuejs.org/guide/plugins.html) in that they have an `install(app: App)` function.\
+Plugins may have their own `components/`, `utils/`, and `store/` subdirectories.\
 New plugins should be declared in `src/boot/plugins.ts`.
 
-## Third-party plugins (discontinued)
+### Third-party plugins (discontinued)
 
 ~~To allow runtime extension of the UI, users can load remote plugins.~~
 ~~These will be loaded from user-defined URLs, and are otherwise treated as identical to plugins found in `src/plugins/`.~~
@@ -115,25 +113,25 @@ New plugins should be declared in `src/boot/plugins.ts`.
 Third-party plugins are no longer supported.
 Implementation beyond proof-of-concept would require too much effort for a feature with no discernible demand.
 
-# Data sources
+## Data sources
 
-## [Datastore](src/database/types.ts)
+### [Datastore](src/database/types.ts)
 
 Local application state is kept using [Pinia](https://pinia.esm.dev/). Persistent data (eg. `Dashboard`, `Widget`, `Service`) is saved using the Redis [datastore](https://redis.io/).
 
 The full datastore state is loaded on startup. After that, two-way synchronization is maintained between VueX (local), and Redis (remote).
 
-## [Eventbus](src/eventbus.ts)
+### [Eventbus](src/eventbus.ts)
 
 Backend services intermittently push MQTT state events.
 
 Plugins can subscribe to receive callbacks for events matching an identifier.
 
-# Interfaces
+## Interfaces
 
 There are some generic interfaces used throughout the UI. Plugins can register functionality they provide.
 
-## [Dashboard](src/store/dashboards/types.ts), [Widget](src/store/widgets/types.ts)
+### [Dashboard](src/store/dashboards/types.ts), [Widget](src/store/widgets/types.ts)
 
 To ensure flexibility, one of the core display elements in the UI is the `Dashboard`. A dashboard is populated with `Widget` elements.
 
@@ -141,13 +139,13 @@ To ensure flexibility, one of the core display elements in the UI is the `Dashbo
 
 This allows the user to display the most relevant items, regardless of whether they are core Brewblox components, or added by a third-party plugin.
 
-## [Service](src/store/services/index.ts)
+### [Service](src/store/services/index.ts)
 
 While widgets are displayed on dashboards, services get their own page.
 
 Other than that, they're very much alike: they have persistent configuration, and are implemented by plugins.
 
-## [Feature](src/store/features/types.ts)
+### [Feature](src/store/features/types.ts)
 
 Widgets and Services by themselves are nothing more than blobs of JSON data. In order for them to be created and rendered, they must be combined with Vue components.
 

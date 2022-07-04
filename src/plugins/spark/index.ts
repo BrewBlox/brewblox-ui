@@ -5,7 +5,7 @@ import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
-import { autoRegister, cref } from '@/utils/component-ref';
+import { cref, globRegister } from '@/utils/component-ref';
 
 import { sparkType } from './const';
 import features from './features';
@@ -34,7 +34,7 @@ const plugin: Plugin = {
     const sparkStore = useSparkStore();
     const snippetStore = useBlockSnippetStore();
 
-    autoRegister(app, require.context('./components', true));
+    globRegister(app, import.meta.globEager('./components/**/*.vue'));
 
     deprecated.forEach(featureStore.addWidgetFeature);
     features.forEach(app.use);
@@ -73,7 +73,7 @@ const plugin: Plugin = {
       }
     });
 
-    startup.onStart(() => snippetStore.start());
+    startup.add(snippetStore);
   },
 };
 

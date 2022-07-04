@@ -51,7 +51,7 @@ const plugin: Plugin = {
       }
     });
 
-    startup.onStart(() => automationStore.start());
+    startup.add(automationStore);
   },
 };
 

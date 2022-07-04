@@ -14,7 +14,7 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const router = useRouter();
 
-    const devMode = Boolean(process.env.DEV);
+    const devMode = Boolean(import.meta.env.DEV);
     const dashboardEditing = ref<boolean>(false);
     const serviceEditing = ref<boolean>(false);
     const builderEditing = ref<boolean>(false);
@@ -86,7 +86,7 @@ export default defineComponent({
 
       <q-scroll-area
         class="col"
-        :thumb-style="{ opacity: 0.5, background: 'silver' }"
+        :thumb-style="{ opacity: '0.5', background: 'silver' }"
       >
         <DashboardIndex v-model:editing="dashboardEditing" />
         <BreweryIndex

@@ -7,3 +7,7 @@ declare module '*.vue' {
   const Component: ComponentPublicInstance;
   export default Component;
 }
+declare module 'mqtt/dist/mqtt.min' {
+  import MQTT from 'mqtt';
+  export = MQTT;
+}

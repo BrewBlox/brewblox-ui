@@ -1,10 +1,12 @@
-import timezones from 'posix_tz_db/zones.json';
+// import timezones from 'posix_tz_db/zones.json';
 import { DialogChainObject } from 'quasar';
 import KeyboardLayouts from 'simple-keyboard-layouts';
 
 import { useSystemStore } from '@/store/system';
 import { SystemConfig } from '@/store/system/types';
 import { createDialog } from '@/utils/dialog';
+
+const timezones = {};
 
 export function startChangeKeyboardLayout(): DialogChainObject {
   const systemStore = useSystemStore();

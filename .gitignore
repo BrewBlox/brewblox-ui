@@ -19,20 +19,15 @@ yarn-error.log*
 *.sln
 
 # Files and subdirectories in dev/ have to be whitelisted
+.env
 dev/*/
+dev/.env
 !dev/*.js
 !dev/*.sh
 !dev/*.ts
 
 !dev/presets
 
-!dev/tilt_share
-dev/tilt_share/*
-!dev/tilt_share/.gitkeep
-
 !dev/traefik
 dev/traefik/brewblox.crt
 dev/traefik/brewblox.key
-
-dev/dist/*
-!dev/dist/.gitkeep

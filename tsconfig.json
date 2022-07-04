@@ -1,6 +1,14 @@
 {
-  "extends": "@quasar/app/tsconfig-preset",
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "useDefineForClassFields": true,
     "importHelpers": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -11,22 +19,18 @@
     "paths": {
       "@/*": [
         "src/*"
-      ],
-      // Required for quasar-generated entrypoint script
-      "boot/*": [
-        "src/boot/*"
-      ],
+      ]
     },
     "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
+      "ESNext",
+      "DOM",
+      "DOM.Iterable",
+      "ScriptHost"
     ],
     "types": [
       "quasar",
       "jest",
-      "webpack-env"
+      "vite/client"
     ]
   },
   "include": [
@@ -42,5 +46,10 @@
     ".vscode",
     "node_modules",
     "**/*.wip"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
   ]
 }

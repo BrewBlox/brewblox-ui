@@ -1,5 +1,9 @@
 import { useSystemStore } from '@/store/system';
 
+export interface Startable {
+  start(): Awaitable<unknown>;
+}
+
 /**
  * Vue/VueX have the concept of lifecycle hooks for individual components,
  * but no parallel at app level.
@@ -14,8 +18,8 @@ import { useSystemStore } from '@/store/system';
 export class BrewbloxStartup {
   private startFuncs: (() => Awaitable<unknown>)[] = [];
 
-  public onStart(func: () => Awaitable<unknown>): void {
-    this.startFuncs.push(func);
+  public add(startable: Startable): void {
+    this.startFuncs.push(startable.start);
   }
 
   public async start(): Promise<void> {
