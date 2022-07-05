@@ -4,6 +4,7 @@
     "editorconfig.editorconfig",
     "syler.sass-indented",
     "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "ZixuanChen.vitest-explorer"
   ]
 }

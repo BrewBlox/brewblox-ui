@@ -3,6 +3,7 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
 import inject from '@rollup/plugin-inject';
 import vue from '@vitejs/plugin-vue';
 import * as fs from 'fs';
+import { ServerOptions } from 'https';
 import * as path from 'path';
 import { UserConfig, defineConfig } from 'vite';
 
@@ -11,20 +12,30 @@ export default defineConfig(({ command, mode }): UserConfig => {
   const buildDate = new Date().toISOString();
   const performanceEnabled = false;
 
-  // Replace these values when using a remote backend
-  // Host/port are also defined in dev/utils.js
+  const isDev = command === 'serve';
+  const isTest = mode === 'test';
+
+  // Host/port are also hardcoded in dev/utils.js
   let apiProtocol: 'http' | 'https' | undefined = undefined;
   let apiHost: string | undefined = undefined;
   let apiPort: number | undefined = undefined;
+  let serverHttps: ServerOptions | boolean = false;
 
-  if (command === 'serve') {
+  if (isDev) {
+    apiProtocol = undefined;
+    apiHost = undefined;
     apiPort = 9001;
+    serverHttps = {
+      key: fs.readFileSync('./dev/traefik/brewblox.key'),
+      cert: fs.readFileSync('./dev/traefik/brewblox.crt'),
+    };
   }
 
-  if (mode === 'test') {
+  if (isTest) {
     apiProtocol = 'http';
     apiHost = 'localhost';
     apiPort = 9001;
+    serverHttps = false;
   }
 
   return {
@@ -66,10 +77,7 @@ export default defineConfig(({ command, mode }): UserConfig => {
       host: '0.0.0.0',
       port: 8080,
       base: '/ui/',
-      https: {
-        key: fs.readFileSync('./dev/traefik/brewblox.key'),
-        cert: fs.readFileSync('./dev/traefik/brewblox.crt'),
-      },
+      https: serverHttps,
     },
 
     build: {
