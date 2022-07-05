@@ -3,7 +3,7 @@ import { PropType, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { calculateProfileValues } from '@/plugins/spark/utils';
+import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
 import {
   Quantity,
   SetpointProfileBlock,

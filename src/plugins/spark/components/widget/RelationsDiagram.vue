@@ -6,7 +6,7 @@ import toFinite from 'lodash/toFinite';
 import { PropType, defineComponent, onMounted, ref, watch } from 'vue';
 
 import { BlockRelation, BlockRelationNode } from '@/plugins/spark/types';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
 import { deepCopy, isJsonEqual } from '@/utils/objects';
 
 const DEFAULT_SCALE = 0.9;

@@ -12,7 +12,7 @@ import type {
   AnyConstraintsObj,
   DigitalConstraint,
 } from '@/plugins/spark/types';
-import { prettifyConstraints } from '@/plugins/spark/utils';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/formatting';
 

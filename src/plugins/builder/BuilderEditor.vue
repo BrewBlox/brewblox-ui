@@ -14,7 +14,7 @@ import {
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { useSystemStore } from '@/store/system';
+import { startupDone } from '@/user-settings';
 import { rotatedSize } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
@@ -81,7 +81,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const router = useRouter();
@@ -120,8 +119,6 @@ export default defineComponent({
       focusRef.value?.focus();
       checkFocus();
     }
-
-    const startupDone = computed<boolean>(() => systemStore.startupDone);
 
     const focusWarningEnabled = computed<boolean>({
       get: () => builderStore.focusWarningEnabled,

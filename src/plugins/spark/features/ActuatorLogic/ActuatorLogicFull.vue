@@ -2,6 +2,7 @@
 import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
@@ -13,12 +14,11 @@ import {
   DigitalState,
   LogicResult,
 } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
 import { nonNullString, prettyLink } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
 
-import { useSparkStore } from '../../store';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { characterTitles, logicResultTitles, nonErrorResults } from './const';

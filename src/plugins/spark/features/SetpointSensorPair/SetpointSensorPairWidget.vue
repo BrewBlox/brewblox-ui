@@ -3,9 +3,9 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
-import { useSparkStore } from '../../store';
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
 import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
 

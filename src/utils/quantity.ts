@@ -5,9 +5,8 @@ import round from 'lodash/round';
 import parseDuration from 'parse-duration';
 
 import { Quantity, TempUnit } from '@/shared-types';
-import { useSystemStore } from '@/store/system';
+import { userUnits } from '@/user-settings';
 
-import { prettyQty } from './formatting';
 import {
   isCompatibleQty,
   isDurationString,
@@ -67,7 +66,11 @@ export class JSQuantity implements Quantity {
   }
 
   public toString(): string {
-    return prettyQty(this);
+    let s = this.value != null ? this.value.toFixed(2) : '---';
+    if (this.unit != null) {
+      s += ` ${this.unit}`;
+    }
+    return s;
   }
 
   public toJSON(): Quantity {
@@ -206,7 +209,7 @@ const converted = (
   valueDegC: number | null,
   fmt: (unit: TempUnit) => string,
 ): Quantity =>
-  bloxQty(valueDegC, fmt('degC')).to(fmt(useSystemStore().units.temperature));
+  bloxQty(valueDegC, fmt('degC')).to(fmt(userUnits.value.temperature));
 
 export const tempQty: TempFunc = (v) => converted(v, (u) => u);
 export const inverseTempQty: TempFunc = (v) => converted(v, (u) => `1 / ${u}`);

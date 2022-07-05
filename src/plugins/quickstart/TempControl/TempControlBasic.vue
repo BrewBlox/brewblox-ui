@@ -4,15 +4,16 @@ import { computed, defineComponent, ref } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { ProfileValues } from '@/plugins/spark/types';
-import { calculateProfileValues } from '@/plugins/spark/utils';
+import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
 import {
   PidBlock,
   Quantity,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/shared-types';
+import { createBlockDialog } from '@/utils/block-dialog';
 import { concatById } from '@/utils/collections';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils/dialog';
 import { prettyQty, shortDateString } from '@/utils/formatting';
 import { notify } from '@/utils/notify';
 import { bloxQty, tempQty } from '@/utils/quantity';

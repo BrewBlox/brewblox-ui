@@ -2,7 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
-import { prettifyConstraints } from '@/plugins/spark/utils';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
 import { DigitalConstraintsObj } from '@/shared-types';
 
 export default defineComponent({

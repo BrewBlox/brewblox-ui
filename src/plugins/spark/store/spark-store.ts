@@ -22,7 +22,7 @@ import type {
   SparkStatus,
 } from '../types';
 import type { Block, BlockFieldAddress } from '../types';
-import { isBlockVolatile, isSparkPatch, isSparkState } from '../utils';
+import { isBlockVolatile, isSparkPatch, isSparkState } from '../utils/info';
 import * as sparkApi from './spark-api';
 import {
   asServiceStatus,

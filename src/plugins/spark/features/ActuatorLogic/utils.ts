@@ -4,7 +4,7 @@ import {
   BlockIntfType,
   DigitalCompare,
 } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { tempQty } from '@/utils/quantity';
 
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './const';

@@ -4,7 +4,7 @@ import { PropType, computed, defineComponent, ref } from 'vue';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
 import { SparkStatus } from '@/plugins/spark/types';
-import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 

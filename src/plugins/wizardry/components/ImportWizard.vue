@@ -5,8 +5,8 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
 import { Widget, useWidgetStore } from '@/store/widgets';
+import { userUISettings } from '@/user-settings';
 import { loadFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator } from '@/utils/rules';
@@ -35,7 +35,6 @@ export default defineComponent({
   },
   emits: [...useWizard.emits],
   setup(props) {
-    const systemStore = useSystemStore();
     const widgetStore = useWidgetStore();
     const dashboardStore = useDashboardStore();
     const featureStore = useFeatureStore();
@@ -46,7 +45,7 @@ export default defineComponent({
     const widget = ref<Widget | null>(null);
 
     const primaryDashboardId = computed<string | null>(() => {
-      const { homePage } = systemStore.config;
+      const { homePage } = userUISettings.value;
       if (!homePage || !homePage.startsWith('/dashboard')) {
         return null;
       }
@@ -71,7 +70,9 @@ export default defineComponent({
       })),
     );
 
-    const widgetError = computed<string | null>(() => validator(widget.value));
+    const widgetError = computed<string | undefined>(
+      () => validator(widget.value) ?? undefined,
+    );
 
     const widgetOk = computed<boolean>(() => widgetError.value === null);
 

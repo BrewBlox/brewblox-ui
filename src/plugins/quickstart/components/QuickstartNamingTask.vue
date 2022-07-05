@@ -2,7 +2,7 @@
 import mapValues from 'lodash/mapValues';
 import { PropType, computed, defineComponent, reactive } from 'vue';
 
-import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { makeDashboardIdRules } from '@/utils/dashboards';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { makeUrlSafe } from '@/utils/url';

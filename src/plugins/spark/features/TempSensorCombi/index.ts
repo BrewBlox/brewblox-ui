@@ -9,7 +9,8 @@ import {
   SensorCombiFunc,
   TempSensorCombiBlock,
 } from '@/plugins/spark/types';
-import { blockWidgetSelector, enumHint } from '@/plugins/spark/utils';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { enumHint } from '@/plugins/spark/utils/formatting';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { tempQty } from '@/utils/quantity';
 

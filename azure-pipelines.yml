@@ -41,7 +41,7 @@ steps:
 
   - bash: |
       yarn lint
-      yarn test
+      yarn test:ci
     displayName: Test
 
   - bash: |

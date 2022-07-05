@@ -6,7 +6,7 @@ import {
   OneWireGpioModuleBlock,
   PidBlock,
 } from '@/plugins/spark/types';
-import { startAddBlockToDisplay } from '@/plugins/spark/utils';
+import { startAddBlockToDisplay } from '@/plugins/spark/utils/actions';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore } from '@/store/widgets';
 import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';

@@ -18,7 +18,7 @@ import {
   DigitalActuatorBlock,
   DigitalState,
 } from '@/plugins/spark/types';
-import { isBlockDriven } from '@/plugins/spark/utils';
+import { isBlockDriven } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
 
 export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock;
@@ -80,7 +80,7 @@ const blueprint: BuilderBlueprint = {
     const sparkStore = useSparkStore();
     const hasAddr = !!part.settings[PUMP_KEY]?.id;
     const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
-    const driven = isBlockDriven(block);
+    const driven = isBlockDriven(block, sparkStore.driveChains);
 
     if (!hasAddr) {
       part.settings.enabled = !part.settings.enabled;

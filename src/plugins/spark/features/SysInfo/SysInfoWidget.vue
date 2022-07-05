@@ -9,7 +9,10 @@ import {
   TicksBlock,
   WiFiSettingsBlock,
 } from '@/plugins/spark/types';
-import { getTicksBlock, getWiFiSettingsBlock } from '@/plugins/spark/utils';
+import {
+  getTicksBlock,
+  getWiFiSettingsBlock,
+} from '@/plugins/spark/utils/system';
 import { useServiceStore } from '@/store/services';
 import { shortDateString } from '@/utils/formatting';
 import { durationString } from '@/utils/quantity';

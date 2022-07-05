@@ -2,7 +2,7 @@
 import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
 import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
@@ -22,7 +22,6 @@ export default defineComponent({
   },
   emits: [...useWizard.emits],
   setup() {
-    const systemStore = useSystemStore();
     const featureStore = useFeatureStore();
     const feature = ref<WidgetFeatureOption | null>(null);
     const wizardActive = ref<boolean>(false);
@@ -38,7 +37,7 @@ export default defineComponent({
     onBeforeMount(() => reset());
 
     const experimental = computed<boolean>(
-      () => systemStore.config.experimental,
+      () => userUISettings.value.experimental,
     );
 
     const wizardOpts = computed<WidgetFeatureOption[]>(() =>

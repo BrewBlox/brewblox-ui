@@ -44,11 +44,11 @@ import App from './App.vue';
 const quasarOpts: Partial<QuasarPluginOptions> = {
   plugins: {
     Cookies,
-    Notify,
     Dialog,
     LocalStorage,
-    SessionStorage,
     Meta,
+    Notify,
+    SessionStorage,
   },
 
   config: {

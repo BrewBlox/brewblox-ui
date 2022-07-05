@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
 import { eventbus } from '@/eventbus';
-import { useSystemStore } from '@/store/system';
+import { userUnits } from '@/user-settings';
 import { concatById, findById } from '@/utils/collections';
 import { bloxQty } from '@/utils/quantity';
 
@@ -33,8 +33,7 @@ export const useTiltStore = defineStore('tiltStore', {
     },
 
     async parseStateEvent(evt: TiltStateEvent): Promise<void> {
-      const systemStore = useSystemStore();
-      const tempUnit = systemStore.units.temperature;
+      const tempUnit = userUnits.value.temperature;
       const temp = evt.data[`temperature[${tempUnit}]`];
       const sg = evt.data['specificGravity'];
       const rssi = evt.data['rssi[dBm]'];

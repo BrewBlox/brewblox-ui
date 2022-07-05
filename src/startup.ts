@@ -1,4 +1,4 @@
-import { useSystemStore } from '@/store/system';
+import { startupDone } from '@/user-settings';
 
 export interface Startable {
   start(): Awaitable<unknown>;
@@ -24,7 +24,7 @@ export class BrewbloxStartup {
 
   public async start(): Promise<void> {
     await Promise.all(this.startFuncs.map((f) => f()));
-    useSystemStore().startupDone = true;
+    startupDone.value = true;
   }
 }
 

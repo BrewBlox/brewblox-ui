@@ -7,7 +7,7 @@ import 'simple-keyboard/build/css/index.css';
 import { PropType, computed, defineComponent, ref, watch } from 'vue';
 
 import { useDialog } from '@/composables';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { isDurationString } from '@/utils/identity';
 import { makeRuleValidator } from '@/utils/rules';
 
@@ -60,7 +60,6 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const systemStore = useSystemStore();
     const { dialogProps, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
 
@@ -87,7 +86,7 @@ export default defineComponent({
         return custom;
       }
       const layouts = new KeyboardLayouts();
-      const layoutName = systemStore.config.keyboardLayout;
+      const layoutName = userUISettings.value.keyboardLayout;
       return layouts.get(layoutName);
     }
 

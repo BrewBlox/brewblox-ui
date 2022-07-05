@@ -8,7 +8,7 @@ import {
   BlockConfig,
   BlockType,
 } from '@/plugins/spark/types';
-import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { useWidgetStore } from '@/store/widgets';

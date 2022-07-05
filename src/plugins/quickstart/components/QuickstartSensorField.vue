@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockIntfType } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { prettyQty } from '@/utils/formatting';
 
 const sensorFilter = (block: Block): boolean =>

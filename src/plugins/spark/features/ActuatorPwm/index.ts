@@ -10,10 +10,8 @@ import {
   BlockSpec,
   BlockType,
 } from '@/plugins/spark/types';
-import {
-  blockWidgetSelector,
-  prettifyConstraints,
-} from '@/plugins/spark/utils';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, durationString } from '@/utils/quantity';

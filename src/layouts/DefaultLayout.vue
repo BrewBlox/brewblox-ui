@@ -4,12 +4,11 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 
 export default defineComponent({
   name: 'DefaultLayout',
   setup() {
-    const systemStore = useSystemStore();
     const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
     const router = useRouter();
@@ -32,7 +31,7 @@ export default defineComponent({
 
     const showSidebarLayouts = computed<boolean>(
       () =>
-        systemStore.config.showSidebarLayouts ||
+        userUISettings.value.showSidebarLayouts ||
         /^\/(builder|brewery)/.test(router.currentRoute.value.path),
     );
 

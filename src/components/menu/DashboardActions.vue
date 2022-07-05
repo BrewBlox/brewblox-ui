@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import {
   startChangeDashboardId,
   startChangeDashboardTitle,
@@ -20,7 +20,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const dashboardStore = useDashboardStore();
     const router = useRouter();
 
@@ -33,7 +32,7 @@ export default defineComponent({
     );
 
     const isHomePage = computed<boolean>(
-      () => systemStore.config.homePage === `/dashboard/${props.dashboardId}`,
+      () => userUISettings.value.homePage === `/dashboard/${props.dashboardId}`,
     );
 
     const listed = computed<boolean>({

@@ -18,7 +18,8 @@ import {
 } from '@/shared-types';
 import { useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore } from '@/store/widgets';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { bloxLink } from '@/utils/link';
 import { notify } from '@/utils/notify';
@@ -173,7 +174,7 @@ export async function startAddBlockToDisplay(
     notify.warn(`Block <i>${addr.id}</i> can't be shown on the Spark display`, {
       shown: opts.showNotify,
     });
-  } else if (opts.unique && isBlockDisplayed(addr)) {
+  } else if (opts.unique && isBlockDisplayed(addr, display)) {
     notify.info(
       `Block <i>${addr.id}</i> is already shown on the Spark display`,
       { shown: opts.showNotify },

@@ -71,6 +71,28 @@ yarn spark:load
 yarn build
 ```
 
+## Common issues
+
+### MetricsWidget.vue is blocked
+
+uBlock Origin and Privacy Badger will block the Metrics widget when in dev mode.
+To bypass this, add `localhost` as trusted domain in the extension settings.
+
+### Chrome dev requests are pending forever
+
+In dev mode, the large number of concurrently downloaded files can cause Chrome to exceed its file handle limit.
+When this happens, requests to the dev server are stuck forever as *pending*.\
+To fix this, add the following line to both `/etc/systemd/system.conf` and `/etc/systemd/user.conf`:
+
+```ini
+DefaultLimitNOFILE=65536
+```
+
+### Tests hang forever
+
+If tests silently hang, this may be due to circular dependencies.
+Use <https://github.com/pahen/madge> to analyze and resolve the problem.
+
 ## Loading and saving backend data
 
 Every time you run `yarn start`, data on the backend is reset to defaults.
@@ -87,8 +109,6 @@ Some examples:
 You can use `yarn redis:save` and `yarn spark:save` to replace the defaults.
 The files are indexed in git. Commit them to make the change permanent.
 
----
-
 ## Architecture
 
 ### Directory structure
@@ -101,7 +121,7 @@ Notable new directories:
 
 **src/plugins/** - Application submodules. Plugins behave like [Vue plugins](https://v3.vuejs.org/guide/plugins.html) in that they have an `install(app: App)` function.\
 Plugins may have their own `components/`, `utils/`, and `store/` subdirectories.\
-New plugins should be declared in `src/boot/plugins.ts`.
+New plugins should be declared in `src/main.ts`.
 
 ### Third-party plugins (discontinued)
 

@@ -13,7 +13,7 @@ import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
 import { useBlockSnippetStore, useSparkStore } from './store';
-import { isSparkState } from './utils';
+import { isSparkState } from './utils/info';
 
 // Allows lookups based on the old type ID
 // DeprecatedWidget will update the widget in the datastore

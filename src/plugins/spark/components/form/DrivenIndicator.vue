@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockDriveChain } from '@/shared-types';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
 
 export default defineComponent({
   name: 'DrivenIndicator',

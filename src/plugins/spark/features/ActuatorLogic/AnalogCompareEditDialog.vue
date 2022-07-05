@@ -10,7 +10,7 @@ import {
   BlockIntfType,
   Quantity,
 } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { isQuantity } from '@/utils/identity';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, tempQty } from '@/utils/quantity';

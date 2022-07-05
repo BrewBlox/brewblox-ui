@@ -19,8 +19,8 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
 import {
   bloxQty,
@@ -201,10 +201,9 @@ export function defineWidgets(
   config: RimsConfig,
   layouts: BuilderLayout[],
 ): Widget[] {
-  const systemStore = useSystemStore();
   const featureStore = useFeatureStore();
   const { serviceId, dashboardId, names, prefix } = config;
-  const userTemp = systemStore.units.temperature;
+  const userTemp = userUnits.value.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),

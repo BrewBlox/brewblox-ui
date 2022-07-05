@@ -7,7 +7,8 @@ import { createBlockWizard } from '@/plugins/wizardry';
 import { BlockType } from '@/shared-types';
 import { WidgetRole, useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
 import { useBlockSpecStore, useSparkStore } from '../store';

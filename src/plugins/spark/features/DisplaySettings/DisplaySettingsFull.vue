@@ -9,7 +9,7 @@ import {
   DisplaySettingsBlock,
   DisplaySlot,
 } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { Link } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { isLink } from '@/utils/identity';

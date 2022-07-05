@@ -11,13 +11,12 @@ import {
   OneWireGpioModuleBlock,
   TempSensorOneWireBlock,
 } from '@/plugins/spark/types';
-import {
-  discoverBlocks,
-  isCompatible,
-  makeBlockIdRules,
-} from '@/plugins/spark/utils';
+import { discoverBlocks } from '@/plugins/spark/utils/configuration';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { useFeatureStore } from '@/store/features';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/formatting';
 import { makeObjectSorter } from '@/utils/functional';
 import { matchesType } from '@/utils/objects';

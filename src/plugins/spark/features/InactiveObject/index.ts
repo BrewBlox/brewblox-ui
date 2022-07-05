@@ -2,7 +2,7 @@ import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { BlockType, InactiveObjectBlock } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 
 import widget from './InactiveObjectWidget.vue';

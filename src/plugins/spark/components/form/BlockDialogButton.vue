@@ -4,7 +4,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
 
 function validateBlockId(v: unknown): boolean {
   return v === null || isString(v);

@@ -10,7 +10,7 @@ import {
 } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
-import { useSystemStore } from '@/store/system';
+import { userUnits } from '@/user-settings';
 import { preciseNumber, prettyUnit } from '@/utils/formatting';
 import { deltaTempQty } from '@/utils/quantity';
 
@@ -27,7 +27,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const sparkStore = useSparkStore();
     const { scale, bordered } = usePart.setup(props.part);
 
@@ -64,7 +63,7 @@ export default defineComponent({
     );
 
     const deltaTempUnit = computed<string>(
-      () => `delta_${systemStore.units.temperature}`,
+      () => `delta_${userUnits.value.temperature}`,
     );
 
     const convertedOutputSetting = computed<number | null>(() =>

@@ -10,6 +10,7 @@ import { JSQuantity, bloxQty } from '@/utils/quantity';
 import type {
   ApiQuery,
   CsvPrecision,
+  GraphConfig,
   HistorySource,
   LoggedSession,
   QueryParams,
@@ -171,6 +172,19 @@ export const useHistoryStore = defineStore('historyStore', {
           precision,
         }),
       );
+    },
+
+    async downloadGraphCsv(
+      config: GraphConfig,
+      precision: CsvPrecision,
+      header: string,
+    ): Promise<void> {
+      await this.downloadCsv({
+        params: config.params,
+        fields: config.fields,
+        precision,
+        fileName: `${header}.csv`,
+      });
     },
 
     async start(): Promise<void> {

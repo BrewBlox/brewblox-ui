@@ -13,7 +13,7 @@ import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { useSparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
-import { isSparkUpdate } from '@/plugins/spark/utils';
+import { isSparkUpdate } from '@/plugins/spark/utils/info';
 
 export default defineComponent({
   name: 'FirmwareUpdateDialog',

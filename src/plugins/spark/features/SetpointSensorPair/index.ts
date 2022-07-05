@@ -10,7 +10,7 @@ import {
   FilterChoice,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import { deltaTempQty, tempQty } from '@/utils/quantity';

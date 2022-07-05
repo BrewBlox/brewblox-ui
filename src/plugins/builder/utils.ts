@@ -6,18 +6,15 @@ import { nanoid } from 'nanoid';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
+import { createBlockDialog } from '@/utils/block-dialog';
 import {
   Coordinates,
   CoordinatesParam,
   rotatedSize,
 } from '@/utils/coordinates';
-import {
-  createBlockDialog,
-  createDialog,
-  createDialogPromise,
-} from '@/utils/dialog';
+import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 
 import {

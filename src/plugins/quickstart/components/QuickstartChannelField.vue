@@ -10,7 +10,8 @@ import {
   IoArrayBlock,
   IoChannel,
 } from '@/plugins/spark/types';
-import { channelName, isCompatible } from '@/plugins/spark/utils';
+import { channelName } from '@/plugins/spark/utils/formatting';
+import { isCompatible } from '@/plugins/spark/utils/info';
 
 import { GpioChange, IoChannelAddress } from '../types';
 

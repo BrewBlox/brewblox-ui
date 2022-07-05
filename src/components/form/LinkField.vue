@@ -5,7 +5,8 @@ import { PropType, computed, defineComponent } from 'vue';
 import { useField } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 
 export default defineComponent({

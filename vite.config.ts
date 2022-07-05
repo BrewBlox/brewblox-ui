@@ -82,6 +82,7 @@ export default defineConfig(({ command, mode }): UserConfig => {
 
     test: {
       environment: 'jsdom',
+      setupFiles: ['test/setup.ts'],
     },
   };
 });

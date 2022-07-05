@@ -1,15 +1,13 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 
-import { useSystemStore } from '@/store/system';
+import { startupDone } from '@/user-settings';
 
 export default defineComponent({
   name: 'PageError',
   setup() {
-    const systemStore = useSystemStore();
-    const started = computed<boolean>(() => systemStore.startupDone);
     return {
-      started,
+      startupDone,
     };
   },
 });
@@ -17,7 +15,7 @@ export default defineComponent({
 
 <template>
   <div class="text-h5 darkened absolute-center column items-center q-gutter-md">
-    <template v-if="started">
+    <template v-if="startupDone">
       <slot />
     </template>
     <template v-else>

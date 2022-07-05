@@ -3,9 +3,11 @@ import { Enum } from 'typescript-string-enums';
 
 import {
   Block,
+  BlockDriveChain,
   BlockIntfType,
   BlockType,
   COMPATIBLE_TYPES,
+  DisplaySettingsBlock,
   SparkPatchEvent,
   SparkStateEvent,
   SparkUpdateEvent,
@@ -14,9 +16,7 @@ import {
 import { useFeatureStore } from '@/store/features';
 import { isLink } from '@/utils/identity';
 
-import { useSparkStore } from '../store';
 import { BlockAddress, ComparedBlockType } from '../types';
-import { getDisplaySettingsBlock } from './system';
 
 export function isCompatible(
   type: Maybe<string>,
@@ -57,15 +57,6 @@ export function isBlockDisplayReady(addr: BlockAddress): boolean {
   ]);
 }
 
-export function isBlockDisplayed(addr: BlockAddress): boolean {
-  return (
-    addr.id !== null &&
-    !!getDisplaySettingsBlock(addr.serviceId)?.data.widgets.find((w) =>
-      Object.values(w).find((v) => isLink(v) && v.id === addr.id),
-    )
-  );
-}
-
 export function isBlockVolatile(block: Maybe<Block>): boolean {
   return block?.meta?.volatile === true;
 }
@@ -78,11 +69,24 @@ export function isBlockRemovable(block: Maybe<Block>): boolean {
   );
 }
 
-export const isBlockDriven = (block: Maybe<Block>): boolean =>
+export function isBlockDisplayed(
+  addr: BlockAddress,
+  display: DisplaySettingsBlock,
+): boolean {
+  return (
+    addr.id !== null &&
+    !!display?.data.widgets.find((w) =>
+      Object.values(w).find((v) => isLink(v) && v.id === addr.id),
+    )
+  );
+}
+
+export const isBlockDriven = (
+  block: Maybe<Block>,
+  chains: Mapped<BlockDriveChain[]>,
+): boolean =>
   block != null &&
-  useSparkStore()
-    .driveChainsByService(block.serviceId)
-    .some((chain) => chain.target === block.id);
+  !!chains[block.serviceId]?.some((chain) => chain.target === block.id);
 
 export const isSparkState = (data: unknown): data is SparkStateEvent =>
   (data as SparkStateEvent).type === 'Spark.state';

@@ -18,6 +18,7 @@ yarn-error.log*
 
 # Build output
 /dist
+/coverage
 
 # Dev environment files
 /.env

@@ -16,7 +16,7 @@ import {
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { useSystemStore } from '@/store/system';
+import { userUnits } from '@/user-settings';
 import { prettyAny } from '@/utils/formatting';
 import { isQuantity } from '@/utils/identity';
 import { deltaTempQty } from '@/utils/quantity';
@@ -41,7 +41,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const sparkStore = useSparkStore();
     const { scale, bordered } = usePart.setup(props.part);
 
@@ -87,7 +86,7 @@ export default defineComponent({
     });
 
     const deltaTempUnit = computed<string>(
-      () => `delta_${systemStore.units.temperature}`,
+      () => `delta_${userUnits.value.temperature}`,
     );
 
     const actualSetting = computed<Quantity | number | null>(() => {

@@ -1,6 +1,7 @@
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { useWidgetStore } from '@/store/widgets';
+import { userUISettings } from '@/user-settings';
 
 import { createDialog } from './dialog';
 import { notify } from './notify';
@@ -37,8 +38,8 @@ async function execDashboardIdChange(
   );
   await dashboardStore.removeDashboard({ ...dashboard });
 
-  if (systemStore.config.homePage === `/dashboard/${oldId}`) {
-    await systemStore.saveConfig({ homePage: `/dashboard/${newId}` });
+  if (userUISettings.value.homePage === `/dashboard/${oldId}`) {
+    await systemStore.patchUserUISettings({ homePage: `/dashboard/${newId}` });
   }
 
   notify.done(`Changed dashboard URL to <b>${newId}</b>`);
