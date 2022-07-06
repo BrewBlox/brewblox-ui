@@ -237,13 +237,13 @@ export default defineComponent({
           </q-btn>
         </div>
         <div class="text-italic q-pr-sm">
-          {{ status }}
+          {{ pd.status }}
           <q-tooltip>
             <div
               class="monospace darkish"
               style="white-space: pre-line"
             >
-              {{ history || 'No history available' }}
+              {{ pd.history || 'No history available' }}
             </div>
           </q-tooltip>
         </div>
