@@ -2,7 +2,7 @@
 import { computed, defineComponent, onMounted } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
-import { shortDateString } from '@/utils/formatting';
+import { shortDateString } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'DateValEdit',

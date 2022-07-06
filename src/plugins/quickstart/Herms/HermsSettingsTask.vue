@@ -4,8 +4,13 @@ import { PropType, computed, defineComponent, ref } from 'vue';
 import { Quantity } from '@/shared-types';
 import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty, prettyUnit } from '@/utils/formatting';
-import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
+import {
+  bloxQty,
+  deltaTempQty,
+  prettyQty,
+  prettyUnit,
+  tempQty,
+} from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { HermsConfig, HermsOpts } from './types';

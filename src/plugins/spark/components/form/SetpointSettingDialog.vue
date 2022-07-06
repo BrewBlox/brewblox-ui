@@ -7,8 +7,7 @@ import { BlockAddress } from '@/plugins/spark/types';
 import { ifCompatible } from '@/plugins/spark/utils/info';
 import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { prettyUnit } from '@/utils/formatting';
-import { tempQty } from '@/utils/quantity';
+import { prettyUnit, tempQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SetpointSettingDialog',

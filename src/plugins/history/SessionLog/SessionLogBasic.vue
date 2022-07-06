@@ -4,7 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { useWidget } from '@/composables';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { shortDateString } from '@/utils/formatting';
+import { shortDateString } from '@/utils/quantity';
 
 import { useHistoryStore } from '../store';
 import {

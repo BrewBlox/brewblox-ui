@@ -11,8 +11,7 @@ import {
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
 import { userUnits } from '@/user-settings';
-import { preciseNumber, prettyUnit } from '@/utils/formatting';
-import { deltaTempQty } from '@/utils/quantity';
+import { deltaTempQty, preciseNumber, prettyUnit } from '@/utils/quantity';
 
 import { PID_KEY, PID_TYPES } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';

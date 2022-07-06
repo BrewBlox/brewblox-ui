@@ -11,8 +11,8 @@ import {
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
-import { shortDateString } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
+import { shortDateString } from '@/utils/quantity';
 
 import widget from './SetpointProfileWidget.vue';
 

@@ -17,7 +17,7 @@ import {
   QueryParams,
   TimeSeriesRangesResult,
 } from '@/plugins/history/types';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber } from '@/utils/quantity';
 
 function boundedConcat(left: number[] = [], right: number[] = []): number[] {
   const sliced = Math.max(left.length + right.length - MAX_GRAPH_POINTS, 0);

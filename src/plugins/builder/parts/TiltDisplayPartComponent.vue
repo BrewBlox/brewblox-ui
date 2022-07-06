@@ -12,8 +12,13 @@ import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
 import { GravityUnit, Quantity } from '@/shared-types';
 import { userUnits } from '@/user-settings';
-import { fixedNumber, prettyQty, prettyUnit } from '@/utils/formatting';
-import { bloxQty, tempQty } from '@/utils/quantity';
+import {
+  bloxQty,
+  fixedNumber,
+  prettyQty,
+  prettyUnit,
+  tempQty,
+} from '@/utils/quantity';
 
 import { SIZE_X, SIZE_Y, TILT_ID_KEY } from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';

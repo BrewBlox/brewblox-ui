@@ -13,9 +13,8 @@ import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockDriven } from '@/plugins/spark/utils/info';
 import { ActuatorOffsetBlock, BlockType } from '@/shared-types';
 import { createBlockDialog } from '@/utils/block-dialog';
-import { fixedNumber, prettyQty } from '@/utils/formatting';
 import { matchesType } from '@/utils/objects';
-import { bloxQty, tempQty } from '@/utils/quantity';
+import { bloxQty, fixedNumber, prettyQty, tempQty } from '@/utils/quantity';
 
 interface GridOpts {
   start?: number;

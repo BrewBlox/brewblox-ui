@@ -19,10 +19,9 @@ import {
   DigitalConstraintKey,
   OneWireGpioModuleBlock,
 } from '@/shared-types';
-import { prettyLink } from '@/utils/formatting';
 import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
-import { durationString } from '@/utils/quantity';
+import { durationString, prettyLink } from '@/utils/quantity';
 
 import { constraintLabels, ioChannelNames } from '../const';
 

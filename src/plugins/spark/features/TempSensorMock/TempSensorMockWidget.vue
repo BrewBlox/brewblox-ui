@@ -5,8 +5,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Fluctuation, TempSensorMockBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
-import { bloxQty, deltaTempQty } from '@/utils/quantity';
+import { bloxQty, deltaTempQty, prettyQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'TempSensorMockWidget',

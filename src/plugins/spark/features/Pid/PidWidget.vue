@@ -5,7 +5,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { PidBlock } from '@/plugins/spark/types';
 import { Link } from '@/shared-types';
-import { prettyLink } from '@/utils/formatting';
+import { prettyLink } from '@/utils/quantity';
 
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';

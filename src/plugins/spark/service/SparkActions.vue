@@ -2,18 +2,17 @@
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { useSparkStore } from '@/plugins/spark/store';
+import { SparkService } from '@/plugins/spark/types';
+import { saveHwInfo, startResetBlocks } from '@/plugins/spark/utils/actions';
+import { discoverBlocks } from '@/plugins/spark/utils/configuration';
+import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { Service, useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
-
-import { useSparkStore } from '../store';
-import { SparkService } from '../types';
-import { saveHwInfo, startResetBlocks } from '../utils/actions';
-import { discoverBlocks } from '../utils/configuration';
-import { cleanUnusedNames } from '../utils/formatting';
 
 export default defineComponent({
   name: 'SparkActions',

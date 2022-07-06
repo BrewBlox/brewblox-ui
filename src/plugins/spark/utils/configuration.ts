@@ -12,10 +12,9 @@ import {
   ProfileValues,
 } from '@/plugins/spark/types';
 import { Block, SetpointProfileBlock } from '@/shared-types';
-import { prettyUnit } from '@/utils/formatting';
 import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
-import { bloxQty } from '@/utils/quantity';
+import { bloxQty, prettyUnit } from '@/utils/quantity';
 
 export const asBlockAddress = (block: Block): BlockAddress =>
   pick(block, ['id', 'serviceId', 'type']);

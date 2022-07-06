@@ -5,7 +5,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { useValEdit } from '@/plugins/spark/composables';
 import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty, prettyUnit, roundedNumber } from '@/utils/formatting';
+import { prettyQty, prettyUnit, roundedNumber } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'QuantityValEdit',

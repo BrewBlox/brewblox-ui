@@ -3,7 +3,7 @@ import { PropType, computed, defineComponent } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
-import { clampRotation } from '@/utils/formatting';
+import { clampRotation } from '@/utils/quantity';
 
 import { BuilderBlueprint, FlowPart, PartSettingsCard } from '../types';
 import { coord2grid } from '../utils';

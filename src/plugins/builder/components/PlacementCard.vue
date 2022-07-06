@@ -1,7 +1,7 @@
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
 
-import { clampRotation } from '@/utils/formatting';
+import { clampRotation } from '@/utils/quantity';
 
 import { FlowPart } from '../types';
 

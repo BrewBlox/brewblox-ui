@@ -10,9 +10,8 @@ import {
   SetpointSensorPairBlock,
 } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { prettyUnit } from '@/utils/formatting';
 import { deepCopy } from '@/utils/objects';
-import { bloxQty, tempQty } from '@/utils/quantity';
+import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SetpointProfileDisableDialog',

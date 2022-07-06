@@ -11,7 +11,7 @@ import {
 import { isBlockDriven } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { fixedNumber, prettyQty } from '@/utils/formatting';
+import { fixedNumber, prettyQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'PidBasic',

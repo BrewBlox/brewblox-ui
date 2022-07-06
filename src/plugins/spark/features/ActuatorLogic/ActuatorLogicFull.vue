@@ -16,8 +16,8 @@ import {
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
-import { nonNullString, prettyLink } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
+import { nonNullString, prettyLink } from '@/utils/quantity';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';

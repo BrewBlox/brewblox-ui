@@ -14,6 +14,7 @@
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
+    "skipLibCheck": true,
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {

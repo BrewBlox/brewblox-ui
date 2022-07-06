@@ -14,9 +14,8 @@ import {
 import { createBlockDialog } from '@/utils/block-dialog';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty, shortDateString } from '@/utils/formatting';
 import { notify } from '@/utils/notify';
-import { bloxQty, tempQty } from '@/utils/quantity';
+import { bloxQty, prettyQty, shortDateString, tempQty } from '@/utils/quantity';
 
 import { PidConfig } from '../types';
 import TempControlModeDialog from './TempControlModeDialog.vue';

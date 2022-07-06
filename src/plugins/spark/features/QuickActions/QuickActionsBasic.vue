@@ -7,11 +7,11 @@ import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { prettyAny } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
+import { prettyAny } from '@/utils/quantity';
 
 import {
   BlockChange,

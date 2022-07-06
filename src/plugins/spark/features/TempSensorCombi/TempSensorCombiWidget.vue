@@ -11,8 +11,8 @@ import {
   TempSensorCombiBlock,
 } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
+import { prettyQty } from '@/utils/quantity';
 
 const combineFuncOpts: SelectOption[] = Object.entries(combineFuncLabels).map(
   ([value, label]) => ({ label, value }),

@@ -8,7 +8,7 @@ import {
   liquidOnCoord,
   textTransformation,
 } from '@/plugins/builder/utils';
-import { fixedNumber, prettyUnit } from '@/utils/formatting';
+import { fixedNumber, prettyUnit } from '@/utils/quantity';
 
 import { SENSOR_KEY, SENSOR_TYPES, SensorT } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';

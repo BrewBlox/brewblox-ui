@@ -6,7 +6,7 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BalancerBlock } from '@/plugins/spark/types';
 import { Block } from '@/shared-types';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'BalancerWidget',

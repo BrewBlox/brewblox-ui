@@ -19,9 +19,8 @@ import {
   MetricsSource,
 } from '@/plugins/history/types';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
-import { fixedNumber } from '@/utils/formatting';
 import { isJsonEqual } from '@/utils/objects';
-import { durationString } from '@/utils/quantity';
+import { durationString, fixedNumber } from '@/utils/quantity';
 
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { MetricsWidget } from './types';

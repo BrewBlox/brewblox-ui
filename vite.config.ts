@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import { ServerOptions } from 'https';
 import * as path from 'path';
 import { UserConfig, defineConfig } from 'vite';
+import Checker from 'vite-plugin-checker';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }): UserConfig => {
@@ -45,7 +46,16 @@ export default defineConfig(({ command, mode }): UserConfig => {
       }),
 
       quasar({
-        sassVariables: 'src/css/quasar.variables.sass',
+        sassVariables: 'src/css/variables.sass',
+      }),
+
+      Checker({
+        typescript: true,
+        vueTsc: true,
+        eslint: {
+          lintCommand:
+            'eslint --ext .js,.ts,.vue --ignore-path .gitignore ./src ./test',
+        },
       }),
     ],
 

@@ -4,8 +4,8 @@ import { computed, defineComponent } from 'vue';
 import { eventbus } from '@/eventbus';
 import { useHistoryStore } from '@/plugins/history/store';
 import { useLoggingStore } from '@/store/logging';
-import { shortDateString } from '@/utils/formatting';
 import { notifyColors, notifyIcons } from '@/utils/notify';
+import { shortDateString } from '@/utils/quantity';
 
 interface LogEntryDisplay {
   message: string;

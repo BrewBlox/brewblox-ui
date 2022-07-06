@@ -1,7 +1,7 @@
 <script lang="ts">
 import { PropType, computed, defineComponent } from 'vue';
 
-import { prettyQty } from '@/utils/formatting';
+import { prettyQty } from '@/utils/quantity';
 
 import { PidConfig } from '../types';
 

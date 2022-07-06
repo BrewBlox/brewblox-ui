@@ -17,9 +17,9 @@ import { isCompatible } from '@/plugins/spark/utils/info';
 import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
 import { makeObjectSorter } from '@/utils/functional';
 import { matchesType } from '@/utils/objects';
+import { prettyQty } from '@/utils/quantity';
 
 import { QuickstartConfig } from '../types';
 

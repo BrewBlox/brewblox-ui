@@ -10,7 +10,7 @@ import {
   LogicResult,
 } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyLink } from '@/utils/formatting';
+import { prettyLink } from '@/utils/quantity';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';

@@ -5,8 +5,8 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Link, SetpointProfileBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyLink } from '@/utils/formatting';
 import { deepCopy, isJsonEqual } from '@/utils/objects';
+import { prettyLink } from '@/utils/quantity';
 
 import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';

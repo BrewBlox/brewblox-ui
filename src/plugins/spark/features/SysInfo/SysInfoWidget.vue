@@ -14,8 +14,7 @@ import {
   getWiFiSettingsBlock,
 } from '@/plugins/spark/utils/system';
 import { useServiceStore } from '@/store/services';
-import { shortDateString } from '@/utils/formatting';
-import { durationString } from '@/utils/quantity';
+import { durationString, shortDateString } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SysInfoWidget',

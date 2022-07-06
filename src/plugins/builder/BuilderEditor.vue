@@ -18,10 +18,10 @@ import { startupDone } from '@/user-settings';
 import { rotatedSize } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
-import { clampRotation } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { loadFile } from '@/utils/import-export';
 import { deepCopy } from '@/utils/objects';
+import { clampRotation } from '@/utils/quantity';
 import { isAbsoluteUrl } from '@/utils/url';
 
 import {
