@@ -3,10 +3,14 @@ import { computed, defineComponent, ref, watch } from 'vue';
 
 import { useSparkStore } from '@/plugins/spark/store';
 import type { Block, BlockConfig } from '@/plugins/spark/types';
-import { discoverBlocks, makeBlockIdRules } from '@/plugins/spark/utils';
+import {
+  discoverBlocks,
+  makeBlockIdRules,
+} from '@/plugins/spark/utils/configuration';
 import { tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 
 export default defineComponent({
   name: 'BlockDiscoveryWizard',

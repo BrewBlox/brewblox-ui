@@ -10,9 +10,8 @@ import {
 } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
-import { useSystemStore } from '@/store/system';
-import { preciseNumber, prettyUnit } from '@/utils/formatting';
-import { deltaTempQty } from '@/utils/quantity';
+import { userUnits } from '@/user-settings';
+import { deltaTempQty, preciseNumber, prettyUnit } from '@/utils/quantity';
 
 import { PID_KEY, PID_TYPES } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';
@@ -27,7 +26,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const sparkStore = useSparkStore();
     const { scale, bordered } = usePart.setup(props.part);
 
@@ -64,7 +62,7 @@ export default defineComponent({
     );
 
     const deltaTempUnit = computed<string>(
-      () => `delta_${systemStore.units.temperature}`,
+      () => `delta_${userUnits.value.temperature}`,
     );
 
     const convertedOutputSetting = computed<number | null>(() =>

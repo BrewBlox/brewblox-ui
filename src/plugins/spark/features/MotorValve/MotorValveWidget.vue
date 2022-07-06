@@ -3,10 +3,10 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import { MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
-import { getSpark3PinsBlock } from '@/plugins/spark/utils';
+import { getSpark3PinsBlock } from '@/plugins/spark/utils/system';
 
-import { useSparkStore } from '../../store';
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
 

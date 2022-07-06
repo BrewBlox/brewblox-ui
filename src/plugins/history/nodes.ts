@@ -4,8 +4,8 @@ import set from 'lodash/set';
 import startCase from 'lodash/startCase';
 import { QTreeNode } from 'quasar';
 
-import { prettyUnit } from '@/utils/formatting';
 import { splitPostfixed } from '@/utils/parsing';
+import { prettyUnit } from '@/utils/quantity';
 
 function sentenceCased(s: string): string {
   return capitalize(startCase(s));

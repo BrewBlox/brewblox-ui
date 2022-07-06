@@ -3,7 +3,7 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { Link } from '@/shared-types';
 
 export default defineComponent({

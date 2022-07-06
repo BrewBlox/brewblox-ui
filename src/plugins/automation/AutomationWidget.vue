@@ -5,7 +5,7 @@ import { useContext } from '@/composables';
 import { HOST } from '@/const';
 import { findById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { shortDateString } from '@/utils/formatting';
+import { shortDateString } from '@/utils/quantity';
 
 import AutomationInfoDialog from './AutomationInfoDialog.vue';
 import AutomationJumpDialog from './AutomationJumpDialog.vue';
@@ -237,13 +237,13 @@ export default defineComponent({
           </q-btn>
         </div>
         <div class="text-italic q-pr-sm">
-          {{ status }}
+          {{ pd.status }}
           <q-tooltip>
             <div
               class="monospace darkish"
               style="white-space: pre-line"
             >
-              {{ history || 'No history available' }}
+              {{ pd.history || 'No history available' }}
             </div>
           </q-tooltip>
         </div>

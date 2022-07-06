@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { makeObjectSorter, uniqueFilter } from '@/utils/functional';
 
 describe('Array funcs', () => {

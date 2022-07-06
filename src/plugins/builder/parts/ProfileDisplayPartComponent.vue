@@ -4,8 +4,8 @@ import { PropType, computed, defineComponent } from 'vue';
 
 import { coord2grid } from '@/plugins/builder/utils';
 import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
-import { fixedNumber } from '@/utils/formatting';
 import { makeObjectSorter } from '@/utils/functional';
+import { fixedNumber } from '@/utils/quantity';
 
 import { PROFILE_KEY, PROFILE_TYPES } from '../blueprints/ProfileDisplay';
 import { usePart, useSettingsBlock } from '../composables';

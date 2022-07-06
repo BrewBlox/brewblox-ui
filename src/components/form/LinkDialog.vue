@@ -4,10 +4,10 @@ import { PropType, computed, defineComponent, ref } from 'vue';
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 

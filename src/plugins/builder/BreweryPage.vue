@@ -4,7 +4,7 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { useSystemStore } from '@/store/system';
+import { startupDone, userUISettings } from '@/user-settings';
 import { concatById } from '@/utils/collections';
 import { isAbsoluteUrl } from '@/utils/url';
 
@@ -23,7 +23,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const { localStorage } = useQuasar();
@@ -31,10 +30,8 @@ export default defineComponent({
 
     const pending = ref<FlowPart | null>(null);
 
-    const startupDone = computed<boolean>(() => systemStore.startupDone);
-
     const delayTouch = computed<boolean>(() => {
-      const { builderTouchDelayed } = systemStore.config;
+      const { builderTouchDelayed } = userUISettings.value;
       return (
         builderTouchDelayed === 'always' ||
         (builderTouchDelayed === 'dense' && dense.value)

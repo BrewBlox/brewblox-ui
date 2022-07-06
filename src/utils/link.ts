@@ -1,7 +1,7 @@
 import { BlockOrIntfType, Link } from '@/shared-types';
 
-import { prettyLink } from './formatting';
 import { isLink } from './identity';
+import { prettyLink } from './quantity';
 
 export function rawLink(
   id: string | null,

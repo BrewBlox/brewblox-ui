@@ -1,4 +1,8 @@
-import { useSystemStore } from '@/store/system';
+import { startupDone } from '@/user-settings';
+
+export interface Startable {
+  start(): Awaitable<unknown>;
+}
 
 /**
  * Vue/VueX have the concept of lifecycle hooks for individual components,
@@ -14,13 +18,13 @@ import { useSystemStore } from '@/store/system';
 export class BrewbloxStartup {
   private startFuncs: (() => Awaitable<unknown>)[] = [];
 
-  public onStart(func: () => Awaitable<unknown>): void {
-    this.startFuncs.push(func);
+  public add(startable: Startable): void {
+    this.startFuncs.push(startable.start);
   }
 
   public async start(): Promise<void> {
     await Promise.all(this.startFuncs.map((f) => f()));
-    useSystemStore().startupDone = true;
+    startupDone.value = true;
   }
 }
 

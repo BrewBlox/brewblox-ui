@@ -4,7 +4,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { useDashboardStore } from '@/store/dashboards';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 
 export default defineComponent({
   name: 'WizardDialog',
@@ -32,7 +32,6 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
     const { dense } = useGlobals.setup();
-    const systemStore = useSystemStore();
     const sparkStore = useSparkStore();
     const dashboardStore = useDashboardStore();
 
@@ -45,7 +44,7 @@ export default defineComponent({
     );
 
     const primaryDashboardId = computed<string | null>(() => {
-      const { homePage } = systemStore.config;
+      const { homePage } = userUISettings.value;
       if (!homePage || !homePage.startsWith('/dashboard')) {
         return null;
       }

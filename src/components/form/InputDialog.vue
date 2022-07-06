@@ -3,7 +3,7 @@ import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
 
 const typeValidator = (v: unknown): boolean =>

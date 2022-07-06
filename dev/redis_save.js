@@ -1,6 +1,12 @@
 const axios = require('axios');
 const fs = require('fs');
-const { datastore, retry, databases, fileDir, objectSorter } = require('./utils');
+const {
+  datastore,
+  retry,
+  databases,
+  fileDir,
+  objectSorter,
+} = require('./utils');
 const get = require('lodash/get');
 
 async function run() {

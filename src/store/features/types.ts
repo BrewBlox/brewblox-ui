@@ -1,5 +1,5 @@
-import { Service, ServiceStub } from '@/store/services';
-import { Widget } from '@/store/widgets';
+import { Service, ServiceStub } from '@/store/services/types';
+import { Widget } from '@/store/widgets/types';
 
 export type WidgetRole =
   | 'Process'

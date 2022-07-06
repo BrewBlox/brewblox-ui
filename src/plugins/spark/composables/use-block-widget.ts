@@ -11,17 +11,16 @@ import {
 
 import { UseWidgetComponent, useWidget } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
-import { Block } from '@/shared-types';
-import { useWidgetStore } from '@/store/widgets';
-
-import { useBlockSpecStore, useSparkStore } from '../store';
-import { BlockConfig, BlockSpec, BlockWidget } from '../types';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
+import { BlockConfig, BlockSpec, BlockWidget } from '@/plugins/spark/types';
+import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import {
   findLimitations,
-  isBlockVolatile,
   limitationString,
-  makeBlockGraphConfig,
-} from '../utils';
+} from '@/plugins/spark/utils/formatting';
+import { isBlockVolatile } from '@/plugins/spark/utils/info';
+import { Block } from '@/shared-types';
+import { useWidgetStore } from '@/store/widgets';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {

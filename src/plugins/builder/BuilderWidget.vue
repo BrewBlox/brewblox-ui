@@ -3,8 +3,8 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useContext, useGlobals, useWidget } from '@/composables';
-import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
+import { userUISettings } from '@/user-settings';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
@@ -24,7 +24,6 @@ import { coord2grid } from './utils';
 export default defineComponent({
   name: 'BuilderWidget',
   setup() {
-    const systemStore = useSystemStore();
     const builderStore = useBuilderStore();
     const router = useRouter();
     const { inDialog } = useContext.setup();
@@ -96,11 +95,8 @@ export default defineComponent({
     }
 
     const delayTouch = computed<boolean>(() => {
-      const { builderTouchDelayed } = systemStore.config;
-      return (
-        builderTouchDelayed === 'always' ||
-        (builderTouchDelayed === 'dense' && dense.value)
-      );
+      const delayed = userUISettings.value.builderTouchDelayed;
+      return delayed === 'always' || (delayed === 'dense' && dense.value);
     });
 
     function interact(part: FlowPart | null): void {

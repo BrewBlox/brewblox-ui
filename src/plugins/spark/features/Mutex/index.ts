@@ -3,7 +3,7 @@ import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, MutexBlock } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { bloxQty } from '@/utils/quantity';
 

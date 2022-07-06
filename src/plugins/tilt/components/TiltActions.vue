@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import { TiltService } from '@/plugins/tilt/types';
 import { Service, useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 
 export default defineComponent({
@@ -29,11 +30,12 @@ export default defineComponent({
     );
 
     const isHomePage = computed<boolean>({
-      get: () => systemStore.config.homePage === `/service/${props.serviceId}`,
+      get: () =>
+        userUISettings.value.homePage === `/service/${props.serviceId}`,
       set: (v) => {
         const homePage =
           v && service.value ? `/service/${props.serviceId}` : null;
-        systemStore.saveConfig({ homePage });
+        systemStore.patchUserUISettings({ homePage });
       },
     });
 

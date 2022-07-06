@@ -12,7 +12,7 @@ import { notify } from '@/utils/notify';
 
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
-import { saveGraphToFile, selectGraphPrecision } from '../utils';
+import { selectGraphPrecision } from '../utils';
 import SessionCreateDialog from './SessionCreateDialog.vue';
 import SessionLoadDialog from './SessionLoadDialog.vue';
 import SessionLogBasic from './SessionLogBasic.vue';
@@ -140,7 +140,7 @@ export default defineComponent({
       notify.info('Generating CSV... This may take a few seconds.');
 
       for (const note of validNotes) {
-        await saveGraphToFile(
+        await historyStore.downloadGraphCsv(
           note.config,
           precision,
           `${session.value.title}__${note.title}__${sessionDate}`,

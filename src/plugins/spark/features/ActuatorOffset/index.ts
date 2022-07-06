@@ -11,10 +11,8 @@ import {
   BlockType,
   ReferenceKind,
 } from '@/plugins/spark/types';
-import {
-  blockWidgetSelector,
-  prettifyConstraints,
-} from '@/plugins/spark/utils';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 

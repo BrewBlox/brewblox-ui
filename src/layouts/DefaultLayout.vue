@@ -4,17 +4,16 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 
 export default defineComponent({
   name: 'DefaultLayout',
   setup() {
-    const systemStore = useSystemStore();
     const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
     const router = useRouter();
 
-    const devMode = Boolean(process.env.DEV);
+    const devMode = Boolean(import.meta.env.DEV);
     const dashboardEditing = ref<boolean>(false);
     const serviceEditing = ref<boolean>(false);
     const builderEditing = ref<boolean>(false);
@@ -32,7 +31,7 @@ export default defineComponent({
 
     const showSidebarLayouts = computed<boolean>(
       () =>
-        systemStore.config.showSidebarLayouts ||
+        userUISettings.value.showSidebarLayouts ||
         /^\/(builder|brewery)/.test(router.currentRoute.value.path),
     );
 
@@ -86,7 +85,7 @@ export default defineComponent({
 
       <q-scroll-area
         class="col"
-        :thumb-style="{ opacity: 0.5, background: 'silver' }"
+        :thumb-style="{ opacity: '0.5', background: 'silver' }"
       >
         <DashboardIndex v-model:editing="dashboardEditing" />
         <BreweryIndex

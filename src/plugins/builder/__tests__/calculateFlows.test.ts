@@ -1,11 +1,6 @@
-// prevents circular import
-// TODO(Bob): revert to trivago/prettier-plugin-sort-imports when side-effect imports are handled
-// https://github.com/trivago/prettier-plugin-sort-imports/pull/111
-import '@/store/system';
-
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { createPinia, setActivePinia } from 'pinia';
+import { describe, expect, it } from 'vitest';
 
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import blueprints from '@/plugins/builder/blueprints';
@@ -93,8 +88,6 @@ const findPaths = (parts: FlowPart[], start: FlowPart): FlowSegment[] => {
 };
 
 describe('Data describing an input tube', () => {
-  setActivePinia(createPinia());
-
   const part: PersistentPart = {
     id: '',
     x: 1,
@@ -124,8 +117,6 @@ describe('Data describing an input tube', () => {
 });
 
 describe('asFlowParts', () => {
-  setActivePinia(createPinia());
-
   const path: PersistentPart[] = [
     {
       id: 'one',
@@ -163,8 +154,6 @@ describe('asFlowParts', () => {
 });
 
 describe('A single path without splits', () => {
-  setActivePinia(createPinia());
-
   const parts: PersistentPart[] = [
     {
       id: '1',
@@ -274,8 +263,6 @@ describe('A single path without splits', () => {
 });
 
 describe('A path with a split, but no joins', () => {
-  setActivePinia(createPinia());
-
   const parts: PersistentPart[] = [
     {
       id: '1',
@@ -425,8 +412,6 @@ describe('A path with a split, but no joins', () => {
 });
 
 describe('A path that forks and rejoins', () => {
-  setActivePinia(createPinia());
-
   const parts: PersistentPart[] = [
     {
       id: '1',
@@ -631,8 +616,6 @@ describe('A path that forks and rejoins', () => {
 });
 
 describe('A single path with a pump', () => {
-  setActivePinia(createPinia());
-
   const parts: PersistentPart[] = [
     {
       id: '1',
@@ -766,8 +749,6 @@ describe('A single path with a pump', () => {
 });
 
 describe('Two sources joining', () => {
-  setActivePinia(createPinia());
-
   const parts: PersistentPart[] = [
     {
       id: '1',
@@ -1003,8 +984,6 @@ describe('Two sources joining', () => {
 });
 
 describe('A path with a bridge', () => {
-  setActivePinia(createPinia());
-
   // 7 transitions long, passes the bridge twice
   const parts: PersistentPart[] = [
     {
@@ -1186,8 +1165,6 @@ describe('A path with a bridge', () => {
 });
 
 describe('A kettle with 2 outflows', () => {
-  setActivePinia(createPinia());
-
   const parts: PersistentPart[] = [
     {
       id: '1',
@@ -1303,8 +1280,6 @@ describe('A kettle with 2 outflows', () => {
 });
 
 describe('A kettle with flow back to itself', () => {
-  setActivePinia(createPinia());
-
   let parts: PersistentPart[] = [
     {
       id: '1',
@@ -1466,8 +1441,6 @@ describe('A kettle with flow back to itself', () => {
 });
 
 describe('A forking and joining path with a pump in each fork', () => {
-  setActivePinia(createPinia());
-
   const partsBase: PersistentPart[] = [
     {
       id: '1a',

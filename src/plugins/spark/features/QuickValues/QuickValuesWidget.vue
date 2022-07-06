@@ -7,9 +7,9 @@ import { useContext, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockFieldSpec } from '@/plugins/spark/types';
 import { Quantity } from '@/shared-types';
-import { prettyAny, prettyQty, roundedNumber } from '@/utils/formatting';
 import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
+import { prettyAny, prettyQty, roundedNumber } from '@/utils/quantity';
 
 import { QuickValuesWidget } from './types';
 

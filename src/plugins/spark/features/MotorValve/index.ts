@@ -12,11 +12,11 @@ import {
   MotorValveBlock,
   ValveState,
 } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import {
-  blockWidgetSelector,
   enumHint,
   prettifyConstraints,
-} from '@/plugins/spark/utils';
+} from '@/plugins/spark/utils/formatting';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 

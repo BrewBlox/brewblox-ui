@@ -12,11 +12,8 @@ import {
   ComparedBlockType,
   UserBlockType,
 } from '@/plugins/spark/types';
-import {
-  isCompatible,
-  isSystemBlockType,
-  makeBlockIdRules,
-} from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
+import { isCompatible, isSystemBlockType } from '@/plugins/spark/utils/info';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
 import { Widget, useWidgetStore } from '@/store/widgets';

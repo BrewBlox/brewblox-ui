@@ -3,6 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   BlockType,
@@ -14,8 +15,6 @@ import { channelName } from '@/plugins/spark/utils/formatting';
 import { IoArrayBlock } from '@/shared-types';
 import { makeTypeFilter } from '@/utils/functional';
 import { matchesType } from '@/utils/objects';
-
-import { useSparkStore } from '../../store';
 
 interface Claim {
   driverId: string;

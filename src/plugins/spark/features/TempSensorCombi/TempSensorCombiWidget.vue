@@ -4,16 +4,15 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { combineFuncLabels } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   BlockIntfType,
   Link,
   TempSensorCombiBlock,
 } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
-
-import { useSparkStore } from '../../store';
+import { prettyQty } from '@/utils/quantity';
 
 const combineFuncOpts: SelectOption[] = Object.entries(combineFuncLabels).map(
   ([value, label]) => ({ label, value }),

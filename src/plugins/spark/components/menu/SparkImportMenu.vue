@@ -4,7 +4,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { createDialog } from '@/utils/dialog';
 import { loadFile, saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';

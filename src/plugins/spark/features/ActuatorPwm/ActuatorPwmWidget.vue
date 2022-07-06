@@ -5,7 +5,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorPwmBlock } from '@/plugins/spark/types';
 import { Link } from '@/shared-types';
-import { fixedNumber, prettyLink, roundedNumber } from '@/utils/formatting';
+import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
 
 const quickValues: SelectOption<number>[] = [
   { label: '0%', value: 0 },

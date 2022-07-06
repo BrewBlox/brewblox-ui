@@ -5,7 +5,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
 import { AnalogConstraintsObj, Link } from '@/shared-types';
-import { fixedNumber, prettyLink } from '@/utils/formatting';
+import { fixedNumber, prettyLink } from '@/utils/quantity';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
   { label: 'Setting', value: ReferenceKind.REF_SETTING },

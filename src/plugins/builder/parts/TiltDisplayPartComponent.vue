@@ -11,9 +11,14 @@ import {
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
 import { GravityUnit, Quantity } from '@/shared-types';
-import { useSystemStore } from '@/store/system';
-import { fixedNumber, prettyQty, prettyUnit } from '@/utils/formatting';
-import { bloxQty, tempQty } from '@/utils/quantity';
+import { userUnits } from '@/user-settings';
+import {
+  bloxQty,
+  fixedNumber,
+  prettyQty,
+  prettyUnit,
+  tempQty,
+} from '@/utils/quantity';
 
 import { SIZE_X, SIZE_Y, TILT_ID_KEY } from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';
@@ -30,7 +35,6 @@ export default defineComponent({
   setup(props) {
     const { bordered, scale } = usePart.setup(props.part);
     const tiltStore = useTiltStore();
-    const systemStore = useSystemStore();
 
     const tiltId = computed<string | null>(
       () => props.part.settings[TILT_ID_KEY] ?? null,
@@ -52,7 +56,7 @@ export default defineComponent({
       () => tiltState.value?.data.plato ?? bloxQty(null, 'degP'),
     );
 
-    const gravityUnit = computed<GravityUnit>(() => systemStore.units.gravity);
+    const gravityUnit = computed<GravityUnit>(() => userUnits.value.gravity);
 
     const color = computed<string>(
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',

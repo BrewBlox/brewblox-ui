@@ -3,8 +3,8 @@
     "Vue.volar",
     "editorconfig.editorconfig",
     "syler.sass-indented",
-    "orta.vscode-jest",
     "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "ZixuanChen.vitest-explorer"
   ]
 }

@@ -14,9 +14,9 @@ import {
   PidBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { fixedNumber, prettyUnit } from '@/utils/formatting';
 import { makeTypeFilter } from '@/utils/functional';
 import { contrastColor } from '@/utils/misc';
+import { fixedNumber, prettyUnit } from '@/utils/quantity';
 
 import { useSettingsBlock } from '../composables';
 

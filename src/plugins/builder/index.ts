@@ -4,7 +4,7 @@ import { Plugin } from 'vue';
 import { startup } from '@/startup';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { Widget } from '@/store/widgets';
-import { autoRegister, cref } from '@/utils/component-ref';
+import { cref, globRegister } from '@/utils/component-ref';
 
 import BuilderWidget from './BuilderWidget.vue';
 import blueprints from './blueprints';
@@ -63,8 +63,8 @@ const plugin: Plugin = {
       },
     };
 
-    startup.onStart(() => builderStore.start());
-    autoRegister(app, require.context('./components', true));
+    startup.add(builderStore);
+    globRegister(app, import.meta.globEager('./components/**/*.vue'));
 
     builderStore.blueprints = Object.values(blueprints);
     featureStore.addWidgetFeature(widget);

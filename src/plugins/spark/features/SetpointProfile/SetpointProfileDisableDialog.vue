@@ -3,16 +3,15 @@ import { PropType, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { calculateProfileValues } from '@/plugins/spark/utils';
+import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
 import {
   Quantity,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { prettyUnit } from '@/utils/formatting';
 import { deepCopy } from '@/utils/objects';
-import { bloxQty, tempQty } from '@/utils/quantity';
+import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SetpointProfileDisableDialog',

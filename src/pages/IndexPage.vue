@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { useDashboardStore } from '@/store/dashboards';
 import { useServiceStore } from '@/store/services';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
@@ -14,14 +14,13 @@ const dashboardSorter = makeObjectSorter('order');
 export default defineComponent({
   name: 'IndexPage',
   setup() {
-    const systemStore = useSystemStore();
     const dashboardStore = useDashboardStore();
     const serviceStore = useServiceStore();
     const builderStore = useBuilderStore();
     const router = useRouter();
 
     const homePage = computed<string | null>(() => {
-      const { homePage } = systemStore.config;
+      const { homePage } = userUISettings.value;
 
       const defaultPage =
         [...dashboardStore.dashboards]

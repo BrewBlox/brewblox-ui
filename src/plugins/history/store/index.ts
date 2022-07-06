@@ -2,14 +2,14 @@ import { defineStore } from 'pinia';
 import { exportFile } from 'quasar';
 
 import { concatById, filterById, findById } from '@/utils/collections';
-import { isoDateString } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
-import { JSQuantity, bloxQty } from '@/utils/quantity';
+import { JSQuantity, bloxQty, isoDateString } from '@/utils/quantity';
 
 import type {
   ApiQuery,
   CsvPrecision,
+  GraphConfig,
   HistorySource,
   LoggedSession,
   QueryParams,
@@ -171,6 +171,19 @@ export const useHistoryStore = defineStore('historyStore', {
           precision,
         }),
       );
+    },
+
+    async downloadGraphCsv(
+      config: GraphConfig,
+      precision: CsvPrecision,
+      header: string,
+    ): Promise<void> {
+      await this.downloadCsv({
+        params: config.params,
+        fields: config.fields,
+        precision,
+        fileName: `${header}.csv`,
+      });
     },
 
     async start(): Promise<void> {

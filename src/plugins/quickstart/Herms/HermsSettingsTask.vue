@@ -2,10 +2,15 @@
 import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { Quantity } from '@/shared-types';
-import { useSystemStore } from '@/store/system';
+import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty, prettyUnit } from '@/utils/formatting';
-import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
+import {
+  bloxQty,
+  deltaTempQty,
+  prettyQty,
+  prettyUnit,
+  tempQty,
+} from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { HermsConfig, HermsOpts } from './types';
@@ -28,8 +33,6 @@ export default defineComponent({
   },
   emits: ['update:config', 'back', 'next', 'close'],
   setup(props, { emit }) {
-    const systemStore = useSystemStore();
-
     const hltFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const bkFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const hltVolume = ref<number>(25);
@@ -38,7 +41,7 @@ export default defineComponent({
     const mashTarget = ref<Quantity>(tempQty(67));
     const mashActual = ref<Quantity>(tempQty(65));
 
-    const userTemp = computed<string>(() => systemStore.units.temperature);
+    const userTemp = computed<string>(() => userUnits.value.temperature);
 
     const hltKp = computed<Quantity>(() =>
       bloxQty(

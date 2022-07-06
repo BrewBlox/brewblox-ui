@@ -3,8 +3,8 @@ import { nanoid } from 'nanoid';
 import { Plugin } from 'vue';
 
 import { WidgetFeature, useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
 import { cref } from '@/utils/component-ref';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty } from '@/utils/quantity';
@@ -38,9 +38,8 @@ const plugin: Plugin = {
       upgrade: (widget: Widget<unknown>): Widget<QuickActionsConfig> | null => {
         let dirty = false;
 
-        const systemStore = useSystemStore();
-        const systemTemp = systemStore.units.temperature;
-        const otherTemp = systemTemp === 'degC' ? 'degF' : 'degC';
+        const userTemp = userUnits.value.temperature;
+        const otherTemp = userTemp === 'degC' ? 'degF' : 'degC';
 
         const config = widget.config as QuickActionsConfig &
           QuickActionsConfigOld;
@@ -83,7 +82,7 @@ const plugin: Plugin = {
               const value = change.data[key];
               if (isQuantity(value) && value.unit.includes(otherTemp)) {
                 updates[key] = bloxQty(value)
-                  .to(value.unit.replace(otherTemp, systemTemp))
+                  .to(value.unit.replace(otherTemp, userTemp))
                   .toJSON();
               }
             }

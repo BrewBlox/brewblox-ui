@@ -1,6 +1,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import brewbloxLogoSvg from '@/assets/logo-wordmark-dark.svg';
+import brewbloxIconSvg from '@/assets/logo-x.svg';
 import { useGlobals } from '@/composables';
 
 export default defineComponent({
@@ -9,6 +11,8 @@ export default defineComponent({
   setup() {
     const { dense } = useGlobals.setup();
     return {
+      brewbloxLogoSvg,
+      brewbloxIconSvg,
       dense,
     };
   },
@@ -34,7 +38,7 @@ export default defineComponent({
           class="absolute-center"
         >
           <img
-            src="~assets/logo-x.svg"
+            :src="brewbloxIconSvg"
             style="height: 30px"
             class="q-py-xs"
           />
@@ -48,7 +52,7 @@ export default defineComponent({
           to="/"
         >
           <img
-            src="~assets/logo-wordmark-dark.svg"
+            :src="brewbloxLogoSvg"
             style="height: 30px"
             class="q-py-xs"
           />

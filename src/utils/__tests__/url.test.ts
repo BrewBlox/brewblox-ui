@@ -1,14 +1,16 @@
+import { describe, expect, it } from 'vitest';
+
 import { isAbsoluteUrl, isUrlSafe, makeUrlSafe } from '@/utils/url';
 
 describe('URL utils', () => {
-  it('Should recognize absolute URLs', () => {
+  it('Recognize absolute URLs', () => {
     expect(isAbsoluteUrl('http://test')).toBe(true);
     expect(isAbsoluteUrl('localhost')).toBe(false);
     expect(isAbsoluteUrl('www.google.com')).toBe(false);
     expect(isAbsoluteUrl('magic://real')).toBe(true);
   });
 
-  it('Should detect URL safe strings', () => {
+  it('Detect URL safe strings', () => {
     expect(isUrlSafe('yes')).toBe(true);
     expect(isUrlSafe('')).toBe(true);
     expect(isUrlSafe('343234df__sdf_---DFSD~~')).toBe(true);
@@ -16,7 +18,7 @@ describe('URL utils', () => {
     expect(isUrlSafe('http://www.google.com')).toBe(false);
   });
 
-  it('Should sanitize URL strings', () => {
+  it('Sanitize URL strings', () => {
     expect(makeUrlSafe('hello world!')).toBe('hello-world-');
     expect(makeUrlSafe('hello        world!')).toBe('hello-world-');
     expect(makeUrlSafe('hello world!', '_')).toBe('hello_world_');

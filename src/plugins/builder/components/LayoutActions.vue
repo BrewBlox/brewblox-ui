@@ -12,6 +12,7 @@ import {
 import { useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { Widget, useWidgetStore } from '@/store/widgets';
+import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
@@ -54,11 +55,12 @@ export default defineComponent({
     });
 
     const isHomePage = computed<boolean>({
-      get: () => systemStore.config.homePage === `/brewery/${props.layout?.id}`,
+      get: () =>
+        userUISettings.value.homePage === `/brewery/${props.layout?.id}`,
       set: (v) => {
         const homePage =
           v && props.layout ? `/brewery/${props.layout.id}` : null;
-        systemStore.saveConfig({ homePage });
+        systemStore.patchUserUISettings({ homePage });
       },
     });
 

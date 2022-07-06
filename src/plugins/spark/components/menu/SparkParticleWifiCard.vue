@@ -7,7 +7,7 @@ import {
   WifiCipherType,
   WifiSecurityType,
 } from '@/plugins/spark/types';
-import { getWiFiSettingsBlock } from '@/plugins/spark/utils';
+import { getWiFiSettingsBlock } from '@/plugins/spark/utils/system';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 

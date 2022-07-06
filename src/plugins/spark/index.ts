@@ -5,7 +5,7 @@ import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
-import { autoRegister, cref } from '@/utils/component-ref';
+import { cref, globRegister } from '@/utils/component-ref';
 
 import { sparkType } from './const';
 import features from './features';
@@ -13,7 +13,7 @@ import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
 import { useBlockSnippetStore, useSparkStore } from './store';
-import { isSparkState } from './utils';
+import { isSparkState } from './utils/info';
 
 // Allows lookups based on the old type ID
 // DeprecatedWidget will update the widget in the datastore
@@ -34,7 +34,7 @@ const plugin: Plugin = {
     const sparkStore = useSparkStore();
     const snippetStore = useBlockSnippetStore();
 
-    autoRegister(app, require.context('./components', true));
+    globRegister(app, import.meta.globEager('./components/**/*.vue'));
 
     deprecated.forEach(featureStore.addWidgetFeature);
     features.forEach(app.use);
@@ -73,7 +73,7 @@ const plugin: Plugin = {
       }
     });
 
-    startup.onStart(() => snippetStore.start());
+    startup.add(snippetStore);
   },
 };
 

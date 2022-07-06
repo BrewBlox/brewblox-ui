@@ -7,7 +7,7 @@ import {
   BlockType,
   OneWireGpioModuleBlock,
 } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { GpioModuleStatus, GpioPins } from '@/shared-types';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 

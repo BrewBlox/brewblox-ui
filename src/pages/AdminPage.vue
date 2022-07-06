@@ -14,6 +14,7 @@ import {
   startEditBuilderTouchDelay,
   useSystemStore,
 } from '@/store/system';
+import { startupDone, userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
@@ -33,20 +34,19 @@ export default defineComponent({
     const featureStore = useFeatureStore();
     const serviceStore = useServiceStore();
     const builderStore = useBuilderStore();
-    const startupDone = computed<boolean>(() => systemStore.startupDone);
 
     const experimental = computed<boolean>({
-      get: () => systemStore.config.experimental,
-      set: (v) => systemStore.saveConfig({ experimental: v }),
+      get: () => userUISettings.value.experimental,
+      set: (v) => systemStore.patchUserUISettings({ experimental: v }),
     });
 
     const showSidebarLayouts = computed<boolean>({
-      get: () => systemStore.config.showSidebarLayouts,
-      set: (v) => systemStore.saveConfig({ showSidebarLayouts: v }),
+      get: () => userUISettings.value.showSidebarLayouts,
+      set: (v) => systemStore.patchUserUISettings({ showSidebarLayouts: v }),
     });
 
     const buildDate = computed<string>(
-      () => process.env.BLOX_DATE ?? 'UNKNOWN',
+      () => __BREWBLOX_BUILD_DATE ?? 'UNKNOWN',
     );
 
     const dashboards = computed<Dashboard[]>(() =>

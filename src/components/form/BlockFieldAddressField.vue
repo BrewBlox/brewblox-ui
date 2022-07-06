@@ -9,8 +9,9 @@ import {
   BlockFieldSpec,
   ComparedBlockType,
 } from '@/plugins/spark/types';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { prettyAny } from '@/utils/formatting';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { prettyAny } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'BlockFieldAddressField',

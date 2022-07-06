@@ -12,9 +12,9 @@ import {
   BlockType,
   SparkService,
 } from '@/plugins/spark/types';
-import { makeBlockGraphConfig } from '@/plugins/spark/utils';
+import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import { useServiceStore } from '@/store/services';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
 import { makeTypeFilter } from '@/utils/functional';
 
 import { GraphConfig } from '../types';

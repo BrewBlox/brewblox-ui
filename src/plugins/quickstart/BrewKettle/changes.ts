@@ -13,8 +13,8 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
@@ -119,10 +119,9 @@ export function defineWidgets(
   config: BrewKettleConfig,
   layouts: BuilderLayout[],
 ): Widget[] {
-  const systemStore = useSystemStore();
   const featureStore = useFeatureStore();
   const { serviceId, names, dashboardId, prefix } = config;
-  const userTemp = systemStore.units.temperature;
+  const userTemp = userUnits.value.temperature;
   const genericSettings = {
     dashboard: dashboardId,
     cols: 4,

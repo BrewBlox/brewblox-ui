@@ -4,8 +4,8 @@ import { PropType, computed, defineComponent } from 'vue';
 import { useField } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
 import { isQuantity } from '@/utils/identity';
+import { prettyQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'InlineQuantityField',

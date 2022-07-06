@@ -3,13 +3,15 @@ import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
-  isBlockDisplayReady,
-  isBlockRemovable,
   startAddBlockToDisplay,
   startAddBlockToGraphWidget,
   startChangeBlockId,
   startRemoveBlock,
-} from '@/plugins/spark/utils';
+} from '@/plugins/spark/utils/actions';
+import {
+  isBlockDisplayReady,
+  isBlockRemovable,
+} from '@/plugins/spark/utils/info';
 import { useServiceStore } from '@/store/services';
 import { saveFile } from '@/utils/import-export';
 import { startCopyWidget } from '@/utils/widgets';

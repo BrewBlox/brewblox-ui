@@ -2,6 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   BlockType,
@@ -11,8 +12,6 @@ import {
 } from '@/plugins/spark/types';
 import { makeTypeFilter } from '@/utils/functional';
 import { matchesType } from '@/utils/objects';
-
-import { useSparkStore } from '../../store';
 
 interface Claim {
   driverId: string;

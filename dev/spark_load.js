@@ -11,7 +11,9 @@ async function run() {
   for (let svc of services) {
     const fname = `${fileDir}/${svc}.spark.json`;
     const backup = JSON.parse(fs.readFileSync(fname));
-    await retry(`Loading ${svc} blocks`, () => axios.post(`${host}/${svc}/blocks/backup/load`, backup));
+    await retry(`Loading ${svc} blocks`, () =>
+      axios.post(`${host}/${svc}/blocks/backup/load`, backup),
+    );
     console.log('Spark blocks loaded', fname);
   }
 }

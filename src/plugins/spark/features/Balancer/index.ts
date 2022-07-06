@@ -3,7 +3,7 @@ import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BalancerBlock, BlockSpec, BlockType } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 
 import widget from './BalancerWidget.vue';

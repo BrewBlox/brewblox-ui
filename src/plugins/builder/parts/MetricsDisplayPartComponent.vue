@@ -6,8 +6,7 @@ import {
   DEFAULT_METRICS_EXPIRY,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
-import { fixedNumber, shortDateString } from '@/utils/formatting';
-import { durationString } from '@/utils/quantity';
+import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
 
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';

@@ -2,20 +2,19 @@
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   PidBlock,
   Quantity,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { isBlockDriven, prettyBlock } from '@/plugins/spark/utils';
+import { prettyBlock } from '@/plugins/spark/utils/formatting';
+import { isBlockDriven } from '@/plugins/spark/utils/info';
 import { ActuatorOffsetBlock, BlockType } from '@/shared-types';
-import { createBlockDialog } from '@/utils/dialog';
-import { fixedNumber, prettyQty } from '@/utils/formatting';
+import { createBlockDialog } from '@/utils/block-dialog';
 import { matchesType } from '@/utils/objects';
-import { bloxQty, tempQty } from '@/utils/quantity';
-
-import { useSparkStore } from '../../store';
+import { bloxQty, fixedNumber, prettyQty, tempQty } from '@/utils/quantity';
 
 interface GridOpts {
   start?: number;
@@ -33,7 +32,7 @@ export default defineComponent({
     );
 
     const inputDriven = computed<boolean>(() =>
-      isBlockDriven(inputBlock.value),
+      isBlockDriven(inputBlock.value, sparkStore.driveChains),
     );
 
     const inputStoredSetting = computed<Quantity | null>({

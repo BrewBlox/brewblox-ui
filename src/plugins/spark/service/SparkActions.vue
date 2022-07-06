@@ -2,20 +2,17 @@
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
-import {
-  cleanUnusedNames,
-  discoverBlocks,
-  saveHwInfo,
-  startResetBlocks,
-} from '@/plugins/spark/utils';
+import { useSparkStore } from '@/plugins/spark/store';
+import { SparkService } from '@/plugins/spark/types';
+import { saveHwInfo, startResetBlocks } from '@/plugins/spark/utils/actions';
+import { discoverBlocks } from '@/plugins/spark/utils/configuration';
+import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { Service, useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
-
-import { useSparkStore } from '../store';
-import { SparkService } from '../types';
 
 export default defineComponent({
   name: 'SparkActions',
@@ -36,11 +33,12 @@ export default defineComponent({
     );
 
     const isHomePage = computed<boolean>({
-      get: () => systemStore.config.homePage === `/service/${props.serviceId}`,
+      get: () =>
+        userUISettings.value.homePage === `/service/${props.serviceId}`,
       set: (v) => {
         const homePage =
           v && service.value ? `/service/${props.serviceId}` : null;
-        systemStore.saveConfig({ homePage });
+        systemStore.patchUserUISettings({ homePage });
       },
     });
 

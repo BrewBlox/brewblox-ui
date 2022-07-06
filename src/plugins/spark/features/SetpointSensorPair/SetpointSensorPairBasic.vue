@@ -4,7 +4,7 @@ import { defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
+import { prettyQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SetpointSensorPairBasic',

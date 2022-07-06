@@ -3,7 +3,7 @@ import { PropType, computed, defineComponent } from 'vue';
 
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'InputField',

@@ -2,16 +2,16 @@
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   PidBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { isBlockDriven } from '@/plugins/spark/utils';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { fixedNumber, prettyQty } from '@/utils/formatting';
-
-import { useSparkStore } from '../../store';
+import { isBlockDriven } from '@/plugins/spark/utils/info';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { fixedNumber, prettyQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'PidBasic',
@@ -24,7 +24,7 @@ export default defineComponent({
     );
 
     const inputDriven = computed<boolean>(() =>
-      isBlockDriven(inputBlock.value),
+      isBlockDriven(inputBlock.value, sparkStore.driveChains),
     );
 
     const outputBlock = computed<Block | null>(() =>

@@ -1,138 +1,243 @@
 import defaults from 'lodash/defaults';
 import omit from 'lodash/omit';
 import { defineStore } from 'pinia';
+import { DialogChainObject } from 'quasar';
+import KeyboardLayouts from 'simple-keyboard-layouts';
 
+import timezones from '@/assets/timezones.json';
 import { StoreObject, StoreObjectImpl } from '@/shared-types';
+import {
+  UserTimeZone,
+  UserUISettings,
+  UserUnits,
+  defaultUserTimeZone,
+  defaultUserUISettings,
+  defaultUserUnits,
+  userTimeZone,
+  userUISettings,
+  userUnits,
+  userUnitsDefined,
+} from '@/user-settings';
+import { createDialog } from '@/utils/dialog';
 
 import { configApi, globalApi } from './api';
-import { SystemConfig, UserTimeZone, UserUnits } from './types';
 
-export * from './types';
-export * from './utils';
-
-const CONFIG_ID = 'default';
-const UNITS_ID = 'units';
-const TIMEZONE_ID = 'timeZone';
-
-const defaultConfig = (): StoreObjectImpl<SystemConfig> => ({
-  id: CONFIG_ID,
-  keyboardLayout: 'english',
-  experimental: false,
-  showSidebarLayouts: true,
-  homePage: null,
-  builderTouchDelayed: 'dense',
-});
-
-const defaultUnits = (): StoreObjectImpl<UserUnits> => ({
-  id: UNITS_ID,
-  temperature: 'degC',
-  gravity: 'G',
-});
-
-const defaultTimeZone = (): StoreObjectImpl<UserTimeZone> => ({
-  id: TIMEZONE_ID,
-  name: 'Etc/UTC',
-  posixValue: 'UTC0',
-});
+const UI_SETTINGS_STORE_ID = 'default';
+const USER_UNITS_STORE_ID = 'units';
+const USER_TIMEZONE_STORE_ID = 'timeZone';
 
 const unitsFilter = (v: StoreObject): v is StoreObjectImpl<UserUnits> =>
-  v.id === UNITS_ID;
+  v.id === USER_UNITS_STORE_ID;
 
 const timeZoneFilter = (v: StoreObject): v is StoreObjectImpl<UserTimeZone> =>
-  v.id === TIMEZONE_ID;
-
-function unwrap<T extends StoreObject>(
-  value: Maybe<T>,
-  fallback: T,
-): Omit<T, 'id' | 'namespace'> {
-  return omit(defaults(value, fallback), 'id', 'namespace');
-}
-
-interface SystemStoreState {
-  startupDone: boolean;
-  config: SystemConfig;
-  units: UserUnits;
-  timeZone: UserTimeZone;
-  userDefinedUnits: boolean;
-}
+  v.id === USER_TIMEZONE_STORE_ID;
 
 export const useSystemStore = defineStore('systemStore', {
-  state: (): SystemStoreState => ({
-    startupDone: false,
-    config: defaultConfig(),
-    units: defaultUnits(),
-    timeZone: defaultTimeZone(),
-    userDefinedUnits: true, // assume yes
-  }),
   actions: {
-    updateConfig(cfg: Maybe<StoreObjectImpl<SystemConfig>>): void {
-      this.config = unwrap(cfg, defaultConfig());
+    updateUserUISettings(obj: Maybe<StoreObjectImpl<UserUISettings>>): void {
+      const settings = defaults(obj, defaultUserUISettings);
+      userUISettings.value = omit(settings, 'id', 'namespace');
     },
 
-    updateUnits(units: Maybe<StoreObjectImpl<UserUnits>>): void {
-      this.units = unwrap(units, defaultUnits());
-      this.userDefinedUnits = units != null;
+    updateUserUnits(obj: Maybe<StoreObjectImpl<UserUnits>>): void {
+      const units = defaults(obj, defaultUserUnits);
+      userUnits.value = omit(units, 'id', 'namespace');
+      userUnitsDefined.value = obj != null;
     },
 
-    updateTimezone(tz: Maybe<StoreObjectImpl<UserTimeZone>>): void {
-      this.timeZone = unwrap(tz, defaultTimeZone());
+    updateUserTimeZone(obj: Maybe<StoreObjectImpl<UserTimeZone>>): void {
+      const timeZone = defaults(obj, defaultUserTimeZone());
+      userTimeZone.value = omit(timeZone, 'id', 'namespace');
     },
 
-    async saveConfig(patch: Partial<SystemConfig>): Promise<void> {
+    async patchUserUISettings(patch: Partial<UserUISettings>): Promise<void> {
       // Triggers callback
       await configApi.persist({
-        ...this.config,
+        ...userUISettings.value,
         ...patch,
-        id: CONFIG_ID,
+        id: UI_SETTINGS_STORE_ID,
       });
     },
 
-    async saveUnits(patch: Partial<UserUnits>): Promise<void> {
+    async patchUserUnits(patch: Partial<UserUnits>): Promise<void> {
       // Triggers callback
       await globalApi.persist({
-        ...this.units,
+        ...userUnits.value,
         ...patch,
-        id: UNITS_ID,
+        id: USER_UNITS_STORE_ID,
       });
     },
 
-    async saveTimeZone(patch: Partial<UserTimeZone>): Promise<void> {
+    async patchUserTimeZone(patch: Partial<UserTimeZone>): Promise<void> {
       // Triggers callback
       await globalApi.persist({
-        ...this.timeZone,
+        ...userTimeZone.value,
         ...patch,
-        id: TIMEZONE_ID,
+        id: USER_TIMEZONE_STORE_ID,
       });
     },
 
     async start(): Promise<void> {
-      this.updateConfig(await configApi.fetchById(CONFIG_ID));
+      this.updateUserUISettings(
+        await configApi.fetchById(UI_SETTINGS_STORE_ID),
+      );
       const globalValues = await globalApi.fetch();
 
-      this.updateUnits(globalValues.find(unitsFilter));
-      this.updateTimezone(globalValues.find(timeZoneFilter));
+      this.updateUserUnits(globalValues.find(unitsFilter));
+      this.updateUserTimeZone(globalValues.find(timeZoneFilter));
 
       configApi.subscribe(
-        (obj) => obj.id === CONFIG_ID && this.updateConfig(obj),
-        (id) => id === CONFIG_ID && this.updateConfig(defaultConfig()),
+        (obj) =>
+          obj.id === UI_SETTINGS_STORE_ID && this.updateUserUISettings(obj),
+        (id) => id === UI_SETTINGS_STORE_ID && this.updateUserUISettings(null),
       );
 
       globalApi.subscribe(
         (obj) => {
           if (unitsFilter(obj)) {
-            this.updateUnits(obj);
+            this.updateUserUnits(obj);
           } else if (timeZoneFilter(obj)) {
-            this.updateTimezone(obj);
+            this.updateUserTimeZone(obj);
           }
         },
         (id) => {
-          if (id === UNITS_ID) {
-            this.updateUnits(defaultUnits());
-          } else if (id === TIMEZONE_ID) {
-            this.updateTimezone(defaultTimeZone());
+          if (id === USER_UNITS_STORE_ID) {
+            this.updateUserUnits(null);
+          } else if (id === USER_TIMEZONE_STORE_ID) {
+            this.updateUserTimeZone(null);
           }
         },
       );
     },
   },
 });
+
+export function startChangeKeyboardLayout(): DialogChainObject {
+  const systemStore = useSystemStore();
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: Object.keys(new KeyboardLayouts().layouts),
+      modelValue: userUISettings.value.keyboardLayout,
+      title: 'Select layout for virtual keyboard',
+      selectProps: {
+        label: 'Layout',
+      },
+    },
+  }).onOk((keyboardLayout) =>
+    systemStore.patchUserUISettings({ keyboardLayout }),
+  );
+}
+
+export function startEditBuilderTouchDelay(): DialogChainObject {
+  const systemStore = useSystemStore();
+  const selectOptions: SelectOption<UserUISettings['builderTouchDelayed']>[] = [
+    { label: 'Always', value: 'always' },
+    { label: 'Never', value: 'never' },
+    { label: 'Only on mobile', value: 'dense' },
+  ];
+
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      listSelect: true,
+      selectOptions,
+      title: 'Click twice to interact?',
+      message: `
+      Actuators and valves can be activated by clicking on them in the builder.
+      To prevent accidental activation, you can require two clicks:
+      the first to select, and the second to confirm.
+      `,
+      modelValue: userUISettings.value.builderTouchDelayed,
+    },
+  }).onOk((builderTouchDelayed) =>
+    systemStore.patchUserUISettings({ builderTouchDelayed }),
+  );
+}
+
+export function startChangeTempUnit(): DialogChainObject {
+  const systemStore = useSystemStore();
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: [
+        { value: 'degC', label: 'Celsius' },
+        { value: 'degF', label: 'Fahrenheit' },
+      ],
+      modelValue: userUnits.value.temperature,
+      title: 'Choose temperature unit',
+      message: `
+      <p>
+        Choose temperature units for all your services. <br>
+        This will affect how temperatures are displayed and logged.
+      </p>
+      <p>
+        Spark data with different units is logged
+        under different field names to distinguish the values. <br>
+        After changing a unit, you will need to select
+        different fields in your Graph and Metrics widgets.
+      </p>
+      `,
+      html: true,
+      selectProps: {
+        label: 'Unit',
+      },
+    },
+  }).onOk((temperature) => systemStore.patchUserUnits({ temperature }));
+}
+
+export function startChangeGravityUnit(): DialogChainObject {
+  const systemStore = useSystemStore();
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: [
+        { value: 'G', label: 'Specific gravity' },
+        { value: 'degP', label: 'Plato' },
+      ],
+      modelValue: userUnits.value.gravity,
+      title: 'Choose gravity unit',
+      message: `
+      <p>
+        Choose gravity units for all your services. <br>
+        This will affect how specific gravity measurements are displayed and logged.
+      </p>
+      `,
+      html: true,
+      selectProps: {
+        label: 'Unit',
+      },
+    },
+  }).onOk((gravity) => systemStore.patchUserUnits({ gravity }));
+}
+
+export function startChangeTimezone(): DialogChainObject {
+  const systemStore = useSystemStore();
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: Object.keys(timezones).map((value) => ({
+        value,
+        label: value.replaceAll('_', ' '),
+      })),
+      modelValue: userTimeZone.value.name,
+      title: 'Choose timezone',
+      message: `
+      <p>
+        Choose the timezone for your Spark 4 services.
+        This will affect the time displayed on the display.
+      </p>
+      <p>
+        History data is always stored as UTC, and is unaffected by this setting.
+      </p>
+      `,
+      html: true,
+      selectProps: {
+        label: 'Timezone',
+      },
+    },
+  }).onOk((name: string) => {
+    const posixValue = timezones[name];
+    systemStore.patchUserTimeZone({ name, posixValue });
+  });
+}

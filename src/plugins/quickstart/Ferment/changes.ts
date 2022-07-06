@@ -15,8 +15,8 @@ import {
 } from '@/plugins/spark/types';
 import { Block } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
 
@@ -270,7 +270,6 @@ export const defineWidgets = (
   config: FermentConfig,
   layouts: BuilderLayout[],
 ): Widget[] => {
-  const systemStore = useSystemStore();
   const featureStore = useFeatureStore();
 
   const genericSettings = {
@@ -281,7 +280,7 @@ export const defineWidgets = (
   };
 
   const { serviceId, names, prefix, fermentOpts } = config;
-  const tempUnit = systemStore.units.temperature;
+  const tempUnit = userUnits.value.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,

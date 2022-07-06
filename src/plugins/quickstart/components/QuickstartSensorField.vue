@@ -3,8 +3,8 @@ import { computed, defineComponent } from 'vue';
 
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockIntfType } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
-import { prettyQty } from '@/utils/formatting';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { prettyQty } from '@/utils/quantity';
 
 const sensorFilter = (block: Block): boolean =>
   isCompatible(block.type, BlockIntfType.TempSensorInterface);

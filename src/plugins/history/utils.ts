@@ -5,7 +5,6 @@ import { Widget, useWidgetStore } from '@/store/widgets';
 import { createDialogPromise } from '@/utils/dialog';
 
 import { typeName as graphType } from './Graph/const';
-import { useHistoryStore } from './store';
 import {
   CsvPrecision,
   GraphConfig,
@@ -86,20 +85,6 @@ export async function selectGraphPrecision(): Promise<
         label: 'Formatting',
       },
     },
-  });
-}
-
-export async function saveGraphToFile(
-  config: GraphConfig,
-  precision: CsvPrecision,
-  header: string,
-): Promise<void> {
-  const historyStore = useHistoryStore();
-  await historyStore.downloadCsv({
-    params: config.params,
-    fields: config.fields,
-    precision,
-    fileName: `${header}.csv`,
   });
 }
 

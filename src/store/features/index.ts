@@ -1,7 +1,7 @@
 import isString from 'lodash/isString';
 import { defineStore } from 'pinia';
 
-import type { Widget } from '@/store/widgets';
+import type { Widget } from '@/store/widgets/types';
 import { findById } from '@/utils/collections';
 
 import type {

@@ -48,16 +48,11 @@ export default defineComponent({
 
     const bodyClass = computed<string>(() => `content__${context.container}`);
 
-    const contentComponent = computed<string>(() =>
-      scrollable.value ? 'q-scroll-area' : 'div',
-    );
-
     return {
       scrollable,
       cardClass,
       toolbarClass,
       bodyClass,
-      contentComponent,
     };
   },
 });
@@ -74,13 +69,20 @@ export default defineComponent({
         v-if="$slots.actions"
         class="fit column"
       >
-        <component
-          :is="contentComponent"
+        <q-scroll-area
+          v-if="scrollable"
           :class="['col', contentClass]"
           visible
         >
           <slot />
-        </component>
+        </q-scroll-area>
+        <div
+          v-else
+          :class="['col', contentClass]"
+        >
+          <slot />
+        </div>
+
         <div class="col-auto">
           <q-separator />
           <q-card-actions align="right">
@@ -90,14 +92,21 @@ export default defineComponent({
       </div>
 
       <!-- Without actions -->
-      <component
-        :is="contentComponent"
-        v-else
-        :class="['fit', contentClass]"
-        visible
-      >
-        <slot />
-      </component>
+      <template v-else>
+        <q-scroll-area
+          v-if="scrollable"
+          :class="['fit', contentClass]"
+          visible
+        >
+          <slot />
+        </q-scroll-area>
+        <div
+          v-else
+          :class="['fit', contentClass]"
+        >
+          <slot />
+        </div>
+      </template>
     </div>
   </div>
 </template>

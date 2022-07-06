@@ -16,10 +16,9 @@ import {
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { useSystemStore } from '@/store/system';
-import { prettyAny } from '@/utils/formatting';
+import { userUnits } from '@/user-settings';
 import { isQuantity } from '@/utils/identity';
-import { deltaTempQty } from '@/utils/quantity';
+import { deltaTempQty, prettyAny } from '@/utils/quantity';
 
 import { DRIVER_KEY, DRIVER_TYPES } from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
@@ -41,7 +40,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const sparkStore = useSparkStore();
     const { scale, bordered } = usePart.setup(props.part);
 
@@ -87,7 +85,7 @@ export default defineComponent({
     });
 
     const deltaTempUnit = computed<string>(
-      () => `delta_${systemStore.units.temperature}`,
+      () => `delta_${userUnits.value.temperature}`,
     );
 
     const actualSetting = computed<Quantity | number | null>(() => {
