@@ -13,8 +13,8 @@ export default defineConfig(({ command, mode }): UserConfig => {
   const buildDate = new Date().toISOString();
   const performanceEnabled = false;
 
-  const isDev = command === 'serve';
   const isTest = mode === 'test';
+  const isDev = command === 'serve';
 
   // Host/port are also hardcoded in dev/utils.js
   let apiProtocol: 'http' | 'https' | undefined = undefined;
@@ -22,7 +22,12 @@ export default defineConfig(({ command, mode }): UserConfig => {
   let apiPort: number | undefined = undefined;
   let serverHttps: ServerOptions | boolean = false;
 
-  if (isDev) {
+  if (isTest) {
+    apiProtocol = 'http';
+    apiHost = 'localhost';
+    apiPort = 9001;
+    serverHttps = false;
+  } else if (isDev) {
     apiProtocol = undefined;
     apiHost = undefined;
     apiPort = 9001;
@@ -30,13 +35,6 @@ export default defineConfig(({ command, mode }): UserConfig => {
       key: fs.readFileSync('./dev/traefik/brewblox.key'),
       cert: fs.readFileSync('./dev/traefik/brewblox.crt'),
     };
-  }
-
-  if (isTest) {
-    apiProtocol = 'http';
-    apiHost = 'localhost';
-    apiPort = 9001;
-    serverHttps = false;
   }
 
   return {
