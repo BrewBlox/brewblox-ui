@@ -24,7 +24,8 @@
     "test:ci": "vitest --run --coverage",
     "lint:eslint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ./src ./test",
     "lint:prettier": "prettier --check ./src ./test ./dev/*.js ./*.js ./*.yml",
-    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint:tsc": "vue-tsc --noEmit",
+    "lint": "yarn lint:tsc && yarn lint:eslint && yarn lint:prettier",
     "lint:fix:eslint": "yarn lint:eslint --fix",
     "lint:fix:prettier": "prettier --write ./src ./test ./dev/*.js ./*.js ./*.yml",
     "lint:fix": "yarn lint:fix:eslint && yarn lint:fix:prettier"

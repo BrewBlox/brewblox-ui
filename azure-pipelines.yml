@@ -40,13 +40,16 @@ steps:
     displayName: Install
 
   - bash: |
-      yarn lint
-      yarn test:ci
-    displayName: Test
+      yarn build
+    displayName: Build
 
   - bash: |
-      yarn build
-    displayName: Build dist
+      yarn lint
+    displayName: Lint
+
+  - bash: |
+      yarn test:ci
+    displayName: Test
 
   - bash: |
       docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
