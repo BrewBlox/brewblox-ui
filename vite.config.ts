@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue';
 import * as fs from 'fs';
 import { ServerOptions } from 'https';
 import * as path from 'path';
-import { UserConfig, defineConfig } from 'vite';
+import { PluginOption, UserConfig, defineConfig } from 'vite';
 import Checker from 'vite-plugin-checker';
 
 // https://vitejs.dev/config/
@@ -14,7 +14,7 @@ export default defineConfig(({ command, mode }): UserConfig => {
   const performanceEnabled = false;
 
   const isTest = mode === 'test';
-  const isDev = command === 'serve';
+  const isDev = mode === 'development' && command === 'serve';
 
   // Host/port are also hardcoded in dev/utils.js
   let apiProtocol: 'http' | 'https' | undefined = undefined;
@@ -22,12 +22,24 @@ export default defineConfig(({ command, mode }): UserConfig => {
   let apiPort: number | undefined = undefined;
   let serverHttps: ServerOptions | boolean = false;
 
+  const plugins: PluginOption[] = [
+    vue({
+      template: { transformAssetUrls },
+    }),
+
+    quasar({
+      sassVariables: 'src/css/variables.sass',
+    }),
+  ];
+
   if (isTest) {
     apiProtocol = 'http';
     apiHost = 'localhost';
     apiPort = 9001;
     serverHttps = false;
-  } else if (isDev) {
+  }
+
+  if (isDev) {
     apiProtocol = undefined;
     apiHost = undefined;
     apiPort = 9001;
@@ -35,18 +47,8 @@ export default defineConfig(({ command, mode }): UserConfig => {
       key: fs.readFileSync('./dev/traefik/brewblox.key'),
       cert: fs.readFileSync('./dev/traefik/brewblox.crt'),
     };
-  }
 
-  return {
-    plugins: [
-      vue({
-        template: { transformAssetUrls },
-      }),
-
-      quasar({
-        sassVariables: 'src/css/variables.sass',
-      }),
-
+    plugins.push(
       Checker({
         typescript: true,
         vueTsc: true,
@@ -55,7 +57,11 @@ export default defineConfig(({ command, mode }): UserConfig => {
             'eslint --ext .js,.ts,.vue --ignore-path .gitignore ./src ./test',
         },
       }),
-    ],
+    );
+  }
+
+  return {
+    plugins,
 
     resolve: {
       alias: {
