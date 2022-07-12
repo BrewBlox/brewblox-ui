@@ -1,77 +1,13 @@
 {
   "blocks": [
     {
-      "id": "ActiveGroups",
-      "nid": 1,
-      "type": "ErrorObject",
-      "serviceId": "sparkey",
-      "data": {
-        "error": "KeyError('No transcoder found for identifier (65534, 0)')",
-        "identifier": [
-          65534,
-          0
-        ]
-      }
-    },
-    {
       "id": "DisplaySettings",
       "nid": 7,
       "type": "DisplaySettings",
       "serviceId": "sparkey",
       "data": {
-        "widgets": [
-          {
-            "pos": 5,
-            "color": "c48600",
-            "name": "BK PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "HERMS BK PID"
-            }
-          },
-          {
-            "pos": 4,
-            "color": "9c4b00",
-            "name": "MT PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "HERMS MT PID"
-            }
-          },
-          {
-            "pos": 3,
-            "color": "b50000",
-            "name": "HLT PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "HERMS HLT PID"
-            }
-          },
-          {
-            "pos": 2,
-            "color": "df2b35",
-            "name": "Heat PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "Ferment Heat PID"
-            }
-          },
-          {
-            "pos": 1,
-            "color": "037cd5",
-            "name": "Cool PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "Ferment Cool PID"
-            }
-          }
-        ],
         "timeZone": "CET-1CEST,M3.5.0,M10.5.0/3",
+        "widgets": [],
         "name": "",
         "tempUnit": 0,
         "brightness": 0
@@ -1454,6 +1390,32 @@
       }
     },
     {
+      "id": "Temp Sensor (External)",
+      "nid": 136,
+      "type": "TempSensorExternal",
+      "serviceId": "sparkey",
+      "data": {
+        "enabled": true,
+        "timeout": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 86400
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 20
+        },
+        "lastUpdated": 1657663236,
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        }
+      }
+    },
+    {
       "id": "TouchSettings",
       "nid": 6,
       "type": "TouchSettings",
@@ -1773,6 +1735,13 @@
       "keys": [
         "Sequence",
         135
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Temp Sensor (External)",
+        136
       ],
       "data": {}
     }

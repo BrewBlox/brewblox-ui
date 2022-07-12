@@ -57,6 +57,7 @@ export const UserBlockType = Enum(
   'SetpointProfile',
   'SetpointSensorPair',
   'TempSensorCombi',
+  'TempSensorExternal',
   'TempSensorMock',
   'TempSensorOneWire',
 );
@@ -81,6 +82,7 @@ export const COMPATIBLE_TYPES: Record<BlockIntfType, BlockType[]> = {
   ],
   TempSensorInterface: [
     BlockType.TempSensorCombi,
+    BlockType.TempSensorExternal,
     BlockType.TempSensorMock,
     BlockType.TempSensorOneWire,
   ],
@@ -117,6 +119,7 @@ export const COMPATIBLE_TYPES: Record<BlockIntfType, BlockType[]> = {
     BlockType.ActuatorPwm,
     BlockType.SetpointSensorPair,
     BlockType.SetpointProfile,
+    BlockType.TempSensorExternal,
   ],
 };
 // #endregion COMPATIBLE_TYPES

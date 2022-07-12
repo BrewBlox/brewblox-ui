@@ -39,6 +39,34 @@ export function nonNullString(value: unknown, nullLabel = ''): string {
 }
 
 /**
+ * Tries to convert given value to a date.
+ * Supports UTC seconds, milliseconds,
+ * strings, and pre-existing dates.
+ *
+ * @param value potential date/time value
+ */
+export function parseDate(value: Maybe<DateCompatible>): Date | null {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return date.clone(value);
+  }
+
+  if (typeof value === 'number') {
+    if (value < 10e10) {
+      // This is an educated guess
+      // 10e10 falls in 1973 if the timestamp is in milliseconds,
+      // and in 5138 if the timestamp is in seconds
+      value *= 1000;
+    }
+  }
+
+  return date.isValid(value) ? new Date(value) : null;
+}
+
+/**
  * Converts date-compatible value to date/time string.
  *
  * "date-compatible" is defined as "valid argument for `new Date()`"
@@ -51,10 +79,8 @@ export function dateString(
   value: Maybe<DateCompatible>,
   nullLabel = '<not set>',
 ): string {
-  if (value == null) {
-    return nullLabel;
-  }
-  return new Date(value).toLocaleString();
+  const dv = parseDate(value);
+  return dv == null ? nullLabel : dv.toLocaleString();
 }
 
 /**
@@ -73,14 +99,14 @@ export function shortDateString(
   value: Maybe<DateCompatible>,
   nullLabel = '<not set>',
 ): string {
-  if (value == null) {
+  const dv = parseDate(value);
+  if (dv == null) {
     return nullLabel;
   }
-  const date = new Date(value);
-  if (Math.abs(new Date().getTime() - date.getTime()) < 24 * 3600 * 1000) {
-    return date.toLocaleTimeString();
+  if (Math.abs(date.getDateDiff(new Date(), dv, 'hours')) < 24) {
+    return dv.toLocaleTimeString();
   }
-  return date.toLocaleDateString();
+  return dv.toLocaleDateString();
 }
 
 /**
@@ -96,17 +122,8 @@ export function shortDateString(
 export function isoDateString(
   value: Maybe<DateCompatible>,
 ): string | undefined {
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  const numV = Number(value);
-  if (isFinite(numV) && date.isValid(numV)) {
-    return new Date(numV).toISOString();
-  }
-  if (isString(value) && date.isValid(value)) {
-    return new Date(value).toISOString();
-  }
-  return undefined;
+  const dv = parseDate(value);
+  return dv == null ? undefined : dv.toISOString();
 }
 
 /**
