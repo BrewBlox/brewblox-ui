@@ -593,6 +593,19 @@ export interface TempSensorOneWireBlock extends Block {
 }
 // #endregion TempSensorOneWire
 
+// #region TempSensorExternal
+export interface TempSensorExternalBlock extends Block {
+  type: 'TempSensorExternal';
+  data: {
+    enabled: boolean;
+    timeout: Quantity;
+    setting: Quantity;
+    lastUpdated: Readonly<number>; // seconds since 1970/1/1
+    value: Readonly<Quantity>;
+  };
+}
+// #endregion TempSensorExternal
+
 // #region Ticks
 export interface TicksBlock extends Block {
   type: 'Ticks';

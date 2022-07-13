@@ -26,6 +26,7 @@ import Spark3Pins from './Spark3Pins';
 import SparkDisplay from './SparkDisplay';
 import SysInfo from './SysInfo';
 import TempSensorCombi from './TempSensorCombi';
+import TempSensorExternal from './TempSensorExternal';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
@@ -56,6 +57,7 @@ const plugins: Plugin[] = [
   QuickActions,
   QuickValues,
   TempSensorCombi,
+  TempSensorExternal,
   TempSensorMock,
   TempSensorOneWire,
 ];

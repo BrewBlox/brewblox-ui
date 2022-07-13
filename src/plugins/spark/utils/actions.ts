@@ -269,7 +269,7 @@ export async function resetBlocks(
     const addresses: Mapped<string> = {};
     const sparkStore = useSparkStore();
 
-    if (!module) {
+    if (!sparkStore.has(serviceId)) {
       throw new Error(`Service <b>${serviceId}</b> not found`);
     }
 
