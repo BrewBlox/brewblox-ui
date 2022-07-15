@@ -14,7 +14,7 @@ import {
   getWiFiSettingsBlock,
 } from '@/plugins/spark/utils/system';
 import { useServiceStore } from '@/store/services';
-import { durationString, shortDateString } from '@/utils/quantity';
+import { dateString, durationString, shortDateString } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SysInfoWidget',
@@ -46,9 +46,7 @@ export default defineComponent({
     );
 
     const sysDate = computed<string>(() =>
-      ticks.value
-        ? new Date(ticks.value.data.secondsSinceEpoch * 1000).toLocaleString()
-        : 'Unknown',
+      dateString(ticks.value?.data.secondsSinceEpoch),
     );
 
     const ipAddress = computed<string>(() =>

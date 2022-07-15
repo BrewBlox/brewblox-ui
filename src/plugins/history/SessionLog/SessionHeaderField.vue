@@ -2,6 +2,7 @@
 import { PropType, computed, defineComponent } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
+import { dateString } from '@/utils/quantity';
 
 import { LoggedSession } from '../types';
 import SessionHeaderDialog from './SessionHeaderDialog.vue';
@@ -29,6 +30,7 @@ export default defineComponent({
     }
 
     return {
+      dateString,
       tags,
       showDialog,
     };
@@ -68,7 +70,7 @@ export default defineComponent({
     </div>
     <q-space />
     <div class="col-auto">
-      {{ new Date(session.date).toLocaleString() }}
+      {{ dateString(session.date) }}
     </div>
   </div>
 </template>

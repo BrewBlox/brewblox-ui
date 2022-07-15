@@ -106,7 +106,7 @@ export default defineComponent({
       stack-label
       class="col-grow"
       v-bind="dateAttrs"
-      @change="(v) => save(combine(v, undefined))"
+      @change="(v: any) => save(combine(v, undefined))"
     />
     <q-input
       :model-value="timeString"
@@ -116,7 +116,7 @@ export default defineComponent({
       stack-label
       class="col-grow"
       v-bind="timeAttrs"
-      @change="(v) => save(combine(undefined, v))"
+      @change="(v: any) => save(combine(undefined, v))"
     />
   </div>
 </template>

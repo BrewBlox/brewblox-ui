@@ -24,6 +24,7 @@ import { saveFile } from '@/utils/import-export';
 import { bloxLink } from '@/utils/link';
 import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
+import { dateString } from '@/utils/quantity';
 
 import { makeBlockIdRules } from './configuration';
 import { channelName } from './formatting';
@@ -252,7 +253,7 @@ export function saveHwInfo(serviceId: string): void {
 
   const lines = [
     `Service: ${serviceId}`,
-    `Date: ${new Date().toLocaleString()}`,
+    `Date: ${dateString(new Date())}`,
     '\n[Actuators]',
     ...linked,
     '\n[OneWire addresses]',

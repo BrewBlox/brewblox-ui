@@ -8,6 +8,7 @@ export interface UserUISettings {
   showSidebarLayouts: boolean;
   homePage: string | null;
   builderTouchDelayed: 'dense' | 'always' | 'never';
+  timeFormat: 'auto' | '12h' | '24h';
 }
 
 export interface UserUnits {
@@ -26,6 +27,7 @@ export const defaultUserUISettings = (): UserUISettings => ({
   showSidebarLayouts: true,
   homePage: null,
   builderTouchDelayed: 'dense',
+  timeFormat: 'auto',
 });
 
 export const defaultUserUnits = (): UserUnits => ({
