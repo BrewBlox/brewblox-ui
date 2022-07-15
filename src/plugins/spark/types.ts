@@ -37,25 +37,6 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
-export interface SparkStatus {
-  serviceId: string;
-  isServiceReachable: boolean;
-
-  deviceAddress: string | null;
-  connectionKind: 'simulation' | 'usb' | 'wifi' | null;
-
-  devicePlatform?: string;
-  isCompatibleFirmware?: boolean;
-  isLatestFirmware?: boolean;
-  isValidDeviceId?: boolean;
-
-  isAutoconnecting?: boolean;
-  isConnected?: boolean;
-  isAcknowledged?: boolean;
-  isSynchronized?: boolean;
-  isUpdating?: boolean;
-}
-
 export interface SparkStoreEntry {
   keys: [string, number];
   data: any;

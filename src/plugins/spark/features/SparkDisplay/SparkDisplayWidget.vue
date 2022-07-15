@@ -42,18 +42,19 @@ export default defineComponent({
 
     const isValid = computed<boolean>(
       () =>
-        sparkStore.statusByService(serviceId.value)?.connectionKind ===
-        'simulation',
+        sparkStore.statusByService(serviceId.value)?.connection_kind ===
+        'SIMULATION',
     );
 
     const error = computed<string | null>(() => {
-      if (!sparkStore.has(serviceId.value)) {
+      const status = sparkStore.statusByService(serviceId.value);
+      if (!status) {
         return 'No service configured';
       }
-      if (!sparkStore.statusByService(serviceId.value)?.isSynchronized) {
+      if (status.connection_status !== 'SYNCHRONIZED') {
         return 'Service is not connected';
       }
-      if (!isValid.value) {
+      if (status.connection_kind !== 'SIMULATION') {
         return 'Service is not a simulation';
       }
       return null;

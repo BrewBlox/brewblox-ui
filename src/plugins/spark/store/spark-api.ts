@@ -4,13 +4,11 @@ import { http, intercept } from '@/utils/http';
 import { notify } from '@/utils/notify';
 
 import {
-  ApiSparkStatus,
   Block,
   BlockIds,
   SparkExported,
-  SparkStatus,
+  SparkStatusDescription,
 } from '../types';
-import { asSparkStatus } from './utils';
 
 export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
   http
@@ -102,8 +100,10 @@ export const fetchDiscoveredBlocks = (serviceId: string): Promise<Block[]> =>
 
 export const validateService = (serviceId: string): Promise<boolean> =>
   http
-    .get<ApiSparkStatus>(`/${encodeURIComponent(serviceId)}/system/status`)
-    .then((resp) => resp.data.service_info !== undefined)
+    .get<SparkStatusDescription>(
+      `/${encodeURIComponent(serviceId)}/system/status`,
+    )
+    .then((resp) => resp.data.service != null)
     .catch(() => false);
 
 export const persistAutoconnecting = (
@@ -120,16 +120,16 @@ export const persistAutoconnecting = (
 
 export const fetchSparkStatus = async (
   serviceId: string,
-): Promise<SparkStatus> => {
+): Promise<SparkStatusDescription | null> => {
   try {
-    const resp = await http.get<ApiSparkStatus>(
+    const resp = await http.get<SparkStatusDescription>(
       `/${encodeURIComponent(serviceId)}/system/status`,
       { timeout: 5 * 1000 },
     );
-    return asSparkStatus(serviceId, resp.data);
+    return resp.data;
   } catch (error) {
     notify.warn(`Unable to fetch Spark status: ${error}`, { shown: false });
-    return asSparkStatus(serviceId, null);
+    return null;
   }
 };
 
