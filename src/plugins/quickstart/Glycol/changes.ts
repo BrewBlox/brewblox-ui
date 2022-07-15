@@ -18,6 +18,7 @@ import { useFeatureStore } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
 import {
   bloxQty,
   deltaTempQty,
@@ -73,19 +74,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
 
   const heatingBlocks = [names.heatPid, names.heatPwm, names.heatAct];
 
-  const blocks: [
-    SetpointSensorPairBlock,
-    SetpointProfileBlock,
-    MutexBlock,
-    DigitalActuatorBlock,
-    DigitalActuatorBlock,
-    ActuatorPwmBlock,
-    ActuatorPwmBlock,
-    PidBlock,
-    PidBlock,
-  ] = [
+  const blocks: Block[] = [
     // Setpoint
-    {
+    typed<SetpointSensorPairBlock>({
       id: names.beerSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
@@ -100,9 +91,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
       },
-    },
+    }),
     // Profile
-    {
+    typed<SetpointProfileBlock>({
       id: names.beerProfile,
       type: BlockType.SetpointProfile,
       serviceId,
@@ -126,9 +117,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         ],
         drivenTargetId: bloxLink(null),
       },
-    },
+    }),
     // Mutex
-    {
+    typed<MutexBlock>({
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
@@ -136,9 +127,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         differentActuatorWait: bloxQty('5m'),
         waitRemaining: bloxQty('0s'),
       },
-    },
+    }),
     // Digital Actuators
-    {
+    typed<DigitalActuatorBlock>({
       id: names.coolAct,
       type: BlockType.DigitalActuator,
       serviceId,
@@ -166,8 +157,8 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           ],
         },
       },
-    },
-    {
+    }),
+    typed<DigitalActuatorBlock>({
       id: names.heatAct,
       type: BlockType.DigitalActuator,
       serviceId,
@@ -191,9 +182,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           ],
         },
       },
-    },
+    }),
     // PWM
-    {
+    typed<ActuatorPwmBlock>({
       id: names.coolPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
@@ -207,8 +198,8 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         value: 0,
         constrainedBy: { constraints: [] },
       },
-    },
-    {
+    }),
+    typed<ActuatorPwmBlock>({
       id: names.heatPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
@@ -222,8 +213,8 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         value: 0,
         constrainedBy: { constraints: [] },
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.coolPid,
       type: BlockType.Pid,
       serviceId,
@@ -234,8 +225,8 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         inputId: bloxLink(names.beerSetpoint),
         outputId: bloxLink(names.coolPwm),
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.heatPid,
       type: BlockType.Pid,
       serviceId,
@@ -246,18 +237,13 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         inputId: bloxLink(names.beerSetpoint),
         outputId: bloxLink(names.heatPwm),
       },
-    },
+    }),
   ];
 
   if (config.glycolControl === 'Control') {
-    const glycolControlBlocks: [
-      SetpointSensorPairBlock,
-      DigitalActuatorBlock,
-      ActuatorPwmBlock,
-      PidBlock,
-    ] = [
+    const glycolControlBlocks: Block[] = [
       // Setpoint
-      {
+      typed<SetpointSensorPairBlock>({
         id: names.glycolSetpoint,
         type: BlockType.SetpointSensorPair,
         serviceId,
@@ -272,9 +258,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           filter: FilterChoice.FILTER_15s,
           resetFilter: false,
         },
-      },
+      }),
       // Digital actuator
-      {
+      typed<DigitalActuatorBlock>({
         id: names.glycolAct,
         type: BlockType.DigitalActuator,
         serviceId,
@@ -291,9 +277,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
             ],
           },
         },
-      },
+      }),
       // PWM
-      {
+      typed<ActuatorPwmBlock>({
         id: names.glycolPwm,
         type: BlockType.ActuatorPwm,
         serviceId,
@@ -307,8 +293,8 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           value: 0,
           constrainedBy: { constraints: [] },
         },
-      },
-      {
+      }),
+      typed<PidBlock>({
         id: names.glycolPid,
         type: BlockType.Pid,
         serviceId,
@@ -319,7 +305,7 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           inputId: bloxLink(names.glycolSetpoint),
           outputId: bloxLink(names.glycolPwm),
         },
-      },
+      }),
     ];
 
     blocks.push(...glycolControlBlocks);

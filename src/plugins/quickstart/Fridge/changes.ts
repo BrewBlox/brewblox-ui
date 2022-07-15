@@ -18,6 +18,7 @@ import { useFeatureStore } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
 import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
@@ -47,19 +48,9 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
   const { serviceId, names } = config;
   const { fridgeSetting } = config.fridgeOpts;
 
-  const blocks: [
-    SetpointSensorPairBlock,
-    MutexBlock,
-    DigitalActuatorBlock,
-    DigitalActuatorBlock,
-    ActuatorPwmBlock,
-    ActuatorPwmBlock,
-    SetpointProfileBlock,
-    PidBlock,
-    PidBlock,
-  ] = [
+  return [
     // setpoint sensor pair
-    {
+    typed<SetpointSensorPairBlock>({
       id: names.fridgeSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
@@ -74,9 +65,9 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
       },
-    },
+    }),
     // Mutex
-    {
+    typed<MutexBlock>({
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
@@ -84,9 +75,9 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       },
-    },
+    }),
     // Digital Actuator
-    {
+    typed<DigitalActuatorBlock>({
       id: names.coolAct,
       type: BlockType.DigitalActuator,
       serviceId,
@@ -118,8 +109,8 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
           ],
         },
       },
-    },
-    {
+    }),
+    typed<DigitalActuatorBlock>({
       id: names.heatAct,
       type: BlockType.DigitalActuator,
       serviceId,
@@ -143,9 +134,9 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
           ],
         },
       },
-    },
+    }),
     // PWM
-    {
+    typed<ActuatorPwmBlock>({
       id: names.coolPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
@@ -159,8 +150,8 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         value: 0,
         constrainedBy: { constraints: [] },
       },
-    },
-    {
+    }),
+    typed<ActuatorPwmBlock>({
       id: names.heatPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
@@ -174,9 +165,9 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         value: 0,
         constrainedBy: { constraints: [] },
       },
-    },
+    }),
     // Setpoint Profile
-    {
+    typed<SetpointProfileBlock>({
       id: names.tempProfile,
       type: BlockType.SetpointProfile,
       serviceId,
@@ -200,9 +191,9 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
           },
         ],
       },
-    },
+    }),
     // PID
-    {
+    typed<PidBlock>({
       id: names.coolPid,
       type: BlockType.Pid,
       serviceId,
@@ -213,8 +204,8 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         inputId: bloxLink(names.fridgeSetpoint),
         outputId: bloxLink(names.coolPwm),
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.heatPid,
       type: BlockType.Pid,
       serviceId,
@@ -225,9 +216,8 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         inputId: bloxLink(names.fridgeSetpoint),
         outputId: bloxLink(names.heatPwm),
       },
-    },
+    }),
   ];
-  return blocks;
 }
 
 export const defineWidgets = (

@@ -25,6 +25,7 @@ import { useFeatureStore } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { DisplayBlock, QuickstartPatch } from '../types';
@@ -75,14 +76,14 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
     });
   }
 
-  const balancerBlocks: [BalancerBlock, MutexBlock] = [
-    {
+  const balancerBlocks: Block[] = [
+    typed<BalancerBlock>({
       id: names.balancer,
       type: BlockType.Balancer,
       serviceId,
       data: { clients: [] },
-    },
-    {
+    }),
+    typed<MutexBlock>({
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
@@ -90,24 +91,12 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       },
-    },
+    }),
   ];
 
-  const baseBlocks: [
-    SetpointSensorPairBlock,
-    SetpointSensorPairBlock,
-    SetpointSensorPairBlock,
-    ActuatorOffsetBlock,
-    DigitalActuatorBlock,
-    DigitalActuatorBlock,
-    ActuatorPwmBlock,
-    ActuatorPwmBlock,
-    PidBlock,
-    PidBlock,
-    PidBlock,
-  ] = [
+  const baseBlocks: Block[] = [
     // Setpoints
-    {
+    typed<SetpointSensorPairBlock>({
       id: names.hltSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
@@ -122,8 +111,8 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
       },
-    },
-    {
+    }),
+    typed<SetpointSensorPairBlock>({
       id: names.mtSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
@@ -138,8 +127,8 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
       },
-    },
-    {
+    }),
+    typed<SetpointSensorPairBlock>({
       id: names.bkSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
@@ -154,9 +143,9 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
       },
-    },
+    }),
     // Setpoint Driver
-    {
+    typed<ActuatorOffsetBlock>({
       id: names.hltDriver,
       type: BlockType.ActuatorOffset,
       serviceId,
@@ -178,9 +167,9 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
           ],
         },
       },
-    },
+    }),
     // Digital Actuators
-    {
+    typed<DigitalActuatorBlock>({
       id: names.hltAct,
       type: BlockType.DigitalActuator,
       serviceId,
@@ -194,8 +183,8 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
           constraints: actuatorConstraints,
         },
       },
-    },
-    {
+    }),
+    typed<DigitalActuatorBlock>({
       id: names.bkAct,
       type: BlockType.DigitalActuator,
       serviceId,
@@ -209,9 +198,9 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
           constraints: actuatorConstraints,
         },
       },
-    },
+    }),
     // PWM
-    {
+    typed<ActuatorPwmBlock>({
       id: names.hltPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
@@ -227,8 +216,8 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
           constraints: pwmConstraints,
         },
       },
-    },
-    {
+    }),
+    typed<ActuatorPwmBlock>({
       id: names.bkPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
@@ -244,9 +233,9 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
           constraints: pwmConstraints,
         },
       },
-    },
+    }),
     // PID
-    {
+    typed<PidBlock>({
       id: names.hltPid,
       type: BlockType.Pid,
       serviceId,
@@ -260,8 +249,8 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         td: bloxQty('10s'),
         boilMinOutput: 25,
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.mtPid,
       type: BlockType.Pid,
       serviceId,
@@ -274,8 +263,8 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         ti: bloxQty('5m'),
         td: bloxQty('10m'),
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.bkPid,
       type: BlockType.Pid,
       serviceId,
@@ -289,7 +278,7 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         td: bloxQty('10s'),
         boilMinOutput: 25,
       },
-    },
+    }),
   ];
 
   return config.mutex ? [...balancerBlocks, ...baseBlocks] : baseBlocks;
@@ -385,42 +374,41 @@ export function defineWidgets(
           name: 'Disable all setpoints',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
+              serviceId,
               blockId: names.hltSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
-            },
-            {
+            }),
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
+              serviceId,
               blockId: names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
-            },
-            {
+            }),
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
+              serviceId,
               blockId: names.bkSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
-            },
-          ] as [
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<SetpointSensorPairBlock>,
+            }),
           ],
         },
         {
           name: 'Constant HLT Temp',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
-            },
-            {
+            }),
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.hltSetpoint,
@@ -431,17 +419,14 @@ export function defineWidgets(
               confirmed: {
                 storedSetting: true,
               },
-            },
-          ] as [
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<SetpointSensorPairBlock>,
+            }),
           ],
         },
         {
           name: 'Constant MT Temp',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.mtSetpoint,
@@ -452,8 +437,8 @@ export function defineWidgets(
               confirmed: {
                 storedSetting: true,
               },
-            },
-            {
+            }),
+            typed<BlockChange<ActuatorOffsetBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.hltDriver,
@@ -461,17 +446,14 @@ export function defineWidgets(
                 enabled: true,
               },
               confirmed: {},
-            },
-          ] as [
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<ActuatorOffsetBlock>,
+            }),
           ],
         },
         {
           name: 'Constant BK Temp',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.bkSetpoint,
@@ -482,8 +464,8 @@ export function defineWidgets(
               confirmed: {
                 storedSetting: true,
               },
-            },
-          ] as [BlockChange<SetpointSensorPairBlock>],
+            }),
+          ],
         },
       ],
     },

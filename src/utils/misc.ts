@@ -1,6 +1,17 @@
 import { colors } from 'quasar';
 
 /**
+ * Immediately returns explicitly typed input value.
+ * This is useful for populating lists of interface types
+ * without losing type checking for the actual objects.
+ *
+ * @param obj Passthrough value
+ */
+export function typed<T>(obj: T): T {
+  return obj;
+}
+
+/**
  * Determines the font color with the most contrast
  * when placed on a background with color `background`.
  *

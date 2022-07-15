@@ -22,6 +22,7 @@ import { useFeatureStore } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
 import {
   bloxQty,
   deltaTempQty,
@@ -54,18 +55,9 @@ export function defineChangedBlocks(
 export function defineCreatedBlocks(config: RimsConfig): Block[] {
   const { serviceId, names } = config;
 
-  const blocks: [
-    SetpointSensorPairBlock,
-    SetpointSensorPairBlock,
-    ActuatorOffsetBlock,
-    DigitalActuatorBlock,
-    DigitalActuatorBlock,
-    ActuatorPwmBlock,
-    PidBlock,
-    PidBlock,
-  ] = [
+  return [
     // setpoints
-    {
+    typed<SetpointSensorPairBlock>({
       id: names.kettleSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
@@ -80,8 +72,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         filterThreshold: deltaTempQty(5),
         resetFilter: false,
       },
-    },
-    {
+    }),
+    typed<SetpointSensorPairBlock>({
       id: names.tubeSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
@@ -96,9 +88,9 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         filterThreshold: deltaTempQty(5),
         resetFilter: false,
       },
-    },
+    }),
     // Setpoint Driver
-    {
+    typed<ActuatorOffsetBlock>({
       id: names.tubeDriver,
       type: BlockType.ActuatorOffset,
       serviceId,
@@ -120,9 +112,9 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           ],
         },
       },
-    },
+    }),
     // Digital Actuators
-    {
+    typed<DigitalActuatorBlock>({
       id: names.tubeAct,
       type: BlockType.DigitalActuator,
       serviceId,
@@ -134,8 +126,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         state: DigitalState.STATE_INACTIVE,
         constrainedBy: { constraints: [] },
       },
-    },
-    {
+    }),
+    typed<DigitalActuatorBlock>({
       id: names.pumpAct,
       type: BlockType.DigitalActuator,
       serviceId,
@@ -147,9 +139,9 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         state: DigitalState.STATE_INACTIVE,
         constrainedBy: { constraints: [] },
       },
-    },
+    }),
     // PWM
-    {
+    typed<ActuatorPwmBlock>({
       id: names.tubePwm,
       type: BlockType.ActuatorPwm,
       serviceId,
@@ -163,9 +155,9 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         value: 0,
         constrainedBy: { constraints: [] },
       },
-    },
+    }),
     // PID
-    {
+    typed<PidBlock>({
       id: names.kettlePid,
       type: BlockType.Pid,
       serviceId,
@@ -178,8 +170,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         inputId: bloxLink(names.kettleSetpoint),
         outputId: bloxLink(names.tubeDriver),
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.tubePid,
       type: BlockType.Pid,
       serviceId,
@@ -192,9 +184,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         inputId: bloxLink(names.tubeSetpoint),
         outputId: bloxLink(names.tubePwm),
       },
-    },
+    }),
   ];
-  return blocks;
 }
 
 export function defineWidgets(
@@ -282,73 +273,67 @@ export function defineWidgets(
           name: 'Enable pump and heater',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<DigitalActuatorBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.STATE_ACTIVE },
               confirmed: {},
-            },
-            {
+            }),
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: true },
               confirmed: {},
-            },
-          ] as [
-            BlockChange<DigitalActuatorBlock>,
-            BlockChange<SetpointSensorPairBlock>,
+            }),
           ],
         },
         {
           name: 'Disable pump and heater',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
-            },
-            {
+            }),
+            typed<BlockChange<DigitalActuatorBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.STATE_INACTIVE },
               confirmed: {},
-            },
-          ] as [
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<DigitalActuatorBlock>,
+            }),
           ],
         },
         {
           name: 'Enable pump',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<DigitalActuatorBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.STATE_ACTIVE },
               confirmed: {},
-            },
-          ] as [BlockChange<DigitalActuatorBlock>],
+            }),
+          ],
         },
         {
           name: 'Disable heater',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
-            },
-          ] as [BlockChange<SetpointSensorPairBlock>],
+            }),
+          ],
         },
       ],
     },
