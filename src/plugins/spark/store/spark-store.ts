@@ -7,6 +7,7 @@ import {
   BlockRelation,
   Link,
   SparkPatchEvent,
+  SparkStatusDescription,
 } from '@/shared-types';
 import { useServiceStore } from '@/store/services';
 import { useWidgetStore } from '@/store/widgets';
@@ -15,18 +16,12 @@ import { makeTypeFilter } from '@/utils/functional';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 
-import type {
-  BlockAddress,
-  SparkExported,
-  SparkSessionConfig,
-  SparkStatus,
-} from '../types';
+import type { BlockAddress, SparkExported, SparkSessionConfig } from '../types';
 import type { Block, BlockFieldAddress } from '../types';
 import { isBlockVolatile, isSparkPatch, isSparkState } from '../utils/info';
 import * as sparkApi from './spark-api';
 import {
   asServiceStatus,
-  asSparkStatus,
   findBlockByAddress,
   findBlockById,
   findBlockFieldByAddress,
@@ -53,7 +48,7 @@ interface SparkStoreState {
   blocks: ByService<Block[]>;
   volatileBlocks: ByService<Block[]>;
   discoveredBlockIds: ByService<string[]>;
-  statuses: ByService<SparkStatus | null>;
+  statuses: ByService<SparkStatusDescription | null>;
   relations: ByService<BlockRelation[]>;
   driveChains: ByService<BlockDriveChain[]>;
   lastBlocksAt: ByService<Date | null>;
@@ -151,7 +146,7 @@ export const useSparkStore = defineStore('sparkStore', {
       return this.has(serviceId) ? this.discoveredBlockIds[serviceId] : [];
     },
 
-    statusByService(serviceId: Maybe<string>): SparkStatus | null {
+    statusByService(serviceId: Maybe<string>): SparkStatusDescription | null {
       return this.has(serviceId) ? this.statuses[serviceId] : null;
     },
 
@@ -343,15 +338,16 @@ export const useSparkStore = defineStore('sparkStore', {
     async fetchAll(serviceId: string): Promise<boolean> {
       const serviceStore = useServiceStore();
       const status = await sparkApi.fetchSparkStatus(serviceId);
-      this.updateStatus(status);
-      serviceStore.updateStatus(asServiceStatus(status));
-      if (status.isSynchronized) {
+      this.updateStatus(serviceId, status);
+      serviceStore.updateStatus(asServiceStatus(serviceId, status));
+      const synchronized = status?.connection_status === 'SYNCHRONIZED';
+      if (synchronized) {
         await Promise.all([
           this.fetchDiscoveredBlocks(serviceId),
           this.fetchBlocks(serviceId),
         ]);
       }
-      return !!status.isSynchronized;
+      return synchronized;
     },
 
     async serviceExport(serviceId: string): Promise<SparkExported> {
@@ -403,8 +399,10 @@ export const useSparkStore = defineStore('sparkStore', {
       ];
     },
 
-    updateStatus(status: SparkStatus): void {
-      const { serviceId } = status;
+    updateStatus(
+      serviceId: string,
+      status: SparkStatusDescription | null,
+    ): void {
       this.statuses[serviceId] = status;
       this.lastStatusAt[serviceId] = new Date();
     },
@@ -461,17 +459,20 @@ export const useSparkStore = defineStore('sparkStore', {
         (_, evt) => {
           if (isSparkState(evt)) {
             const serviceStore = useServiceStore();
-            const status = asSparkStatus(serviceId, evt.data.status);
-            const blocks = evt.data.blocks.map(deserialize);
+            if (evt.data) {
+              const blocks = evt.data.blocks.map(deserialize);
+              const { status, relations, drive_chains } = evt.data;
 
-            this.updateBlocks(serviceId, blocks);
-            this.updateStatus(status);
-            this.updateComputed(
-              serviceId,
-              evt.data.relations,
-              evt.data.drive_chains,
-            );
-            serviceStore.updateStatus(asServiceStatus(status));
+              this.updateBlocks(serviceId, blocks);
+              this.updateStatus(serviceId, status);
+              this.updateComputed(serviceId, relations, drive_chains);
+              serviceStore.updateStatus(asServiceStatus(serviceId, status));
+            } else {
+              this.updateBlocks(serviceId, []);
+              this.updateStatus(serviceId, null);
+              this.updateComputed(serviceId, [], []);
+              serviceStore.updateStatus(asServiceStatus(serviceId, null));
+            }
           }
         },
       );

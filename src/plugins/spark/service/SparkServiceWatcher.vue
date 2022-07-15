@@ -3,7 +3,10 @@ import { useQuasar } from 'quasar';
 import { PropType, computed, defineComponent, inject, ref, watch } from 'vue';
 
 import { useSparkStore } from '@/plugins/spark/store';
-import type { SparkService, SparkStatus } from '@/plugins/spark/types';
+import type {
+  SparkService,
+  SparkStatusDescription,
+} from '@/plugins/spark/types';
 import { NowKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
@@ -28,7 +31,7 @@ export default defineComponent({
 
     const serviceId = computed<string>(() => props.service.id);
 
-    const status = computed<SparkStatus | null>(() =>
+    const status = computed<SparkStatusDescription | null>(() =>
       sparkStore.statusByService(serviceId.value),
     );
 
@@ -73,12 +76,14 @@ export default defineComponent({
 
     watch(
       () => status.value,
-      (status: SparkStatus | null) => {
+      (status: SparkStatusDescription | null) => {
+        if (!status) {
+          return;
+        }
+
         if (
+          status.firmware_error == null ||
           notifiedUpdate.value ||
-          !status ||
-          !status.isConnected ||
-          status.isLatestFirmware ||
           snoozeTime.value > new Date().getTime() - snoozeDuration
         ) {
           return;
@@ -88,7 +93,7 @@ export default defineComponent({
         notify.info({
           timeout: 0,
           icon: 'mdi-download-network',
-          message: `Firmware update available for <b>${props.service.title}</b>`,
+          message: `Firmware update available for <b>${props.service.title}</b>.`,
           actions: [
             {
               label: 'Update',

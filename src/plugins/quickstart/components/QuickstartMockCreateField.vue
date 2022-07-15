@@ -3,7 +3,7 @@ import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
-import { SparkStatus } from '@/plugins/spark/types';
+import { SparkStatusDescription } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
@@ -25,12 +25,12 @@ export default defineComponent({
     const specStore = useBlockSpecStore();
     const finished = ref(false);
 
-    const status = computed<SparkStatus | null>(() =>
+    const status = computed<SparkStatusDescription | null>(() =>
       sparkStore.statusByService(props.serviceId),
     );
 
     const isSimulation = computed<boolean>(
-      () => status.value?.connectionKind === 'simulation',
+      () => status.value?.connection_kind === 'SIMULATION',
     );
 
     async function createMockSensors(): Promise<void> {

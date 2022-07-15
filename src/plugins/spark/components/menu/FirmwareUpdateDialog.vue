@@ -12,7 +12,11 @@ import { useDialog } from '@/composables';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { useSparkStore } from '@/plugins/spark/store';
-import { SparkStatus } from '@/plugins/spark/types';
+import {
+  SparkControllerDescription,
+  SparkServiceDescription,
+  SparkStatusDescription,
+} from '@/plugins/spark/types';
 import { isSparkUpdate } from '@/plugins/spark/utils/info';
 
 export default defineComponent({
@@ -49,24 +53,43 @@ export default defineComponent({
       eventbus.removeListener(listenerId.value);
     });
 
-    const status = computed<SparkStatus | null>(() =>
+    const status = computed<SparkStatusDescription | null>(() =>
       sparkStore.statusByService(props.serviceId),
     );
 
     const updateAvailableText = computed<string>(() => {
-      const latest = status.value?.isLatestFirmware;
-      return latest === undefined
-        ? 'Current firmware version is unknown.'
-        : latest
-        ? "You're using the latest firmware."
-        : 'A firmware update is available.';
+      if (!status.value) {
+        return 'The service is not connected: firmware status is unknown.';
+      }
+
+      const { firmware_error, controller, service } = status.value;
+      if (controller == null) {
+        return 'The service is not connected to a controller.';
+      }
+
+      if (firmware_error == null) {
+        return "You're using the latest firmware.";
+      }
+
+      if (controller.firmware.firmware_date > service.firmware.firmware_date) {
+        return 'The controller firmware is newer than the service firmware.';
+      }
+
+      return 'A firmware update is available';
     });
 
-    const ready = computed<boolean>(() => Boolean(status.value?.isConnected));
+    const ready = computed<boolean>(() => {
+      const cs = status.value?.connection_status;
+      return cs != null && (cs === 'ACKNOWLEDGED' || cs === 'SYNCHRONIZED');
+    });
 
-    const buttonColor = computed<string>(() =>
-      status.value?.isLatestFirmware ? '' : 'primary',
-    );
+    function firmwareText(
+      arg: SparkServiceDescription | SparkControllerDescription | null,
+    ): string {
+      return arg
+        ? `${arg.firmware.firmware_version} (${arg.firmware.firmware_date})`
+        : 'Unknown';
+    }
 
     function updateFirmware(): void {
       if (busy.value || !ready.value) {
@@ -90,12 +113,13 @@ export default defineComponent({
       dialogRef,
       dialogProps,
       onDialogHide,
+      status,
       busy,
       error,
       messages,
       updateAvailableText,
       ready,
-      buttonColor,
+      firmwareText,
       updateFirmware,
     };
   },
@@ -118,6 +142,16 @@ export default defineComponent({
       </template>
 
       <q-card-section>
+        <div class="q-pa-md">
+          <b>{{ updateAvailableText }}</b>
+          <template v-if="status">
+            <br />
+            Service firmware: {{ firmwareText(status.service) }}
+            <br />
+            Controller firmware: {{ firmwareText(status.controller) }}
+          </template>
+        </div>
+
         <div
           v-if="error"
           class="text-negative q-pa-md"
@@ -127,13 +161,7 @@ export default defineComponent({
           If the retry fails, run `brewblox-ctl flash`
         </div>
 
-        <div
-          v-if="messages.length === 0"
-          class="q-pa-md"
-        >
-          {{ updateAvailableText }}
-        </div>
-        <template v-else>
+        <template v-if="messages.length > 0">
           <div class="text-h6 q-pa-md">Log messages</div>
           <div class="q-gutter-sm q-px-md monospace">
             <div
@@ -150,7 +178,7 @@ export default defineComponent({
         <q-btn
           :disable="busy || !ready"
           :loading="busy || !ready"
-          :color="buttonColor"
+          :color="status && status.firmware_error ? 'primary' : ''"
           unelevated
           label="Flash"
           @click="updateFirmware"

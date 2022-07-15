@@ -7,7 +7,7 @@ import type {
   BlockRelationNode,
   PageMode,
   SparkService,
-  SparkStatus,
+  SparkStatusDescription,
 } from '@/plugins/spark/types';
 import { BlockType } from '@/shared-types';
 import { useFeatureStore } from '@/store/features';
@@ -62,15 +62,12 @@ export default defineComponent({
         sparkStore.lastBlocksAtByService(props.serviceId) != null,
     );
 
-    const status = computed<SparkStatus | null>(() =>
+    const status = computed<SparkStatusDescription | null>(() =>
       sparkStore.statusByService(props.serviceId),
     );
 
     const statusNok = computed<boolean>(
-      () =>
-        isAvailable.value &&
-        status.value !== null &&
-        (!status.value.isSynchronized || !!status.value.isUpdating),
+      () => status.value?.connection_status !== 'SYNCHRONIZED',
     );
 
     const pageMode = computed<PageMode>({
