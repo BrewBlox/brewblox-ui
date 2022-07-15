@@ -20,7 +20,7 @@ import {
 } from '@/plugins/history/types';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { isJsonEqual } from '@/utils/objects';
-import { durationString, fixedNumber } from '@/utils/quantity';
+import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
 
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { MetricsWidget } from './types';
@@ -115,6 +115,7 @@ export default defineComponent({
     onBeforeUnmount(() => removeSource());
 
     return {
+      shortDateString,
       context,
       metricsId,
       config,
@@ -160,7 +161,7 @@ export default defineComponent({
             {{ val.name }} was updated more than
             {{ durationString(fieldFreshDuration(val.field)) }} ago.
             <br />
-            Last update: {{ new Date(val.time).toLocaleString() }}.
+            Last update: {{ shortDateString(val.time) }}.
           </q-tooltip>
         </div>
       </LabeledField>

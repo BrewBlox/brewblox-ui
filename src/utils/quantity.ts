@@ -6,7 +6,7 @@ import parseDuration from 'parse-duration';
 import { date } from 'quasar';
 
 import { Link, Quantity, TempUnit } from '@/shared-types';
-import { userUnits } from '@/user-settings';
+import { userUISettings, userUnits } from '@/user-settings';
 
 import {
   isCompatibleQty,
@@ -66,6 +66,18 @@ export function parseDate(value: Maybe<DateCompatible>): Date | null {
   return date.isValid(value) ? new Date(value) : null;
 }
 
+export function timeFormatOpts(): Intl.DateTimeFormatOptions {
+  const { timeFormat } = userUISettings.value;
+
+  return {
+    hour12: {
+      '12h': true,
+      '24h': false,
+      auto: undefined,
+    }[timeFormat],
+  };
+}
+
 /**
  * Converts date-compatible value to date/time string.
  *
@@ -80,7 +92,9 @@ export function dateString(
   nullLabel = '<not set>',
 ): string {
   const dv = parseDate(value);
-  return dv == null ? nullLabel : dv.toLocaleString();
+  return dv == null
+    ? nullLabel
+    : dv.toLocaleString(undefined, timeFormatOpts());
 }
 
 /**
@@ -104,9 +118,9 @@ export function shortDateString(
     return nullLabel;
   }
   if (Math.abs(date.getDateDiff(new Date(), dv, 'hours')) < 24) {
-    return dv.toLocaleTimeString();
+    return dv.toLocaleTimeString(undefined, timeFormatOpts());
   }
-  return dv.toLocaleDateString();
+  return dv.toLocaleDateString(undefined, timeFormatOpts());
 }
 
 /**

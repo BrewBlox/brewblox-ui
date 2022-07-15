@@ -9,6 +9,7 @@ import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
+import { dateString } from '@/utils/quantity';
 
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
@@ -79,10 +80,6 @@ export default defineComponent({
       patchConfig({ currentSession: null });
     }
 
-    function renderDate(date: number | null): string {
-      return date !== null ? new Date(date).toLocaleString() : '??';
-    }
-
     function* sessionLines(): Generator<string, void, unknown> {
       yield '';
       for (const note of notes.value) {
@@ -92,7 +89,7 @@ export default defineComponent({
           yield note.value;
         }
         if (note.type === 'Graph') {
-          yield `${renderDate(note.start)} - ${renderDate(note.end)}`;
+          yield `${dateString(note.start)} - ${dateString(note.end)}`;
           yield '';
           for (const annotation of note.config.layout?.annotations ?? []) {
             yield `${annotation.x} :: ${annotation.text}`;
@@ -107,7 +104,7 @@ export default defineComponent({
       if (session.value === null) {
         return;
       }
-      const name = `${widget.value.title} ${session.value.title} ${renderDate(
+      const name = `${widget.value.title} ${session.value.title} ${dateString(
         session.value.date,
       )}`;
       const lines: string[] = [name, ...sessionLines()];
@@ -122,7 +119,7 @@ export default defineComponent({
       if (session.value === null) {
         return;
       }
-      const sessionDate = renderDate(session.value.date);
+      const sessionDate = dateString(session.value.date);
       const validNotes = notes.value
         .filter(graphFilter)
         .filter((v) => v.config.fields.length);

@@ -3,6 +3,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { useField } from '@/composables';
+import { dateString } from '@/utils/quantity';
 
 import { LoggedSession } from '../types';
 
@@ -13,7 +14,7 @@ interface SessionOpt extends SelectOption {
 function asOpt(session: LoggedSession): SessionOpt {
   return {
     session,
-    label: `${session.title} (${new Date(session.date).toLocaleDateString()})`,
+    label: `${session.title} (${dateString(session.date)})`,
     value: session.id,
   };
 }

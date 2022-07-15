@@ -10,6 +10,7 @@ import {
   startChangeGravityUnit,
   startChangeKeyboardLayout,
   startChangeTempUnit,
+  startChangeTimeFormat,
   startChangeTimezone,
   startEditBuilderTouchDelay,
   useSystemStore,
@@ -74,6 +75,7 @@ export default defineComponent({
       startChangeTempUnit,
       startChangeGravityUnit,
       startChangeTimezone,
+      startChangeTimeFormat,
       startEditBuilderTouchDelay,
       startupDone,
       experimental,
@@ -140,6 +142,11 @@ export default defineComponent({
             icon="mdi-map-clock"
             label="Timezone"
             @click="startChangeTimezone"
+          />
+          <ActionItem
+            icon="mdi-clock-outline"
+            label="Time format"
+            @click="startChangeTimeFormat"
           />
           <ActionItem
             icon="mdi-gesture-tap-hold"

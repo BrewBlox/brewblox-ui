@@ -4,6 +4,7 @@ import { defineComponent, nextTick, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
 import { createDialog } from '@/utils/dialog';
+import { timeFormatOpts } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SessionTextNoteDialog',
@@ -64,8 +65,9 @@ export default defineComponent({
             : [prev.length, prev.length];
 
         // [Fri 11/15/2019, 2:00:23 PM]
-        const day = date.toLocaleString(undefined, { weekday: 'short' });
-        const insert = `[${day} ${date.toLocaleString()}] `;
+        const dayOfWeek = date.toLocaleString(undefined, { weekday: 'short' });
+        const fulldate = date.toLocaleString(undefined, timeFormatOpts());
+        const insert = `[${dayOfWeek} ${fulldate}] `;
 
         // Splice into current string
         local.value = [

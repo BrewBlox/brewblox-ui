@@ -35,12 +35,12 @@ const timeZoneFilter = (v: StoreObject): v is StoreObjectImpl<UserTimeZone> =>
 export const useSystemStore = defineStore('systemStore', {
   actions: {
     updateUserUISettings(obj: Maybe<StoreObjectImpl<UserUISettings>>): void {
-      const settings = defaults(obj, defaultUserUISettings);
+      const settings = defaults(obj, defaultUserUISettings());
       userUISettings.value = omit(settings, 'id', 'namespace');
     },
 
     updateUserUnits(obj: Maybe<StoreObjectImpl<UserUnits>>): void {
-      const units = defaults(obj, defaultUserUnits);
+      const units = defaults(obj, defaultUserUnits());
       userUnits.value = omit(units, 'id', 'namespace');
       userUnitsDefined.value = obj != null;
     },
@@ -239,5 +239,33 @@ export function startChangeTimezone(): DialogChainObject {
   }).onOk((name: string) => {
     const posixValue = timezones[name];
     systemStore.patchUserTimeZone({ name, posixValue });
+  });
+}
+
+export function startChangeTimeFormat(): DialogChainObject {
+  const systemStore = useSystemStore();
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: [
+        { value: 'auto', label: 'Automatic' },
+        { value: '12h', label: '12H AM/PM' },
+        { value: '24h', label: '24H' },
+      ],
+      modelValue: userUISettings.value.timeFormat,
+      title: 'Choose time formatting',
+      message: `
+      <p>
+        Choose how time values are formatted in the UI.
+        If 'Automatic' is chosen, the browser and OS locales are used.
+      </p>
+      `,
+      html: true,
+      selectProps: {
+        label: 'Time format',
+      },
+    },
+  }).onOk((timeFormat: UserUISettings['timeFormat']) => {
+    systemStore.patchUserUISettings({ timeFormat });
   });
 }

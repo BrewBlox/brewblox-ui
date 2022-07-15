@@ -15,7 +15,13 @@ import { createBlockDialog } from '@/utils/block-dialog';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
-import { bloxQty, prettyQty, shortDateString, tempQty } from '@/utils/quantity';
+import {
+  bloxQty,
+  dateString,
+  prettyQty,
+  shortDateString,
+  tempQty,
+} from '@/utils/quantity';
 
 import { PidConfig } from '../types';
 import TempControlModeDialog from './TempControlModeDialog.vue';
@@ -100,13 +106,12 @@ export default defineComponent({
           return;
         }
 
-        const start = new Date((profile.value.data.start || 0) * 1000);
         createDialog({
           component: 'ConfirmDialog',
           componentProps: {
             title: 'Start profile',
             message: `
-          Profile start time is ${start.toLocaleString()}.
+          Profile start time is ${dateString(profile.value.data.start)}.
           Do you want to reset this value to current date and time?
           `,
             nok: 'No',
