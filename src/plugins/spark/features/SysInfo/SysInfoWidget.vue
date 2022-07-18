@@ -3,29 +3,15 @@ import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  SparkService,
-  SysInfoBlock,
-  TicksBlock,
-  WiFiSettingsBlock,
-} from '@/plugins/spark/types';
-import {
-  getTicksBlock,
-  getWiFiSettingsBlock,
-} from '@/plugins/spark/utils/system';
-import { useServiceStore } from '@/store/services';
+import { SysInfoBlock, TicksBlock } from '@/plugins/spark/types';
+import { getTicksBlock } from '@/plugins/spark/utils/system';
 import { dateString, durationString, shortDateString } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SysInfoWidget',
   setup() {
-    const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
     const { block, serviceId } = useBlockWidget.setup<SysInfoBlock>();
-
-    const service = computed<SparkService | null>(() =>
-      serviceStore.serviceById(serviceId),
-    );
 
     const lastBlocks = computed<string>(() =>
       shortDateString(sparkStore.lastBlocksAtByService(serviceId), 'Unknown'),
@@ -37,10 +23,6 @@ export default defineComponent({
       getTicksBlock(serviceId),
     );
 
-    const wifi = computed<WiFiSettingsBlock | undefined>(() =>
-      getWiFiSettingsBlock(serviceId),
-    );
-
     const uptime = computed<string>(() =>
       durationString(ticks.value?.data.millisSinceBoot),
     );
@@ -49,14 +31,8 @@ export default defineComponent({
       dateString(ticks.value?.data.secondsSinceEpoch),
     );
 
-    const ipAddress = computed<string>(() =>
-      wifi.value ? wifi.value.data.ip : '0.0.0.0',
-    );
-
     const ready = computed<boolean>(
-      () =>
-        service.value !== null &&
-        sparkStore.lastBlocksAtByService(serviceId) != null,
+      () => sparkStore.lastStatusAtByService(serviceId) != null,
     );
 
     return {
@@ -66,7 +42,6 @@ export default defineComponent({
       sysInfo,
       uptime,
       sysDate,
-      ipAddress,
     };
   },
 });
@@ -124,7 +99,7 @@ export default defineComponent({
           label="IP address"
           class="col-lg-5 col-11"
         >
-          {{ ipAddress }}
+          {{ sysInfo.data.ip }}
         </LabeledField>
         <LabeledField
           label="Last blocks update"

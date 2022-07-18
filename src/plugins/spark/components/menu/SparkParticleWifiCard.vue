@@ -49,7 +49,6 @@ export default defineComponent({
       security: WifiSecurityType.WLAN_SEC_WPA2,
       cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
       signal: 0,
-      ip: '',
     });
 
     const block = computed<WiFiSettingsBlock>(

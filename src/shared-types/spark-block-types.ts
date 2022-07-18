@@ -545,6 +545,7 @@ export interface SysInfoBlock extends Block {
     protocolVersion: Readonly<string>;
     releaseDate: Readonly<string>;
     protocolDate: Readonly<string>;
+    ip: Readonly<string>;
 
     // internal use only
     command: any;
@@ -638,7 +639,6 @@ export interface WiFiSettingsBlock extends Block {
   type: 'WiFiSettings';
   data: {
     signal: Readonly<number>; // dBm
-    ip: Readonly<string>;
 
     // Write-only values
     ssid: string;

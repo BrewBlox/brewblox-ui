@@ -25,6 +25,7 @@ const plugin: Plugin = {
         releaseDate: '',
         protocolVersion: '',
         protocolDate: '',
+        ip: '0.0.0.0',
         command: null,
         trace: [],
       }),

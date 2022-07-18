@@ -28,9 +28,8 @@ export default defineComponent({
 
     const platformVendor = computed<'esp' | 'particle' | 'sim' | 'unknown'>(
       () => {
-        const platform = sparkStore.statusByService(
-          props.serviceId,
-        )?.devicePlatform;
+        const status = sparkStore.statusByService(props.serviceId);
+        const platform = status?.controller?.platform;
         if (platform === 'p1' || platform === 'photon') {
           return 'particle';
         }
