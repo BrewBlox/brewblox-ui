@@ -41,7 +41,7 @@ export const defaultUserTimeZone = (): UserTimeZone => ({
 });
 
 export const startupDone = ref(false);
-export const userUnitsDefined = ref(false);
+export const userUnitsDefined = ref(true);
 
 export const userUISettings = ref(defaultUserUISettings());
 export const userUnits = ref(defaultUserUnits());
