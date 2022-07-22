@@ -30,6 +30,7 @@ import {
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { SequenceBlock, SequenceError, SequenceStatus } from '@/shared-types';
+import { bloxQty } from '@/utils/quantity';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.NONE]: null,
@@ -260,9 +261,9 @@ export default defineComponent({
         enabled,
         overrideState: true,
         activeInstruction: 0,
-        activeInstructionStartedAt: 0,
-        disabledAt: 0,
-        disabledDuration: 0,
+        activeInstructionStartedAt: null,
+        disabledAt: null,
+        disabledDuration: bloxQty('0s'),
       });
     }
 
@@ -289,9 +290,9 @@ export default defineComponent({
         patchBlock({
           overrideState: true,
           activeInstruction: idx,
-          activeInstructionStartedAt: 0,
-          disabledAt: 0,
-          disabledDuration: 0,
+          activeInstructionStartedAt: null,
+          disabledAt: null,
+          disabledDuration: bloxQty('0s'),
         });
       }
     }

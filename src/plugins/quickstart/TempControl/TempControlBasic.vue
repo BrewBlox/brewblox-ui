@@ -127,7 +127,7 @@ export default defineComponent({
           });
           await sparkStore.patchBlock(profile.value, {
             enabled: true,
-            start: reset ? new Date().getTime() / 1000 : undefined,
+            start: reset ? new Date().toISOString() : undefined,
           });
         });
       },

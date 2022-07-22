@@ -87,12 +87,12 @@ export default defineComponent({
     }
 
     function startGraphNote(note: SessionGraphNote): void {
-      note.start = new Date().getTime();
+      note.start = new Date().toISOString();
       saveSession();
     }
 
     function stopGraphNote(note: SessionGraphNote): void {
-      note.end = new Date().getTime();
+      note.end = new Date().toISOString();
       saveSession();
     }
 

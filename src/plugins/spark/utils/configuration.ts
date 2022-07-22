@@ -14,7 +14,7 @@ import {
 import { Block, SetpointProfileBlock } from '@/shared-types';
 import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
-import { bloxQty, prettyUnit } from '@/utils/quantity';
+import { bloxQty, durationMs, parseDate, prettyUnit } from '@/utils/quantity';
 
 export const asBlockAddress = (block: Block): BlockAddress =>
   pick(block, ['id', 'serviceId', 'type']);
@@ -112,9 +112,11 @@ export function calculateProfileValues(
     return null;
   }
 
-  const now = new Date().getTime() / 1000;
-  const start = block.data.start || 0;
-  const idx = block.data.points.findIndex((point) => start + point.time > now);
+  const now = new Date().getTime();
+  const start = parseDate(block.data.start)?.getTime() ?? 0;
+  const idx = block.data.points.findIndex(
+    (point) => start + durationMs(point.time) > now,
+  );
   if (idx < 1) {
     return null;
   }
@@ -123,9 +125,10 @@ export function calculateProfileValues(
   const unit = prev.temperature.unit;
   const prevVal = prev.temperature.value as number;
   const nextVal = next.temperature.value as number;
-  const duration = next.time - prev.time || 1;
+  const duration = durationMs(next.time) - durationMs(prev.time) || 1;
   const currentVal =
-    prevVal + ((now - start + prev.time) * (nextVal - prevVal)) / duration;
+    prevVal +
+    ((now - start + durationMs(prev.time)) * (nextVal - prevVal)) / duration;
 
   return {
     prev: bloxQty(prevVal, unit),

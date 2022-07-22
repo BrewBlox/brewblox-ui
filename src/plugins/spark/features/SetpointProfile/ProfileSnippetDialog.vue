@@ -81,7 +81,7 @@ export default defineComponent({
         .onOk(async () => {
           await sparkStore.patchBlock(block.value, {
             points,
-            start: new Date().getTime() / 1000,
+            start: new Date().toISOString(),
           });
           onDialogOK();
         })

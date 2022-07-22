@@ -19,7 +19,7 @@ import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
 import { typed } from '@/utils/misc';
-import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
+import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
@@ -203,21 +203,21 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       type: BlockType.SetpointProfile,
       serviceId,
       data: {
-        start: new Date().getTime() / 1000,
+        start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(activeSetpointId),
         drivenTargetId: bloxLink(null),
         points: [
           {
-            time: 0,
+            time: bloxQty('0s'),
             temperature: initialSetting,
           },
           {
-            time: durationMs('7d') / 1000,
+            time: bloxQty('7d'),
             temperature: initialSetting,
           },
           {
-            time: durationMs('10d') / 1000,
+            time: bloxQty('10d'),
             temperature: bloxQty(initialSetting).copy(
               initialSetting.value! + 3,
             ),

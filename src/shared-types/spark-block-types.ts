@@ -63,6 +63,10 @@ export interface DefinedLink extends Link {
   type: BlockOrIntfType;
 }
 
+// #region DateString
+export type DateString = string;
+// #endregion DateString
+
 // #region IoChannel
 export interface IoChannel {
   id: number;
@@ -464,9 +468,9 @@ export interface SequenceBlock extends Block {
     enabled: boolean;
     overrideState: boolean;
     activeInstruction: number;
-    activeInstructionStartedAt: number; // seconds since 1970/1/1
-    disabledAt: number; // seconds since 1970/1/1
-    disabledDuration: number; // seconds
+    activeInstructionStartedAt: DateString | null;
+    disabledAt: DateString | null;
+    disabledDuration: Quantity;
     status: SequenceStatus;
     error: SequenceError;
     instructions: string[];
@@ -476,14 +480,14 @@ export interface SequenceBlock extends Block {
 
 // #region SetpointProfile
 export interface Setpoint {
-  time: number; // seconds since start
+  time: Quantity; // offset from start
   temperature: Quantity;
 }
 
 export interface SetpointProfileBlock extends Block {
   type: 'SetpointProfile';
   data: {
-    start: number; // seconds since 1970/1/1
+    start: DateString | null;
     points: Setpoint[];
     enabled: boolean;
     targetId: Link;
@@ -601,7 +605,7 @@ export interface TempSensorExternalBlock extends Block {
     enabled: boolean;
     timeout: Quantity;
     setting: Quantity;
-    lastUpdated: Readonly<number>; // seconds since 1970/1/1
+    lastUpdated: Readonly<DateString | null>;
     value: Readonly<Quantity>;
   };
 }
@@ -611,7 +615,7 @@ export interface TempSensorExternalBlock extends Block {
 export interface TicksBlock extends Block {
   type: 'Ticks';
   data: {
-    secondsSinceEpoch: number;
+    secondsSinceEpoch: DateString;
     millisSinceBoot: Readonly<number>;
     avgCommunicationTask: Readonly<number>;
     avgBlocksUpdateTask: Readonly<number>;

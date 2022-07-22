@@ -78,6 +78,15 @@ export function timeFormatOpts(): Intl.DateTimeFormatOptions {
   };
 }
 
+export function compareDate(
+  lhs: Maybe<DateCompatible>,
+  rhs: Maybe<DateCompatible>,
+): number {
+  const lhsV = parseDate(lhs) ?? new Date(0);
+  const rhsV = parseDate(rhs) ?? new Date(0);
+  return lhsV.getTime() - rhsV.getTime();
+}
+
 /**
  * Converts date-compatible value to date/time string.
  *

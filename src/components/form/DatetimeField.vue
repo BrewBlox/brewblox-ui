@@ -10,7 +10,7 @@ export default defineComponent({
   props: {
     ...useField.props,
     modelValue: {
-      type: [Number, String, Date] as PropType<number | string | Date | null>,
+      type: [Date] as PropType<Date | null>,
       default: null,
     },
     short: {
@@ -33,18 +33,13 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    emitNumber: {
-      type: Boolean,
-      default: false,
-    },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
 
-    function save(v: Date): void {
-      const result = props.emitNumber ? v.getTime() : v;
-      emit('update:modelValue', result);
+    function save(v: Date | null): void {
+      emit('update:modelValue', v);
     }
 
     const displayValue = computed<string>(() =>
@@ -58,9 +53,10 @@ export default defineComponent({
         return;
       }
 
-      const date = new Date(
-        props.modelValue || (props.defaultNow ? new Date().getTime() : 0),
-      );
+      const date =
+        props.modelValue == null && props.defaultNow
+          ? new Date()
+          : props.modelValue;
 
       createDialog({
         component: 'DatetimeDialog',

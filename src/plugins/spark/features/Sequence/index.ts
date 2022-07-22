@@ -6,6 +6,7 @@ import { BlockSpec, BlockType, SequenceBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { SequenceError, SequenceStatus } from '@/shared-types';
 import { WidgetFeature, useFeatureStore } from '@/store/features';
+import { bloxQty } from '@/utils/quantity';
 
 import widget from './SequenceWidget.vue';
 
@@ -22,9 +23,9 @@ const plugin: Plugin = {
         enabled: false,
         overrideState: false,
         activeInstruction: 0,
-        activeInstructionStartedAt: 0,
-        disabledAt: 0,
-        disabledDuration: 0,
+        activeInstructionStartedAt: null,
+        disabledAt: null,
+        disabledDuration: bloxQty('0s'),
         status: SequenceStatus.UNKNOWN,
         error: SequenceError.NONE,
         instructions: [],

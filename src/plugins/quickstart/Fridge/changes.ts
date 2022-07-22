@@ -19,7 +19,7 @@ import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
 import { bloxLink } from '@/utils/link';
 import { typed } from '@/utils/misc';
-import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
+import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, QuickstartPatch } from '../types';
@@ -172,21 +172,21 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
       type: BlockType.SetpointProfile,
       serviceId,
       data: {
-        start: new Date().getTime() / 1000,
+        start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(names.fridgeSetpoint),
         drivenTargetId: bloxLink(null),
         points: [
           {
-            time: 0,
+            time: bloxQty('0s'),
             temperature: fridgeSetting,
           },
           {
-            time: durationMs('7d') / 1000,
+            time: bloxQty('7d'),
             temperature: fridgeSetting,
           },
           {
-            time: durationMs('10d') / 1000,
+            time: bloxQty('10d'),
             temperature: bloxQty(fridgeSetting).copy(fridgeSetting.value! + 3),
           },
         ],

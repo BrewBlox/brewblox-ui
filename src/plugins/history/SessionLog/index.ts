@@ -2,6 +2,7 @@ import { Plugin } from 'vue';
 
 import { WidgetFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
+import { compareDate } from '@/utils/quantity';
 
 import { useHistoryStore } from '../store';
 import widget from './SessionLogWidget.vue';
@@ -23,8 +24,8 @@ const plugin: Plugin = {
       },
       generateConfig: () => {
         // `historyStore.sessions` must be copied before sorting
-        const [last] = [...historyStore.sessions].sort(
-          (a, b) => b.date - a.date,
+        const [last] = [...historyStore.sessions].sort((lhs, rhs) =>
+          compareDate(rhs.date, lhs.date),
         );
         return { currentSession: last !== undefined ? last.id : null };
       },
