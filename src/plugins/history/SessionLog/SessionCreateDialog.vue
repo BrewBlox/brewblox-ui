@@ -39,7 +39,7 @@ export default defineComponent({
     const example: LoggedSession = {
       id: nanoid(),
       title: 'Example session',
-      date: new Date().getTime(),
+      date: new Date().toISOString(),
       tags: [...props.widgetTags],
       notes: [
         {
@@ -128,7 +128,7 @@ export default defineComponent({
       const session: LoggedSession = {
         id,
         title: sessionTitle.value,
-        date: new Date().getTime(),
+        date: new Date().toISOString(),
         notes: sourceNotes(),
         tags: tags.value,
       };

@@ -27,7 +27,7 @@ const plugin: Plugin = {
         enabled: true,
         timeout: bloxQty('5m'),
         setting: tempQty(20),
-        lastUpdated: 0,
+        lastUpdated: null,
         value: tempQty(null),
       }),
     };

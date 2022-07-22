@@ -22,7 +22,6 @@ import { typed } from '@/utils/misc';
 import {
   bloxQty,
   deltaTempQty,
-  durationMs,
   inverseTempQty,
   tempQty,
 } from '@/utils/quantity';
@@ -98,20 +97,20 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       type: BlockType.SetpointProfile,
       serviceId,
       data: {
-        start: new Date().getTime() / 1000,
+        start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(names.beerSetpoint),
         points: [
           {
-            time: 0,
+            time: bloxQty('0s'),
             temperature: beerSetting,
           },
           {
-            time: durationMs('7d') / 1000,
+            time: bloxQty('7d'),
             temperature: beerSetting,
           },
           {
-            time: durationMs('10d') / 1000,
+            time: bloxQty('10d'),
             temperature: bloxQty(beerSetting).copy(beerSetting.value! + 3),
           },
         ],

@@ -8,14 +8,13 @@ import {
   SetpointProfileBlock,
 } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { makeObjectSorter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, durationMs, durationString, tempQty } from '@/utils/quantity';
 
 interface DisplaySetpoint {
-  offsetMs: number;
-  absTimeMs: number;
+  datetime: Date;
+  offset: Quantity;
   temperature: Quantity;
 }
 
@@ -25,14 +24,17 @@ export default defineComponent({
     const { serviceId, block, patchBlock } =
       useBlockWidget.setup<SetpointProfileBlock>();
 
-    const start = computed<number>(() => (block.value.data.start || 0) * 1000);
+    const start = computed<Date>({
+      get: () => new Date(block.value.data.start ?? 0),
+      set: (v) => patchBlock({ start: v.toISOString() }),
+    });
 
     const points = computed<DisplaySetpoint[]>(() =>
       [...block.value.data.points]
-        .sort(makeObjectSorter('time'))
+        .sort((lhs, rhs) => durationMs(lhs.time) - durationMs(rhs.time))
         .map((point: Setpoint) => ({
-          offsetMs: point.time * 1000,
-          absTimeMs: start.value + point.time * 1000,
+          datetime: new Date(start.value.getTime() + durationMs(point.time)),
+          offset: point.time,
           temperature: point.temperature,
         })),
     );
@@ -40,9 +42,9 @@ export default defineComponent({
     function savePoints(pts: DisplaySetpoint[] = points.value): void {
       patchBlock({
         points: [...pts]
-          .sort(makeObjectSorter('offsetMs'))
+          .sort((lhs, rhs) => lhs.datetime.getTime() - rhs.datetime.getTime())
           .map((point: DisplaySetpoint) => ({
-            time: point.offsetMs / 1000,
+            time: point.offset,
             temperature: point.temperature,
           })),
       });
@@ -50,8 +52,8 @@ export default defineComponent({
 
     function defaultPoint(): DisplaySetpoint {
       return {
-        offsetMs: 0,
-        absTimeMs: new Date(start.value).getTime(),
+        datetime: new Date(start.value),
+        offset: bloxQty(0, 's'),
         temperature: tempQty(20),
       };
     }
@@ -70,10 +72,6 @@ export default defineComponent({
       savePoints();
     }
 
-    function updateStartTime(startDate: Date): void {
-      patchBlock({ start: startDate.getTime() / 1000 });
-    }
-
     function notifyInvalidTime(): void {
       notify.warn('Point time must be later than start time', {
         logged: false,
@@ -82,20 +80,24 @@ export default defineComponent({
 
     function intermediateTemp(
       points: DisplaySetpoint[],
-      dateMs: number,
+      date: Date,
     ): Quantity | null {
-      const nextIdx = points.findIndex((point) => point.absTimeMs >= dateMs);
+      const nextIdx = points.findIndex(
+        (point) => point.datetime.getTime() >= date.getTime(),
+      );
       if (nextIdx < 1) {
         return null;
       }
 
       const prev = points[nextIdx - 1];
       const next = points[nextIdx];
-      const prevVal = prev.temperature.value as number;
-      const nextVal = next.temperature.value as number;
-      const duration = next.absTimeMs - prev.absTimeMs || 1;
+      const prevVal = prev.temperature.value!;
+      const nextVal = next.temperature.value!;
+      const duration = next.datetime.getTime() - prev.datetime.getTime() || 1;
       const interpolated =
-        prevVal + ((dateMs - prev.absTimeMs) * (nextVal - prevVal)) / duration;
+        prevVal +
+        ((date.getTime() - prev.datetime.getTime()) * (nextVal - prevVal)) /
+          duration;
       return bloxQty(prev.temperature).copy(interpolated);
     }
 
@@ -105,15 +107,15 @@ export default defineComponent({
     }
 
     function changePoint(index: number, changed: DisplaySetpoint): void {
-      const now = new Date().getTime();
+      const now = new Date();
 
       // Check if temp is currently managed by profile
       if (
         block.value.data.enabled &&
         block.value.data.targetId.id &&
         points.value.length >= 2 &&
-        points.value[0].absTimeMs < now &&
-        points.value[points.value.length - 1].absTimeMs > now
+        points.value[0].datetime.getTime() < now.getTime() &&
+        points.value[points.value.length - 1].datetime.getTime() > now.getTime()
       ) {
         const copy = deepCopy(points.value);
         copy[index] = changed;
@@ -128,13 +130,13 @@ export default defineComponent({
           !bloxQty(current).eq(projected)
         ) {
           const pinned: DisplaySetpoint = {
-            offsetMs: now - start.value,
-            absTimeMs: now,
+            offset: bloxQty(now.getTime() - start.value.getTime(), 'ms'),
+            datetime: now,
             temperature: current,
           };
 
           const [first, second] = [pinned, changed].sort(
-            makeObjectSorter('absTimeMs'),
+            (lhs, rhs) => lhs.datetime.getTime() - rhs.datetime.getTime(),
           );
 
           createDialog({
@@ -161,27 +163,26 @@ export default defineComponent({
       splicePoints(index, changed);
     }
 
-    function updatePointTime(index: number, date: Date): void {
-      const absTimeMs = date.getTime();
-      if (absTimeMs < start.value) {
+    function updatePointTime(index: number, datetime: Date): void {
+      if (datetime.getTime() < start.value.getTime()) {
         notifyInvalidTime();
       } else {
         changePoint(index, {
-          absTimeMs,
+          datetime,
           temperature: points.value[index].temperature,
-          offsetMs: absTimeMs - start.value,
+          offset: bloxQty(datetime.getTime() - start.value.getTime(), 'ms'),
         });
       }
     }
 
-    function updatePointOffset(index: number, offsetMs: number): void {
-      if (offsetMs < 0) {
+    function updatePointOffset(index: number, offset: Quantity): void {
+      if (!offset.value || offset.value < 0) {
         notifyInvalidTime();
       } else {
         changePoint(index, {
-          offsetMs,
+          offset,
           temperature: points.value[index].temperature,
-          absTimeMs: start.value + offsetMs,
+          datetime: new Date(start.value.getTime() + durationMs(offset)),
         });
       }
     }
@@ -201,7 +202,6 @@ export default defineComponent({
       block,
       patchBlock,
       start,
-      updateStartTime,
       points,
       updatePointOffset,
       updatePointTime,
@@ -219,7 +219,7 @@ export default defineComponent({
 
     <div class="q-ma-md row q-gutter-xs">
       <DatetimeField
-        :model-value="start"
+        v-model="start"
         label="Start time"
         title="Start time"
         html
@@ -228,7 +228,6 @@ export default defineComponent({
           <br>Offset time will remain the same, absolute time values will change.
           <br>The offset for the first point is always 0s."
         class="col-grow"
-        @update:model-value="updateStartTime"
       />
       <LinkField
         :model-value="block.data.targetId"
@@ -247,7 +246,7 @@ export default defineComponent({
         class="col-12 row q-gutter-xs q-mt-none profile-point"
       >
         <DurationField
-          :model-value="bloxQty(point.offsetMs, 'ms')"
+          :model-value="point.offset"
           title="Offset from start time"
           label="Offset"
           html
@@ -256,10 +255,10 @@ export default defineComponent({
             <br>The absolute point time will be changed to start time + offset.
             <br>Changing point offset may change point order."
           class="col min-width-sm"
-          @update:model-value="(v) => updatePointOffset(idx, durationMs(v))"
+          @update:model-value="(v) => updatePointOffset(idx, v)"
         />
         <DatetimeField
-          :model-value="point.absTimeMs"
+          :model-value="point.datetime"
           title="Time"
           label="Time"
           html

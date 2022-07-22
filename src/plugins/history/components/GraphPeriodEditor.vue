@@ -2,9 +2,10 @@
 import find from 'lodash/find';
 import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
+import { date as dateUtil } from 'quasar';
 import { PropType, computed, defineComponent, ref, watch } from 'vue';
 
-import { durationMs, durationString } from '@/utils/quantity';
+import { durationString, parseDate } from '@/utils/quantity';
 
 import { QueryConfig, QueryParams } from '../types';
 
@@ -38,9 +39,9 @@ const periodOptions: SelectOption[] = [
 ];
 
 const paramDefaults = (): QueryParams => ({
-  start: new Date().getTime() - durationMs('1d'),
+  start: dateUtil.subtractFromDate(new Date(), { days: 1 }).toISOString(),
   duration: '1d',
-  end: new Date().getTime(),
+  end: new Date().toISOString(),
 });
 
 export default defineComponent({
@@ -97,28 +98,37 @@ export default defineComponent({
       return opt !== undefined && opt.label.startsWith('Live');
     });
 
-    function saveStart(val: number): void {
-      local.value.params.start = val;
-      saveSanitized(period.value);
-    }
+    const start = computed<Date | null>({
+      get: () => parseDate(props.config.params.start),
+      set: (v) => {
+        local.value.params.start = v ? v.toISOString() : undefined;
+        saveSanitized(period.value);
+      },
+    });
 
-    function saveDuration(val: string): void {
-      local.value.params.duration = durationString(val || '10m');
-      saveSanitized(period.value);
-    }
+    const duration = computed<string>({
+      get: () => props.config.params.duration ?? '',
+      set: (v) => {
+        local.value.params.duration = durationString(v || '10m');
+        saveSanitized(period.value);
+      },
+    });
 
-    function saveEnd(val: number): void {
-      local.value.params.end = val;
-      saveSanitized(period.value);
-    }
+    const end = computed<Date | null>({
+      get: () => parseDate(props.config.params.end),
+      set: (v) => {
+        local.value.params.end = v ? v.toISOString() : undefined;
+        saveSanitized(period.value);
+      },
+    });
 
     return {
       periodOptions,
       period,
       isLive,
-      saveStart,
-      saveDuration,
-      saveEnd,
+      start,
+      duration,
+      end,
       saveSanitized,
     };
   },
@@ -139,29 +149,26 @@ export default defineComponent({
     <div class="col-auto row q-gutter-x-sm q-mt-sm q-ml-none">
       <DatetimeField
         v-if="period.start"
-        :model-value="config.params.start"
+        v-model="start"
         emit-number
         title="Start time"
         label="Start date and time"
         class="col-auto min-width-sm"
-        @update:model-value="saveStart"
       />
       <DurationField
         v-if="period.duration"
-        :model-value="config.params.duration"
+        v-model="duration"
         title="Duration"
         label="Duration"
         class="col-auto min-width-sm"
-        @update:model-value="saveDuration"
       />
       <DatetimeField
         v-if="period.end"
-        :model-value="config.params.end"
+        v-model="end"
         emit-number
         title="End time"
         label="End date and time"
         class="col-auto min-width-sm"
-        @update:model-value="saveEnd"
       />
       <LabeledField
         v-if="isLive"

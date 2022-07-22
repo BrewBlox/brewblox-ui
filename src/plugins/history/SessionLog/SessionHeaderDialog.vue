@@ -3,6 +3,7 @@ import { PropType, computed, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
+import { parseDate } from '@/utils/quantity';
 
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
@@ -24,6 +25,12 @@ export default defineComponent({
 
     const local = ref<LoggedSession>(deepCopy(props.modelValue));
 
+    const date = computed<Date | null>({
+      get: () => parseDate(local.value.date),
+      set: (v) =>
+        (local.value.date = v ? v.toISOString() : new Date().toISOString()),
+    });
+
     function save(): void {
       onDialogOK(local.value);
     }
@@ -36,6 +43,7 @@ export default defineComponent({
       onDialogHide,
       onDialogCancel,
       local,
+      date,
       save,
       knownTags,
     };
@@ -59,10 +67,9 @@ export default defineComponent({
         item-aligned
       />
       <DatetimeField
-        v-model="local.date"
+        v-model="date"
         label="Session date"
         title="Session date"
-        emit-number
         default-now
         dense
         item-aligned

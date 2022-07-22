@@ -1,12 +1,12 @@
 import { Annotations, Layout, PlotData } from 'plotly.js';
 
-import { StoreObject } from '@/shared-types';
+import { DateString, StoreObject } from '@/shared-types';
 
 export interface QueryParams {
   database?: string;
-  start?: string | number;
+  start?: DateString;
   duration?: string;
-  end?: string | number;
+  end?: DateString;
   limit?: number;
   orderBy?: string;
   policy?: string;
@@ -19,9 +19,9 @@ export interface QueryTarget {
 }
 
 export interface ApiQuery {
-  start?: string;
+  start?: DateString;
   duration?: string;
-  end?: string;
+  end?: DateString;
   fields: string[];
 }
 
@@ -165,8 +165,8 @@ export interface SessionTextNote extends SessionNoteBase {
 
 export interface SessionGraphNote extends SessionNoteBase {
   type: 'Graph';
-  start: number | null;
-  end: number | null;
+  start: DateString | null;
+  end: DateString | null;
   config: GraphConfig;
 }
 
@@ -175,7 +175,7 @@ export type SessionNote = SessionTextNote | SessionGraphNote;
 export interface LoggedSession extends StoreObject {
   id: string;
   title: string;
-  date: number;
+  date: DateString;
   notes: SessionNote[];
   tags?: string[];
 }

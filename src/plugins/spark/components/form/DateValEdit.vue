@@ -2,38 +2,28 @@
 import { computed, defineComponent, onMounted } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
+import { DateString } from '@/shared-types';
 import { shortDateString } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'DateValEdit',
   props: {
     ...useValEdit.props,
-    timeScale: {
-      type: Number,
-      default: 1,
-    },
   },
   emits: [...useValEdit.emits],
-  setup(props) {
-    const { field, startEdit } = useValEdit.setup<number>();
+  setup() {
+    const { field, startEdit } = useValEdit.setup<DateString | null>();
 
-    const scaledField = computed<number>({
-      get: () => field.value * props.timeScale,
-      set: (v) => (field.value = Math.round(v / props.timeScale)),
-    });
-
-    const displayVal = computed<string>(() =>
-      shortDateString(scaledField.value),
-    );
+    const displayVal = computed<string>(() => shortDateString(field.value));
 
     onMounted(() => {
-      if (scaledField.value === 0) {
-        scaledField.value = new Date().getTime();
+      if (field.value == null) {
+        field.value = new Date().toISOString();
       }
     });
 
     return {
-      scaledField,
+      field,
       displayVal,
       startEdit,
     };
@@ -44,8 +34,7 @@ export default defineComponent({
 <template>
   <DatetimeField
     v-if="editable"
-    v-model="scaledField"
-    emit-number
+    v-model="field"
   />
   <div
     v-else
