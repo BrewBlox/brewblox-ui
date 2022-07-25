@@ -1285,7 +1285,7 @@ braces@^3.0.2, braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"brewblox-proto@https://github.com/brewblox/brewblox-proto#7b77fbf":
+"brewblox-proto@https://github.com/brewblox/brewblox-proto#7b77fbf1":
   version "1.0.0"
   resolved "https://github.com/brewblox/brewblox-proto#7b77fbf1e7526984672f8232d8c3e9fce5956c8c"
   dependencies:
