@@ -1,11 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { filterLabels } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 const filterOpts: SelectOption[] = Object.entries(filterLabels).map(
   ([value, label]) => ({ label, value }),

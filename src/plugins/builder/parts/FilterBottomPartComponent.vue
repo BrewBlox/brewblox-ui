@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { LEFT } from '@/plugins/builder/const';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
 import { coord2grid, flowOnCoord, liquidOnCoord } from '../utils';

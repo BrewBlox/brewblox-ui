@@ -1,10 +1,8 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
 import { parseDate } from '@/utils/quantity';
-
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 

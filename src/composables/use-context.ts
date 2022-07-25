@@ -1,7 +1,6 @@
-import { ComputedRef, UnwrapRef, computed, inject } from 'vue';
-
 import { WidgetContext } from '@/store/features';
 import { ContextKey } from '@/symbols';
+import { computed, ComputedRef, inject, UnwrapRef } from 'vue';
 
 export interface UseContextComponent {
   context: UnwrapRef<WidgetContext>;

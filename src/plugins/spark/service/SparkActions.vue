@@ -1,7 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useSparkStore } from '@/plugins/spark/store';
 import { SparkService } from '@/plugins/spark/types';
 import { saveHwInfo, startResetBlocks } from '@/plugins/spark/utils/actions';
@@ -13,6 +10,8 @@ import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
+import { computed, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'SparkActions',

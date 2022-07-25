@@ -15,13 +15,9 @@ module.exports = {
   rules: {
     quotes: ['error', 'single', { avoidEscape: true }],
     'class-methods-use-this': 0,
-    'sort-imports': 'off',
-    'import/order': 'off',
     'import/first': 0,
     'import/extensions': 0,
-    'import/no-unresolved': 0,
     'import/prefer-default-export': 0,
-    'import/newline-after-import': 0,
     'object-curly-newline': 0,
     'no-param-reassign': 0,
     'no-console': 'warn',

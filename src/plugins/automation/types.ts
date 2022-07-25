@@ -1,4 +1,4 @@
-export * from '@/shared-types/automation-types';
+export * from 'brewblox-proto/ts/automation-types';
 
 export type Section = 'Preconditions' | 'Actions' | 'Transitions';
 

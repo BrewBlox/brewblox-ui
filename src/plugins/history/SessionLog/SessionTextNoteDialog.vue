@@ -1,10 +1,9 @@
 <script lang="ts">
-import { QInput } from 'quasar';
-import { defineComponent, nextTick, ref } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { timeFormatOpts } from '@/utils/quantity';
+import { QInput } from 'quasar';
+import { defineComponent, nextTick, ref } from 'vue';
 
 export default defineComponent({
   name: 'SessionTextNoteDialog',

@@ -1,16 +1,14 @@
 <script lang="ts">
-import capitalize from 'lodash/capitalize';
-import { computed, defineComponent, nextTick, ref } from 'vue';
-
 import { useElementRefs, useGlobals } from '@/composables';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { BlockType } from '@/shared-types';
-import { WidgetRole, useFeatureStore } from '@/store/features';
+import { useFeatureStore, WidgetRole } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-
+import { BlockType } from 'brewblox-proto/ts';
+import capitalize from 'lodash/capitalize';
+import { computed, defineComponent, nextTick, ref } from 'vue';
 import { useBlockSpecStore, useSparkStore } from '../store';
 import { SparkService } from '../types';
 import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';

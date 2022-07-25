@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ActuatorLogicBlock, Link } from '@/plugins/spark/types';
 import { prettyLink } from '@/utils/quantity';
-
+import { ActuatorLogicBlock, Link } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
 import ActuatorLogicFull from './ActuatorLogicFull.vue';
 

@@ -1,7 +1,4 @@
 <script lang="ts">
-import { mdiThermometer } from '@quasar/extras/mdi-v5';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { CENTER } from '@/plugins/builder/const';
 import {
   coord2grid,
@@ -10,7 +7,6 @@ import {
 } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
-import { GravityUnit, Quantity } from '@/shared-types';
 import { userUnits } from '@/user-settings';
 import {
   bloxQty,
@@ -19,7 +15,9 @@ import {
   prettyUnit,
   tempQty,
 } from '@/utils/quantity';
-
+import { mdiThermometer } from '@quasar/extras/mdi-v5';
+import { GravityUnit, Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 import { SIZE_X, SIZE_Y, TILT_ID_KEY } from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';

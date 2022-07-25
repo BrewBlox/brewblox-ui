@@ -1,7 +1,4 @@
 <script lang="ts">
-import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
 import {
   coord2grid,
@@ -9,10 +6,11 @@ import {
   textTransformation,
 } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
 import { userUnits } from '@/user-settings';
 import { deltaTempQty, preciseNumber, prettyUnit } from '@/utils/quantity';
-
+import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
+import { Block, BlockType, PidBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 import { PID_KEY, PID_TYPES } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';

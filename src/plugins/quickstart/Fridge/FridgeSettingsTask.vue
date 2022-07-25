@@ -1,9 +1,7 @@
 <script lang="ts">
-import { PropType, defineComponent, ref } from 'vue';
-
-import { Quantity } from '@/shared-types';
 import { tempQty } from '@/utils/quantity';
-
+import { Quantity } from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref } from 'vue';
 import { QuickstartAction } from '../types';
 import { FridgeConfig, FridgeOpts } from './types';
 

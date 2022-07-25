@@ -1,11 +1,10 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useField } from '@/composables';
-import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { isDurationString, isQuantity } from '@/utils/identity';
 import { bloxQty, durationString } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 
 function modelValidator(v: unknown): boolean {
   return isQuantity(v) || isDurationString(v);

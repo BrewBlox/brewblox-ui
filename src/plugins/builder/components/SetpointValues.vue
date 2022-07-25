@@ -1,23 +1,21 @@
 <script lang="ts">
+import { FlowPart } from '@/plugins/builder/types';
+import { coord2grid } from '@/plugins/builder/utils';
+import { useSparkStore } from '@/plugins/spark/store';
+import { makeTypeFilter } from '@/utils/functional';
+import { contrastColor } from '@/utils/misc';
+import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import {
   mdiBullseyeArrow,
   mdiSwapVerticalBold,
   mdiThermometer,
 } from '@quasar/extras/mdi-v5';
-import { PropType, computed, defineComponent } from 'vue';
-
-import { FlowPart } from '@/plugins/builder/types';
-import { coord2grid } from '@/plugins/builder/utils';
-import { useSparkStore } from '@/plugins/spark/store';
 import {
   BlockType,
   PidBlock,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { makeTypeFilter } from '@/utils/functional';
-import { contrastColor } from '@/utils/misc';
-import { fixedNumber, prettyUnit } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 import { useSettingsBlock } from '../composables';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);

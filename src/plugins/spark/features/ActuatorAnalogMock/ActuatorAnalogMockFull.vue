@@ -1,8 +1,7 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
+import { ActuatorAnalogMockBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ActuatorAnalogMockFull',

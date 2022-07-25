@@ -1,9 +1,8 @@
 <script lang="ts">
-import { PropType, defineComponent, onBeforeMount, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
 import { deepCopy } from '@/utils/objects';
+import { defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'BlockFieldDialog',

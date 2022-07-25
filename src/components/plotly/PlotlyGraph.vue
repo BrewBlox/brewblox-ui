@@ -11,11 +11,11 @@ import Plotly, {
 } from 'plotly.js';
 import { debounce } from 'quasar';
 import {
-  PropType,
   computed,
   defineComponent,
   onBeforeUnmount,
   onMounted,
+  PropType,
   ref,
   watch,
 } from 'vue';

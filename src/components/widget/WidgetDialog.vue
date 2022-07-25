@@ -1,14 +1,13 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import {
   ComponentResult,
+  useFeatureStore,
   WidgetContext,
   WidgetMode,
-  useFeatureStore,
 } from '@/store/features';
-import { Widget, useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'WidgetDialog',

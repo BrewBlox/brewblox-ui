@@ -1,22 +1,21 @@
 <script lang="ts">
+import { filteredNodes, nodeBuilder } from '@/plugins/history/nodes';
+import { useHistoryStore } from '@/plugins/history/store';
+import type { QueryConfig } from '@/plugins/history/types';
+import { createDialog } from '@/utils/dialog';
+import { bloxQty } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
 import isEqual from 'lodash/isEqual';
 import { QTree, QTreeNode } from 'quasar';
 import {
-  PropType,
   computed,
   defineComponent,
   onBeforeMount,
   onMounted,
+  PropType,
   ref,
   watch,
 } from 'vue';
-
-import { filteredNodes, nodeBuilder } from '@/plugins/history/nodes';
-import { useHistoryStore } from '@/plugins/history/store';
-import type { QueryConfig } from '@/plugins/history/types';
-import { Quantity } from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
-import { bloxQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'QueryEditor',

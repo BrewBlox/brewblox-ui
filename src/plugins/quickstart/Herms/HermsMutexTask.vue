@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, defineComponent, ref } from 'vue';
-
+import { defineComponent, PropType, ref } from 'vue';
 import { HermsConfig } from './types';
 
 export default defineComponent({

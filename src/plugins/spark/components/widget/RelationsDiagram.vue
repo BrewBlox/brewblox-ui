@@ -1,13 +1,13 @@
 <script lang="ts">
+import { BlockRelationNode } from '@/plugins/spark/types';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { deepCopy, isJsonEqual } from '@/utils/objects';
+import { BlockRelation } from 'brewblox-proto/ts';
 import * as d3 from 'd3';
 import ELK, { ElkExtendedEdge, ElkNode } from 'elkjs/lib/elk.bundled';
 import debounce from 'lodash/debounce';
 import toFinite from 'lodash/toFinite';
-import { PropType, defineComponent, onMounted, ref, watch } from 'vue';
-
-import { BlockRelation, BlockRelationNode } from '@/plugins/spark/types';
-import { createBlockDialog } from '@/utils/block-dialog';
-import { deepCopy, isJsonEqual } from '@/utils/objects';
+import { defineComponent, onMounted, PropType, ref, watch } from 'vue';
 
 const DEFAULT_SCALE = 0.9;
 const UNKNOWN_TYPE = '???';
@@ -148,7 +148,7 @@ export default defineComponent({
       // Create a straight line between start, end, and all bend points of the edge
       edgeSelect.attr('d', (d): string => {
         const path: (string | number)[] = [];
-        d.sections.forEach((s) => {
+        d.sections?.forEach((s) => {
           path.push('M', s.startPoint.x, s.startPoint.y);
           s.bendPoints?.forEach((bp) => path.push('L', bp.x, bp.y));
           path.push('L', s.endPoint.x, s.endPoint.y);

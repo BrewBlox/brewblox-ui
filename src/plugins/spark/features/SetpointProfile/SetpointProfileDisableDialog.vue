@@ -1,17 +1,16 @@
 <script lang="ts">
-import { PropType, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/objects';
+import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 import {
   Quantity,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
-} from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/objects';
-import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
+} from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'SetpointProfileDisableDialog',

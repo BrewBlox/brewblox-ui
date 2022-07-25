@@ -1,7 +1,7 @@
 import { SCALE_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { showSettingsBlock } from '@/plugins/builder/utils';
-import { BlockType } from '@/plugins/spark/types';
+import { BlockType } from 'brewblox-proto/ts';
 
 export const SIZE_X = 2;
 export const SIZE_Y = 5;

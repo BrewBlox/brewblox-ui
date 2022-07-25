@@ -1,12 +1,11 @@
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { tempQty } from '@/utils/quantity';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
   BlockIntfType,
   DigitalCompare,
-} from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { tempQty } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './const';
 import { ExpressionError } from './types';
 

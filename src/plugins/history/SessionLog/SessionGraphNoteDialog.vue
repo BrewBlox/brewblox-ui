@@ -1,9 +1,7 @@
 <script lang="ts">
-import { PropType, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
-
+import { defineComponent, PropType, ref } from 'vue';
 import { SessionGraphNote } from '../types';
 
 type NoteDates = Pick<SessionGraphNote, 'start' | 'end'>;

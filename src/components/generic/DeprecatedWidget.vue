@@ -1,7 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useWidget } from '@/composables';
+import { defineComponent } from 'vue';
 
 const replacements = {
   StepView: 'QuickActions',

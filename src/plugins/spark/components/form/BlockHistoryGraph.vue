@@ -1,10 +1,9 @@
 <script lang="ts">
-import { Layout } from 'plotly.js';
-import { defineComponent, nextTick, ref } from 'vue';
-
 import { useContext } from '@/composables';
 import { QueryParams } from '@/plugins/history/types';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { Layout } from 'plotly.js';
+import { defineComponent, nextTick, ref } from 'vue';
 
 export default defineComponent({
   name: 'BlockHistoryGraph',

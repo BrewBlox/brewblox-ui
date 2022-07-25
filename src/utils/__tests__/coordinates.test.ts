@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import { Coordinates } from '@/utils/coordinates';
+import { describe, expect, it } from 'vitest';
 
 describe('coordinates', () => {
   it('Should parse strings', () => {

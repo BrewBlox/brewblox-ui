@@ -1,8 +1,7 @@
 <script lang="ts">
+import { DigitalState } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
-import { PropType, computed, defineComponent } from 'vue';
-
-import { DigitalState } from '@/plugins/spark/types';
+import { computed, defineComponent, PropType } from 'vue';
 
 const alternatives: Record<number | string, DigitalState> = {
   0: DigitalState.STATE_INACTIVE,

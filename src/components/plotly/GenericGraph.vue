@@ -1,4 +1,8 @@
 <script lang="ts">
+import { useGlobals } from '@/composables';
+import { GraphAnnotation } from '@/plugins/history/types';
+import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid';
 import {
@@ -8,13 +12,7 @@ import {
   PlotData,
   PlotMouseEvent,
 } from 'plotly.js';
-import { PropType, computed, defineComponent } from 'vue';
-
-import { useGlobals } from '@/composables';
-import { GraphAnnotation } from '@/plugins/history/types';
-import { createDialog } from '@/utils/dialog';
-import { notify } from '@/utils/notify';
-
+import { computed, defineComponent, PropType } from 'vue';
 import PlotlyGraph from './PlotlyGraph.vue';
 
 const layoutDefaults = (): Partial<Layout> => ({

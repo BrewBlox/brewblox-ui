@@ -1,10 +1,8 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { BlockType, InactiveObjectBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
-
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { BlockType, InactiveObjectBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './InactiveObjectWidget.vue';
 
 const type = BlockType.InactiveObject;

@@ -1,11 +1,9 @@
+import { BlockOrIntfType, Link, Quantity } from 'brewblox-proto/ts';
 import fromPairs from 'lodash/fromPairs';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 import mapValues from 'lodash/mapValues';
 import toPairs from 'lodash/toPairs';
-
-import { BlockOrIntfType, Link, Quantity } from '@/shared-types';
-
 import { canSerialize, isBloxField } from './identity';
 import { rawLink } from './link';
 import { rawQty } from './quantity';

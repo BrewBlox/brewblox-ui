@@ -1,14 +1,12 @@
-import isEmpty from 'lodash/isEmpty';
-import { nanoid } from 'nanoid';
-import { Plugin } from 'vue';
-
-import { WidgetFeature, useFeatureStore } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
 import { cref } from '@/utils/component-ref';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty } from '@/utils/quantity';
-
+import isEmpty from 'lodash/isEmpty';
+import { nanoid } from 'nanoid';
+import { Plugin } from 'vue';
 import widget from './QuickActionsWidget.vue';
 import { QuickActionsConfig, QuickActionsConfigOld } from './types';
 

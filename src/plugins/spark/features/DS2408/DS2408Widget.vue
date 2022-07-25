@@ -1,18 +1,17 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  BlockIntfType,
-  DS2408Block,
-  DS2408ConnectMode,
-  DigitalActuatorBlock,
-  MotorValveBlock,
-} from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
+import {
+  BlockIntfType,
+  DigitalActuatorBlock,
+  DS2408Block,
+  DS2408ConnectMode,
+  MotorValveBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 const connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
   { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },

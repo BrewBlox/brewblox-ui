@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { BrewKettleBlockNames, BrewKettleConfig } from './types';
 
 const defaultNames: BrewKettleBlockNames = {

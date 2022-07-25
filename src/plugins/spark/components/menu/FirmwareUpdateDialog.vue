@@ -1,4 +1,14 @@
 <script lang="ts">
+import { useDialog } from '@/composables';
+import { STATE_TOPIC } from '@/const';
+import { eventbus } from '@/eventbus';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isSparkUpdate } from '@/plugins/spark/utils/info';
+import {
+  SparkControllerDescription,
+  SparkServiceDescription,
+  SparkStatusDescription,
+} from 'brewblox-proto/ts';
 import {
   computed,
   defineComponent,
@@ -7,17 +17,6 @@ import {
   reactive,
   ref,
 } from 'vue';
-
-import { useDialog } from '@/composables';
-import { STATE_TOPIC } from '@/const';
-import { eventbus } from '@/eventbus';
-import { useSparkStore } from '@/plugins/spark/store';
-import {
-  SparkControllerDescription,
-  SparkServiceDescription,
-  SparkStatusDescription,
-} from '@/plugins/spark/types';
-import { isSparkUpdate } from '@/plugins/spark/utils/info';
 
 export default defineComponent({
   name: 'FirmwareUpdateDialog',

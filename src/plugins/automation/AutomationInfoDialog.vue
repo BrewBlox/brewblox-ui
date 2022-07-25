@@ -1,7 +1,7 @@
 <script lang="ts">
-import { PropType, defineComponent } from 'vue';
-
 import { useDialog } from '@/composables';
+import { matchesType } from '@/utils/objects';
+import { durationString, shortDateString } from '@/utils/quantity';
 import {
   BlockPatchImpl,
   BlockValueImpl,
@@ -12,10 +12,8 @@ import {
   TimeAbsoluteImpl,
   TimeElapsedImpl,
   WebhookImpl,
-} from '@/shared-types';
-import { matchesType } from '@/utils/objects';
-import { durationString, shortDateString } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { defineComponent, PropType } from 'vue';
 import {
   AutomationImpl,
   AutomationTemplate,

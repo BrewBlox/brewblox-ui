@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, defineComponent } from 'vue';
-
 import { clampRotation } from '@/utils/quantity';
-
+import { defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 
 export default defineComponent({

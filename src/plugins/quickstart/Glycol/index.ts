@@ -1,8 +1,6 @@
-import { Plugin } from 'vue';
-
 import { QuickstartFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
-
+import { Plugin } from 'vue';
 import GlycolCompletionTask from './GlycolCompletionTask.vue';
 import GlycolHardwareTask from './GlycolHardwareTask.vue';
 import GlycolIoTask from './GlycolIoTask.vue';

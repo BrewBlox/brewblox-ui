@@ -1,20 +1,18 @@
 <script lang="ts">
-import { Enum } from 'typescript-string-enums';
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { isQuantity } from '@/utils/identity';
+import { deepCopy } from '@/utils/objects';
+import { bloxQty, tempQty } from '@/utils/quantity';
 import {
   AnalogCompare,
   AnalogCompareOp,
   BlockIntfType,
   Quantity,
-} from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { isQuantity } from '@/utils/identity';
-import { deepCopy } from '@/utils/objects';
-import { bloxQty, tempQty } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { Enum } from 'typescript-string-enums';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { analogOpTitles } from './const';
 
 const operatorOpts = Enum.values(AnalogCompareOp).map((value) => ({

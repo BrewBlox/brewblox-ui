@@ -1,8 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import type { Block, BlockConfig } from '@/plugins/spark/types';
+import { BlockConfig } from '@/plugins/spark/types';
 import {
   discoverBlocks,
   makeBlockIdRules,
@@ -11,6 +9,8 @@ import { tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
+import { Block } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'BlockDiscoveryWizard',

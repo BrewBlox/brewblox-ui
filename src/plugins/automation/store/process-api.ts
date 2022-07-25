@@ -1,7 +1,5 @@
-import { AxiosResponse } from 'axios';
-
 import { http, intercept } from '@/utils/http';
-
+import { AxiosResponse } from 'axios';
 import {
   AutomationProcess,
   AutomationStepJump,

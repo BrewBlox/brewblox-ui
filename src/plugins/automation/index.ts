@@ -1,16 +1,14 @@
-import { Plugin } from 'vue';
-
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
 import {
+  useFeatureStore,
   WatcherFeature,
   WidgetFeature,
-  useFeatureStore,
 } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { deserialize } from '@/utils/parsing';
-
+import { Plugin } from 'vue';
 import AutomationWatcher from './AutomationWatcher.vue';
 import AutomationWidget from './AutomationWidget.vue';
 import { useAutomationStore } from './store';

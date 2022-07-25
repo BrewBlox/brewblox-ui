@@ -1,10 +1,8 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useDashboardStore } from '@/store/dashboards';
-import { Widget, useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { makeObjectSorter } from '@/utils/functional';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 
 export default defineComponent({

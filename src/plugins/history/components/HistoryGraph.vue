@@ -1,17 +1,4 @@
 <script lang="ts">
-import debounce from 'lodash/debounce';
-import { Layout, PlotData } from 'plotly.js';
-import {
-  PropType,
-  computed,
-  defineComponent,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from 'vue';
-
 import { addSource } from '@/plugins/history/sources/graph';
 import { useHistoryStore } from '@/plugins/history/store';
 import {
@@ -22,6 +9,18 @@ import {
 } from '@/plugins/history/types';
 import { defaultPresets } from '@/plugins/history/utils';
 import { isJsonEqual } from '@/utils/objects';
+import debounce from 'lodash/debounce';
+import { Layout, PlotData } from 'plotly.js';
+import {
+  computed,
+  defineComponent,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  PropType,
+  ref,
+  watch,
+} from 'vue';
 
 export default defineComponent({
   name: 'HistoryGraph',

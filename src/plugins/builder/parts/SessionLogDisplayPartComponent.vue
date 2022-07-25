@@ -1,12 +1,10 @@
 <script lang="ts">
-import { mdiTextSubject } from '@quasar/extras/mdi-v5';
-import { PropType, computed, defineComponent } from 'vue';
-
 // import type { SessionLogWidget } from '@/plugins/history/SessionLog/types';
 import { useHistoryStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
-import { Widget, useWidgetStore } from '@/store/widgets';
-
+import { useWidgetStore, Widget } from '@/store/widgets';
+import { mdiTextSubject } from '@quasar/extras/mdi-v5';
+import { computed, defineComponent, PropType } from 'vue';
 import { WIDGET_KEY } from '../blueprints/SessionLogDisplay';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';

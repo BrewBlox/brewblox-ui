@@ -1,8 +1,6 @@
-import { Plugin } from 'vue';
-
 import { QuickstartFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
-
+import { Plugin } from 'vue';
 import RimsCompletionTask from './RimsCompletionTask.vue';
 import RimsHardwareTask from './RimsHardwareTask.vue';
 import RimsIoTask from './RimsIoTask.vue';

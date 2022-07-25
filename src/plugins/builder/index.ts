@@ -1,13 +1,11 @@
-import { nanoid } from 'nanoid';
-import { Plugin } from 'vue';
-
 import { startup } from '@/startup';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { cref, globRegister } from '@/utils/component-ref';
-
-import BuilderWidget from './BuilderWidget.vue';
+import { nanoid } from 'nanoid';
+import { Plugin } from 'vue';
 import blueprints from './blueprints';
+import BuilderWidget from './BuilderWidget.vue';
 import { DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH } from './const';
 import { useBuilderStore } from './store';
 import { BuilderConfig } from './types';

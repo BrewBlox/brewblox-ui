@@ -1,12 +1,10 @@
-import { Plugin } from 'vue';
-
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { cref, globRegister } from '@/utils/component-ref';
-
+import { Plugin } from 'vue';
 import { sparkType } from './const';
 import features from './features';
 import SparkActions from './service/SparkActions.vue';

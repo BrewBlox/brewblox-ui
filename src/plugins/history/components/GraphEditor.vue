@@ -1,9 +1,7 @@
 <script lang="ts">
-import { QTreeNode } from 'quasar';
-import { PropType, defineComponent } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
-
+import { QTreeNode } from 'quasar';
+import { defineComponent, PropType } from 'vue';
 import { DEFAULT_GRAPH_DECIMALS } from '../const';
 import { GraphConfig } from '../types';
 

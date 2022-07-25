@@ -1,13 +1,12 @@
-import { DS2408ConnectMode } from '@/shared-types';
-
 import {
   AnalogConstraintKey,
   BlockType,
   DigitalConstraintKey,
   DisplayTempUnit,
+  DS2408ConnectMode,
   FilterChoice,
   SensorCombiFunc,
-} from './types';
+} from 'brewblox-proto/ts';
 
 export const sparkType = 'Spark';
 export const systemGroup = 7;

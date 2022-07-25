@@ -1,7 +1,6 @@
-import { ComputedRef, computed } from 'vue';
-
-import { Block, BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
-
+import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { Block } from 'brewblox-proto/ts';
+import { computed, ComputedRef } from 'vue';
 import { FlowPart } from '../types';
 import { settingsAddress, settingsBlock } from '../utils';
 

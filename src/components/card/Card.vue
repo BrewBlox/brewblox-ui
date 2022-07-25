@@ -1,7 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useContext, useGlobals } from '@/composables';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'Card',

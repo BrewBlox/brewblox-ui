@@ -1,9 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-
+import { computed, defineComponent } from 'vue';
 import SparkEspWifiCard from './SparkEspWifiCard.vue';
 import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
 

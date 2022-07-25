@@ -1,11 +1,9 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import parts from '../parts';
 

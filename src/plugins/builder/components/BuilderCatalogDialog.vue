@@ -1,12 +1,10 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { BuilderBlueprint, FlowPart, PersistentPart } from '../types';
 import { asStatePart, coord2grid } from '../utils';
 

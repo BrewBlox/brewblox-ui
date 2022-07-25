@@ -1,8 +1,6 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-
 import { useContext } from '@/composables';
-
+import { defineComponent, ref } from 'vue';
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
 

@@ -1,13 +1,11 @@
 <script lang="ts">
+import { useGlobals, useWidget } from '@/composables';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
 import clamp from 'lodash/clamp';
 import { nanoid } from 'nanoid';
 import { dom } from 'quasar';
 import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue';
-
-import { useGlobals, useWidget } from '@/composables';
-import { spliceById } from '@/utils/collections';
-import { createDialog } from '@/utils/dialog';
-
 import { useHistoryStore } from '../store';
 import {
   LoggedSession,

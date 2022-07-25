@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
 import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
-import { AnalogConstraintsObj } from '@/shared-types';
+import { AnalogConstraintsObj } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'AnalogConstraintsValEdit',

@@ -1,9 +1,7 @@
-import { Plugin } from 'vue';
-
 import { useHistoryStore } from '@/plugins/history/store';
 import { startup } from '@/startup';
 import { globRegister } from '@/utils/component-ref';
-
+import { Plugin } from 'vue';
 import Graph from './Graph';
 import Metrics from './Metrics';
 import SessionLog from './SessionLog';

@@ -1,12 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-
 import { useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { startAddLayout } from '@/plugins/builder/utils';
 import { makeObjectSorter } from '@/utils/functional';
+import { computed, defineComponent, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'BreweryIndex',

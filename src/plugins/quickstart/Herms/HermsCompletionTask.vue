@@ -1,7 +1,6 @@
 <script lang="ts">
-import { PropType, defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, PropType, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
 import { QuickstartAction } from '../types';
 import { createOutputActions, executeActions } from '../utils';
 import {

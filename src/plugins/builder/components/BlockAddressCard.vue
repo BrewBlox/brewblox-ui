@@ -1,9 +1,7 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { settingsAddress } from '@/plugins/builder/utils';
 import { BlockAddress } from '@/plugins/spark/types';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 
 export default defineComponent({

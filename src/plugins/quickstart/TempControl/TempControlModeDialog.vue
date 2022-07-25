@@ -1,14 +1,16 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, reactive } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
-
+import {
+  BlockType,
+  Quantity,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, reactive } from 'vue';
 import { PidConfig } from '../types';
 import { TempControlMode } from './types';
 

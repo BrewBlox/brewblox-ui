@@ -1,7 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useWizard } from '@/plugins/wizardry/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { makeDashboardIdRules } from '@/utils/dashboards';
@@ -9,6 +6,8 @@ import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { makeUrlSafe } from '@/utils/url';
+import { computed, defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const idRules = makeDashboardIdRules();
 const idValidator = makeRuleValidator(idRules);

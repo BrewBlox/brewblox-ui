@@ -1,7 +1,6 @@
 <script lang="ts">
-import { PropType, defineComponent } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'EnumValEdit',

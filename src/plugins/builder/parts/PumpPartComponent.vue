@@ -1,6 +1,4 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, onBeforeMount, watch } from 'vue';
-
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
 import { liquidOnCoord, settingsBlock } from '@/plugins/builder/utils';
 import {
@@ -8,9 +6,9 @@ import {
   BlockType,
   DigitalActuatorBlock,
   DigitalState,
-} from '@/plugins/spark/types';
-
-import { PUMP_KEY, PUMP_TYPES, PumpT } from '../blueprints/Pump';
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, onBeforeMount, PropType, watch } from 'vue';
+import { PumpT, PUMP_KEY, PUMP_TYPES } from '../blueprints/Pump';
 import { FlowPart } from '../types';
 
 export default defineComponent({

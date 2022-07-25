@@ -1,13 +1,11 @@
+import { userUISettings, userUnits } from '@/user-settings';
+import { Link, Quantity, TempUnit } from 'brewblox-proto/ts';
 import isFinite from 'lodash/isFinite';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import round from 'lodash/round';
 import parseDuration from 'parse-duration';
 import { date } from 'quasar';
-
-import { Link, Quantity, TempUnit } from '@/shared-types';
-import { userUISettings, userUnits } from '@/user-settings';
-
 import {
   isCompatibleQty,
   isDurationString,

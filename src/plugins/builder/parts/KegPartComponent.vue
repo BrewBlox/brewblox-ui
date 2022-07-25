@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { colorString } from '@/plugins/builder/utils';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
 

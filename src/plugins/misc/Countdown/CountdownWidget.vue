@@ -1,10 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-
 import { useWidget } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { JSQuantity, bloxQty } from '@/utils/quantity';
-
+import { bloxQty, JSQuantity } from '@/utils/quantity';
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { CountdownSession, CountdownWidget } from './types';
 
 const DEFAULT_DURATION = 10 * 60 * 1000;

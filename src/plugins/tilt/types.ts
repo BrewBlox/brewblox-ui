@@ -1,6 +1,5 @@
 import { Service } from '@/store/services';
-
-import { Quantity } from '../spark/types';
+import { Quantity } from 'brewblox-proto/ts';
 
 export type TiltService = Service<Record<string, never>>;
 

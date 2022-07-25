@@ -1,8 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
-
+import { computed, defineComponent } from 'vue';
 import { WebframeWidget } from './types';
 
 export default defineComponent({

@@ -1,9 +1,7 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, reactive } from 'vue';
-
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
-
+import { computed, defineComponent, PropType, reactive } from 'vue';
 import { defaultLabel } from '../nodes';
 import { GraphAxis, GraphConfig } from '../types';
 

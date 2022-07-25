@@ -1,10 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { useDashboardStore } from '@/store/dashboards';
 import { userUISettings } from '@/user-settings';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'WizardDialog',

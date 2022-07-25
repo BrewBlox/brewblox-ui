@@ -1,6 +1,5 @@
 import { QTreeNode } from 'quasar';
 import { describe, expect, it } from 'vitest';
-
 import { defaultLabel, nodeBuilder } from '../nodes';
 
 const groupedFields = (): Mapped<string[]> => ({

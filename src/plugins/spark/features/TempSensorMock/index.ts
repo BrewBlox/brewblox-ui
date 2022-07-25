@@ -1,17 +1,11 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  BlockFieldSpec,
-  BlockSpec,
-  BlockType,
-  TempSensorMockBlock,
-} from '@/plugins/spark/types';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { tempQty } from '@/utils/quantity';
-
+import { BlockType, TempSensorMockBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './TempSensorMockWidget.vue';
 
 const type = BlockType.TempSensorMock;

@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, onMounted } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
-import { DateString } from '@/shared-types';
 import { shortDateString } from '@/utils/quantity';
+import { DateString } from 'brewblox-proto/ts';
+import { computed, defineComponent, onMounted } from 'vue';
 
 export default defineComponent({
   name: 'DateValEdit',

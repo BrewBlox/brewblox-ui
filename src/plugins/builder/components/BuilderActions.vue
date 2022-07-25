@@ -1,12 +1,10 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { PropType, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { loadFile } from '@/utils/import-export';
-
+import { nanoid } from 'nanoid';
+import { defineComponent, PropType } from 'vue';
+import { useRouter } from 'vue-router';
 import { startAddLayout } from '../utils';
 
 export default defineComponent({

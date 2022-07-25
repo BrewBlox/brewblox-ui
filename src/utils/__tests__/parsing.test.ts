@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { isLink, isQuantity } from '../identity';
 import { JSLink } from '../link';
 import { deserialize, serialize } from '../parsing';

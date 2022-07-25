@@ -1,7 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { startupDone } from '@/user-settings';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'PageError',

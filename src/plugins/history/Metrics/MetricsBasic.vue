@@ -1,4 +1,16 @@
 <script lang="ts">
+import { useContext, useWidget } from '@/composables';
+import { defaultLabel } from '@/plugins/history/nodes';
+import { addSource } from '@/plugins/history/sources/metrics';
+import { useHistoryStore } from '@/plugins/history/store';
+import {
+  MetricsConfig,
+  MetricsSource,
+  MetricValue,
+} from '@/plugins/history/types';
+import { emptyMetricsConfig } from '@/plugins/history/utils';
+import { isJsonEqual } from '@/utils/objects';
+import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import {
@@ -8,20 +20,6 @@ import {
   onMounted,
   watch,
 } from 'vue';
-
-import { useContext, useWidget } from '@/composables';
-import { defaultLabel } from '@/plugins/history/nodes';
-import { addSource } from '@/plugins/history/sources/metrics';
-import { useHistoryStore } from '@/plugins/history/store';
-import {
-  MetricValue,
-  MetricsConfig,
-  MetricsSource,
-} from '@/plugins/history/types';
-import { emptyMetricsConfig } from '@/plugins/history/utils';
-import { isJsonEqual } from '@/utils/objects';
-import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
-
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { MetricsWidget } from './types';
 

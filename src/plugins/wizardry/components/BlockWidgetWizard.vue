@@ -1,13 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, onBeforeUnmount, ref } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import {
-  Block,
-  BlockAddress,
-  BlockConfig,
-  BlockType,
-} from '@/plugins/spark/types';
+import { BlockAddress, BlockConfig } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
@@ -15,6 +8,8 @@ import { useWidgetStore } from '@/store/widgets';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
+import { Block, BlockType } from 'brewblox-proto/ts';
+import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
 type CreateMode = 'new' | 'existing';
 

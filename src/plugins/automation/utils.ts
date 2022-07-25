@@ -1,7 +1,5 @@
-import { nanoid } from 'nanoid';
-
 import { findById } from '@/utils/collections';
-
+import { nanoid } from 'nanoid';
 import { AutomationTemplate, AutomationTransition } from './types';
 
 export function idCopy<T extends HasId>(v: T): T {

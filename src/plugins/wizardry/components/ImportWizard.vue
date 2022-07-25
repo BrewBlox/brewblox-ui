@@ -1,16 +1,14 @@
 <script lang="ts">
-import isString from 'lodash/isString';
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
-import { Widget, useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { userUISettings } from '@/user-settings';
 import { loadFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator } from '@/utils/rules';
-
+import isString from 'lodash/isString';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, ref } from 'vue';
 import { useWizard } from '../composables';
 
 const widgetRules: InputRule[] = [

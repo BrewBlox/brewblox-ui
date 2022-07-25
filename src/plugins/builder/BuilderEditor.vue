@@ -1,18 +1,4 @@
 <script lang="ts">
-import * as d3 from 'd3';
-import isEqual from 'lodash/isEqual';
-import throttle from 'lodash/throttle';
-import { nanoid } from 'nanoid';
-import {
-  UnwrapRef,
-  computed,
-  defineComponent,
-  nextTick,
-  ref,
-  watch,
-} from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useGlobals } from '@/composables';
 import { startupDone } from '@/user-settings';
 import { rotatedSize } from '@/utils/coordinates';
@@ -23,16 +9,28 @@ import { loadFile } from '@/utils/import-export';
 import { deepCopy } from '@/utils/objects';
 import { clampRotation } from '@/utils/quantity';
 import { isAbsoluteUrl } from '@/utils/url';
-
+import * as d3 from 'd3';
+import isEqual from 'lodash/isEqual';
+import throttle from 'lodash/throttle';
+import { nanoid } from 'nanoid';
 import {
-  UseSvgZoomDimensions,
+  computed,
+  defineComponent,
+  nextTick,
+  ref,
+  UnwrapRef,
+  watch,
+} from 'vue';
+import { useRouter } from 'vue-router';
+import {
   normalizeSelectArea,
   useDragSelect,
   useFlowParts,
   useSvgZoom,
+  UseSvgZoomDimensions,
 } from './composables';
 import { useMetrics } from './composables/use-metrics';
-import { SQUARE_SIZE, builderTools } from './const';
+import { builderTools, SQUARE_SIZE } from './const';
 import { useBuilderStore } from './store';
 import {
   BuilderLayout,

@@ -1,6 +1,5 @@
 import get from 'lodash/get';
 import { exportFile } from 'quasar';
-
 import { deserialize, serialize } from './parsing';
 
 /**

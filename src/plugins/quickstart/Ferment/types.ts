@@ -1,5 +1,4 @@
-import { Quantity } from '@/shared-types';
-
+import { Quantity } from 'brewblox-proto/ts';
 import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export interface FermentBlockNames {

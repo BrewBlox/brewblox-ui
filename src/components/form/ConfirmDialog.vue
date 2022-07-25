@@ -1,7 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useDialog } from '@/composables';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ConfirmDialog',

@@ -1,10 +1,9 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/quantity';
+import { SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'SetpointSensorPairBasic',

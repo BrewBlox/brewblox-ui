@@ -1,12 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { TiltService } from '@/plugins/tilt/types';
 import { Service, useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
+import { computed, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'TiltActions',

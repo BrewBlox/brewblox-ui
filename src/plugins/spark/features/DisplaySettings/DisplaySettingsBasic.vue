@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { DisplaySettingsBlock, DisplaySlot } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 const footerRules: InputRule[] = [
   (v) => !v || v.length <= 40 || 'Footer text can only be 40 characters',

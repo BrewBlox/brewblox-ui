@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, defineComponent, reactive } from 'vue';
-
+import { defineComponent, PropType, reactive } from 'vue';
 import { GpioChange } from '../types';
 import { RimsConfig } from './types';
 

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { makeRuleValidator, suggestId } from '../rules';
 
 describe('InputRule validation', () => {
@@ -26,7 +25,7 @@ describe('InputRule validation', () => {
     expect(errorValidator(1)).toBe('Value is <= 2');
     expect(errorValidator(5)).toBe('Value is <= 5');
     expect(errorValidator(10)).toBe('Value is >= 10');
-    expect(errorValidator(6)).toBe(null);
+    expect(errorValidator(6)).toBeUndefined();
   });
 
   it('Should suggest valid IDs', () => {

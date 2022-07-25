@@ -1,11 +1,9 @@
 <script lang="ts">
-import { Enum } from 'typescript-string-enums';
-import { PropType, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-import { DigitalCompare, DigitalCompareOp } from '@/plugins/spark/types';
 import { deepCopy } from '@/utils/objects';
-
+import { DigitalCompare, DigitalCompareOp } from 'brewblox-proto/ts';
+import { Enum } from 'typescript-string-enums';
+import { defineComponent, PropType, ref } from 'vue';
 import { digitalOpTitles } from './const';
 
 const operatorOpts: SelectOption[] = Enum.values(DigitalCompareOp).map(

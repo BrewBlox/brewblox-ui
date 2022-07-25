@@ -1,19 +1,18 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
+import { isLink } from '@/utils/identity';
+import { bloxLink } from '@/utils/link';
 import {
   BlockIntfType,
   BlockOrIntfType,
   BlockType,
   DisplaySettingsBlock,
   DisplaySlot,
-} from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { Link } from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
-import { isLink } from '@/utils/identity';
-import { bloxLink } from '@/utils/link';
+  Link,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 const slotNameRules: InputRule[] = [
   (v) => !v || v.length <= 15 || 'Name can only be 15 characters',

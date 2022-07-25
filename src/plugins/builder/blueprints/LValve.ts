@@ -11,7 +11,7 @@ import {
   DigitalActuatorBlock,
   DigitalState,
   MotorValveBlock,
-} from '@/plugins/spark/types';
+} from 'brewblox-proto/ts';
 
 export type ValveT = DigitalActuatorBlock | MotorValveBlock;
 

@@ -1,8 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useFeatureStore } from '@/store/features';
 import { Service, useServiceStore } from '@/store/services';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ServicePage',

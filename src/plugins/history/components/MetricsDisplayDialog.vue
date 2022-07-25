@@ -1,10 +1,8 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, reactive } from 'vue';
-
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
 import { durationMs, durationString } from '@/utils/quantity';
-
+import { computed, defineComponent, PropType, reactive } from 'vue';
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { defaultLabel } from '../nodes';
 import { MetricsConfig } from '../types';

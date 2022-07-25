@@ -1,5 +1,4 @@
-import { PropType, getCurrentInstance } from 'vue';
-
+import { getCurrentInstance, PropType } from 'vue';
 import { WizardOutput } from '../types';
 
 export interface UseWizardProps {

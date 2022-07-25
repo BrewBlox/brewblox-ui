@@ -1,16 +1,15 @@
 <script lang="ts">
-import { PropType, defineComponent, ref, watch } from 'vue';
-
 import { analogConstraintLabels } from '@/plugins/spark/const';
+import { createDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
+import { deepCopy } from '@/utils/objects';
 import {
   AnalogConstraint,
   AnalogConstraintKey,
   AnalogConstraintsObj,
   BlockType,
-} from '@/plugins/spark/types';
-import { createDialog } from '@/utils/dialog';
-import { bloxLink } from '@/utils/link';
-import { deepCopy } from '@/utils/objects';
+} from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref, watch } from 'vue';
 
 const constraintOpts: SelectOption[] = Object.entries(
   analogConstraintLabels,

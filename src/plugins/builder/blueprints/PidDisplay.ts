@@ -4,7 +4,7 @@ import {
   showSettingsBlock,
   universalTransitions,
 } from '@/plugins/builder/utils';
-import { BlockType } from '@/plugins/spark/types';
+import { BlockType } from 'brewblox-proto/ts';
 
 export const SIZE_X = 1;
 export const SIZE_Y = 1;

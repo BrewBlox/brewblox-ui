@@ -1,7 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { getNumDialogs } from '@/utils/dialog';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'Toolbar',

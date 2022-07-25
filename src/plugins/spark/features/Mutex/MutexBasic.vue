@@ -1,10 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { MutexBlock, MutexedConstraint, Quantity } from '@/plugins/spark/types';
 import { durationString } from '@/utils/quantity';
+import { MutexBlock, MutexedConstraint, Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface MutexClient {
   id: string;

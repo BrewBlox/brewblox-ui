@@ -1,14 +1,9 @@
 <script lang="ts">
-import isString from 'lodash/isString';
-import { PropType, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-import {
-  AnalogConstraintsObj,
-  DigitalConstraintsObj,
-} from '@/plugins/spark/types';
 import { deepCopy } from '@/utils/objects';
-
+import { AnalogConstraintsObj, DigitalConstraintsObj } from 'brewblox-proto/ts';
+import isString from 'lodash/isString';
+import { defineComponent, PropType, ref } from 'vue';
 import AnalogConstraints from './AnalogConstraints.vue';
 import DigitalConstraints from './DigitalConstraints.vue';
 

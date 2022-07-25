@@ -1,10 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
-import { Link } from '@/shared-types';
+import { Link } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'LinkValEdit',

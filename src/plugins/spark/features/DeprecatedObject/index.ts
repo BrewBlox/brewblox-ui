@@ -1,10 +1,8 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { BlockType } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
-
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { BlockType } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './DeprecatedObjectWidget.vue';
 
 const plugin: Plugin = {

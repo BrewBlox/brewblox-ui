@@ -1,10 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { startChangeWidgetTitle } from '@/utils/widgets';
-
+import { computed, defineComponent } from 'vue';
 import Toolbar from './Toolbar.vue';
 
 export default defineComponent({

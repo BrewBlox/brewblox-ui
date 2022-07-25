@@ -3,7 +3,7 @@ import {
   DigitalCompareOp,
   DigitalState,
   LogicResult,
-} from '@/plugins/spark/types';
+} from 'brewblox-proto/ts';
 
 export const characterTitles = {
   '(': 'Sub-expression start',

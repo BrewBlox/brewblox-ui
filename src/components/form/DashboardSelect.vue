@@ -1,7 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount } from 'vue';
-
 import { useDashboardStore } from '@/store/dashboards';
+import { computed, defineComponent, onBeforeMount } from 'vue';
 
 export default defineComponent({
   name: 'DashboardSelect',

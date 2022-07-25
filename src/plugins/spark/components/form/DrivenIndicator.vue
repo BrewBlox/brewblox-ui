@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import { BlockDriveChain } from '@/shared-types';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { BlockDriveChain } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'DrivenIndicator',

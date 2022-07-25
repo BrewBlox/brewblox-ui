@@ -1,20 +1,19 @@
 <script lang="ts">
-import isString from 'lodash/isString';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useField } from '@/composables';
 import {
   analogConstraintLabels,
   digitalConstraintLabels,
 } from '@/plugins/spark/const';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
+import { createDialog } from '@/utils/dialog';
+import { prettyQty } from '@/utils/quantity';
 import type {
   AnalogConstraint,
   AnyConstraintsObj,
   DigitalConstraint,
-} from '@/plugins/spark/types';
-import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
-import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/quantity';
+} from 'brewblox-proto/ts';
+import isString from 'lodash/isString';
+import { computed, defineComponent, PropType } from 'vue';
 
 const constraintLabels = {
   ...digitalConstraintLabels,

@@ -1,20 +1,19 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
+import { channelName } from '@/plugins/spark/utils/formatting';
+import { makeTypeFilter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
 import {
   Block,
   BlockType,
+  DigitalActuatorBlock,
   DS2408Block,
   DS2408ConnectMode,
-  DigitalActuatorBlock,
-} from '@/plugins/spark/types';
-import { channelName } from '@/plugins/spark/utils/formatting';
-import { IoArrayBlock } from '@/shared-types';
-import { makeTypeFilter } from '@/utils/functional';
-import { matchesType } from '@/utils/objects';
+  IoArrayBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface Claim {
   driverId: string;

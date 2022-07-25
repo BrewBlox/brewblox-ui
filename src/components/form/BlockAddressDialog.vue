@@ -1,18 +1,14 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import type {
-  Block,
-  BlockAddress,
-  ComparedBlockType,
-} from '@/plugins/spark/types';
+import type { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { Block } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
   id: v?.id ?? null,

@@ -1,8 +1,4 @@
 <script lang="ts">
-import DOMPurify from 'dompurify';
-import { marked } from 'marked';
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
 import { createDialog } from '@/utils/dialog';
@@ -10,7 +6,9 @@ import { makeTypeFilter } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
 import { dateString } from '@/utils/quantity';
-
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
+import { computed, defineComponent } from 'vue';
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import { selectGraphPrecision } from '../utils';

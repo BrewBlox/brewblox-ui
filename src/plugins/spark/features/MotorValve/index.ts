@@ -1,25 +1,22 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  BlockFieldSpec,
-  BlockIntfType,
-  BlockSpec,
-  BlockType,
-  DigitalConstraintsObj,
-  DigitalState,
-  MotorValveBlock,
-  ValveState,
-} from '@/plugins/spark/types';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import {
   enumHint,
   prettifyConstraints,
 } from '@/plugins/spark/utils/formatting';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
-
+import {
+  BlockIntfType,
+  BlockType,
+  DigitalConstraintsObj,
+  DigitalState,
+  MotorValveBlock,
+  ValveState,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './MotorValveWidget.vue';
 
 const type = BlockType.MotorValve;

@@ -1,13 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  BlockAddress,
-  BlockType,
-  TempSensorOneWireBlock,
-} from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { BlockType, TempSensorOneWireBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'TempSensorSwapDialog',

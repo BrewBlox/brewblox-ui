@@ -1,21 +1,8 @@
-import isMatch from 'lodash/isMatch';
-import range from 'lodash/range';
-
 import { typeName as graphType } from '@/plugins/history/Graph/const';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, DisplayOpts } from '@/plugins/spark/types';
 import { createWidgetWizard } from '@/plugins/wizardry';
-import {
-  Block,
-  BlockIntfType,
-  BlockType,
-  DS2408Block,
-  DigitalActuatorBlock,
-  DisplaySlot,
-  IoArrayBlock,
-  MotorValveBlock,
-} from '@/shared-types';
 import { useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog } from '@/utils/block-dialog';
@@ -25,10 +12,21 @@ import { bloxLink } from '@/utils/link';
 import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 import { dateString } from '@/utils/quantity';
-
+import {
+  Block,
+  BlockIntfType,
+  BlockType,
+  DigitalActuatorBlock,
+  DisplaySlot,
+  DS2408Block,
+  IoArrayBlock,
+  MotorValveBlock,
+} from 'brewblox-proto/ts';
+import isMatch from 'lodash/isMatch';
+import range from 'lodash/range';
 import { makeBlockIdRules } from './configuration';
 import { channelName } from './formatting';
-import { isBlockDisplayReady, isBlockDisplayed, isCompatible } from './info';
+import { isBlockDisplayed, isBlockDisplayReady, isCompatible } from './info';
 import { getDisplaySettingsBlock } from './system';
 
 export function startChangeBlockId(block: Block | null): void {

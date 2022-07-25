@@ -1,11 +1,14 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
-import { AnalogConstraintsObj, Link } from '@/shared-types';
 import { fixedNumber, prettyLink } from '@/utils/quantity';
+import {
+  ActuatorOffsetBlock,
+  AnalogConstraintsObj,
+  Link,
+  ReferenceKind,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
   { label: 'Setting', value: ReferenceKind.REF_SETTING },

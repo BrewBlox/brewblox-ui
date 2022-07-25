@@ -1,7 +1,6 @@
-import { Layout, PlotData } from 'plotly.js';
-
-import { SetpointProfileBlock } from '@/plugins/spark/types';
 import { durationMs, parseDate } from '@/utils/quantity';
+import { SetpointProfileBlock } from 'brewblox-proto/ts';
+import { Layout, PlotData } from 'plotly.js';
 
 export interface GraphProps {
   data: Partial<PlotData>[];

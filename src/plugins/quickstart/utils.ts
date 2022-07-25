@@ -1,11 +1,5 @@
 import { useBuilderStore } from '@/plugins/builder/store';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import {
-  BlockType,
-  DigitalActuatorBlock,
-  OneWireGpioModuleBlock,
-  PidBlock,
-} from '@/plugins/spark/types';
 import { startAddBlockToDisplay } from '@/plugins/spark/utils/actions';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore } from '@/store/widgets';
@@ -13,7 +7,12 @@ import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
-
+import {
+  BlockType,
+  DigitalActuatorBlock,
+  OneWireGpioModuleBlock,
+  PidBlock,
+} from 'brewblox-proto/ts';
 import {
   GpioChange,
   IoChannelAddress,

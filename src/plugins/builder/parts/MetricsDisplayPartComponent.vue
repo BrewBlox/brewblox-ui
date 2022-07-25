@@ -1,13 +1,11 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import {
   DEFAULT_METRICS_DECIMALS,
   DEFAULT_METRICS_EXPIRY,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
 import { CENTER } from '../const';

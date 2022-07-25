@@ -1,6 +1,5 @@
-import { Link } from '@/shared-types';
 import { Widget } from '@/store/widgets';
-
+import { Link } from 'brewblox-proto/ts';
 import { PidConfig } from '../types';
 
 export interface TempControlMode {

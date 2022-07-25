@@ -1,16 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import {
-  Quantity,
-  Setpoint,
-  SetpointProfileBlock,
-} from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, durationMs, durationString, tempQty } from '@/utils/quantity';
+import { Quantity, Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface DisplaySetpoint {
   datetime: Date;

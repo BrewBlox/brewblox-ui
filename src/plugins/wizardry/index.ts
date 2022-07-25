@@ -1,6 +1,5 @@
-import { Plugin } from 'vue';
-
 import { globRegister } from '@/utils/component-ref';
+import { Plugin } from 'vue';
 
 export * from './utils';
 

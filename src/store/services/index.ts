@@ -1,9 +1,7 @@
-import isEqual from 'lodash/isEqual';
-import { defineStore } from 'pinia';
-
 import { ServiceHook, useFeatureStore } from '@/store/features';
 import { concatById, filterById, findById } from '@/utils/collections';
-
+import isEqual from 'lodash/isEqual';
+import { defineStore } from 'pinia';
 import api from './api';
 import type { Service, ServiceStatus, ServiceStub } from './types';
 

@@ -1,5 +1,4 @@
 import isFinite from 'lodash/isFinite';
-
 import { clampRotation } from './quantity';
 
 export type CoordinatesParam =

@@ -1,24 +1,19 @@
-import { Layout } from 'plotly.js';
-
 import {
   GraphAxis,
   GraphValueAxes,
   QueryParams,
 } from '@/plugins/history/types';
+import { WidgetFeature } from '@/store/features';
+import { Service } from '@/store/services';
+import { Widget } from '@/store/widgets';
 import {
   AnyConstraintKey,
   Block,
   BlockOrIntfType,
   Quantity,
   StoreObject,
-} from '@/shared-types';
-import { WidgetFeature } from '@/store/features';
-import { Service } from '@/store/services';
-import { Widget } from '@/store/widgets';
-
-export * from '@/shared-types/spark-block-enums';
-export * from '@/shared-types/spark-block-types';
-export * from '@/shared-types/spark-service-types';
+} from 'brewblox-proto/ts';
+import { Layout } from 'plotly.js';
 
 export type ComparedBlockType = BlockOrIntfType | BlockOrIntfType[] | null;
 

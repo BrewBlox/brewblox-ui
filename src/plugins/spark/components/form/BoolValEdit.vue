@@ -1,7 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'BoolValEdit',

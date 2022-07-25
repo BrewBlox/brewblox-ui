@@ -1,17 +1,16 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
+import { makeTypeFilter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
 import {
   Block,
   BlockType,
   DS2408Block,
   DS2408ConnectMode,
   MotorValveBlock,
-} from '@/plugins/spark/types';
-import { makeTypeFilter } from '@/utils/functional';
-import { matchesType } from '@/utils/objects';
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface Claim {
   driverId: string;

@@ -1,23 +1,26 @@
-import { defineStore } from 'pinia';
-
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
-import {
-  BlockDriveChain,
-  BlockRelation,
-  Link,
-  SparkPatchEvent,
-  SparkStatusDescription,
-} from '@/shared-types';
+import type {
+  BlockAddress,
+  BlockFieldAddress,
+  SparkExported,
+  SparkSessionConfig,
+} from '@/plugins/spark/types';
 import { useServiceStore } from '@/store/services';
 import { useWidgetStore } from '@/store/widgets';
 import { concatById, filterById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
-
-import type { BlockAddress, SparkExported, SparkSessionConfig } from '../types';
-import type { Block, BlockFieldAddress } from '../types';
+import {
+  Block,
+  BlockDriveChain,
+  BlockRelation,
+  Link,
+  SparkPatchEvent,
+  SparkStatusDescription,
+} from 'brewblox-proto/ts';
+import { defineStore } from 'pinia';
 import { isBlockVolatile, isSparkPatch, isSparkState } from '../utils/info';
 import * as sparkApi from './spark-api';
 import {

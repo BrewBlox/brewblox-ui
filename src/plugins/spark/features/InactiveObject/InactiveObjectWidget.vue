@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { InactiveObjectBlock } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
+import { InactiveObjectBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'InactiveObjectWidget',

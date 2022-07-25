@@ -1,9 +1,8 @@
 <script lang="ts">
-import { Notify } from 'quasar';
-import { defineComponent, ref, watch } from 'vue';
-
 import { useSystemStore } from '@/store/system';
 import { userUnitsDefined } from '@/user-settings';
+import { Notify } from 'quasar';
+import { defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'ConfigWatcher',

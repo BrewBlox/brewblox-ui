@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { GlycolBlockNames, GlycolConfig } from './types';
 
 const defaultNames: GlycolBlockNames = {

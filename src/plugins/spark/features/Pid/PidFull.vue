@@ -1,20 +1,20 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  Block,
-  PidBlock,
-  Quantity,
-  SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockDriven } from '@/plugins/spark/utils/info';
-import { ActuatorOffsetBlock, BlockType } from '@/shared-types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { matchesType } from '@/utils/objects';
 import { bloxQty, fixedNumber, prettyQty, tempQty } from '@/utils/quantity';
+import {
+  ActuatorOffsetBlock,
+  Block,
+  BlockType,
+  PidBlock,
+  Quantity,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface GridOpts {
   start?: number;

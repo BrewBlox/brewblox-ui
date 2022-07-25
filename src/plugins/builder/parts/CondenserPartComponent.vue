@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, defineComponent } from 'vue';
-
 import { coord2grid, elbow } from '@/plugins/builder/utils';
-
+import { defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
 

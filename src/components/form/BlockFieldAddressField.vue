@@ -1,10 +1,7 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useField } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
-  Block,
   BlockFieldAddress,
   BlockFieldSpec,
   ComparedBlockType,
@@ -12,6 +9,8 @@ import {
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { prettyAny } from '@/utils/quantity';
+import { Block } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'BlockFieldAddressField',

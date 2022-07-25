@@ -1,10 +1,9 @@
 <script lang="ts">
+import { useGlobals } from '@/composables';
+import { userUISettings } from '@/user-settings';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { useGlobals } from '@/composables';
-import { userUISettings } from '@/user-settings';
 
 export default defineComponent({
   name: 'DefaultLayout',

@@ -1,7 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
@@ -11,6 +8,8 @@ import {
   startRemoveDashboard,
 } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
+import { computed, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'DashboardActions',

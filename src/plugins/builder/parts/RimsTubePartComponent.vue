@@ -1,6 +1,4 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import {
   coord2grid,
   elbow,
@@ -8,7 +6,7 @@ import {
   liquidOnCoord,
 } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
 

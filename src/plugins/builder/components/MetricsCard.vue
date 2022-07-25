@@ -1,10 +1,8 @@
 <script lang="ts">
-import defaults from 'lodash/defaults';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { MetricsConfig } from '@/plugins/history/types';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
-
+import defaults from 'lodash/defaults';
+import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 
 export default defineComponent({

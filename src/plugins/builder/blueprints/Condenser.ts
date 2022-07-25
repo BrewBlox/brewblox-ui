@@ -1,6 +1,5 @@
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
 import { Coordinates } from '@/utils/coordinates';
-
 import {
   CENTER,
   DEFAULT_IO_PRESSURE,

@@ -1,8 +1,6 @@
-import { nanoid } from 'nanoid';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-
+import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { FridgeConfig } from './types';
 

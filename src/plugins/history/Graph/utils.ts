@@ -1,12 +1,11 @@
+import { GraphConfig, QueryTarget } from '@/plugins/history/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { useWidgetStore, Widget } from '@/store/widgets';
+import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
 import isArray from 'lodash/isArray';
 import mergeWith from 'lodash/mergeWith';
 import uniq from 'lodash/uniq';
-
-import { GraphConfig, QueryTarget } from '@/plugins/history/types';
-import { BlockAddress } from '@/plugins/spark/types';
-import { Widget, useWidgetStore } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
-import { notify } from '@/utils/notify';
 
 export function mergeTargets(
   a: QueryTarget[],

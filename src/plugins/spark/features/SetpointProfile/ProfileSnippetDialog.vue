@@ -1,13 +1,12 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';
-import { BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
+import { BlockType, SetpointProfileBlock } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 const typeName = BlockType.SetpointProfile;
 

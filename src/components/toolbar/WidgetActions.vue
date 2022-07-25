@@ -1,6 +1,4 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useWidget } from '@/composables';
 import {
   startChangeWidgetTitle,
@@ -8,6 +6,7 @@ import {
   startMoveWidget,
   startRemoveWidget,
 } from '@/utils/widgets';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'WidgetActions',

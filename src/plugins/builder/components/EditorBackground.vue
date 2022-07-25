@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
-
 import { coord2grid } from '../utils';
 
 export default defineComponent({
