@@ -1,11 +1,9 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { deserialize } from '@/utils/parsing';
-
+import { nanoid } from 'nanoid';
+import { computed, defineComponent } from 'vue';
 import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';
 import { ChangeAction, QuickActionsWidget } from './types';

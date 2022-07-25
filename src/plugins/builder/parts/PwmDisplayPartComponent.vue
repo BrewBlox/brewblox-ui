@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { CENTER } from '@/plugins/builder/const';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { PWM_KEY } from '../blueprints/PwmDisplay';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';

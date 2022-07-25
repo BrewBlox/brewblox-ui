@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { SetpointProfileBlock } from '@/plugins/spark/types';
 import { saveFile } from '@/utils/import-export';
+import { SetpointProfileBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ProfileExportAction',

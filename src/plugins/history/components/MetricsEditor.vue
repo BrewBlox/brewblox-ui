@@ -1,10 +1,8 @@
 <script lang="ts">
-import { QTreeNode } from 'quasar';
-import { PropType, defineComponent } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/quantity';
-
+import { QTreeNode } from 'quasar';
+import { defineComponent, PropType } from 'vue';
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { MetricsConfig } from '../types';
 

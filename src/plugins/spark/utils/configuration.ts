@@ -1,8 +1,3 @@
-import defaults from 'lodash/defaults';
-import keyBy from 'lodash/keyBy';
-import mapValues from 'lodash/mapValues';
-import pick from 'lodash/pick';
-
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
@@ -11,10 +6,14 @@ import {
   BlockFieldSpec,
   ProfileValues,
 } from '@/plugins/spark/types';
-import { Block, SetpointProfileBlock } from '@/shared-types';
 import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
 import { bloxQty, durationMs, parseDate, prettyUnit } from '@/utils/quantity';
+import { Block, SetpointProfileBlock } from 'brewblox-proto/ts';
+import defaults from 'lodash/defaults';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
+import pick from 'lodash/pick';
 
 export const asBlockAddress = (block: Block): BlockAddress =>
   pick(block, ['id', 'serviceId', 'type']);

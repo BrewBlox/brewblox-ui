@@ -1,11 +1,5 @@
-import defaults from 'lodash/defaults';
-import range from 'lodash/range';
-import reduce from 'lodash/reduce';
-import { nanoid } from 'nanoid';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block, ComparedBlockType } from '@/plugins/spark/types';
-import { BlockAddress } from '@/plugins/spark/types';
+import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog } from '@/utils/block-dialog';
@@ -16,13 +10,17 @@ import {
 } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
-
+import { Block } from 'brewblox-proto/ts';
+import defaults from 'lodash/defaults';
+import range from 'lodash/range';
+import reduce from 'lodash/reduce';
+import { nanoid } from 'nanoid';
 import {
   CENTER,
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
-  SQUARE_SIZE,
   deprecatedTypes,
+  SQUARE_SIZE,
 } from './const';
 import { useBuilderStore } from './store';
 import {

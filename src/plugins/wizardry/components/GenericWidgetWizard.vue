@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
-
 import { tryCreateWidget } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
-import { Widget, useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
-
+import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 import { useWidgetWizard } from '../composables';
 
 export default defineComponent({

@@ -1,20 +1,20 @@
 <script lang="ts">
-import { computed, defineComponent, watch } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type {
-  BlockRelation,
   BlockRelationNode,
   PageMode,
   SparkService,
-  SparkStatusDescription,
 } from '@/plugins/spark/types';
-import { BlockType } from '@/shared-types';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
-
+import {
+  BlockRelation,
+  BlockType,
+  SparkStatusDescription,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, watch } from 'vue';
 import SparkListView from './SparkListView.vue';
 import SparkTroubleshooter from './SparkTroubleshooter.vue';
 

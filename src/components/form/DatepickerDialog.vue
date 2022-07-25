@@ -1,8 +1,7 @@
 <script lang="ts">
+import { useDialog } from '@/composables';
 import { date as qdate } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
-
-import { useDialog } from '@/composables';
 
 export default defineComponent({
   name: 'DatepickerDialog',

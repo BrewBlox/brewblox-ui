@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import brewbloxLogoSvg from '@/assets/logo-wordmark-dark.svg';
 import brewbloxIconSvg from '@/assets/logo-x.svg';
 import { useGlobals } from '@/composables';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'LayoutHeader',

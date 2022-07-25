@@ -1,8 +1,7 @@
-import { ComputedRef, Ref, UnwrapRef, computed, inject, ref, watch } from 'vue';
-
 import { useFeatureStore } from '@/store/features';
-import { Widget, useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { InvalidateKey, WidgetIdKey } from '@/symbols';
+import { computed, ComputedRef, inject, Ref, ref, UnwrapRef, watch } from 'vue';
 
 export interface UseWidgetComponent<WidgetT extends Widget> {
   widgetId: string;

@@ -1,8 +1,7 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
-import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
+import { GpioDeviceType, GpioModuleChannel, GpioPins } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 interface DeviceSlot extends GpioModuleChannel {
   start: number;

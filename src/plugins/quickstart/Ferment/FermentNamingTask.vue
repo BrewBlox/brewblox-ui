@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { FermentBlockNames, FermentConfig } from './types';
 
 const defaultNames: FermentBlockNames = {

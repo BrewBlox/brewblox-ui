@@ -1,5 +1,4 @@
 import { Notify } from 'quasar';
-
 import { DEFAULT_FRICTION } from './const';
 import { FlowPart, FlowRoute, PathFriction } from './types';
 

@@ -1,11 +1,9 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { PropType, computed, defineComponent, ref, watch } from 'vue';
-
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
-
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import { emptyGraphConfig } from '../utils';

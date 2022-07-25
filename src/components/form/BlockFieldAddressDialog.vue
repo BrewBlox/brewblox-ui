@@ -1,19 +1,17 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, onBeforeMount, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
-  Block,
   BlockFieldAddress,
   BlockFieldSpec,
-  BlockOrIntfType,
   BlockSpec,
   ComparedBlockType,
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { Block, BlockOrIntfType } from 'brewblox-proto/ts';
+import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'BlockFieldAddressDialog',

@@ -1,7 +1,3 @@
-import forEach from 'lodash/forEach';
-import last from 'lodash/last';
-import parseDuration from 'parse-duration';
-
 import {
   DEFAULT_GRAPH_DECIMALS,
   MAX_GRAPH_POINTS,
@@ -18,6 +14,9 @@ import {
   TimeSeriesRangesResult,
 } from '@/plugins/history/types';
 import { fixedNumber } from '@/utils/quantity';
+import forEach from 'lodash/forEach';
+import last from 'lodash/last';
+import parseDuration from 'parse-duration';
 
 function boundedConcat(left: number[] = [], right: number[] = []): number[] {
   const sliced = Math.max(left.length + right.length - MAX_GRAPH_POINTS, 0);

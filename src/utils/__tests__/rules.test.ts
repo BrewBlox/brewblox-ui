@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { makeRuleValidator, suggestId } from '../rules';
 
 describe('InputRule validation', () => {

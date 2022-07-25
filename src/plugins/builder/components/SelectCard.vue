@@ -1,7 +1,6 @@
 <script lang="ts">
 import isArray from 'lodash/isArray';
-import { PropType, computed, defineComponent } from 'vue';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 
 export default defineComponent({

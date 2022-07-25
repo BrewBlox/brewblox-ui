@@ -1,10 +1,8 @@
-import { defineStore } from 'pinia';
-
 import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
 import { upgradeMetricsConfig } from '@/plugins/history/utils';
 import { concatById, filterById, findById } from '@/utils/collections';
 import { nullFilter } from '@/utils/functional';
-
+import { defineStore } from 'pinia';
 import api from './api';
 
 const fallbackBlueprint = (): BuilderBlueprint => ({

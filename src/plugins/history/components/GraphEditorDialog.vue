@@ -1,11 +1,9 @@
 <script lang="ts">
-import defaults from 'lodash/defaults';
-import { PropType, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
-
+import defaults from 'lodash/defaults';
+import { defineComponent, PropType, ref } from 'vue';
 import { GraphConfig, SharedGraphConfig } from '../types';
 import { emptyGraphConfig } from '../utils';
 

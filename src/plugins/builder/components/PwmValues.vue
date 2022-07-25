@@ -1,11 +1,9 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, textTransformation } from '@/plugins/builder/utils';
-import { ActuatorPwmBlock, BlockType } from '@/plugins/spark/types';
 import { preciseNumber } from '@/utils/quantity';
-
+import { ActuatorPwmBlock, BlockType } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({

@@ -1,11 +1,10 @@
 <script lang="ts">
-import isFinite from 'lodash/isFinite';
-import { computed, defineComponent, ref } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
-import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty, prettyUnit, roundedNumber } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
+import isFinite from 'lodash/isFinite';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'QuantityValEdit',

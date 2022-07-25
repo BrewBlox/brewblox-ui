@@ -1,16 +1,14 @@
 <script lang="ts">
-import isNumber from 'lodash/isNumber';
-import { debounce } from 'quasar';
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import { Block, BlockFieldSpec } from '@/plugins/spark/types';
-import { Quantity } from '@/shared-types';
+import { BlockFieldSpec } from '@/plugins/spark/types';
 import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
 import { prettyAny, prettyQty, roundedNumber } from '@/utils/quantity';
-
+import { Block, Quantity } from 'brewblox-proto/ts';
+import isNumber from 'lodash/isNumber';
+import { debounce } from 'quasar';
+import { computed, defineComponent } from 'vue';
 import { QuickValuesWidget } from './types';
 
 export default defineComponent({

@@ -1,16 +1,13 @@
 <script lang="ts">
-import { useQuasar } from 'quasar';
-import { PropType, computed, defineComponent, inject, ref, watch } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import type {
-  SparkService,
-  SparkStatusDescription,
-} from '@/plugins/spark/types';
+import type { SparkService } from '@/plugins/spark/types';
 import { NowKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { durationMs } from '@/utils/quantity';
+import { SparkStatusDescription } from 'brewblox-proto/ts';
+import { useQuasar } from 'quasar';
+import { computed, defineComponent, inject, PropType, ref, watch } from 'vue';
 
 const snoozeDuration = durationMs('1d');
 const updateValidDuration = durationMs('30s');

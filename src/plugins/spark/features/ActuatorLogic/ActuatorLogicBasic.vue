@@ -1,20 +1,18 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
+import { prettyLink } from '@/utils/quantity';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
   DigitalCompare,
   LogicResult,
-} from '@/plugins/spark/types';
-import { createDialog } from '@/utils/dialog';
-import { prettyLink } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
-import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { logicResultTitles, nonErrorResults } from './const';
+import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { ExpressionError } from './types';
 import {
   analogIdx,

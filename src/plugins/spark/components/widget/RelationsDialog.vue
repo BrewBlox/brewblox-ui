@@ -1,8 +1,8 @@
 <script lang="ts">
-import { PropType, defineComponent } from 'vue';
-
 import { useDialog } from '@/composables';
-import { BlockRelation, BlockRelationNode } from '@/plugins/spark/types';
+import { BlockRelationNode } from '@/plugins/spark/types';
+import { BlockRelation } from 'brewblox-proto/ts';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'RelationsDialog',

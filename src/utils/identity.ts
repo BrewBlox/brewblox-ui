@@ -1,13 +1,12 @@
-import LibQty from 'js-quantities';
-import isString from 'lodash/isString';
-
 import {
   BloxField,
   DefinedLink,
   DefinedQuantity,
   Link,
   Quantity,
-} from '@/shared-types';
+} from 'brewblox-proto/ts';
+import LibQty from 'js-quantities';
+import isString from 'lodash/isString';
 
 interface UnitGroup {
   name: string;

@@ -1,12 +1,11 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-import { Quantity } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'DurationQuantityDialog',
@@ -51,7 +50,7 @@ export default defineComponent({
       makeRuleValidator(props.rules)(localMs.value),
     );
 
-    const error = computed<string | null>(() =>
+    const error = computed<string | undefined>(() =>
       makeRuleValidator(props.rules, 'error')(localMs.value),
     );
 

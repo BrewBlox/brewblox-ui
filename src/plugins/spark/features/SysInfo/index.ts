@@ -1,12 +1,10 @@
-import { Plugin } from 'vue';
-
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType } from '@/plugins/spark/types';
+import { BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { SparkPlatform, SysInfoBlock } from '@/shared-types';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
-
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { BlockType, SparkPlatform, SysInfoBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './SysInfoWidget.vue';
 
 const type = BlockType.SysInfo;

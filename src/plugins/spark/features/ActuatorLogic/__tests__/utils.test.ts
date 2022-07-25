@@ -1,15 +1,14 @@
-import { describe, expect, it } from 'vitest';
-
+import { bloxLink } from '@/utils/link';
 import {
   ActuatorLogicBlock,
+  AnalogCompare,
   AnalogCompareOp,
+  DigitalCompare,
   DigitalCompareOp,
   DigitalState,
   LogicResult,
-} from '@/plugins/spark/types';
-import { AnalogCompare, DigitalCompare } from '@/plugins/spark/types';
-import { bloxLink } from '@/utils/link';
-
+} from 'brewblox-proto/ts';
+import { describe, expect, it } from 'vitest';
 import {
   comparisonCheck,
   sanitize,

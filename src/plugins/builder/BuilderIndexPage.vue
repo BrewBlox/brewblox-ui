@@ -1,11 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent, watch } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { startupDone } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { computed, defineComponent, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'IndexPage',

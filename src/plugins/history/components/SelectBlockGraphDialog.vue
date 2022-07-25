@@ -1,22 +1,19 @@
 <script lang="ts">
-import mapValues from 'lodash/mapValues';
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { sparkType } from '@/plugins/spark/const';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
-  Block,
   BlockAddress,
   BlockFieldSpec,
-  BlockType,
   SparkService,
 } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import { useServiceStore } from '@/store/services';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { makeTypeFilter } from '@/utils/functional';
-
+import { Block, BlockType } from 'brewblox-proto/ts';
+import mapValues from 'lodash/mapValues';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { GraphConfig } from '../types';
 
 export default defineComponent({

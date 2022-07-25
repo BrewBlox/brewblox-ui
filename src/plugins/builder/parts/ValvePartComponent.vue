@@ -1,10 +1,8 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, watch } from 'vue';
-
 import { RIGHT } from '@/plugins/builder/const';
-import { DigitalState } from '@/shared-types';
-
-import { VALVE_KEY, VALVE_TYPES, ValveT } from '../blueprints/Valve';
+import { DigitalState } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, watch } from 'vue';
+import { ValveT, VALVE_KEY, VALVE_TYPES } from '../blueprints/Valve';
 import { useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';
 import { coord2grid, flowOnCoord, liquidOnCoord } from '../utils';

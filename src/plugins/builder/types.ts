@@ -1,5 +1,5 @@
 import { MetricsConfig } from '@/plugins/history/types';
-import { StoreObject } from '@/shared-types';
+import { StoreObject } from 'brewblox-proto/ts';
 
 export interface FlowRoute {
   outCoords: string;

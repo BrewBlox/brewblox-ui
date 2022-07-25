@@ -1,7 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'QuickstartNameField',

@@ -1,4 +1,7 @@
 <script lang="ts">
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { bloxQty } from '@/utils/quantity';
 import {
   Compartment,
   EditorState,
@@ -9,11 +12,16 @@ import {
   Decoration,
   DecorationSet,
   EditorView,
-  ViewPlugin,
-  ViewUpdate,
   lineNumbers,
   placeholder,
+  ViewPlugin,
+  ViewUpdate,
 } from '@codemirror/view';
+import {
+  SequenceBlock,
+  SequenceError,
+  SequenceStatus,
+} from 'brewblox-proto/ts';
 import { basicDark } from 'cm6-theme-basic-dark';
 import { minimalSetup } from 'codemirror';
 import { colors } from 'quasar';
@@ -26,11 +34,6 @@ import {
   ref,
   watch,
 } from 'vue';
-
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { SequenceBlock, SequenceError, SequenceStatus } from '@/shared-types';
-import { bloxQty } from '@/utils/quantity';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.NONE]: null,

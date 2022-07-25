@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block, DeprecatedObjectBlock } from '@/plugins/spark/types';
+import { Block, DeprecatedObjectBlock } from 'brewblox-proto/ts';
+import { defineComponent, onBeforeMount, ref } from 'vue';
 
 export default defineComponent({
   name: 'DeprecatedObjectWidget',

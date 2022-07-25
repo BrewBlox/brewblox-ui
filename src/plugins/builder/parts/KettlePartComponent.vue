@@ -1,12 +1,10 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import {
   colorString,
   coord2grid,
   textTransformation,
 } from '@/plugins/builder/utils';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { DEFAULT_FILL_PCT } from '../blueprints/Kettle';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';

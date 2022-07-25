@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, defineComponent, reactive } from 'vue';
-
 import { tempQty } from '@/utils/quantity';
-
+import { defineComponent, PropType, reactive } from 'vue';
 import { QuickstartAction } from '../types';
 import { FermentConfig, FermentMode, FermentOpts } from './types';
 

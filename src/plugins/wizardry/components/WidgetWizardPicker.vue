@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-
 import { useFeatureStore } from '@/store/features';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useWizard } from '../composables';
 
 interface WidgetFeatureOption {

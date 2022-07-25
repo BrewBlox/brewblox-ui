@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, defineComponent } from 'vue';
-
 import { useGlobals } from '@/composables';
-
+import { defineComponent, PropType } from 'vue';
 import { builderTools } from '../const';
 import { BuilderToolName } from '../types';
 

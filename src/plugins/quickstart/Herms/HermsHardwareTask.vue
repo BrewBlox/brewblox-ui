@@ -1,16 +1,14 @@
 <script lang="ts">
+import { useSparkStore } from '@/plugins/spark/store';
+import { createBlockWizard } from '@/plugins/wizardry';
 import {
-  PropType,
   computed,
   defineComponent,
   onBeforeMount,
+  PropType,
   reactive,
   ref,
 } from 'vue';
-
-import { useSparkStore } from '@/plugins/spark/store';
-import { createBlockWizard } from '@/plugins/wizardry';
-
 import { GpioChange, IoChannelAddress } from '../types';
 import { hasShared, resetGpioChanges } from '../utils';
 import { HermsConfig } from './types';

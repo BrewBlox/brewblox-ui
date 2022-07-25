@@ -1,11 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { SysInfoBlock, TicksBlock } from '@/plugins/spark/types';
 import { getTicksBlock } from '@/plugins/spark/utils/system';
 import { dateString, durationString, shortDateString } from '@/utils/quantity';
+import { SysInfoBlock, TicksBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'SysInfoWidget',

@@ -1,10 +1,8 @@
 <script lang="ts">
-import { debounce } from 'quasar';
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { findById } from '@/utils/collections';
-
+import { debounce } from 'quasar';
+import { computed, defineComponent } from 'vue';
 import { fieldLabels } from '../const';
 import { useTiltStore } from '../store';
 import { TiltStateValue } from '../types';

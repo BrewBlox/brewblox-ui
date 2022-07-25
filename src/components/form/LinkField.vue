@@ -1,13 +1,13 @@
 <script lang="ts">
-import truncate from 'lodash/truncate';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useField } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import type { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
+import type { ComparedBlockType } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
+import { Block, Link } from 'brewblox-proto/ts';
+import truncate from 'lodash/truncate';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'LinkField',

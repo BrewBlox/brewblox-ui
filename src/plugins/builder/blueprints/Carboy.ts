@@ -1,6 +1,6 @@
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
 import { showSettingsBlock } from '@/plugins/builder/utils';
-import { BlockType } from '@/plugins/spark/types';
+import { BlockType } from 'brewblox-proto/ts';
 
 export const DEFAULT_SIZE_X = 2;
 export const DEFAULT_SIZE_Y = 4;

@@ -1,12 +1,7 @@
-import { Block } from '@/shared-types';
+import { BlockAddress, BlockFieldAddress } from '@/plugins/spark/types';
 import { ServiceStatus } from '@/store/services';
 import { findById } from '@/utils/collections';
-
-import {
-  BlockAddress,
-  BlockFieldAddress,
-  SparkStatusDescription,
-} from '../types';
+import { Block, SparkStatusDescription } from 'brewblox-proto/ts';
 
 export function findBlockById<T extends Block>(
   blocks: Block[],

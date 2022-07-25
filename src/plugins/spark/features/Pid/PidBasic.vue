@@ -1,17 +1,12 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  Block,
-  PidBlock,
-  SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyQty } from '@/utils/quantity';
+import { Block, PidBlock, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'PidBasic',

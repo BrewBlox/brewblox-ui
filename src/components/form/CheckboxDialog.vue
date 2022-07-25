@@ -1,7 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'CheckboxDialog',

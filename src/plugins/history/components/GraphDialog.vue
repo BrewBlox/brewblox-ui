@@ -1,9 +1,7 @@
 <script lang="ts">
-import { PropType, defineComponent, reactive, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
-
+import { defineComponent, PropType, reactive, ref } from 'vue';
 import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
 export default defineComponent({

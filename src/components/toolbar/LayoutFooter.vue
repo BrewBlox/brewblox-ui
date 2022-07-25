@@ -1,11 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { eventbus } from '@/eventbus';
 import { useHistoryStore } from '@/plugins/history/store';
 import { useLoggingStore } from '@/store/logging';
 import { notifyColors, notifyIcons } from '@/utils/notify';
 import { shortDateString } from '@/utils/quantity';
+import { computed, defineComponent } from 'vue';
 
 interface LogEntryDisplay {
   message: string;

@@ -1,7 +1,6 @@
 <script lang="ts">
-import { PropType, defineComponent, ref } from 'vue';
-
 import { useField } from '@/composables';
+import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'TagSelectField',

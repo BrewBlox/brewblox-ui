@@ -1,10 +1,9 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 const typeValidator = (v: unknown): boolean =>
   typeof v === 'string' && ['text', 'number'].includes(v);

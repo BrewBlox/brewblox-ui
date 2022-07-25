@@ -1,10 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DisplaySettingsBlock } from '@/plugins/spark/types';
-
+import { DisplaySettingsBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 import DisplaySettingsBasic from './DisplaySettingsBasic.vue';
 import DisplaySettingsFull from './DisplaySettingsFull.vue';
 

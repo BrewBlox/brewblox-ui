@@ -1,11 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
-import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'DurationValEdit',

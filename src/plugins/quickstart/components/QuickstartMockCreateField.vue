@@ -1,12 +1,14 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import { BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
-import { SparkStatusDescription } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
+import {
+  BlockType,
+  SparkStatusDescription,
+  TempSensorMockBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'QuickstartMockCreateField',

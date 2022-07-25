@@ -1,10 +1,9 @@
 <script lang="ts">
-import { PropType, defineComponent } from 'vue';
-
 import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig } from '@/plugins/history/types';
 import { selectGraphPrecision } from '@/plugins/history/utils';
 import { notify } from '@/utils/notify';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'ExportGraphAction',

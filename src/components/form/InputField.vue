@@ -1,9 +1,8 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/quantity';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'InputField',

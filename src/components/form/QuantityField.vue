@@ -1,11 +1,10 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useField } from '@/composables';
-import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'QuantityField',

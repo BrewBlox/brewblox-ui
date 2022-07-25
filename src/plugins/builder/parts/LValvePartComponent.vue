@@ -1,6 +1,4 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, watch } from 'vue';
-
 import { UP } from '@/plugins/builder/const';
 import {
   coord2grid,
@@ -8,9 +6,9 @@ import {
   flowOnCoord,
   liquidOnCoord,
 } from '@/plugins/builder/utils';
-import { DigitalState } from '@/plugins/spark/types';
-
-import { VALVE_KEY, VALVE_TYPES, ValveT } from '../blueprints/LValve';
+import { DigitalState } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, watch } from 'vue';
+import { ValveT, VALVE_KEY, VALVE_TYPES } from '../blueprints/LValve';
 import { usePart, useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';
 

@@ -1,25 +1,23 @@
 <script lang="ts">
+import { coord2grid } from '@/plugins/builder/utils';
+import { useSparkStore } from '@/plugins/spark/store';
+import { userUnits } from '@/user-settings';
+import { isQuantity } from '@/utils/identity';
+import { deltaTempQty, prettyAny } from '@/utils/quantity';
 import {
   mdiBullseyeArrow,
   mdiGauge,
   mdiPlusMinus,
   mdiThermometer,
 } from '@quasar/extras/mdi-v5';
-import { PropType, computed, defineComponent } from 'vue';
-
-import { coord2grid } from '@/plugins/builder/utils';
-import { useSparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
   Quantity,
   ReferenceKind,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { userUnits } from '@/user-settings';
-import { isQuantity } from '@/utils/identity';
-import { deltaTempQty, prettyAny } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 import { DRIVER_KEY, DRIVER_TYPES } from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';

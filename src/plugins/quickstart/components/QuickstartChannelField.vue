@@ -1,7 +1,7 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
+import { channelName } from '@/plugins/spark/utils/formatting';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import {
   BlockIntfType,
   BlockType,
@@ -9,10 +9,8 @@ import {
   GpioPins,
   IoArrayBlock,
   IoChannel,
-} from '@/plugins/spark/types';
-import { channelName } from '@/plugins/spark/utils/formatting';
-import { isCompatible } from '@/plugins/spark/utils/info';
-
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 import { GpioChange, IoChannelAddress } from '../types';
 
 function unusedId(change: GpioChange): number {

@@ -1,7 +1,16 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, onBeforeMount } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
+import {
+  discoverBlocks,
+  makeBlockIdRules,
+} from '@/plugins/spark/utils/configuration';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { useFeatureStore } from '@/store/features';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
+import { prettyQty } from '@/utils/quantity';
 import {
   Block,
   BlockIntfType,
@@ -10,17 +19,8 @@ import {
   DS2413Block,
   OneWireGpioModuleBlock,
   TempSensorOneWireBlock,
-} from '@/plugins/spark/types';
-import { discoverBlocks } from '@/plugins/spark/utils/configuration';
-import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { useFeatureStore } from '@/store/features';
-import { createBlockDialog } from '@/utils/block-dialog';
-import { createDialog } from '@/utils/dialog';
-import { makeObjectSorter } from '@/utils/functional';
-import { matchesType } from '@/utils/objects';
-import { prettyQty } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, onBeforeMount, PropType } from 'vue';
 import { QuickstartConfig } from '../types';
 
 export default defineComponent({

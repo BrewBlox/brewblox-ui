@@ -1,19 +1,24 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
-import { Block, DigitalState, IoChannel } from '@/plugins/spark/types';
 import {
   channelName,
   findLimitations,
   limitationString,
 } from '@/plugins/spark/utils/formatting';
 import { isBlockDriven } from '@/plugins/spark/utils/info';
-import { IoArrayBlock, Link } from '@/shared-types';
 import { makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
+import {
+  Block,
+  BlockType,
+  DigitalActuatorBlock,
+  DigitalState,
+  IoArrayBlock,
+  IoChannel,
+  Link,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface EditableChannel extends IoChannel {
   name: string;

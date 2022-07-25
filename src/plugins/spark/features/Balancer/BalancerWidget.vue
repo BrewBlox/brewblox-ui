@@ -1,12 +1,10 @@
 <script lang="ts">
-import get from 'lodash/get';
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { BalancerBlock } from '@/plugins/spark/types';
-import { Block } from '@/shared-types';
 import { fixedNumber } from '@/utils/quantity';
+import { BalancerBlock, Block } from 'brewblox-proto/ts';
+import get from 'lodash/get';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'BalancerWidget',

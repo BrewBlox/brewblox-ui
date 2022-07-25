@@ -1,16 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { ProfileValues } from '@/plugins/spark/types';
 import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
-import {
-  PidBlock,
-  Quantity,
-  SetpointProfileBlock,
-  SetpointSensorPairBlock,
-} from '@/shared-types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
@@ -22,12 +14,18 @@ import {
   shortDateString,
   tempQty,
 } from '@/utils/quantity';
-
+import {
+  PidBlock,
+  Quantity,
+  SetpointProfileBlock,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, ref } from 'vue';
 import { PidConfig } from '../types';
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlSyncView from './TempControlSyncView.vue';
 import { TempControlMode, TempControlWidget } from './types';
-import { TempControlProblem, applyMode, findControlProblems } from './utils';
+import { applyMode, findControlProblems, TempControlProblem } from './utils';
 
 export default defineComponent({
   name: 'TempControlBasic',

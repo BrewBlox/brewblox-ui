@@ -1,13 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useWidget } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { BlockType, PidBlock, SetpointProfileBlock } from '@/shared-types';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
-
+import { BlockType, PidBlock, SetpointProfileBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlPidView from './TempControlPidView.vue';
 import { TempControlMode, TempControlWidget } from './types';

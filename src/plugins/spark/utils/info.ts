@@ -1,6 +1,5 @@
-import isArray from 'lodash/isArray';
-import { Enum } from 'typescript-string-enums';
-
+import { useFeatureStore } from '@/store/features';
+import { isLink } from '@/utils/identity';
 import {
   Block,
   BlockDriveChain,
@@ -12,10 +11,9 @@ import {
   SparkStateEvent,
   SparkUpdateEvent,
   SystemBlockType,
-} from '@/shared-types';
-import { useFeatureStore } from '@/store/features';
-import { isLink } from '@/utils/identity';
-
+} from 'brewblox-proto/ts';
+import isArray from 'lodash/isArray';
+import { Enum } from 'typescript-string-enums';
 import { BlockAddress, ComparedBlockType } from '../types';
 
 export function isCompatible(

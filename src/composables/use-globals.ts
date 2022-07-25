@@ -1,6 +1,5 @@
-import { Ref, inject } from 'vue';
-
 import { DenseKey, NowKey, TouchKey } from '@/symbols';
+import { inject, Ref } from 'vue';
 
 export interface UseGlobalsComponent {
   dense: Ref<boolean>;

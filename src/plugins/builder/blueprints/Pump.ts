@@ -12,14 +12,14 @@ import {
   showDrivingBlockDialog,
 } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
+import { isBlockDriven } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
 import {
   ActuatorPwmBlock,
   BlockType,
   DigitalActuatorBlock,
   DigitalState,
-} from '@/plugins/spark/types';
-import { isBlockDriven } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
+} from 'brewblox-proto/ts';
 
 export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock;
 export const PUMP_KEY = 'actuator';

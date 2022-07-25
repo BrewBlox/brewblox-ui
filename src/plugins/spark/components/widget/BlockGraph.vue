@@ -1,11 +1,10 @@
 <script lang="ts">
-import { Layout } from 'plotly.js';
-import { PropType, computed, defineComponent, ref, watch } from 'vue';
-
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
 import { deepCopy, isJsonEqual } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
+import { Layout } from 'plotly.js';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'BlockGraph',

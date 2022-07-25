@@ -1,6 +1,5 @@
+import { DateString, StoreObject } from 'brewblox-proto/ts';
 import { Annotations, Layout, PlotData } from 'plotly.js';
-
-import { DateString, StoreObject } from '@/shared-types';
 
 export interface QueryParams {
   database?: string;

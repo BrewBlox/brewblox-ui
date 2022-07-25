@@ -1,12 +1,10 @@
 <script lang="ts">
-import { mdiArrowRightBold } from '@quasar/extras/mdi-v5';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { coord2grid } from '@/plugins/builder/utils';
-import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
 import { makeObjectSorter } from '@/utils/functional';
-import { fixedNumber } from '@/utils/quantity';
-
+import { durationMs, fixedNumber } from '@/utils/quantity';
+import { mdiArrowRightBold } from '@quasar/extras/mdi-v5';
+import { Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 import { PROFILE_KEY, PROFILE_TYPES } from '../blueprints/ProfileDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';
@@ -38,21 +36,29 @@ export default defineComponent({
     });
 
     const currentValue = computed<number | null>(() => {
-      if (!block.value || !block.value.data.enabled) {
+      if (
+        !block.value ||
+        !block.value.data.enabled ||
+        !block.value.data.start
+      ) {
         return null;
       }
-      const now = new Date().getTime() / 1000;
-      const start = block.value.data.start || 0;
-      const idx = points.value.findIndex((point) => start + point.time > now);
+      const now = new Date().getTime();
+      const start = new Date(block.value.data.start).getTime();
+      const idx = points.value.findIndex(
+        (point) => start + durationMs(point.time) > now,
+      );
       if (idx < 1) {
         return null;
       }
       const prev = points.value[idx - 1];
       const next = points.value[idx];
-      const prevVal = prev.temperature.value as number;
-      const nextVal = next.temperature.value as number;
-      const durationBetween = next.time - prev.time || 1;
-      const elapsedBetween = now - prev.time - start;
+      const prevVal = prev.temperature.value!;
+      const nextVal = next.temperature.value!;
+      const prevTime = durationMs(prev.time);
+      const nextTime = durationMs(next.time);
+      const durationBetween = nextTime - prevTime || 1;
+      const elapsedBetween = now - prevTime - start;
       const progress = elapsedBetween / durationBetween; // 0-1
       const tempDelta = nextVal - prevVal;
 
@@ -60,16 +66,16 @@ export default defineComponent({
     });
 
     const nextValue = computed<number | null>(() => {
-      if (!block.value) {
+      if (!block.value || !block.value.data.start) {
         return null;
       }
-      const now = new Date().getTime() / 1000;
-      const start = block.value.data.start || 0;
+      const now = new Date().getTime();
+      const start = new Date(block.value.data.start).getTime();
       if (!block.value.data.enabled || !block.value.data.drivenTargetId.id) {
         return null;
       }
       const point: Setpoint | undefined = points.value.find(
-        (point) => start + point.time > now,
+        (point) => start + durationMs(point.time) > now,
       );
       return point ? point.temperature.value : null;
     });

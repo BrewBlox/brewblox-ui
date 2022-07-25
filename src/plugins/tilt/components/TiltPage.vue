@@ -1,6 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent, provide, reactive, watch } from 'vue';
-
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltService, TiltStateValue } from '@/plugins/tilt/types';
 import { WidgetContext } from '@/store/features';
@@ -8,6 +6,7 @@ import { useServiceStore } from '@/store/services';
 import { ContextKey } from '@/symbols';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
+import { computed, defineComponent, provide, reactive, watch } from 'vue';
 
 const context: WidgetContext = {
   mode: 'Basic',

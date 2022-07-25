@@ -1,19 +1,5 @@
-import { nanoid } from 'nanoid';
-
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import {
-  ActuatorPwmBlock,
-  Block,
-  BlockType,
-  DigitalActuatorBlock,
-  DigitalState,
-  FilterChoice,
-  MutexBlock,
-  PidBlock,
-  SetpointProfileBlock,
-  SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
@@ -25,15 +11,27 @@ import {
   inverseTempQty,
   tempQty,
 } from '@/utils/quantity';
-
+import {
+  ActuatorPwmBlock,
+  Block,
+  BlockType,
+  DigitalActuatorBlock,
+  DigitalState,
+  FilterChoice,
+  MutexBlock,
+  PidBlock,
+  SetpointProfileBlock,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
   unlinkedActuators,
-  withPrefix,
   withoutPrefix,
+  withPrefix,
 } from '../utils';
 import { GlycolConfig } from './types';
 

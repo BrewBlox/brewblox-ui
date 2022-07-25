@@ -1,11 +1,10 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Fluctuation, TempSensorMockBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty, deltaTempQty, prettyQty } from '@/utils/quantity';
+import { Fluctuation, TempSensorMockBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TempSensorMockWidget',

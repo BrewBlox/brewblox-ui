@@ -1,11 +1,10 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { TempSensorExternalBlock } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty, shortDateString } from '@/utils/quantity';
+import { TempSensorExternalBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TempSensorExternalWidget',

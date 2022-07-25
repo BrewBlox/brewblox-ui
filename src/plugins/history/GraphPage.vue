@@ -1,14 +1,13 @@
 <script lang="ts">
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { emptyGraphConfig } from '@/plugins/history/utils';
+import { useWidgetStore, Widget } from '@/store/widgets';
+import { isJsonEqual } from '@/utils/objects';
 import { cloneDeep } from 'lodash';
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { emptyGraphConfig } from '@/plugins/history/utils';
-import { Widget, useWidgetStore } from '@/store/widgets';
-import { isJsonEqual } from '@/utils/objects';
 
 export default defineComponent({
   name: 'GraphPage',

@@ -1,7 +1,5 @@
-import { defineStore } from 'pinia';
-
 import { concatById, filterById, findById } from '@/utils/collections';
-
+import { defineStore } from 'pinia';
 import type {
   AutomationEventData,
   AutomationProcess,

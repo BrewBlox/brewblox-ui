@@ -1,6 +1,6 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { showDrivingBlockDialog } from '@/plugins/builder/utils';
-import { BlockType } from '@/plugins/spark/types';
+import { BlockType } from 'brewblox-proto/ts';
 
 export const PWM_KEY = 'pwm';
 export const PWM_TYPES = [BlockType.ActuatorPwm];

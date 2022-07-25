@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { COIL_BOTTOM } from '../blueprints/Coil';
 import { FlowPart } from '../types';
 import { flowOnCoord, liquidOnCoord } from '../utils';

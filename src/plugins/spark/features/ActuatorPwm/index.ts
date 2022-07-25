@@ -1,21 +1,18 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { bloxLink } from '@/utils/link';
+import { bloxQty, durationString } from '@/utils/quantity';
 import {
   ActuatorPwmBlock,
   AnalogConstraintsObj,
-  BlockFieldSpec,
   BlockIntfType,
-  BlockSpec,
   BlockType,
-} from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
-import { bloxLink } from '@/utils/link';
-import { bloxQty, durationString } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './ActuatorPwmWidget.vue';
 
 const type = BlockType.ActuatorPwm;

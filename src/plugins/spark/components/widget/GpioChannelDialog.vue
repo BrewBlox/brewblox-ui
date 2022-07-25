@@ -1,9 +1,8 @@
 <script lang="ts">
-import clamp from 'lodash/clamp';
-import { PropType, computed, defineComponent, reactive, watch } from 'vue';
-
 import { useDialog } from '@/composables';
-import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
+import { GpioDeviceType, GpioModuleChannel, GpioPins } from 'brewblox-proto/ts';
+import clamp from 'lodash/clamp';
+import { computed, defineComponent, PropType, reactive, watch } from 'vue';
 
 type EditingKind =
   | 'UNKNOWN'

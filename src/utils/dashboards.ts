@@ -2,7 +2,6 @@ import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { useWidgetStore } from '@/store/widgets';
 import { userUISettings } from '@/user-settings';
-
 import { createDialog } from './dialog';
 import { notify } from './notify';
 import { makeRuleValidator, suggestId } from './rules';

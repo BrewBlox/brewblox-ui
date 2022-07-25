@@ -1,9 +1,7 @@
-import isString from 'lodash/isString';
-import { Router } from 'vue-router';
-
 import { useFeatureStore } from '@/store/features';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
-
+import isString from 'lodash/isString';
+import { Router } from 'vue-router';
 import { createDialog } from './dialog';
 import { notify } from './notify';
 

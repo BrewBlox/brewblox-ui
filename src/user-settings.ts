@@ -1,6 +1,5 @@
+import { GravityUnit, TempUnit } from 'brewblox-proto/ts';
 import { ref } from 'vue';
-
-import { GravityUnit, TempUnit } from '@/shared-types';
 
 export interface UserUISettings {
   keyboardLayout: string;

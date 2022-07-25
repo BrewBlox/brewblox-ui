@@ -1,13 +1,16 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { ifCompatible } from '@/plugins/spark/utils/info';
-import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { prettyUnit, tempQty } from '@/utils/quantity';
+import {
+  BlockType,
+  Quantity,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'SetpointSettingDialog',

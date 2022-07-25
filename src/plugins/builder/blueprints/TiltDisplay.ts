@@ -1,7 +1,6 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { universalTransitions } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
-
 import { SCALE_KEY } from '../const';
 
 export const SIZE_X = 2;

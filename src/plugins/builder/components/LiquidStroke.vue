@@ -1,6 +1,6 @@
 <script lang="ts">
 import { svgPathProperties } from 'svg-path-properties';
-import { PropType, computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'LiquidStroke',

@@ -1,6 +1,6 @@
 <script lang="ts">
 import isObject from 'lodash/isObject';
-import { PropType, computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'ListSelect',

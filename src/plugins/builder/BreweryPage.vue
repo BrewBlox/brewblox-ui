@@ -1,14 +1,12 @@
 <script lang="ts">
-import { useQuasar } from 'quasar';
-import { computed, defineComponent, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useGlobals } from '@/composables';
 import { startupDone, userUISettings } from '@/user-settings';
 import { concatById } from '@/utils/collections';
 import { isAbsoluteUrl } from '@/utils/url';
-
-import { UseSvgZoomDimensions, useFlowParts, useSvgZoom } from './composables';
+import { useQuasar } from 'quasar';
+import { computed, defineComponent, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { useBuilderStore } from './store';
 import { FlowPart, PersistentPart } from './types';

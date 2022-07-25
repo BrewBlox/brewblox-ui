@@ -1,8 +1,7 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { startChangeBlockId } from '@/plugins/spark/utils/actions';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'BlockWidgetToolbar',

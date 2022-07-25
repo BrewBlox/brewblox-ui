@@ -1,12 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { PidBlock } from '@/plugins/spark/types';
-import { Link } from '@/shared-types';
 import { prettyLink } from '@/utils/quantity';
-
+import { Link, PidBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
 import { startRelationsDialog } from './relations';

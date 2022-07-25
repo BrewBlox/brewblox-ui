@@ -1,10 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useGlobals } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { computed, defineComponent } from 'vue';
 
 const dashboardSorter = makeObjectSorter<Dashboard>('order');
 

@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'SelectedLayoutDialog',

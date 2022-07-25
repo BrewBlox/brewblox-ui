@@ -1,10 +1,8 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
-import { Quantity } from '@/shared-types';
 import { userUnits } from '@/user-settings';
 import { bloxQty, deltaTempQty } from '@/utils/quantity';
-
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { QuickstartAction } from '../types';
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 

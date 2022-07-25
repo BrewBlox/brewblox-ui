@@ -1,7 +1,4 @@
 <script lang="ts">
-import { mdiThermometer } from '@quasar/extras/mdi-v5';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { CENTER } from '@/plugins/builder/const';
 import {
   coord2grid,
@@ -9,8 +6,9 @@ import {
   textTransformation,
 } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
-
-import { SENSOR_KEY, SENSOR_TYPES, SensorT } from '../blueprints/SensorDisplay';
+import { mdiThermometer } from '@quasar/extras/mdi-v5';
+import { computed, defineComponent, PropType } from 'vue';
+import { SensorT, SENSOR_KEY, SENSOR_TYPES } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';
 

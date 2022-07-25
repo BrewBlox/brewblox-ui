@@ -1,9 +1,8 @@
 <script lang="ts">
-import isArray from 'lodash/isArray';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
+import isArray from 'lodash/isArray';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'SelectField',

@@ -1,6 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
   startAddBlockToDisplay,
@@ -15,6 +13,7 @@ import {
 import { useServiceStore } from '@/store/services';
 import { saveFile } from '@/utils/import-export';
 import { startCopyWidget } from '@/utils/widgets';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'BlockActions',

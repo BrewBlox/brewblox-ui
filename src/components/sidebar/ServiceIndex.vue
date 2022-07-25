@@ -1,7 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useGlobals } from '@/composables';
 import { ServiceFeature, useFeatureStore } from '@/store/features';
 import {
@@ -12,6 +9,8 @@ import {
 } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startCreateService } from '@/utils/services';
+import { computed, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
 interface ServiceSuggestion {
   stub: ServiceStub;

@@ -1,15 +1,14 @@
 <script lang="ts">
-import { computed, defineComponent, reactive, ref } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  WiFiSettingsBlock,
-  WifiCipherType,
-  WifiSecurityType,
-} from '@/plugins/spark/types';
 import { getWiFiSettingsBlock } from '@/plugins/spark/utils/system';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
+import {
+  WifiCipherType,
+  WifiSecurityType,
+  WiFiSettingsBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, reactive, ref } from 'vue';
 
 const securityOpts: SelectOption<WifiSecurityType>[] = [
   { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },

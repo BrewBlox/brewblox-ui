@@ -4,11 +4,5 @@
   "singleQuote": true,
   "printWidth": 80,
   "singleAttributePerLine": true,
-  "bracketSameLine": false,
-  "importOrder": [
-    "^@/(.*)$",
-    "^[./]"
-  ],
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true
+  "bracketSameLine": false
 }

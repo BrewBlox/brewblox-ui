@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref, watch } from 'vue';
-
 import { defaultLabel } from '@/plugins/history/nodes';
-
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { GraphAxis, GraphConfig } from '../types';
 
 export default defineComponent({

@@ -8,7 +8,7 @@ import {
   BlockIntfType,
   TempSensorMockBlock,
   TempSensorOneWireBlock,
-} from '@/plugins/spark/types';
+} from 'brewblox-proto/ts';
 
 export type SensorT = TempSensorMockBlock | TempSensorOneWireBlock;
 export const SIZE_X = 1;

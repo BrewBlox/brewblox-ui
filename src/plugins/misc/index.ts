@@ -1,5 +1,4 @@
 import { Plugin } from 'vue';
-
 import ConfigWatcher from './ConfigWatcher';
 import Countdown from './Countdown';
 import Stopwatch from './Stopwatch';

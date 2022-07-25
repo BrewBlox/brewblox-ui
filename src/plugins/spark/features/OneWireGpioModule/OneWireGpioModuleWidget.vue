@@ -1,10 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
-import { GpioModuleChannel, OneWireGpioModuleBlock } from '@/shared-types';
 import { createDialogPromise } from '@/utils/dialog';
-
+import { GpioModuleChannel, OneWireGpioModuleBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '../../composables';
 
 export default defineComponent({

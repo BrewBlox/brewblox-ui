@@ -1,4 +1,4 @@
-import { ComponentPublicInstance, Ref, onBeforeUpdate, ref } from 'vue';
+import { ComponentPublicInstance, onBeforeUpdate, Ref, ref } from 'vue';
 
 export interface UseElementRefsComponent<T extends Element> {
   setElementRef(

@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, defineComponent, ref } from 'vue';
-
+import { defineComponent, PropType, ref } from 'vue';
 import { QuickstartAction } from '../types';
 
 export default defineComponent({

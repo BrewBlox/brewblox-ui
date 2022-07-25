@@ -1,7 +1,6 @@
 import { database } from '@/database';
-import { StoreObject } from '@/shared-types';
 import { deserialize } from '@/utils/parsing';
-
+import { StoreObject } from 'brewblox-proto/ts';
 import { ChangeCb, DeleteCb } from './types';
 
 export interface DatabaseApi<T extends StoreObject> {

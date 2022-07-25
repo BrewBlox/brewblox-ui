@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import {
   concatById,
   filterById,
@@ -8,6 +6,7 @@ import {
   popById,
   spliceById,
 } from '@/utils/collections';
+import { describe, expect, it } from 'vitest';
 
 interface TestObj extends HasId {
   v1: string;

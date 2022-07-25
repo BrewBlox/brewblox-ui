@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import { isAbsoluteUrl, isUrlSafe, makeUrlSafe } from '@/utils/url';
+import { describe, expect, it } from 'vitest';
 
 describe('URL utils', () => {
   it('Recognize absolute URLs', () => {

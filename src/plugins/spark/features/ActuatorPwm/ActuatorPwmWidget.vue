@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ActuatorPwmBlock } from '@/plugins/spark/types';
-import { Link } from '@/shared-types';
 import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
+import { ActuatorPwmBlock, Link } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 const quickValues: SelectOption<number>[] = [
   { label: '0%', value: 0 },

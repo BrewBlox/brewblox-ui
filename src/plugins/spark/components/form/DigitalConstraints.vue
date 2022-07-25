@@ -1,19 +1,20 @@
 <script lang="ts">
-import { PropType, defineComponent, ref, watch } from 'vue';
-
 import { digitalConstraintLabels } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import type {
-  DigitalConstraint,
-  DigitalConstraintKey,
-  DigitalConstraintsObj,
-  MutexedConstraint,
-} from '@/plugins/spark/types';
-import { BlockType, MutexBlock, Quantity } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty } from '@/utils/quantity';
+import {
+  BlockType,
+  DigitalConstraint,
+  DigitalConstraintKey,
+  DigitalConstraintsObj,
+  MutexBlock,
+  MutexedConstraint,
+  Quantity,
+} from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref, watch } from 'vue';
 
 const constraintOpts: SelectOption[] = Object.entries(
   digitalConstraintLabels,

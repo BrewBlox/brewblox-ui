@@ -1,12 +1,10 @@
 <script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { sparkType } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { BlockType } from '@/plugins/spark/types';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
 import { startCreateService } from '@/utils/services';
-
+import { BlockType } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { QuickstartConfig } from '../types';
 
 export default defineComponent({

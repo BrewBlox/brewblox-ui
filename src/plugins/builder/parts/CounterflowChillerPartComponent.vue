@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
+import { computed, defineComponent, PropType } from 'vue';
 import {
   CFC_BOTTOM_LEFT,
   CFC_TOP_RIGHT,

@@ -11,8 +11,7 @@ import {
   DigitalActuatorBlock,
   DigitalState,
   MotorValveBlock,
-} from '@/shared-types';
-
+} from 'brewblox-proto/ts';
 import { settingsAddress, settingsBlock } from '../utils';
 
 export type ValveT = DigitalActuatorBlock | MotorValveBlock;

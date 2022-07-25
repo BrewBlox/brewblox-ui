@@ -1,4 +1,4 @@
-import { StoreObject } from '@/shared-types';
+import { StoreObject } from 'brewblox-proto/ts';
 
 export type ChangeCb<T> = (obj: T) => unknown;
 export type DeleteCb = (id: string) => unknown;

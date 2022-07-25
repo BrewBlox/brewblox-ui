@@ -1,15 +1,4 @@
-import debounce from 'lodash/debounce';
-import {
-  ComputedRef,
-  Ref,
-  UnwrapRef,
-  WritableComputedRef,
-  computed,
-  ref,
-  watch,
-} from 'vue';
-
-import { UseWidgetComponent, useWidget } from '@/composables';
+import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockConfig, BlockSpec, BlockWidget } from '@/plugins/spark/types';
@@ -19,8 +8,18 @@ import {
   limitationString,
 } from '@/plugins/spark/utils/formatting';
 import { isBlockVolatile } from '@/plugins/spark/utils/info';
-import { Block } from '@/shared-types';
 import { useWidgetStore } from '@/store/widgets';
+import { Block } from 'brewblox-proto/ts';
+import debounce from 'lodash/debounce';
+import {
+  computed,
+  ComputedRef,
+  Ref,
+  ref,
+  UnwrapRef,
+  watch,
+  WritableComputedRef,
+} from 'vue';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {

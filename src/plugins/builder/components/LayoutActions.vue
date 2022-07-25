@@ -1,8 +1,4 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { PropType, computed, defineComponent } from 'vue';
-import { useRoute } from 'vue-router';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import {
@@ -11,11 +7,14 @@ import {
 } from '@/plugins/builder/utils';
 import { useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
-import { Widget, useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default defineComponent({
   name: 'LayoutActions',

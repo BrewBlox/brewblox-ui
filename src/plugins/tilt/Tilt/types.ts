@@ -1,5 +1,4 @@
 import { Widget } from '@/store/widgets';
-
 import { TiltFieldIndex } from '../types';
 
 export interface TiltWidgetConfig {

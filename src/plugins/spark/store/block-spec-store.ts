@@ -1,14 +1,13 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-
 import {
   BlockAddress,
   BlockFieldAddress,
   BlockFieldSpec,
   BlockSpec,
 } from '@/plugins/spark/types';
-import { Block, BlockType, UserBlockType } from '@/shared-types';
 import { findByKey } from '@/utils/collections';
+import { Block, BlockType, UserBlockType } from 'brewblox-proto/ts';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export const useBlockSpecStore = defineStore('blockSpecStore', () => {
   const blockSpecs = ref<BlockSpec[]>([]);

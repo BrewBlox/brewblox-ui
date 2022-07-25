@@ -1,16 +1,10 @@
-import { Plugin } from 'vue';
-
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  BlockSpec,
-  BlockType,
-  DS2408Block,
-  DS2408ConnectMode,
-} from '@/plugins/spark/types';
+import { BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { WidgetFeature, useFeatureStore } from '@/store/features';
-
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { BlockType, DS2408Block, DS2408ConnectMode } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './DS2408Widget.vue';
 
 const type = BlockType.DS2408;

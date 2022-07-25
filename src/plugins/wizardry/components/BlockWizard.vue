@@ -1,26 +1,19 @@
 <script lang="ts">
-import isMatch from 'lodash/isMatch';
-import { nanoid } from 'nanoid';
-import { DialogChainObject } from 'quasar';
-import { PropType, computed, defineComponent, onBeforeUnmount, ref } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import {
-  Block,
-  BlockConfig,
-  BlockIntfType,
-  ComparedBlockType,
-  UserBlockType,
-} from '@/plugins/spark/types';
+import { BlockConfig, ComparedBlockType } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { isCompatible, isSystemBlockType } from '@/plugins/spark/utils/info';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
-import { Widget, useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter, nullFilter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
-
+import { Block, BlockIntfType, UserBlockType } from 'brewblox-proto/ts';
+import isMatch from 'lodash/isMatch';
+import { nanoid } from 'nanoid';
+import { DialogChainObject } from 'quasar';
+import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 import { useWizard } from '../composables';
 
 export default defineComponent({

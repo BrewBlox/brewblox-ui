@@ -1,9 +1,7 @@
 <script lang="ts">
-import { defineComponent, inject, watch } from 'vue';
-
 import { NowKey } from '@/symbols';
 import { durationMs } from '@/utils/quantity';
-
+import { defineComponent, inject, watch } from 'vue';
 import { useAutomationStore } from './store';
 
 const validDuration = durationMs('60s');

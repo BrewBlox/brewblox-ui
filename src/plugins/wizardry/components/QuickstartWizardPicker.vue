@@ -1,8 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-
 import { QuickstartFeature, useFeatureStore } from '@/store/features';
-
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useWizard } from '../composables';
 
 export default defineComponent({

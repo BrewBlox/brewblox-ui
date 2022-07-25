@@ -1,5 +1,4 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-
 import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
 import BuilderLabel from './BuilderLabel';
@@ -19,8 +18,8 @@ import HeatingElement from './HeatingElement';
 import ImmersionCoil from './ImmersionCoil';
 import Keg from './Keg';
 import Kettle from './Kettle';
-import LValve from './LValve';
 import Lauterhexe from './Lauterhexe';
+import LValve from './LValve';
 import MetricsDisplay from './MetricsDisplay';
 import PidDisplay from './PidDisplay';
 import ProfileDisplay from './ProfileDisplay';

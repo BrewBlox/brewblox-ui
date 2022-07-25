@@ -1,6 +1,5 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
 import { coord2grid, textTransformation } from '../utils';

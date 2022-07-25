@@ -1,8 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-
+import { computed, defineComponent, ref } from 'vue';
 import { useAutomationStore } from './store';
 import { AutomationProcess, AutomationStep } from './types';
 

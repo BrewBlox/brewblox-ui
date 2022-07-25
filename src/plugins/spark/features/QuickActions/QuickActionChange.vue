@@ -1,15 +1,13 @@
 <script lang="ts">
-import difference from 'lodash/difference';
-import { nanoid } from 'nanoid';
-import { PropType, computed, defineComponent, reactive, ref, watch } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import type { Block } from '@/plugins/spark/types';
 import { BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-
+import type { Block } from 'brewblox-proto/ts';
+import difference from 'lodash/difference';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
 import { BlockChange, EditableBlockField } from './types';
 
 interface EditableBlockChange {

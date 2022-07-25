@@ -1,15 +1,12 @@
 <script lang="ts">
-import Keyboard from 'simple-keyboard';
-import KeyboardLayouts from 'simple-keyboard-layouts';
-
-import 'simple-keyboard/build/css/index.css';
-
-import { PropType, computed, defineComponent, ref, watch } from 'vue';
-
 import { useDialog } from '@/composables';
 import { userUISettings } from '@/user-settings';
 import { isDurationString } from '@/utils/identity';
 import { makeRuleValidator } from '@/utils/rules';
+import Keyboard from 'simple-keyboard';
+import KeyboardLayouts from 'simple-keyboard-layouts';
+import 'simple-keyboard/build/css/index.css';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 type BoardType = 'text' | 'number' | 'duration';
 

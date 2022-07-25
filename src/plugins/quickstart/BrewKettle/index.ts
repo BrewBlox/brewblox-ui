@@ -1,8 +1,6 @@
-import { Plugin } from 'vue';
-
 import { QuickstartFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
-
+import { Plugin } from 'vue';
 import BrewKettleCompletionTask from './BrewKettleCompletionTask.vue';
 import BrewKettleHardwareTask from './BrewKettleHardwareTask.vue';
 import BrewKettleIoTask from './BrewKettleIoTask.vue';

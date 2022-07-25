@@ -1,13 +1,11 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { UP } from '@/plugins/builder/const';
 import {
   flowOnCoord,
   liquidOnCoord,
   verticalChevrons,
 } from '@/plugins/builder/utils';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 
 const chevrons = verticalChevrons(50, 86.4);

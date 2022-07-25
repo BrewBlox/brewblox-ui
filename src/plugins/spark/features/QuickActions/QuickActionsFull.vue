@@ -1,16 +1,14 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, ref } from 'vue';
-
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
-import { Block } from '@/shared-types';
 import { filterById, spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
-
+import { Block } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, ref } from 'vue';
 import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, ChangeAction, QuickActionsWidget } from './types';
 

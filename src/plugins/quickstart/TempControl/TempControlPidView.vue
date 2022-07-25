@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { prettyQty } from '@/utils/quantity';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { PidConfig } from '../types';
 
 export default defineComponent({

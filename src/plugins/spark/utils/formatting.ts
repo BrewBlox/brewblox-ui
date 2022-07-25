@@ -1,28 +1,23 @@
-import get from 'lodash/get';
-import { Enum } from 'typescript-string-enums';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  AnyConstraint,
-  AnyConstraintsObj,
-  BlockAddress,
-  BlockLimitation,
-} from '@/plugins/spark/types';
-import {
-  AnalogConstraint,
-  AnalogConstraintKey,
-  AnyConstraintKey,
-  Block,
-  BlockType,
-  DS2408Block,
-  DigitalConstraint,
-  DigitalConstraintKey,
-  OneWireGpioModuleBlock,
-} from '@/shared-types';
+import { BlockAddress, BlockLimitation } from '@/plugins/spark/types';
 import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 import { durationString, prettyLink } from '@/utils/quantity';
-
+import {
+  AnalogConstraint,
+  AnalogConstraintKey,
+  AnyConstraint,
+  AnyConstraintKey,
+  AnyConstraintsObj,
+  Block,
+  BlockType,
+  DigitalConstraint,
+  DigitalConstraintKey,
+  DS2408Block,
+  OneWireGpioModuleBlock,
+} from 'brewblox-proto/ts';
+import get from 'lodash/get';
+import { Enum } from 'typescript-string-enums';
 import { constraintLabels, ioChannelNames } from '../const';
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>

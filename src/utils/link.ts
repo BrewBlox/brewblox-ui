@@ -1,5 +1,4 @@
-import { BlockOrIntfType, Link } from '@/shared-types';
-
+import { BlockOrIntfType, Link } from 'brewblox-proto/ts';
 import { isLink } from './identity';
 import { prettyLink } from './quantity';
 

@@ -1,7 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'BlockEnableToggle',

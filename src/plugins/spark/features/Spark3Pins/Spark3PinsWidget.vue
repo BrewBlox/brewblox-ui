@@ -1,10 +1,9 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Spark3PinsBlock } from '@/plugins/spark/types';
 import { fixedNumber } from '@/utils/quantity';
+import { Spark3PinsBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'Spark3PinsWidget',

@@ -1,5 +1,4 @@
 import { http, intercept } from '@/utils/http';
-
 import { AutomationTask } from '../types';
 
 export const fetchAll = (): Promise<AutomationTask[]> =>

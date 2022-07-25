@@ -1,17 +1,16 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { PropType, computed, defineComponent, onUnmounted } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import type { Block } from '@/plugins/spark/types';
 import {
   ComponentResult,
+  useFeatureStore,
   WidgetContext,
   WidgetMode,
-  useFeatureStore,
 } from '@/store/features';
-import { Widget, useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
+import type { Block } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, onUnmounted, PropType } from 'vue';
 
 export default defineComponent({
   name: 'BlockWidgetDialog',

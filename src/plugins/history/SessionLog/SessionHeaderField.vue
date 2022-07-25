@@ -1,9 +1,7 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
 import { dateString } from '@/utils/quantity';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { LoggedSession } from '../types';
 import SessionHeaderDialog from './SessionHeaderDialog.vue';
 

@@ -1,10 +1,9 @@
-import { App, Component } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import { BlockType } from '@/shared-types';
 import { ComponentResult, WidgetFeature } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { cref } from '@/utils/component-ref';
+import { BlockType } from 'brewblox-proto/ts';
+import { App, Component } from 'vue';
 
 const errorComponent = (error: string): ComponentResult => ({
   component: 'InvalidWidget',

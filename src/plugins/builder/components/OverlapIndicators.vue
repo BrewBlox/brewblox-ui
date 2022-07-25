@@ -1,8 +1,6 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from 'vue';
-
 import { Coordinates } from '@/utils/coordinates';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 import { coord2grid } from '../utils';
 

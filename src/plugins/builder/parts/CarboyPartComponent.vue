@@ -1,9 +1,7 @@
 <script lang="ts">
-import svgpath from 'svgpath';
-import { PropType, computed, defineComponent } from 'vue';
-
 import { colorString, coord2grid } from '@/plugins/builder/utils';
-
+import svgpath from 'svgpath';
+import { computed, defineComponent, PropType } from 'vue';
 import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/Carboy';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';

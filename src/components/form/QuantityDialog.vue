@@ -1,12 +1,11 @@
 <script lang="ts">
-import round from 'lodash/round';
-import { PropType, computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-import { Quantity } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty, prettyUnit } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
+import round from 'lodash/round';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'QuantityDialog',

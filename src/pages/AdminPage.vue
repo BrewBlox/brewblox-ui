@@ -1,6 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
@@ -18,6 +16,7 @@ import {
 import { startupDone, userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { computed, defineComponent } from 'vue';
 
 interface ConfigService {
   serviceId: string;

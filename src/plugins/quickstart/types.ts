@@ -1,8 +1,7 @@
 import { BuilderLayout } from '@/plugins/builder/types';
-import { Block } from '@/plugins/spark/types';
 import { DisplayOpts } from '@/plugins/spark/types';
-import { GpioModuleChannel, PidBlock } from '@/shared-types';
 import { Widget } from '@/store/widgets';
+import { Block, GpioModuleChannel, PidBlock } from 'brewblox-proto/ts';
 
 export interface IoChannelAddress {
   blockId: string;

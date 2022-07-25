@@ -1,9 +1,8 @@
 <script lang="ts">
-import { Layout } from 'plotly.js';
-import { PropType, defineComponent } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
+import { Layout } from 'plotly.js';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'GraphRangeSubmenu',
