@@ -21,7 +21,7 @@ export default defineComponent({
         <p>
           For the complete reference guide, see the
           <a
-            href="https://brewblox.com//dev/reference/sequence_instructions.html"
+            href="https://brewblox.com/dev/reference/sequence_instructions.html"
             target="_blank"
             style="color: white"
           >
