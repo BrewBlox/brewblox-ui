@@ -34,6 +34,7 @@ import {
   ref,
   watch,
 } from 'vue';
+import SequenceDocumentation from './SequenceDocumentation.vue';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.NONE]: null,
@@ -58,8 +59,11 @@ const activeInstructionAttributes = Decoration.line({
 
 export default defineComponent({
   name: 'SequenceWidget',
+  components: {
+    SequenceDocumentation,
+  },
   setup() {
-    const { context } = useContext.setup();
+    const { context, inDialog } = useContext.setup();
     const { block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
     const editor = ref<HTMLDivElement>();
     const configError = ref<string | undefined>();
@@ -302,6 +306,7 @@ export default defineComponent({
 
     return {
       context,
+      inDialog,
       block,
       editor,
       editing,
@@ -326,7 +331,14 @@ export default defineComponent({
 </script>
 
 <template>
-  <Card>
+  <PreviewCard
+    :enabled="inDialog"
+    show-initial
+  >
+    <template #preview>
+      <SequenceDocumentation />
+    </template>
+
     <template #toolbar>
       <BlockWidgetToolbar />
     </template>
@@ -409,5 +421,5 @@ export default defineComponent({
         />
       </div>
     </div>
-  </Card>
+  </PreviewCard>
 </template>
