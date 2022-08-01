@@ -3,7 +3,9 @@ import { useGlobals } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { computed, defineComponent } from 'vue';
+import { QTreeNode } from 'quasar';
+import { computed, defineComponent, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const dashboardSorter = makeObjectSorter<Dashboard>('order');
 
@@ -19,6 +21,7 @@ export default defineComponent({
   setup() {
     const dashboardStore = useDashboardStore();
     const { dense } = useGlobals.setup();
+    const router = useRouter();
 
     const dashboards = computed<Dashboard[]>({
       // Avoid modifying the store object when calling sort()
@@ -30,6 +33,53 @@ export default defineComponent({
         dashboardStore.updateDashboardOrder(dashboards.map((v) => v.id)),
     });
 
+    const nodes = computed<QTreeNode[]>(() => {
+      const rootNodes: QTreeNode[] = [];
+
+      dashboards.value.forEach((dashboard) => {
+        const path = dashboard.path ?? '';
+        const slugs = path.split('/').filter((s) => s !== '');
+        let nodes = rootNodes;
+
+        slugs.forEach((slug: string, i: number) => {
+          const path = slugs.slice(0, i + 1).join('/') + '/';
+          const existing = nodes.find((n) => n.id === path && n.children);
+          if (existing) {
+            nodes = existing.children!;
+          } else {
+            const children = [];
+            nodes.push({
+              id: path,
+              label: slug,
+              children,
+              handler: (node) => {
+                if (expanded.value.includes(node.id)) {
+                  expanded.value = expanded.value.filter((s) => s !== node.id);
+                } else {
+                  expanded.value = [...expanded.value, node.id];
+                }
+              },
+            });
+            nodes = children;
+          }
+        });
+
+        nodes.push({
+          id: dashboard.id,
+          label: dashboard.title,
+          url: `/dashboard/${dashboard.id}`,
+          body: 'dashboard',
+          path,
+          handler: (node) => router.push(node.url),
+        });
+      });
+
+      return rootNodes;
+    });
+
+    const selected = ref<string | null>(null);
+    const expanded = ref<string[]>([]);
+
     function startWizard(): void {
       createDialog({
         component: 'WizardDialog',
@@ -39,9 +89,25 @@ export default defineComponent({
       });
     }
 
+    onMounted(() => {
+      const activePath = router.currentRoute.value.path;
+      const activeDashboard = dashboards.value.find(
+        (v) => activePath === `/dashboard/${v.id}`,
+      );
+      if (activeDashboard && activeDashboard.path) {
+        const slugs = activeDashboard.path.split('/').filter((s) => s !== '');
+        expanded.value = slugs.map(
+          (_, i) => slugs.slice(0, i + 1).join('/') + '/',
+        );
+      }
+    });
+
     return {
       dense,
       dashboards,
+      nodes,
+      selected,
+      expanded,
       startWizard,
     };
   },
@@ -78,25 +144,30 @@ export default defineComponent({
       </q-item-section>
     </q-item>
 
-    <vue-draggable
-      v-model="dashboards"
-      :disabled="dense || !editing"
-      item-key="id"
+    <q-tree
+      v-model:selected="selected"
+      v-model:expanded="expanded"
+      :nodes="nodes"
+      node-key="id"
     >
-      <template #item="{ element }">
-        <q-item
-          :to="editing ? undefined : `/dashboard/${element.id}`"
-          :inset-level="0.2"
-          :class="['q-pb-sm', editing && 'bordered pointer']"
-          style="min-height: 0px"
-        >
-          <!-- {{ element }} -->
-          <q-item-section :class="['ellipsis', editing && 'text-italic']">
-            {{ element.title }}
-          </q-item-section>
-        </q-item>
+      <template #default-header="{ node }">
+        <span :class="[node.url === $route.path && 'text-primary']">{{
+          node.label
+        }}</span>
       </template>
-    </vue-draggable>
+      <template
+        v-if="editing"
+        #body-dashboard="{ node }"
+      >
+        <div
+          v-if="editing"
+          :class="[!node.path && 'q-pl-lg']"
+          class="col"
+        >
+          body
+        </div>
+      </template>
+    </q-tree>
   </div>
 </template>
 

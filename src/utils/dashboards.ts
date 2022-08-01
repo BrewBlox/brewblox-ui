@@ -53,7 +53,7 @@ export function startChangeDashboardId(
     component: 'InputDialog',
     componentProps: {
       modelValue: dashboard.id,
-      title: 'Change dashboard URL',
+      title: 'Edit dashboard URL',
       message: 'The dashboard URL is used as unique identifier.',
       rules: makeDashboardIdRules(),
     },
@@ -72,7 +72,7 @@ export function startChangeDashboardTitle(
   createDialog({
     component: 'InputDialog',
     componentProps: {
-      title: 'Rename dashboard',
+      title: 'Edit dashboard name',
       message:
         'This changes the dashboard display name, not its unique identifier.',
       modelValue: dashboard.title,

@@ -86,6 +86,30 @@ export default defineComponent({
       );
     }
 
+    function changeDashboardPath(): void {
+      if (!dashboard.value) {
+        return;
+      }
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          title: 'Set dashboard path',
+          message:
+            'Dashboards with the same path are shown together. ' +
+            'Use / to created nested directories.',
+          modelValue: dashboard.value.path ?? '',
+        },
+      }).onOk((path: string) => {
+        if (!dashboard.value) {
+          return;
+        }
+        dashboardStore.saveDashboard({
+          ...dashboard.value,
+          path,
+        });
+      });
+    }
+
     function removeDashboard(): void {
       if (!dashboard.value) {
         return;
@@ -101,6 +125,7 @@ export default defineComponent({
       showWizard,
       changeDashboardId,
       changeDashboardTitle,
+      changeDashboardPath,
       removeDashboard,
     };
   },
@@ -126,17 +151,22 @@ export default defineComponent({
       />
       <ActionItem
         icon="edit"
-        label="Change dashboard URL"
+        label="Change URL"
         @click="changeDashboardId"
       />
       <ActionItem
         icon="edit"
-        label="Rename dashboard"
+        label="Change name"
         @click="changeDashboardTitle"
       />
       <ActionItem
+        icon="edit"
+        label="Change path"
+        @click="changeDashboardPath"
+      />
+      <ActionItem
         icon="delete"
-        label="Remove dashboard"
+        label="Remove"
         @click="removeDashboard"
       />
     </template>
