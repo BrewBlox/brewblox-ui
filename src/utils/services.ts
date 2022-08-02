@@ -31,7 +31,7 @@ export async function startCreateService(
     });
   } else {
     const service = await feature.wizard(stub);
-    await serviceStore.appendService(service);
+    await serviceStore.createService(service);
     notify.done(`Added ${feature.title} <b>${service.id}</b>`);
     if (router) {
       router.push(`/service/${service.id}`);
@@ -60,6 +60,25 @@ export function startChangeServiceTitle(service: Maybe<Service>): void {
 
     await serviceStore.saveService({ ...service, title: newTitle });
     notify.done(`Renamed service to <b>${newTitle}</b>`);
+  });
+}
+
+export function startChangeServiceDir(service: Maybe<Service>): void {
+  if (!service) {
+    return;
+  }
+  createDialog({
+    component: 'InputDialog',
+    componentProps: {
+      title: 'Set service directory',
+      message:
+        'Services with the same directory are shown together. ' +
+        'Use / to created nested directories.',
+      modelValue: service.dir ?? '',
+    },
+  }).onOk((dir: string) => {
+    const serviceStore = useServiceStore();
+    serviceStore.saveService({ ...service, dir });
   });
 }
 

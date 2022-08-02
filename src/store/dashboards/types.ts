@@ -15,20 +15,10 @@ export interface Dashboard extends StoreObject {
   title: string;
 
   /**
-   * Sorting order among other dashboards.
-   */
-  order: number;
-
-  /**
-   * Whether the dashboard is shown in the sidebar. Defaults to true.
-   */
-  listed?: boolean;
-
-  /**
    * Dashboards are rendered in a tree structure.
    * Directories do not have to be created.
-   * They will be present if present in at least one Dashboard path.
+   * They will be present if present in at least one Dashboard dir.
    * Values are /-separated, and are not used in routing.
    */
-  path?: string;
+  dir?: string;
 }

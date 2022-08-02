@@ -1,17 +1,14 @@
-import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { FermentConfig } from './types';
 
 export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
-  const builderStore = useBuilderStore();
   const serviceId = config.serviceId;
   return [
     {
       id: nanoid(),
       title: withPrefix(config.prefix, 'Layout'),
-      order: builderStore.layouts.length + 1,
       width: 8,
       height: 10,
       parts: [

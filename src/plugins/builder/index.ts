@@ -40,7 +40,6 @@ const plugin: Plugin = {
             width: DEFAULT_LAYOUT_WIDTH,
             height: DEFAULT_LAYOUT_HEIGHT,
             parts: config.parts,
-            order: builderStore.layouts.length + 1,
           });
 
           const layoutIds: string[] = config.layoutIds ?? [];

@@ -3,54 +3,72 @@ import { useGlobals } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { QTreeNode } from 'quasar';
-import { computed, defineComponent, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import isArray from 'lodash/isArray';
+import nth from 'lodash/nth';
+import { QTreeNode, useQuasar } from 'quasar';
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-const dashboardSorter = makeObjectSorter<Dashboard>('order');
+const sorter = makeObjectSorter<Dashboard>('dir', 'title');
 
 export default defineComponent({
   name: 'DashboardIndex',
-  props: {
-    editing: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  emits: ['update:editing'],
   setup() {
     const dashboardStore = useDashboardStore();
     const { dense } = useGlobals.setup();
+    const route = useRoute();
     const router = useRouter();
+    const { localStorage } = useQuasar();
 
-    const dashboards = computed<Dashboard[]>({
+    const selected = ref<string | null>(null);
+    const _expanded = ref<string[]>([]);
+
+    const expanded = computed<string[]>({
+      get: () => _expanded.value,
+      set: (v) => {
+        _expanded.value = v;
+        localStorage.set('dashboard_expanded', v);
+      },
+    });
+
+    onBeforeMount(() => {
+      const stored = localStorage.getItem('dashboard_expanded');
+      if (isArray(stored)) {
+        _expanded.value = stored;
+      }
+    });
+
+    const dashboards = computed<Dashboard[]>(
       // Avoid modifying the store object when calling sort()
-      get: () =>
-        [...dashboardStore.dashboards]
-          .filter((dashboard) => dashboard.listed ?? true)
-          .sort(dashboardSorter),
-      set: (dashboards) =>
-        dashboardStore.updateDashboardOrder(dashboards.map((v) => v.id)),
+      () => [...dashboardStore.dashboards].sort(sorter),
+    );
+
+    const activePath = computed<string | null>(() => {
+      const dashboard = dashboards.value.find(
+        (v) => `/dashboard/${v.id}` === route.path,
+      );
+      return dashboard ? `${dashboard.dir ?? ''}/${dashboard.id}` : null;
     });
 
     const nodes = computed<QTreeNode[]>(() => {
       const rootNodes: QTreeNode[] = [];
 
       dashboards.value.forEach((dashboard) => {
-        const path = dashboard.path ?? '';
-        const slugs = path.split('/').filter((s) => s !== '');
+        const dir = dashboard.dir ?? '';
+        const dirPaths = intermediatePaths(dir);
         let nodes = rootNodes;
 
-        slugs.forEach((slug: string, i: number) => {
-          const path = slugs.slice(0, i + 1).join('/') + '/';
-          const existing = nodes.find((n) => n.id === path && n.children);
+        dirPaths.forEach((path: string) => {
+          const id = `dir://${path}`;
+          const existing = nodes.find((n) => n.id === id);
           if (existing) {
             nodes = existing.children!;
           } else {
             const children = [];
             nodes.push({
-              id: path,
-              label: slug,
+              id,
+              path,
+              label: nth(path.split('/'), -1),
               children,
               handler: (node) => {
                 if (expanded.value.includes(node.id)) {
@@ -67,9 +85,8 @@ export default defineComponent({
         nodes.push({
           id: dashboard.id,
           label: dashboard.title,
+          path: `${dir}/${dashboard.id}`,
           url: `/dashboard/${dashboard.id}`,
-          body: 'dashboard',
-          path,
           handler: (node) => router.push(node.url),
         });
       });
@@ -77,8 +94,10 @@ export default defineComponent({
       return rootNodes;
     });
 
-    const selected = ref<string | null>(null);
-    const expanded = ref<string[]>([]);
+    function intermediatePaths(path: string): string[] {
+      const slugs = path.split('/').filter((s) => s !== '');
+      return slugs.map((_, i) => slugs.slice(0, i + 1).join('/'));
+    }
 
     function startWizard(): void {
       createDialog({
@@ -89,25 +108,13 @@ export default defineComponent({
       });
     }
 
-    onMounted(() => {
-      const activePath = router.currentRoute.value.path;
-      const activeDashboard = dashboards.value.find(
-        (v) => activePath === `/dashboard/${v.id}`,
-      );
-      if (activeDashboard && activeDashboard.path) {
-        const slugs = activeDashboard.path.split('/').filter((s) => s !== '');
-        expanded.value = slugs.map(
-          (_, i) => slugs.slice(0, i + 1).join('/') + '/',
-        );
-      }
-    });
-
     return {
       dense,
       dashboards,
       nodes,
       selected,
       expanded,
+      activePath,
       startWizard,
     };
   },
@@ -129,19 +136,6 @@ export default defineComponent({
           <q-tooltip>Add dashboard</q-tooltip>
         </q-btn>
       </q-item-section>
-      <q-item-section class="col-auto">
-        <q-btn
-          :disable="dashboards.length === 0"
-          :color="editing ? 'primary' : ''"
-          icon="mdi-sort"
-          round
-          flat
-          size="sm"
-          @click="$emit('update:editing', !editing)"
-        >
-          <q-tooltip> Rearrange dashboards </q-tooltip>
-        </q-btn>
-      </q-item-section>
     </q-item>
 
     <q-tree
@@ -151,29 +145,10 @@ export default defineComponent({
       node-key="id"
     >
       <template #default-header="{ node }">
-        <span :class="[node.url === $route.path && 'text-primary']">{{
+        <span :class="[activePath?.startsWith(node.path) && 'text-primary']">{{
           node.label
         }}</span>
-      </template>
-      <template
-        v-if="editing"
-        #body-dashboard="{ node }"
-      >
-        <div
-          v-if="editing"
-          :class="[!node.path && 'q-pl-lg']"
-          class="col"
-        >
-          body
-        </div>
       </template>
     </q-tree>
   </div>
 </template>
-
-<style scoped>
-.bordered {
-  border: 1px solid whitesmoke;
-  margin-top: 2px;
-}
-</style>

@@ -1,7 +1,6 @@
 import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
 import { upgradeMetricsConfig } from '@/plugins/history/utils';
 import { concatById, filterById, findById } from '@/utils/collections';
-import { nullFilter } from '@/utils/functional';
 import { defineStore } from 'pinia';
 import api from './api';
 
@@ -61,20 +60,6 @@ export const useBuilderStore = defineStore('builderStore', {
         this.lastLayoutId = null;
       }
       await api.remove(layout); // triggers callback
-    },
-
-    async updateLayoutOrder(ids: string[]): Promise<void> {
-      await Promise.all(
-        ids
-          .map((id) => this.layoutById(id))
-          .filter(nullFilter)
-          .map((layout, idx) => {
-            const order = idx + 1;
-            if (order !== layout.order) {
-              this.saveLayout({ ...layout, order });
-            }
-          }),
-      );
     },
 
     async start(): Promise<void> {

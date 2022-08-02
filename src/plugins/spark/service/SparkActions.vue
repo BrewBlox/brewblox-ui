@@ -9,7 +9,11 @@ import { Service, useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
-import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
+import {
+  startChangeServiceDir,
+  startChangeServiceTitle,
+  startRemoveService,
+} from '@/utils/services';
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -38,15 +42,6 @@ export default defineComponent({
         const homePage =
           v && service.value ? `/service/${props.serviceId}` : null;
         systemStore.patchUserUISettings({ homePage });
-      },
-    });
-
-    const listed = computed<boolean>({
-      get: () => service.value?.listed ?? true,
-      set: (v) => {
-        if (service.value) {
-          serviceStore.saveService({ ...service.value, listed: v });
-        }
       },
     });
 
@@ -80,10 +75,10 @@ export default defineComponent({
       createBlockWizard,
       cleanUnusedNames,
       startChangeServiceTitle,
+      startChangeServiceDir,
       removeService,
       service,
       isHomePage,
-      listed,
       serviceReboot,
       controllerReboot,
       startDialog,
@@ -153,14 +148,15 @@ export default defineComponent({
         icon="home"
         :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
-      <ToggleAction
-        v-model="listed"
-        label="Show in sidebar"
+      <ActionItem
+        icon="edit"
+        label="Change service name"
+        @click="startChangeServiceTitle(service)"
       />
       <ActionItem
         icon="edit"
-        label="Rename service"
-        @click="startChangeServiceTitle(service)"
+        label="Change service directory"
+        @click="startChangeServiceDir(service)"
       />
       <ActionItem
         icon="delete"

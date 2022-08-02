@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useBuilderStore } from '@/plugins/builder/store';
-import { useDashboardStore } from '@/store/dashboards';
+import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useServiceStore } from '@/store/services';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
@@ -8,7 +8,7 @@ import { makeObjectSorter } from '@/utils/functional';
 import { computed, defineComponent, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
-const dashboardSorter = makeObjectSorter('order');
+const dashboardSorter = makeObjectSorter<Dashboard>('dir', 'id');
 
 export default defineComponent({
   name: 'IndexPage',

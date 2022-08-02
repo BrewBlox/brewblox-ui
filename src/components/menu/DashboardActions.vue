@@ -41,15 +41,6 @@ export default defineComponent({
         }),
     });
 
-    const listed = computed<boolean>({
-      get: () => dashboard.value?.listed ?? true,
-      set: (v) => {
-        if (dashboard.value) {
-          dashboardStore.saveDashboard({ ...dashboard.value, listed: v });
-        }
-      },
-    });
-
     function showWizard(): void {
       createDialog({
         component: 'WizardDialog',
@@ -86,27 +77,26 @@ export default defineComponent({
       );
     }
 
-    function changeDashboardPath(): void {
+    function changeDashboardDir(): void {
       if (!dashboard.value) {
         return;
       }
       createDialog({
         component: 'InputDialog',
         componentProps: {
-          title: 'Set dashboard path',
+          title: 'Set dashboard directory',
           message:
-            'Dashboards with the same path are shown together. ' +
+            'Dashboards with the same directory are shown together. ' +
             'Use / to created nested directories.',
-          modelValue: dashboard.value.path ?? '',
+          modelValue: dashboard.value.dir ?? '',
         },
-      }).onOk((path: string) => {
-        if (!dashboard.value) {
-          return;
+      }).onOk((dir: string) => {
+        if (dashboard.value) {
+          dashboardStore.saveDashboard({
+            ...dashboard.value,
+            dir,
+          });
         }
-        dashboardStore.saveDashboard({
-          ...dashboard.value,
-          path,
-        });
       });
     }
 
@@ -121,11 +111,10 @@ export default defineComponent({
       dashboard,
       title,
       isHomePage,
-      listed,
       showWizard,
       changeDashboardId,
       changeDashboardTitle,
-      changeDashboardPath,
+      changeDashboardDir,
       removeDashboard,
     };
   },
@@ -145,24 +134,20 @@ export default defineComponent({
         icon="home"
         :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
-      <ToggleAction
-        v-model="listed"
-        label="Show in sidebar"
-      />
       <ActionItem
         icon="edit"
-        label="Change URL"
-        @click="changeDashboardId"
-      />
-      <ActionItem
-        icon="edit"
-        label="Change name"
+        label="Change dashboard name"
         @click="changeDashboardTitle"
       />
       <ActionItem
         icon="edit"
-        label="Change path"
-        @click="changeDashboardPath"
+        label="Change dashboard URL"
+        @click="changeDashboardId"
+      />
+      <ActionItem
+        icon="edit"
+        label="Change dashboard directory"
+        @click="changeDashboardDir"
       />
       <ActionItem
         icon="delete"

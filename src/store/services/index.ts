@@ -53,25 +53,11 @@ export const useServiceStore = defineStore('serviceStore', {
     async createService(service: Service): Promise<void> {
       await api.create(service); // triggers callback
     },
-    async appendService(service: Service): Promise<void> {
-      const order = this.services.length + 1;
-      await this.createService({ ...service, order });
-    },
     async saveService(service: Service): Promise<void> {
       await api.persist(service); // triggers callback
     },
     async removeService(service: Service): Promise<void> {
       await api.remove(service); // triggers callback
-    },
-    async updateServiceOrder(ids: string[]): Promise<void> {
-      await Promise.all(
-        ids
-          .map((id) => this.serviceById(id))
-          .filter((v) => v !== null)
-          .map((service: Service | null, idx) =>
-            this.saveService({ ...service!, order: idx + 1 }),
-          ),
-      );
     },
     async ensureStub(stub: ServiceStub): Promise<void> {
       this.trySetStub(stub);

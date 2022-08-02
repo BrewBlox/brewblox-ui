@@ -1,24 +1,17 @@
 import isEqual from 'lodash/isEqual';
 
 /**
- * Returns a function that will sort objects by one of their properties.
- * If both values are numbers, they will be compared directly.
- * Otherwise, they will be compared as string.
+ * Returns a function that will sort objects by one or more of their properties.
  *
  */
-export function makeObjectSorter<T>(key: keyof T): (a: T, b: T) => number {
+export function makeObjectSorter<T>(
+  ...keys: (keyof T)[]
+): (a: T, b: T) => number {
   return (a: T, b: T) => {
-    const left = a[key] ?? 0;
-    const right = b[key] ?? 0;
+    const lhs = keys.map((k) => `${a[k] ?? ''}`).join('');
+    const rhs = keys.map((k) => `${b[k] ?? ''}`).join('');
 
-    if (typeof left === 'number' && typeof right === 'number') {
-      return left - right;
-    } else {
-      return `${left}`.localeCompare(`${right}`, undefined, {
-        sensitivity: 'base',
-        ignorePunctuation: true,
-      });
-    }
+    return lhs.localeCompare(rhs, undefined, { sensitivity: 'base' });
   };
 }
 

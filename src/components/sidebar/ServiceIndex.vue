@@ -9,39 +9,57 @@ import {
 } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startCreateService } from '@/utils/services';
-import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
+import isArray from 'lodash/isArray';
+import nth from 'lodash/nth';
+import { QTreeNode, useQuasar } from 'quasar';
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 interface ServiceSuggestion {
   stub: ServiceStub;
   feature: ServiceFeature;
 }
 
-const serviceSorter = makeObjectSorter<Service>('order');
+const sorter = makeObjectSorter<Service>('dir', 'title');
 
 export default defineComponent({
   name: 'ServiceIndex',
-  props: {
-    editing: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  emits: ['update:editing'],
   setup() {
     const serviceStore = useServiceStore();
     const featureStore = useFeatureStore();
+    const route = useRoute();
     const router = useRouter();
     const { dense } = useGlobals.setup();
+    const { localStorage } = useQuasar();
 
-    const services = computed<Service[]>({
-      // avoid modifying the store object
-      get: () =>
-        [...serviceStore.services]
-          .filter((service) => service.listed ?? true)
-          .sort(serviceSorter),
-      set: (services) =>
-        serviceStore.updateServiceOrder(services.map((v) => v.id)),
+    const selected = ref<string | null>(null);
+    const _expanded = ref<string[]>([]);
+
+    const expanded = computed<string[]>({
+      get: () => _expanded.value,
+      set: (v) => {
+        _expanded.value = v;
+        localStorage.set('service_expanded', v);
+      },
+    });
+
+    onBeforeMount(() => {
+      const stored = localStorage.getItem('service_expanded');
+      if (isArray(stored)) {
+        _expanded.value = stored;
+      }
+    });
+
+    const services = computed<Service[]>(
+      // Avoid modifying the store object when calling sort()
+      () => [...serviceStore.services].sort(sorter),
+    );
+
+    const activePath = computed<string | null>(() => {
+      const service = services.value.find(
+        (v) => `/service/${v.id}` === route.path,
+      );
+      return service ? `${service.dir ?? ''}/${service.id}` : null;
     });
 
     const suggestions = computed<ServiceSuggestion[]>(() =>
@@ -52,6 +70,69 @@ export default defineComponent({
         })
         .filter(({ feature }) => feature !== null),
     );
+
+    const nodes = computed<QTreeNode[]>(() => {
+      const rootNodes: QTreeNode[] = [];
+
+      services.value.forEach((service) => {
+        const dir = service.dir ?? '';
+        const dirPaths = intermediatePaths(dir);
+        let nodes = rootNodes;
+
+        dirPaths.forEach((path: string) => {
+          const id = `dir://${path}`;
+          const existing = nodes.find((n) => n.id === id);
+          if (existing) {
+            nodes = existing.children!;
+          } else {
+            const children = [];
+            nodes.push({
+              id,
+              path,
+              label: nth(path.split('/'), -1),
+              children,
+              handler: (node) => {
+                if (expanded.value.includes(node.id)) {
+                  expanded.value = expanded.value.filter((s) => s !== node.id);
+                } else {
+                  expanded.value = [...expanded.value, node.id];
+                }
+              },
+            });
+            nodes = children;
+          }
+        });
+
+        nodes.push({
+          id: service.id,
+          label: service.title,
+          path: `${dir}/${service.id}`,
+          url: `/service/${service.id}`,
+          status: serviceStore.statuses.find((v) => v.id === service.id),
+          handler: (node) => router.push(node.url),
+        });
+      });
+
+      suggestions.value.forEach((suggestion) => {
+        const { stub, feature } = suggestion;
+        rootNodes.push({
+          stub,
+          feature,
+          id: stub.id,
+          label: stub.id,
+          header: 'suggestion',
+          body: 'suggestion',
+          handler: (node) => createService(node.stub),
+        });
+      });
+
+      return rootNodes;
+    });
+
+    function intermediatePaths(path: string): string[] {
+      const slugs = path.split('/').filter((s) => s !== '');
+      return slugs.map((_, i) => slugs.slice(0, i + 1).join('/'));
+    }
 
     function status(service: Service): ServiceStatus | null {
       return serviceStore.statuses.find((v) => v.id === service.id) ?? null;
@@ -65,6 +146,10 @@ export default defineComponent({
       dense,
       services,
       suggestions,
+      activePath,
+      selected,
+      expanded,
+      nodes,
       status,
       createService,
     };
@@ -73,89 +158,48 @@ export default defineComponent({
 </script>
 
 <template>
-  <vue-draggable
-    v-model="services"
-    :disabled="dense || !editing"
-    item-key="id"
-  >
-    <template #header>
-      <q-item class="q-pb-none">
-        <q-item-section>
-          <q-item-section class="text-bold"> Services </q-item-section>
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn
-            :disable="services.length === 0"
-            :color="editing ? 'primary' : ''"
-            icon="mdi-sort"
-            round
-            flat
-            size="sm"
-            @click="$emit('update:editing', !editing)"
-          >
-            <q-tooltip> Rearrange services </q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
-    </template>
+  <div>
+    <q-item class="q-pb-none">
+      <q-item-section class="text-bold"> Services </q-item-section>
+    </q-item>
 
-    <template #item="{ element }">
-      <q-item
-        :to="editing ? undefined : `/service/${element.id}`"
-        :inset-level="0.2"
-        :class="['q-pb-sm', editing && 'bordered pointer']"
-        style="min-height: 0px"
-      >
-        <q-item-section :class="['ellipsis', { 'text-italic': editing }]">
-          {{ element.title }}
+    <q-tree
+      v-model:selected="selected"
+      v-model:expanded="expanded"
+      :nodes="nodes"
+      node-key="id"
+    >
+      <template #default-header="{ node }">
+        <q-item-section
+          :class="[activePath?.startsWith(node.path) && 'text-primary']"
+        >
+          {{ node.label }}
         </q-item-section>
-        <template v-if="status(element) !== null">
+        <template v-if="node.status">
           <q-item-section class="col-auto q-mr-sm">
             <q-icon
-              :name="status(element)?.icon || 'mdi-checkbox-blank-circle'"
-              :color="status(element)?.color"
+              :name="node.status.icon || 'mdi-checkbox-blank-circle'"
+              :color="node.status.color"
             />
             <q-tooltip>
-              {{ status(element)?.desc }}
+              {{ node.status.desc }}
             </q-tooltip>
           </q-item-section>
         </template>
-      </q-item>
-    </template>
-
-    <template #footer>
-      <q-item
-        v-for="{ stub, feature } in suggestions"
-        :key="stub.id"
-        :inset-level="0.2"
-        class="q-pb-sm darkish"
-        style="min-height: 0px"
-        clickable
-        @click="createService(stub)"
-      >
-        <q-item-section class="col-auto">
-          <q-icon
-            name="add"
-            size="xs"
-          />
+      </template>
+      <template #header-suggestion="{ node }">
+        <q-item-section class="col ellipsis text-secondary">
+          {{ node.stub.id }}
         </q-item-section>
-        <q-item-section class="ellipsis">
-          {{ stub.id }}
-        </q-item-section>
-        <q-item-section class="col-auto text-grey text-italic">
+        <q-item-section class="col-auto text-grey text-italic q-mr-sm">
           Click to add
         </q-item-section>
         <q-tooltip>
-          Click to create UI service for {{ feature.title }} '{{ stub.id }}'
+          Click to create UI service for
+          {{ node.feature.title }}
+          '{{ node.stub.id }}'
         </q-tooltip>
-      </q-item>
-    </template>
-  </vue-draggable>
+      </template>
+    </q-tree>
+  </div>
 </template>
-
-<style scoped>
-.bordered {
-  border: 1px solid whitesmoke;
-  margin-top: 2px;
-}
-</style>

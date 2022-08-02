@@ -417,7 +417,7 @@ export async function startAddLayout(
     component: 'InputDialog',
     componentProps: {
       modelValue: 'Brewery Layout',
-      title: 'Add Layout',
+      title: 'New Layout',
       message: 'Create a new Brewery Builder layout',
     },
   });
@@ -432,7 +432,6 @@ export async function startAddLayout(
     width: source?.width ?? DEFAULT_LAYOUT_WIDTH,
     height: source?.height ?? DEFAULT_LAYOUT_HEIGHT,
     parts: deepCopy(source?.parts) ?? [],
-    order: builderStore.layouts.length + 1,
   });
   return id;
 }

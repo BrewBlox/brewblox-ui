@@ -3,7 +3,11 @@ import { TiltService } from '@/plugins/tilt/types';
 import { Service, useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
-import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
+import {
+  startChangeServiceDir,
+  startChangeServiceTitle,
+  startRemoveService,
+} from '@/utils/services';
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -38,26 +42,17 @@ export default defineComponent({
       },
     });
 
-    const listed = computed<boolean>({
-      get: () => service.value?.listed ?? true,
-      set: (v) => {
-        if (service.value) {
-          serviceStore.saveService({ ...service.value, listed: v });
-        }
-      },
-    });
-
     function removeService(service: Maybe<Service>): void {
       startRemoveService(service, router);
     }
 
     return {
+      startChangeServiceDir,
       startChangeServiceTitle,
       removeService,
       service,
       serviceTitle,
       isHomePage,
-      listed,
     };
   },
 });
@@ -70,14 +65,15 @@ export default defineComponent({
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
-    <ToggleAction
-      v-model="listed"
-      label="Show in sidebar"
+    <ActionItem
+      icon="edit"
+      label="Change service name"
+      @click="startChangeServiceTitle(service)"
     />
     <ActionItem
       icon="edit"
-      label="Rename service"
-      @click="startChangeServiceTitle(service)"
+      label="Change service directory"
+      @click="startChangeServiceDir(service)"
     />
     <ActionItem
       icon="delete"

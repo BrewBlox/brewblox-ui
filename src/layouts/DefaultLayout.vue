@@ -1,6 +1,5 @@
 <script lang="ts">
 import { useGlobals } from '@/composables';
-import { userUISettings } from '@/user-settings';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -12,10 +11,7 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const router = useRouter();
 
-    const devMode = Boolean(import.meta.env.DEV);
-    const dashboardEditing = ref<boolean>(false);
-    const serviceEditing = ref<boolean>(false);
-    const builderEditing = ref<boolean>(false);
+    const devMode = Boolean((import.meta as any).env.DEV);
 
     const _drawerOpen = ref<boolean>(
       localStorage.getItem('drawer') ?? !dense.value,
@@ -28,30 +24,13 @@ export default defineComponent({
       },
     });
 
-    const showSidebarLayouts = computed<boolean>(
-      () =>
-        userUISettings.value.showSidebarLayouts ||
-        /^\/(builder|brewery)/.test(router.currentRoute.value.path),
-    );
-
-    function stopEditing(): void {
-      dashboardEditing.value = false;
-      serviceEditing.value = false;
-      builderEditing.value = false;
-    }
-
     function routeActive(route: string): boolean {
       return Boolean(router.currentRoute.value.path.match(route));
     }
 
     return {
       devMode,
-      dashboardEditing,
-      serviceEditing,
-      builderEditing,
       drawerOpen,
-      showSidebarLayouts,
-      stopEditing,
       routeActive,
     };
   },
@@ -86,12 +65,9 @@ export default defineComponent({
         class="col"
         :thumb-style="{ opacity: '0.5', background: 'silver' }"
       >
-        <DashboardIndex v-model:editing="dashboardEditing" />
-        <BreweryIndex
-          v-if="showSidebarLayouts"
-          v-model:editing="builderEditing"
-        />
-        <ServiceIndex v-model:editing="serviceEditing" />
+        <DashboardIndex />
+        <BreweryIndex />
+        <ServiceIndex />
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
@@ -107,10 +83,7 @@ export default defineComponent({
       </div>
     </q-drawer>
 
-    <q-page-container
-      style="overflow: hidden"
-      @click="stopEditing"
-    >
+    <q-page-container style="overflow: hidden">
       <router-view />
     </q-page-container>
   </q-layout>

@@ -16,14 +16,12 @@ export interface Service<ConfigT = any> extends StoreObject {
   title: string;
 
   /**
-   * Sorting order among other services.
+   * Services are rendered in a tree structure.
+   * Directories do not have to be created.
+   * They will be present if present in at least one Service dir.
+   * Values are /-separated, and are not used in routing.
    */
-  order: number;
-
-  /**
-   * Whether the service is shown in the sidebar. Defaults to true.
-   */
-  listed?: boolean;
+  dir?: string;
 
   /**
    * Foreign key to `ServiceFeature.id`

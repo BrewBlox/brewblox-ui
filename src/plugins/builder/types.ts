@@ -74,10 +74,8 @@ export interface BuilderLayout extends StoreObject {
   title: string;
   width: number;
   height: number;
-  order: number;
-  listed?: boolean;
   parts: PersistentPart[];
-  path?: string;
+  dir?: string;
 }
 
 export interface BuilderConfig {

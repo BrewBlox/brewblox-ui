@@ -44,15 +44,6 @@ export default defineComponent({
       props.noLabel ? null : title.value,
     );
 
-    const listed = computed<boolean>({
-      get: () => props.layout?.listed ?? true,
-      set: (v) => {
-        if (props.layout) {
-          builderStore.saveLayout({ ...props.layout, listed: v });
-        }
-      },
-    });
-
     const isHomePage = computed<boolean>({
       get: () =>
         userUISettings.value.homePage === `/brewery/${props.layout?.id}`,
@@ -85,8 +76,31 @@ export default defineComponent({
       saveFile(exported, `brewblox-${props.layout.title}-layout.json`);
     }
 
-    function renameLayout(): void {
+    function changeLayoutTitle(): void {
       startChangeLayoutTitle(props.layout);
+    }
+
+    function changeLayoutDir(): void {
+      if (!props.layout) {
+        return;
+      }
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          title: 'Set layout directory',
+          message:
+            'Layouts with the same directory are shown together. ' +
+            'Use / to created nested directories.',
+          modelValue: props.layout.dir ?? '',
+        },
+      }).onOk((dir: string) => {
+        if (props.layout) {
+          builderStore.saveLayout({
+            ...props.layout,
+            dir,
+          });
+        }
+      });
     }
 
     function clearParts(): void {
@@ -170,12 +184,12 @@ export default defineComponent({
 
     return {
       label,
-      listed,
       inEditor,
       isHomePage,
       selectLayout,
       copyLayout,
-      renameLayout,
+      changeLayoutTitle,
+      changeLayoutDir,
       createLayoutWidget,
       exportLayout,
       clearParts,
@@ -196,10 +210,6 @@ export default defineComponent({
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
-    <ToggleAction
-      v-model="listed"
-      label="Show in sidebar"
-    />
     <ActionItem
       icon="file_copy"
       label="Copy layout"
@@ -207,12 +217,17 @@ export default defineComponent({
     />
     <ActionItem
       icon="edit"
-      label="Rename layout"
-      @click="renameLayout"
+      label="Change layout name"
+      @click="changeLayoutTitle"
+    />
+    <ActionItem
+      icon="edit"
+      label="Change layout directory"
+      @click="changeLayoutDir"
     />
     <ActionItem
       icon="dashboard"
-      label="Show layout on dashboard"
+      label="Create widget for layout"
       @click="createLayoutWidget"
     />
     <ActionItem
