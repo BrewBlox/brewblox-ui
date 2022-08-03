@@ -25,12 +25,11 @@
     "lib": [
       "ESNext",
       "DOM",
-      "DOM.Iterable",
-      "ScriptHost"
+      "DOM.Iterable"
     ],
     "types": [
-      "quasar",
-      "vite/client"
+      "vite/client",
+      "quasar"
     ]
   },
   "include": [

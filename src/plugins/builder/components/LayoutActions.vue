@@ -4,6 +4,7 @@ import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import {
   startAddLayout,
   startChangeLayoutTitle,
+  startRemoveLayout,
 } from '@/plugins/builder/utils';
 import { useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
@@ -119,20 +120,7 @@ export default defineComponent({
     }
 
     function removeLayout(): void {
-      if (!props.layout) {
-        return;
-      }
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: 'Remove layout',
-          message: `Are you sure you wish to remove ${props.layout.title}?`,
-          noBackdropDismiss: true,
-        },
-      }).onOk(async () => {
-        if (props.layout) {
-          await builderStore.removeLayout(props.layout).catch(() => {});
-        }
+      startRemoveLayout(props.layout, () => {
         const [id] = layoutIds.value;
         selectLayout(id || null);
       });

@@ -21,7 +21,7 @@ export interface Service<ConfigT = any> extends StoreObject {
    * They will be present if present in at least one Service dir.
    * Values are /-separated, and are not used in routing.
    */
-  dir?: string;
+  dir?: string | null;
 
   /**
    * Foreign key to `ServiceFeature.id`

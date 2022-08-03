@@ -20,5 +20,5 @@ export interface Dashboard extends StoreObject {
    * They will be present if present in at least one Dashboard dir.
    * Values are /-separated, and are not used in routing.
    */
-  dir?: string;
+  dir?: string | null;
 }

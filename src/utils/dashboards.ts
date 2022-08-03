@@ -112,7 +112,10 @@ export function startChangeDashboardTitle(
   });
 }
 
-export function startRemoveDashboard(dashboard: Dashboard): void {
+export function startRemoveDashboard(dashboard: Maybe<Dashboard>): void {
+  if (!dashboard) {
+    return;
+  }
   createDialog({
     component: 'ConfirmDialog',
     componentProps: {

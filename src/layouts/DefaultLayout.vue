@@ -1,5 +1,6 @@
 <script lang="ts">
 import { useGlobals } from '@/composables';
+import { startCreateDirectory } from '@/store/sidebar/utils';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -11,7 +12,8 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const router = useRouter();
 
-    const devMode = Boolean((import.meta as any).env.DEV);
+    const devMode = Boolean(import.meta.env.DEV);
+    const editing = ref<boolean>(false);
 
     const _drawerOpen = ref<boolean>(
       localStorage.getItem('drawer') ?? !dense.value,
@@ -28,10 +30,16 @@ export default defineComponent({
       return Boolean(router.currentRoute.value.path.match(route));
     }
 
+    function createDirectory(): void {
+      startCreateDirectory(null);
+    }
+
     return {
       devMode,
+      editing,
       drawerOpen,
       routeActive,
+      createDirectory,
     };
   },
 });
@@ -65,9 +73,7 @@ export default defineComponent({
         class="col"
         :thumb-style="{ opacity: '0.5', background: 'silver' }"
       >
-        <DashboardIndex />
-        <BreweryIndex />
-        <ServiceIndex />
+        <SidebarIndex :editing="editing" />
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
@@ -80,6 +86,20 @@ export default defineComponent({
         >
           <q-tooltip> Theming </q-tooltip>
         </q-btn>
+        <q-space />
+        <q-btn
+          flat
+          round
+          icon="mdi-folder-plus"
+          @click="createDirectory"
+        />
+        <q-btn
+          :color="editing ? 'primary' : ''"
+          flat
+          round
+          icon="edit"
+          @click="editing = !editing"
+        />
       </div>
     </q-drawer>
 

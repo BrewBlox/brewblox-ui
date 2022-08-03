@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 declare const __BREWBLOX_BUILD_DATE: string;
 declare const __BREWBLOX_PERFORMANCE: boolean;
 declare const __BREWBLOX_API_PROTOCOL: 'http' | 'https' | undefined;

@@ -436,7 +436,7 @@ export async function startAddLayout(
   return id;
 }
 
-export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
+export function startChangeLayoutTitle(layout: Maybe<BuilderLayout>): void {
   if (!layout) {
     return;
   }
@@ -452,5 +452,28 @@ export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
     if (layout) {
       builderStore.saveLayout({ ...layout, title });
     }
+  });
+}
+
+export function startRemoveLayout(
+  layout: Maybe<BuilderLayout>,
+  onDone: () => unknown = () => {},
+): void {
+  if (!layout) {
+    return;
+  }
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: 'Remove layout',
+      message: `Are you sure you wish to remove ${layout.title}?`,
+      noBackdropDismiss: true,
+    },
+  }).onOk(async () => {
+    if (layout) {
+      const builderStore = useBuilderStore();
+      await builderStore.removeLayout(layout).catch(() => {});
+    }
+    onDone();
   });
 }
