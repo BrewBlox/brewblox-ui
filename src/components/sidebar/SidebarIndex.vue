@@ -13,11 +13,11 @@ import {
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { ServiceFeature, useFeatureStore } from '@/store/features';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
-import { SidebarDirectory, useSidebarStore } from '@/store/sidebar';
+import { SidebarFolder, useSidebarStore } from '@/store/sidebar';
 import {
-  startChangeDirectoryTitle,
-  startCreateDirectory,
-  startRemoveDirectory,
+  startChangeFolderTitle,
+  startCreateFolder,
+  startRemoveFolder,
 } from '@/store/sidebar/utils';
 import {
   startChangeDashboardTitle,
@@ -34,6 +34,7 @@ import isArray from 'lodash/isArray';
 import { QTreeNode, useQuasar } from 'quasar';
 import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
 type SidebarObject = Dashboard | Service | BuilderLayout;
 
 interface ServiceSuggestion {
@@ -42,9 +43,10 @@ interface ServiceSuggestion {
 }
 
 const sorter = makeObjectSorter<{ title: string }>('title');
-const dashboardDirNodeId = 'MISC/DASHBOARDS';
-const layoutDirNodeId = 'MISC/LAYOUTS';
-const serviceDirNodeId = 'MISC/SERVICES';
+const dashboardFolderNodeId = 'MISC/DASHBOARDS';
+const layoutFolderNodeId = 'MISC/LAYOUTS';
+const serviceFolderNodeId = 'MISC/SERVICES';
+const spacerNodeId = '/SPACER';
 
 export default defineComponent({
   name: 'SidebarIndex',
@@ -83,8 +85,8 @@ export default defineComponent({
       route.path.startsWith('/builder') ? '/builder' : '/brewery',
     );
 
-    const directories = computed<SidebarDirectory[]>(() =>
-      [...sidebarStore.directories].sort(sorter),
+    const folders = computed<SidebarFolder[]>(() =>
+      [...sidebarStore.folders].sort(sorter),
     );
 
     const objects = computed<SidebarObject[]>(() =>
@@ -104,7 +106,7 @@ export default defineComponent({
         .filter(({ feature }) => feature !== null),
     );
 
-    function directoryHandler(node: QTreeNode): void {
+    function folderHandler(node: QTreeNode): void {
       selected.value = node.id;
       if (expanded.value.includes(node.id)) {
         expanded.value = expanded.value.filter((s) => s !== node.id);
@@ -118,77 +120,57 @@ export default defineComponent({
       const miscLayoutNodes: QTreeNode[] = [];
       const miscServiceNodes: QTreeNode[] = [];
 
-      const rootNodes: QTreeNode[] = [
-        {
-          id: dashboardDirNodeId,
-          kind: 'miscDirectory',
-          parent: null,
-          label: 'Dashboards',
-          icon: 'mdi-view-dashboard',
-          children: miscDashboardNodes,
-          handler: directoryHandler,
-        },
-        {
-          id: layoutDirNodeId,
-          kind: 'miscDirectory',
-          parent: null,
-          label: 'Layouts',
-          icon: 'mdi-tools',
-          children: miscLayoutNodes,
-          handler: directoryHandler,
-        },
-        {
-          id: serviceDirNodeId,
-          kind: 'miscDirectory',
-          parent: null,
-          label: 'Services',
-          icon: 'mdi-code-braces',
-          children: miscServiceNodes,
-          handler: directoryHandler,
-        },
-      ];
+      const rootNodes: QTreeNode[] = [];
 
-      const dirNodes = directories.value.reduce(
-        (acc: Mapped<QTreeNode>, dir: SidebarDirectory) => {
+      const dirNodes = folders.value.reduce(
+        (acc: Mapped<QTreeNode>, dir: SidebarFolder) => {
           return {
             ...acc,
             [dir.id]: {
               id: dir.id,
-              kind: 'directory',
+              kind: 'folder',
               label: dir.title,
-              parent: dir.parent,
+              parent: dir.parentFolder,
               icon: 'mdi-folder',
-              body: 'directory',
+              header: 'folder',
               children: [],
-              handler: directoryHandler,
+              handler: folderHandler,
             },
           };
         },
         {},
       );
 
-      directories.value.forEach((dir) => {
+      folders.value.forEach((dir) => {
         const node = dirNodes[dir.id];
-        if (dir.parent) {
-          const parent = dirNodes[dir.parent];
+        if (dir.parentFolder) {
+          const parent = dirNodes[dir.parentFolder];
           (parent?.children ?? rootNodes).push(node);
         } else {
           rootNodes.push(node);
         }
       });
 
+      if (rootNodes.length) {
+        rootNodes.push({
+          id: spacerNodeId + '/misc',
+          selectable: false,
+          label: '',
+        });
+      }
+
       objects.value.forEach((obj) => {
-        const parent = dirNodes[obj.dir ?? ''];
+        const parent = dirNodes[obj.parentFolder ?? ''];
 
         if (obj.namespace === DASHBOARD_NAMESPACE) {
           (parent?.children ?? miscDashboardNodes).push({
             id: obj.id,
-            parent: obj.dir,
+            parent: obj.parentFolder,
             kind: 'dashboard',
             label: obj.title,
             url: `/dashboard/${obj.id}`,
             icon: 'mdi-view-dashboard',
-            body: 'dashboard',
+            header: 'dashboard',
             handler: (node) => router.push(node.url),
           });
         }
@@ -196,12 +178,12 @@ export default defineComponent({
         if (obj.namespace === LAYOUT_NAMESPACE) {
           (parent?.children ?? miscLayoutNodes).push({
             id: obj.id,
-            parent: obj.dir,
+            parent: obj.parentFolder,
             kind: 'layout',
             label: obj.title,
             url: `${builderRoutePrefix.value}/${obj.id}`,
             icon: 'mdi-tools',
-            body: 'layout',
+            header: 'layout',
             handler: (node) => router.push(node.url),
           });
         }
@@ -209,29 +191,67 @@ export default defineComponent({
         if (obj.namespace === SERVICE_NAMESPACE) {
           (parent?.children ?? miscServiceNodes).push({
             id: obj.id,
-            parent: obj.dir,
+            parent: obj.parentFolder,
             kind: 'service',
             label: obj.title,
             url: `/service/${obj.id}`,
             icon: 'mdi-code-braces',
             header: 'service',
-            body: 'service',
             status: serviceStore.statuses.find((v) => v.id === obj.id),
             handler: (node) => router.push(node.url),
           });
         }
       });
 
+      rootNodes.push(
+        {
+          id: dashboardFolderNodeId,
+          kind: 'miscFolder',
+          parent: null,
+          label: 'Dashboards',
+          icon: 'mdi-view-dashboard',
+          header: 'misc',
+          children: miscDashboardNodes,
+          handler: folderHandler,
+        },
+        {
+          id: layoutFolderNodeId,
+          kind: 'miscFolder',
+          parent: null,
+          label: 'Layouts',
+          icon: 'mdi-tools',
+          header: 'misc',
+          children: miscLayoutNodes,
+          handler: folderHandler,
+        },
+        {
+          id: serviceFolderNodeId,
+          kind: 'miscFolder',
+          parent: null,
+          label: 'Services',
+          icon: 'mdi-code-braces',
+          header: 'misc',
+          children: miscServiceNodes,
+          handler: folderHandler,
+        },
+      );
+
+      if (suggestions.value.length) {
+        rootNodes.push({
+          id: spacerNodeId + '/suggestions',
+          selectable: false,
+          label: '',
+        });
+      }
+
       suggestions.value.forEach((suggestion) => {
         const { stub, feature } = suggestion;
         rootNodes.push({
-          stub,
-          feature,
           id: stub.id,
           label: stub.id,
+          featureTitle: feature.title,
           icon: 'mdi-code-braces',
           header: 'suggestion',
-          body: 'suggestion',
           handler: (node) => startCreateService(node.stub, router),
         });
       });
@@ -239,19 +259,32 @@ export default defineComponent({
       return rootNodes;
     });
 
-    function changeDirectoryTitle(node: QTreeNode): void {
-      startChangeDirectoryTitle(sidebarStore.directoryById(node.id));
+    function findRouteFolders(nodes: QTreeNode[], parents: string[]): string[] {
+      for (const node of nodes) {
+        if (node.url === route.path) {
+          return parents;
+        }
+        if (node.children) {
+          const extendedParents = [...parents, node.id];
+          const childResults = findRouteFolders(node.children, extendedParents);
+          if (childResults.length) {
+            return childResults;
+          }
+        }
+      }
+      return [];
+    }
+
+    const routeFolderIds = computed<string[]>(() =>
+      findRouteFolders(treeNodes.value, []),
+    );
+
+    function changeFolderTitle(node: QTreeNode): void {
+      startChangeFolderTitle(sidebarStore.folderById(node.id));
     }
 
     function changeDashboardTitle(node: QTreeNode): void {
-      const dashboard = dashboardStore.dashboardById(node.id);
-      if (dashboard) {
-        const active = route.path === `/dashboard/${node.id}`;
-        startChangeDashboardTitle(
-          dashboard,
-          (newId) => active && router.replace(`/dashboard/${newId}`),
-        );
-      }
+      startChangeDashboardTitle(dashboardStore.dashboardById(node.id), router);
     }
 
     function changeLayoutTitle(node: QTreeNode): void {
@@ -262,16 +295,16 @@ export default defineComponent({
       startChangeServiceTitle(serviceStore.serviceById(node.id));
     }
 
-    function removeDirectory(node: QTreeNode): void {
-      startRemoveDirectory(sidebarStore.directoryById(node.id));
+    function removeFolder(node: QTreeNode): void {
+      startRemoveFolder(sidebarStore.folderById(node.id));
     }
 
     function removeDashboard(node: QTreeNode): void {
-      startRemoveDashboard(dashboardStore.dashboardById(node.id));
+      startRemoveDashboard(dashboardStore.dashboardById(node.id), router);
     }
 
     function removeLayout(node: QTreeNode): void {
-      startRemoveLayout(builderStore.layoutById(node.id));
+      startRemoveLayout(builderStore.layoutById(node.id), router);
     }
 
     function removeService(node: QTreeNode): void {
@@ -281,14 +314,14 @@ export default defineComponent({
     function makeSelectNodes(): QTreeNode[] {
       const selectNodes: QTreeNode[] = [];
 
-      const dirNodes = directories.value.reduce(
-        (acc: Mapped<QTreeNode>, dir: SidebarDirectory) => {
+      const dirNodes = folders.value.reduce(
+        (acc: Mapped<QTreeNode>, dir: SidebarFolder) => {
           return {
             ...acc,
             [dir.id]: {
               id: dir.id,
               label: dir.title,
-              parent: dir.parent,
+              parent: dir.parentFolder,
               children: [],
             },
           };
@@ -296,10 +329,10 @@ export default defineComponent({
         {},
       );
 
-      directories.value.forEach((dir) => {
+      folders.value.forEach((dir) => {
         const node = dirNodes[dir.id];
-        if (dir.parent) {
-          const parent = dirNodes[dir.parent];
+        if (dir.parentFolder) {
+          const parent = dirNodes[dir.parentFolder];
           (parent?.children ?? selectNodes).push(node);
         } else {
           selectNodes.push(node);
@@ -309,64 +342,64 @@ export default defineComponent({
       return selectNodes;
     }
 
-    function createDirectory(node: QTreeNode): void {
-      startCreateDirectory(node.id);
+    function createFolder(node: QTreeNode): void {
+      startCreateFolder(node.id);
     }
 
-    function moveToDirectory(node: QTreeNode): void {
+    function moveToFolder(node: QTreeNode): void {
       createDialog({
         component: 'TreeSelectDialog',
         componentProps: {
           modelValue: node.parent,
-          title: 'Move to directory',
-          message: `To which directory do you want to move ${node.kind} <b>${node.label}</b>?`,
+          title: 'Move to folder',
+          message: `To which folder do you want to move ${node.kind} <b>${node.label}</b>?`,
           html: true,
           clearable: true,
           nodes: makeSelectNodes(),
         },
-      }).onOk((dir: string | null) => {
-        // Prevent circular directory relations
-        let familyId: Maybe<string> = dir;
+      }).onOk((parentFolder: string | null) => {
+        // Prevent circular folder relations
+        let familyId: Maybe<string> = parentFolder;
         while (familyId) {
           if (familyId === node.id) {
             return;
           }
-          familyId = sidebarStore.directoryById(familyId)?.parent;
+          familyId = sidebarStore.folderById(familyId)?.parentFolder;
         }
 
-        if (node.kind === 'directory') {
-          const directory = sidebarStore.directoryById(node.id);
-          if (directory) {
-            sidebarStore.saveDirectory({ ...directory, parent: dir });
+        if (node.kind === 'folder') {
+          const folder = sidebarStore.folderById(node.id);
+          if (folder) {
+            sidebarStore.saveFolder({ ...folder, parentFolder });
           }
         }
         if (node.kind === 'dashboard') {
           const dashboard = dashboardStore.dashboardById(node.id);
           if (dashboard) {
-            dashboardStore.saveDashboard({ ...dashboard, dir });
+            dashboardStore.saveDashboard({ ...dashboard, parentFolder });
           }
         }
         if (node.kind === 'layout') {
           const layout = builderStore.layoutById(node.id);
           if (layout) {
-            builderStore.saveLayout({ ...layout, dir });
+            builderStore.saveLayout({ ...layout, parentFolder });
           }
         }
         if (node.kind === 'service') {
           const service = serviceStore.serviceById(node.id);
           if (service) {
-            serviceStore.saveService({ ...service, dir });
+            serviceStore.saveService({ ...service, parentFolder });
           }
         }
 
-        if (dir && !expanded.value.includes(dir)) {
-          expanded.value = [...expanded.value, dir];
+        if (parentFolder && !expanded.value.includes(parentFolder)) {
+          expanded.value = [...expanded.value, parentFolder];
         }
       });
     }
 
-    function misalignedDirectory(node: QTreeNode): boolean {
-      // Node bodies of top level directories without children require extra indenting
+    function misalignedFolder(node: QTreeNode): boolean {
+      // Node bodies of top level folders without children require extra indenting
       return (
         !node.children?.length &&
         !!treeNodes.value.find((n) => n.id === node.id)
@@ -377,17 +410,19 @@ export default defineComponent({
       selected,
       expanded,
       treeNodes,
-      createDirectory,
-      changeDirectoryTitle,
+      folders,
+      routeFolderIds,
+      createFolder,
+      changeFolderTitle,
       changeDashboardTitle,
       changeLayoutTitle,
       changeServiceTitle,
-      removeDirectory,
+      removeFolder,
       removeDashboard,
       removeLayout,
       removeService,
-      moveToDirectory,
-      misalignedDirectory,
+      moveToFolder,
+      misalignedFolder,
     };
   },
 });
@@ -401,18 +436,118 @@ export default defineComponent({
       :nodes="treeNodes"
       node-key="id"
     >
-      <template #default-header="{ node }">
+      <template #header-folder="{ node }">
         <q-item-section class="col-auto">
           <q-icon :name="node.icon" />
         </q-item-section>
         <q-item-section
-          :class="{
-            col: true,
-            'text-primary': $route.path === node.url,
-          }"
+          :class="['col', { 'text-primary': routeFolderIds.includes(node.id) }]"
         >
           {{ node.label }}
         </q-item-section>
+        <div
+          v-if="editing"
+          class="row"
+          @click.stop
+        >
+          <q-btn
+            flat
+            round
+            icon="edit"
+            size="sm"
+            @click="changeFolderTitle(node)"
+          />
+          <q-btn
+            flat
+            round
+            icon="mdi-folder-move"
+            size="sm"
+            @click="moveToFolder(node)"
+          />
+          <q-btn
+            flat
+            round
+            icon="mdi-delete"
+            size="sm"
+            @click="removeFolder(node)"
+          />
+        </div>
+      </template>
+      <template #header-dashboard="{ node }">
+        <q-item-section class="col-auto">
+          <q-icon :name="node.icon" />
+        </q-item-section>
+        <q-item-section
+          :class="['col', { 'text-primary': $route.path === node.url }]"
+        >
+          {{ node.label }}
+        </q-item-section>
+        <div
+          v-if="editing"
+          class="row"
+          @click.stop
+        >
+          <q-btn
+            flat
+            round
+            icon="edit"
+            size="sm"
+            @click.stop="changeDashboardTitle(node)"
+          />
+          <q-btn
+            :disable="!folders.length"
+            flat
+            round
+            icon="mdi-folder-move"
+            size="sm"
+            @click="moveToFolder(node)"
+          />
+          <q-btn
+            flat
+            round
+            icon="mdi-delete"
+            size="sm"
+            @click="removeDashboard(node)"
+          />
+        </div>
+      </template>
+      <template #header-layout="{ node }">
+        <q-item-section class="col-auto">
+          <q-icon :name="node.icon" />
+        </q-item-section>
+        <q-item-section
+          :class="['col', { 'text-primary': $route.path === node.url }]"
+        >
+          {{ node.label }}
+        </q-item-section>
+        <div
+          v-if="editing"
+          class="row"
+          @click.stop
+        >
+          <q-btn
+            flat
+            round
+            icon="edit"
+            size="sm"
+            @click="changeLayoutTitle(node)"
+          />
+          <q-btn
+            :disable="!folders.length"
+            flat
+            round
+            icon="mdi-folder-move"
+            size="sm"
+            @click="moveToFolder(node)"
+          />
+          <q-btn
+            flat
+            round
+            icon="mdi-delete"
+            size="sm"
+            @click="removeLayout(node)"
+          />
+        </div>
       </template>
       <template #header-service="{ node }">
         <q-item-section
@@ -434,10 +569,48 @@ export default defineComponent({
           <q-icon :name="node.icon" />
         </q-item-section>
         <q-item-section
-          :class="{
-            col: true,
-            'text-primary': $route.path === node.url,
-          }"
+          :class="['col', { 'text-primary': $route.path === node.url }]"
+        >
+          {{ node.label }}
+        </q-item-section>
+        <div
+          v-if="editing"
+          class="row"
+          @click.stop
+        >
+          <q-btn
+            flat
+            round
+            icon="edit"
+            size="sm"
+            @click="changeServiceTitle(node)"
+          />
+          <q-btn
+            :disable="!folders.length"
+            flat
+            round
+            icon="mdi-folder-move"
+            size="sm"
+            @click="moveToFolder(node)"
+          />
+          <q-btn
+            flat
+            round
+            icon="mdi-delete"
+            size="sm"
+            @click="removeService(node)"
+          />
+        </div>
+      </template>
+      <template #header-misc="{ node }">
+        <q-item-section class="col-auto">
+          <q-icon :name="node.icon" />
+        </q-item-section>
+        <q-item-section
+          :class="[
+            'col text-bold',
+            { 'text-primary': routeFolderIds.includes(node.id) },
+          ]"
         >
           {{ node.label }}
         </q-item-section>
@@ -447,126 +620,16 @@ export default defineComponent({
           <q-icon :name="node.icon" />
         </q-item-section>
         <q-item-section class="col ellipsis text-secondary">
-          {{ node.stub.id }}
+          {{ node.id }}
         </q-item-section>
         <q-item-section class="col-auto text-grey text-italic q-mr-sm">
           Click to add
         </q-item-section>
         <q-tooltip>
           Click to create UI service for
-          {{ node.feature.title }}
-          '{{ node.stub.id }}'
+          {{ node.featureTitle }}
+          '{{ node.id }}'
         </q-tooltip>
-      </template>
-      <template
-        v-if="editing"
-        #body-directory="{ node }"
-      >
-        <div class="row">
-          <div
-            v-if="misalignedDirectory(node)"
-            class="col-auto q-ml-md"
-          />
-          <q-btn
-            flat
-            round
-            icon="mdi-folder-move"
-            size="sm"
-            @click="moveToDirectory(node)"
-          />
-          <q-btn
-            flat
-            round
-            icon="edit"
-            size="sm"
-            @click="changeDirectoryTitle(node)"
-          />
-          <q-btn
-            flat
-            round
-            icon="mdi-delete"
-            size="sm"
-            @click="removeDirectory(node)"
-          />
-        </div>
-      </template>
-      <template
-        v-if="editing"
-        #body-dashboard="{ node }"
-      >
-        <q-btn
-          flat
-          round
-          icon="mdi-folder-move"
-          size="sm"
-          @click="moveToDirectory(node)"
-        />
-        <q-btn
-          flat
-          round
-          icon="edit"
-          size="sm"
-          @click="changeDashboardTitle(node)"
-        />
-        <q-btn
-          flat
-          round
-          icon="mdi-delete"
-          size="sm"
-          @click="removeDashboard(node)"
-        />
-      </template>
-      <template
-        v-if="editing"
-        #body-layout="{ node }"
-      >
-        <q-btn
-          flat
-          round
-          icon="mdi-folder-move"
-          size="sm"
-          @click="moveToDirectory(node)"
-        />
-        <q-btn
-          flat
-          round
-          icon="edit"
-          size="sm"
-          @click="changeLayoutTitle(node)"
-        />
-        <q-btn
-          flat
-          round
-          icon="mdi-delete"
-          size="sm"
-          @click="removeLayout(node)"
-        />
-      </template>
-      <template
-        v-if="editing"
-        #body-service="{ node }"
-      >
-        <q-btn
-          flat
-          round
-          icon="mdi-folder-move"
-          size="sm"
-          @click="moveToDirectory(node)"
-        />
-        <q-btn
-          flat
-          round
-          icon="edit"
-          size="sm"
-          @click="changeServiceTitle(node)"
-        />
-        <q-btn
-          flat
-          round
-          icon="mdi-delete"
-          size="sm"
-          @click="removeService(node)"
-        />
       </template>
     </q-tree>
   </div>

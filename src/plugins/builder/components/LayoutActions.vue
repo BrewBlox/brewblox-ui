@@ -37,8 +37,6 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const route = useRoute();
 
-    const layoutIds = computed<string[]>(() => builderStore.layoutIds);
-
     const title = computed<string>(() => props.layout?.title ?? 'Unknown');
 
     const label = computed<string | null>(() =>
@@ -77,33 +75,6 @@ export default defineComponent({
       saveFile(exported, `brewblox-${props.layout.title}-layout.json`);
     }
 
-    function changeLayoutTitle(): void {
-      startChangeLayoutTitle(props.layout);
-    }
-
-    function changeLayoutDir(): void {
-      if (!props.layout) {
-        return;
-      }
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          title: 'Set layout directory',
-          message:
-            'Layouts with the same directory are shown together. ' +
-            'Use / to created nested directories.',
-          modelValue: props.layout.dir ?? '',
-        },
-      }).onOk((dir: string) => {
-        if (props.layout) {
-          builderStore.saveLayout({
-            ...props.layout,
-            dir,
-          });
-        }
-      });
-    }
-
     function clearParts(): void {
       createDialog({
         component: 'ConfirmDialog',
@@ -116,13 +87,6 @@ export default defineComponent({
         if (props.layout) {
           builderStore.saveLayout({ ...props.layout, parts: [] });
         }
-      });
-    }
-
-    function removeLayout(): void {
-      startRemoveLayout(props.layout, () => {
-        const [id] = layoutIds.value;
-        selectLayout(id || null);
       });
     }
 
@@ -176,12 +140,11 @@ export default defineComponent({
       isHomePage,
       selectLayout,
       copyLayout,
-      changeLayoutTitle,
-      changeLayoutDir,
+      startChangeLayoutTitle,
       createLayoutWidget,
       exportLayout,
       clearParts,
-      removeLayout,
+      startRemoveLayout,
     };
   },
 });
@@ -206,12 +169,7 @@ export default defineComponent({
     <ActionItem
       icon="edit"
       label="Change layout name"
-      @click="changeLayoutTitle"
-    />
-    <ActionItem
-      icon="edit"
-      label="Change layout directory"
-      @click="changeLayoutDir"
+      @click="startChangeLayoutTitle(layout)"
     />
     <ActionItem
       icon="dashboard"
@@ -231,7 +189,7 @@ export default defineComponent({
     <ActionItem
       icon="delete"
       label="Remove layout"
-      @click="removeLayout"
+      @click="startRemoveLayout(layout, $router)"
     />
   </ActionSubmenu>
 </template>

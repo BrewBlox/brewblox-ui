@@ -1,48 +1,47 @@
 import { concatById, filterById, findById } from '@/utils/collections';
 import { defineStore } from 'pinia';
 import api from './api';
-import type { SidebarDirectory } from './types';
+import type { SidebarFolder } from './types';
 
 export * from './types';
 
 interface SidebarStoreState {
-  directories: SidebarDirectory[];
+  folders: SidebarFolder[];
 }
 
 export const useSidebarStore = defineStore('sidebarStore', {
   state: (): SidebarStoreState => ({
-    directories: [],
+    folders: [],
   }),
   getters: {
-    directoryIds: (state): string[] => state.directories.map((v) => v.id),
+    folderIds: (state): string[] => state.folders.map((v) => v.id),
   },
   actions: {
-    directoryById(id: Maybe<string>): SidebarDirectory | null {
-      return findById(this.directories, id);
+    folderById(id: Maybe<string>): SidebarFolder | null {
+      return findById(this.folders, id);
     },
 
-    directoryTitle(id: Maybe<string>): string {
-      return this.directoryById(id)?.title ?? 'Unknown';
+    folderTitle(id: Maybe<string>): string {
+      return this.folderById(id)?.title ?? 'Unknown';
     },
 
-    async createDirectory(directory: SidebarDirectory): Promise<void> {
-      await api.create(directory); // triggers callback
+    async createFolder(folder: SidebarFolder): Promise<void> {
+      await api.create(folder); // triggers callback
     },
 
-    async saveDirectory(directory: SidebarDirectory): Promise<void> {
-      await api.persist(directory); // triggers callback
+    async saveFolder(folder: SidebarFolder): Promise<void> {
+      await api.persist(folder); // triggers callback
     },
 
-    async removeDirectory(directory: SidebarDirectory): Promise<void> {
-      await api.remove(directory); // triggers callback
+    async removeFolder(folder: SidebarFolder): Promise<void> {
+      await api.remove(folder); // triggers callback
     },
 
     async start(): Promise<void> {
-      this.directories = await api.fetch();
+      this.folders = await api.fetch();
       api.subscribe(
-        (directory) =>
-          (this.directories = concatById(this.directories, directory)),
-        (id) => (this.directories = filterById(this.directories, { id })),
+        (folder) => (this.folders = concatById(this.folders, folder)),
+        (id) => (this.folders = filterById(this.folders, { id })),
       );
     },
   },

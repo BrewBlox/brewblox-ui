@@ -15,6 +15,7 @@ import defaults from 'lodash/defaults';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
+import { Router } from 'vue-router';
 import {
   CENTER,
   DEFAULT_LAYOUT_HEIGHT,
@@ -457,7 +458,7 @@ export function startChangeLayoutTitle(layout: Maybe<BuilderLayout>): void {
 
 export function startRemoveLayout(
   layout: Maybe<BuilderLayout>,
-  onDone: () => unknown = () => {},
+  router: Router,
 ): void {
   if (!layout) {
     return;
@@ -474,6 +475,11 @@ export function startRemoveLayout(
       const builderStore = useBuilderStore();
       await builderStore.removeLayout(layout).catch(() => {});
     }
-    onDone();
+    const path = router.currentRoute.value.path;
+    if (path === `/brewery/${layout.id}`) {
+      router.replace('/brewery');
+    } else if (path === `/builder/${layout.id}`) {
+      router.replace('/builder');
+    }
   });
 }

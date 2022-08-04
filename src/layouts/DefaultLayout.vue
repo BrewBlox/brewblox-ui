@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useGlobals } from '@/composables';
-import { startCreateDirectory } from '@/store/sidebar/utils';
+import { startCreateFolder } from '@/store/sidebar/utils';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -30,16 +30,12 @@ export default defineComponent({
       return Boolean(router.currentRoute.value.path.match(route));
     }
 
-    function createDirectory(): void {
-      startCreateDirectory(null);
-    }
-
     return {
       devMode,
       editing,
       drawerOpen,
       routeActive,
-      createDirectory,
+      startCreateFolder,
     };
   },
 });
@@ -91,15 +87,19 @@ export default defineComponent({
           flat
           round
           icon="mdi-folder-plus"
-          @click="createDirectory"
-        />
+          @click="startCreateFolder(null)"
+        >
+          <q-tooltip>Add folder</q-tooltip>
+        </q-btn>
         <q-btn
           :color="editing ? 'primary' : ''"
           flat
           round
           icon="edit"
           @click="editing = !editing"
-        />
+        >
+          <q-tooltip>Edit sidebar</q-tooltip>
+        </q-btn>
       </div>
     </q-drawer>
 

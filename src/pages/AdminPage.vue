@@ -24,7 +24,7 @@ interface ConfigService {
   configComponent: string;
 }
 
-const dirSorter = makeObjectSorter<Dashboard>('dir', 'title');
+const sorter = makeObjectSorter<Dashboard>('title');
 
 export default defineComponent({
   name: 'AdminPage',
@@ -45,12 +45,12 @@ export default defineComponent({
     );
 
     const dashboards = computed<Dashboard[]>(() =>
-      [...dashboardStore.dashboards].sort(dirSorter),
+      [...dashboardStore.dashboards].sort(sorter),
     );
 
     const serviceComponents = computed<ConfigService[]>(() =>
       [...serviceStore.services]
-        .sort(dirSorter)
+        .sort(sorter)
         .map((v) => ({
           serviceId: v.id,
           title: v.title,
@@ -60,7 +60,7 @@ export default defineComponent({
     );
 
     const layouts = computed<BuilderLayout[]>(() =>
-      [...builderStore.layouts].sort(dirSorter),
+      [...builderStore.layouts].sort(sorter),
     );
 
     return {

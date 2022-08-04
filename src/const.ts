@@ -22,7 +22,7 @@ export const DASHBOARD_NAMESPACE = `${UI_NAMESPACE}:dashboards`;
 export const SERVICE_NAMESPACE = `${UI_NAMESPACE}:services`;
 export const SYSTEM_NAMESPACE = `${UI_NAMESPACE}:system-config`;
 export const WIDGET_NAMESPACE = `${UI_NAMESPACE}:dashboard-items`;
-export const SIDEBAR_NAMESPACE = `${UI_NAMESPACE}:sidebar`;
+export const FOLDER_NAMESPACE = `${UI_NAMESPACE}:folders`;
 
 export const LAYOUT_NAMESPACE = `${UI_NAMESPACE}:layouts`;
 export const SESSION_NAMESPACE = `${UI_NAMESPACE}:logged-sessions`;

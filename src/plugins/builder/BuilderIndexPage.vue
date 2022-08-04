@@ -7,7 +7,7 @@ import { computed, defineComponent, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { BuilderLayout } from './types';
 
-const layoutSorter = makeObjectSorter<BuilderLayout>('dir', 'id');
+const sorter = makeObjectSorter<BuilderLayout>('title');
 
 export default defineComponent({
   name: 'IndexPage',
@@ -26,7 +26,7 @@ export default defineComponent({
 
       const layout =
         builderStore.layoutById(builderStore.lastLayoutId) ??
-        [...builderStore.layouts].sort(layoutSorter)[0] ??
+        [...builderStore.layouts].sort(sorter)[0] ??
         null;
 
       return layout ? `/builder/${layout.id}` : null;

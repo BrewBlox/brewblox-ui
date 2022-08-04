@@ -2,12 +2,11 @@ import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { useWidgetStore } from '@/store/widgets';
 import { userUISettings } from '@/user-settings';
+import { Router } from 'vue-router';
 import { createDialog } from './dialog';
 import { notify } from './notify';
 import { makeRuleValidator, suggestId } from './rules';
 import { isUrlSafe, makeUrlSafe } from './url';
-
-type IdChangedCallback = (id: string) => void;
 
 export const makeDashboardIdRules = (): InputRule[] => [
   (v) => !!v || 'Value is required',
@@ -19,7 +18,7 @@ export const makeDashboardIdRules = (): InputRule[] => [
 async function execDashboardIdChange(
   oldId: string,
   newId: string,
-  onIdChanged?: IdChangedCallback,
+  router: Router,
 ): Promise<void> {
   const dashboardStore = useDashboardStore();
   const widgetStore = useWidgetStore();
@@ -42,13 +41,18 @@ async function execDashboardIdChange(
   }
 
   notify.done(`Changed dashboard URL to <b>${newId}</b>`);
-  onIdChanged?.(newId);
+  if (router.currentRoute.value.path === `/dashboard/${oldId}`) {
+    router.replace(`/dashboard/${newId}`);
+  }
 }
 
 export function startChangeDashboardId(
-  dashboard: Dashboard,
-  onIdChanged?: IdChangedCallback,
+  dashboard: Maybe<Dashboard>,
+  router: Router,
 ): void {
+  if (!dashboard) {
+    return;
+  }
   createDialog({
     component: 'InputDialog',
     componentProps: {
@@ -60,15 +64,18 @@ export function startChangeDashboardId(
   }).onOk(async (newId: string) => {
     const oldId = dashboard.id;
     if (newId !== oldId) {
-      await execDashboardIdChange(oldId, newId, onIdChanged);
+      await execDashboardIdChange(oldId, newId, router);
     }
   });
 }
 
 export function startChangeDashboardTitle(
-  dashboard: Dashboard,
-  onIdChanged?: IdChangedCallback,
+  dashboard: Maybe<Dashboard>,
+  router: Router,
 ): void {
+  if (!dashboard) {
+    return;
+  }
   createDialog({
     component: 'InputDialog',
     componentProps: {
@@ -108,11 +115,14 @@ export function startChangeDashboardTitle(
         ok: 'Yes',
         cancel: 'No',
       },
-    }).onOk(() => execDashboardIdChange(oldId, suggestedId, onIdChanged));
+    }).onOk(() => execDashboardIdChange(oldId, suggestedId, router));
   });
 }
 
-export function startRemoveDashboard(dashboard: Maybe<Dashboard>): void {
+export function startRemoveDashboard(
+  dashboard: Maybe<Dashboard>,
+  router: Router,
+): void {
   if (!dashboard) {
     return;
   }
@@ -126,11 +136,14 @@ export function startRemoveDashboard(dashboard: Maybe<Dashboard>): void {
   }).onOk(async () => {
     const widgetStore = useWidgetStore();
     const dashboardStore = useDashboardStore();
-    await dashboardStore.removeDashboard(dashboard);
     await Promise.all(
       widgetStore.widgets
         .filter((widget) => widget.dashboard === dashboard.id)
         .map((widget) => widgetStore.removeWidget(widget)),
     );
+    await dashboardStore.removeDashboard(dashboard);
+    if (router.currentRoute.value.path === `/dashboard/${dashboard.id}`) {
+      router.replace('/');
+    }
   });
 }

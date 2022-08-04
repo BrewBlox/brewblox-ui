@@ -1,6 +1,6 @@
 import { StoreObject } from 'brewblox-proto/ts';
 
-export interface SidebarDirectory extends StoreObject {
+export interface SidebarFolder extends StoreObject {
   title: string;
-  parent?: string | null;
+  parentFolder?: string | null;
 }

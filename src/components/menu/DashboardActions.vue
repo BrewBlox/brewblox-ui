@@ -51,60 +51,16 @@ export default defineComponent({
       });
     }
 
-    function onIdChanged(oldId: string, newId: string): void {
-      if (newId && router.currentRoute.value.path === `/dashboard/${oldId}`) {
-        router.replace(`/dashboard/${newId}`);
-      }
-    }
-
     function changeDashboardId(): void {
-      if (!dashboard.value) {
-        return;
-      }
-      const oldId = props.dashboardId;
-      startChangeDashboardId(dashboard.value, (newId) =>
-        onIdChanged(oldId, newId),
-      );
+      startChangeDashboardId(dashboard.value, router);
     }
 
     function changeDashboardTitle(): void {
-      if (!dashboard.value) {
-        return;
-      }
-      const oldId = props.dashboardId;
-      startChangeDashboardTitle(dashboard.value, (newId) =>
-        onIdChanged(oldId, newId),
-      );
-    }
-
-    function changeDashboardDir(): void {
-      if (!dashboard.value) {
-        return;
-      }
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          title: 'Set dashboard directory',
-          message:
-            'Dashboards with the same directory are shown together. ' +
-            'Use / to created nested directories.',
-          modelValue: dashboard.value.dir ?? '',
-        },
-      }).onOk((dir: string) => {
-        if (dashboard.value) {
-          dashboardStore.saveDashboard({
-            ...dashboard.value,
-            dir,
-          });
-        }
-      });
+      startChangeDashboardTitle(dashboard.value, router);
     }
 
     function removeDashboard(): void {
-      if (!dashboard.value) {
-        return;
-      }
-      startRemoveDashboard(dashboard.value);
+      startRemoveDashboard(dashboard.value, router);
     }
 
     return {
@@ -114,7 +70,6 @@ export default defineComponent({
       showWizard,
       changeDashboardId,
       changeDashboardTitle,
-      changeDashboardDir,
       removeDashboard,
     };
   },
@@ -143,11 +98,6 @@ export default defineComponent({
         icon="edit"
         label="Change dashboard URL"
         @click="changeDashboardId"
-      />
-      <ActionItem
-        icon="edit"
-        label="Change dashboard directory"
-        @click="changeDashboardDir"
       />
       <ActionItem
         icon="delete"

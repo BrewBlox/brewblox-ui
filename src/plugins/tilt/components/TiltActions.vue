@@ -1,15 +1,10 @@
 <script lang="ts">
 import { TiltService } from '@/plugins/tilt/types';
-import { Service, useServiceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
-import {
-  startChangeServiceDir,
-  startChangeServiceTitle,
-  startRemoveService,
-} from '@/utils/services';
+import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'TiltActions',
@@ -22,7 +17,6 @@ export default defineComponent({
   setup(props) {
     const systemStore = useSystemStore();
     const serviceStore = useServiceStore();
-    const router = useRouter();
 
     const service = computed<TiltService | null>(() =>
       serviceStore.serviceById(props.serviceId),
@@ -42,14 +36,9 @@ export default defineComponent({
       },
     });
 
-    function removeService(service: Maybe<Service>): void {
-      startRemoveService(service, router);
-    }
-
     return {
-      startChangeServiceDir,
       startChangeServiceTitle,
-      removeService,
+      startRemoveService,
       service,
       serviceTitle,
       isHomePage,
@@ -71,14 +60,9 @@ export default defineComponent({
       @click="startChangeServiceTitle(service)"
     />
     <ActionItem
-      icon="edit"
-      label="Change service directory"
-      @click="startChangeServiceDir(service)"
-    />
-    <ActionItem
       icon="delete"
       label="Remove service from UI"
-      @click="removeService(service)"
+      @click="startRemoveService(service, $router)"
     />
   </ActionSubmenu>
 </template>

@@ -15,10 +15,8 @@ export interface Dashboard extends StoreObject {
   title: string;
 
   /**
-   * Dashboards are rendered in a tree structure.
-   * Directories do not have to be created.
-   * They will be present if present in at least one Dashboard dir.
-   * Values are /-separated, and are not used in routing.
+   * Dashboards are rendered in a tree structure,
+   * and can be placed in a folder.
    */
-  dir?: string | null;
+  parentFolder?: string | null;
 }

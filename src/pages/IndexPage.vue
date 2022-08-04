@@ -8,7 +8,7 @@ import { makeObjectSorter } from '@/utils/functional';
 import { computed, defineComponent, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
-const dashboardSorter = makeObjectSorter<Dashboard>('dir', 'id');
+const sorter = makeObjectSorter<Dashboard>('title');
 
 export default defineComponent({
   name: 'IndexPage',
@@ -23,7 +23,7 @@ export default defineComponent({
 
       const defaultPage =
         [...dashboardStore.dashboards]
-          .sort(dashboardSorter)
+          .sort(sorter)
           .map((v) => `/dashboard/${v.id}`)[0] ?? null;
 
       // Defaults to first dashboard

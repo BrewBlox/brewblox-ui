@@ -16,12 +16,10 @@ export interface Service<ConfigT = any> extends StoreObject {
   title: string;
 
   /**
-   * Services are rendered in a tree structure.
-   * Directories do not have to be created.
-   * They will be present if present in at least one Service dir.
-   * Values are /-separated, and are not used in routing.
+   * Services are rendered in a tree structure,
+   * and can be placed in a folder.
    */
-  dir?: string | null;
+  parentFolder?: string | null;
 
   /**
    * Foreign key to `ServiceFeature.id`

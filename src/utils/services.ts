@@ -63,25 +63,6 @@ export function startChangeServiceTitle(service: Maybe<Service>): void {
   });
 }
 
-export function startChangeServiceDir(service: Maybe<Service>): void {
-  if (!service) {
-    return;
-  }
-  createDialog({
-    component: 'InputDialog',
-    componentProps: {
-      title: 'Set service directory',
-      message:
-        'Services with the same directory are shown together. ' +
-        'Use / to created nested directories.',
-      modelValue: service.dir ?? '',
-    },
-  }).onOk((dir: string) => {
-    const serviceStore = useServiceStore();
-    serviceStore.saveService({ ...service, dir });
-  });
-}
-
 export function startRemoveService(
   service: Maybe<Service>,
   router: Router,
@@ -100,9 +81,9 @@ export function startRemoveService(
     },
   }).onOk(() => {
     const serviceStore = useServiceStore();
+    serviceStore.removeService(service);
     if (router.currentRoute.value.path === `/service/${service.id}`) {
       router.replace('/');
     }
-    serviceStore.removeService(service);
   });
 }

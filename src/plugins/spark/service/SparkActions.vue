@@ -5,17 +5,12 @@ import { saveHwInfo, startResetBlocks } from '@/plugins/spark/utils/actions';
 import { discoverBlocks } from '@/plugins/spark/utils/configuration';
 import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { Service, useServiceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
-import {
-  startChangeServiceDir,
-  startChangeServiceTitle,
-  startRemoveService,
-} from '@/utils/services';
+import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'SparkActions',
@@ -26,7 +21,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const router = useRouter();
     const systemStore = useSystemStore();
     const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
@@ -64,10 +58,6 @@ export default defineComponent({
       }
     }
 
-    function removeService(service: Maybe<Service>): void {
-      startRemoveService(service, router);
-    }
-
     return {
       startResetBlocks,
       saveHwInfo,
@@ -75,8 +65,7 @@ export default defineComponent({
       createBlockWizard,
       cleanUnusedNames,
       startChangeServiceTitle,
-      startChangeServiceDir,
-      removeService,
+      startRemoveService,
       service,
       isHomePage,
       serviceReboot,
@@ -154,14 +143,9 @@ export default defineComponent({
         @click="startChangeServiceTitle(service)"
       />
       <ActionItem
-        icon="edit"
-        label="Change service directory"
-        @click="startChangeServiceDir(service)"
-      />
-      <ActionItem
         icon="delete"
         label="Remove service from UI"
-        @click="removeService(service)"
+        @click="startRemoveService(service, $router)"
       />
     </template>
   </ActionSubmenu>
