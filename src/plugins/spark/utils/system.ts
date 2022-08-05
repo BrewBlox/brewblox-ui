@@ -7,7 +7,6 @@ import {
   Spark3PinsBlock,
   SysInfoBlock,
   SystemBlockType,
-  TicksBlock,
   WiFiSettingsBlock,
 } from 'brewblox-proto/ts';
 
@@ -34,9 +33,6 @@ export const getSysInfoBlock: SysBlockFn<SysInfoBlock> = (serviceId) =>
 export const getWiFiSettingsBlock: SysBlockFn<WiFiSettingsBlock> = (
   serviceId,
 ) => getSysBlock(serviceId, SystemBlockType.WiFiSettings);
-
-export const getTicksBlock: SysBlockFn<TicksBlock> = (serviceId) =>
-  getSysBlock(serviceId, SystemBlockType.Ticks);
 
 export const getSpark2PinsBlock: SysBlockFn<Spark2PinsBlock> = (serviceId) =>
   getSysBlock(serviceId, SystemBlockType.Spark2Pins);
