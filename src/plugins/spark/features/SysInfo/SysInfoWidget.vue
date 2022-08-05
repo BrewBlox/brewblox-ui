@@ -1,9 +1,8 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { getTicksBlock } from '@/plugins/spark/utils/system';
 import { dateString, durationString, shortDateString } from '@/utils/quantity';
-import { SysInfoBlock, TicksBlock } from 'brewblox-proto/ts';
+import { SysInfoBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
@@ -16,31 +15,17 @@ export default defineComponent({
       shortDateString(sparkStore.lastBlocksAtByService(serviceId), 'Unknown'),
     );
 
-    const sysInfo = computed<SysInfoBlock>(() => block.value);
-
-    const ticks = computed<TicksBlock | undefined>(() =>
-      getTicksBlock(serviceId),
-    );
-
-    const uptime = computed<string>(() =>
-      durationString(ticks.value?.data.millisSinceBoot),
-    );
-
-    const sysDate = computed<string>(() =>
-      dateString(ticks.value?.data.secondsSinceEpoch),
-    );
-
     const ready = computed<boolean>(
-      () => sparkStore.lastStatusAtByService(serviceId) != null,
+      () => sparkStore.statusByService(serviceId) != null,
     );
 
     return {
+      dateString,
+      durationString,
+      block,
       serviceId,
       ready,
       lastBlocks,
-      sysInfo,
-      uptime,
-      sysDate,
     };
   },
 });
@@ -60,26 +45,26 @@ export default defineComponent({
         >
           {{
             /* We only use first 8 characters of version hash */
-            sysInfo.data.version.substring(0, 8)
+            block.data.version.substring(0, 8)
           }}
         </LabeledField>
         <LabeledField
           label="Firmware release date"
           class="col-lg-5 col-11"
         >
-          {{ sysInfo.data.releaseDate }}
+          {{ block.data.releaseDate }}
         </LabeledField>
         <LabeledField
           label="Controller date / time"
           class="col-lg-5 col-11"
         >
-          {{ sysDate }}
+          {{ dateString(block.data.systemTime) }}
         </LabeledField>
         <LabeledField
           label="Controller uptime"
           class="col-lg-5 col-11"
         >
-          {{ uptime }}
+          {{ durationString(block.data.uptime) }}
         </LabeledField>
         <LabeledField
           label="Service ID"
@@ -92,13 +77,13 @@ export default defineComponent({
           class="col-lg-5 col-11"
           tag-style="word-wrap: break-word;"
         >
-          {{ sysInfo.data.deviceId }}
+          {{ block.data.deviceId }}
         </LabeledField>
         <LabeledField
           label="IP address"
           class="col-lg-5 col-11"
         >
-          {{ sysInfo.data.ip }}
+          {{ block.data.ip }}
         </LabeledField>
         <LabeledField
           label="Last blocks update"

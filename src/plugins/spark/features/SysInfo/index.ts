@@ -3,7 +3,13 @@ import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { BlockType, SparkPlatform, SysInfoBlock } from 'brewblox-proto/ts';
+import { bloxQty } from '@/utils/quantity';
+import {
+  BlockType,
+  DisplayTempUnit,
+  SparkPlatform,
+  SysInfoBlock,
+} from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './SysInfoWidget.vue';
 
@@ -24,8 +30,12 @@ const plugin: Plugin = {
         protocolVersion: '',
         protocolDate: '',
         ip: '0.0.0.0',
-        command: null,
-        trace: [],
+        uptime: bloxQty('0s'),
+        updatesPerSecond: 0,
+        systemTime: '',
+        timeZone: 'etc/UTC',
+        tempUnit: DisplayTempUnit.TEMP_CELSIUS,
+        displayBrightness: 255,
       }),
     };
 

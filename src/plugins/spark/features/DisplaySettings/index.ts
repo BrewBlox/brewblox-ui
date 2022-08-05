@@ -3,11 +3,7 @@ import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
-import {
-  BlockType,
-  DisplaySettingsBlock,
-  DisplayTempUnit,
-} from 'brewblox-proto/ts';
+import { BlockType, DisplaySettingsBlock } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './DisplaySettingsWidget.vue';
 
@@ -22,10 +18,7 @@ const plugin: Plugin = {
       type,
       generate: () => ({
         name: 'Display settings',
-        tempUnit: DisplayTempUnit.TEMP_CELSIUS,
         widgets: [],
-        brightness: 255,
-        timeZone: '',
       }),
     };
 
