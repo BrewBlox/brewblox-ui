@@ -11,6 +11,7 @@ import router from '@/router';
 import { startup } from '@/startup';
 import { useDashboardStore } from '@/store/dashboards';
 import { useServiceStore } from '@/store/services';
+import { useSidebarStore } from '@/store/sidebar';
 import { useSystemStore } from '@/store/system';
 import { useWidgetStore } from '@/store/widgets';
 import { DenseKey, NowKey, TouchKey } from '@/symbols';
@@ -86,6 +87,7 @@ startup.add(useSystemStore());
 startup.add(useServiceStore());
 startup.add(useDashboardStore());
 startup.add(useWidgetStore());
+startup.add(useSidebarStore());
 
 // Global values
 const dense = computed<boolean>(() => Screen.lt.md);

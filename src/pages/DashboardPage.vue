@@ -65,14 +65,6 @@ export default defineComponent({
       })),
     );
 
-    function editTitle(): void {
-      if (dashboard.value) {
-        startChangeDashboardTitle(dashboard.value, (newId) =>
-          router.replace(`/dashboard/${newId}`),
-        );
-      }
-    }
-
     watch(
       () => dashboardId.value,
       () => (widgetEditable.value = false),
@@ -111,7 +103,7 @@ export default defineComponent({
       showWizard,
       widgets,
       dashboardItems,
-      editTitle,
+      startChangeDashboardTitle,
     };
   },
 });
@@ -131,7 +123,7 @@ export default defineComponent({
       <TitleTeleport>
         <span
           class="cursor-pointer"
-          @click="editTitle"
+          @click="startChangeDashboardTitle(dashboard, $router)"
         >
           {{ dashboard.title }}
         </span>

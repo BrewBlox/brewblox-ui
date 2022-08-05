@@ -128,7 +128,6 @@ export function createOutputActions(): QuickstartAction[] {
         const dashboard: Dashboard = {
           id: config.dashboardId,
           title: config.dashboardTitle,
-          order: dashboardStore.dashboardIds.length + 1,
         };
         await dashboardStore.createDashboard(dashboard);
       }

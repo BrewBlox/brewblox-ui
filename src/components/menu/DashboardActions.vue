@@ -41,15 +41,6 @@ export default defineComponent({
         }),
     });
 
-    const listed = computed<boolean>({
-      get: () => dashboard.value?.listed ?? true,
-      set: (v) => {
-        if (dashboard.value) {
-          dashboardStore.saveDashboard({ ...dashboard.value, listed: v });
-        }
-      },
-    });
-
     function showWizard(): void {
       createDialog({
         component: 'WizardDialog',
@@ -60,44 +51,22 @@ export default defineComponent({
       });
     }
 
-    function onIdChanged(oldId: string, newId: string): void {
-      if (newId && router.currentRoute.value.path === `/dashboard/${oldId}`) {
-        router.replace(`/dashboard/${newId}`);
-      }
-    }
-
     function changeDashboardId(): void {
-      if (!dashboard.value) {
-        return;
-      }
-      const oldId = props.dashboardId;
-      startChangeDashboardId(dashboard.value, (newId) =>
-        onIdChanged(oldId, newId),
-      );
+      startChangeDashboardId(dashboard.value, router);
     }
 
     function changeDashboardTitle(): void {
-      if (!dashboard.value) {
-        return;
-      }
-      const oldId = props.dashboardId;
-      startChangeDashboardTitle(dashboard.value, (newId) =>
-        onIdChanged(oldId, newId),
-      );
+      startChangeDashboardTitle(dashboard.value, router);
     }
 
     function removeDashboard(): void {
-      if (!dashboard.value) {
-        return;
-      }
-      startRemoveDashboard(dashboard.value);
+      startRemoveDashboard(dashboard.value, router);
     }
 
     return {
       dashboard,
       title,
       isHomePage,
-      listed,
       showWizard,
       changeDashboardId,
       changeDashboardTitle,
@@ -120,9 +89,10 @@ export default defineComponent({
         icon="home"
         :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
-      <ToggleAction
-        v-model="listed"
-        label="Show in sidebar"
+      <ActionItem
+        icon="edit"
+        label="Change dashboard name"
+        @click="changeDashboardTitle"
       />
       <ActionItem
         icon="edit"
@@ -130,13 +100,8 @@ export default defineComponent({
         @click="changeDashboardId"
       />
       <ActionItem
-        icon="edit"
-        label="Rename dashboard"
-        @click="changeDashboardTitle"
-      />
-      <ActionItem
         icon="delete"
-        label="Remove dashboard"
+        label="Remove"
         @click="removeDashboard"
       />
     </template>

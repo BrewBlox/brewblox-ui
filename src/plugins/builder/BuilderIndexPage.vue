@@ -5,6 +5,9 @@ import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { computed, defineComponent, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { BuilderLayout } from './types';
+
+const sorter = makeObjectSorter<BuilderLayout>('title');
 
 export default defineComponent({
   name: 'IndexPage',
@@ -22,9 +25,8 @@ export default defineComponent({
       }
 
       const layout =
-        null ??
         builderStore.layoutById(builderStore.lastLayoutId) ??
-        [...builderStore.layouts].sort(makeObjectSorter('order'))[0] ??
+        [...builderStore.layouts].sort(sorter)[0] ??
         null;
 
       return layout ? `/builder/${layout.id}` : null;

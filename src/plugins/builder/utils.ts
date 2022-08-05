@@ -15,6 +15,7 @@ import defaults from 'lodash/defaults';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
+import { Router } from 'vue-router';
 import {
   CENTER,
   DEFAULT_LAYOUT_HEIGHT,
@@ -417,7 +418,7 @@ export async function startAddLayout(
     component: 'InputDialog',
     componentProps: {
       modelValue: 'Brewery Layout',
-      title: 'Add Layout',
+      title: 'New Layout',
       message: 'Create a new Brewery Builder layout',
     },
   });
@@ -432,12 +433,11 @@ export async function startAddLayout(
     width: source?.width ?? DEFAULT_LAYOUT_WIDTH,
     height: source?.height ?? DEFAULT_LAYOUT_HEIGHT,
     parts: deepCopy(source?.parts) ?? [],
-    order: builderStore.layouts.length + 1,
   });
   return id;
 }
 
-export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
+export function startChangeLayoutTitle(layout: Maybe<BuilderLayout>): void {
   if (!layout) {
     return;
   }
@@ -452,6 +452,34 @@ export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
   }).onOk((title: string) => {
     if (layout) {
       builderStore.saveLayout({ ...layout, title });
+    }
+  });
+}
+
+export function startRemoveLayout(
+  layout: Maybe<BuilderLayout>,
+  router: Router,
+): void {
+  if (!layout) {
+    return;
+  }
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: 'Remove layout',
+      message: `Are you sure you wish to remove ${layout.title}?`,
+      noBackdropDismiss: true,
+    },
+  }).onOk(async () => {
+    if (layout) {
+      const builderStore = useBuilderStore();
+      await builderStore.removeLayout(layout).catch(() => {});
+    }
+    const path = router.currentRoute.value.path;
+    if (path === `/brewery/${layout.id}`) {
+      router.replace('/brewery');
+    } else if (path === `/builder/${layout.id}`) {
+      router.replace('/builder');
     }
   });
 }

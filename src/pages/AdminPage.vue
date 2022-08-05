@@ -24,7 +24,7 @@ interface ConfigService {
   configComponent: string;
 }
 
-const orderSorter = makeObjectSorter<{ order: number }>('order');
+const sorter = makeObjectSorter<Dashboard>('title');
 
 export default defineComponent({
   name: 'AdminPage',
@@ -40,22 +40,17 @@ export default defineComponent({
       set: (v) => systemStore.patchUserUISettings({ experimental: v }),
     });
 
-    const showSidebarLayouts = computed<boolean>({
-      get: () => userUISettings.value.showSidebarLayouts,
-      set: (v) => systemStore.patchUserUISettings({ showSidebarLayouts: v }),
-    });
-
     const buildDate = computed<string>(
       () => __BREWBLOX_BUILD_DATE ?? 'UNKNOWN',
     );
 
     const dashboards = computed<Dashboard[]>(() =>
-      [...dashboardStore.dashboards].sort(orderSorter),
+      [...dashboardStore.dashboards].sort(sorter),
     );
 
     const serviceComponents = computed<ConfigService[]>(() =>
       [...serviceStore.services]
-        .sort(orderSorter)
+        .sort(sorter)
         .map((v) => ({
           serviceId: v.id,
           title: v.title,
@@ -65,7 +60,7 @@ export default defineComponent({
     );
 
     const layouts = computed<BuilderLayout[]>(() =>
-      [...builderStore.layouts].sort(orderSorter),
+      [...builderStore.layouts].sort(sorter),
     );
 
     return {
@@ -78,7 +73,6 @@ export default defineComponent({
       startEditBuilderTouchDelay,
       startupDone,
       experimental,
-      showSidebarLayouts,
       buildDate,
       dashboards,
       serviceComponents,
@@ -115,11 +109,6 @@ export default defineComponent({
           <ToggleAction
             v-model="experimental"
             label="Experimental features"
-            :colored="false"
-          />
-          <ToggleAction
-            v-model="showSidebarLayouts"
-            label="Show builder layouts in sidebar"
             :colored="false"
           />
           <ActionItem

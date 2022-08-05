@@ -4,7 +4,6 @@ import { ref } from 'vue';
 export interface UserUISettings {
   keyboardLayout: string;
   experimental: boolean;
-  showSidebarLayouts: boolean;
   homePage: string | null;
   builderTouchDelayed: 'dense' | 'always' | 'never';
   timeFormat: 'auto' | '12h' | '24h';
@@ -23,7 +22,6 @@ export interface UserTimeZone {
 export const defaultUserUISettings = (): UserUISettings => ({
   keyboardLayout: 'english',
   experimental: false,
-  showSidebarLayouts: true,
   homePage: null,
   builderTouchDelayed: 'dense',
   timeFormat: 'auto',

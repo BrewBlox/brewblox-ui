@@ -24,7 +24,6 @@ const plugin: Plugin = {
       wizard: (stub): TiltService => ({
         ...stub,
         title: stub.id,
-        order: 0,
         config: {},
       }),
     });

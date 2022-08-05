@@ -4,6 +4,7 @@ import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import {
   startAddLayout,
   startChangeLayoutTitle,
+  startRemoveLayout,
 } from '@/plugins/builder/utils';
 import { useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
@@ -36,22 +37,11 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const route = useRoute();
 
-    const layoutIds = computed<string[]>(() => builderStore.layoutIds);
-
     const title = computed<string>(() => props.layout?.title ?? 'Unknown');
 
     const label = computed<string | null>(() =>
       props.noLabel ? null : title.value,
     );
-
-    const listed = computed<boolean>({
-      get: () => props.layout?.listed ?? true,
-      set: (v) => {
-        if (props.layout) {
-          builderStore.saveLayout({ ...props.layout, listed: v });
-        }
-      },
-    });
 
     const isHomePage = computed<boolean>({
       get: () =>
@@ -85,10 +75,6 @@ export default defineComponent({
       saveFile(exported, `brewblox-${props.layout.title}-layout.json`);
     }
 
-    function renameLayout(): void {
-      startChangeLayoutTitle(props.layout);
-    }
-
     function clearParts(): void {
       createDialog({
         component: 'ConfirmDialog',
@@ -101,26 +87,6 @@ export default defineComponent({
         if (props.layout) {
           builderStore.saveLayout({ ...props.layout, parts: [] });
         }
-      });
-    }
-
-    function removeLayout(): void {
-      if (!props.layout) {
-        return;
-      }
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: 'Remove layout',
-          message: `Are you sure you wish to remove ${props.layout.title}?`,
-          noBackdropDismiss: true,
-        },
-      }).onOk(async () => {
-        if (props.layout) {
-          await builderStore.removeLayout(props.layout).catch(() => {});
-        }
-        const [id] = layoutIds.value;
-        selectLayout(id || null);
       });
     }
 
@@ -170,16 +136,15 @@ export default defineComponent({
 
     return {
       label,
-      listed,
       inEditor,
       isHomePage,
       selectLayout,
       copyLayout,
-      renameLayout,
+      startChangeLayoutTitle,
       createLayoutWidget,
       exportLayout,
       clearParts,
-      removeLayout,
+      startRemoveLayout,
     };
   },
 });
@@ -196,10 +161,6 @@ export default defineComponent({
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
-    <ToggleAction
-      v-model="listed"
-      label="Show in sidebar"
-    />
     <ActionItem
       icon="file_copy"
       label="Copy layout"
@@ -207,12 +168,12 @@ export default defineComponent({
     />
     <ActionItem
       icon="edit"
-      label="Rename layout"
-      @click="renameLayout"
+      label="Change layout name"
+      @click="startChangeLayoutTitle(layout)"
     />
     <ActionItem
       icon="dashboard"
-      label="Show layout on dashboard"
+      label="Create widget for layout"
       @click="createLayoutWidget"
     />
     <ActionItem
@@ -228,7 +189,7 @@ export default defineComponent({
     <ActionItem
       icon="delete"
       label="Remove layout"
-      @click="removeLayout"
+      @click="startRemoveLayout(layout, $router)"
     />
   </ActionSubmenu>
 </template>

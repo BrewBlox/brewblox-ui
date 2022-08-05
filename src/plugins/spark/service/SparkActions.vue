@@ -5,13 +5,12 @@ import { saveHwInfo, startResetBlocks } from '@/plugins/spark/utils/actions';
 import { discoverBlocks } from '@/plugins/spark/utils/configuration';
 import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { Service, useServiceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'SparkActions',
@@ -22,7 +21,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const router = useRouter();
     const systemStore = useSystemStore();
     const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
@@ -38,15 +36,6 @@ export default defineComponent({
         const homePage =
           v && service.value ? `/service/${props.serviceId}` : null;
         systemStore.patchUserUISettings({ homePage });
-      },
-    });
-
-    const listed = computed<boolean>({
-      get: () => service.value?.listed ?? true,
-      set: (v) => {
-        if (service.value) {
-          serviceStore.saveService({ ...service.value, listed: v });
-        }
       },
     });
 
@@ -69,10 +58,6 @@ export default defineComponent({
       }
     }
 
-    function removeService(service: Maybe<Service>): void {
-      startRemoveService(service, router);
-    }
-
     return {
       startResetBlocks,
       saveHwInfo,
@@ -80,10 +65,9 @@ export default defineComponent({
       createBlockWizard,
       cleanUnusedNames,
       startChangeServiceTitle,
-      removeService,
+      startRemoveService,
       service,
       isHomePage,
-      listed,
       serviceReboot,
       controllerReboot,
       startDialog,
@@ -153,19 +137,15 @@ export default defineComponent({
         icon="home"
         :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
-      <ToggleAction
-        v-model="listed"
-        label="Show in sidebar"
-      />
       <ActionItem
         icon="edit"
-        label="Rename service"
+        label="Change service name"
         @click="startChangeServiceTitle(service)"
       />
       <ActionItem
         icon="delete"
         label="Remove service from UI"
-        @click="removeService(service)"
+        @click="startRemoveService(service, $router)"
       />
     </template>
   </ActionSubmenu>
