@@ -6,7 +6,8 @@ export interface UserUISettings {
   experimental: boolean;
   homePage: string | null;
   builderTouchDelayed: 'dense' | 'always' | 'never';
-  timeFormat: 'auto' | '12h' | '24h';
+  dateFormatString: string;
+  timeFormatString: string;
 }
 
 export interface UserUnits {
@@ -24,7 +25,8 @@ export const defaultUserUISettings = (): UserUISettings => ({
   experimental: false,
   homePage: null,
   builderTouchDelayed: 'dense',
-  timeFormat: 'auto',
+  dateFormatString: 'P',
+  timeFormatString: 'pp',
 });
 
 export const defaultUserUnits = (): UserUnits => ({

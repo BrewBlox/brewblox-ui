@@ -1,5 +1,6 @@
 import { userUISettings, userUnits } from '@/user-settings';
 import { Link, Quantity, TempUnit } from 'brewblox-proto/ts';
+import formatDate from 'date-fns/format';
 import isFinite from 'lodash/isFinite';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
@@ -64,18 +65,6 @@ export function parseDate(value: Maybe<DateCompatible>): Date | null {
   return date.isValid(value) ? new Date(value) : null;
 }
 
-export function timeFormatOpts(): Intl.DateTimeFormatOptions {
-  const { timeFormat } = userUISettings.value;
-
-  return {
-    hour12: {
-      '12h': true,
-      '24h': false,
-      auto: undefined,
-    }[timeFormat],
-  };
-}
-
 export function compareDate(
   lhs: Maybe<DateCompatible>,
   rhs: Maybe<DateCompatible>,
@@ -99,9 +88,9 @@ export function dateString(
   nullLabel = '<not set>',
 ): string {
   const dv = parseDate(value);
-  return dv == null
-    ? nullLabel
-    : dv.toLocaleString(undefined, timeFormatOpts());
+  const { dateFormatString, timeFormatString } = userUISettings.value;
+  const fmt = `${dateFormatString} ${timeFormatString}`;
+  return dv == null ? nullLabel : formatDate(dv, fmt);
 }
 
 /**
@@ -124,10 +113,12 @@ export function shortDateString(
   if (dv == null) {
     return nullLabel;
   }
-  if (Math.abs(date.getDateDiff(new Date(), dv, 'hours')) < 24) {
-    return dv.toLocaleTimeString(undefined, timeFormatOpts());
-  }
-  return dv.toLocaleDateString(undefined, timeFormatOpts());
+  const { dateFormatString, timeFormatString } = userUISettings.value;
+  const fmt =
+    Math.abs(date.getDateDiff(new Date(), dv, 'hours')) < 24
+      ? timeFormatString
+      : `${dateFormatString} ${timeFormatString}`;
+  return formatDate(dv, fmt);
 }
 
 /**

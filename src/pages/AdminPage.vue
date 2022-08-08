@@ -5,6 +5,7 @@ import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import {
+  startChangeDateFormat,
   startChangeGravityUnit,
   startChangeKeyboardLayout,
   startChangeTempUnit,
@@ -69,6 +70,7 @@ export default defineComponent({
       startChangeTempUnit,
       startChangeGravityUnit,
       startChangeTimezone,
+      startChangeDateFormat,
       startChangeTimeFormat,
       startEditBuilderTouchDelay,
       startupDone,
@@ -132,8 +134,13 @@ export default defineComponent({
             @click="startChangeTimezone"
           />
           <ActionItem
+            icon="mdi-calendar-outline"
+            label="Date formatting"
+            @click="startChangeDateFormat"
+          />
+          <ActionItem
             icon="mdi-clock-outline"
-            label="Time format"
+            label="Time formatting"
             @click="startChangeTimeFormat"
           />
           <ActionItem
