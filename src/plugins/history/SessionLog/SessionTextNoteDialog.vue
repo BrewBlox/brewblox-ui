@@ -1,7 +1,8 @@
 <script lang="ts">
 import { useDialog, useGlobals } from '@/composables';
+import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
-import { timeFormatOpts } from '@/utils/quantity';
+import formatDate from 'date-fns/format';
 import { QInput } from 'quasar';
 import { defineComponent, nextTick, ref } from 'vue';
 
@@ -64,9 +65,9 @@ export default defineComponent({
             : [prev.length, prev.length];
 
         // [Fri 11/15/2019, 2:00:23 PM]
-        const dayOfWeek = date.toLocaleString(undefined, { weekday: 'short' });
-        const fulldate = date.toLocaleString(undefined, timeFormatOpts());
-        const insert = `[${dayOfWeek} ${fulldate}] `;
+        const { dateFormatString, timeFormatString } = userUISettings.value;
+        const fmt = `[ccc ${dateFormatString}, ${timeFormatString}]`;
+        const insert = formatDate(date, fmt);
 
         // Splice into current string
         local.value = [

@@ -13,6 +13,7 @@ import {
 } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { StoreObject, StoreObjectImpl } from 'brewblox-proto/ts';
+import formatDate from 'date-fns/format';
 import defaults from 'lodash/defaults';
 import omit from 'lodash/omit';
 import { defineStore } from 'pinia';
@@ -240,30 +241,61 @@ export function startChangeTimezone(): DialogChainObject {
   });
 }
 
-export function startChangeTimeFormat(): DialogChainObject {
+export function startChangeDateFormat(): DialogChainObject {
   const systemStore = useSystemStore();
   return createDialog({
     component: 'SelectDialog',
     componentProps: {
       selectOptions: [
-        { value: 'auto', label: 'Automatic' },
-        { value: '12h', label: '12H AM/PM' },
-        { value: '24h', label: '24H' },
-      ],
-      modelValue: userUISettings.value.timeFormat,
+        'P',
+        'yyyy-MM-dd',
+        'yyyy/MM/dd',
+        'dd/MM/yyyy',
+        'dd/MM/yy',
+        'MM/dd/yyyy',
+        'MM/dd/yy',
+        'MMM dd, yyyy',
+      ].map((fmt) => ({
+        label:
+          formatDate(new Date(1953, 3, 29), fmt) +
+          (fmt.startsWith('P') ? ' (default)' : ''),
+        value: fmt,
+      })),
+      modelValue: userUISettings.value.dateFormatString,
+      title: 'Choose date formatting',
+      message:
+        'Choose how date values are formatted in the UI. ' +
+        'The default value uses browser settings.',
+      selectProps: {
+        label: 'Date format',
+      },
+    },
+  }).onOk((dateFormatString: string) => {
+    systemStore.patchUserUISettings({ dateFormatString });
+  });
+}
+
+export function startChangeTimeFormat(): DialogChainObject {
+  const systemStore = useSystemStore();
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: ['pp', 'HH:mm:ss', 'hh:mm:ss aa'].map((fmt) => ({
+        label:
+          formatDate(new Date(1453, 3, 29, 14, 53, 20), fmt) +
+          (fmt.startsWith('p') ? ' (default)' : ''),
+        value: fmt,
+      })),
+      modelValue: userUISettings.value.timeFormatString,
       title: 'Choose time formatting',
-      message: `
-      <p>
-        Choose how time values are formatted in the UI.
-        If 'Automatic' is chosen, the browser and OS locales are used.
-      </p>
-      `,
-      html: true,
+      message:
+        'Choose how time values are formatted in the UI. ' +
+        'The default value uses browser settings.',
       selectProps: {
         label: 'Time format',
       },
     },
-  }).onOk((timeFormat: UserUISettings['timeFormat']) => {
-    systemStore.patchUserUISettings({ timeFormat });
+  }).onOk((timeFormatString: string) => {
+    systemStore.patchUserUISettings({ timeFormatString });
   });
 }
