@@ -206,9 +206,39 @@ export default defineComponent({
           </span>
         </q-step>
         <q-step
+          v-if="status?.firmware_error === 'INCOMPATIBLE'"
+          active-icon="close"
+          active-color="negative"
+          name="ACKNOWLEDGED"
+          title="Incompatible firmware"
+        >
+          <div>
+            A firmware update is required before the service can communicate
+            with the controller.
+          </div>
+          <q-btn
+            unelevated
+            color="primary"
+            label="update"
+            class="q-mt-md"
+            @click="startFirmwareUpdate"
+          />
+        </q-step>
+        <q-step
+          v-else-if="status?.identity_error === 'INCOMPATIBLE'"
+          active-icon="close"
+          active-color="negative"
+          name="ACKNOWLEDGED"
+          title="Invalid device ID"
+        >
+          The controller device ID does not match the desired device ID. Please
+          check your connection settings.
+        </q-step>
+        <q-step
+          v-else
           :done="isStepDone('ACKNOWLEDGED')"
           name="ACKNOWLEDGED"
-          title="Synchronize settings"
+          title="Validate controller handshake"
         >
           Your Spark service is connected to your controller, but not yet
           synchronized.
