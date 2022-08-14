@@ -11,7 +11,7 @@ import {
   startRemoveLayout,
 } from '@/plugins/builder/utils';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
-import { ServiceFeature, useFeatureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
 import { SidebarFolder, useSidebarStore } from '@/store/sidebar';
 import {
@@ -36,11 +36,6 @@ import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 type SidebarObject = Dashboard | Service | BuilderLayout;
-
-interface ServiceSuggestion {
-  stub: ServiceStub;
-  feature: ServiceFeature;
-}
 
 const sorter = makeObjectSorter<{ title: string }>('title');
 const dashboardFolderNodeId = 'MISC/DASHBOARDS';
@@ -97,13 +92,10 @@ export default defineComponent({
       ].sort(sorter),
     );
 
-    const suggestions = computed<ServiceSuggestion[]>(() =>
-      serviceStore.stubs
-        .map((stub) => {
-          const feature = featureStore.serviceById(stub.type)!;
-          return { stub, feature };
-        })
-        .filter(({ feature }) => feature !== null),
+    const stubs = computed<ServiceStub[]>(() =>
+      serviceStore.stubs.filter((stub) =>
+        featureStore.serviceIds.includes(stub.type),
+      ),
     );
 
     function folderHandler(node: QTreeNode): void {
@@ -236,23 +228,22 @@ export default defineComponent({
         },
       );
 
-      if (suggestions.value.length) {
+      if (stubs.value.length) {
         rootNodes.push({
-          id: spacerNodeId + '/suggestions',
+          id: spacerNodeId + '/stubs',
           selectable: false,
           label: '',
         });
       }
 
-      suggestions.value.forEach((suggestion) => {
-        const { stub, feature } = suggestion;
+      stubs.value.forEach((stub) => {
         rootNodes.push({
           id: stub.id,
           label: stub.id,
-          featureTitle: feature.title,
+          featureTitle: featureStore.serviceById(stub.type)?.title,
           icon: 'mdi-code-braces',
-          header: 'suggestion',
-          handler: (node) => startCreateService(node.stub, router),
+          header: 'stub',
+          handler: () => startCreateService(stub, router),
         });
       });
 
@@ -615,7 +606,7 @@ export default defineComponent({
           {{ node.label }}
         </q-item-section>
       </template>
-      <template #header-suggestion="{ node }">
+      <template #header-stub="{ node }">
         <q-item-section class="col-auto">
           <q-icon :name="node.icon" />
         </q-item-section>
