@@ -14,8 +14,14 @@ export default defineComponent({
   name: 'SetpointSensorPairFull',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, blockId, block, patchBlock, isVolatileBlock, isDriven } =
-      useBlockWidget.setup<SetpointSensorPairBlock>();
+    const {
+      serviceId,
+      blockId,
+      block,
+      patchBlock,
+      isVolatileBlock,
+      isClaimed,
+    } = useBlockWidget.setup<SetpointSensorPairBlock>();
 
     const usedBy = computed<Block[]>(() => {
       if (isVolatileBlock.value) {
@@ -32,7 +38,7 @@ export default defineComponent({
       serviceId,
       block,
       patchBlock,
-      isDriven,
+      isClaimed,
       usedBy,
     };
   },
@@ -46,8 +52,8 @@ export default defineComponent({
     <div class="widget-body row">
       <QuantityField
         :model-value="block.data.storedSetting"
-        :readonly="isDriven"
-        :class="{ darkened: !block.data.settingEnabled }"
+        :readonly="isClaimed"
+        :class="{ darkened: !block.data.enabled }"
         title="Setting"
         label="Setting"
         tag="big"
@@ -152,7 +158,7 @@ export default defineComponent({
 
       <div class="col-break" />
 
-      <DrivenIndicator
+      <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"

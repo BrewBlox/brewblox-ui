@@ -71,7 +71,7 @@ export default defineComponent({
 
     <component :is="context.mode">
       <template #warnings>
-        <BlockEnableToggle data-key="settingEnabled">
+        <BlockEnableToggle>
           <template #enabled>
             <span v-html="enabledString" />
           </template>

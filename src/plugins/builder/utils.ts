@@ -299,13 +299,13 @@ export function showDrivingBlockDialog(
     return showAbsentBlock(part, settingsKey);
   }
 
-  const driveChain = sparkStore
-    .driveChainsByService(block.serviceId)
-    .find((chain) => chain.target === block.id);
+  const claim = sparkStore
+    .claimsByService(block.serviceId)
+    .find((c) => c.target === block.id);
 
   const actual =
-    driveChain !== undefined
-      ? sparkStore.blockById(block.serviceId, driveChain.source)
+    claim !== undefined
+      ? sparkStore.blockById(block.serviceId, claim.source)
       : block;
 
   if (actual) {

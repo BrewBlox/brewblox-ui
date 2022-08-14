@@ -1,20 +1,61 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { quickPwmValues } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { channelName, prettyBlock } from '@/plugins/spark/utils/formatting';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
-import { ActuatorPwmBlock, Link } from 'brewblox-proto/ts';
+import {
+  BlockIntfType,
+  ChannelCapabilities,
+  FastPwmBlock,
+  IoArrayInterfaceBlock,
+  PwmFrequency,
+} from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { quickPwmValues } from '../../const';
+
+const frequencyOpts: SelectOption[] = Object.entries(PwmFrequency).map(
+  ([value, label]) => ({ label, value }),
+);
+
+const requiredCapabilities =
+  ChannelCapabilities.CHAN_SUPPORTS_PWM_80HZ |
+  ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ |
+  ChannelCapabilities.CHAN_SUPPORTS_PWM_200HZ |
+  ChannelCapabilities.CHAN_SUPPORTS_PWM_2000HZ;
 
 export default defineComponent({
-  name: 'ActuatorPwmWidget',
+  name: 'FastPwmWidget',
   setup() {
+    const sparkStore = useSparkStore();
     const { context, inDialog } = useContext.setup();
 
     const { serviceId, block, patchBlock, isClaimed } =
-      useBlockWidget.setup<ActuatorPwmBlock>();
+      useBlockWidget.setup<FastPwmBlock>();
 
-    const outputLink = computed<Link>(() => block.value.data.actuatorId);
+    const target = computed<IoArrayInterfaceBlock | null>(() =>
+      sparkStore.blockByLink(serviceId, block.value.data.hwDevice),
+    );
+
+    const channelOpts = computed<SelectOption[]>(() =>
+      sparkStore
+        .blocksByService(serviceId)
+        .filter((block): block is IoArrayInterfaceBlock =>
+          isBlockCompatible(block, BlockIntfType.IoArrayInterface),
+        )
+        .flatMap((block) =>
+          block.data.channels.map((channel) => ({ block, channel })),
+        )
+        .filter(({ channel }) => channel.capabilities & requiredCapabilities)
+        .map(({ block, channel }) => ({
+          label: `${block.id} ${channelName(block, channel.id)}`,
+          value: `${block.id}/${channel.id}`,
+          block,
+          channel,
+        })),
+    );
 
     const isLimited = computed<boolean>(
       () =>
@@ -28,18 +69,24 @@ export default defineComponent({
     });
 
     return {
+      setExclusiveChannelActuator,
+      ChannelCapabilities,
       prettyLink,
       fixedNumber,
+      frequencyOpts,
       quickPwmValues,
       context,
       inDialog,
       serviceId,
       block,
+      target,
+      channelOpts,
       patchBlock,
       isClaimed,
-      outputLink,
       isLimited,
       pwmDesired,
+      channelName,
+      prettyBlock,
     };
   },
 });
@@ -56,16 +103,29 @@ export default defineComponent({
     </template>
 
     <div class="q-mx-auto">
-      <CardWarning v-if="!outputLink.id">
-        <template #message> PWM has no target actuator configured. </template>
+      <CardWarning v-if="!target || !block.data.channel">
+        <template #message> PWM has no target channel configured. </template>
       </CardWarning>
       <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
         <template #enabled>
-          PWM is enabled and claims <i> {{ prettyLink(outputLink) }} </i>.
+          PWM is enabled
+          <template v-if="target">
+            and claims
+            <i>
+              {{ prettyBlock(target) }}
+              {{ channelName(target, block.data.channel) }} </i
+            >.
+          </template>
         </template>
         <template #disabled>
-          PWM is disabled and does not claim
-          <i> {{ prettyLink(outputLink) }} </i>.
+          PWM is disabled
+          <template v-if="target">
+            and does not claim
+            <i>
+              {{ prettyBlock(target) }}
+              {{ channelName(target, block.data.channel) }} </i
+            >.
+          </template>
         </template>
       </BlockEnableToggle>
 
@@ -140,21 +200,29 @@ export default defineComponent({
         <q-separator inset />
 
         <div class="widget-body row">
-          <DurationField
-            :model-value="block.data.period"
-            title="Period"
-            label="Period"
-            tag="big"
+          <SelectField
+            :model-value="block.data.frequency"
+            :options="frequencyOpts"
+            title="Frequency"
+            label="Frequency"
             class="col-grow"
-            @update:model-value="(v) => patchBlock({ period: v })"
+            @update:model-value="(v) => patchBlock({ frequency: v })"
           />
-          <LinkField
-            :model-value="block.data.actuatorId"
+          <ChannelSelectField
+            :model-value="{
+              hwDevice: block.data.hwDevice,
+              channel: block.data.channel,
+            }"
             :service-id="serviceId"
-            title="target"
-            label="Digital Actuator Target"
+            :capabilities="ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ"
+            clearable
+            title="Target channel"
+            label="Channel"
             class="col-grow"
-            @update:model-value="(v) => patchBlock({ actuatorId: v })"
+            @update:model-value="
+              ({ hwDevice, channel }) =>
+                setExclusiveChannelActuator(block, hwDevice, channel)
+            "
           />
         </div>
       </template>

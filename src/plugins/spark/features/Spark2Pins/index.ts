@@ -16,7 +16,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<Spark2PinsBlock> = {
       type,
-      generate: () => ({
+      generate: (): Spark2PinsBlock['data'] => ({
         channels: [],
         soundAlarm: false,
         hardware: Spark2Hardware.HW_UNKNOWN,

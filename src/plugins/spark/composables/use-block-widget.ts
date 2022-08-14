@@ -33,7 +33,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   patchBlock(data: Partial<BlockT['data']>): Promise<void>;
 
   hasGraph: boolean;
-  isDriven: ComputedRef<boolean>;
+  isClaimed: ComputedRef<boolean>;
   limitations: ComputedRef<string | null>;
 }
 
@@ -129,10 +129,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       },
     });
 
-    const isDriven = computed<boolean>(() =>
-      sparkStore
-        .driveChainsByService(serviceId)
-        .some((c) => c.target === blockId),
+    const isClaimed = computed<boolean>(
+      () => block.value.data.claimedBy && block.value.data.claimedBy.id != null,
     );
 
     return {
@@ -149,7 +147,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       limitations,
       graphConfig,
       hasGraph,
-      isDriven,
+      isClaimed,
     };
   },
 };

@@ -85,7 +85,13 @@ export const enumHint = (e: Enum<any>): string =>
     .map((v) => `'${v}'`)
     .join(', ');
 
-export function channelName(block: Block, id: number): string | undefined {
+export function channelName(
+  block: Maybe<Block>,
+  id: number,
+): string | undefined {
+  if (block == null) {
+    return undefined;
+  }
   if (matchesType<DS2408Block>(BlockType.DS2408, block)) {
     return ioChannelNames[block.type][block.data.connectMode][id];
   }

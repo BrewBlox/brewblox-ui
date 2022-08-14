@@ -12,7 +12,7 @@ import {
   showDrivingBlockDialog,
 } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isBlockDriven } from '@/plugins/spark/utils/info';
+import { isBlockClaimed } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
 import {
   ActuatorPwmBlock,
@@ -80,14 +80,14 @@ const blueprint: BuilderBlueprint = {
     const sparkStore = useSparkStore();
     const hasAddr = !!part.settings[PUMP_KEY]?.id;
     const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
-    const driven = isBlockDriven(block, sparkStore.driveChains);
+    const claimed = isBlockClaimed(block, sparkStore.claims);
 
     if (!hasAddr) {
       part.settings.enabled = !part.settings.enabled;
       savePart(part);
     } else if (block === null) {
       showAbsentBlock(part, PUMP_KEY);
-    } else if (driven) {
+    } else if (claimed) {
       showDrivingBlockDialog(part, PUMP_KEY, PUMP_TYPES);
     } else if (block.type === BlockType.DigitalActuator) {
       sparkStore.patchBlock(block, {

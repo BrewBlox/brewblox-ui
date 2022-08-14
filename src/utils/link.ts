@@ -2,29 +2,22 @@ import { BlockOrIntfType, Link } from 'brewblox-proto/ts';
 import { isLink } from './identity';
 import { prettyLink } from './quantity';
 
-export function rawLink(
-  id: string | null,
-  type?: BlockOrIntfType | null,
-  driven?: boolean,
-): Link;
+export function rawLink(id: string | null, type?: BlockOrIntfType | null): Link;
 export function rawLink(other: Link): Link;
 export function rawLink(
   value: Link | string | null,
   type?: BlockOrIntfType | null,
-  driven?: boolean,
 ): Link {
   return isLink(value)
     ? {
         __bloxtype: 'Link',
         id: value.id ?? null,
         type: value.type ?? null,
-        driven: value.driven,
       }
     : {
         __bloxtype: 'Link',
         id: value,
         type: type ?? null,
-        driven,
       };
 }
 
@@ -32,29 +25,20 @@ export class JSLink implements Link {
   public readonly __bloxtype = 'Link';
   public id: string | null;
   public type: BlockOrIntfType | null;
-  public driven: boolean;
 
-  public constructor(
-    id?: string | null,
-    type?: BlockOrIntfType | null,
-    driven?: boolean,
-  );
+  public constructor(id?: string | null, type?: BlockOrIntfType | null);
   public constructor(other: Link);
   public constructor(
     value?: Link | string | null,
     type?: BlockOrIntfType | null,
-    driven?: boolean,
   ) {
-    const obj = rawLink(value as any, type as any, driven as any);
+    const obj = rawLink(value as any, type as any);
     this.id = obj.id ?? null;
     this.type = obj.type as BlockOrIntfType;
-    this.driven = obj.driven ?? false;
   }
 
   public get postfix(): string {
-    const typeStr = this.type ?? '';
-    const drivenStr = this.driven ? ',driven' : '';
-    return `<${typeStr}${drivenStr}>`;
+    return `<${this.type ?? ''}>`;
   }
 
   public toString(): string {
@@ -66,7 +50,6 @@ export class JSLink implements Link {
       __bloxtype: 'Link',
       id: this.id,
       type: this.type,
-      driven: this.driven || undefined,
     };
   }
 
@@ -76,9 +59,7 @@ export class JSLink implements Link {
 
   public eq(other: Link): boolean {
     // Type does not have to be equal
-    return (
-      isLink(other) && this.id === other.id && !!this.driven === !!other.driven
-    );
+    return isLink(other) && this.id === other.id;
   }
 
   public withId(id: string | null): JSLink {
@@ -103,13 +84,11 @@ export class JSLink implements Link {
 export function bloxLink(
   id: string | null,
   type?: BlockOrIntfType | null,
-  driven?: boolean,
 ): JSLink;
 export function bloxLink(other?: Link): JSLink;
 export function bloxLink(
   value?: Link | string | null,
   type?: BlockOrIntfType | null,
-  driven?: boolean,
 ): JSLink {
-  return new JSLink(value as any, type, driven);
+  return new JSLink(value as any, type);
 }

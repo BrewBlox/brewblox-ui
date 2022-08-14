@@ -17,7 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<TempSensorMockBlock> = {
       type,
-      generate: () => ({
+      generate: (): TempSensorMockBlock['data'] => ({
         value: tempQty(20),
         setting: tempQty(20),
         fluctuations: [],

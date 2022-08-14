@@ -1,9 +1,7 @@
 <script lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  discoverBlocks,
-  makeBlockIdRules,
-} from '@/plugins/spark/utils/configuration';
+import { discoverBlocks } from '@/plugins/spark/utils/actions';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/block-dialog';

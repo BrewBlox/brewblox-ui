@@ -8,11 +8,11 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'SetpointSensorPairBasic',
   setup() {
-    const { serviceId, block, patchBlock, isDriven } =
+    const { serviceId, block, patchBlock, isClaimed } =
       useBlockWidget.setup<SetpointSensorPairBlock>();
 
     function editSetting(): void {
-      if (isDriven.value) {
+      if (isClaimed.value) {
         return;
       }
       createDialog({
@@ -31,7 +31,7 @@ export default defineComponent({
       prettyQty,
       serviceId,
       block,
-      isDriven,
+      isClaimed,
       editSetting,
     };
   },
@@ -44,7 +44,7 @@ export default defineComponent({
 
     <div class="widget-body row justify-center">
       <SettingValueField
-        :editable="!isDriven"
+        :editable="!isClaimed"
         class="col-auto"
         @click="editSetting"
       >
@@ -64,7 +64,7 @@ export default defineComponent({
 
       <div class="col-break" />
 
-      <DrivenIndicator
+      <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"

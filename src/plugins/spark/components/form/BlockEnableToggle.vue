@@ -1,14 +1,11 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { EnablerInterfaceBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'BlockEnableToggle',
   props: {
-    dataKey: {
-      type: String,
-      default: 'enabled',
-    },
     hideEnabled: {
       type: Boolean,
       default: false,
@@ -20,17 +17,16 @@ export default defineComponent({
   },
   emits: ['change'],
   setup(props, { emit }) {
-    const { block, patchBlock } = useBlockWidget.setup();
+    const { block, patchBlock } = useBlockWidget.setup<EnablerInterfaceBlock>();
 
-    const enabled = computed<boolean>(() =>
-      Boolean(block.value?.data[props.dataKey]),
-    );
+    const enabled = computed<boolean>(() => block.value.data.enabled);
 
     function toggleEnabled(): void {
+      const newV = !block.value.data.enabled;
       if (props.emitToggle) {
-        emit('change', !enabled.value);
+        emit('change', newV);
       } else {
-        patchBlock({ [props.dataKey]: !enabled.value });
+        patchBlock({ enabled: newV });
       }
     }
 

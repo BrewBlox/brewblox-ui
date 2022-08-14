@@ -156,14 +156,12 @@ describe('serialize', () => {
         __bloxtype: 'Link',
         id: 'sensor-1',
         type: null,
-        driven: undefined,
       },
       deeper: {
         sensor: {
           __bloxtype: 'Link',
           id: 'sensor-2',
           type: null,
-          driven: undefined,
         },
       },
     };

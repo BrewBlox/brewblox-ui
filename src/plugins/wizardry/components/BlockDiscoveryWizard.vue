@@ -1,10 +1,8 @@
 <script lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockConfig } from '@/plugins/spark/types';
-import {
-  discoverBlocks,
-  makeBlockIdRules,
-} from '@/plugins/spark/utils/configuration';
+import { discoverBlocks } from '@/plugins/spark/utils/actions';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { createBlockDialog } from '@/utils/block-dialog';

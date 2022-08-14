@@ -2,80 +2,74 @@ import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
+import {
+  enumHint,
+  prettifyConstraints,
+} from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
+import { bloxQty } from '@/utils/quantity';
 import {
-  ActuatorAnalogMockBlock,
   AnalogConstraintsObj,
+  BlockIntfType,
   BlockType,
+  FastPwmBlock,
+  PwmFrequency,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './ActuatorAnalogMockWidget.vue';
+import widget from './FastPwmWidget.vue';
 
-const type = BlockType.ActuatorAnalogMock;
+const type = BlockType.FastPwm;
 
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
     const featureStore = useFeatureStore();
 
-    const blockSpec: BlockSpec<ActuatorAnalogMockBlock> = {
+    const blockSpec: BlockSpec<FastPwmBlock> = {
       type,
-      generate: (): ActuatorAnalogMockBlock['data'] => ({
-        setting: 0,
+      generate: (): FastPwmBlock['data'] => ({
+        enabled: true,
+        hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
+        channel: 0,
+        invert: false,
+        frequency: PwmFrequency.PWM_FREQ_80HZ,
         desiredSetting: 0,
-        minSetting: 0,
-        maxSetting: 100,
+        setting: 0,
         value: 0,
-        minValue: 0,
-        maxValue: 100,
         constrainedBy: { constraints: [] },
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
       }),
     };
 
-    const fieldSpecs: BlockFieldSpec<ActuatorAnalogMockBlock>[] = [
+    const fieldSpecs: BlockFieldSpec<FastPwmBlock>[] = [
       {
         type,
         key: 'desiredSetting',
-        title: 'Setting',
+        title: 'Duty Setting',
         component: 'NumberValEdit',
-        valueHint: '0-100',
         generate: () => 0,
-        graphed: true,
+        valueHint: '0-100',
       },
       {
         type,
-        key: 'minSetting',
-        title: 'Minimum Setting',
-        component: 'NumberValEdit',
-        valueHint: '0-100',
-        generate: () => 0,
+        key: 'frequency',
+        title: 'Frequency',
+        component: 'EnumValEdit',
+        componentProps: { options: PwmFrequency },
+        generate: () => PwmFrequency.PWM_FREQ_80HZ,
+        valueHint: enumHint(PwmFrequency),
       },
       {
         type,
-        key: 'maxSetting',
-        title: 'Maximum Setting',
-        component: 'NumberValEdit',
-        valueHint: '0-100',
-        generate: () => 100,
-      },
-      {
-        type,
-        key: 'minValue',
-        title: 'Minimum Value',
-        component: 'NumberValEdit',
-        valueHint: '0-100',
-        generate: () => 0,
-      },
-      {
-        type,
-        key: 'maxValue',
-        title: 'Maximum Value',
-        component: 'NumberValEdit',
-        valueHint: '0-100',
-        generate: () => 100,
+        key: 'enabled',
+        title: 'Enabled',
+        component: 'BoolValEdit',
+        generate: () => true,
       },
       {
         type,
@@ -87,8 +81,18 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'setting',
+        title: 'Duty Setting',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: '0-100',
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'value',
-        title: 'Measured Value',
+        title: 'Duty Achieved',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',
@@ -100,12 +104,12 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Analog Actuator (Mock)',
+      title: 'Fast PWM',
       role: 'Output',
       component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
-        rows: 2,
+        rows: 3,
       },
     };
 

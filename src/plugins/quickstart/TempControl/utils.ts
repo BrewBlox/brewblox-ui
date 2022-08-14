@@ -143,10 +143,10 @@ export async function applyMode(
     throw new Error('No heat PID defined');
   }
 
-  await sparkStore.patchBlock(setpoint, { settingEnabled: false });
+  await sparkStore.patchBlock(setpoint, { enabled: false });
   await sparkStore.patchBlock(profile, { targetId: bloxLink(setpoint.id) });
 
-  // Disable all blocks driving target setpoint
+  // Disable all blocks claiming target setpoint
   await Promise.all(
     sparkStore
       .blocksByService(serviceId)
@@ -233,11 +233,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     }
 
     const deviceLink = digital.data.hwDevice;
-    // It is possible for MotorValve startChannel to be 0, so only check for DigitalActuator channel
-    if (
-      !deviceLink.id ||
-      (digital.type === BlockType.DigitalActuator && !digital.data.channel)
-    ) {
+    if (!deviceLink.id || !digital.data.channel) {
       issues.push({
         desc: `Pin Channel not defined: ${linkStr(pid, analog, digital)}`,
         autofix: () => createBlockDialogPromise(digital),
@@ -298,29 +294,29 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
       });
     }
 
-    const drivenLink = analog.data.targetId;
-    if (!drivenLink.id) {
+    const targetLink = analog.data.targetId;
+    if (!targetLink.id) {
       issues.push({
-        desc: `Driven block not defined: ${linkStr(pid, analog)}`,
+        desc: `Target block not defined: ${linkStr(pid, analog)}`,
         autofix: () => createBlockDialogPromise(analog),
       });
       return issues;
     }
 
-    const driven = sparkStore.blockByLink(serviceId, drivenLink);
-    if (!driven) {
+    const target = sparkStore.blockByLink(serviceId, targetLink);
+    if (!target) {
       issues.push({
-        desc: `Driven block not found: ${linkStr(pid, analog, drivenLink)}`,
+        desc: `Target block not found: ${linkStr(pid, analog, targetLink)}`,
         autofix: () => createBlockDialogPromise(analog),
       });
       return issues;
     }
 
     // ActuatorAnalogMock also is a valid target, but has no enabled flag
-    if (driven.data.enabled === false) {
+    if (target.data.enabled === false) {
       issues.push({
-        desc: `Driven block is disabled: ${linkStr(pid, analog, driven)}`,
-        autofix: () => sparkStore.patchBlock(driven, { enabled: true }),
+        desc: `Target block is disabled: ${linkStr(pid, analog, target)}`,
+        autofix: () => sparkStore.patchBlock(target, { enabled: true }),
       });
     }
   }

@@ -21,7 +21,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<OneWireGpioModuleBlock> = {
       type,
-      generate: () => ({
+      generate: (): OneWireGpioModuleBlock['data'] => ({
         channels: [],
         modulePosition: 0,
         useExternalPower: false,

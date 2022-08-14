@@ -16,7 +16,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<DisplaySettingsBlock> = {
       type,
-      generate: () => ({
+      generate: (): DisplaySettingsBlock['data'] => ({
         name: 'Display settings',
         widgets: [],
       }),

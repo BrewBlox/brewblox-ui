@@ -2,12 +2,14 @@
 import { useSparkStore } from '@/plugins/spark/store';
 import { channelName } from '@/plugins/spark/utils/formatting';
 import { isCompatible } from '@/plugins/spark/utils/info';
+import { bloxLink } from '@/utils/link';
 import {
   BlockIntfType,
   BlockType,
+  ChannelCapabilities,
   GpioDeviceType,
   GpioPins,
-  IoArrayBlock,
+  IoArrayInterfaceBlock,
   IoChannel,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
@@ -61,6 +63,8 @@ export default defineComponent({
               deviceType: GpioDeviceType.GPIO_DEV_SSR_2P,
               width: 2,
               pinsMask: GpioPins.NONE,
+              capabilities: ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT,
+              claimedBy: bloxLink(null),
             });
             emit('update:modelValue', { ...addr, channelId });
           }
@@ -76,7 +80,7 @@ export default defineComponent({
         ...sparkStore
           .blocksByService(props.serviceId)
           .filter(
-            (block): block is IoArrayBlock =>
+            (block): block is IoArrayInterfaceBlock =>
               isCompatible(block.type, BlockIntfType.IoArrayInterface) &&
               block.type !== BlockType.OneWireGpioModule,
           )

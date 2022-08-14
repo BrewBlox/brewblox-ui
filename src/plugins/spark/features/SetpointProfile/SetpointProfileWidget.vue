@@ -116,11 +116,11 @@ export default defineComponent({
           @change="changeEnabled"
         >
           <template #enabled>
-            Setpoint Profile is enabled and driving
+            Setpoint Profile is enabled and claims
             <i> {{ prettyLink(target) }} </i>.
           </template>
           <template #disabled>
-            Setpoint Profile is disabled and not driving
+            Setpoint Profile is disabled and does not claim
             <i> {{ prettyLink(target) }} </i>.
           </template>
         </BlockEnableToggle>

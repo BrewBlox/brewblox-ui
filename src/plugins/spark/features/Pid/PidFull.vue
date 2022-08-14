@@ -2,7 +2,7 @@
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
-import { isBlockDriven } from '@/plugins/spark/utils/info';
+import { isBlockClaimed } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { matchesType } from '@/utils/objects';
 import { bloxQty, fixedNumber, prettyQty, tempQty } from '@/utils/quantity';
@@ -31,8 +31,8 @@ export default defineComponent({
       sparkStore.blockByLink(serviceId, block.value.data.inputId),
     );
 
-    const inputDriven = computed<boolean>(() =>
-      isBlockDriven(inputBlock.value, sparkStore.driveChains),
+    const inputClaimed = computed<boolean>(() =>
+      isBlockClaimed(inputBlock.value, sparkStore.claims),
     );
 
     const inputStoredSetting = computed<Quantity | null>({
@@ -120,7 +120,7 @@ export default defineComponent({
       block,
       patchBlock,
       inputBlock,
-      inputDriven,
+      inputClaimed,
       inputStoredSetting,
       outputBlock,
       baseOutput,
@@ -150,13 +150,13 @@ export default defineComponent({
         label="Input Block"
         html
         message="
-              <p>A PID block drives its output to regulate its input.</p>
+              <p>A PID block sets its target setting to regulate its input value.</p>
               <p>
-                This input is a process value:
-                something that has a target value and an actual value.
-                In most cases, this will be a sensor and setpoint pair.
+                This input is a ProcessValue:
+                something that has a target setting and an measured value.
+                In most cases, the input will be a Setpoint block.
               </p>
-              <p>The input target minus the input value is called the error</p>
+              <p>The input setting minus the input value is called the error</p>
               "
         class="col-grow"
         @update:model-value="(v) => patchBlock({ inputId: v })"
@@ -165,8 +165,8 @@ export default defineComponent({
         <QuantityField
           v-if="inputBlock !== null"
           v-model="inputStoredSetting"
-          :readonly="inputDriven"
-          :class="[{ darkened: !inputBlock.data.settingEnabled }, 'col']"
+          :readonly="inputClaimed"
+          :class="[{ darkened: !inputBlock.data.enabled }, 'col']"
           label="Setting"
           tag="b"
         />
@@ -213,14 +213,14 @@ export default defineComponent({
         label="Output Block"
         html
         message="
-              <p>The PID sets its output block to the result from the PID calculation.</p>
+              <p>The PID sets its output block setting to the result from the PID calculation.</p>
               <p>
                 The output value is the sum of 3 parts derived from the input error:
                 Proportional, Integral and Derivative.
               </p>
               <p>
                 The output block is an 'analog' actuator.
-                A digital actuator can be driven indirectly via a PWM actuator.
+                The analog actuator may in turn set the setting for a digital actuator.
               </p>
               "
         class="col-grow"

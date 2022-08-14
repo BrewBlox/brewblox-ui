@@ -1,7 +1,6 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isBlockDriven } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyQty } from '@/utils/quantity';
@@ -16,10 +15,6 @@ export default defineComponent({
 
     const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
       sparkStore.blockByLink(serviceId, block.value.data.inputId),
-    );
-
-    const inputDriven = computed<boolean>(() =>
-      isBlockDriven(inputBlock.value, sparkStore.driveChains),
     );
 
     const outputBlock = computed<Block | null>(() =>
@@ -43,7 +38,7 @@ export default defineComponent({
 
       const setpointId = inputBlock.value.id;
       const setpointChain = sparkStore
-        .driveChainsByService(serviceId)
+        .claimsByService(serviceId)
         .find((chain) => chain.target === setpointId);
 
       if (setpointChain) {
@@ -78,7 +73,6 @@ export default defineComponent({
       fixedNumber,
       block,
       inputBlock,
-      inputDriven,
       outputBlock,
       kp,
       fit,

@@ -1,8 +1,11 @@
 <script lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
 import { SparkService } from '@/plugins/spark/types';
-import { saveHwInfo, startResetBlocks } from '@/plugins/spark/utils/actions';
-import { discoverBlocks } from '@/plugins/spark/utils/configuration';
+import {
+  discoverBlocks,
+  saveHwInfo,
+  startResetBlocks,
+} from '@/plugins/spark/utils/actions';
 import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { useServiceStore } from '@/store/services';

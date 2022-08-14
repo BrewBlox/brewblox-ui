@@ -25,6 +25,7 @@ import {
   PidBlock,
   ReferenceKind,
   SetpointSensorPairBlock,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { DisplayBlock, QuickstartPatch } from '../types';
@@ -102,13 +103,14 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       data: {
         sensorId: bloxLink(names.hltSensor),
         storedSetting: tempQty(70),
-        settingEnabled: false,
+        enabled: false,
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
       },
     }),
     typed<SetpointSensorPairBlock>({
@@ -118,13 +120,14 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       data: {
         sensorId: bloxLink(names.mtSensor),
         storedSetting: tempQty(67),
-        settingEnabled: false,
+        enabled: false,
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
       },
     }),
     typed<SetpointSensorPairBlock>({
@@ -134,13 +137,14 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       data: {
         sensorId: bloxLink(names.bkSensor),
         storedSetting: tempQty(70),
-        settingEnabled: false,
+        enabled: false,
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
       },
     }),
     // Setpoint Driver
@@ -150,7 +154,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       serviceId,
       data: {
         targetId: bloxLink(names.hltSetpoint),
-        drivenTargetId: bloxLink(names.hltSetpoint),
         referenceId: bloxLink(names.mtSetpoint),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
         enabled: false,
@@ -165,6 +168,7 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
             },
           ],
         },
+        claimedBy: bloxLink(null),
       },
     }),
     // Digital Actuators
@@ -177,6 +181,10 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         channel: config.hltChannel.channelId,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
         invert: false,
         constrainedBy: {
           constraints: actuatorConstraints,
@@ -192,6 +200,10 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         channel: config.bkChannel.channelId,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
         invert: false,
         constrainedBy: {
           constraints: actuatorConstraints,
@@ -207,13 +219,13 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         enabled: true,
         period: bloxQty('2s'),
         actuatorId: bloxLink(names.hltAct),
-        drivenActuatorId: bloxLink(null),
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: {
           constraints: pwmConstraints,
         },
+        claimedBy: bloxLink(null),
       },
     }),
     typed<ActuatorPwmBlock>({
@@ -224,13 +236,13 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         enabled: true,
         period: bloxQty('2s'),
         actuatorId: bloxLink(names.bkAct),
-        drivenActuatorId: bloxLink(null),
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: {
           constraints: pwmConstraints,
         },
+        claimedBy: bloxLink(null),
       },
     }),
     // PID
@@ -377,21 +389,21 @@ export function defineWidgets(
               id: nanoid(),
               serviceId,
               blockId: names.hltSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
             }),
             typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.mtSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
             }),
             typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.bkSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
             }),
           ],
@@ -404,7 +416,7 @@ export function defineWidgets(
               id: nanoid(),
               serviceId,
               blockId: names.mtSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
             }),
             typed<BlockChange<SetpointSensorPairBlock>>({
@@ -412,7 +424,7 @@ export function defineWidgets(
               serviceId,
               blockId: names.hltSetpoint,
               data: {
-                settingEnabled: true,
+                enabled: true,
                 storedSetting: tempQty(70),
               },
               confirmed: {
@@ -430,7 +442,7 @@ export function defineWidgets(
               serviceId,
               blockId: names.mtSetpoint,
               data: {
-                settingEnabled: true,
+                enabled: true,
                 storedSetting: tempQty(66.7),
               },
               confirmed: {
@@ -457,7 +469,7 @@ export function defineWidgets(
               serviceId,
               blockId: names.bkSetpoint,
               data: {
-                settingEnabled: true,
+                enabled: true,
                 storedSetting: tempQty(100),
               },
               confirmed: {

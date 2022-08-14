@@ -6,7 +6,7 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'MotorValveBasic',
   setup() {
-    const { serviceId, block, patchBlock, limitations, isDriven } =
+    const { serviceId, block, patchBlock, limitations, isClaimed } =
       useBlockWidget.setup<MotorValveBlock>();
 
     return {
@@ -14,7 +14,7 @@ export default defineComponent({
       block,
       patchBlock,
       limitations,
-      isDriven,
+      isClaimed,
     };
   },
 });
@@ -32,7 +32,7 @@ export default defineComponent({
             :model-value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
             :pending-reason="limitations"
-            :disable="isDriven"
+            :disable="isClaimed"
             @update:model-value="(v) => patchBlock({ desiredState: v })"
           />
         </LabeledField>
@@ -42,7 +42,7 @@ export default defineComponent({
           class="col-grow"
         />
         <div class="col-break" />
-        <DrivenIndicator
+        <ClaimIndicator
           :block-id="block.id"
           :service-id="serviceId"
           class="col-grow"

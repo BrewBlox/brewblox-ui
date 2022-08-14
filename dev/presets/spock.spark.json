@@ -758,7 +758,7 @@
           "type": "TempSensorInterface",
           "id": "sensor-1"
         },
-        "settingEnabled": true,
+        "enabled": true,
         "storedSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -797,7 +797,7 @@
       "type": "SetpointSensorPair",
       "serviceId": "spock",
       "data": {
-        "settingEnabled": true,
+        "enabled": true,
         "storedSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",

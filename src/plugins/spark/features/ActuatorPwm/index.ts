@@ -24,19 +24,15 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorPwmBlock> = {
       type,
-      generate: () => ({
+      generate: (): ActuatorPwmBlock['data'] => ({
         actuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
-        drivenActuatorId: bloxLink(
-          null,
-          BlockIntfType.ActuatorDigitalInterface,
-          true,
-        ),
         period: bloxQty('4s'),
         desiredSetting: 0,
         setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
         enabled: true,
+        claimedBy: bloxLink(null),
       }),
     };
 

@@ -22,7 +22,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SysInfoBlock> = {
       type,
-      generate: () => ({
+      generate: (): SysInfoBlock['data'] => ({
         deviceId: '',
         platform: SparkPlatform.PLATFORM_UNKNOWN,
         version: '',

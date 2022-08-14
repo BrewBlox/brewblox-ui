@@ -24,16 +24,11 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorLogicBlock> = {
       type,
-      generate: () => ({
+      generate: (): ActuatorLogicBlock['data'] => ({
         enabled: true,
         result: LogicResult.RESULT_EMPTY,
         errorPos: 0,
         targetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
-        drivenTargetId: bloxLink(
-          null,
-          BlockIntfType.ActuatorDigitalInterface,
-          true,
-        ),
         analog: [],
         digital: [],
         expression: '',
