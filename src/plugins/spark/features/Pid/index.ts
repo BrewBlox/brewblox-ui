@@ -31,7 +31,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<PidBlock> = {
       type,
-      generate: () => ({
+      generate: (): PidBlock['data'] => ({
         inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
         inputValue: tempQty(0),
@@ -50,7 +50,6 @@ const plugin: Plugin = {
         integral: deltaTempMultHourQty(0),
         derivative: deltaTempPerMinuteQty(0),
         derivativeFilter: FilterChoice.FILTER_NONE,
-        drivenOutputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
         integralReset: 0,
         boilPointAdjust: deltaTempQty(0),
         boilMinOutput: 0,

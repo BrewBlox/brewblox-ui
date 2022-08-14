@@ -19,7 +19,7 @@ export default defineComponent({
   name: 'ActuatorOffsetWidget',
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { serviceId, block, patchBlock, isDriven } =
+    const { serviceId, block, patchBlock, isClaimed } =
       useBlockWidget.setup<ActuatorOffsetBlock>();
 
     const target = computed<Link>({
@@ -66,7 +66,7 @@ export default defineComponent({
       inDialog,
       serviceId,
       block,
-      isDriven,
+      isClaimed,
       target,
       reference,
       refKind,
@@ -102,18 +102,21 @@ export default defineComponent({
       </CardWarning>
       <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
         <template #enabled>
-          Driver is enabled and driving <i> {{ prettyLink(target) }} </i>, based
-          on the {{ refKindLabel }} of <i> {{ prettyLink(reference) }} </i>.
+          Driver is enabled and claims <i> {{ prettyLink(target) }} </i>.
+          <br />
+          The setting is based on the {{ refKindLabel }} of
+          <i> {{ prettyLink(reference) }} </i>.
         </template>
         <template #disabled>
-          Driver is disabled and not driving <i> {{ prettyLink(target) }} </i>.
+          Driver is disabled and does not claim
+          <i> {{ prettyLink(target) }} </i>.
         </template>
       </BlockEnableToggle>
 
       <div class="widget-body row">
         <InputField
           v-model="desiredSetting"
-          :readonly="isDriven"
+          :readonly="isClaimed"
           tag="big"
           title="Desired offset"
           label="Desired offset"
@@ -166,7 +169,7 @@ export default defineComponent({
 
         <div class="col-break" />
 
-        <DrivenIndicator
+        <ClaimIndicator
           :block-id="block.id"
           :service-id="serviceId"
           class="col-grow"

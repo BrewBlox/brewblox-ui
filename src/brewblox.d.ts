@@ -66,3 +66,7 @@ interface HasType {
 }
 
 type Patch<T> = HasId & Partial<T>;
+
+type DeepNonNullable<T> = {
+  [P in keyof T]-?: NonNullable<T[P]>;
+};

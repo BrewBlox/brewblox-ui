@@ -6,14 +6,14 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'ActuatorAnalogMockFull',
   setup() {
-    const { serviceId, block, patchBlock, isDriven } =
+    const { serviceId, block, patchBlock, isClaimed } =
       useBlockWidget.setup<ActuatorAnalogMockBlock>();
 
     return {
       serviceId,
       block,
       patchBlock,
-      isDriven,
+      isClaimed,
     };
   },
 });
@@ -25,7 +25,7 @@ export default defineComponent({
 
     <div class="widget-body row">
       <InputField
-        :readonly="isDriven"
+        :readonly="isClaimed"
         :model-value="block.data.desiredSetting"
         label="Setting"
         type="number"
@@ -79,7 +79,7 @@ export default defineComponent({
         @update:model-value="(v) => patchBlock({ maxValue: v })"
       />
       <div class="col-break" />
-      <DrivenIndicator
+      <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"

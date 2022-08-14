@@ -2,7 +2,7 @@ import { useFeatureStore } from '@/store/features';
 import { isLink } from '@/utils/identity';
 import {
   Block,
-  BlockDriveChain,
+  BlockClaim,
   BlockIntfType,
   BlockType,
   COMPATIBLE_TYPES,
@@ -33,6 +33,16 @@ export function isCompatible(
     return intf.some((i) => isCompatible(type, i));
   }
   return Boolean(COMPATIBLE_TYPES[intf]?.includes(type));
+}
+
+export function isBlockCompatible<T extends Block>(
+  block: Maybe<Block>,
+  intf: ComparedBlockType,
+): block is T {
+  if (block == null) {
+    return false;
+  }
+  return isCompatible(block.type, intf);
 }
 
 export function ifCompatible<T extends Block>(
@@ -79,12 +89,12 @@ export function isBlockDisplayed(
   );
 }
 
-export const isBlockDriven = (
+export const isBlockClaimed = (
   block: Maybe<Block>,
-  chains: Mapped<BlockDriveChain[]>,
+  claims: Mapped<BlockClaim[]>,
 ): boolean =>
   block != null &&
-  !!chains[block.serviceId]?.some((chain) => chain.target === block.id);
+  !!claims[block.serviceId]?.some((claim) => claim.target === block.id);
 
 export const isSparkState = (data: unknown): data is SparkStateEvent =>
   (data as SparkStateEvent).type === 'Spark.state';

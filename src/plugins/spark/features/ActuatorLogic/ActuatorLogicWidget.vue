@@ -53,11 +53,11 @@ export default defineComponent({
           :hide-enabled="context.mode === 'Basic'"
         >
           <template #enabled>
-            Logic Actuator is enabled and driving
+            Logic Actuator is enabled and claims
             <i> {{ prettyLink(target) }} </i>.
           </template>
           <template #disabled>
-            Logic Actuator is disabled and not driving
+            Logic Actuator is disabled and does not claim
             <i> {{ prettyLink(target) }} </i>.
           </template>
         </BlockEnableToggle>

@@ -65,17 +65,17 @@ export default defineComponent({
     const isUsed = computed<boolean>(
       () =>
         block.value !== null &&
-        block.value.data.settingEnabled &&
+        block.value.data.enabled &&
         sparkStore
           .blocksByService(serviceId)
           .filter(pidFilter)
           .some((blk) => blk.data.inputId.id === address.value.id),
     );
 
-    const isDriven = computed<boolean>(() =>
+    const isClaimed = computed<boolean>(() =>
       sparkStore
-        .driveChainsByService(serviceId)
-        .some((v) => v.target === block.value?.id),
+        .claimsByService(serviceId)
+        .some((c) => c.target === block.value?.id),
     );
 
     const setpointSetting = computed<number | null>(() =>
@@ -99,7 +99,7 @@ export default defineComponent({
       textColor,
       block,
       isBroken,
-      isDriven,
+      isClaimed,
       setpointSetting,
       setpointValue,
       setpointUnit,
@@ -144,7 +144,7 @@ export default defineComponent({
         </div>
         <div class="col row q-gutter-x-xs">
           <q-icon
-            :name="isDriven ? mdiSwapVerticalBold : mdiBullseyeArrow"
+            :name="isClaimed ? mdiSwapVerticalBold : mdiBullseyeArrow"
             size="20px"
             class="static col-auto"
           />

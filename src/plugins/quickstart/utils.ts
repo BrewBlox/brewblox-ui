@@ -186,7 +186,7 @@ export function withoutPrefix(prefix: string, val: string): string {
 }
 
 export const pidDefaults = (): PidBlock['data'] =>
-  useBlockSpecStore().blockSpecByType(BlockType.Pid).generate();
+  useBlockSpecStore().blockSpecByType<PidBlock>(BlockType.Pid).generate();
 
 export const makeBeerCoolConfig = (): PidConfig => ({
   kp: inverseTempQty(-50),

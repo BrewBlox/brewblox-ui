@@ -6,13 +6,13 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'ActuatorAnalogMockBasic',
   setup() {
-    const { serviceId, block, isDriven, patchBlock } =
+    const { serviceId, block, isClaimed, patchBlock } =
       useBlockWidget.setup<ActuatorAnalogMockBlock>();
 
     return {
       serviceId,
       block,
-      isDriven,
+      isClaimed,
       patchBlock,
     };
   },
@@ -26,7 +26,7 @@ export default defineComponent({
     <div class="widget-body row">
       <SliderField
         :model-value="block.data.setting"
-        :readonly="isDriven"
+        :readonly="isClaimed"
         title="Analog actuator Setting"
         label="Setting"
         tag="big"
@@ -44,7 +44,7 @@ export default defineComponent({
         class="col-grow"
       />
       <div class="col-break" />
-      <DrivenIndicator
+      <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"

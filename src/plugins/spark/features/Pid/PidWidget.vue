@@ -71,17 +71,17 @@ export default defineComponent({
           <CardWarning v-if="block.data.enabled && !block.data.active">
             <template #message>
               <span>
-                PID is inactive and not driving
-                <i> {{ prettyLink(outputLink) }} </i>.
+                PID is inactive.
+                <i> {{ prettyLink(outputLink) }} </i> is claimed but inactive.
               </span>
             </template>
           </CardWarning>
           <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
             <template #enabled>
-              PID is enabled and driving <i> {{ prettyLink(outputLink) }} </i>.
+              PID is enabled and claims <i> {{ prettyLink(outputLink) }} </i>.
             </template>
             <template #disabled>
-              PID is disabled and not driving
+              PID is disabled and does not claim
               <i> {{ prettyLink(outputLink) }} </i>.
             </template>
           </BlockEnableToggle>

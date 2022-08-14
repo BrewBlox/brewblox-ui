@@ -64,7 +64,7 @@ export default defineComponent({
 
     function confirm(): void {
       sparkStore.patchBlock(setpoint, {
-        settingEnabled: setpointEnabled.value,
+        enabled: setpointEnabled.value,
         storedSetting: setpointSetting.value,
       });
       sparkStore.patchBlock(profile, {
@@ -99,7 +99,9 @@ export default defineComponent({
     <DialogCard v-bind="{ title, message, html }">
       <template #title> Desired Setpoint settings </template>
       <template #message>
-        Your Setpoint Profile will now stop driving the Setpoint. <br />
+        Your Setpoint Profile will now release its claim on
+        <i> {{ setpointId }} </i>.
+        <br />
         <br />
         Please confirm the new settings for <i> {{ setpointId }} </i>.
       </template>

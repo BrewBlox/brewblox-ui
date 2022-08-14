@@ -16,7 +16,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MockPinsBlock> = {
       type,
-      generate: () => ({
+      generate: (): MockPinsBlock['data'] => ({
         channels: [],
       }),
     };

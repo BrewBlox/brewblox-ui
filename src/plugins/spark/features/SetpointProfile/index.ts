@@ -23,12 +23,11 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SetpointProfileBlock> = {
       type,
-      generate: () => ({
+      generate: (): SetpointProfileBlock['data'] => ({
         start: new Date().toISOString(),
         points: [],
         enabled: false,
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
-        drivenTargetId: bloxLink(null),
       }),
     };
 

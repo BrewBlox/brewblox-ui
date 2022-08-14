@@ -22,7 +22,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<TempSensorCombiBlock> = {
       type,
-      generate: () => ({
+      generate: (): TempSensorCombiBlock['data'] => ({
         sensors: [],
         combineFunc: SensorCombiFunc.SENSOR_COMBI_FUNC_AVG,
         value: tempQty(20),

@@ -14,6 +14,7 @@ import {
   FilterChoice,
   PidBlock,
   SetpointSensorPairBlock,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { TempControlWidget } from '../TempControl/types';
@@ -52,13 +53,14 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
       data: {
         sensorId: bloxLink(names.kettleSensor),
         storedSetting: tempQty(70),
-        settingEnabled: false,
+        enabled: false,
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
       },
     },
     {
@@ -74,6 +76,10 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         constrainedBy: {
           constraints: [],
         },
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
       },
     },
     {
@@ -84,13 +90,13 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         enabled: true,
         period: bloxQty('2s'),
         actuatorId: bloxLink(names.kettleAct),
-        drivenActuatorId: bloxLink(null),
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: {
           constraints: [],
         },
+        claimedBy: bloxLink(null),
       },
     },
     {

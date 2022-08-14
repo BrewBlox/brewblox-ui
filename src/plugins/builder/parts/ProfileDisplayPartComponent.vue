@@ -71,7 +71,7 @@ export default defineComponent({
       }
       const now = new Date().getTime();
       const start = new Date(block.value.data.start).getTime();
-      if (!block.value.data.enabled || !block.value.data.drivenTargetId.id) {
+      if (!block.value.data.enabled || !block.value.data.targetId.id) {
         return null;
       }
       const point: Setpoint | undefined = points.value.find(

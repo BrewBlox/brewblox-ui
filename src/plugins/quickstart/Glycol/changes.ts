@@ -22,6 +22,7 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { TempControlWidget } from '../TempControl/types';
@@ -80,13 +81,14 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       data: {
         sensorId: bloxLink(names.beerSensor),
         storedSetting: beerSetting,
-        settingEnabled: true,
+        enabled: true,
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
       },
     }),
     // Profile
@@ -112,7 +114,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
             temperature: bloxQty(beerSetting).copy(beerSetting.value! + 3),
           },
         ],
-        drivenTargetId: bloxLink(null),
       },
     }),
     // Mutex
@@ -136,6 +137,10 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
         constrainedBy: {
           constraints: [
             {
@@ -165,6 +170,10 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
         constrainedBy: {
           constraints: [
             {
@@ -189,11 +198,11 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         enabled: true,
         period: bloxQty('10m'),
         actuatorId: bloxLink(names.coolAct),
-        drivenActuatorId: bloxLink(null),
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
       },
     }),
     typed<ActuatorPwmBlock>({
@@ -204,11 +213,11 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         enabled: true,
         period: bloxQty('10s'),
         actuatorId: bloxLink(names.heatAct),
-        drivenActuatorId: bloxLink(null),
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
       },
     }),
     typed<PidBlock>({
@@ -247,13 +256,14 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         data: {
           sensorId: bloxLink(names.glycolSensor),
           storedSetting: glycolSetting,
-          settingEnabled: true,
+          enabled: true,
           setting: tempQty(null),
           value: tempQty(null),
           valueUnfiltered: tempQty(null),
           filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
           resetFilter: false,
+          claimedBy: bloxLink(null),
         },
       }),
       // Digital actuator
@@ -267,6 +277,10 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           invert: false,
           desiredState: DigitalState.STATE_INACTIVE,
           state: DigitalState.STATE_INACTIVE,
+          transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+          transitionDurationSetting: bloxQty('0s'),
+          transitionDurationValue: bloxQty('0s'),
+          claimedBy: bloxLink(null),
           constrainedBy: {
             constraints: [
               { minOff: bloxQty('5m'), remaining: bloxQty('0s') },
@@ -284,11 +298,11 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           enabled: true,
           period: bloxQty('30m'),
           actuatorId: bloxLink(names.glycolAct),
-          drivenActuatorId: bloxLink(null),
           setting: 0,
           desiredSetting: 0,
           value: 0,
           constrainedBy: { constraints: [] },
+          claimedBy: bloxLink(null),
         },
       }),
       typed<PidBlock>({

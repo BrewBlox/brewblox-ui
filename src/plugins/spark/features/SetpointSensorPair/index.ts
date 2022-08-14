@@ -23,16 +23,17 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SetpointSensorPairBlock> = {
       type,
-      generate: () => ({
+      generate: (): SetpointSensorPairBlock['data'] => ({
         sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
         storedSetting: tempQty(20),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         resetFilter: false,
-        settingEnabled: true,
+        enabled: true,
         filter: FilterChoice.FILTER_15s,
         filterThreshold: deltaTempQty(5),
+        claimedBy: bloxLink(null),
       }),
     };
 
@@ -46,7 +47,7 @@ const plugin: Plugin = {
       },
       {
         type,
-        key: 'settingEnabled',
+        key: 'enabled',
         title: 'Enabled',
         component: 'BoolValEdit',
         generate: () => true,

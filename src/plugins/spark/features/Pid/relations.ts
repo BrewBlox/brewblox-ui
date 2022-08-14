@@ -16,7 +16,7 @@ function findLinks(serviceId: string, id: string | null): BlockRelation[] {
     Link,
   ][];
 
-  const filtered = links.filter(([, link]) => !link.driven && link.id);
+  const filtered = links.filter(([, link]) => link.id != null);
 
   const relations: BlockRelation[] = filtered.map(([k, link]) => ({
     source: id,
@@ -34,8 +34,9 @@ function findLinks(serviceId: string, id: string | null): BlockRelation[] {
 function relations(block: PidBlock): BlockRelation[] {
   const chain = findLinks(block.serviceId, block.id);
 
-  // Setpoints may be driven by something else (profile, setpoint driver, etc)
-  // Just display the block that's actually driving, ignore any blocks driving the driver
+  // Setpoints may be claimed by something else (profile, setpoint driver, etc)
+  // Just display the block that directly claims the setpoint.
+  // Ignore any blocks that claim this block in turn.
   const setpointId = block.data.inputId.id;
   if (!setpointId) {
     return chain;

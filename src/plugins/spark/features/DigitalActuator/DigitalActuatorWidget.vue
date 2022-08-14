@@ -8,12 +8,14 @@ import { matchesType } from '@/utils/objects';
 import {
   Block,
   BlockType,
+  ChannelCapabilities,
   DigitalActuatorBlock,
   DS2408Block,
   DS2408ConnectMode,
-  IoArrayBlock,
+  IoArrayInterfaceBlock,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import { setExclusiveChannelActuator } from '../../utils/configuration';
 
 interface Claim {
   driverId: string;
@@ -39,10 +41,10 @@ export default defineComponent({
   setup() {
     const sparkStore = useSparkStore();
     const { inDialog, context } = useContext.setup();
-    const { serviceId, block, patchBlock, isDriven, limitations } =
+    const { serviceId, block, patchBlock, isClaimed, limitations } =
       useBlockWidget.setup<DigitalActuatorBlock>();
 
-    const hwBlock = computed<IoArrayBlock | null>(() =>
+    const hwBlock = computed<IoArrayInterfaceBlock | null>(() =>
       sparkStore.blockById(serviceId, block.value.data.hwDevice.id),
     );
 
@@ -89,14 +91,15 @@ export default defineComponent({
       }
       await patchBlock({ channel: channelId });
     }
-
     return {
+      setExclusiveChannelActuator,
+      ChannelCapabilities,
       inDialog,
       context,
       serviceId,
       block,
       patchBlock,
-      isDriven,
+      isClaimed,
       limitations,
       channelOpts,
       claimChannel,
@@ -132,7 +135,7 @@ export default defineComponent({
             :model-value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
             :pending-reason="limitations"
-            :disable="isDriven"
+            :disable="isClaimed"
             dense
             class="col-auto"
             @update:model-value="(v) => patchBlock({ desiredState: v })"
@@ -142,30 +145,21 @@ export default defineComponent({
         <template v-if="context.mode === 'Full'">
           <div class="col-break" />
 
-          <LinkField
-            :model-value="block.data.hwDevice"
+          <ChannelSelectField
+            :model-value="{
+              hwDevice: block.data.hwDevice,
+              channel: block.data.channel,
+            }"
             :service-id="serviceId"
-            :creatable="false"
-            :block-filter="targetFilter"
-            title="Pin Array"
-            label="Target Pin Array"
+            :capabilities="ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT"
+            clearable
+            title="Target channel"
+            label="Channel"
             class="col-grow"
             @update:model-value="
-              (v) =>
-                patchBlock({
-                  hwDevice: v,
-                  channel: 0,
-                })
+              ({ hwDevice, channel }) =>
+                setExclusiveChannelActuator(block, hwDevice, channel)
             "
-          />
-          <SelectField
-            :model-value="block.data.channel"
-            :options="channelOpts"
-            :readonly="!block.data.hwDevice.id"
-            title="Pin Channel"
-            label="Pin Channel"
-            class="col-grow"
-            @update:model-value="claimChannel"
           />
           <LabeledField
             label="Invert"
@@ -181,7 +175,7 @@ export default defineComponent({
 
         <div class="col-break" />
 
-        <DrivenIndicator
+        <ClaimIndicator
           :block-id="block.id"
           :service-id="serviceId"
           class="col-grow"

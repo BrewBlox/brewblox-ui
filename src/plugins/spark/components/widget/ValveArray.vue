@@ -1,19 +1,18 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import {
   channelName,
   findLimitations,
   limitationString,
 } from '@/plugins/spark/utils/formatting';
-import { isBlockDriven } from '@/plugins/spark/utils/info';
-import { makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 import {
   Block,
   BlockType,
   DigitalState,
-  IoArrayBlock,
+  IoArrayInterfaceBlock,
   IoChannel,
   Link,
   MotorValveBlock,
@@ -22,95 +21,52 @@ import { computed, defineComponent } from 'vue';
 
 interface EditableChannel extends IoChannel {
   name: string;
-  driver: MotorValveBlock | null;
+  actuator: MotorValveBlock | null;
 }
-
-interface Claim {
-  driverId: string;
-  channelId: number;
-}
-
-const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
 
 export default defineComponent({
   name: 'ValveArray',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block } = useBlockWidget.setup<IoArrayBlock>();
-
-    const claims = computed<Claim[]>(() =>
-      sparkStore
-        .blocksByService(serviceId)
-        .filter(motorValveFilter)
-        .filter((b) => b.data.hwDevice.id === block.value.id)
-        .map((b) => ({ driverId: b.id, channelId: b.data.startChannel })),
-    );
+    const { serviceId, block } = useBlockWidget.setup<IoArrayInterfaceBlock>();
 
     const channels = computed<EditableChannel[]>(() =>
-      block.value.data.channels.map((channel: IoChannel) => {
-        const { id } = channel;
-        const claim = claims.value.find((c) => c.channelId === id);
-        const name = channelName(block.value, id) ?? 'Unknown';
-        const driver = sparkStore.blockById<MotorValveBlock>(
-          serviceId,
-          claim?.driverId,
-        );
-        return { id, driver, name };
-      }),
+      block.value.data.channels.map((channel: IoChannel) => ({
+        ...channel,
+        name: channelName(block.value, channel.id) ?? 'Unknown',
+        actuator: sparkStore.blockByLink(serviceId, channel.claimedBy),
+      })),
     );
 
-    function driverLink(channel: EditableChannel): Link {
-      return bloxLink(channel.driver?.id ?? null, BlockType.MotorValve);
-    }
-
-    function driverDriven(block: Block): boolean {
-      return isBlockDriven(block, sparkStore.driveChains);
-    }
-
-    function driverLimitations(block: Block): string | null {
+    function actuatorLimitations(block: Block): string | null {
       return limitationString(findLimitations(block));
     }
 
-    async function saveDriver(
+    async function replaceActuator(
       channel: EditableChannel,
       link: Link,
     ): Promise<void> {
-      if (channel.driver && channel.driver.id === link.id) {
-        return;
-      }
-      if (channel.driver) {
-        await sparkStore.patchBlock(channel.driver, { startChannel: 0 });
-      }
-      if (link.id) {
-        const newDriver = sparkStore.blockById<MotorValveBlock>(
-          serviceId,
-          link.id,
-        );
-        const { id, type } = block.value;
-        await sparkStore.patchBlock(newDriver, {
-          hwDevice: bloxLink(id, type),
-          startChannel: channel.id,
-        });
-      }
+      setExclusiveChannelActuator(
+        sparkStore.blockByLink(serviceId, link),
+        bloxLink(block.value.id),
+        channel.id,
+      );
     }
 
-    async function saveState(
+    async function updateDigitalState(
       channel: EditableChannel,
       desiredState: DigitalState,
     ): Promise<void> {
-      if (channel.driver) {
-        await sparkStore.patchBlock(channel.driver, { desiredState });
-      }
+      await sparkStore.patchBlock(channel.actuator, { desiredState });
     }
 
     return {
-      channels,
-      driverDriven,
-      driverLimitations,
-      saveState,
-      driverLink,
+      BlockType,
       serviceId,
-      saveDriver,
+      channels,
+      actuatorLimitations,
+      updateDigitalState,
+      replaceActuator,
     };
   },
 });
@@ -128,15 +84,15 @@ export default defineComponent({
       </div>
       <div class="col-auto row items-baseline min-width-sm">
         <DigitalStateButton
-          v-if="channel.driver"
-          :disable="driverDriven(channel.driver)"
-          :model-value="channel.driver.data.desiredState"
+          v-if="channel.actuator"
+          :disable="channel.actuator.data.claimedBy.id"
+          :model-value="channel.actuator.data.desiredState"
           :pending="
-            channel.driver.data.state !== channel.driver.data.desiredState
+            channel.actuator.data.state !== channel.actuator.data.desiredState
           "
-          :pending-reason="driverLimitations(channel.driver)"
+          :pending-reason="actuatorLimitations(channel.actuator)"
           class="col-auto self-center"
-          @update:model-value="(v) => saveState(channel, v)"
+          @update:model-value="(v) => updateDigitalState(channel, v)"
         />
         <div
           v-else
@@ -146,13 +102,14 @@ export default defineComponent({
         </div>
       </div>
       <LinkField
-        :model-value="driverLink(channel)"
+        :model-value="channel.claimedBy"
         :service-id="serviceId"
+        :compatible="BlockType.MotorValve"
         title="Driver"
         label="Driver"
         dense
         class="col-grow"
-        @update:model-value="(link) => saveDriver(channel, link)"
+        @update:model-value="(link) => replaceActuator(channel, link)"
       />
     </div>
   </div>

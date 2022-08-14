@@ -16,7 +16,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<Spark3PinsBlock> = {
       type,
-      generate: () => ({
+      generate: (): Spark3PinsBlock['data'] => ({
         channels: [],
         enableIoSupply5V: false,
         enableIoSupply12V: false,

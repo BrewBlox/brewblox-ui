@@ -84,7 +84,7 @@ export default defineComponent({
     });
 
     const setpointEnabled = computed<boolean | null>({
-      get: () => setpoint.value?.data.settingEnabled ?? null,
+      get: () => setpoint.value?.data.enabled ?? null,
       set: (value) => setControl(!!value),
     });
 
@@ -121,7 +121,7 @@ export default defineComponent({
           }
 
           await sparkStore.patchBlock(setpoint.value, {
-            settingEnabled: true,
+            enabled: true,
           });
           await sparkStore.patchBlock(profile.value, {
             enabled: true,
@@ -190,7 +190,7 @@ export default defineComponent({
 
       if (setpoint.value) {
         await sparkStore.patchBlock(setpoint.value, {
-          settingEnabled: enabled,
+          enabled: enabled,
         });
       }
     }
@@ -370,7 +370,7 @@ export default defineComponent({
       :disable="!profile"
     >
       <q-item-section>
-        <q-item-label>Setpoint driven by Profile</q-item-label>
+        <q-item-label>Setpoint claimed by Profile</q-item-label>
       </q-item-section>
       <q-item-section avatar>
         <q-toggle

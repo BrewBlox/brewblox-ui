@@ -22,7 +22,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SequenceBlock> = {
       type,
-      generate: () => ({
+      generate: (): SequenceBlock['data'] => ({
         enabled: false,
         overrideState: false,
         activeInstruction: 0,

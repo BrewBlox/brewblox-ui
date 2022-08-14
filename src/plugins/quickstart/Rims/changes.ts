@@ -26,6 +26,7 @@ import {
   PidBlock,
   ReferenceKind,
   SetpointSensorPairBlock,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { DisplayBlock, QuickstartPatch } from '../types';
@@ -62,13 +63,14 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       data: {
         sensorId: bloxLink(names.kettleSensor),
         storedSetting: tempQty(67.7),
-        settingEnabled: false,
+        enabled: false,
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filter: FilterChoice.FILTER_15s,
         filterThreshold: deltaTempQty(5),
         resetFilter: false,
+        claimedBy: bloxLink(null),
       },
     }),
     typed<SetpointSensorPairBlock>({
@@ -78,13 +80,14 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       data: {
         sensorId: bloxLink(names.tubeSensor),
         storedSetting: tempQty(67.7),
-        settingEnabled: false,
+        enabled: false,
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filter: FilterChoice.FILTER_15s,
         filterThreshold: deltaTempQty(5),
         resetFilter: false,
+        claimedBy: bloxLink(null),
       },
     }),
     // Setpoint Driver
@@ -94,7 +97,6 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       serviceId,
       data: {
         targetId: bloxLink(names.tubeSetpoint),
-        drivenTargetId: bloxLink(names.tubeSetpoint),
         referenceId: bloxLink(names.kettleSetpoint),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
         enabled: true,
@@ -109,6 +111,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
             },
           ],
         },
+        claimedBy: bloxLink(null),
       },
     }),
     // Digital Actuators
@@ -123,6 +126,10 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         constrainedBy: { constraints: [] },
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
       },
     }),
     typed<DigitalActuatorBlock>({
@@ -136,6 +143,10 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         constrainedBy: { constraints: [] },
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
       },
     }),
     // PWM
@@ -147,11 +158,11 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         enabled: true,
         period: bloxQty('10s'),
         actuatorId: bloxLink(names.tubeAct),
-        drivenActuatorId: bloxLink(null),
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
       },
     }),
     // PID
@@ -282,7 +293,7 @@ export function defineWidgets(
               id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
-              data: { settingEnabled: true },
+              data: { enabled: true },
               confirmed: {},
             }),
           ],
@@ -295,7 +306,7 @@ export function defineWidgets(
               id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
             }),
             typed<BlockChange<DigitalActuatorBlock>>({
@@ -328,7 +339,7 @@ export function defineWidgets(
               id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
             }),
           ],

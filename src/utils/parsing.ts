@@ -55,11 +55,8 @@ export function parsePostfixed(
       if (matched) {
         const [, name, leftBracket, bracketed] = matched;
         if (leftBracket === '<') {
-          const [type, driven] = bracketed.split(',');
-          return [
-            name,
-            rawLink(val as string | null, type as BlockOrIntfType, !!driven),
-          ];
+          const [type] = bracketed.split(','); // backwards compatibility for old 'driven' links
+          return [name, rawLink(val as string | null, type as BlockOrIntfType)];
         } else if (leftBracket === '[') {
           return [name, rawQty(val as number | null, bracketed)];
         }

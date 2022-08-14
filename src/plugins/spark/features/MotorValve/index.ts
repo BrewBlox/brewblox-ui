@@ -28,13 +28,14 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MotorValveBlock> = {
       type,
-      generate: () => ({
+      generate: (): MotorValveBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
-        startChannel: 0,
+        channel: 0,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         valveState: ValveState.VALVE_INIT_IDLE,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
       }),
     };
 

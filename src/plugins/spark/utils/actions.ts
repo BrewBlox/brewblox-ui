@@ -10,24 +10,47 @@ import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { bloxLink } from '@/utils/link';
 import { notify } from '@/utils/notify';
-import { matchesType } from '@/utils/objects';
 import { dateString } from '@/utils/quantity';
 import {
   Block,
   BlockIntfType,
   BlockType,
-  DigitalActuatorBlock,
   DisplaySlot,
-  DS2408Block,
-  IoArrayBlock,
-  MotorValveBlock,
+  IoArrayInterfaceBlock,
+  IoDriverInterfaceBlock,
 } from 'brewblox-proto/ts';
 import isMatch from 'lodash/isMatch';
 import range from 'lodash/range';
 import { makeBlockIdRules } from './configuration';
 import { channelName } from './formatting';
-import { isBlockDisplayed, isBlockDisplayReady, isCompatible } from './info';
+import {
+  isBlockCompatible,
+  isBlockDisplayed,
+  isBlockDisplayReady,
+  isCompatible,
+} from './info';
 import { getDisplaySettingsBlock } from './system';
+
+export async function discoverBlocks(
+  serviceId: string | null,
+  show = true,
+): Promise<string[]> {
+  const sparkStore = useSparkStore();
+  if (!sparkStore.has(serviceId)) {
+    return [];
+  }
+  const discovered = await sparkStore.fetchDiscoveredBlocks(serviceId);
+  if (show) {
+    notify.info({
+      icon: 'mdi-magnify-plus-outline',
+      message:
+        discovered.length > 0
+          ? `Discovered <i>${discovered.join(', ')}</i>.`
+          : 'Discovered no new blocks.',
+    });
+  }
+  return discovered;
+}
 
 export function startChangeBlockId(block: Block | null): void {
   if (!block) {
@@ -183,7 +206,7 @@ export async function startAddBlockToDisplay(
   } else {
     const { id, type } = addr;
 
-    const link = bloxLink(id, type as BlockType);
+    const link = bloxLink(id, type);
     const slot: DisplaySlot = {
       pos: opts.pos,
       color: opts.color,
@@ -213,38 +236,29 @@ export async function startAddBlockToDisplay(
 }
 
 export function saveHwInfo(serviceId: string): void {
-  const linked: string[] = [];
+  const ioDrivers: string[] = [];
   const addressed: string[] = [];
   const sparkStore = useSparkStore();
 
   sparkStore.blocksByService(serviceId).forEach((block) => {
-    if (matchesType<MotorValveBlock>(BlockType.MotorValve, block)) {
-      const { hwDevice, startChannel } = block.data;
-      if (hwDevice.id === null || !startChannel) {
-        return;
-      }
-      const target = sparkStore.blockById<DS2408Block>(serviceId, hwDevice.id);
-      if (target) {
-        linked.push(
-          `${block.id}: ${target.id} ${channelName(target, startChannel)}`,
-        );
-      }
-    }
-
-    if (matchesType<DigitalActuatorBlock>(BlockType.DigitalActuator, block)) {
-      const { hwDevice, channel } = block.data;
+    if (isBlockCompatible(block, BlockIntfType.IoDriverInterface)) {
+      const actuator = block as IoDriverInterfaceBlock;
+      const { hwDevice, channel } = actuator.data;
       if (hwDevice.id === null || !channel) {
         return;
       }
-      const target = sparkStore.blockById<IoArrayBlock>(serviceId, hwDevice.id);
+      const target = sparkStore.blockById<IoArrayInterfaceBlock>(
+        serviceId,
+        hwDevice.id,
+      );
       if (target) {
-        linked.push(
+        ioDrivers.push(
           `${block.id}: ${target.id} ${channelName(target, channel)}`,
         );
       }
     }
 
-    if ('address' in block.data) {
+    if (isBlockCompatible(block, BlockIntfType.OneWireDeviceInterface)) {
       addressed.push(`${block.id}: ${block.data.address}`);
     }
   });
@@ -253,7 +267,7 @@ export function saveHwInfo(serviceId: string): void {
     `Service: ${serviceId}`,
     `Date: ${dateString(new Date())}`,
     '\n[Actuators]',
-    ...linked,
+    ...ioDrivers,
     '\n[OneWire addresses]',
     ...addressed,
   ];
@@ -281,7 +295,7 @@ export async function resetBlocks(
         .blocksByService(serviceId)
         .filter(
           (block) =>
-            isCompatible(block.type, BlockIntfType.OneWireDeviceInterface) &&
+            isBlockCompatible(block, BlockIntfType.OneWireDeviceInterface) &&
             !block.id.startsWith('New|'),
         )
         .forEach((block) => (addresses[block.data.address] = block.id));
@@ -296,7 +310,7 @@ export async function resetBlocks(
         .blocksByService(serviceId)
         .filter(
           (block) =>
-            isCompatible(block.type, BlockIntfType.OneWireDeviceInterface) &&
+            isBlockCompatible(block, BlockIntfType.OneWireDeviceInterface) &&
             !!addresses[block.data.address],
         )
         .map((block) =>

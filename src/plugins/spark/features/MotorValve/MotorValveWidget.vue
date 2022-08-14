@@ -68,9 +68,7 @@ export default defineComponent({
             />
           </template>
         </CardWarning>
-        <CardWarning
-          v-else-if="!block.data.hwDevice.id || !block.data.startChannel"
-        >
+        <CardWarning v-else-if="!block.data.hwDevice.id || !block.data.channel">
           <template #message>
             <span>This Motor Valve has no channel selected.</span>
           </template>

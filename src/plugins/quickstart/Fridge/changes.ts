@@ -17,6 +17,7 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { TempControlWidget } from '../TempControl/types';
@@ -55,13 +56,14 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
       data: {
         sensorId: bloxLink(names.fridgeSensor),
         storedSetting: fridgeSetting,
-        settingEnabled: true,
+        enabled: true,
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
       },
     }),
     // Mutex
@@ -85,6 +87,10 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
         constrainedBy: {
           constraints: [
             {
@@ -118,6 +124,10 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
         constrainedBy: {
           constraints: [
             {
@@ -142,11 +152,11 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         enabled: true,
         period: bloxQty('30m'),
         actuatorId: bloxLink(names.coolAct),
-        drivenActuatorId: bloxLink(null),
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
       },
     }),
     typed<ActuatorPwmBlock>({
@@ -157,11 +167,11 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         enabled: true,
         period: bloxQty('10s'),
         actuatorId: bloxLink(names.heatAct),
-        drivenActuatorId: bloxLink(null),
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
       },
     }),
     // Setpoint Profile
@@ -173,7 +183,6 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(names.fridgeSetpoint),
-        drivenTargetId: bloxLink(null),
         points: [
           {
             time: bloxQty('0s'),

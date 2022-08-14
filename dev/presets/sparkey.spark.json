@@ -58,7 +58,7 @@
           "type": "TempSensorInterface",
           "id": "Ferment Beer Sensor"
         },
-        "settingEnabled": true,
+        "enabled": true,
         "storedSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -306,7 +306,7 @@
           "type": "TempSensorInterface",
           "id": "Ferment Fridge Sensor"
         },
-        "settingEnabled": true,
+        "enabled": true,
         "storedSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -799,7 +799,7 @@
           "readonly": true,
           "value": 0
         },
-        "settingEnabled": false,
+        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -1037,7 +1037,7 @@
           "readonly": true,
           "value": 0
         },
-        "settingEnabled": false,
+        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -1224,7 +1224,7 @@
           "readonly": true,
           "value": 0
         },
-        "settingEnabled": false,
+        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",

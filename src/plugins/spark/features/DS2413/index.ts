@@ -16,7 +16,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<DS2413Block> = {
       type,
-      generate: () => ({
+      generate: (): DS2413Block['data'] => ({
         oneWireBusId: 0,
         address: '',
         connected: false,

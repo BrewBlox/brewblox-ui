@@ -1,92 +1,23 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { makeTypeFilter } from '@/utils/functional';
-import { matchesType } from '@/utils/objects';
-import {
-  Block,
-  BlockType,
-  DS2408Block,
-  DS2408ConnectMode,
-  MotorValveBlock,
-} from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
-
-interface Claim {
-  driverId: string;
-  channelId: number;
-}
-
-function targetFilter(b: Block): boolean {
-  // DS2408 is only valid if in valve mode
-  if (matchesType<DS2408Block>(BlockType.DS2408, b)) {
-    return b.data.connectMode === DS2408ConnectMode.CONNECT_VALVE;
-  }
-  // Filter is in addition to the default compatibility check
-  return true;
-}
-
-const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { ChannelCapabilities, MotorValveBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'MotorValveFull',
   setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, block, patchBlock, limitations, isDriven } =
+    const { serviceId, block, patchBlock, limitations, isClaimed } =
       useBlockWidget.setup<MotorValveBlock>();
 
-    const hwBlock = computed<DS2408Block | null>(() =>
-      sparkStore.blockByLink(serviceId, block.value.data.hwDevice),
-    );
-
-    const claims = computed<Claim[]>(() => {
-      if (!hwBlock.value) {
-        return [];
-      }
-      const targetId = hwBlock.value.id;
-      return sparkStore
-        .blocksByService(serviceId)
-        .filter(motorValveFilter)
-        .filter((b) => b.id !== block.value.id)
-        .filter((b) => b.data.hwDevice.id === targetId)
-        .map((b) => ({ driverId: b.id, channelId: b.data.startChannel }));
-    });
-
-    function driverStr(startChannel: number): string {
-      const claim = claims.value.find((c) => c.channelId === startChannel);
-      return claim ? ` (replace '${claim.driverId}')` : '';
-    }
-
-    const channelOpts = computed<SelectOption<number>[]>(() => [
-      { value: 0, label: 'Not set' },
-      { value: 5, label: `A${driverStr(5)}` },
-      { value: 1, label: `B${driverStr(1)}` },
-    ]);
-
-    async function claimChannel(channelId: number): Promise<void> {
-      if (block.value.data.startChannel === channelId) {
-        return;
-      }
-      const claim = claims.value.find((c) => c.channelId === channelId);
-      if (claim) {
-        const driver = sparkStore.blockById<MotorValveBlock>(
-          serviceId,
-          claim.driverId,
-        )!;
-        await sparkStore.patchBlock(driver, { startChannel: 0 });
-      }
-      await patchBlock({ startChannel: channelId });
-    }
-
     return {
+      ChannelCapabilities,
+      setExclusiveChannelActuator,
       serviceId,
       block,
       patchBlock,
       limitations,
-      isDriven,
-      channelOpts,
-      claimChannel,
-      targetFilter,
+      isClaimed,
     };
   },
 });
@@ -97,26 +28,21 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row">
-      <LinkField
-        :model-value="block.data.hwDevice"
+      <ChannelSelectField
+        :model-value="{
+          hwDevice: block.data.hwDevice,
+          channel: block.data.channel,
+        }"
         :service-id="serviceId"
-        :creatable="false"
-        :block-filter="targetFilter"
-        title="Target DS2408 Chip"
-        label="Target DS2408 Chip"
+        :capabilities="ChannelCapabilities.CHAN_SUPPORTS_BIDIRECTIONAL"
+        clearable
+        title="Target channel"
+        label="Channel"
         class="col-grow"
         @update:model-value="
-          (v) => patchBlock({ hwDevice: v, startChannel: 0 })
+          ({ hwDevice, channel }) =>
+            setExclusiveChannelActuator(block, hwDevice, channel)
         "
-      />
-      <SelectField
-        :model-value="block.data.startChannel"
-        :options="channelOpts"
-        :readonly="!block.data.hwDevice.id"
-        title="DS2408 Channel"
-        label="DS2408 Channel"
-        class="col-grow"
-        @update:model-value="claimChannel"
       />
       <div class="col-break" />
       <LabeledField
@@ -127,7 +53,7 @@ export default defineComponent({
           :model-value="block.data.desiredState"
           :pending="block.data.state !== block.data.desiredState"
           :pending-reason="limitations"
-          :disable="isDriven"
+          :disable="isClaimed"
           @update:model-value="(v) => patchBlock({ desiredState: v })"
         />
       </LabeledField>
@@ -137,7 +63,7 @@ export default defineComponent({
         class="col-grow"
       />
       <div class="col-break" />
-      <DrivenIndicator
+      <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"

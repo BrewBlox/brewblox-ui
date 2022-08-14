@@ -16,7 +16,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<BalancerBlock> = {
       type,
-      generate: () => ({
+      generate: (): BalancerBlock['data'] => ({
         clients: [],
       }),
     };

@@ -8,12 +8,14 @@ import {
 } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
+import { bloxQty } from '@/utils/quantity';
 import {
   BlockIntfType,
   BlockType,
   DigitalActuatorBlock,
   DigitalConstraintsObj,
   DigitalState,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './DigitalActuatorWidget.vue';
@@ -27,13 +29,17 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<DigitalActuatorBlock> = {
       type,
-      generate: () => ({
+      generate: (): DigitalActuatorBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
         constrainedBy: { constraints: [] },
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
       }),
     };
 

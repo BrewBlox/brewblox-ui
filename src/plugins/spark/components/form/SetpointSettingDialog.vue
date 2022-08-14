@@ -32,7 +32,7 @@ export default defineComponent({
       BlockType.SetpointSensorPair,
     );
 
-    const enabled = ref<boolean>(block?.data.settingEnabled ?? false);
+    const enabled = ref<boolean>(block?.data.enabled ?? false);
     const setting = ref<Quantity>(block?.data.storedSetting ?? tempQty(null));
 
     const notation = prettyUnit(setting.value.unit);
@@ -55,7 +55,7 @@ export default defineComponent({
     function save(): void {
       if (block) {
         sparkStore.patchBlock(block, {
-          settingEnabled: enabled.value,
+          enabled: enabled.value,
           storedSetting: setting.value,
         });
         onDialogOK();

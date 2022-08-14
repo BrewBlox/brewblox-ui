@@ -17,7 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<TempSensorExternalBlock> = {
       type,
-      generate: () => ({
+      generate: (): TempSensorExternalBlock['data'] => ({
         enabled: true,
         timeout: bloxQty('5m'),
         setting: tempQty(20),

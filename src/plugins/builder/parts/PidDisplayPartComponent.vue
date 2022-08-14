@@ -6,6 +6,7 @@ import {
   textTransformation,
 } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { userUnits } from '@/user-settings';
 import { deltaTempQty, preciseNumber, prettyUnit } from '@/utils/quantity';
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
@@ -54,9 +55,8 @@ export default defineComponent({
         : null,
     );
 
-    const drivingOffset = computed<boolean>(
-      () =>
-        target.value !== null && target.value.type === BlockType.ActuatorOffset,
+    const targetingOffset = computed<boolean>(() =>
+      isBlockCompatible(target.value, BlockType.ActuatorOffset),
     );
 
     const deltaTempUnit = computed<string>(
@@ -64,7 +64,7 @@ export default defineComponent({
     );
 
     const convertedOutputSetting = computed<number | null>(() =>
-      drivingOffset.value && block.value !== null
+      targetingOffset.value && block.value !== null
         ? deltaTempQty(outputSetting.value).value
         : outputSetting.value,
     );
@@ -72,7 +72,7 @@ export default defineComponent({
     const suffix = computed<string>(() =>
       outputSetting.value === null
         ? ''
-        : drivingOffset.value
+        : targetingOffset.value
         ? prettyUnit(deltaTempUnit.value)
         : '%',
     );
@@ -96,7 +96,7 @@ export default defineComponent({
       outputSetting,
       kp,
       target,
-      drivingOffset,
+      targetingOffset,
       convertedOutputSetting,
       suffix,
       color,
@@ -134,7 +134,7 @@ export default defineComponent({
           size="25px"
         />
         <q-icon
-          v-else-if="drivingOffset"
+          v-else-if="targetingOffset"
           :name="mdiPlusMinus"
           class="col-auto static"
           size="25px"

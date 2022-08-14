@@ -9,6 +9,7 @@ import DigitalActuator from './DigitalActuator';
 import DisplaySettings from './DisplaySettings';
 import DS2408 from './DS2408';
 import DS2413 from './DS2413';
+import FastPwm from './FastPwm';
 import InactiveObject from './InactiveObject';
 import MockPins from './MockPins';
 import MotorValve from './MotorValve';
@@ -40,6 +41,7 @@ const plugins: Plugin[] = [
   DS2408,
   DS2413,
   DeprecatedObject,
+  FastPwm,
   InactiveObject,
   MockPins,
   Pid,

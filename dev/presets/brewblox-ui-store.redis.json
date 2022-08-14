@@ -1111,7 +1111,7 @@
                   "value": 10,
                   "unit": "degC"
                 },
-                "settingEnabled": true
+                "enabled": true
               },
               "id": "80edc81a-8ee6-4ad7-8c55-ca924def3258",
               "serviceId": "sparkey"
@@ -1150,7 +1150,7 @@
                   "value": 20,
                   "unit": "degC"
                 },
-                "settingEnabled": true
+                "enabled": true
               },
               "id": "90f603ac-7d3e-46d6-a784-822e44e68dd9",
               "serviceId": "sparkey"
@@ -3441,7 +3441,7 @@
               "id": "08d7f410-83c7-45cb-a6ea-4d721b013f77",
               "blockId": "HERMS HLT Setpoint",
               "data": {
-                "settingEnabled": false
+                "enabled": false
               },
               "confirmed": {},
               "serviceId": "sparkey"
@@ -3450,7 +3450,7 @@
               "id": "6e784ce5-faf0-4241-a224-f18c509edebc",
               "blockId": "HERMS MT Setpoint",
               "data": {
-                "settingEnabled": false
+                "enabled": false
               },
               "confirmed": {},
               "serviceId": "sparkey"
@@ -3459,7 +3459,7 @@
               "id": "59f95a88-dd51-4020-8d76-e3068fc3344c",
               "blockId": "HERMS BK Setpoint",
               "data": {
-                "settingEnabled": false
+                "enabled": false
               },
               "confirmed": {},
               "serviceId": "sparkey"
@@ -3475,7 +3475,7 @@
               "serviceId": "sparkey",
               "blockId": "HERMS MT Setpoint",
               "data": {
-                "settingEnabled": false
+                "enabled": false
               },
               "confirmed": {}
             },
@@ -3484,7 +3484,7 @@
               "serviceId": "sparkey",
               "blockId": "HERMS HLT Setpoint",
               "data": {
-                "settingEnabled": true,
+                "enabled": true,
                 "storedSetting": {
                   "__bloxtype": "Quantity",
                   "value": 70,
@@ -3506,7 +3506,7 @@
               "serviceId": "sparkey",
               "blockId": "HERMS MT Setpoint",
               "data": {
-                "settingEnabled": true,
+                "enabled": true,
                 "storedSetting": {
                   "__bloxtype": "Quantity",
                   "value": 66.7,
@@ -3537,7 +3537,7 @@
               "serviceId": "sparkey",
               "blockId": "HERMS BK Setpoint",
               "data": {
-                "settingEnabled": true,
+                "enabled": true,
                 "storedSetting": {
                   "__bloxtype": "Quantity",
                   "value": 100,
