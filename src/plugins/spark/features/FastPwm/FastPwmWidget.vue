@@ -1,24 +1,37 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { quickPwmValues } from '@/plugins/spark/const';
+import {
+  pwmFrequencyLabels,
+  quickPwmValues,
+  transitionPresetLabels,
+} from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import { channelName, prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
-import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
+import {
+  fixedNumber,
+  prettyLink,
+  prettyQty,
+  roundedNumber,
+} from '@/utils/quantity';
 import {
   BlockIntfType,
   ChannelCapabilities,
   FastPwmBlock,
   IoArrayInterfaceBlock,
-  PwmFrequency,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
-const frequencyOpts: SelectOption[] = Object.entries(PwmFrequency).map(
+const frequencyOpts: SelectOption[] = Object.entries(pwmFrequencyLabels).map(
   ([value, label]) => ({ label, value }),
 );
+
+const transitionPresetOpts: SelectOption[] = Object.entries(
+  transitionPresetLabels,
+).map(([value, label]) => ({ label, value }));
 
 const requiredCapabilities =
   ChannelCapabilities.CHAN_SUPPORTS_PWM_80HZ |
@@ -69,6 +82,9 @@ export default defineComponent({
     });
 
     return {
+      prettyQty,
+      TransitionDurationPreset,
+      transitionPresetOpts,
       setExclusiveChannelActuator,
       ChannelCapabilities,
       prettyLink,
@@ -224,6 +240,39 @@ export default defineComponent({
                 setExclusiveChannelActuator(block, hwDevice, channel)
             "
           />
+
+          <div class="col-break" />
+
+          <SelectField
+            :model-value="block.data.transitionDurationPreset"
+            :options="transitionPresetOpts"
+            title="Soft start preset"
+            label="Soft start preset"
+            class="col-grow"
+            @update:model-value="
+              (v) => patchBlock({ transitionDurationPreset: v })
+            "
+          />
+          <DurationField
+            v-if="
+              block.data.transitionDurationPreset ===
+              TransitionDurationPreset.ST_CUSTOM
+            "
+            :model-value="block.data.transitionDurationSetting"
+            title="Custom soft start duration"
+            label="Soft start"
+            class="col-grow"
+            @update:model-value="
+              (v) => patchBlock({ transitionDurationSetting: v })
+            "
+          />
+          <LabeledField
+            v-else
+            label="Soft start"
+            class="col-grow"
+          >
+            {{ prettyQty(block.data.transitionDurationValue) }}
+          </LabeledField>
         </div>
       </template>
     </div>

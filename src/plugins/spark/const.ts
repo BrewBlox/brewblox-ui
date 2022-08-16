@@ -5,7 +5,9 @@ import {
   DisplayTempUnit,
   DS2408ConnectMode,
   FilterChoice,
+  PwmFrequency,
   SensorCombiFunc,
+  TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 
 export const sparkType = 'Spark';
@@ -104,3 +106,19 @@ export const quickPwmValues: SelectOption<number>[] = [
   { label: '75%', value: 75 },
   { label: '100%', value: 100 },
 ];
+
+export const transitionPresetLabels: Record<TransitionDurationPreset, string> =
+  {
+    ST_OFF: 'Off',
+    ST_FAST: 'Fast',
+    ST_MEDIUM: 'Medium',
+    ST_SLOW: 'Slow',
+    ST_CUSTOM: 'Custom',
+  };
+
+export const pwmFrequencyLabels: Record<PwmFrequency, string> = {
+  PWM_FREQ_80HZ: '80Hz',
+  PWM_FREQ_100HZ: '100Hz',
+  PWM_FREQ_200HZ: '200Hz',
+  PWM_FREQ_2000HZ: '2000Hz',
+};
