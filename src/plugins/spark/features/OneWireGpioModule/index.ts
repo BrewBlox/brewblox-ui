@@ -36,7 +36,7 @@ const plugin: Plugin = {
         pullDownWhenInactive: GpioPins.NONE,
         overCurrent: GpioPins.NONE,
         openLoad: GpioPins.NONE,
-        moduleStatusClear: GpioPins.NONE, // write-only
+        clearFaults: false, // write-only
       }),
     };
 
