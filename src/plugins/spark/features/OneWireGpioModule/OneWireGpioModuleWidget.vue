@@ -1,9 +1,14 @@
 <script lang="ts">
 import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialogPromise } from '@/utils/dialog';
-import { GpioModuleChannel, OneWireGpioModuleBlock } from 'brewblox-proto/ts';
+import {
+  GpioModuleChannel,
+  GpioModuleStatus,
+  GpioPins,
+  OneWireGpioModuleBlock,
+} from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { useBlockWidget } from '../../composables';
 
 export default defineComponent({
   name: 'OneWireGpioModuleWidget',
@@ -37,11 +42,41 @@ export default defineComponent({
       set: (channels) => patchBlock({ channels }),
     });
 
+    const errors = computed<string[]>(() => {
+      const values: string[] = [];
+      const { moduleStatus, overCurrent } = block.value.data;
+      if (overCurrent !== GpioPins.NONE) {
+        values.push(
+          'ERROR: Overcurrent on ' +
+            block.value.data.channels
+              .filter((c) => c.id & overCurrent)
+              .map((c) => c.name)
+              .join(', '),
+        );
+      } else if (moduleStatus & GpioModuleStatus.OVERCURRENT) {
+        values.push('ERROR: Overcurrent');
+      }
+      if (moduleStatus & GpioModuleStatus.OVERVOLTAGE) {
+        values.push('ERROR: Overvoltage');
+      }
+      if (moduleStatus & GpioModuleStatus.UNDERVOLTAGE_LOCKOUT) {
+        values.push('ERROR: Undervoltage');
+      }
+      if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_SHUTDOWN) {
+        values.push('ERROR: Overtemperature');
+      } else if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_WARNING) {
+        values.push('WARNING: Overtemperature');
+      }
+      return values;
+    });
+
     return {
       context,
       block,
+      patchBlock,
       power,
       channels,
+      errors,
     };
   },
 });
@@ -52,6 +87,24 @@ export default defineComponent({
     <template #toolbar>
       <BlockWidgetToolbar has-mode-toggle />
     </template>
+
+    <CardWarning v-if="errors.length">
+      <template #message>
+        <div
+          v-for="e in errors"
+          :key="`error-${e}`"
+        >
+          {{ e }}
+        </div>
+      </template>
+      <template #actions>
+        <q-btn
+          flat
+          label="Clear errors"
+          @click="patchBlock({ clearFaults: true })"
+        />
+      </template>
+    </CardWarning>
 
     <div class="widget-body">
       <div class="row q-gutter-sm">

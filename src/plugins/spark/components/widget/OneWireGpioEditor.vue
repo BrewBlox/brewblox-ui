@@ -1,6 +1,12 @@
 <script lang="ts">
 import { createDialog } from '@/utils/dialog';
-import { GpioDeviceType, GpioModuleChannel, GpioPins } from 'brewblox-proto/ts';
+import { bloxLink } from '@/utils/link';
+import {
+  ChannelCapabilities,
+  GpioDeviceType,
+  GpioModuleChannel,
+  GpioPins,
+} from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 interface DeviceSlot extends GpioModuleChannel {
@@ -192,6 +198,8 @@ export default defineComponent({
         deviceType: GpioDeviceType.GPIO_DEV_SSR_2P,
         pinsMask: GpioPins.NONE,
         width: 2,
+        capabilities: ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT,
+        claimedBy: bloxLink(null),
       };
       modifyChannel(channel);
     }

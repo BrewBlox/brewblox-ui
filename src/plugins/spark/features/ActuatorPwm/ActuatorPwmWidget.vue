@@ -1,10 +1,10 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { quickPwmValues } from '@/plugins/spark/const';
 import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
 import { ActuatorPwmBlock, Link } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { quickPwmValues } from '../../const';
 
 export default defineComponent({
   name: 'ActuatorPwmWidget',
