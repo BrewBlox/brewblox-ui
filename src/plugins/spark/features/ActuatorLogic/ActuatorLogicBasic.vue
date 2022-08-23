@@ -1,5 +1,6 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_LOGIC_RESULT } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
 import { prettyLink } from '@/utils/quantity';
@@ -11,7 +12,7 @@ import {
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
-import { logicResultTitles, nonErrorResults } from './const';
+import { nonErrorResults } from './const';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { ExpressionError } from './types';
 import {
@@ -83,7 +84,7 @@ export default defineComponent({
         ? null
         : {
             index,
-            message: logicResultTitles[result],
+            message: ENUM_LABELS_LOGIC_RESULT[result],
             indicator: '-'.repeat(index) + '^',
           };
     });
@@ -98,7 +99,7 @@ export default defineComponent({
     const result = computed<string>(() =>
       err.value
         ? `Error: ${err.value.message}`
-        : logicResultTitles[block.value.data.result],
+        : ENUM_LABELS_LOGIC_RESULT[block.value.data.result],
     );
 
     function editDigital(key: string, cmp: DigitalCompare): void {

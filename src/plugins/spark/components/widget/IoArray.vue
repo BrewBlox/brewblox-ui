@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { quickPwmValues } from '@/plugins/spark/const';
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import {
@@ -96,7 +96,7 @@ export default defineComponent({
             label: 'Pwm %',
             min: 0,
             max: 100,
-            quickActions: quickPwmValues,
+            quickActions: PWM_SELECT_OPTIONS,
           },
         }).onOk((desiredSetting) =>
           sparkStore.patchBlock(channel.pwmActuator, { desiredSetting }),

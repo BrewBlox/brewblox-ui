@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { quickPwmValues } from '@/plugins/spark/const';
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
 import { ActuatorPwmBlock, Link } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
@@ -30,7 +30,7 @@ export default defineComponent({
     return {
       prettyLink,
       fixedNumber,
-      quickPwmValues,
+      PWM_SELECT_OPTIONS,
       context,
       inDialog,
       serviceId,
@@ -75,7 +75,7 @@ export default defineComponent({
           class="col-grow row q-mb-sm justify-around q-gutter-xs"
         >
           <div
-            v-for="q in quickPwmValues"
+            v-for="q in PWM_SELECT_OPTIONS"
             :key="'quick' + q.value"
             class="col-auto clickable rounded-borders"
           >

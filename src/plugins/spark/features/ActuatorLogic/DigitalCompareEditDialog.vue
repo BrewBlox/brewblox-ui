@@ -1,14 +1,12 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
+import { ENUM_LABELS_DIGITAL_OP } from '@/plugins/spark/const';
+import { selectable } from '@/utils/collections';
 import { deepCopy } from '@/utils/objects';
-import { DigitalCompare, DigitalCompareOp } from 'brewblox-proto/ts';
-import { Enum } from 'typescript-string-enums';
+import { DigitalCompare } from 'brewblox-proto/ts';
 import { defineComponent, PropType, ref } from 'vue';
-import { digitalOpTitles } from './const';
 
-const operatorOpts: SelectOption[] = Enum.values(DigitalCompareOp).map(
-  (value) => ({ value, label: digitalOpTitles[value] }),
-);
+const operatorOpts = selectable(ENUM_LABELS_DIGITAL_OP);
 
 export default defineComponent({
   name: 'DigitalCompareEditDialog',

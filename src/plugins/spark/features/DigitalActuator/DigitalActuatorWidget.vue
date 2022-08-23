@@ -1,10 +1,11 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { transitionPresetLabels } from '@/plugins/spark/const';
+import { ENUM_LABELS_TRANSITION_PRESET } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import { channelName } from '@/plugins/spark/utils/formatting';
+import { selectable } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { matchesType } from '@/utils/objects';
 import { prettyQty } from '@/utils/quantity';
@@ -39,9 +40,7 @@ const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
   BlockType.DigitalActuator,
 );
 
-const transitionPresetOpts: SelectOption[] = Object.entries(
-  transitionPresetLabels,
-).map(([value, label]) => ({ label, value }));
+const transitionPresetOpts = selectable(ENUM_LABELS_TRANSITION_PRESET);
 
 export default defineComponent({
   name: 'DigitalActuatorWidget',

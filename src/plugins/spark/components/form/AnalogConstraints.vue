@@ -1,5 +1,6 @@
 <script lang="ts">
-import { analogConstraintLabels } from '@/plugins/spark/const';
+import { ENUM_LABELS_ANALOG_CONSTRAINT } from '@/plugins/spark/const';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { deepCopy } from '@/utils/objects';
@@ -11,9 +12,7 @@ import {
 } from 'brewblox-proto/ts';
 import { defineComponent, PropType, ref, watch } from 'vue';
 
-const constraintOpts: SelectOption[] = Object.entries(
-  analogConstraintLabels,
-).map(([k, v]) => ({ value: k, label: v }));
+const constraintOpts = selectable(ENUM_LABELS_ANALOG_CONSTRAINT);
 
 const defaultValues: Record<AnalogConstraintKey, AnalogConstraint> = {
   min: {
