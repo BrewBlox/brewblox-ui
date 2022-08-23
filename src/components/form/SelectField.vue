@@ -91,6 +91,7 @@ export default defineComponent({
           listSelect: props.listSelect,
           selectOptions: props.options,
           selectProps: {
+            ...props.selectProps,
             label: props.label,
             optionLabel: props.optionLabel,
             optionValue: props.optionValue,

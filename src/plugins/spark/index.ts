@@ -5,7 +5,7 @@ import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { cref, globRegister } from '@/utils/component-ref';
 import { Plugin } from 'vue';
-import { sparkType } from './const';
+import { SPARK_SERVICE_TYPE } from './const';
 import features from './features';
 import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
@@ -44,7 +44,7 @@ const plugin: Plugin = {
     });
 
     featureStore.addServiceFeature({
-      id: sparkType,
+      id: SPARK_SERVICE_TYPE,
       title: 'Spark Service',
       pageComponent: cref(app, SparkPage),
       configComponent: cref(app, SparkActions),
@@ -67,7 +67,7 @@ const plugin: Plugin = {
 
     eventbus.addListener(`${STATE_TOPIC}/+`, (_, data) => {
       if (isSparkState(data)) {
-        serviceStore.ensureStub({ id: data.key, type: sparkType });
+        serviceStore.ensureStub({ id: data.key, type: SPARK_SERVICE_TYPE });
       }
     });
 

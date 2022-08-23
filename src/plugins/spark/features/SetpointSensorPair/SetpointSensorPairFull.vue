@@ -1,14 +1,13 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { filterLabels } from '@/plugins/spark/const';
+import { ENUM_LABELS_FILTER_CHOICE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { selectable } from '@/utils/collections';
 import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
-const filterOpts: SelectOption[] = Object.entries(filterLabels).map(
-  ([value, label]) => ({ label, value }),
-);
+const filterOpts = selectable(ENUM_LABELS_FILTER_CHOICE);
 
 export default defineComponent({
   name: 'SetpointSensorPairFull',
@@ -139,7 +138,7 @@ export default defineComponent({
         label="Input for:"
         class="col-grow"
       >
-        <div class="row">
+        <div class="row q-gutter-xs">
           <q-btn
             v-for="userBlock in usedBy"
             :key="userBlock.id"

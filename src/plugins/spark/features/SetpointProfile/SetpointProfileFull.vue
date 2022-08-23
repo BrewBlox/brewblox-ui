@@ -227,8 +227,8 @@ export default defineComponent({
       <LinkField
         :model-value="block.data.targetId"
         :service-id="serviceId"
-        label="Driven Setpoint"
-        title="Driven Setpoint/Sensor pair"
+        label="Target Setpoint"
+        title="Target Setpoint"
         class="col-grow"
         @update:model-value="(v) => patchBlock({ targetId: v })"
       />

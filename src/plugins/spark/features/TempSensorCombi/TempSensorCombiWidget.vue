@@ -1,17 +1,16 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { combineFuncLabels } from '@/plugins/spark/const';
+import { ENUM_LABELS_COMBINE_FUNC } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { prettyQty } from '@/utils/quantity';
 import { BlockIntfType, Link, TempSensorCombiBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
-const combineFuncOpts: SelectOption[] = Object.entries(combineFuncLabels).map(
-  ([value, label]) => ({ label, value }),
-);
+const combineFuncOpts = selectable(ENUM_LABELS_COMBINE_FUNC);
 
 export default defineComponent({
   name: 'TempSensorCombiWidget',

@@ -1,11 +1,14 @@
 <script lang="ts">
-import { sparkType } from '@/plugins/spark/const';
+import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
+import { makeTypeFilter } from '@/utils/functional';
 import { startCreateService } from '@/utils/services';
 import { BlockType } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType, ref } from 'vue';
 import { QuickstartConfig } from '../types';
+
+const sparkFilter = makeTypeFilter(SPARK_SERVICE_TYPE);
 
 export default defineComponent({
   name: 'QuickstartServiceTask',
@@ -26,11 +29,11 @@ export default defineComponent({
     const handleExisting = ref<'keep' | 'clear' | null>(null);
 
     const services = computed<Service[]>(() =>
-      serviceStore.services.filter((v) => v.type === sparkType),
+      serviceStore.services.filter(sparkFilter),
     );
 
     const stubs = computed<ServiceStub[]>(() =>
-      serviceStore.stubs.filter((v) => v.type === sparkType),
+      serviceStore.stubs.filter(sparkFilter),
     );
 
     if (

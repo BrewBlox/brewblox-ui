@@ -1,9 +1,6 @@
 <script lang="ts">
 import { useField } from '@/composables';
-import {
-  analogConstraintLabels,
-  digitalConstraintLabels,
-} from '@/plugins/spark/const';
+import { ENUM_LABELS_ANY_CONSTRAINT } from '@/plugins/spark/const';
 import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/quantity';
@@ -14,11 +11,6 @@ import type {
 } from 'brewblox-proto/ts';
 import isString from 'lodash/isString';
 import { computed, defineComponent, PropType } from 'vue';
-
-const constraintLabels = {
-  ...digitalConstraintLabels,
-  ...analogConstraintLabels,
-};
 
 function typeValidator(v: unknown): boolean {
   return isString(v) && ['analog', 'digital'].includes(v);
@@ -61,14 +53,14 @@ export default defineComponent({
         return (props.modelValue.constraints as AnalogConstraint[])
           .filter((c) => c.limiting)
           .map((c) => Object.keys(c).find((k) => k !== 'limiting') ?? 'Unknown')
-          .map((k) => constraintLabels[k] ?? k);
+          .map((k) => ENUM_LABELS_ANY_CONSTRAINT[k] ?? k);
       } else {
         return (props.modelValue.constraints as DigitalConstraint[])
           .filter((c) => c.remaining.value)
           .map((c) => {
             const key =
               Object.keys(c).find((k) => k !== 'remaining') ?? 'Unknown';
-            const label = constraintLabels[key] ?? key;
+            const label = ENUM_LABELS_ANY_CONSTRAINT[key] ?? key;
             return `${label} (${prettyQty(c.remaining)})`;
           });
       }

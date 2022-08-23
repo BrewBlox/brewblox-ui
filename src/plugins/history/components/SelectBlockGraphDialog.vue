@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { sparkType } from '@/plugins/spark/const';
+import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockAddress,
@@ -38,7 +38,9 @@ export default defineComponent({
     const specStore = useBlockSpecStore();
 
     const services = computed<SparkService[]>(() =>
-      serviceStore.services.filter(makeTypeFilter<SparkService>(sparkType)),
+      serviceStore.services.filter(
+        makeTypeFilter<SparkService>(SPARK_SERVICE_TYPE),
+      ),
     );
 
     const block = ref<Block | null>(sparkStore.blockByAddress(props.address));

@@ -3,6 +3,7 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { channelName } from '@/plugins/spark/utils/formatting';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { bloxLink } from '@/utils/link';
+import { prettyLink } from '@/utils/quantity';
 import { BlockIntfType, IoArrayInterfaceBlock, Link } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
 
@@ -52,14 +53,19 @@ export default defineComponent({
       },
     });
 
+    const channelLabel = computed<string>(() => {
+      const block = sparkStore.blockByLink(
+        props.serviceId,
+        props.modelValue.hwDevice,
+      );
+      return channelName(block, props.modelValue.channel) ?? '';
+    });
+
     const channelOpts = computed<SelectOption[]>(() =>
       sparkStore
         .blocksByService(props.serviceId)
-        .filter((v) =>
-          isBlockCompatible<IoArrayInterfaceBlock>(
-            v,
-            BlockIntfType.IoArrayInterface,
-          ),
+        .filter((block): block is IoArrayInterfaceBlock =>
+          isBlockCompatible(block, BlockIntfType.IoArrayInterface),
         )
         .flatMap((block: IoArrayInterfaceBlock) =>
           block.data.channels.map((channel) => ({ block, channel })),
@@ -72,17 +78,20 @@ export default defineComponent({
         })
         .map(({ block, channel }) => ({
           label:
-            `${block.id} ${channelName(block, channel.id)}` +
-            (channel.claimedBy.id ? ` (${channel.claimedBy.id})` : ''),
+            `<b>${block.id}</b> ${channelName(block, channel.id)}` +
+            (channel.claimedBy.id
+              ? ` <small>(${channel.claimedBy.id})</small>`
+              : ''),
           value: `${block.id}/${channel.id}`,
-          block,
-          channel,
+          html: true,
         })),
     );
 
     return {
+      prettyLink,
       model,
       channelOpts,
+      channelLabel,
     };
   },
 });
@@ -92,5 +101,10 @@ export default defineComponent({
   <SelectField
     v-model="model"
     :options="channelOpts"
-  />
+    :select-props="{ displayValueHtml: true }"
+  >
+    <template #value>
+      {{ prettyLink(modelValue.hwDevice) }} {{ channelLabel }}
+    </template>
+  </SelectField>
 </template>

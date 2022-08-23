@@ -1,6 +1,7 @@
 <script lang="ts">
-import { digitalConstraintLabels } from '@/plugins/spark/const';
+import { ENUM_LABELS_DIGITAL_CONSTRAINT } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { deepCopy } from '@/utils/objects';
@@ -16,9 +17,7 @@ import {
 } from 'brewblox-proto/ts';
 import { defineComponent, PropType, ref, watch } from 'vue';
 
-const constraintOpts: SelectOption[] = Object.entries(
-  digitalConstraintLabels,
-).map(([k, v]) => ({ value: k, label: v }));
+const constraintOpts = selectable(ENUM_LABELS_DIGITAL_CONSTRAINT);
 
 const defaultValues: Record<DigitalConstraintKey, DigitalConstraint> = {
   minOff: {

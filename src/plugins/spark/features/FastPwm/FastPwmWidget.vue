@@ -2,14 +2,14 @@
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
-  pwmFrequencyLabels,
-  quickPwmValues,
-  transitionPresetLabels,
+  ENUM_LABELS_PWM_FREQUENCY,
+  ENUM_LABELS_TRANSITION_PRESET,
+  PWM_SELECT_OPTIONS,
 } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import { channelName, prettyBlock } from '@/plugins/spark/utils/formatting';
-import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { selectable } from '@/utils/collections';
 import {
   fixedNumber,
   prettyLink,
@@ -17,7 +17,6 @@ import {
   roundedNumber,
 } from '@/utils/quantity';
 import {
-  BlockIntfType,
   ChannelCapabilities,
   FastPwmBlock,
   IoArrayInterfaceBlock,
@@ -25,19 +24,8 @@ import {
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
-const frequencyOpts: SelectOption[] = Object.entries(pwmFrequencyLabels).map(
-  ([value, label]) => ({ label, value }),
-);
-
-const transitionPresetOpts: SelectOption[] = Object.entries(
-  transitionPresetLabels,
-).map(([value, label]) => ({ label, value }));
-
-const requiredCapabilities =
-  ChannelCapabilities.CHAN_SUPPORTS_PWM_80HZ |
-  ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ |
-  ChannelCapabilities.CHAN_SUPPORTS_PWM_200HZ |
-  ChannelCapabilities.CHAN_SUPPORTS_PWM_2000HZ;
+const frequencyOpts = selectable(ENUM_LABELS_PWM_FREQUENCY);
+const transitionPresetOpts = selectable(ENUM_LABELS_TRANSITION_PRESET);
 
 export default defineComponent({
   name: 'FastPwmWidget',
@@ -50,24 +38,6 @@ export default defineComponent({
 
     const target = computed<IoArrayInterfaceBlock | null>(() =>
       sparkStore.blockByLink(serviceId, block.value.data.hwDevice),
-    );
-
-    const channelOpts = computed<SelectOption[]>(() =>
-      sparkStore
-        .blocksByService(serviceId)
-        .filter((block): block is IoArrayInterfaceBlock =>
-          isBlockCompatible(block, BlockIntfType.IoArrayInterface),
-        )
-        .flatMap((block) =>
-          block.data.channels.map((channel) => ({ block, channel })),
-        )
-        .filter(({ channel }) => channel.capabilities & requiredCapabilities)
-        .map(({ block, channel }) => ({
-          label: `${block.id} ${channelName(block, channel.id)}`,
-          value: `${block.id}/${channel.id}`,
-          block,
-          channel,
-        })),
     );
 
     const isLimited = computed<boolean>(
@@ -90,13 +60,12 @@ export default defineComponent({
       prettyLink,
       fixedNumber,
       frequencyOpts,
-      quickPwmValues,
+      PWM_SELECT_OPTIONS,
       context,
       inDialog,
       serviceId,
       block,
       target,
-      channelOpts,
       patchBlock,
       isClaimed,
       isLimited,
@@ -151,7 +120,7 @@ export default defineComponent({
           class="col-grow row q-mb-sm justify-around q-gutter-xs"
         >
           <div
-            v-for="q in quickPwmValues"
+            v-for="q in PWM_SELECT_OPTIONS"
             :key="'quick' + q.value"
             class="col-auto clickable rounded-borders"
           >

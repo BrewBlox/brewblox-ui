@@ -1,113 +1,103 @@
 import {
+  AnalogCompareOp,
   AnalogConstraintKey,
-  BlockType,
+  AnyConstraintKey,
+  DigitalCompareOp,
   DigitalConstraintKey,
+  DigitalState,
   DisplayTempUnit,
-  DS2408ConnectMode,
   FilterChoice,
+  LogicResult,
   PwmFrequency,
   SensorCombiFunc,
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 
-export const sparkType = 'Spark';
-export const systemGroup = 7;
+type EnumLabels<T extends keyof any> = Record<T, string>;
 
-export const digitalConstraintLabels: Record<DigitalConstraintKey, string> = {
-  minOff: 'Minimum OFF time',
-  minOn: 'Minimum ON time',
-  mutexed: 'Mutually exclusive',
-  delayedOff: 'Delay OFF',
-  delayedOn: 'Delay ON',
-};
+export const SPARK_SERVICE_TYPE = 'Spark';
 
-export const analogConstraintLabels: Record<AnalogConstraintKey, string> = {
+export const ENUM_LABELS_DIGITAL_CONSTRAINT: EnumLabels<DigitalConstraintKey> =
+  {
+    minOff: 'Minimum OFF time',
+    minOn: 'Minimum ON time',
+    mutexed: 'Mutually exclusive',
+    delayedOff: 'Delay OFF',
+    delayedOn: 'Delay ON',
+  };
+
+export const ENUM_LABELS_ANALOG_CONSTRAINT: EnumLabels<AnalogConstraintKey> = {
   min: 'Minimum',
   max: 'Maximum',
   balanced: 'Balanced',
 };
 
-export const constraintLabels = {
-  ...digitalConstraintLabels,
-  ...analogConstraintLabels,
+export const ENUM_LABELS_ANY_CONSTRAINT: EnumLabels<AnyConstraintKey> = {
+  ...ENUM_LABELS_DIGITAL_CONSTRAINT,
+  ...ENUM_LABELS_ANALOG_CONSTRAINT,
 };
 
-export const filterLabels: Record<FilterChoice, string> = {
-  [FilterChoice.FILTER_NONE]: 'No filtering',
-  [FilterChoice.FILTER_15s]: 'Filter 15s',
-  [FilterChoice.FILTER_45s]: 'Filter 45s',
-  [FilterChoice.FILTER_90s]: 'Filter 90s',
-  [FilterChoice.FILTER_3m]: 'Filter 3m',
-  [FilterChoice.FILTER_10m]: 'Filter 10m',
-  [FilterChoice.FILTER_30m]: 'Filter 30m',
+export const ENUM_LABELS_FILTER_CHOICE: EnumLabels<FilterChoice> = {
+  FILTER_NONE: 'No filtering',
+  FILTER_15s: 'Filter 15s',
+  FILTER_45s: 'Filter 45s',
+  FILTER_90s: 'Filter 90s',
+  FILTER_3m: 'Filter 3m',
+  FILTER_10m: 'Filter 10m',
+  FILTER_30m: 'Filter 30m',
 };
 
-export const combineFuncLabels: Record<SensorCombiFunc, string> = {
-  [SensorCombiFunc.SENSOR_COMBI_FUNC_AVG]: 'Average',
-  [SensorCombiFunc.SENSOR_COMBI_FUNC_MIN]: 'Minimum',
-  [SensorCombiFunc.SENSOR_COMBI_FUNC_MAX]: 'Maximum',
+export const ENUM_LABELS_COMBINE_FUNC: EnumLabels<SensorCombiFunc> = {
+  SENSOR_COMBI_FUNC_AVG: 'Average',
+  SENSOR_COMBI_FUNC_MIN: 'Minimum',
+  SENSOR_COMBI_FUNC_MAX: 'Maximum',
 };
 
-export const displayTempLabels: Record<DisplayTempUnit, string> = {
-  [DisplayTempUnit.TEMP_CELSIUS]: 'Celsius',
-  [DisplayTempUnit.TEMP_FAHRENHEIT]: 'Fahrenheit',
+export const ENUM_LABELS_DISPLAY_TEMP: EnumLabels<DisplayTempUnit> = {
+  TEMP_CELSIUS: 'Celsius',
+  TEMP_FAHRENHEIT: 'Fahrenheit',
 };
 
-export const ioChannelNames = {
-  [BlockType.DS2408]: {
-    [DS2408ConnectMode.CONNECT_ACTUATOR]: {
-      1: 'A',
-      2: 'B',
-      3: 'C',
-      4: 'D',
-      5: 'E',
-      6: 'F',
-      7: 'G',
-      8: 'H',
-    },
-    [DS2408ConnectMode.CONNECT_VALVE]: {
-      1: 'B',
-      5: 'A',
-    },
-  },
-  [BlockType.DS2413]: {
-    1: 'A',
-    2: 'B',
-  },
-  [BlockType.MockPins]: {
-    1: 'A',
-    2: 'B',
-    3: 'C',
-    4: 'D',
-    5: 'E',
-    6: 'F',
-    7: 'G',
-    8: 'H',
-  },
-  [BlockType.Spark2Pins]: {
-    1: 'Bottom 1',
-    2: 'Bottom 2',
-    3: 'Bottom 3',
-    4: 'Bottom 4',
-  },
-  [BlockType.Spark3Pins]: {
-    1: 'Top 1',
-    2: 'Top 2',
-    3: 'Top 3',
-    4: 'Bottom 1',
-    5: 'Bottom 2',
-  },
+export const ENUM_LABELS_DIGITAL_STATE: EnumLabels<DigitalState> = {
+  STATE_ACTIVE: 'ON',
+  STATE_INACTIVE: 'OFF',
+  STATE_UNKNOWN: 'UNKNOWN',
+  STATE_REVERSE: 'REVERSED',
 };
 
-export const quickPwmValues: SelectOption<number>[] = [
-  { label: '0%', value: 0 },
-  { label: '25%', value: 25 },
-  { label: '50%', value: 50 },
-  { label: '75%', value: 75 },
-  { label: '100%', value: 100 },
-];
+export const ENUM_LABELS_DIGITAL_OP: EnumLabels<DigitalCompareOp> = {
+  OP_VALUE_IS: 'Measured state ==',
+  OP_VALUE_IS_NOT: 'Measured state !=',
+  OP_DESIRED_IS: 'Desired state ==',
+  OP_DESIRED_IS_NOT: 'Desired state !=',
+};
 
-export const transitionPresetLabels: Record<TransitionDurationPreset, string> =
+export const ENUM_LABELS_ANALOG_OP: EnumLabels<AnalogCompareOp> = {
+  OP_VALUE_LE: 'Measured value <=',
+  OP_VALUE_GE: 'Measured value >=',
+  OP_SETTING_LE: 'Setting <=',
+  OP_SETTING_GE: 'Setting >=',
+};
+
+export const ENUM_LABELS_LOGIC_RESULT: EnumLabels<LogicResult> = {
+  RESULT_FALSE: 'Result is OFF',
+  RESULT_TRUE: 'Result is ON',
+  RESULT_EMPTY: 'Expression empty: result is OFF',
+  RESULT_EMPTY_SUBSTRING: 'Empty sub-expression',
+  RESULT_BLOCK_NOT_FOUND: 'Block not found',
+  RESULT_INVALID_DIGITAL_OP: 'Invalid operator',
+  RESULT_INVALID_ANALOG_OP: 'Invalid operator',
+  RESULT_UNDEFINED_ANALOG_COMPARE: 'Invalid analog comparison',
+  RESULT_UNDEFINED_DIGITAL_COMPARE: 'Invalid digital comparison',
+  RESULT_UNEXPECTED_OPEN_BRACKET: 'Unexpected opening bracket',
+  RESULT_UNEXPECTED_CLOSE_BRACKET: 'Unexpected closing bracket',
+  RESULT_UNEXPECTED_CHARACTER: 'Unexpected character',
+  RESULT_UNEXPECTED_COMPARISON: 'Unexpected comparison',
+  RESULT_UNEXPECTED_OPERATOR: 'Unexpected operator',
+  RESULT_MISSING_CLOSE_BRACKET: 'Missing closing bracket',
+};
+
+export const ENUM_LABELS_TRANSITION_PRESET: EnumLabels<TransitionDurationPreset> =
   {
     ST_OFF: 'Off',
     ST_FAST: 'Fast',
@@ -116,9 +106,17 @@ export const transitionPresetLabels: Record<TransitionDurationPreset, string> =
     ST_CUSTOM: 'Custom',
   };
 
-export const pwmFrequencyLabels: Record<PwmFrequency, string> = {
+export const ENUM_LABELS_PWM_FREQUENCY: EnumLabels<PwmFrequency> = {
   PWM_FREQ_80HZ: '80Hz',
   PWM_FREQ_100HZ: '100Hz',
   PWM_FREQ_200HZ: '200Hz',
   PWM_FREQ_2000HZ: '2000Hz',
 };
+
+export const PWM_SELECT_OPTIONS: SelectOption<number>[] = [
+  { label: '0%', value: 0 },
+  { label: '25%', value: 25 },
+  { label: '50%', value: 50 },
+  { label: '75%', value: 75 },
+  { label: '100%', value: 100 },
+];
