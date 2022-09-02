@@ -47,10 +47,10 @@ export default defineComponent({
       const { moduleStatus, overCurrent } = block.value.data;
       if (overCurrent !== GpioPins.NONE) {
         values.push(
-          'ERROR: Overcurrent on ' +
-            block.value.data.channels
-              .filter((c) => c.id & overCurrent)
-              .map((c) => c.name)
+          'ERROR: Overcurrent on pin ' +
+            [...Array(8).keys()]
+              .filter((i) => (1 << i) & overCurrent)
+              .map((i) => `${i + 1}`)
               .join(', '),
         );
       } else if (moduleStatus & GpioModuleStatus.OVERCURRENT) {
@@ -116,7 +116,10 @@ export default defineComponent({
         </LabeledField>
       </div>
 
-      <OneWireGpioEditor v-model:channels="channels" />
+      <OneWireGpioEditor
+        v-model:channels="channels"
+        :error-pins="block.data.overCurrent"
+      />
 
       <template v-if="context.mode === 'Full'">
         <q-separator inset />

@@ -69,6 +69,10 @@ export default defineComponent({
       type: Array as PropType<GpioModuleChannel[]>,
       required: true,
     },
+    errorPins: {
+      type: Number as PropType<GpioPins>,
+      default: GpioPins.NONE,
+    },
   },
   emits: ['update:channels'],
   setup(props, { emit }) {
@@ -285,6 +289,9 @@ export default defineComponent({
           <div
             v-for="(p, idx) in pinLegend(slot)"
             :key="`${slot.id}-pin-${idx}`"
+            :class="{
+              'text-negative': Boolean((1 << (slot.start + idx)) & errorPins),
+            }"
           >
             {{ p }}
           </div>
