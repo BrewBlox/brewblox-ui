@@ -45,7 +45,7 @@ export default defineComponent({
         const actuator = sparkStore.blockByLink(serviceId, c.claimedBy);
         const compatibleTypes: BlockOrIntfType[] = [];
         if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT) {
-          compatibleTypes.push(BlockOrIntfType.ActuatorDigitalInterface);
+          compatibleTypes.push(BlockOrIntfType.DigitalActuator);
         }
         if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ) {
           compatibleTypes.push(BlockOrIntfType.FastPwm);
