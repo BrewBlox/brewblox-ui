@@ -1,4 +1,5 @@
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
+import { createDialog } from '@/utils/dialog';
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 1;
@@ -50,6 +51,18 @@ const blueprint: BuilderBlueprint = {
     part.settings.sizeY || DEFAULT_SIZE_Y,
   ],
   transitions: () => ({}),
+  interactHandler: (part: PersistentPart, { savePart }) => {
+    createDialog({
+      component: 'InputDialog',
+      componentProps: {
+        modelValue: part.settings.text ?? '',
+        title: 'Edit label',
+        label: 'text',
+      },
+    }).onOk((text) =>
+      savePart({ ...part, settings: { ...part.settings, text } }),
+    );
+  },
 };
 
 export default blueprint;

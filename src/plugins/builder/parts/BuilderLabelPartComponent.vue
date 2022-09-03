@@ -5,7 +5,7 @@ import { FlowPart } from '../types';
 import { coord2grid, textTransformation } from '../utils';
 
 export default defineComponent({
-  name: 'LabelPartComponent',
+  name: 'BuilderLabelPartComponent',
   props: {
     part: {
       type: Object as PropType<FlowPart>,
@@ -16,7 +16,7 @@ export default defineComponent({
     const { sizeX, sizeY } = usePart.setup(props.part);
 
     const text = computed<string>(
-      () => props.part.settings.text || '<edit to set text>',
+      () => props.part.settings.text || '[click to edit]',
     );
 
     const fontSize = computed<number>(() => props.part.settings.fontSize || 16);
