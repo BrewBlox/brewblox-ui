@@ -81,6 +81,7 @@ export default defineComponent({
         }`,
         gridColumnEnd: `span ${currentCols.value || cols}`,
         gridRowEnd: `span ${currentRows.value || rows}`,
+        border: props.editable ? '1px solid silver' : '',
       };
     });
 
