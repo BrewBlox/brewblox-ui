@@ -54,6 +54,18 @@ export default defineComponent({
       sparkStore.blockById(serviceId, block.value.data.hwDevice.id),
     );
 
+    const softStartSupported = computed<boolean>(() => {
+      const channel = hwBlock.value?.data.channels.find(
+        (c) => c.id === block.value.data.channel,
+      );
+      return (
+        channel != null &&
+        Boolean(
+          channel.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ,
+        )
+      );
+    });
+
     const claims = computed<Claim[]>(() => {
       if (!hwBlock.value) {
         return [];
@@ -109,6 +121,7 @@ export default defineComponent({
       serviceId,
       block,
       patchBlock,
+      softStartSupported,
       isClaimed,
       limitations,
       channelOpts,
@@ -184,36 +197,46 @@ export default defineComponent({
 
           <div class="col-break" />
 
-          <SelectField
-            :model-value="block.data.transitionDurationPreset"
-            :options="transitionPresetOpts"
-            title="Soft start preset"
-            label="Soft start preset"
-            class="col-grow"
-            @update:model-value="
-              (v) => patchBlock({ transitionDurationPreset: v })
-            "
-          />
-          <DurationField
-            v-if="
-              block.data.transitionDurationPreset ===
-              TransitionDurationPreset.ST_CUSTOM
-            "
-            :model-value="block.data.transitionDurationSetting"
-            title="Custom soft start duration"
-            label="Soft start"
-            class="col-grow"
-            @update:model-value="
-              (v) => patchBlock({ transitionDurationSetting: v })
-            "
-          />
-          <LabeledField
-            v-else
-            label="Soft start"
-            class="col-grow"
-          >
-            {{ prettyQty(block.data.transitionDurationValue) }}
-          </LabeledField>
+          <template v-if="softStartSupported">
+            <SelectField
+              :model-value="block.data.transitionDurationPreset"
+              :options="transitionPresetOpts"
+              title="Soft start preset"
+              label="Soft start preset"
+              class="col-grow"
+              @update:model-value="
+                (v) => patchBlock({ transitionDurationPreset: v })
+              "
+            />
+            <DurationField
+              v-if="
+                block.data.transitionDurationPreset ===
+                TransitionDurationPreset.ST_CUSTOM
+              "
+              :model-value="block.data.transitionDurationSetting"
+              title="Custom soft start duration"
+              label="Soft start"
+              class="col-grow"
+              @update:model-value="
+                (v) => patchBlock({ transitionDurationSetting: v })
+              "
+            />
+            <LabeledField
+              v-else
+              label="Soft start"
+              class="col-grow"
+            >
+              {{ prettyQty(block.data.transitionDurationValue) }}
+            </LabeledField>
+          </template>
+          <template v-else>
+            <LabeledField
+              label="Soft start"
+              class="col-grow"
+            >
+              Soft start is not supported on target channel
+            </LabeledField>
+          </template>
         </template>
 
         <div class="col-break" />
