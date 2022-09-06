@@ -80,7 +80,7 @@ export default defineComponent({
           label:
             `<b>${block.id}</b> ${channelName(block, channel.id)}` +
             (channel.claimedBy.id
-              ? ` <small>(${channel.claimedBy.id})</small>`
+              ? ` <small>(replace ${channel.claimedBy.id})</small>`
               : ''),
           value: `${block.id}/${channel.id}`,
           html: true,
