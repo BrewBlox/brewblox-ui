@@ -34,7 +34,7 @@ const plugin: Plugin = {
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,
         invert: false,
-        frequency: PwmFrequency.PWM_FREQ_80HZ,
+        frequency: PwmFrequency.PWM_FREQ_100HZ,
         desiredSetting: 0,
         setting: 0,
         value: 0,
