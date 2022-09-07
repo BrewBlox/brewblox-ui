@@ -88,12 +88,15 @@ export default defineComponent({
         <div
           v-for="d in values"
           :key="d.field"
-          class="column items-center full-width"
+          class="column items-center full-width no-wrap"
         >
-          <div class="col text-small ellipsis full-width q-px-sm">
+          <div
+            class="col-auto text-small ellipsis q-px-sm"
+            style="max-width: 100%"
+          >
             {{ d.label }}
           </div>
-          <div class="col text-bold">{{ d.value }}</div>
+          <div class="col-auto text-bold">{{ d.value }}</div>
         </div>
         <div
           v-if="!values.length"
