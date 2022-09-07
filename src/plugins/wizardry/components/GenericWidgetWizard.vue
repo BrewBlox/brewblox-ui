@@ -1,7 +1,7 @@
 <script lang="ts">
 import { tryCreateWidget } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { useWidgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 import { useWidgetWizard } from '../composables';
@@ -24,28 +24,29 @@ export default defineComponent({
 
     const defaultConfig =
       featureStore.widgetById(props.featureId)?.generateConfig?.() ?? {};
-    const activeWidget = ref<Widget | null>(null);
     const dashboardId = ref<string | null>(null);
     const widgetTitle = ref<string>(featureTitle);
 
     const canCreate = computed<boolean>(() => Boolean(dashboardId.value));
 
     async function ensureVolatile(): Promise<void> {
-      await widgetStore.setVolatileWidget({
-        id: widgetId,
-        title: widgetTitle.value,
-        feature: props.featureId,
-        order: 0,
-        dashboard: dashboardId.value ?? '',
-        config: activeWidget.value?.config ?? defaultConfig,
-        ...defaultWidgetSize,
-      });
-      activeWidget.value = widgetStore.widgetById(widgetId);
+      if (!widgetStore.widgetById(widgetId)) {
+        widgetStore.setVolatileWidget({
+          id: widgetId,
+          title: widgetTitle.value,
+          feature: props.featureId,
+          order: 0,
+          dashboard: dashboardId.value ?? '',
+          config: defaultConfig,
+          ...defaultWidgetSize,
+        });
+      }
     }
 
     onBeforeUnmount(() => {
-      if (activeWidget.value) {
-        widgetStore.removeVolatileWidget(activeWidget.value);
+      const widget = widgetStore.widgetById(widgetId);
+      if (widget) {
+        widgetStore.removeVolatileWidget(widget);
       }
     });
 
@@ -69,13 +70,16 @@ export default defineComponent({
     }
 
     async function createWidget(): Promise<void> {
+      if (!canCreate.value) {
+        return;
+      }
       await ensureVolatile();
-      if (canCreate.value && activeWidget.value) {
-        const persistentWidget: Widget = {
-          ...activeWidget.value,
+      const volatileWidget = widgetStore.widgetById(widgetId);
+      if (volatileWidget) {
+        const widget = await tryCreateWidget({
+          ...volatileWidget,
           volatile: undefined,
-        };
-        const widget = await tryCreateWidget(persistentWidget);
+        });
         onDone({ widget });
       }
     }
