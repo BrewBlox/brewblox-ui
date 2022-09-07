@@ -84,17 +84,17 @@ export default defineComponent({
       :height="coord2grid(sizeY)"
       class="column"
     >
-      <div class="full-width column">
-        <LabeledField
+      <div class="full-width column q-py-xs">
+        <div
           v-for="d in values"
           :key="d.field"
-          :label="d.label"
-          class="col-auto min-width-md"
-          :tag-class="{ 'text-strike': d.stale }"
-          dense
+          class="column items-center full-width"
         >
-          {{ d.value }}
-        </LabeledField>
+          <div class="col text-small ellipsis full-width q-px-sm">
+            {{ d.label }}
+          </div>
+          <div class="col text-bold">{{ d.value }}</div>
+        </div>
         <div
           v-if="!values.length"
           class="self-center q-pt-sm"
