@@ -11,19 +11,22 @@ import {
   showAbsentBlock,
   showDrivingBlockDialog,
 } from '@/plugins/builder/utils';
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isBlockClaimed } from '@/plugins/spark/utils/info';
+import { isBlockClaimed, isCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
 import {
   ActuatorPwmBlock,
   BlockType,
   DigitalActuatorBlock,
   DigitalState,
+  FastPwmBlock,
 } from 'brewblox-proto/ts';
 
-export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock;
+export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock | FastPwmBlock;
 export const PUMP_KEY = 'actuator';
-export const PUMP_TYPES = [BlockType.DigitalActuator, BlockType.ActuatorPwm];
+export const PWM_PUMP_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
+export const PUMP_TYPES = [BlockType.DigitalActuator, ...PWM_PUMP_TYPES];
 
 const calcPressure = (part: PersistentPart): number => {
   const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
@@ -37,7 +40,7 @@ const calcPressure = (part: PersistentPart): number => {
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
-  if (block.type === BlockType.ActuatorPwm) {
+  if (isCompatible(block.type, PWM_PUMP_TYPES)) {
     return (
       (block.data.setting / 100) *
       (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE)
@@ -55,7 +58,7 @@ const blueprint: BuilderBlueprint = {
       component: 'BlockAddressCard',
       props: {
         settingsKey: PUMP_KEY,
-        compatible: [BlockType.DigitalActuator, BlockType.ActuatorPwm],
+        compatible: PUMP_TYPES,
         label: 'Actuator',
       },
     },
@@ -96,7 +99,7 @@ const blueprint: BuilderBlueprint = {
             ? DigitalState.STATE_INACTIVE
             : DigitalState.STATE_ACTIVE,
       });
-    } else if (block.type === BlockType.ActuatorPwm) {
+    } else if (isCompatible(block.type, PWM_PUMP_TYPES)) {
       const limiterWarning = block.data.constrainedBy?.constraints.length
         ? 'The value may be limited by constraints'
         : '';
@@ -107,11 +110,7 @@ const blueprint: BuilderBlueprint = {
           title: 'Pump speed',
           message: limiterWarning,
           label: 'Percentage output',
-          quickActions: [
-            { label: '0%', value: 0 },
-            { label: '50%', value: 50 },
-            { label: '100%', value: 100 },
-          ],
+          quickActions: PWM_SELECT_OPTIONS,
         },
       }).onOk((value: number) => {
         sparkStore.patchBlock(block, { desiredSetting: value });

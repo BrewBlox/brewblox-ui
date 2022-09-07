@@ -1,6 +1,7 @@
 <script lang="ts">
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
 import { liquidOnCoord, settingsBlock } from '@/plugins/builder/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import {
   ActuatorPwmBlock,
   BlockType,
@@ -8,7 +9,12 @@ import {
   DigitalState,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent, onBeforeMount, PropType, watch } from 'vue';
-import { PumpT, PUMP_KEY, PUMP_TYPES } from '../blueprints/Pump';
+import {
+  PumpT,
+  PUMP_KEY,
+  PUMP_TYPES,
+  PWM_PUMP_TYPES,
+} from '../blueprints/Pump';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -34,7 +40,7 @@ export default defineComponent({
         return hasAddress.value ? false : Boolean(props.part.settings.enabled);
       } else if (block.value.type === BlockType.DigitalActuator) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
-      } else if (block.value.type === BlockType.ActuatorPwm) {
+      } else if (isCompatible(block.value.type, PWM_PUMP_TYPES)) {
         return block.value.data.setting > 0;
       } else {
         return false;

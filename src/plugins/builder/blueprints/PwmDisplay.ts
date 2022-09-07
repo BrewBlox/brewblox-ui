@@ -9,7 +9,7 @@ import { BlockType } from 'brewblox-proto/ts';
 export const SIZE_X = 1;
 export const SIZE_Y = 1;
 export const PWM_KEY = 'pwm';
-export const PWM_TYPES = [BlockType.ActuatorPwm];
+export const PWM_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
 export const FLOW_TOGGLE_KEY = 'flowEnabled';
 
 const size: BuilderBlueprint['size'] = ({ settings }) => {

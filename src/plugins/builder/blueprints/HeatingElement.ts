@@ -3,7 +3,7 @@ import { showDrivingBlockDialog } from '@/plugins/builder/utils';
 import { BlockType } from 'brewblox-proto/ts';
 
 export const PWM_KEY = 'pwm';
-export const PWM_TYPES = [BlockType.ActuatorPwm];
+export const PWM_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
 
 const DEFAULT_SIZE_X = 5;
 const SIZE_Y = 1;

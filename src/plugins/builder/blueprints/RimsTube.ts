@@ -11,7 +11,7 @@ export const DEFAULT_SIZE_X = 4;
 export const SIZE_Y = 1;
 export const ENTRY = '1.5,0,0';
 export const PWM_KEY = 'pwm';
-export const PWM_TYPES = [BlockType.ActuatorPwm];
+export const PWM_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
 
 const blueprint: BuilderBlueprint = {
   type: 'RimsTube',
