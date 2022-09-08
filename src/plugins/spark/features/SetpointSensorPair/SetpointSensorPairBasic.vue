@@ -58,7 +58,12 @@ export default defineComponent({
           {{ prettyQty(block.data.value) }}
         </template>
         <template #setting>
-          {{ prettyQty(block.data.storedSetting) }}
+          <template v-if="isClaimed">
+            {{ prettyQty(block.data.setting) }}
+          </template>
+          <template v-else>
+            {{ prettyQty(block.data.storedSetting) }}
+          </template>
         </template>
       </SettingValueField>
 
