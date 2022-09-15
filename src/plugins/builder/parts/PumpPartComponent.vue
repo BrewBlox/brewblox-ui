@@ -73,7 +73,9 @@ export default defineComponent({
           (newV as DigitalActuatorBlock).data.state !==
             (oldV as DigitalActuatorBlock).data.state ||
           (newV as ActuatorPwmBlock).data.setting !==
-            (oldV as ActuatorPwmBlock).data.setting
+            (oldV as ActuatorPwmBlock).data.setting ||
+          (newV as ActuatorPwmBlock).data.enabled !==
+            (oldV as ActuatorPwmBlock).data.enabled
         ) {
           emit('dirty');
         }
