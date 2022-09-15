@@ -41,7 +41,7 @@ export default defineComponent({
       } else if (block.value.type === BlockType.DigitalActuator) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
       } else if (isCompatible(block.value.type, PWM_PUMP_TYPES)) {
-        return block.value.data.setting > 0;
+        return block.value.data.enabled && Boolean(block.value.data.setting);
       } else {
         return false;
       }
@@ -52,7 +52,7 @@ export default defineComponent({
     const pwmSetting = computed<number>(() =>
       block.value?.type === BlockType.ActuatorPwm ||
       block.value?.type === BlockType.FastPwm
-        ? block.value.data.setting
+        ? Number(block.value.data.setting)
         : 100,
     );
 

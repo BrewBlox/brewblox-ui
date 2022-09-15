@@ -42,7 +42,7 @@ const calcPressure = (part: PersistentPart): number => {
   }
   if (isCompatible(block.type, PWM_PUMP_TYPES)) {
     return (
-      (block.data.setting / 100) *
+      (Number(block.data.value) / 100) *
       (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE)
     );
   }
