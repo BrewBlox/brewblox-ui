@@ -50,7 +50,8 @@ export default defineComponent({
     const liquids = computed<string[]>(() => liquidOnCoord(props.part, LEFT));
 
     const pwmSetting = computed<number>(() =>
-      block.value?.type === BlockType.ActuatorPwm
+      block.value?.type === BlockType.ActuatorPwm ||
+      block.value?.type === BlockType.FastPwm
         ? block.value.data.setting
         : 100,
     );
