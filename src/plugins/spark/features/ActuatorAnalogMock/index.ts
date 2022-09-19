@@ -9,6 +9,7 @@ import {
   ActuatorAnalogMockBlock,
   AnalogConstraintsObj,
   BlockType,
+  SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './ActuatorAnalogMockWidget.vue';
@@ -23,8 +24,10 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<ActuatorAnalogMockBlock> = {
       type,
       generate: (): ActuatorAnalogMockBlock['data'] => ({
-        setting: 0,
+        enabled: true,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         minSetting: 0,
         maxSetting: 100,
         value: 0,
@@ -32,14 +35,15 @@ const plugin: Plugin = {
         maxValue: 100,
         constrainedBy: { constraints: [] },
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorAnalogMockBlock>[] = [
       {
         type,
-        key: 'desiredSetting',
-        title: 'Setting',
+        key: 'storedSetting',
+        title: 'Stored setting',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 0,
@@ -47,8 +51,15 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'enabled',
+        title: 'Enabled',
+        component: 'BoolValEdit',
+        generate: () => true,
+      },
+      {
+        type,
         key: 'minSetting',
-        title: 'Minimum Setting',
+        title: 'Minimum setting',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 0,
@@ -56,7 +67,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'maxSetting',
-        title: 'Maximum Setting',
+        title: 'Maximum setting',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 100,
@@ -64,7 +75,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'minValue',
-        title: 'Minimum Value',
+        title: 'Minimum value',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 0,
@@ -72,7 +83,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'maxValue',
-        title: 'Maximum Value',
+        title: 'Maximum value',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 100,
@@ -87,8 +98,18 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'setting',
+        title: 'Setting',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: '0-100',
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'value',
-        title: 'Measured Value',
+        title: 'Measured value',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',

@@ -50,7 +50,8 @@ export default defineComponent({
 
     <div class="widget-body row">
       <QuantityField
-        :model-value="block.data.storedSetting"
+        :model-value="block.data.desiredSetting"
+        :backup-value="block.data.storedSetting"
         :readonly="isClaimed"
         :class="{ darkened: !block.data.enabled }"
         title="Setting"

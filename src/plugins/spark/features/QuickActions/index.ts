@@ -24,7 +24,7 @@ const plugin: Plugin = {
         rows: 5,
       },
       generateConfig: () => ({
-        version: '1.0',
+        version: '1.1',
         actions: [
           {
             id: nanoid(),
@@ -42,7 +42,7 @@ const plugin: Plugin = {
         const config = widget.config as QuickActionsConfig &
           QuickActionsConfigOld;
 
-        if (config.version !== '1.0') {
+        if (config.version !== '1.1') {
           if (config.steps) {
             dirty = true;
             config.actions = config.steps;
@@ -69,7 +69,27 @@ const plugin: Plugin = {
               }),
           );
 
-          config.version = '1.0';
+          // The editable setting moved from 'desiredSetting' to 'storedSetting'
+          config.actions.forEach((action) =>
+            action.changes
+              .filter((change) => change.data.desiredSetting !== undefined)
+              .forEach((change) => {
+                change.data.storedSetting = change.data.desiredSetting;
+                dirty = true;
+              }),
+          );
+
+          // The editable setting moved from 'desiredState' to 'storedState'
+          config.actions.forEach((action) =>
+            action.changes
+              .filter((change) => change.data.desiredState !== undefined)
+              .forEach((change) => {
+                change.data.storedState = change.data.desiredState;
+                dirty = true;
+              }),
+          );
+
+          config.version = '1.1';
         }
 
         // Convert units if user changed system temperature
@@ -99,7 +119,7 @@ const plugin: Plugin = {
           const upgraded: Widget<QuickActionsConfig> = {
             ...widget,
             config: {
-              version: '1.0',
+              version: '1.1',
               actions: config.actions,
               lastActionId: config.lastActionId,
             },

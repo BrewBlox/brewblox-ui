@@ -25,16 +25,16 @@ export default defineComponent({
 
     <div class="widget-body row">
       <SliderField
-        :model-value="block.data.setting"
+        :model-value="block.data.storedSetting"
         :readonly="isClaimed"
         title="Analog actuator Setting"
         label="Setting"
         tag="big"
         class="col-grow"
         :tag-class="{
-          'text-orange': block.data.setting !== block.data.desiredSetting,
+          'text-orange': block.data.desiredSetting !== block.data.storedSetting,
         }"
-        @update:model-value="(v) => patchBlock({ desiredSetting: v })"
+        @update:model-value="(v) => patchBlock({ storedSetting: v })"
       />
       <LabeledField
         :model-value="block.data.value"

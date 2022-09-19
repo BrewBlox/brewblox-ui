@@ -62,7 +62,7 @@ export default defineComponent({
             {{ prettyQty(block.data.setting) }}
           </template>
           <template v-else>
-            {{ prettyQty(block.data.storedSetting) }}
+            {{ prettyQty(block.data.desiredSetting) }}
           </template>
         </template>
       </SettingValueField>

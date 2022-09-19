@@ -17,6 +17,7 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
+  SettingMode,
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
@@ -55,8 +56,9 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
       serviceId,
       data: {
         sensorId: bloxLink(names.fridgeSensor),
-        storedSetting: fridgeSetting,
         enabled: true,
+        storedSetting: fridgeSetting,
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
@@ -64,6 +66,7 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     // Mutex
@@ -85,12 +88,14 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         hwDevice: bloxLink(config.coolChannel.blockId),
         channel: config.coolChannel.channelId,
         invert: false,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         transitionDurationPreset: TransitionDurationPreset.ST_OFF,
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
         constrainedBy: {
           constraints: [
             {
@@ -121,6 +126,7 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
       data: {
         hwDevice: bloxLink(config.heatChannel.blockId),
         channel: config.heatChannel.channelId,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
@@ -128,6 +134,7 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
         constrainedBy: {
           constraints: [
             {
@@ -152,11 +159,13 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         enabled: true,
         period: bloxQty('30m'),
         actuatorId: bloxLink(names.coolAct),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     typed<ActuatorPwmBlock>({
@@ -167,11 +176,13 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         enabled: true,
         period: bloxQty('10s'),
         actuatorId: bloxLink(names.heatAct),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     // Setpoint Profile

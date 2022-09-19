@@ -91,7 +91,7 @@ export default defineComponent({
       <CardWarning v-if="!target || !block.data.channel">
         <template #message> PWM has no target channel configured. </template>
       </CardWarning>
-      <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
+      <BlockEnableToggle>
         <template #enabled>
           PWM is enabled
           <template v-if="target">
@@ -127,7 +127,7 @@ export default defineComponent({
             <q-btn
               :label="q.label"
               unelevated
-              @click="patchBlock({ desiredSetting: q.value })"
+              @click="patchBlock({ storedSetting: q.value })"
             />
           </div>
         </div>
@@ -140,7 +140,7 @@ export default defineComponent({
           class="col-grow q-mt-md q-mx-md'"
           label-always
           color="primary"
-          @change="(v) => patchBlock({ desiredSetting: v })"
+          @change="(v) => patchBlock({ storedSetting: v })"
         />
         <div
           v-else

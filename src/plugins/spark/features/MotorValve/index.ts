@@ -14,6 +14,7 @@ import {
   DigitalConstraintsObj,
   DigitalState,
   MotorValveBlock,
+  SettingMode,
   ValveState,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
@@ -31,24 +32,24 @@ const plugin: Plugin = {
       generate: (): MotorValveBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         valveState: ValveState.VALVE_INIT_IDLE,
         constrainedBy: { constraints: [] },
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<MotorValveBlock>[] = [
       {
         type,
-        key: 'desiredState',
-        title: 'State',
+        key: 'storedState',
+        title: 'Stored state',
         component: 'StateValEdit',
         generate: () => DigitalState.STATE_INACTIVE,
         valueHint: enumHint(DigitalState),
-        graphed: true,
-        graphName: 'Desired state',
       },
       {
         type,
@@ -57,6 +58,16 @@ const plugin: Plugin = {
         component: 'DigitalConstraintsValEdit',
         generate: (): DigitalConstraintsObj => ({ constraints: [] }),
         pretty: prettifyConstraints,
+      },
+      {
+        type,
+        key: 'desiredState',
+        title: 'Desired state',
+        component: 'StateValEdit',
+        generate: () => DigitalState.STATE_INACTIVE,
+        valueHint: enumHint(DigitalState),
+        readonly: true,
+        graphed: true,
       },
       {
         type,

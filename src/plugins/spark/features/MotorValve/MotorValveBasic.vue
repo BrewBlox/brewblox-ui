@@ -33,7 +33,7 @@ export default defineComponent({
             :pending="block.data.state !== block.data.desiredState"
             :pending-reason="limitations"
             :disable="isClaimed"
-            @update:model-value="(v) => patchBlock({ desiredState: v })"
+            @update:model-value="(v) => patchBlock({ storedState: v })"
           />
         </LabeledField>
         <LabeledField

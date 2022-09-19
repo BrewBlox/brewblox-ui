@@ -26,13 +26,13 @@ export default defineComponent({
     <div class="widget-body row">
       <InputField
         :readonly="isClaimed"
-        :model-value="block.data.desiredSetting"
+        :model-value="block.data.storedSetting"
         label="Setting"
         type="number"
         title="Target"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ desiredSetting: v })"
+        @update:model-value="(v) => patchBlock({ storedSetting: v })"
       />
       <InputField
         :model-value="block.data.minSetting"

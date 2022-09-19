@@ -15,6 +15,7 @@ import {
   DigitalActuatorBlock,
   DigitalConstraintsObj,
   DigitalState,
+  SettingMode,
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
@@ -32,6 +33,7 @@ const plugin: Plugin = {
       generate: (): DigitalActuatorBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
@@ -40,19 +42,18 @@ const plugin: Plugin = {
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<DigitalActuatorBlock>[] = [
       {
         type,
-        key: 'desiredState',
-        title: 'State',
+        key: 'storedState',
+        title: 'Stored state',
         component: 'StateValEdit',
-        generate: (): DigitalState => DigitalState.STATE_INACTIVE,
+        generate: () => DigitalState.STATE_INACTIVE,
         valueHint: enumHint(DigitalState),
-        graphed: true,
-        graphName: 'Desired state',
       },
       {
         type,
@@ -68,6 +69,16 @@ const plugin: Plugin = {
         component: 'DigitalConstraintsValEdit',
         generate: (): DigitalConstraintsObj => ({ constraints: [] }),
         pretty: prettifyConstraints,
+      },
+      {
+        type,
+        key: 'desiredState',
+        title: 'Desired state',
+        component: 'StateValEdit',
+        generate: () => DigitalState.STATE_INACTIVE,
+        valueHint: enumHint(DigitalState),
+        readonly: true,
+        graphed: true,
       },
       {
         type,

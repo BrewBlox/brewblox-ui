@@ -161,7 +161,7 @@ export default defineComponent({
             :disable="isClaimed"
             dense
             class="col-auto"
-            @update:model-value="(v) => patchBlock({ desiredState: v })"
+            @update:model-value="(v) => patchBlock({ storedState: v })"
           />
         </LabeledField>
 

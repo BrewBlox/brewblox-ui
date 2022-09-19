@@ -81,9 +81,9 @@ export default defineComponent({
 
     async function updateDigitalState(
       channel: EditableChannel,
-      desiredState: DigitalState,
+      storedState: DigitalState,
     ): Promise<void> {
-      await sparkStore.patchBlock(channel.digitalActuator, { desiredState });
+      await sparkStore.patchBlock(channel.digitalActuator, { storedState });
     }
 
     async function updatePwmSetting(channel: EditableChannel): Promise<void> {
@@ -91,18 +91,19 @@ export default defineComponent({
         createDialog({
           component: 'SliderDialog',
           componentProps: {
-            modelValue: channel.pwmActuator.data.desiredSetting,
+            modelValue: channel.pwmActuator.data.storedSetting,
             title: 'Edit PWM setting',
             label: 'Pwm %',
             min: 0,
             max: 100,
             quickActions: PWM_SELECT_OPTIONS,
           },
-        }).onOk((desiredSetting) =>
-          sparkStore.patchBlock(channel.pwmActuator, { desiredSetting }),
+        }).onOk((storedSetting) =>
+          sparkStore.patchBlock(channel.pwmActuator, { storedSetting }),
         );
       }
     }
+
     return {
       BlockType,
       serviceId,
@@ -146,6 +147,7 @@ export default defineComponent({
         >
           <q-btn
             unelevated
+            :disable="channel.actuatorClaimed"
             :label="`${channel.pwmActuator.data.desiredSetting}%`"
             @click="updatePwmSetting(channel)"
           />

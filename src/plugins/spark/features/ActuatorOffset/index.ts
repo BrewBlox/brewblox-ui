@@ -11,6 +11,7 @@ import {
   BlockIntfType,
   BlockType,
   ReferenceKind,
+  SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './ActuatorOffsetWidget.vue';
@@ -28,19 +29,21 @@ const plugin: Plugin = {
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         referenceId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
+        storedSetting: 0,
         desiredSetting: 0,
         setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
         enabled: true,
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorOffsetBlock>[] = [
       {
         type,
-        key: 'desiredSetting',
+        key: 'storedSetting',
         title: 'Target offset',
         component: 'NumberValEdit',
         generate: () => 0,
@@ -76,6 +79,16 @@ const plugin: Plugin = {
         component: 'AnalogConstraintsValEdit',
         generate: (): AnalogConstraintsObj => ({ constraints: [] }),
         pretty: prettifyConstraints,
+      },
+      {
+        type,
+        key: 'desiredSetting',
+        title: 'Desired offset',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: 'number',
+        readonly: true,
+        graphed: true,
       },
       {
         type,
