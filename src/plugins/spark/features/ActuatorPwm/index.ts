@@ -11,6 +11,7 @@ import {
   AnalogConstraintsObj,
   BlockIntfType,
   BlockType,
+  SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './ActuatorPwmWidget.vue';
@@ -27,20 +28,22 @@ const plugin: Plugin = {
       generate: (): ActuatorPwmBlock['data'] => ({
         actuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
         period: bloxQty('4s'),
+        storedSetting: 0,
         desiredSetting: 0,
         setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
         enabled: true,
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorPwmBlock>[] = [
       {
         type,
-        key: 'desiredSetting',
-        title: 'Duty Setting',
+        key: 'storedSetting',
+        title: 'Stored duty setting',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',
@@ -77,8 +80,18 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'desiredSetting',
+        title: 'Desired duty setting',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: '0-100',
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'setting',
-        title: 'Duty Setting',
+        title: 'Duty setting',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',
@@ -88,7 +101,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'value',
-        title: 'Duty Achieved',
+        title: 'Duty achieved',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',

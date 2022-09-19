@@ -106,14 +106,14 @@ const blueprint: BuilderBlueprint = {
       createDialog({
         component: 'SliderDialog',
         componentProps: {
-          modelValue: block.data.desiredSetting,
+          modelValue: block.data.storedSetting,
           title: 'Pump speed',
           message: limiterWarning,
           label: 'Percentage output',
           quickActions: PWM_SELECT_OPTIONS,
         },
       }).onOk((value: number) => {
-        sparkStore.patchBlock(block, { desiredSetting: value });
+        sparkStore.patchBlock(block, { storedSetting: value });
       });
     }
   },

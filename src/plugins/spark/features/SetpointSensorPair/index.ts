@@ -10,6 +10,7 @@ import {
   BlockType,
   FilterChoice,
   SetpointSensorPairBlock,
+  SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './SetpointSensorPairWidget.vue';
@@ -26,6 +27,7 @@ const plugin: Plugin = {
       generate: (): SetpointSensorPairBlock['data'] => ({
         sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
         storedSetting: tempQty(20),
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
@@ -34,6 +36,7 @@ const plugin: Plugin = {
         filter: FilterChoice.FILTER_15s,
         filterThreshold: deltaTempQty(5),
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
@@ -41,7 +44,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'storedSetting',
-        title: 'Setting',
+        title: 'Stored setting',
         component: 'QuantityValEdit',
         generate: () => tempQty(20),
       },
@@ -62,14 +65,23 @@ const plugin: Plugin = {
       {
         type,
         key: 'sensorId',
-        title: 'Linked Sensor',
+        title: 'Linked sensor',
         component: 'LinkValEdit',
         generate: () => bloxLink(null, BlockIntfType.TempSensorInterface),
       },
       {
         type,
+        key: 'desiredSetting',
+        title: 'Desired setting',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'setting',
-        title: 'Setting (actual)',
+        title: 'Actual setting',
         component: 'QuantityValEdit',
         generate: () => tempQty(20),
         readonly: true,

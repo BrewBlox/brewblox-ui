@@ -26,6 +26,7 @@ import {
   PidBlock,
   ReferenceKind,
   SetpointSensorPairBlock,
+  SettingMode,
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
@@ -62,8 +63,9 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       serviceId,
       data: {
         sensorId: bloxLink(names.kettleSensor),
-        storedSetting: tempQty(67.7),
         enabled: false,
+        storedSetting: tempQty(67.7),
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
@@ -71,6 +73,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         filterThreshold: deltaTempQty(5),
         resetFilter: false,
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     typed<SetpointSensorPairBlock>({
@@ -79,8 +82,9 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       serviceId,
       data: {
         sensorId: bloxLink(names.tubeSensor),
-        storedSetting: tempQty(67.7),
         enabled: false,
+        storedSetting: tempQty(67.7),
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
@@ -88,6 +92,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         filterThreshold: deltaTempQty(5),
         resetFilter: false,
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     // Setpoint Driver
@@ -100,6 +105,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         referenceId: bloxLink(names.kettleSetpoint),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
         enabled: true,
+        storedSetting: 0,
         desiredSetting: 0,
         setting: 0,
         value: 0,
@@ -112,6 +118,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           ],
         },
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     // Digital Actuators
@@ -123,6 +130,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         hwDevice: bloxLink(config.tubeChannel.blockId),
         channel: config.tubeChannel.channelId,
         invert: false,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         constrainedBy: { constraints: [] },
@@ -130,6 +138,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     typed<DigitalActuatorBlock>({
@@ -140,6 +149,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         hwDevice: bloxLink(config.pumpChannel.blockId),
         channel: config.pumpChannel.channelId,
         invert: false,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         constrainedBy: { constraints: [] },
@@ -147,6 +157,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     // PWM
@@ -158,11 +169,13 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         enabled: true,
         period: bloxQty('10s'),
         actuatorId: bloxLink(names.tubeAct),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     }),
     // PID
@@ -276,7 +289,7 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
-      version: '1.0',
+      version: '1.1',
       actions: [
         {
           name: 'Enable pump and heater',
@@ -286,7 +299,7 @@ export function defineWidgets(
               id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
-              data: { desiredState: DigitalState.STATE_ACTIVE },
+              data: { storedState: DigitalState.STATE_ACTIVE },
               confirmed: {},
             }),
             typed<BlockChange<SetpointSensorPairBlock>>({
@@ -313,7 +326,7 @@ export function defineWidgets(
               id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
-              data: { desiredState: DigitalState.STATE_INACTIVE },
+              data: { storedState: DigitalState.STATE_INACTIVE },
               confirmed: {},
             }),
           ],
@@ -326,7 +339,7 @@ export function defineWidgets(
               id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
-              data: { desiredState: DigitalState.STATE_ACTIVE },
+              data: { storedState: DigitalState.STATE_ACTIVE },
               confirmed: {},
             }),
           ],

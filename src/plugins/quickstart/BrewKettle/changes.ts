@@ -14,6 +14,7 @@ import {
   FilterChoice,
   PidBlock,
   SetpointSensorPairBlock,
+  SettingMode,
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
@@ -52,8 +53,9 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
       serviceId,
       data: {
         sensorId: bloxLink(names.kettleSensor),
-        storedSetting: tempQty(70),
         enabled: false,
+        storedSetting: tempQty(70),
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
@@ -61,6 +63,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     },
     {
@@ -70,6 +73,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
       data: {
         hwDevice: bloxLink(config.kettleChannel.blockId),
         channel: config.kettleChannel.channelId,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
@@ -80,6 +84,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     },
     {
@@ -90,6 +95,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         enabled: true,
         period: bloxQty('2s'),
         actuatorId: bloxLink(names.kettleAct),
+        storedSetting: 0,
         setting: 0,
         desiredSetting: 0,
         value: 0,
@@ -97,6 +103,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
           constraints: [],
         },
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     },
     {

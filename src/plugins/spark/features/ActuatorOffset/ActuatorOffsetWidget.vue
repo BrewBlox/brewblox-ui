@@ -1,6 +1,7 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyLink } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
@@ -9,6 +10,7 @@ import {
   ReferenceKind,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import ActuatorOffsetDisableDialog from './ActuatorOffsetDisableDialog.vue';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
   { label: 'Setting', value: ReferenceKind.REF_SETTING },
@@ -59,6 +61,19 @@ export default defineComponent({
       );
     });
 
+    function changeEnabled(enabled: boolean): void {
+      if (enabled) {
+        patchBlock({ enabled });
+      } else {
+        createDialog({
+          component: ActuatorOffsetDisableDialog,
+          componentProps: {
+            block: block.value,
+          },
+        });
+      }
+    }
+
     return {
       prettyLink,
       referenceOpts,
@@ -74,6 +89,7 @@ export default defineComponent({
       desiredSetting,
       constrainedBy,
       isLimited,
+      changeEnabled,
     };
   },
 });
@@ -100,7 +116,10 @@ export default defineComponent({
           Setpoint Driver has no reference Setpoint configured.
         </template>
       </CardWarning>
-      <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
+      <BlockEnableToggle
+        emit-toggle
+        @change="changeEnabled"
+      >
         <template #enabled>
           Driver is enabled and claims <i> {{ prettyLink(target) }} </i>.
           <br />
@@ -147,8 +166,8 @@ export default defineComponent({
           <LinkField
             v-model="target"
             :service-id="serviceId"
-            title="Driven block"
-            label="Driven block"
+            title="Target block"
+            label="Target block"
             class="col-grow"
           />
           <LinkField

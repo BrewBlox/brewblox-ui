@@ -15,6 +15,7 @@ import {
   BlockType,
   FastPwmBlock,
   PwmFrequency,
+  SettingMode,
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
@@ -35,6 +36,7 @@ const plugin: Plugin = {
         channel: 0,
         invert: false,
         frequency: PwmFrequency.PWM_FREQ_100HZ,
+        storedSetting: 0,
         desiredSetting: 0,
         setting: 0,
         value: 0,
@@ -43,14 +45,15 @@ const plugin: Plugin = {
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<FastPwmBlock>[] = [
       {
         type,
-        key: 'desiredSetting',
-        title: 'Duty Setting',
+        key: 'storedSetting',
+        title: 'Stored duty setting',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',
@@ -81,8 +84,18 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'desiredSetting',
+        title: 'Desired duty setting',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: '0-100',
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'setting',
-        title: 'Duty Setting',
+        title: 'Duty setting',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',
@@ -92,7 +105,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'value',
-        title: 'Duty Achieved',
+        title: 'Duty achieved',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',

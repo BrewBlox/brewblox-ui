@@ -13,6 +13,7 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
+  SettingMode,
   TempSensorCombiBlock,
   TempSensorMockBlock,
   TempSensorOneWireBlock,
@@ -409,6 +410,7 @@ export function findControlProblems(
     serviceId,
     setpointLink,
   );
+
   if (!setpoint) {
     issues.push({
       desc: `Setpoint not found: ${linkStr(setpointLink)}`,
@@ -439,6 +441,16 @@ export function findControlProblems(
     issues.push({
       desc: `Profile Setpoint does not match: ${linkStr(setpointLink)}`,
       autofix: () => sparkStore.patchBlock(profile, { targetId: setpointLink }),
+    });
+  }
+
+  if (
+    setpoint.data.claimedBy.id == null &&
+    setpoint.data.settingMode === SettingMode.CLAIMED
+  ) {
+    issues.push({
+      desc: `Setpoint is inactive: ${linkStr(setpointLink)}`,
+      autofix: () => createBlockDialogPromise(setpoint),
     });
   }
 

@@ -15,6 +15,10 @@ export default defineComponent({
       required: true,
       validator: isQuantity,
     },
+    backupValue: {
+      type: Object as PropType<Quantity>,
+      default: null,
+    },
     label: {
       type: String,
       default: '',
@@ -54,10 +58,16 @@ export default defineComponent({
       if (props.readonly) {
         return;
       }
+
+      const modelValue =
+        props.modelValue.value == null && props.backupValue != null
+          ? props.backupValue
+          : props.modelValue;
+
       createDialog({
         component: 'QuantityDialog',
         componentProps: {
-          modelValue: props.modelValue,
+          modelValue,
           title: props.title,
           message: props.message,
           html: props.html,
