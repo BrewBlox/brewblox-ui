@@ -94,7 +94,7 @@ const blueprint: BuilderBlueprint = {
       showDrivingBlockDialog(part, PUMP_KEY, PUMP_TYPES);
     } else if (block.type === BlockType.DigitalActuator) {
       sparkStore.patchBlock(block, {
-        desiredState:
+        storedState:
           block.data.state === DigitalState.STATE_ACTIVE
             ? DigitalState.STATE_INACTIVE
             : DigitalState.STATE_ACTIVE,

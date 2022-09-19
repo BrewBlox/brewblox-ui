@@ -52,7 +52,7 @@ const blueprint: BuilderBlueprint = {
     const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
     if (block) {
       useSparkStore().patchBlock(block, {
-        desiredState:
+        storedState:
           block.data.state === DigitalState.STATE_ACTIVE
             ? DigitalState.STATE_INACTIVE
             : DigitalState.STATE_ACTIVE,
