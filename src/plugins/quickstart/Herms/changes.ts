@@ -164,10 +164,10 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         referenceId: bloxLink(names.mtSetpoint),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
         enabled: false,
-        storedSetting: 0,
-        desiredSetting: 0,
-        setting: 0,
-        value: 0,
+        storedSetting: deltaTempQty(0),
+        desiredSetting: deltaTempQty(null),
+        setting: tempQty(null),
+        value: deltaTempQty(null),
         constrainedBy: {
           constraints: [
             {

@@ -1,9 +1,7 @@
 <script lang="ts">
 import { coord2grid } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
-import { userUnits } from '@/user-settings';
-import { isQuantity } from '@/utils/identity';
-import { deltaTempQty, prettyAny } from '@/utils/quantity';
+import { prettyQty } from '@/utils/quantity';
 import {
   mdiBullseyeArrow,
   mdiGauge,
@@ -12,7 +10,6 @@ import {
 } from '@quasar/extras/mdi-v5';
 import {
   ActuatorOffsetBlock,
-  ActuatorPwmBlock,
   Quantity,
   ReferenceKind,
   SetpointSensorPairBlock,
@@ -47,11 +44,7 @@ export default defineComponent({
       DRIVER_TYPES,
     );
 
-    // Reference actually is a BlockIntf.ProcessValueInterface
-    // We don't have a TS type for that, but Setpoint/PWM are a good intersection
-    const refBlock = computed<
-      SetpointSensorPairBlock | ActuatorPwmBlock | null
-    >(() =>
+    const refBlock = computed<SetpointSensorPairBlock | null>(() =>
       block.value !== null
         ? sparkStore.blockById(
             block.value.serviceId,
@@ -60,7 +53,7 @@ export default defineComponent({
         : null,
     );
 
-    const refAmount = computed<Quantity | number | null>(() => {
+    const refAmount = computed<Quantity | null>(() => {
       if (!block.value || !refBlock.value) {
         return null;
       }
@@ -79,21 +72,16 @@ export default defineComponent({
       ) {
         return 'mdiBullseyeArrow';
       }
-      return isQuantity(refAmount.value) ? 'mdiThermometer' : 'mdiGauge';
+      return 'mdiThermometer';
     });
 
-    const deltaTempUnit = computed<string>(
-      () => `delta_${userUnits.value.temperature}`,
-    );
-
-    const actualSetting = computed<Quantity | number | null>(() => {
-      const v = block.value?.data.setting ?? null;
-      return isQuantity(refAmount.value) ? deltaTempQty(v) : v;
+    const actualSetting = computed<Quantity | null>(() => {
+      return block.value?.data.setting ?? null;
     });
 
     return {
       coord2grid,
-      prettyAny,
+      prettyQty,
       icons,
       bordered,
       isBroken,
@@ -101,7 +89,6 @@ export default defineComponent({
       scale,
       refAmount,
       refIcon,
-      deltaTempUnit,
       actualSetting,
     };
   },
@@ -134,7 +121,7 @@ export default defineComponent({
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ prettyAny(refAmount) }}
+            {{ prettyQty(refAmount) }}
           </div>
         </div>
         <div class="col row q-gutter-x-xs">
@@ -145,7 +132,7 @@ export default defineComponent({
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ prettyAny(actualSetting) }}
+            {{ prettyQty(actualSetting) }}
           </div>
         </div>
       </div>

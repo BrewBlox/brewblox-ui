@@ -105,10 +105,10 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         referenceId: bloxLink(names.kettleSetpoint),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
         enabled: true,
-        storedSetting: 0,
-        desiredSetting: 0,
-        setting: 0,
-        value: 0,
+        storedSetting: deltaTempQty(0),
+        desiredSetting: deltaTempQty(null),
+        setting: tempQty(null),
+        value: deltaTempQty(null),
         constrainedBy: {
           constraints: [
             {

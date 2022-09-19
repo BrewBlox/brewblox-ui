@@ -7,6 +7,7 @@ import {
   ActuatorOffsetBlock,
   AnalogConstraintsObj,
   Link,
+  Quantity,
   ReferenceKind,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
@@ -44,9 +45,9 @@ export default defineComponent({
         referenceOpts.find((v) => v.value === refKind.value)?.label ?? '???',
     );
 
-    const desiredSetting = computed<number>({
+    const desiredSetting = computed<Quantity>({
       get: () => block.value.data.desiredSetting,
-      set: (v) => patchBlock({ desiredSetting: v }),
+      set: (v) => patchBlock({ storedSetting: v }),
     });
 
     const constrainedBy = computed<AnalogConstraintsObj>({
@@ -57,7 +58,8 @@ export default defineComponent({
     const isLimited = computed<boolean>(() => {
       const { enabled, desiredSetting, setting } = block.value.data;
       return (
-        enabled && fixedNumber(desiredSetting, 1) !== fixedNumber(setting, 1)
+        enabled &&
+        fixedNumber(desiredSetting.value, 1) !== fixedNumber(setting.value, 1)
       );
     });
 
@@ -133,8 +135,9 @@ export default defineComponent({
       </BlockEnableToggle>
 
       <div class="widget-body row">
-        <InputField
+        <QuantityField
           v-model="desiredSetting"
+          :backup-value="block.data.storedSetting"
           :readonly="isClaimed"
           tag="big"
           title="Desired offset"
@@ -143,17 +146,17 @@ export default defineComponent({
           class="col-grow"
           tag-class="text-primary"
         />
-        <LabeledField
+        <QuantityField
           :model-value="block.data.setting"
-          number
+          readonly
           label="Limited offset"
           tag="big"
           class="col-grow"
           :tag-class="['text-pink-4', !isLimited && 'fade-4']"
         />
-        <LabeledField
+        <QuantityField
           :model-value="block.data.value"
-          number
+          readonly
           label="Achieved offset"
           tag="big"
           class="col-grow"
