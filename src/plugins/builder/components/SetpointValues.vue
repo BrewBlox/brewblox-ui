@@ -6,7 +6,9 @@ import { makeTypeFilter } from '@/utils/functional';
 import { contrastColor } from '@/utils/misc';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import {
+  mdiAlertCircleOutline,
   mdiBullseyeArrow,
+  mdiSleep,
   mdiSwapVerticalBold,
   mdiThermometer,
 } from '@quasar/extras/mdi-v5';
@@ -72,14 +74,24 @@ export default defineComponent({
           .some((blk) => blk.data.inputId.id === address.value.id),
     );
 
-    const isClaimed = computed<boolean>(() =>
-      sparkStore
-        .claimsByService(serviceId)
-        .some((c) => c.target === block.value?.id),
-    );
+    const settingIcon = computed<string>(() => {
+      if (block.value == null) {
+        return mdiAlertCircleOutline;
+      }
+      const { enabled, claimedBy } = block.value.data;
+      if (!enabled) {
+        return mdiSleep;
+      }
+      if (claimedBy.id != null) {
+        return mdiSwapVerticalBold;
+      }
+      return mdiBullseyeArrow;
+    });
 
     const setpointSetting = computed<number | null>(() =>
-      block.value && isUsed.value ? block.value.data.storedSetting.value : null,
+      block.value && isUsed.value
+        ? block.value.data.desiredSetting.value
+        : null,
     );
 
     const setpointValue = computed<number | null>(
@@ -87,19 +99,17 @@ export default defineComponent({
     );
 
     const setpointUnit = computed<string>(() =>
-      prettyUnit(block.value?.data.storedSetting),
+      prettyUnit(block.value?.data.desiredSetting),
     );
 
     return {
       mdiThermometer,
-      mdiSwapVerticalBold,
-      mdiBullseyeArrow,
       coord2grid,
       fixedNumber,
       textColor,
       block,
       isBroken,
-      isClaimed,
+      settingIcon,
       setpointSetting,
       setpointValue,
       setpointUnit,
@@ -144,7 +154,7 @@ export default defineComponent({
         </div>
         <div class="col row q-gutter-x-xs">
           <q-icon
-            :name="isClaimed ? mdiSwapVerticalBold : mdiBullseyeArrow"
+            :name="settingIcon"
             size="20px"
             class="static col-auto"
           />

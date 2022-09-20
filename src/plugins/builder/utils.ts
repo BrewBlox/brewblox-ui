@@ -292,24 +292,24 @@ export function showDrivingBlockDialog(
   settingsKey: string,
   intf: ComparedBlockType,
 ): void {
-  const sparkStore = useSparkStore();
+  // const sparkStore = useSparkStore();
   const block = settingsBlock(part, settingsKey, intf);
 
   if (!block) {
     return showAbsentBlock(part, settingsKey);
   }
 
-  const claim = sparkStore
-    .claimsByService(block.serviceId)
-    .find((c) => c.target === block.id);
+  // const claim = sparkStore
+  //   .claimsByService(block.serviceId)
+  //   .find((c) => c.target === block.id);
 
-  const actual =
-    claim !== undefined
-      ? sparkStore.blockById(block.serviceId, claim.source)
-      : block;
+  // const actual =
+  //   claim !== undefined
+  //     ? sparkStore.blockById(block.serviceId, claim.source)
+  //     : block;
 
-  if (actual) {
-    createBlockDialog(actual, { mode: 'Basic' });
+  if (block) {
+    createBlockDialog(block, { mode: 'Basic' });
   }
 }
 

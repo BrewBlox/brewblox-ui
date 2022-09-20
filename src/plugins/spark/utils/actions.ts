@@ -233,6 +233,10 @@ export async function startAddBlockToDisplay(
   if (opts.showDialog) {
     createBlockDialog(display);
   }
+
+  // Make sure the display widget is updated in pinia before next call
+  // TODO(Bob) nicer solution
+  await new Promise((r) => setTimeout(r, 50));
 }
 
 export function saveHwInfo(serviceId: string): void {

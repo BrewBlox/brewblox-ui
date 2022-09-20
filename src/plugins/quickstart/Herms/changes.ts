@@ -429,10 +429,10 @@ export function defineWidgets(
           name: 'Constant HLT Temp',
           id: nanoid(),
           changes: [
-            typed<BlockChange<SetpointSensorPairBlock>>({
+            typed<BlockChange<ActuatorOffsetBlock>>({
               id: nanoid(),
               serviceId,
-              blockId: names.mtSetpoint,
+              blockId: names.hltDriver,
               data: { enabled: false },
               confirmed: {},
             }),

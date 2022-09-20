@@ -40,11 +40,14 @@ export default defineComponent({
 
     function showSource(): void {
       if (claim.value) {
-        createBlockDialog({
-          serviceId: props.serviceId,
-          id: claim.value.source,
-          type: null,
-        });
+        createBlockDialog(
+          {
+            serviceId: props.serviceId,
+            id: claim.value.source,
+            type: null,
+          },
+          { mode: 'Basic' },
+        );
       }
     }
 

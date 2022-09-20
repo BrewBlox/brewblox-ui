@@ -109,6 +109,10 @@ export default defineComponent({
         v-else-if="!block"
         class="col"
       />
+      <SleepingIcon
+        v-else-if="!block.data.enabled"
+        class="col"
+      />
       <div
         v-else
         class="col column q-ma-xs"
