@@ -209,6 +209,16 @@ export default defineComponent({
                 setExclusiveChannelActuator(block, hwDevice, channel)
             "
           />
+          <LabeledField
+            label="Invert"
+            class="col-grow"
+          >
+            <q-toggle
+              :model-value="block.data.invert"
+              dense
+              @update:model-value="(v) => patchBlock({ invert: v })"
+            />
+          </LabeledField>
 
           <div class="col-break" />
 
