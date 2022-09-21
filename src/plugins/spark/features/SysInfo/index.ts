@@ -1,12 +1,16 @@
-import { Plugin } from 'vue';
-
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { SparkPlatform, SysInfoBlock } from '@/shared-types';
+import { BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
-
+import { bloxQty } from '@/utils/quantity';
+import {
+  BlockType,
+  DisplayTempUnit,
+  SparkPlatform,
+  SysInfoBlock,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './SysInfoWidget.vue';
 
 const type = BlockType.SysInfo;
@@ -18,15 +22,20 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SysInfoBlock> = {
       type,
-      generate: () => ({
+      generate: (): SysInfoBlock['data'] => ({
         deviceId: '',
         platform: SparkPlatform.PLATFORM_UNKNOWN,
         version: '',
         releaseDate: '',
         protocolVersion: '',
         protocolDate: '',
-        command: null,
-        trace: [],
+        ip: '0.0.0.0',
+        uptime: bloxQty('0s'),
+        updatesPerSecond: 0,
+        systemTime: '',
+        timeZone: 'etc/UTC',
+        tempUnit: DisplayTempUnit.TEMP_CELSIUS,
+        displayBrightness: 255,
       }),
     };
 

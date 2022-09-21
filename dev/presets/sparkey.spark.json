@@ -1,93 +1,23 @@
 {
   "blocks": [
     {
-      "nid": 1,
-      "groups": [
-        7
-      ],
-      "type": "Groups",
-      "data": {
-        "active": [
-          0,
-          7
-        ]
-      },
-      "id": "ActiveGroups",
-      "serviceId": "sparkey"
-    },
-    {
+      "id": "DisplaySettings",
       "nid": 7,
-      "groups": [
-        7
-      ],
       "type": "DisplaySettings",
+      "serviceId": "sparkey",
       "data": {
-        "widgets": [
-          {
-            "pos": 5,
-            "color": "c48600",
-            "name": "BK PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "HERMS BK PID"
-            }
-          },
-          {
-            "pos": 4,
-            "color": "9c4b00",
-            "name": "MT PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "HERMS MT PID"
-            }
-          },
-          {
-            "pos": 3,
-            "color": "b50000",
-            "name": "HLT PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "HERMS HLT PID"
-            }
-          },
-          {
-            "pos": 2,
-            "color": "df2b35",
-            "name": "Heat PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "Ferment Heat PID"
-            }
-          },
-          {
-            "pos": 1,
-            "color": "037cd5",
-            "name": "Cool PID",
-            "pid": {
-              "__bloxtype": "Link",
-              "type": "Pid",
-              "id": "Ferment Cool PID"
-            }
-          }
-        ],
         "timeZone": "CET-1CEST,M3.5.0,M10.5.0/3",
+        "widgets": [],
         "name": "",
         "tempUnit": 0,
         "brightness": 0
-      },
-      "id": "DisplaySettings",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Beer Sensor",
       "nid": 106,
-      "groups": [
-        0
-      ],
       "type": "TempSensorMock",
+      "serviceId": "sparkey",
       "data": {
         "connected": true,
         "setting": {
@@ -115,23 +45,20 @@
           "readonly": true,
           "value": 0
         }
-      },
-      "id": "Ferment Beer Sensor",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Beer Setting",
       "nid": 108,
-      "groups": [
-        0
-      ],
       "type": "SetpointSensorPair",
+      "serviceId": "sparkey",
       "data": {
         "sensorId": {
           "__bloxtype": "Link",
           "type": "TempSensorInterface",
           "id": "Ferment Beer Sensor"
         },
-        "settingEnabled": true,
+        "enabled": true,
         "storedSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -162,16 +89,13 @@
           "value": 0
         },
         "resetFilter": false
-      },
-      "id": "Ferment Beer Setting",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Cool Actuator",
       "nid": 110,
-      "groups": [
-        0
-      ],
       "type": "DigitalActuator",
+      "serviceId": "sparkey",
       "data": {
         "hwDevice": {
           "__bloxtype": "Link",
@@ -235,16 +159,13 @@
         "state": 0,
         "invert": false,
         "desiredState": 0
-      },
-      "id": "Ferment Cool Actuator",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Cool PID",
       "nid": 115,
-      "groups": [
-        0
-      ],
       "type": "Pid",
+      "serviceId": "sparkey",
       "data": {
         "inputId": {
           "__bloxtype": "Link",
@@ -323,16 +244,13 @@
         "boilMinOutput": 0,
         "boilModeActive": false,
         "derivativeFilter": 0
-      },
-      "id": "Ferment Cool PID",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Cool PWM",
       "nid": 112,
-      "groups": [
-        0
-      ],
       "type": "ActuatorPwm",
+      "serviceId": "sparkey",
       "data": {
         "actuatorId": {
           "__bloxtype": "Link",
@@ -354,16 +272,13 @@
           "id": null
         },
         "desiredSetting": 0
-      },
-      "id": "Ferment Cool PWM",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Fridge Sensor",
       "nid": 105,
-      "groups": [
-        0
-      ],
       "type": "TempSensorMock",
+      "serviceId": "sparkey",
       "data": {
         "connected": true,
         "setting": {
@@ -378,23 +293,20 @@
           "value": 0
         },
         "fluctuations": []
-      },
-      "id": "Ferment Fridge Sensor",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Fridge Setting",
       "nid": 107,
-      "groups": [
-        0
-      ],
       "type": "SetpointSensorPair",
+      "serviceId": "sparkey",
       "data": {
         "sensorId": {
           "__bloxtype": "Link",
           "type": "TempSensorInterface",
           "id": "Ferment Fridge Sensor"
         },
-        "settingEnabled": true,
+        "enabled": true,
         "storedSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -425,16 +337,13 @@
           "value": 0
         },
         "resetFilter": false
-      },
-      "id": "Ferment Fridge Setting",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Heat Actuator",
       "nid": 111,
-      "groups": [
-        0
-      ],
       "type": "DigitalActuator",
+      "serviceId": "sparkey",
       "data": {
         "hwDevice": {
           "__bloxtype": "Link",
@@ -472,16 +381,13 @@
         "state": 0,
         "invert": false,
         "desiredState": 0
-      },
-      "id": "Ferment Heat Actuator",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Heat PID",
       "nid": 116,
-      "groups": [
-        0
-      ],
       "type": "Pid",
+      "serviceId": "sparkey",
       "data": {
         "inputId": {
           "__bloxtype": "Link",
@@ -560,16 +466,13 @@
         "boilMinOutput": 0,
         "boilModeActive": false,
         "derivativeFilter": 0
-      },
-      "id": "Ferment Heat PID",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Heat PWM",
       "nid": 113,
-      "groups": [
-        0
-      ],
       "type": "ActuatorPwm",
+      "serviceId": "sparkey",
       "data": {
         "actuatorId": {
           "__bloxtype": "Link",
@@ -591,16 +494,13 @@
           "id": null
         },
         "desiredSetting": 0
-      },
-      "id": "Ferment Heat PWM",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Mutex",
       "nid": 109,
-      "groups": [
-        0
-      ],
       "type": "Mutex",
+      "serviceId": "sparkey",
       "data": {
         "differentActuatorWait": {
           "__bloxtype": "Quantity",
@@ -613,16 +513,13 @@
           "readonly": true,
           "value": 0
         }
-      },
-      "id": "Ferment Mutex",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Ferment Temperature Profile",
       "nid": 114,
-      "groups": [
-        0
-      ],
       "type": "SetpointProfile",
+      "serviceId": "sparkey",
       "data": {
         "points": [
           {
@@ -663,28 +560,22 @@
           "driven": true,
           "id": null
         }
-      },
-      "id": "Ferment Temperature Profile",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS Balancer",
       "nid": 120,
-      "groups": [
-        0
-      ],
       "type": "Balancer",
+      "serviceId": "sparkey",
       "data": {
         "clients": []
-      },
-      "id": "HERMS Balancer",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS BK Actuator",
       "nid": 127,
-      "groups": [
-        0
-      ],
       "type": "DigitalActuator",
+      "serviceId": "sparkey",
       "data": {
         "hwDevice": {
           "__bloxtype": "Link",
@@ -722,16 +613,13 @@
         "state": 0,
         "invert": false,
         "desiredState": 0
-      },
-      "id": "HERMS BK Actuator",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS BK PID",
       "nid": 132,
-      "groups": [
-        0
-      ],
       "type": "Pid",
+      "serviceId": "sparkey",
       "data": {
         "inputId": {
           "__bloxtype": "Link",
@@ -810,16 +698,13 @@
         },
         "boilModeActive": false,
         "derivativeFilter": 0
-      },
-      "id": "HERMS BK PID",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS BK PWM",
       "nid": 129,
-      "groups": [
-        0
-      ],
       "type": "ActuatorPwm",
+      "serviceId": "sparkey",
       "data": {
         "actuatorId": {
           "__bloxtype": "Link",
@@ -857,16 +742,13 @@
           "id": null
         },
         "desiredSetting": 0
-      },
-      "id": "HERMS BK PWM",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS BK Sensor",
       "nid": 119,
-      "groups": [
-        0
-      ],
       "type": "TempSensorMock",
+      "serviceId": "sparkey",
       "data": {
         "connected": true,
         "setting": {
@@ -881,16 +763,13 @@
           "value": 0
         },
         "fluctuations": []
-      },
-      "id": "HERMS BK Sensor",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS BK Setpoint",
       "nid": 124,
-      "groups": [
-        0
-      ],
       "type": "SetpointSensorPair",
+      "serviceId": "sparkey",
       "data": {
         "sensorId": {
           "__bloxtype": "Link",
@@ -920,7 +799,7 @@
           "readonly": true,
           "value": 0
         },
-        "settingEnabled": false,
+        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -928,16 +807,13 @@
           "value": 0
         },
         "resetFilter": false
-      },
-      "id": "HERMS BK Setpoint",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS HLT Actuator",
       "nid": 126,
-      "groups": [
-        0
-      ],
       "type": "DigitalActuator",
+      "serviceId": "sparkey",
       "data": {
         "hwDevice": {
           "__bloxtype": "Link",
@@ -975,16 +851,13 @@
         "state": 0,
         "invert": false,
         "desiredState": 0
-      },
-      "id": "HERMS HLT Actuator",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS HLT PID",
       "nid": 130,
-      "groups": [
-        0
-      ],
       "type": "Pid",
+      "serviceId": "sparkey",
       "data": {
         "inputId": {
           "__bloxtype": "Link",
@@ -1063,16 +936,13 @@
         },
         "boilModeActive": false,
         "derivativeFilter": 0
-      },
-      "id": "HERMS HLT PID",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS HLT PWM",
       "nid": 128,
-      "groups": [
-        0
-      ],
       "type": "ActuatorPwm",
+      "serviceId": "sparkey",
       "data": {
         "actuatorId": {
           "__bloxtype": "Link",
@@ -1110,16 +980,13 @@
           "id": null
         },
         "desiredSetting": 0
-      },
-      "id": "HERMS HLT PWM",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS HLT Sensor",
       "nid": 117,
-      "groups": [
-        0
-      ],
       "type": "TempSensorMock",
+      "serviceId": "sparkey",
       "data": {
         "connected": true,
         "setting": {
@@ -1134,16 +1001,13 @@
           "value": 0
         },
         "fluctuations": []
-      },
-      "id": "HERMS HLT Sensor",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS HLT Setpoint",
       "nid": 122,
-      "groups": [
-        0
-      ],
       "type": "SetpointSensorPair",
+      "serviceId": "sparkey",
       "data": {
         "sensorId": {
           "__bloxtype": "Link",
@@ -1173,7 +1037,7 @@
           "readonly": true,
           "value": 0
         },
-        "settingEnabled": false,
+        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -1181,16 +1045,13 @@
           "value": 0
         },
         "resetFilter": false
-      },
-      "id": "HERMS HLT Setpoint",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS HLT Setpoint Driver",
       "nid": 125,
-      "groups": [
-        0
-      ],
       "type": "ActuatorOffset",
+      "serviceId": "sparkey",
       "data": {
         "targetId": {
           "__bloxtype": "Link",
@@ -1221,16 +1082,13 @@
         },
         "enabled": false,
         "desiredSetting": 0
-      },
-      "id": "HERMS HLT Setpoint Driver",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS MT PID",
       "nid": 131,
-      "groups": [
-        0
-      ],
       "type": "Pid",
+      "serviceId": "sparkey",
       "data": {
         "inputId": {
           "__bloxtype": "Link",
@@ -1309,16 +1167,13 @@
         "boilMinOutput": 0,
         "boilModeActive": false,
         "derivativeFilter": 0
-      },
-      "id": "HERMS MT PID",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS MT Sensor",
       "nid": 118,
-      "groups": [
-        0
-      ],
       "type": "TempSensorMock",
+      "serviceId": "sparkey",
       "data": {
         "connected": true,
         "setting": {
@@ -1333,16 +1188,13 @@
           "value": 0
         },
         "fluctuations": []
-      },
-      "id": "HERMS MT Sensor",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS MT Setpoint",
       "nid": 123,
-      "groups": [
-        0
-      ],
       "type": "SetpointSensorPair",
+      "serviceId": "sparkey",
       "data": {
         "sensorId": {
           "__bloxtype": "Link",
@@ -1372,7 +1224,7 @@
           "readonly": true,
           "value": 0
         },
-        "settingEnabled": false,
+        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -1380,16 +1232,13 @@
           "value": 0
         },
         "resetFilter": false
-      },
-      "id": "HERMS MT Setpoint",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "HERMS Mutex",
       "nid": 121,
-      "groups": [
-        0
-      ],
       "type": "Mutex",
+      "serviceId": "sparkey",
       "data": {
         "differentActuatorWait": {
           "__bloxtype": "Quantity",
@@ -1402,16 +1251,13 @@
           "readonly": true,
           "value": 0
         }
-      },
-      "id": "HERMS Mutex",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "New|DS2408-1",
       "nid": 134,
-      "groups": [
-        0
-      ],
       "type": "DS2408",
+      "serviceId": "sparkey",
       "data": {
         "address": "29555555555555da",
         "connected": false,
@@ -1422,16 +1268,13 @@
           "id": null
         },
         "channels": []
-      },
-      "id": "New|DS2408-1",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "New|DS2413-1",
       "nid": 133,
-      "groups": [
-        0
-      ],
       "type": "DS2413",
+      "serviceId": "sparkey",
       "data": {
         "address": "3a44444444444406",
         "connected": false,
@@ -1441,16 +1284,13 @@
           "id": null
         },
         "channels": []
-      },
-      "id": "New|DS2413-1",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-1",
       "nid": 100,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "sparkey",
       "data": {
         "address": "28222222222222de",
         "value": {
@@ -1469,16 +1309,13 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-1",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-2",
       "nid": 101,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "sparkey",
       "data": {
         "address": "281111111111117e",
         "value": {
@@ -1497,16 +1334,13 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-2",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-3",
       "nid": 102,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "sparkey",
       "data": {
         "address": "28333333333333be",
         "value": {
@@ -1525,32 +1359,80 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-3",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "Sequence",
+      "nid": 135,
+      "type": "Sequence",
+      "serviceId": "sparkey",
+      "data": {
+        "enabled": true,
+        "instructions": [
+          "WAIT_SETPOINT target='Ferment Beer Setting', precision=1.0dC",
+          "WAIT_DURATION duration=1m",
+          "WAIT_DURATION duration=1m",
+          "WAIT_DURATION duration=1m",
+          "WAIT_DURATION duration=1m",
+          "RESTART"
+        ],
+        "overrideState": true,
+        "activeInstructionStartedAt": 1653915641,
+        "disabledAt": 1653915641,
+        "activeInstruction": 0,
+        "disabledDuration": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0
+        },
+        "status": 0,
+        "error": 0
+      }
+    },
+    {
+      "id": "Temp Sensor (External)",
+      "nid": 136,
+      "type": "TempSensorExternal",
+      "serviceId": "sparkey",
+      "data": {
+        "enabled": true,
+        "timeout": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 86400
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 20
+        },
+        "lastUpdated": 1657663236,
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        }
+      }
+    },
+    {
+      "id": "TouchSettings",
       "nid": 6,
-      "groups": [
-        7
-      ],
       "type": "TouchSettings",
+      "serviceId": "sparkey",
       "data": {
         "calibrated": 1,
         "xBitsPerPixelX16": 64,
         "yBitsPerPixelX16": 64,
         "xOffset": 0,
         "yOffset": 0
-      },
-      "id": "TouchSettings",
-      "serviceId": "sparkey"
+      }
     },
     {
+      "id": "WiFiSettings",
       "nid": 5,
-      "groups": [
-        7
-      ],
       "type": "WiFiSettings",
+      "serviceId": "sparkey",
       "data": {
         "ssid": "",
         "password": "",
@@ -1558,19 +1440,10 @@
         "cipher": 0,
         "signal": 0,
         "ip": ""
-      },
-      "id": "WiFiSettings",
-      "serviceId": "sparkey"
+      }
     }
   ],
   "store": [
-    {
-      "keys": [
-        "ActiveGroups",
-        1
-      ],
-      "data": {}
-    },
     {
       "keys": [
         "SystemInfo",
@@ -1617,6 +1490,13 @@
       "keys": [
         "SparkPins",
         19
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "ActiveGroups",
+        1
       ],
       "data": {}
     },
@@ -1848,6 +1728,20 @@
       "keys": [
         "New|DS2408-1",
         134
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Sequence",
+        135
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Temp Sensor (External)",
+        136
       ],
       "data": {}
     }

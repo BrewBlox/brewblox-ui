@@ -1,15 +1,12 @@
+import { BlockOrIntfType, Link, Quantity } from 'brewblox-proto/ts';
 import fromPairs from 'lodash/fromPairs';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 import mapValues from 'lodash/mapValues';
 import toPairs from 'lodash/toPairs';
-
-import { BlockOrIntfType, Link, Quantity } from '@/shared-types';
-
 import { canSerialize, isBloxField } from './identity';
 import { rawLink } from './link';
 import { rawQty } from './quantity';
-
 
 // string start
 // then any characters (captured)
@@ -48,23 +45,24 @@ export function splitPostfixed(name: string): [string, string | null] {
  * @param val
  * @returns
  */
-export function parsePostfixed(key: string, val: unknown): [string, Quantity | Link] | null {
+export function parsePostfixed(
+  key: string,
+  val: unknown,
+): [string, Quantity | Link] | null {
   try {
     if (key.endsWith(']') || key.endsWith('>')) {
       const matched = key.match(postfixExpr);
       if (matched) {
         const [, name, leftBracket, bracketed] = matched;
         if (leftBracket === '<') {
-          const [type, driven] = bracketed.split(',');
-          return [name, rawLink(val as string | null, type as BlockOrIntfType, !!driven)];
-        }
-        else if (leftBracket === '[') {
+          const [type] = bracketed.split(','); // backwards compatibility for old 'driven' links
+          return [name, rawLink(val as string | null, type as BlockOrIntfType)];
+        } else if (leftBracket === '[') {
           return [name, rawQty(val as number | null, bracketed)];
         }
       }
     }
-  }
-  catch (e) { }
+  } catch (e) {}
   return null;
 }
 
@@ -84,8 +82,9 @@ export function deserialize<T>(obj: T): T {
     return obj;
   }
   if (isObject(obj)) {
-    const parsed = toPairs(obj)
-      .map(([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]);
+    const parsed = toPairs(obj).map(
+      ([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)],
+    );
     return fromPairs(parsed) as T;
   }
   return obj;

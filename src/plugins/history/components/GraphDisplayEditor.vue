@@ -1,9 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
-
 import { defaultLabel } from '@/plugins/history/nodes';
-
-import { targetSplitter } from '../nodes';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { GraphAxis, GraphConfig } from '../types';
 
 export default defineComponent({
@@ -28,24 +25,24 @@ export default defineComponent({
     ];
 
     const local = ref<GraphConfig>({ ...props.config });
-    watch(props.config, cfg => { local.value = { ...cfg }; });
+    watch(props.config, (cfg) => {
+      local.value = { ...cfg };
+    });
 
-    function saveConfig(config: GraphConfig = local.value): void {
+    function saveLocalConfig(config: GraphConfig = local.value): void {
       emit('update:config', config);
     }
 
-    const selected = computed<string[]>(
-      () => targetSplitter(props.config.targets),
-    );
+    const selected = computed<string[]>(() => props.config.fields);
 
     function saveAxis(field: string, value: GraphAxis): void {
       local.value.axes[field] = value;
-      saveConfig();
+      saveLocalConfig();
     }
 
     function saveColor(field: string, color: string | null): void {
       local.value.colors[field] = color || '';
-      saveConfig();
+      saveLocalConfig();
     }
 
     function fieldRename(field: string): string {
@@ -54,7 +51,7 @@ export default defineComponent({
 
     function saveRename(field: string, label: string | null): void {
       local.value.renames[field] = label ?? defaultLabel(field);
-      saveConfig();
+      saveLocalConfig();
     }
 
     return {
@@ -81,7 +78,7 @@ export default defineComponent({
         <InputField
           :model-value="fieldRename(field)"
           title="Legend"
-          @update:model-value="v => saveRename(field, v)"
+          @update:model-value="(v) => saveRename(field, v)"
         />
       </q-item-section>
       <q-space />
@@ -89,9 +86,7 @@ export default defineComponent({
         <q-list dense>
           <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Key
-              </q-item-label>
+              <q-item-label caption> Key </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
               {{ field }}
@@ -99,24 +94,20 @@ export default defineComponent({
           </q-item>
           <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Line color
-              </q-item-label>
+              <q-item-label caption> Line color </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
               <ColorField
                 :model-value="local.colors[field] || ''"
                 title="Line color"
                 clearable
-                @update:model-value="v => saveColor(field, v)"
+                @update:model-value="(v) => saveColor(field, v)"
               />
             </q-item-section>
           </q-item>
           <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Y-axis
-              </q-item-label>
+              <q-item-label caption> Y-axis </q-item-label>
             </q-item-section>
             <q-item-section class="col-auto">
               <q-btn-toggle
@@ -124,7 +115,7 @@ export default defineComponent({
                 :options="axisOpts"
                 flat
                 stretch
-                @update:model-value="v => saveAxis(field, v)"
+                @update:model-value="(v) => saveAxis(field, v)"
               />
             </q-item-section>
           </q-item>
@@ -133,14 +124,16 @@ export default defineComponent({
       </q-item-section>
     </div>
     <q-item v-if="!selected || selected.length === 0">
-      <q-item-section side>
-        No metrics selected
-      </q-item-section>
+      <q-item-section side> No metrics selected </q-item-section>
     </q-item>
     <q-item>
       <q-space />
       <q-item-section class="col-auto">
-        <q-btn outline round icon="edit">
+        <q-btn
+          outline
+          round
+          icon="edit"
+        >
           <q-tooltip>Edit targets</q-tooltip>
         </q-btn>
       </q-item-section>

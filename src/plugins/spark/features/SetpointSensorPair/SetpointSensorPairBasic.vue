@@ -1,23 +1,20 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
+import { prettyQty } from '@/utils/quantity';
+import { SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'SetpointSensorPairBasic',
   setup() {
-    const {
-      serviceId,
-      block,
-      saveBlock,
-      isDriven,
-    } = useBlockWidget.setup<SetpointSensorPairBlock>();
+    const { serviceId, block, patchBlock, isClaimed } =
+      useBlockWidget.setup<SetpointSensorPairBlock>();
 
     function editSetting(): void {
-      if (isDriven.value) { return; }
+      if (isClaimed.value) {
+        return;
+      }
       createDialog({
         component: 'QuantityDialog',
         componentProps: {
@@ -25,18 +22,16 @@ export default defineComponent({
           label: 'Setting',
           modelValue: block.value.data.storedSetting,
         },
-      })
-        .onOk(v => {
-          block.value.data.storedSetting = v;
-          saveBlock();
-        });
+      }).onOk((v) => {
+        patchBlock({ storedSetting: v });
+      });
     }
 
     return {
       prettyQty,
       serviceId,
       block,
-      isDriven,
+      isClaimed,
       editSetting,
     };
   },
@@ -48,21 +43,33 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
-      <SettingValueField :editable="!isDriven" class="col-auto" @click="editSetting">
+      <SettingValueField
+        :editable="!isClaimed"
+        class="col-auto"
+        @click="editSetting"
+      >
         <template #valueIcon>
-          <q-icon name="mdi-thermometer" color="green-3" />
+          <q-icon
+            name="mdi-thermometer"
+            color="green-3"
+          />
         </template>
         <template #value>
           {{ prettyQty(block.data.value) }}
         </template>
         <template #setting>
-          {{ prettyQty(block.data.storedSetting) }}
+          <template v-if="isClaimed">
+            {{ prettyQty(block.data.setting) }}
+          </template>
+          <template v-else>
+            {{ prettyQty(block.data.desiredSetting) }}
+          </template>
         </template>
       </SettingValueField>
 
       <div class="col-break" />
 
-      <DrivenIndicator
+      <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"

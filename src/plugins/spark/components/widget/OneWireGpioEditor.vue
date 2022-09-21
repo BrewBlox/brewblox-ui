@@ -1,8 +1,13 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
-import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
+import {
+  ChannelCapabilities,
+  GpioDeviceType,
+  GpioModuleChannel,
+  GpioPins,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 interface DeviceSlot extends GpioModuleChannel {
   start: number;
@@ -63,6 +68,10 @@ export default defineComponent({
     channels: {
       type: Array as PropType<GpioModuleChannel[]>,
       required: true,
+    },
+    errorPins: {
+      type: Number as PropType<GpioPins>,
+      default: GpioPins.NONE,
     },
   },
   emits: ['update:channels'],
@@ -193,6 +202,8 @@ export default defineComponent({
         deviceType: GpioDeviceType.GPIO_DEV_SSR_2P,
         pinsMask: GpioPins.NONE,
         width: 2,
+        capabilities: ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT,
+        claimedBy: bloxLink(null),
       };
       modifyChannel(channel);
     }
@@ -278,6 +289,9 @@ export default defineComponent({
           <div
             v-for="(p, idx) in pinLegend(slot)"
             :key="`${slot.id}-pin-${idx}`"
+            :class="{
+              'text-negative': Boolean((1 << (slot.start + idx)) & errorPins),
+            }"
           >
             {{ p }}
           </div>
@@ -299,7 +313,10 @@ export default defineComponent({
         }"
         @click="clickUnused(slot)"
       />
-      <div style="grid-column: 9 / span 2" class="power">
+      <div
+        style="grid-column: 9 / span 2"
+        class="power"
+      >
         Power
         <div class="text-bold text-h5 row full-width justify-around">
           <div>-</div>
@@ -352,7 +369,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .container
   display: grid
   grid-template-columns: repeat(10, 1fr)

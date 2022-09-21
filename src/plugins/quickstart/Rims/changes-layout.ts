@@ -1,19 +1,14 @@
-import { nanoid } from 'nanoid';
-
-import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-
+import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { RimsConfig } from './types';
 
 export function defineLayouts(config: RimsConfig): BuilderLayout[] {
-  const builderStore = useBuilderStore();
   const { serviceId, names } = config;
   return [
     {
       id: nanoid(),
       title: withPrefix(config.prefix, 'Layout'),
-      order: builderStore.layouts.length + 1,
       width: 12,
       height: 12,
       parts: [

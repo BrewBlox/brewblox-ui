@@ -1,9 +1,7 @@
-import { Plugin } from 'vue';
-
 import { useHistoryStore } from '@/plugins/history/store';
 import { startup } from '@/startup';
-import { autoRegister } from '@/utils/component-ref';
-
+import { globRegister } from '@/utils/component-ref';
+import { Plugin } from 'vue';
 import Graph from './Graph';
 import Metrics from './Metrics';
 import SessionLog from './SessionLog';
@@ -11,13 +9,13 @@ import SessionLog from './SessionLog';
 const plugin: Plugin = {
   install(app) {
     const historyStore = useHistoryStore();
-    autoRegister(app, require.context('./components', true));
+    globRegister(app, import.meta.globEager('./components/**/*.vue'));
 
     app.use(Graph);
     app.use(Metrics);
     app.use(SessionLog);
 
-    startup.onStart(() => historyStore.start());
+    startup.add(historyStore);
   },
 };
 

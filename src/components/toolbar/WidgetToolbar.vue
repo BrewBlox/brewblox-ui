@@ -1,10 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { startChangeWidgetTitle } from '@/utils/widgets';
-
+import { computed, defineComponent } from 'vue';
 import Toolbar from './Toolbar.vue';
 
 export default defineComponent({
@@ -23,27 +21,17 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      inDialog,
-      context,
-      toggleMode,
-    } = useContext.setup();
-    const {
-      widgetId,
-      widget,
-      featureTitle,
-    } = useWidget.setup();
+    const { inDialog, context, toggleMode } = useContext.setup();
+    const { widgetId, widget, featureTitle } = useWidget.setup();
 
-    const toggleBtnIcon = computed<string>(
-      () => context.mode === 'Basic'
+    const toggleBtnIcon = computed<string>(() =>
+      context.mode === 'Basic'
         ? 'mdi-unfold-more-horizontal'
         : 'mdi-unfold-less-horizontal',
     );
 
-    const toggleBtnTooltip = computed<string>(
-      () => context.mode === 'Basic'
-        ? 'Show full widget'
-        : 'Show basic widget',
+    const toggleBtnTooltip = computed<string>(() =>
+      context.mode === 'Basic' ? 'Show full widget' : 'Show basic widget',
     );
 
     function showDialog(): void {
@@ -58,8 +46,7 @@ export default defineComponent({
     function changeTitle(): void {
       if (props.changeTitleFn) {
         props.changeTitleFn();
-      }
-      else {
+      } else {
         startChangeWidgetTitle(widget.value);
       }
     }
@@ -106,12 +93,16 @@ export default defineComponent({
         round
         @click="showDialog"
       >
-        <q-tooltip>
-          Show in dialog
-        </q-tooltip>
+        <q-tooltip> Show in dialog </q-tooltip>
       </q-btn>
-      <ActionMenu round dense>
-        <template v-if="!!$slots.actions" #actions>
+      <ActionMenu
+        round
+        dense
+      >
+        <template
+          v-if="!!$slots.actions"
+          #actions
+        >
           <slot name="actions" />
         </template>
         <template #menus>

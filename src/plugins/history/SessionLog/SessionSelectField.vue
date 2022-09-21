@@ -1,9 +1,8 @@
 <script lang="ts">
+import { useField } from '@/composables';
+import { dateString } from '@/utils/quantity';
 import escapeRegExp from 'lodash/escapeRegExp';
 import { computed, defineComponent, PropType, ref } from 'vue';
-
-import { useField } from '@/composables';
-
 import { LoggedSession } from '../types';
 
 interface SessionOpt extends SelectOption {
@@ -13,7 +12,7 @@ interface SessionOpt extends SelectOption {
 function asOpt(session: LoggedSession): SessionOpt {
   return {
     session,
-    label: `${session.title} (${new Date(session.date).toLocaleDateString()})`,
+    label: `${session.title} (${dateString(session.date)})`,
     value: session.id,
   };
 }
@@ -83,7 +82,11 @@ export default defineComponent({
     @keyup.enter.exact.stop
   >
     <template #option="{ opt, selected, toggleOption }">
-      <q-item :active="selected" clickable @click="toggleOption(opt)">
+      <q-item
+        :active="selected"
+        clickable
+        @click="toggleOption(opt)"
+      >
         <q-item-section style="max-width: 300px">
           {{ opt.label }}
           <q-item-label
@@ -105,9 +108,7 @@ export default defineComponent({
     </template>
     <template #no-option>
       <q-item>
-        <q-item-section class="text-grey">
-          No results
-        </q-item-section>
+        <q-item-section class="text-grey"> No results </q-item-section>
       </q-item>
     </template>
   </q-select>

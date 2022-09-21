@@ -1,15 +1,14 @@
 <script lang="ts">
-import { computed, defineComponent, reactive, ref } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
+import { getWiFiSettingsBlock } from '@/plugins/spark/utils/system';
+import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
 import {
   WifiCipherType,
   WifiSecurityType,
   WiFiSettingsBlock,
-} from '@/plugins/spark/types';
-import { getWiFiSettingsBlock } from '@/plugins/spark/utils';
-import { createDialog } from '@/utils/dialog';
-import { notify } from '@/utils/notify';
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, reactive, ref } from 'vue';
 
 const securityOpts: SelectOption<WifiSecurityType>[] = [
   { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },
@@ -49,7 +48,6 @@ export default defineComponent({
       security: WifiSecurityType.WLAN_SEC_WPA2,
       cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
       signal: 0,
-      ip: '',
     });
 
     const block = computed<WiFiSettingsBlock>(
@@ -59,7 +57,7 @@ export default defineComponent({
     async function save(): Promise<void> {
       busy.value = true;
       await sparkStore
-        .saveBlock({ ...block.value, data: values })
+        .patchBlock(block.value, values)
         .then(() => notify.done('Wifi settings updated!'))
         .finally(() => (busy.value = false));
     }
@@ -91,13 +89,20 @@ export default defineComponent({
 <template>
   <Card>
     <template #toolbar>
-      <Toolbar :title="serviceId" subtitle="Wifi Configuration" />
+      <Toolbar
+        :title="serviceId"
+        subtitle="Wifi Configuration"
+      />
     </template>
 
     <q-card-section>
       <q-item>
         <q-item-section>
-          <q-input v-model="values.ssid" label="SSID" autofocus>
+          <q-input
+            v-model="values.ssid"
+            label="SSID"
+            autofocus
+          >
             <template #append>
               <KeyboardButton @click="showKeyboard('ssid')" />
             </template>
@@ -147,7 +152,11 @@ export default defineComponent({
       </q-item>
     </q-card-section>
     <template #actions>
-      <q-btn flat label="Cancel" @click="$emit('cancel')" />
+      <q-btn
+        flat
+        label="Cancel"
+        @click="$emit('cancel')"
+      />
       <q-space />
       <q-btn
         :loading="busy"

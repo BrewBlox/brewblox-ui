@@ -1,21 +1,19 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { bloxLink } from '@/utils/link';
 import {
   ActuatorAnalogMockBlock,
   AnalogConstraintsObj,
-  BlockFieldSpec,
-  BlockSpec,
   BlockType,
-} from '@/plugins/spark/types';
-import {
-  blockWidgetSelector,
-  prettifyConstraints,
-} from '@/plugins/spark/utils';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-
+  SettingMode,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './ActuatorAnalogMockWidget.vue';
+
 const type = BlockType.ActuatorAnalogMock;
 
 const plugin: Plugin = {
@@ -25,23 +23,27 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorAnalogMockBlock> = {
       type,
-      generate: () => ({
-        setting: 0,
+      generate: (): ActuatorAnalogMockBlock['data'] => ({
+        enabled: true,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         minSetting: 0,
         maxSetting: 100,
         value: 0,
         minValue: 0,
         maxValue: 100,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorAnalogMockBlock>[] = [
       {
         type,
-        key: 'desiredSetting',
-        title: 'Setting',
+        key: 'storedSetting',
+        title: 'Stored setting',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 0,
@@ -49,8 +51,15 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'enabled',
+        title: 'Enabled',
+        component: 'BoolValEdit',
+        generate: () => true,
+      },
+      {
+        type,
         key: 'minSetting',
-        title: 'Minimum Setting',
+        title: 'Minimum setting',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 0,
@@ -58,7 +67,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'maxSetting',
-        title: 'Maximum Setting',
+        title: 'Maximum setting',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 100,
@@ -66,7 +75,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'minValue',
-        title: 'Minimum Value',
+        title: 'Minimum value',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 0,
@@ -74,7 +83,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'maxValue',
-        title: 'Maximum Value',
+        title: 'Maximum value',
         component: 'NumberValEdit',
         valueHint: '0-100',
         generate: () => 100,
@@ -89,8 +98,18 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'setting',
+        title: 'Setting',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: '0-100',
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'value',
-        title: 'Measured Value',
+        title: 'Measured value',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',

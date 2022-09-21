@@ -1,6 +1,4 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useWidget } from '@/composables';
 import {
   startChangeWidgetTitle,
@@ -8,6 +6,7 @@ import {
   startMoveWidget,
   startRemoveWidget,
 } from '@/utils/widgets';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'WidgetActions',
@@ -18,10 +17,7 @@ export default defineComponent({
     },
   },
   setup() {
-    const {
-      widget,
-      isVolatileWidget,
-    } = useWidget.setup();
+    const { widget, isVolatileWidget } = useWidget.setup();
 
     return {
       widget,
@@ -36,7 +32,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionSubmenu v-if="!isVolatileWidget" label="Widget">
+  <ActionSubmenu
+    v-if="!isVolatileWidget"
+    label="Widget"
+  >
     <ActionItem
       icon="file_copy"
       label="Copy"

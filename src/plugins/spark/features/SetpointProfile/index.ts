@@ -1,19 +1,17 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  BlockFieldSpec,
-  BlockIntfType,
-  BlockSpec,
-  BlockType,
-  SetpointProfileBlock,
-} from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { shortDateString } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
-
+import { shortDateString } from '@/utils/quantity';
+import {
+  BlockIntfType,
+  BlockType,
+  DateString,
+  SetpointProfileBlock,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './SetpointProfileWidget.vue';
 
 const type = BlockType.SetpointProfile;
@@ -25,12 +23,11 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SetpointProfileBlock> = {
       type,
-      generate: () => ({
-        start: new Date().getTime() / 1000,
+      generate: (): SetpointProfileBlock['data'] => ({
+        start: new Date().toISOString(),
         points: [],
         enabled: false,
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
-        drivenTargetId: bloxLink(null),
       }),
     };
 
@@ -47,18 +44,9 @@ const plugin: Plugin = {
         key: 'start',
         title: 'Start Time',
         component: 'DateValEdit',
-        componentProps: { timeScale: 1000 },
-        generate: () => new Date().getTime() / 1000,
-        valueHint: 'seconds since 1/1/1970',
-        pretty: (val: number): string => {
-          if (val === 0) {
-            return 'now';
-          }
-          if (!val) {
-            return 'invalid date';
-          }
-          return shortDateString(val * 1000);
-        },
+        generate: () => new Date().toISOString(),
+        pretty: (val: DateString): string =>
+          val == null ? 'now' : shortDateString(val),
       },
       {
         type,

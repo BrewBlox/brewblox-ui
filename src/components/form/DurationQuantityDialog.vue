@@ -1,13 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-import { Quantity } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
-
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'DurationQuantityDialog',
@@ -27,42 +25,33 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
     const local = ref<string | null>(durationString(props.modelValue));
 
     function findUnit(s: string): string {
       const match = s.match(/^[0-9\.]*([a-z]*)/i);
-      return match && match[1]
-        ? match[1]
-        : '';
+      return match && match[1] ? match[1] : '';
     }
 
-    const defaultUnit = computed<string>(
-      () => findUnit(local.value || '') === ''
+    const defaultUnit = computed<string>(() =>
+      findUnit(local.value || '') === ''
         ? findUnit(durationString(props.modelValue))
         : '',
     );
 
-    const localMs = computed<number>(
-      () => durationMs(`${local.value || 0}${defaultUnit.value}`),
+    const localMs = computed<number>(() =>
+      durationMs(`${local.value || 0}${defaultUnit.value}`),
     );
 
-    const valueOk = computed<boolean>(
-      () => makeRuleValidator(props.rules)(localMs.value),
+    const valueOk = computed<boolean>(() =>
+      makeRuleValidator(props.rules)(localMs.value),
     );
 
-    const error = computed<string | null>(
-      () => makeRuleValidator(props.rules, 'error')(localMs.value),
+    const error = computed<string | undefined>(() =>
+      makeRuleValidator(props.rules, 'error')(localMs.value),
     );
 
     function normalize(): void {
@@ -75,13 +64,12 @@ export default defineComponent({
         componentProps: {
           modelValue: local.value,
           type: 'duration',
-          rules: props.rules.map(f => (s: string) => f(durationMs(s))),
+          rules: props.rules.map((f) => (s: string) => f(durationMs(s))),
         },
-      })
-        .onOk((v: string) => {
-          local.value = v;
-          normalize();
-        });
+      }).onOk((v: string) => {
+        local.value = v;
+        normalize();
+      });
     }
 
     function save(): void {
@@ -115,7 +103,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-input
         v-model="local"
         :label="label"

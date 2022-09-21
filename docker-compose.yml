@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 
 services:
   eventbus:
@@ -12,7 +12,7 @@ services:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
     volumes:
       - type: bind
-        source: ./dev/victoria
+        source: ${BREWBLOX_CACHE_DIR}/victoria
         target: /victoria-metrics-data
     command: >-
       --retentionPeriod=100y
@@ -25,7 +25,7 @@ services:
       - traefik.enable=false
     volumes:
       - type: bind
-        source: ./dev/redis
+        source: ${BREWBLOX_CACHE_DIR}/redis
         target: /data
     command: --appendonly yes
 
@@ -36,7 +36,7 @@ services:
     image: brewblox/node-red:develop
     volumes:
       - type: bind
-        source: ./dev/node-red
+        source: ${BREWBLOX_CACHE_DIR}/node-red
         target: /data
 
   sparkey:
@@ -45,7 +45,7 @@ services:
     privileged: true
     volumes:
       - type: bind
-        source: ./dev/simulator__sparkey
+        source: ${BREWBLOX_CACHE_DIR}/simulator__sparkey
         target: /app/simulator
     command: --name=sparkey --simulation --device-id=123456789012345678901234
 
@@ -55,7 +55,7 @@ services:
     privileged: true
     volumes:
       - type: bind
-        source: ./dev/simulator__spock
+        source: ${BREWBLOX_CACHE_DIR}/simulator__spock
         target: /app/simulator
     command: --name=spock --simulation --device-id=432109876543210987654321
 
@@ -65,7 +65,7 @@ services:
       - traefik.enable=false
     volumes:
       - type: bind
-        source: ./dev/tilt_share
+        source: ${BREWBLOX_CACHE_DIR}/tilt
         target: /share
     restart: unless-stopped
     network_mode: host
@@ -75,8 +75,8 @@ services:
   traefik:
     image: traefik:2.2
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     labels:
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
       - traefik.http.routers.api.service=api@internal

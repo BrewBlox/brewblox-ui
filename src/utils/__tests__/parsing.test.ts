@@ -1,8 +1,8 @@
+import { describe, expect, it } from 'vitest';
 import { isLink, isQuantity } from '../identity';
 import { JSLink } from '../link';
 import { deserialize, serialize } from '../parsing';
 import { bloxQty } from '../quantity';
-
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {
@@ -156,14 +156,12 @@ describe('serialize', () => {
         __bloxtype: 'Link',
         id: 'sensor-1',
         type: null,
-        driven: undefined,
       },
       deeper: {
         sensor: {
           __bloxtype: 'Link',
           id: 'sensor-2',
           type: null,
-          driven: undefined,
         },
       },
     };

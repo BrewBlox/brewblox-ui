@@ -1,9 +1,14 @@
-import { nanoid } from 'nanoid';
-
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { useFeatureStore } from '@/store/features';
+import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
+import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
+import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 import {
   ActuatorPwmBlock,
+  Block,
   BlockType,
   DigitalActuatorBlock,
   DigitalState,
@@ -12,16 +17,12 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { Block } from '@/plugins/spark/types';
-import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
-import { Widget } from '@/store/widgets';
-import { bloxLink } from '@/utils/link';
-import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
-
+  SettingMode,
+  TransitionDurationPreset,
+} from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
 import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock } from '../types';
+import { DisplayBlock, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   makeFridgeCoolConfig,
@@ -33,7 +34,9 @@ import {
 } from '../utils';
 import { FridgeConfig } from './types';
 
-export function defineChangedBlocks(config: FridgeConfig): Block[] {
+export function defineChangedBlocks(
+  config: FridgeConfig,
+): QuickstartPatch<Block>[] {
   const channels = [config.heatChannel, config.coolChannel];
   return [
     ...unlinkedActuators(config.serviceId, channels),
@@ -42,62 +45,56 @@ export function defineChangedBlocks(config: FridgeConfig): Block[] {
 }
 
 export function defineCreatedBlocks(config: FridgeConfig): Block[] {
-  const groups = [0];
   const { serviceId, names } = config;
   const { fridgeSetting } = config.fridgeOpts;
 
-  const blocks: [
-    SetpointSensorPairBlock,
-    MutexBlock,
-    DigitalActuatorBlock,
-    DigitalActuatorBlock,
-    ActuatorPwmBlock,
-    ActuatorPwmBlock,
-    SetpointProfileBlock,
-    PidBlock,
-    PidBlock,
-  ] = [
+  return [
     // setpoint sensor pair
-    {
+    typed<SetpointSensorPairBlock>({
       id: names.fridgeSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.fridgeSensor),
+        enabled: true,
         storedSetting: fridgeSetting,
-        settingEnabled: true,
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
+    }),
     // Mutex
-    {
+    typed<MutexBlock>({
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
-      groups,
       data: {
-        differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       },
-    },
+    }),
     // Digital Actuator
-    {
+    typed<DigitalActuatorBlock>({
       id: names.coolAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.coolChannel.blockId),
         channel: config.coolChannel.channelId,
         invert: false,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
         constrainedBy: {
           constraints: [
             {
@@ -112,7 +109,6 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('45m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),
@@ -120,25 +116,29 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
           ],
         },
       },
-    },
-    {
+    }),
+    typed<DigitalActuatorBlock>({
       id: names.heatAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.heatChannel.blockId),
         channel: config.heatChannel.channelId,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
         constrainedBy: {
           constraints: [
             {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('20m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),
@@ -146,73 +146,72 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
           ],
         },
       },
-    },
+    }),
     // PWM
-    {
+    typed<ActuatorPwmBlock>({
       id: names.coolPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('30m'),
         actuatorId: bloxLink(names.coolAct),
-        drivenActuatorId: bloxLink(null),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
-    {
+    }),
+    typed<ActuatorPwmBlock>({
       id: names.heatPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('10s'),
         actuatorId: bloxLink(names.heatAct),
-        drivenActuatorId: bloxLink(null),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
+    }),
     // Setpoint Profile
-    {
+    typed<SetpointProfileBlock>({
       id: names.tempProfile,
       type: BlockType.SetpointProfile,
       serviceId,
-      groups,
       data: {
-        start: new Date().getTime() / 1000,
+        start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(names.fridgeSetpoint),
-        drivenTargetId: bloxLink(null),
         points: [
           {
-            time: 0,
+            time: bloxQty('0s'),
             temperature: fridgeSetting,
           },
           {
-            time: durationMs('7d') / 1000,
+            time: bloxQty('7d'),
             temperature: fridgeSetting,
           },
           {
-            time: durationMs('10d') / 1000,
+            time: bloxQty('10d'),
             temperature: bloxQty(fridgeSetting).copy(fridgeSetting.value! + 3),
           },
         ],
       },
-    },
+    }),
     // PID
-    {
+    typed<PidBlock>({
       id: names.coolPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         ...makeFridgeCoolConfig(),
@@ -220,12 +219,11 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         inputId: bloxLink(names.fridgeSetpoint),
         outputId: bloxLink(names.coolPwm),
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.heatPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         ...makeFridgeHeatConfig(),
@@ -233,16 +231,14 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         inputId: bloxLink(names.fridgeSetpoint),
         outputId: bloxLink(names.heatPwm),
       },
-    },
+    }),
   ];
-  return blocks;
 }
 
 export const defineWidgets = (
   config: FridgeConfig,
   layouts: BuilderLayout[],
 ): Widget[] => {
-  const systemStore = useSystemStore();
   const featureStore = useFeatureStore();
   const genericSettings = {
     dashboard: config.dashboardId,
@@ -252,7 +248,7 @@ export const defineWidgets = (
   };
 
   const { serviceId, names, prefix } = config;
-  const tempUnit = systemStore.units.temperature;
+  const tempUnit = userUnits.value.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
@@ -284,20 +280,16 @@ export const defineWidgets = (
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.fridgeSensor}/value[${tempUnit}]`,
-            `${names.fridgeSetpoint}/setting[${tempUnit}]`,
-            `${names.coolPwm}/value`,
-            `${names.heatPwm}/value`,
-            `${names.coolAct}/state`,
-            `${names.heatAct}/state`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.fridgeSensor}/value[${tempUnit}]`,
+        `${serviceId}/${names.fridgeSetpoint}/setting[${tempUnit}]`,
+        `${serviceId}/${names.coolPwm}/value`,
+        `${serviceId}/${names.heatPwm}/value`,
+        `${serviceId}/${names.coolAct}/state`,
+        `${serviceId}/${names.heatAct}/state`,
       ],
       renames: {
         [`${serviceId}/${names.fridgeSensor}/value[${tempUnit}]`]:

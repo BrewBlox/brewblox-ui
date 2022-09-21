@@ -1,7 +1,5 @@
-import { AxiosResponse } from 'axios';
-
 import { http, intercept } from '@/utils/http';
-
+import { AxiosResponse } from 'axios';
 import { SandboxResult, WebhookImpl } from '../types';
 
 export const previewWebhook = (impl: WebhookImpl): Promise<AxiosResponse> =>

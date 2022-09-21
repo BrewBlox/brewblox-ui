@@ -1,11 +1,9 @@
-import { nanoid } from 'nanoid';
-import { Plugin } from 'vue';
-
-import { BlockType } from '@/shared-types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
-
+import { BlockType } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { Plugin } from 'vue';
 import {
   makeBeerCoolConfig,
   makeBeerHeatConfig,

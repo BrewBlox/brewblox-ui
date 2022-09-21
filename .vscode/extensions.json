@@ -1,10 +1,10 @@
 {
   "recommendations": [
-    "johnsoncodehk.volar",
+    "Vue.volar",
     "editorconfig.editorconfig",
     "syler.sass-indented",
-    "orta.vscode-jest",
     "dbaeumer.vscode-eslint",
-    "rvest.vs-code-prettier-eslint"
+    "esbenp.prettier-vscode",
+    "ZixuanChen.vitest-explorer"
   ]
 }

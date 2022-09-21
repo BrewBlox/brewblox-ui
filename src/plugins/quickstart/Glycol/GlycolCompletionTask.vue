@@ -1,7 +1,6 @@
 <script lang="ts">
 import { defineComponent, onMounted, PropType, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
 import { QuickstartAction } from '../types';
 import { createOutputActions, executeActions } from '../utils';
 import {
@@ -66,9 +65,7 @@ export default defineComponent({
 <template>
   <WizardBody>
     <q-card-section>
-      <q-item class="text-big">
-        About your new fermentation dashboard
-      </q-item>
+      <q-item class="text-big"> About your new fermentation dashboard </q-item>
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
@@ -76,21 +73,24 @@ export default defineComponent({
             here is a quick explanation of what we set up.
           </p>
           <p>
-            We did not put every controller block on your new dashboard.
-            You can find all blocks and their relations on the Spark controller service page.
+            We did not put every controller block on your new dashboard. You can
+            find all blocks and their relations on the Spark controller service
+            page.
           </p>
-          <p>
-            On your new dashboard, you will find:
-            <ul>
-              <li>An assistant widget to enable or disable temperature control.</li>
-              <li>
-                A graphical representation of your setup.
-                Parts are clickable for quick access to settings.
-              </li>
-              <li>A graph with the most important metrics.</li>
-              <li>A temperature profile that can slowly change a setpoint over time.</li>
-            </ul>
-          </p>
+          <p>On your new dashboard, you will find:</p>
+          <ul>
+            <li>
+              An assistant widget to enable or disable temperature control.
+            </li>
+            <li>
+              A graphical representation of your setup. Parts are clickable for
+              quick access to settings.
+            </li>
+            <li>A graph with the most important metrics.</li>
+            <li>
+              A temperature profile that can slowly change a setpoint over time.
+            </li>
+          </ul>
         </q-item-section>
       </q-item>
     </q-card-section>
@@ -103,9 +103,7 @@ export default defineComponent({
         color="primary"
         @click="done"
       >
-        <q-tooltip v-if="busy">
-          Creating everything...
-        </q-tooltip>
+        <q-tooltip v-if="busy"> Creating everything... </q-tooltip>
       </q-btn>
     </template>
   </WizardBody>

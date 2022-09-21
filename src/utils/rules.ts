@@ -21,11 +21,11 @@ export function makeRuleValidator(
 export function makeRuleValidator(
   rules: InputRule[],
   mode: 'error',
-): (val: any) => string | null;
+): (val: any) => string | undefined;
 export function makeRuleValidator(
   rules: InputRule[],
   mode?: ValidationMode,
-): (val: any) => boolean | string | null {
+): (val: any) => boolean | string | undefined {
   return (val) => {
     for (const rule of rules) {
       const res = rule(val);
@@ -34,7 +34,7 @@ export function makeRuleValidator(
       }
     }
     // No errors found
-    return mode === 'error' ? null : true;
+    return mode === 'error' ? undefined : true;
   };
 }
 

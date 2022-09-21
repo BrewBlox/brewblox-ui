@@ -1,18 +1,15 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useContext, useGlobals, useWidget } from '@/composables';
-import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
+import { userUISettings } from '@/user-settings';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
 import { isAbsoluteUrl } from '@/utils/url';
-
+import { computed, defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
-import { DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH } from './const';
+import { useMetrics } from './composables/use-metrics';
 import { useBuilderStore } from './store';
 import {
   BuilderConfig,
@@ -25,13 +22,11 @@ import { coord2grid } from './utils';
 export default defineComponent({
   name: 'BuilderWidget',
   setup() {
-    const systemStore = useSystemStore();
     const builderStore = useBuilderStore();
     const router = useRouter();
     const { inDialog } = useContext.setup();
     const { dense } = useGlobals.setup();
-    const { widget, config, saveConfig } =
-      useWidget.setup<Widget<BuilderConfig>>();
+    const { config, patchConfig } = useWidget.setup<Widget<BuilderConfig>>();
 
     const pending = ref<FlowPart | null>(null);
     const zoomEnabled = ref<boolean>(inDialog.value);
@@ -42,6 +37,7 @@ export default defineComponent({
       () => config.value.currentLayoutId,
     );
 
+    useMetrics.setup(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 
@@ -73,8 +69,7 @@ export default defineComponent({
           modelValue: config.value.currentLayoutId,
         },
       }).onOk((id) => {
-        config.value.currentLayoutId = id;
-        saveConfig();
+        patchConfig({ currentLayoutId: id });
       });
     }
 
@@ -84,8 +79,7 @@ export default defineComponent({
           uniqueFilter,
         );
       }
-      config.value.currentLayoutId = id;
-      saveConfig(config.value);
+      patchConfig({ currentLayoutId: id });
     }
 
     function startEditor(): void {
@@ -99,18 +93,15 @@ export default defineComponent({
     }
 
     const delayTouch = computed<boolean>(() => {
-      const { builderTouchDelayed } = systemStore.config;
-      return (
-        builderTouchDelayed === 'always' ||
-        (builderTouchDelayed === 'dense' && dense.value)
-      );
+      const delayed = userUISettings.value.builderTouchDelayed;
+      return delayed === 'always' || (delayed === 'dense' && dense.value);
     });
 
     function interact(part: FlowPart | null): void {
       if (!part) {
         return;
       }
-      const handler = builderStore.spec(part).interactHandler;
+      const handler = builderStore.blueprintByType(part.type).interactHandler;
       if (!handler) {
         return;
       }
@@ -123,27 +114,6 @@ export default defineComponent({
         handler(part, { savePart, navigate });
       }
     }
-
-    async function migrate(): Promise<void> {
-      const oldParts: PersistentPart[] = (config.value as any).parts;
-      if (oldParts) {
-        const id = nanoid();
-        await builderStore.createLayout({
-          id,
-          title: `${widget.value.title} layout`,
-          width: DEFAULT_LAYOUT_WIDTH,
-          height: DEFAULT_LAYOUT_HEIGHT,
-          parts: oldParts,
-          order: builderStore.layouts.length + 1,
-        });
-        config.value.layoutIds.push(id);
-        config.value.currentLayoutId = id;
-        config.value['parts'] = undefined;
-        saveConfig();
-      }
-    }
-
-    onBeforeMount(() => migrate());
 
     return {
       coord2grid,
@@ -200,8 +170,14 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
 
-    <div class="fit" @click="pending = null">
-      <span v-if="parts.length === 0" class="absolute-center q-gutter-y-sm">
+    <div
+      class="fit"
+      @click="pending = null"
+    >
+      <span
+        v-if="parts.length === 0"
+        class="absolute-center q-gutter-y-sm"
+      >
         <div class="text-center">
           {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
         </div>
@@ -235,7 +211,10 @@ export default defineComponent({
           </q-btn>
         </div>
       </span>
-      <svg ref="svgRef" class="fit">
+      <svg
+        ref="svgRef"
+        class="fit"
+      >
         <g ref="svgContentRef">
           <g
             v-for="part in flowParts"
@@ -292,7 +271,10 @@ export default defineComponent({
   </Card>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 @import './grid.sass'
 
 .inactive

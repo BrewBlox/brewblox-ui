@@ -1,10 +1,9 @@
-import { Plugin } from 'vue';
-
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { Widget } from '@/store/widgets';
 import { cref } from '@/utils/component-ref';
-
-import { emptyGraphConfig } from '../const';
+import { Plugin } from 'vue';
 import { GraphConfig } from '../types';
+import { emptyGraphConfig, upgradeGraphConfig } from '../utils';
 import { typeName } from './const';
 import widget from './GraphWidget.vue';
 
@@ -21,6 +20,10 @@ const plugin: Plugin = {
       widgetSize: {
         cols: 10,
         rows: 5,
+      },
+      upgrade: (widget: Widget<unknown>): Widget<GraphConfig> | null => {
+        const config = upgradeGraphConfig(widget.config);
+        return config ? { ...widget, config } : null;
       },
     };
 

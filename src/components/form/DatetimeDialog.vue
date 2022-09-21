@@ -1,8 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { makeRuleValidator } from '@/utils/rules';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'DatetimeDialog',
@@ -25,21 +24,14 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
     const local = ref<Date | null>(props.modelValue);
 
-    const valid = computed<boolean>(
-      () => makeRuleValidator(props.rules)(local.value),
+    const valid = computed<boolean>(() =>
+      makeRuleValidator(props.rules)(local.value),
     );
 
     function save(): void {
@@ -68,8 +60,11 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
-      <DatetimeInput v-model="local" output="date" />
+    <DialogCard v-bind="{ title, message, html }">
+      <DatetimeInput
+        v-model="local"
+        output="date"
+      />
       <template #actions>
         <q-btn
           :icon="resetIcon"

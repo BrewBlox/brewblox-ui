@@ -1,8 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
+import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'TextAreaDialog',
@@ -25,17 +24,10 @@ export default defineComponent({
       default: 'Value',
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const local = ref<string>(props.modelValue ?? '');
 
@@ -50,8 +42,7 @@ export default defineComponent({
           modelValue: local.value,
           rules: props.rules,
         },
-      })
-        .onOk(v => local.value = v);
+      }).onOk((v) => (local.value = v));
     }
 
     return {
@@ -74,7 +65,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-input
         v-model="local"
         type="textarea"
@@ -91,8 +82,18 @@ export default defineComponent({
       </q-input>
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

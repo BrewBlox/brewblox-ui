@@ -1,4 +1,16 @@
 <script lang="ts">
+import { useContext, useWidget } from '@/composables';
+import { defaultLabel } from '@/plugins/history/nodes';
+import { addSource } from '@/plugins/history/sources/metrics';
+import { useHistoryStore } from '@/plugins/history/store';
+import {
+  MetricsConfig,
+  MetricsSource,
+  MetricValue,
+} from '@/plugins/history/types';
+import { emptyMetricsConfig } from '@/plugins/history/utils';
+import { isJsonEqual } from '@/utils/objects';
+import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import {
@@ -8,19 +20,8 @@ import {
   onMounted,
   watch,
 } from 'vue';
-
-import { useContext, useWidget } from '@/composables';
-import { defaultLabel } from '@/plugins/history/nodes';
-import { addSource } from '@/plugins/history/sources/metrics';
-import { useHistoryStore } from '@/plugins/history/store';
-import { MetricsSource, MetricValue } from '@/plugins/history/types';
-import { fixedNumber } from '@/utils/formatting';
-import { isJsonEqual } from '@/utils/objects';
-import { durationString } from '@/utils/quantity';
-
-import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './const';
-import { MetricsConfig, MetricsWidget } from './types';
-import { emptyMetricsConfig } from './utils';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { MetricsWidget } from './types';
 
 interface CurrentValue extends MetricValue {
   name: string;
@@ -50,11 +51,11 @@ export default defineComponent({
     );
 
     function fieldFreshDuration(field: string): number {
-      return config.value.freshDuration[field] ?? DEFAULT_FRESH_DURATION;
+      return config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
     }
 
     function fieldDecimals(field: string): number {
-      return config.value.decimals[field] ?? DEFAULT_DECIMALS;
+      return config.value.decimals[field] ?? DEFAULT_METRICS_DECIMALS;
     }
 
     function fixedValue(value: CurrentValue): string {
@@ -80,9 +81,7 @@ export default defineComponent({
         metricsId,
         config.value.params,
         config.value.renames,
-        config.value.targets.flatMap((t) =>
-          t.fields.map((f) => `${t.measurement}/${f}`),
-        ),
+        config.value.fields,
       );
     }
 
@@ -114,6 +113,7 @@ export default defineComponent({
     onBeforeUnmount(() => removeSource());
 
     return {
+      shortDateString,
       context,
       metricsId,
       config,
@@ -128,15 +128,13 @@ export default defineComponent({
 
 <template>
   <div>
-    <div v-if="config.targets.length === 0">
+    <div v-if="config.fields.length === 0">
       <div class="text-italic text-h6 q-pa-md darkened text-center">
         Add metrics to get started.
       </div>
     </div>
     <CardWarning v-else-if="values.length === 0">
-      <template #message>
-        Waiting for data...
-      </template>
+      <template #message> Waiting for data... </template>
     </CardWarning>
 
     <div class="widget-body column">
@@ -149,18 +147,27 @@ export default defineComponent({
         <div :class="['text-big col-auto', val.stale && 'darkened']">
           {{ fixedValue(val) }}
         </div>
-        <div v-if="val.stale" class="col-auto">
-          <q-icon name="warning" size="24px" />
+        <div
+          v-if="val.stale"
+          class="col-auto"
+        >
+          <q-icon
+            name="warning"
+            size="24px"
+          />
           <q-tooltip>
             {{ val.name }} was updated more than
             {{ durationString(fieldFreshDuration(val.field)) }} ago.
-            <br>
-            Last update: {{ new Date(val.time).toLocaleString() }}.
+            <br />
+            Last update: {{ shortDateString(val.time) }}.
           </q-tooltip>
         </div>
       </LabeledField>
     </div>
-    <div v-if="values.length === 0" class="column q-px-md">
+    <div
+      v-if="values.length === 0"
+      class="column q-px-md"
+    >
       <q-btn
         flat
         dense

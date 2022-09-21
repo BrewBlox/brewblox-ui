@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { SetpointProfileBlock } from '@/plugins/spark/types';
 import { saveFile } from '@/utils/import-export';
+import { SetpointProfileBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ProfileExportAction',
@@ -22,7 +21,10 @@ export default defineComponent({
 
     function startExport(): void {
       const { points } = block.value.data;
-      saveFile({ points }, `${block.value.serviceId}-${block.value.id}.profile.json`);
+      saveFile(
+        { points },
+        `${block.value.serviceId}-${block.value.id}.profile.json`,
+      );
     }
 
     return {
@@ -33,5 +35,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionItem v-bind="{...$attrs, ...$props}" @click="startExport" />
+  <ActionItem
+    v-bind="{ ...$attrs, ...$props }"
+    @click="startExport"
+  />
 </template>

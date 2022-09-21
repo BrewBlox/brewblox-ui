@@ -39,7 +39,12 @@ export default defineComponent({
   <q-page padding>
     <h1>Quick reference and playground for app theming</h1>
     <div class="q-gutter-md row items-start">
-      <q-card v-for="color in colors" :key="color" flat class="color">
+      <q-card
+        v-for="color in colors"
+        :key="color"
+        flat
+        class="color"
+      >
         <q-card-section
           class="flex flex-center text-white"
           :class="'bg-' + color"
@@ -60,8 +65,10 @@ export default defineComponent({
   </q-page>
 </template>
 
-
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .color
   width: 135px
 .detailed-color

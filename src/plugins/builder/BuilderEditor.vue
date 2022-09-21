@@ -1,4 +1,14 @@
 <script lang="ts">
+import { useGlobals } from '@/composables';
+import { startupDone } from '@/user-settings';
+import { rotatedSize } from '@/utils/coordinates';
+import { createDialog } from '@/utils/dialog';
+import { keyEventString } from '@/utils/events';
+import { uniqueFilter } from '@/utils/functional';
+import { loadFile } from '@/utils/import-export';
+import { deepCopy } from '@/utils/objects';
+import { clampRotation } from '@/utils/quantity';
+import { isAbsoluteUrl } from '@/utils/url';
 import * as d3 from 'd3';
 import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
@@ -12,18 +22,6 @@ import {
   watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { useGlobals } from '@/composables';
-import { useSystemStore } from '@/store/system';
-import { rotatedSize } from '@/utils/coordinates';
-import { createDialog } from '@/utils/dialog';
-import { keyEventString } from '@/utils/events';
-import { clampRotation } from '@/utils/formatting';
-import { uniqueFilter } from '@/utils/functional';
-import { loadFile } from '@/utils/import-export';
-import { deepCopy } from '@/utils/objects';
-import { isAbsoluteUrl } from '@/utils/url';
-
 import {
   normalizeSelectArea,
   useDragSelect,
@@ -31,6 +29,7 @@ import {
   useSvgZoom,
   UseSvgZoomDimensions,
 } from './composables';
+import { useMetrics } from './composables/use-metrics';
 import { builderTools, SQUARE_SIZE } from './const';
 import { useBuilderStore } from './store';
 import {
@@ -80,7 +79,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const router = useRouter();
@@ -120,8 +118,6 @@ export default defineComponent({
       checkFocus();
     }
 
-    const startupDone = computed<boolean>(() => systemStore.startupDone);
-
     const focusWarningEnabled = computed<boolean>({
       get: () => builderStore.focusWarningEnabled,
       set: (v) => (builderStore.focusWarningEnabled = v),
@@ -131,6 +127,7 @@ export default defineComponent({
 
     const layoutId = computed<string | null>(() => props.routeId || null);
 
+    useMetrics.setup(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 
@@ -520,7 +517,7 @@ export default defineComponent({
         const part = findHoveredPart();
         if (part) {
           builderStore
-            .spec(part)
+            .blueprintByType(part.type)
             .interactHandler?.(part, { savePart, navigate });
         }
       }
@@ -891,17 +888,17 @@ export default defineComponent({
 
     watch(
       [svgContentRef, activeToolId, flowPartsRevision],
-      ([el, tool]) =>
-        nextTick(() => {
-          if (el) {
-            selectPartHandlers(el, tool);
-          }
-          if (configuredPart.value) {
-            const id = configuredPart.value.id;
-            configuredPart.value =
-              flowParts.value.find((v) => v.id === id) ?? null;
-          }
-        }),
+      async ([el, tool]) => {
+        await nextTick();
+        if (el) {
+          selectPartHandlers(el, tool);
+        }
+        if (configuredPart.value) {
+          const id = configuredPart.value.id;
+          configuredPart.value =
+            flowParts.value.find((v) => v.id === id) ?? null;
+        }
+      },
       { immediate: true },
     );
 
@@ -956,7 +953,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-page class="page-height" @keydown="keyHandler">
+  <q-page
+    class="page-height"
+    @keydown="keyHandler"
+  >
     <BuilderPartSettingsDialog
       v-if="configuredPart"
       :part="configuredPart"
@@ -968,7 +968,12 @@ export default defineComponent({
     />
 
     <TitleTeleport v-if="layout">
-      <span class="cursor-pointer" @click="editTitle">{{ layoutTitle }}</span>
+      <span
+        class="cursor-pointer"
+        @click="editTitle"
+      >
+        {{ layoutTitle }}
+      </span>
     </TitleTeleport>
 
     <ButtonsTeleport v-if="layout">
@@ -982,12 +987,20 @@ export default defineComponent({
       >
         <q-tooltip>Leave editor</q-tooltip>
       </q-btn>
-      <ActionMenu round class="self-center" label="Builder actions">
+      <ActionMenu
+        round
+        class="self-center"
+        label="Builder actions"
+      >
         <template #menus>
           <LayoutActions :layout="layout" />
         </template>
         <template #actions>
-          <ActionItem label="New layout" icon="add" @click="createLayout" />
+          <ActionItem
+            label="New layout"
+            icon="add"
+            @click="createLayout"
+          />
           <ActionItem
             icon="mdi-file-import"
             label="Import Layout"
@@ -1041,10 +1054,23 @@ export default defineComponent({
     </PageError>
 
     <!-- Grid -->
-    <div v-else ref="focusRef" class="fit" tabindex="-1" @focusout="checkFocus">
-      <svg ref="svgRef" class="fit" :style="{ cursor }">
+    <div
+      v-else
+      ref="focusRef"
+      class="fit"
+      tabindex="-1"
+      @focusout="checkFocus"
+    >
+      <svg
+        ref="svgRef"
+        class="fit"
+        :style="{ cursor }"
+      >
         <g ref="svgContentRef">
-          <EditorBackground :width="layout.width" :height="layout.height" />
+          <EditorBackground
+            :width="layout.width"
+            :height="layout.height"
+          />
           <!-- All parts, hidden if selected or floating -->
           <g
             v-for="part in flowParts"
@@ -1079,7 +1105,10 @@ export default defineComponent({
               )})`"
               :class="[part.type, partClass(part)]"
             >
-              <PartWrapper :part="part" selected />
+              <PartWrapper
+                :part="part"
+                selected
+              />
             </g>
           </g>
           <!-- Indicators for multiple parts sharing the same top/left coordinates-->
@@ -1107,7 +1136,10 @@ export default defineComponent({
         class="unfocus-overlay row items-center justify-center"
         @click.stop="setFocus"
       >
-        <transition appear name="fade">
+        <transition
+          appear
+          name="fade"
+        >
           <div class="text-h5 text-white q-pa-lg unfocus-message col-auto">
             Click to resume editing
           </div>
@@ -1117,7 +1149,10 @@ export default defineComponent({
   </q-page>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .q-page-container
   max-height: 100vh
   max-width: 100vw

@@ -1,15 +1,12 @@
 <script lang="ts">
-import { Enum } from 'typescript-string-enums';
+import { useDialog } from '@/composables';
+import { ENUM_LABELS_DIGITAL_OP } from '@/plugins/spark/const';
+import { selectable } from '@/utils/collections';
+import { deepCopy } from '@/utils/objects';
+import { DigitalCompare } from 'brewblox-proto/ts';
 import { defineComponent, PropType, ref } from 'vue';
 
-import { useDialog } from '@/composables';
-import { DigitalCompare, DigitalCompareOp } from '@/plugins/spark/types';
-import { deepCopy } from '@/utils/objects';
-
-import { digitalOpTitles } from './const';
-
-const operatorOpts: SelectOption[] = Enum.values(DigitalCompareOp)
-  .map(value => ({ value, label: digitalOpTitles[value] }));
+const operatorOpts = selectable(ENUM_LABELS_DIGITAL_OP);
 
 export default defineComponent({
   name: 'DigitalCompareEditDialog',
@@ -24,17 +21,10 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
     const local = ref<DigitalCompare>(deepCopy(props.modelValue));
 
     function save(): void {
@@ -61,7 +51,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <LinkField
         v-model="local.id"
         :service-id="serviceId"
@@ -85,8 +75,18 @@ export default defineComponent({
         />
       </div>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

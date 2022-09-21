@@ -1,4 +1,5 @@
-import { StoreObject } from '@/shared-types';
+import { MetricsConfig } from '@/plugins/history/types';
+import { StoreObject } from 'brewblox-proto/ts';
 
 export interface FlowRoute {
   outCoords: string;
@@ -35,6 +36,7 @@ export interface PersistentPart {
   rotate: number;
   flipped?: boolean;
   settings: Mapped<any>;
+  metrics?: MetricsConfig;
 }
 
 export interface StatePart extends PersistentPart {
@@ -52,16 +54,16 @@ export interface PartApi {
   navigate: (url: string) => void;
 }
 
-export interface CardSpec {
+export interface PartSettingsCard {
   component: string;
   props?: Mapped<any>;
 }
 
-export interface PartSpec {
-  id: string;
+export interface BuilderBlueprint {
+  type: string;
   title: string;
-  component?: string; // ID is used by default
-  cards: CardSpec[];
+  component?: string; // defaults to `${type}PartComponent`
+  cards: PartSettingsCard[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
   interactHandler?: (part: PersistentPart, api: PartApi) => void;
@@ -72,9 +74,8 @@ export interface BuilderLayout extends StoreObject {
   title: string;
   width: number;
   height: number;
-  order: number;
-  listed?: boolean;
   parts: PersistentPart[];
+  parentFolder?: string | null;
 }
 
 export interface BuilderConfig {

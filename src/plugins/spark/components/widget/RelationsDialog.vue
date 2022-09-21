@@ -1,8 +1,8 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
 import { useDialog } from '@/composables';
-import { BlockRelation, BlockRelationNode } from '@/plugins/spark/types';
+import { BlockRelationNode } from '@/plugins/spark/types';
+import { BlockRelation } from 'brewblox-proto/ts';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'RelationsDialog',
@@ -56,7 +56,10 @@ export default defineComponent({
   >
     <Card no-scroll>
       <template #toolbar>
-        <Toolbar :title="title" subtitle="Relations diagram" />
+        <Toolbar
+          :title="title"
+          subtitle="Relations diagram"
+        />
       </template>
       <div class="fit bg-dark">
         <RelationsDiagram

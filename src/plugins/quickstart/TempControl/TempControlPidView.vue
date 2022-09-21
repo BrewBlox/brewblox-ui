@@ -1,9 +1,6 @@
 <script lang="ts">
-
+import { prettyQty } from '@/utils/quantity';
 import { computed, defineComponent, PropType } from 'vue';
-
-import { prettyQty } from '@/utils/formatting';
-
 import { PidConfig } from '../types';
 
 export default defineComponent({
@@ -15,16 +12,12 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const colorClass = computed<string>(
-      () => {
-        if (!props.modelValue.kp.value) {
-          return '';
-        }
-        return props.modelValue.kp.value > 0
-          ? 'text-red'
-          : 'text-blue';
-      },
-    );
+    const colorClass = computed<string>(() => {
+      if (!props.modelValue.kp.value) {
+        return '';
+      }
+      return props.modelValue.kp.value > 0 ? 'text-red' : 'text-blue';
+    });
     return {
       prettyQty,
       colorClass,
@@ -34,12 +27,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div
-    :class="[
-      'q-gutter-x-sm prop-parent',
-      colorClass,
-    ]"
-  >
+  <div :class="['q-gutter-x-sm prop-parent', colorClass]">
     <div class="col-auto">
       <span>Kp</span>
       <span>{{ prettyQty(modelValue.kp) }}</span>
@@ -55,7 +43,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .prop-parent > div > span:first-child
   width: 2em
   float: left

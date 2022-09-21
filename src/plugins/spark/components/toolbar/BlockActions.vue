@@ -1,18 +1,19 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
-  isBlockDisplayReady,
-  isBlockRemovable,
   startAddBlockToDisplay,
   startAddBlockToGraphWidget,
   startChangeBlockId,
   startRemoveBlock,
-} from '@/plugins/spark/utils';
+} from '@/plugins/spark/utils/actions';
+import {
+  isBlockDisplayReady,
+  isBlockRemovable,
+} from '@/plugins/spark/utils/info';
 import { useServiceStore } from '@/store/services';
 import { saveFile } from '@/utils/import-export';
 import { startCopyWidget } from '@/utils/widgets';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'BlockActions',
@@ -61,9 +62,7 @@ export default defineComponent({
         <q-icon name="mdi-cloud" />
       </q-item-section>
       <q-item-section>
-        <q-item-label caption>
-          Service
-        </q-item-label>
+        <q-item-label caption> Service </q-item-label>
         {{ serviceTitle }}
       </q-item-section>
     </q-item>
@@ -74,7 +73,11 @@ export default defineComponent({
       label="Show on dashboard"
       @click="startCopyWidget(widget)"
     />
-    <ActionItem icon="edit" label="Rename" @click="startChangeBlockId(block)" />
+    <ActionItem
+      icon="edit"
+      label="Rename"
+      @click="startChangeBlockId(block)"
+    />
     <ActionItem
       v-if="hasGraph"
       icon="mdi-chart-line"
@@ -87,7 +90,11 @@ export default defineComponent({
       label="Add to Spark display"
       @click="startAddBlockToDisplay(block)"
     />
-    <ActionItem icon="mdi-file-export" label="Export" @click="exportBlock" />
+    <ActionItem
+      icon="mdi-file-export"
+      label="Export"
+      @click="exportBlock"
+    />
     <ActionItem
       v-if="canRemove"
       icon="delete"

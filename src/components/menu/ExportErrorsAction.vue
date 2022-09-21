@@ -1,8 +1,7 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useLoggingStore } from '@/store/logging';
 import { saveFile } from '@/utils/import-export';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ExportErrorsAction',
@@ -32,5 +31,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionItem v-bind="{ ...$attrs, icon, label }" @click="startExport" />
+  <ActionItem
+    v-bind="{ ...$attrs, icon, label }"
+    @click="startExport"
+  />
 </template>

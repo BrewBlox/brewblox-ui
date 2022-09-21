@@ -1,12 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useField } from '@/composables';
-import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { isDurationString, isQuantity } from '@/utils/identity';
 import { bloxQty, durationString } from '@/utils/quantity';
-
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 
 function modelValidator(v: unknown): boolean {
   return isQuantity(v) || isDurationString(v);
@@ -31,18 +29,14 @@ export default defineComponent({
       default: 'duration',
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
 
-    const isQtyValue = computed<boolean>(
-      () => isQuantity(props.modelValue),
-    );
+    const isQtyValue = computed<boolean>(() => isQuantity(props.modelValue));
 
-    const displayValue = computed<string>(
-      () => durationString(props.modelValue),
+    const displayValue = computed<string>(() =>
+      durationString(props.modelValue),
     );
 
     function save(v: Quantity): void {
@@ -64,8 +58,7 @@ export default defineComponent({
           label: props.label,
           rules: props.rules,
         },
-      })
-        .onOk(save);
+      }).onOk(save);
     }
 
     return {
@@ -80,11 +73,17 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+  <LabeledField
+    v-bind="{ ...$attrs, ...$props }"
+    @click="openDialog"
+  >
     <slot name="value">
       {{ displayValue }}
     </slot>
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
   </LabeledField>

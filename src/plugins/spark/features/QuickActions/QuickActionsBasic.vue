@@ -1,18 +1,16 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, ref } from 'vue';
-
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import type { Block } from '@/plugins/spark/types';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { prettyAny } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
-
+import { prettyAny } from '@/utils/quantity';
+import type { Block } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, ref } from 'vue';
 import {
   BlockChange,
   ChangeAction,
@@ -46,13 +44,13 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const { touch } = useGlobals.setup();
-    const { widgetId, config, saveConfig } =
+    const { widgetId, config, patchConfig } =
       useWidget.setup<QuickActionsWidget>();
 
     const applying = ref(false);
 
     const actions = computed<ChangeAction[]>(() =>
-      deserialize(config.value.actions ?? config.value.steps),
+      deserialize(config.value.actions),
     );
 
     const lastActionId = computed<string | null>(
@@ -60,12 +58,13 @@ export default defineComponent({
     );
 
     function saveActions(values: ChangeAction[] = actions.value): void {
-      config.value.actions = values.map(({ id, name, changes }) => ({
-        id,
-        name,
-        changes,
-      }));
-      saveConfig();
+      patchConfig({
+        actions: values.map(({ id, name, changes }) => ({
+          id,
+          name,
+          changes,
+        })),
+      });
     }
 
     function blockByChange(change: BlockChange): Block | null {
@@ -154,10 +153,7 @@ export default defineComponent({
         actualChanges.push([block, actualData]);
       }
       for (const [block, actualData] of actualChanges) {
-        await sparkStore.saveBlock({
-          ...block,
-          data: { ...block.data, ...actualData },
-        });
+        await sparkStore.patchBlock(block, actualData);
       }
       action.changes = action.changes.map((change, idx) => ({
         ...change,
@@ -172,8 +168,7 @@ export default defineComponent({
       applyChanges(action)
         .then(() => {
           notify.done(`Applied ${action.name}`);
-          config.value.lastActionId = action.id;
-          return saveConfig();
+          return patchConfig({ lastActionId: action.id });
         })
         .then(() =>
           // Fetch all blocks to show secondary effects
@@ -249,7 +244,11 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body column">
-      <div v-for="action in actionDisplays" :key="action.id" class="row">
+      <div
+        v-for="action in actionDisplays"
+        :key="action.id"
+        class="row"
+      >
         <div
           :class="[
             'col-grow q-py-xs q-px-sm rounded-borders clickable',
@@ -261,12 +260,21 @@ export default defineComponent({
           <div :class="action.active ? 'text-positive' : ''">
             {{ action.name }}
           </div>
-          <q-item-label caption class="darkened">
+          <q-item-label
+            caption
+            class="darkened"
+          >
             {{ action.changes.length }} blocks changed
           </q-item-label>
           <q-tooltip v-if="action.applicable">
-            <div class="column" style="max-width: 400px">
-              <div class="col-auto text-italic" style="font-size: 120%">
+            <div
+              class="column"
+              style="max-width: 400px"
+            >
+              <div
+                class="col-auto text-italic"
+                style="font-size: 120%"
+              >
                 <div v-if="lastActionId === action.id">
                   This is the last used action.
                 </div>

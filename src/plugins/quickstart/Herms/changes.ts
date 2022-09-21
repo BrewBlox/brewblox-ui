@@ -1,33 +1,35 @@
-import { nanoid } from 'nanoid';
-
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import {
   BlockChange,
   QuickActionsConfig,
 } from '@/plugins/spark/features/QuickActions/types';
+import { useFeatureStore } from '@/store/features';
+import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
+import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
+import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
+  AnalogConstraint,
   BalancerBlock,
   Block,
   BlockType,
   DigitalActuatorBlock,
+  DigitalConstraint,
   DigitalState,
   FilterChoice,
   MutexBlock,
   PidBlock,
   ReferenceKind,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
-import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
-import { Widget } from '@/store/widgets';
-import { bloxLink } from '@/utils/link';
-import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
-
-import { DisplayBlock } from '../types';
+  SettingMode,
+  TransitionDurationPreset,
+} from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { DisplayBlock, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
@@ -37,7 +39,9 @@ import {
 } from '../utils';
 import { HermsConfig } from './types';
 
-export function defineChangedBlocks(config: HermsConfig): Block[] {
+export function defineChangedBlocks(
+  config: HermsConfig,
+): QuickstartPatch<Block>[] {
   return [
     ...unlinkedActuators(config.serviceId, [
       config.hltChannel,
@@ -48,7 +52,6 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
 }
 
 export function defineCreatedBlocks(config: HermsConfig): Block[] {
-  const groups = [0];
   const { serviceId, names, hermsOpts } = config;
 
   const pwmConstraints: AnalogConstraint[] = [];
@@ -67,113 +70,102 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       mutexed: {
         mutexId: bloxLink(names.mutex),
         extraHoldTime: bloxQty('0s'),
-        hasCustomHoldTime: true,
         hasLock: false,
       },
       remaining: bloxQty('0s'),
     });
   }
 
-  const balancerBlocks: [BalancerBlock, MutexBlock] = [
-    {
+  const balancerBlocks: Block[] = [
+    typed<BalancerBlock>({
       id: names.balancer,
       type: BlockType.Balancer,
       serviceId,
-      groups,
       data: { clients: [] },
-    },
-    {
+    }),
+    typed<MutexBlock>({
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
-      groups,
       data: {
-        differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       },
-    },
+    }),
   ];
 
-  const baseBlocks: [
-    SetpointSensorPairBlock,
-    SetpointSensorPairBlock,
-    SetpointSensorPairBlock,
-    ActuatorOffsetBlock,
-    DigitalActuatorBlock,
-    DigitalActuatorBlock,
-    ActuatorPwmBlock,
-    ActuatorPwmBlock,
-    PidBlock,
-    PidBlock,
-    PidBlock,
-  ] = [
+  const baseBlocks: Block[] = [
     // Setpoints
-    {
+    typed<SetpointSensorPairBlock>({
       id: names.hltSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.hltSensor),
+        enabled: false,
         storedSetting: tempQty(70),
-        settingEnabled: false,
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
-    {
+    }),
+    typed<SetpointSensorPairBlock>({
       id: names.mtSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.mtSensor),
+        enabled: false,
         storedSetting: tempQty(67),
-        settingEnabled: false,
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
-    {
+    }),
+    typed<SetpointSensorPairBlock>({
       id: names.bkSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.bkSensor),
+        enabled: false,
         storedSetting: tempQty(70),
-        settingEnabled: false,
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
+    }),
     // Setpoint Driver
-    {
+    typed<ActuatorOffsetBlock>({
       id: names.hltDriver,
       type: BlockType.ActuatorOffset,
       serviceId,
-      groups,
       data: {
         targetId: bloxLink(names.hltSetpoint),
-        drivenTargetId: bloxLink(names.hltSetpoint),
         referenceId: bloxLink(names.mtSetpoint),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
         enabled: false,
-        desiredSetting: 0,
-        setting: 0,
-        value: 0,
+        storedSetting: deltaTempQty(0),
+        desiredSetting: deltaTempQty(null),
+        setting: tempQty(null),
+        value: deltaTempQty(null),
         constrainedBy: {
           constraints: [
             {
@@ -182,84 +174,97 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
             },
           ],
         },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
+    }),
     // Digital Actuators
-    {
+    typed<DigitalActuatorBlock>({
       id: names.hltAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.hltChannel.blockId),
         channel: config.hltChannel.channelId,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
         invert: false,
         constrainedBy: {
           constraints: actuatorConstraints,
         },
       },
-    },
-    {
+    }),
+    typed<DigitalActuatorBlock>({
       id: names.bkAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.bkChannel.blockId),
         channel: config.bkChannel.channelId,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
         invert: false,
         constrainedBy: {
           constraints: actuatorConstraints,
         },
       },
-    },
+    }),
     // PWM
-    {
+    typed<ActuatorPwmBlock>({
       id: names.hltPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('2s'),
         actuatorId: bloxLink(names.hltAct),
-        drivenActuatorId: bloxLink(null),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: {
           constraints: pwmConstraints,
         },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
-    {
+    }),
+    typed<ActuatorPwmBlock>({
       id: names.bkPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('2s'),
         actuatorId: bloxLink(names.bkAct),
-        drivenActuatorId: bloxLink(null),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: {
           constraints: pwmConstraints,
         },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
+    }),
     // PID
-    {
+    typed<PidBlock>({
       id: names.hltPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         enabled: true,
@@ -270,12 +275,11 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         td: bloxQty('10s'),
         boilMinOutput: 25,
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.mtPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         enabled: true,
@@ -285,12 +289,11 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         ti: bloxQty('5m'),
         td: bloxQty('10m'),
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.bkPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         enabled: true,
@@ -301,7 +304,7 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         td: bloxQty('10s'),
         boilMinOutput: 25,
       },
-    },
+    }),
   ];
 
   return config.mutex ? [...balancerBlocks, ...baseBlocks] : baseBlocks;
@@ -311,10 +314,9 @@ export function defineWidgets(
   config: HermsConfig,
   layouts: BuilderLayout[],
 ): Widget[] {
-  const systemStore = useSystemStore();
   const featureStore = useFeatureStore();
   const { serviceId, names, dashboardId, prefix } = config;
-  const userTemp = systemStore.units.temperature;
+  const userTemp = userUnits.value.temperature;
   const genericSettings = {
     dashboard: dashboardId,
     cols: 4,
@@ -352,22 +354,18 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.hltSensor}/value[${userTemp}]`,
-            `${names.mtSensor}/value[${userTemp}]`,
-            `${names.bkSensor}/value[${userTemp}]`,
-            `${names.hltSetpoint}/setting[${userTemp}]`,
-            `${names.mtSetpoint}/setting[${userTemp}]`,
-            `${names.bkSetpoint}/setting[${userTemp}]`,
-            `${names.hltPwm}/value`,
-            `${names.bkPwm}/value`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.hltSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.mtSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.bkSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.hltSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.mtSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.bkSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.hltPwm}/value`,
+        `${serviceId}/${names.bkPwm}/value`,
       ],
       renames: {
         [`${serviceId}/${names.hltSensor}/value[${userTemp}]`]:
@@ -396,83 +394,77 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
     config: {
-      serviceId,
-      changeIdMigrated: true,
-      serviceIdMigrated: true,
+      version: '1.1',
       actions: [
         {
           name: 'Disable all setpoints',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
+              serviceId,
               blockId: names.hltSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
-            },
-            {
+            }),
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
+              serviceId,
               blockId: names.mtSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
-            },
-            {
+            }),
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
+              serviceId,
               blockId: names.bkSetpoint,
-              data: { settingEnabled: false },
+              data: { enabled: false },
               confirmed: {},
-            },
-          ] as [
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<SetpointSensorPairBlock>,
+            }),
           ],
         },
         {
           name: 'Constant HLT Temp',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<ActuatorOffsetBlock>>({
               id: nanoid(),
               serviceId,
-              blockId: names.mtSetpoint,
-              data: { settingEnabled: false },
+              blockId: names.hltDriver,
+              data: { enabled: false },
               confirmed: {},
-            },
-            {
+            }),
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.hltSetpoint,
               data: {
-                settingEnabled: true,
+                enabled: true,
                 storedSetting: tempQty(70),
               },
               confirmed: {
                 storedSetting: true,
               },
-            },
-          ] as [
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<SetpointSensorPairBlock>,
+            }),
           ],
         },
         {
           name: 'Constant MT Temp',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.mtSetpoint,
               data: {
-                settingEnabled: true,
+                enabled: true,
                 storedSetting: tempQty(66.7),
               },
               confirmed: {
                 storedSetting: true,
               },
-            },
-            {
+            }),
+            typed<BlockChange<ActuatorOffsetBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.hltDriver,
@@ -480,29 +472,26 @@ export function defineWidgets(
                 enabled: true,
               },
               confirmed: {},
-            },
-          ] as [
-            BlockChange<SetpointSensorPairBlock>,
-            BlockChange<ActuatorOffsetBlock>,
+            }),
           ],
         },
         {
           name: 'Constant BK Temp',
           id: nanoid(),
           changes: [
-            {
+            typed<BlockChange<SetpointSensorPairBlock>>({
               id: nanoid(),
               serviceId,
               blockId: names.bkSetpoint,
               data: {
-                settingEnabled: true,
+                enabled: true,
                 storedSetting: tempQty(100),
               },
               confirmed: {
                 storedSetting: true,
               },
-            },
-          ] as [BlockChange<SetpointSensorPairBlock>],
+            }),
+          ],
         },
       ],
     },

@@ -1,23 +1,26 @@
 <script lang="ts">
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_FILTER_CHOICE } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { selectable } from '@/utils/collections';
+import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { filterLabels } from '@/plugins/spark/const';
-import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
-import { createBlockDialog } from '@/utils/dialog';
-
-import { useSparkStore } from '../../store';
-
-const filterOpts: SelectOption[] = Object.entries(filterLabels).map(
-  ([value, label]) => ({ label, value }),
-);
+const filterOpts = selectable(ENUM_LABELS_FILTER_CHOICE);
 
 export default defineComponent({
   name: 'SetpointSensorPairFull',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, blockId, block, saveBlock, isVolatileBlock, isDriven } =
-      useBlockWidget.setup<SetpointSensorPairBlock>();
+    const {
+      serviceId,
+      blockId,
+      block,
+      patchBlock,
+      isVolatileBlock,
+      isClaimed,
+    } = useBlockWidget.setup<SetpointSensorPairBlock>();
 
     const usedBy = computed<Block[]>(() => {
       if (isVolatileBlock.value) {
@@ -33,8 +36,8 @@ export default defineComponent({
       filterOpts,
       serviceId,
       block,
-      saveBlock,
-      isDriven,
+      patchBlock,
+      isClaimed,
       usedBy,
     };
   },
@@ -47,19 +50,15 @@ export default defineComponent({
 
     <div class="widget-body row">
       <QuantityField
-        :model-value="block.data.storedSetting"
-        :readonly="isDriven"
-        :class="{ darkened: !block.data.settingEnabled }"
+        :model-value="block.data.desiredSetting"
+        :backup-value="block.data.storedSetting"
+        :readonly="isClaimed"
+        :class="{ darkened: !block.data.enabled }"
         title="Setting"
         label="Setting"
         tag="big"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.storedSetting = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ storedSetting: v })"
       />
       <QuantityField
         :model-value="block.data.value"
@@ -87,7 +86,7 @@ export default defineComponent({
         message="
               <p>
                 A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
-                Changes faster than the filter period will be filted out.
+                Changes faster than the filter period will be filtered out.
               </p>
               <p>
                 A longer period will give a smoother output at the cost of a delay in response.
@@ -95,12 +94,7 @@ export default defineComponent({
               </p>
               "
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.filter = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ filter: v })"
       />
       <QuantityField
         :model-value="block.data.filterThreshold"
@@ -115,12 +109,7 @@ export default defineComponent({
               </p>
               "
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.filterThreshold = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ filterThreshold: v })"
       >
         <template #append>
           <q-btn
@@ -128,10 +117,7 @@ export default defineComponent({
             round
             icon="mdi-skip-forward"
             class="self-end"
-            @click.stop="
-              block.data.resetFilter = true;
-              saveBlock();
-            "
+            @click.stop="patchBlock({ resetFilter: true })"
           >
             <q-tooltip>Bypass filter now</q-tooltip>
           </q-btn>
@@ -147,15 +133,13 @@ export default defineComponent({
         label="Sensor Block"
         tag="span"
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.sensorId = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ sensorId: v })"
       />
-      <LabeledField label="Input for:" class="col-grow">
-        <div class="row">
+      <LabeledField
+        label="Input for:"
+        class="col-grow"
+      >
+        <div class="row q-gutter-xs">
           <q-btn
             v-for="userBlock in usedBy"
             :key="userBlock.id"
@@ -174,7 +158,7 @@ export default defineComponent({
 
       <div class="col-break" />
 
-      <DrivenIndicator
+      <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"

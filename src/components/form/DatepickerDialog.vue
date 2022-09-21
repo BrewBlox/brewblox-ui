@@ -1,9 +1,7 @@
 <script lang="ts">
+import { useDialog } from '@/composables';
 import { date as qdate } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
-
-import { useDialog } from '@/composables';
-
 
 export default defineComponent({
   name: 'DatepickerDialog',
@@ -18,26 +16,21 @@ export default defineComponent({
       default: 'Date and time',
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
     const tab = ref<'date' | 'time'>('date');
-    const stringValue = ref<string>(qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'));
-
-    const parsed = computed<Date>(
-      () => qdate.extractDate(stringValue.value, 'YYYY/MM/DD HH:mm:ss'),
+    const stringValue = ref<string>(
+      qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'),
     );
 
-    const valid = computed<boolean>(
-      () => Number.isFinite(parsed.value.getTime()),
+    const parsed = computed<Date>(() =>
+      qdate.extractDate(stringValue.value, 'YYYY/MM/DD HH:mm:ss'),
+    );
+
+    const valid = computed<boolean>(() =>
+      Number.isFinite(parsed.value.getTime()),
     );
 
     function save(): void {
@@ -68,7 +61,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <template #body>
         <q-tabs
           v-model="tab"
@@ -77,19 +70,34 @@ export default defineComponent({
           align="justify"
           narrow-indicator
         >
-          <q-tab name="date" label="Date" />
-          <q-tab name="time" label="Time" />
+          <q-tab
+            name="date"
+            label="Date"
+          />
+          <q-tab
+            name="time"
+            label="Time"
+          />
         </q-tabs>
-        <q-tab-panels v-model="tab" animated>
-          <q-tab-panel name="date" class="q-pa-none">
+        <q-tab-panels
+          v-model="tab"
+          animated
+        >
+          <q-tab-panel
+            name="date"
+            class="q-pa-none"
+          >
             <q-date
               v-model="stringValue"
               mask="YYYY/MM/DD HH:mm:ss"
               class="fit"
-              @update:model-value="tab='time'"
+              @update:model-value="tab = 'time'"
             />
           </q-tab-panel>
-          <q-tab-panel name="time" class="q-pa-none">
+          <q-tab-panel
+            name="time"
+            class="q-pa-none"
+          >
             <q-time
               v-model="stringValue"
               mask="YYYY/MM/DD HH:mm:ss"

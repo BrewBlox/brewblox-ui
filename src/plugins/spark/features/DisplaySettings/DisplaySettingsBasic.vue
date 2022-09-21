@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { DisplaySettingsBlock, DisplaySlot } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 const footerRules: InputRule[] = [
   (v) => !v || v.length <= 40 || 'Footer text can only be 40 characters',
@@ -12,7 +11,7 @@ const footerRules: InputRule[] = [
 export default defineComponent({
   name: 'DisplaySettingsBasic',
   setup() {
-    const { block, saveBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
+    const { block, patchBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
 
     const slots = computed<(DisplaySlot | null)[]>(() => {
       const slots = Array(6).fill(null);
@@ -40,7 +39,7 @@ export default defineComponent({
     return {
       footerRules,
       block,
-      saveBlock,
+      patchBlock,
       slots,
       slotStyle,
       showDialog,
@@ -62,13 +61,19 @@ export default defineComponent({
           class="hoverable q-pa-sm q-item--dark"
           @click="showDialog"
         >
-          <q-item-label caption>
-            Slot {{ idx + 1 }}
-          </q-item-label>
-          <span v-if="slot" class="text-bold ellipsis">{{
-            slot.name || '---'
-          }}</span>
-          <span v-else class="darkened">Not set</span>
+          <q-item-label caption> Slot {{ idx + 1 }} </q-item-label>
+          <span
+            v-if="slot"
+            class="text-bold ellipsis"
+          >
+            {{ slot.name || '---' }}
+          </span>
+          <span
+            v-else
+            class="darkened"
+          >
+            Not set
+          </span>
         </div>
       </div>
 
@@ -77,18 +82,16 @@ export default defineComponent({
         :rules="footerRules"
         label="Footer text"
         title="footer text"
-        @update:model-value="
-          (v) => {
-            block.data.name = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ name: v })"
       />
     </div>
   </div>
 </template>
 
-<style scoped lang="sass">
+<style
+  scoped
+  lang="sass"
+>
 .grid-container
   display: grid
   grid-template-columns: repeat(3, 1fr)

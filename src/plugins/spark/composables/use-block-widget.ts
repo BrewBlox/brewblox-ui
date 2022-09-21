@@ -1,3 +1,15 @@
+import { useWidget, UseWidgetComponent } from '@/composables';
+import { GraphConfig } from '@/plugins/history/types';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
+import { BlockConfig, BlockSpec, BlockWidget } from '@/plugins/spark/types';
+import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
+import {
+  findLimitations,
+  limitationString,
+} from '@/plugins/spark/utils/formatting';
+import { isBlockVolatile } from '@/plugins/spark/utils/info';
+import { useWidgetStore } from '@/store/widgets';
+import { Block } from 'brewblox-proto/ts';
 import debounce from 'lodash/debounce';
 import {
   computed,
@@ -9,20 +21,6 @@ import {
   WritableComputedRef,
 } from 'vue';
 
-import { useWidget, UseWidgetComponent } from '@/composables';
-import { GraphConfig } from '@/plugins/history/types';
-import { Block } from '@/shared-types';
-import { useWidgetStore } from '@/store/widgets';
-
-import { useBlockSpecStore, useSparkStore } from '../store';
-import { BlockConfig, BlockSpec, BlockWidget } from '../types';
-import {
-  findLimitations,
-  isBlockVolatile,
-  limitationString,
-  makeBlockGraphConfig,
-} from '../utils';
-
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {
   serviceId: string;
@@ -32,10 +30,10 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   blockSpec: ComputedRef<BlockSpec<BlockT>>;
   isVolatileBlock: ComputedRef<boolean>;
 
-  saveBlock(block?: BlockT): Promise<void>;
+  patchBlock(data: Partial<BlockT['data']>): Promise<void>;
 
   hasGraph: boolean;
-  isDriven: ComputedRef<boolean>;
+  isClaimed: ComputedRef<boolean>;
   limitations: ComputedRef<string | null>;
 }
 
@@ -101,8 +99,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       isBlockVolatile(block.value),
     );
 
-    async function saveBlock(v: BlockT = block.value): Promise<void> {
-      await sparkStore.saveBlock(v);
+    async function patchBlock(data: Partial<BlockT['data']>): Promise<void> {
+      await sparkStore.patchBlock(block.value, data);
     }
 
     const limitations = computed<string | null>(() =>
@@ -131,10 +129,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       },
     });
 
-    const isDriven = computed<boolean>(() =>
-      sparkStore
-        .driveChainsByService(serviceId)
-        .some((c) => c.target === blockId),
+    const isClaimed = computed<boolean>(
+      () => block.value.data.claimedBy && block.value.data.claimedBy.id != null,
     );
 
     return {
@@ -147,11 +143,11 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       block,
       blockSpec,
       isVolatileBlock,
-      saveBlock,
+      patchBlock,
       limitations,
       graphConfig,
       hasGraph,
-      isDriven,
+      isClaimed,
     };
   },
 };

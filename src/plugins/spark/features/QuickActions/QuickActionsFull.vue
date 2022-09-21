@@ -1,16 +1,14 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, ref } from 'vue';
-
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
-import { Block } from '@/shared-types';
 import { filterById, spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
-
+import { Block } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, ref } from 'vue';
 import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, ChangeAction, QuickActionsWidget } from './types';
 
@@ -29,33 +27,33 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const { dense } = useGlobals.setup();
-    const { config, saveConfig } = useWidget.setup<QuickActionsWidget>();
+    const { config, patchConfig } = useWidget.setup<QuickActionsWidget>();
     const draggingStep = ref(false);
 
     const actions = computed<ChangeAction[]>(() =>
-      deserialize(config.value.actions ?? config.value.steps),
+      deserialize(config.value.actions),
     );
 
-    function saveActions(acs: ChangeAction[] = actions.value): void {
-      config.value.actions = acs;
-      saveConfig();
+    function saveActions(acs: ChangeAction[]): void {
+      patchConfig({ actions: acs });
     }
 
     function saveAction(action: ChangeAction): void {
-      spliceById(actions.value, action);
-      saveActions();
+      saveActions(spliceById([...actions.value], action));
     }
 
     function duplicateAction(action: ChangeAction): void {
-      actions.value.push({
-        id: nanoid(),
-        name: `${action.name} (copy)`,
-        changes: action.changes.map((change) => ({
-          ...deepCopy(change),
+      saveActions([
+        ...actions.value,
+        {
           id: nanoid(),
-        })),
-      });
-      saveActions();
+          name: `${action.name} (copy)`,
+          changes: action.changes.map((change) => ({
+            ...deepCopy(change),
+            id: nanoid(),
+          })),
+        },
+      ]);
     }
 
     function renameAction(action: ChangeAction): void {
@@ -67,10 +65,9 @@ export default defineComponent({
           title: 'Change ChangeAction name',
           message: `Choose a new name for '${action.name}'`,
         },
-      }).onOk((newName) => {
-        if (newName !== stepName) {
-          action.name = newName;
-          saveAction(action);
+      }).onOk((name) => {
+        if (name !== stepName) {
+          saveAction({ ...action, name });
         }
       });
     }
@@ -175,7 +172,7 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body column">
-      <draggable
+      <vue-draggable
         v-if="actions.length > 0"
         :disabled="dense"
         :model-value="actions"
@@ -194,7 +191,7 @@ export default defineComponent({
             icon="mdi-format-list-checks"
             class="action-container q-mr-md q-mb-sm depth-1"
           >
-            <draggable
+            <vue-draggable
               :disabled="dense"
               :model-value="action.element.changes"
               item-key="id"
@@ -209,7 +206,7 @@ export default defineComponent({
                   @switch="startSwitchBlock(action.element, change.element)"
                 />
               </template>
-            </draggable>
+            </vue-draggable>
             <div class="row justify-end q-px-md q-py-sm action-actions">
               <q-btn
                 size="sm"
@@ -242,7 +239,7 @@ export default defineComponent({
             </div>
           </q-expansion-item>
         </template>
-      </draggable>
+      </vue-draggable>
       <slot name="below" />
     </div>
   </div>

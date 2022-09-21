@@ -1,19 +1,17 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  ActuatorLogicBlock,
-  BlockFieldSpec,
-  BlockIntfType,
-  BlockSpec,
-  BlockType,
-  LogicResult,
-} from '@/plugins/spark/types';
-import { blockWidgetSelector, enumHint } from '@/plugins/spark/utils';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { enumHint } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
-
+import {
+  ActuatorLogicBlock,
+  BlockIntfType,
+  BlockType,
+  LogicResult,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './ActuatorLogicWidget.vue';
 import { nonErrorResults } from './const';
 
@@ -26,16 +24,11 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorLogicBlock> = {
       type,
-      generate: () => ({
+      generate: (): ActuatorLogicBlock['data'] => ({
         enabled: true,
         result: LogicResult.RESULT_EMPTY,
         errorPos: 0,
         targetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
-        drivenTargetId: bloxLink(
-          null,
-          BlockIntfType.ActuatorDigitalInterface,
-          true,
-        ),
         analog: [],
         digital: [],
         expression: '',

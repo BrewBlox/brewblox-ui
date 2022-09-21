@@ -1,7 +1,6 @@
 <script lang="ts">
 import { defineComponent, onMounted, PropType, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
 import { QuickstartAction } from '../types';
 import { createOutputActions, executeActions } from '../utils';
 import {
@@ -66,9 +65,7 @@ export default defineComponent({
 <template>
   <WizardBody>
     <q-card-section>
-      <q-item class="text-big">
-        About your new fermentation dashboard
-      </q-item>
+      <q-item class="text-big"> About your new fermentation dashboard </q-item>
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
@@ -80,14 +77,16 @@ export default defineComponent({
                 href="https://brewblox.netlify.app/user/ferment_guide.html"
                 target="_blank"
                 style="color: white"
-              >documentation page</a>
+              >
+                documentation page
+              </a>
               for a more in-depth guide.
             </span>
           </p>
           <p>
             On the controller we created two PIDs to drive the heater and the
             cooler.
-            <br>The input to both will either be the <i>Fridge Setpoint</i> or
+            <br />The input to both will either be the <i>Fridge Setpoint</i> or
             the <i>Beer Setpoint</i>.
           </p>
           <p>
@@ -120,9 +119,7 @@ export default defineComponent({
         color="primary"
         @click="done"
       >
-        <q-tooltip v-if="busy">
-          Creating everything...
-        </q-tooltip>
+        <q-tooltip v-if="busy"> Creating everything... </q-tooltip>
       </q-btn>
     </template>
   </WizardBody>

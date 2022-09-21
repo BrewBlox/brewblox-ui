@@ -1,12 +1,10 @@
 <script lang="ts">
-import mapValues from 'lodash/mapValues';
-import { computed, defineComponent, PropType, reactive } from 'vue';
-
-import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { makeDashboardIdRules } from '@/utils/dashboards';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { makeUrlSafe } from '@/utils/url';
-
+import mapValues from 'lodash/mapValues';
+import { computed, defineComponent, PropType, reactive } from 'vue';
 import { QuickstartConfig } from '../types';
 import { withPrefix } from '../utils';
 
@@ -156,16 +154,21 @@ export default defineComponent({
         label="Dashboard name"
         @clear="clearKey('dashboardTitle')"
       >
-        <template #help>
-          The name for the new dashboard.
-        </template>
+        <template #help> The name for the new dashboard. </template>
       </QuickstartNameField>
 
       <!-- Overall prefix -->
-      <QuickstartPrefixField v-model="prefix" @clear="clearKey('prefix')" />
+      <QuickstartPrefixField
+        v-model="prefix"
+        @clear="clearKey('prefix')"
+      />
 
       <!-- Automatically generated names -->
-      <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
+      <q-expansion-item
+        label="Generated names"
+        icon="mdi-tag-multiple"
+        dense
+      >
         <!-- Dashboard ID -->
         <QuickstartNameField
           v-model="dashboardId"
@@ -175,7 +178,7 @@ export default defineComponent({
         >
           <template #help>
             The unique identifier for your dashboard.
-            <br>
+            <br />
             By default, this is an URL-safe version of the dashboard title.
           </template>
         </QuickstartNameField>
@@ -193,7 +196,11 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
       <q-btn
         :disable="!valuesOk"

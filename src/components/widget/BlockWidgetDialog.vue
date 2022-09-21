@@ -1,10 +1,6 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, onUnmounted, PropType } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import type { Block } from '@/plugins/spark/types';
 import {
   ComponentResult,
   useFeatureStore,
@@ -12,6 +8,9 @@ import {
   WidgetMode,
 } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
+import type { Block } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, onUnmounted, PropType } from 'vue';
 
 export default defineComponent({
   name: 'BlockWidgetDialog',
@@ -107,7 +106,10 @@ export default defineComponent({
     v-bind="{ ...dialogProps, ...$attrs }"
     @hide="onDialogHide"
   >
-    <WidgetProvider :widget-id="widgetId" :context="context">
+    <WidgetProvider
+      :widget-id="widgetId"
+      :context="context"
+    >
       <component
         :is="widgetComponent.component"
         v-if="block && widgetComponent"

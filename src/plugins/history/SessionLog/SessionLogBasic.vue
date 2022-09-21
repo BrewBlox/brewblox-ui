@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useWidget } from '@/composables';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { shortDateString } from '@/utils/formatting';
-
+import { shortDateString } from '@/utils/quantity';
+import { computed, defineComponent } from 'vue';
 import { useHistoryStore } from '../store';
 import {
   GraphAnnotation,
@@ -87,12 +85,12 @@ export default defineComponent({
     }
 
     function startGraphNote(note: SessionGraphNote): void {
-      note.start = new Date().getTime();
+      note.start = new Date().toISOString();
       saveSession();
     }
 
     function stopGraphNote(note: SessionGraphNote): void {
-      note.end = new Date().getTime();
+      note.end = new Date().toISOString();
       saveSession();
     }
 
@@ -133,7 +131,10 @@ export default defineComponent({
   <div>
     <slot name="warnings" />
 
-    <div v-if="session !== null" class="row q-ma-md">
+    <div
+      v-if="session !== null"
+      class="row q-ma-md"
+    >
       <SessionHeaderField
         :session="session"
         class="col q-mb-sm"
@@ -154,7 +155,10 @@ export default defineComponent({
           <!-- Text note -->
           <template v-if="note.type === 'Text'">
             <div class="col-grow">
-              <q-item-label caption class="text-secondary">
+              <q-item-label
+                caption
+                class="text-secondary"
+              >
                 <q-icon name="mdi-text-subject" />
                 {{ note.title }}
               </q-item-label>
@@ -167,7 +171,10 @@ export default defineComponent({
 
           <template v-if="note.type === 'Graph'">
             <div class="col-grow">
-              <q-item-label caption class="text-secondary">
+              <q-item-label
+                caption
+                class="text-secondary"
+              >
                 <q-icon name="mdi-chart-line" />
                 {{ note.title }}
               </q-item-label>

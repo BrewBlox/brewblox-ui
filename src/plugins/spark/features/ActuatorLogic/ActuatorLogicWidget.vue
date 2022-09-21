@@ -1,52 +1,35 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ActuatorLogicBlock, Link } from '@/plugins/spark/types';
-import { prettyLink } from '@/utils/formatting';
-
+import { prettyLink } from '@/utils/quantity';
+import { ActuatorLogicBlock, Link } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
 import ActuatorLogicFull from './ActuatorLogicFull.vue';
 
 export default defineComponent({
   name: 'ActuatorLogicWidget',
   components: {
-    'Basic': ActuatorLogicBasic,
-    'Full': ActuatorLogicFull,
+    Basic: ActuatorLogicBasic,
+    Full: ActuatorLogicFull,
   },
   setup() {
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
-    const {
-      widgetId,
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<ActuatorLogicBlock>();
+    const { context, inDialog } = useContext.setup();
+    const { widgetId, block } = useBlockWidget.setup<ActuatorLogicBlock>();
 
-    function enable(): void {
-      block.value.data.enabled = true;
-      saveBlock();
-    }
+    const target = computed<Link>(() => block.value.data.targetId);
 
-    const target = computed<Link>(
-      () => block.value.data.targetId,
-    );
     return {
       prettyLink,
       context,
       inDialog,
       widgetId,
       block,
-      enable,
       target,
     };
   },
 });
 </script>
-
 
 <template>
   <PreviewCard :enabled="inDialog">
@@ -70,10 +53,12 @@ export default defineComponent({
           :hide-enabled="context.mode === 'Basic'"
         >
           <template #enabled>
-            Logic Actuator is enabled and driving <i>{{ prettyLink(target) }}</i>.
+            Logic Actuator is enabled and claims
+            <i> {{ prettyLink(target) }} </i>.
           </template>
           <template #disabled>
-            Logic Actuator is disabled and not driving <i>{{ prettyLink(target) }}</i>.
+            Logic Actuator is disabled and does not claim
+            <i> {{ prettyLink(target) }} </i>.
           </template>
         </BlockEnableToggle>
       </template>

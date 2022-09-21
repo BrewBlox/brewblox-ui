@@ -1,4 +1,7 @@
 import { useSparkStore } from '@/plugins/spark/store';
+import { createBlockDialogPromise } from '@/utils/block-dialog';
+import { makeTypeFilter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -10,14 +13,11 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
+  SettingMode,
   TempSensorCombiBlock,
   TempSensorMockBlock,
   TempSensorOneWireBlock,
-} from '@/shared-types';
-import { createBlockDialogPromise } from '@/utils/dialog';
-import { makeTypeFilter } from '@/utils/functional';
-import { bloxLink } from '@/utils/link';
-
+} from 'brewblox-proto/ts';
 import { TempControlConfig, TempControlMode } from './types';
 
 interface TempControlBlocks {
@@ -62,20 +62,6 @@ function linkEq(
 
 function linkStr(...blocks: (Block | Link)[]): string {
   return blocks.map((v) => `<i>${v?.id ?? '[not set]'}</i>`).join(' -> ');
-}
-
-function adjust<T extends Block>(
-  block: T,
-  func: (v: T) => unknown,
-): () => Awaitable<unknown> {
-  return () => {
-    const sparkStore = useSparkStore();
-    const actual = sparkStore.blockByAddress<T>(block);
-    if (actual) {
-      func(actual);
-      return sparkStore.saveBlock(actual);
-    }
-  };
 }
 
 function getBlocks(
@@ -158,42 +144,30 @@ export async function applyMode(
     throw new Error('No heat PID defined');
   }
 
-  setpoint.data.settingEnabled = false;
-  await sparkStore.saveBlock(setpoint);
+  await sparkStore.patchBlock(setpoint, { enabled: false });
+  await sparkStore.patchBlock(profile, { targetId: bloxLink(setpoint.id) });
 
-  if (profile) {
-    profile.data.targetId = bloxLink(setpoint.id);
-    await sparkStore.saveBlock(profile);
-  }
-
-  // Disable all blocks driving target setpoint
+  // Disable all blocks claiming target setpoint
   await Promise.all(
     sparkStore
       .blocksByService(serviceId)
       .filter(isDriver)
       .filter((block) => block.data.targetId.id === setpoint.id)
-      .map((block) => {
-        block.data.enabled = false;
-        return sparkStore.saveBlock(block);
-      }),
+      .map((block) => sparkStore.patchBlock(block, { enabled: false })),
   );
 
   if (coolPid && mode.coolConfig) {
-    coolPid.data = {
-      ...coolPid.data,
+    await sparkStore.patchBlock(coolPid, {
       ...mode.coolConfig,
       inputId: mode.setpoint,
-    };
-    await sparkStore.saveBlock(coolPid);
+    });
   }
 
   if (heatPid && mode.heatConfig) {
-    heatPid.data = {
-      ...heatPid.data,
+    await sparkStore.patchBlock(heatPid, {
       ...mode.heatConfig,
       inputId: mode.setpoint,
-    };
-    await sparkStore.saveBlock(heatPid);
+    });
   }
 }
 
@@ -205,7 +179,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
   if (!pid.data.enabled) {
     issues.push({
       desc: `PID is disabled: ${linkStr(pid)}`,
-      autofix: adjust(pid, (block) => (block.data.enabled = true)),
+      autofix: () => sparkStore.patchBlock(pid, { enabled: true }),
     });
   }
 
@@ -231,7 +205,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (!analog.data.enabled) {
       issues.push({
         desc: `PWM is disabled: ${linkStr(pid, analog)}`,
-        autofix: adjust(analog, (block) => (block.data.enabled = true)),
+        autofix: () => sparkStore.patchBlock(analog, { enabled: true }),
       });
     }
 
@@ -260,11 +234,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     }
 
     const deviceLink = digital.data.hwDevice;
-    // It is possible for MotorValve startChannel to be 0, so only check for DigitalActuator channel
-    if (
-      !deviceLink.id ||
-      (digital.type === BlockType.DigitalActuator && !digital.data.channel)
-    ) {
+    if (!deviceLink.id || !digital.data.channel) {
       issues.push({
         desc: `Pin Channel not defined: ${linkStr(pid, analog, digital)}`,
         autofix: () => createBlockDialogPromise(digital),
@@ -291,7 +261,7 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (!analog.data.enabled) {
       issues.push({
         desc: `Setpoint Driver is disabled: ${linkStr(pid, analog)}`,
-        autofix: adjust(analog, (block) => (block.data.enabled = true)),
+        autofix: () => sparkStore.patchBlock(analog, { enabled: true }),
       });
     }
 
@@ -321,33 +291,33 @@ function findPidProblems(pid: PidBlock): TempControlProblem[] {
     if (reference.data.enabled === false) {
       issues.push({
         desc: `Reference block is disabled: ${linkStr(pid, analog, reference)}`,
-        autofix: adjust(reference, (block) => (block.data.enabled = true)),
+        autofix: () => sparkStore.patchBlock(reference, { enabled: true }),
       });
     }
 
-    const drivenLink = analog.data.targetId;
-    if (!drivenLink.id) {
+    const targetLink = analog.data.targetId;
+    if (!targetLink.id) {
       issues.push({
-        desc: `Driven block not defined: ${linkStr(pid, analog)}`,
+        desc: `Target block not defined: ${linkStr(pid, analog)}`,
         autofix: () => createBlockDialogPromise(analog),
       });
       return issues;
     }
 
-    const driven = sparkStore.blockByLink(serviceId, drivenLink);
-    if (!driven) {
+    const target = sparkStore.blockByLink(serviceId, targetLink);
+    if (!target) {
       issues.push({
-        desc: `Driven block not found: ${linkStr(pid, analog, drivenLink)}`,
+        desc: `Target block not found: ${linkStr(pid, analog, targetLink)}`,
         autofix: () => createBlockDialogPromise(analog),
       });
       return issues;
     }
 
     // ActuatorAnalogMock also is a valid target, but has no enabled flag
-    if (driven.data.enabled === false) {
+    if (target.data.enabled === false) {
       issues.push({
-        desc: `Driven block is disabled: ${linkStr(pid, analog, driven)}`,
-        autofix: adjust(driven, (block) => (block.data.enabled = true)),
+        desc: `Target block is disabled: ${linkStr(pid, analog, target)}`,
+        autofix: () => sparkStore.patchBlock(target, { enabled: true }),
       });
     }
   }
@@ -440,6 +410,7 @@ export function findControlProblems(
     serviceId,
     setpointLink,
   );
+
   if (!setpoint) {
     issues.push({
       desc: `Setpoint not found: ${linkStr(setpointLink)}`,
@@ -457,19 +428,29 @@ export function findControlProblems(
   if (coolPid && !linkEq(setpointLink, coolSetpointLink)) {
     issues.push({
       desc: `Cool PID Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(coolPid, (block) => (block.data.inputId = setpointLink)),
+      autofix: () => sparkStore.patchBlock(coolPid, { inputId: setpointLink }),
     });
   }
   if (heatPid && !linkEq(setpointLink, heatSetpointLink)) {
     issues.push({
       desc: `Heat PID Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(heatPid, (block) => (block.data.inputId = setpointLink)),
+      autofix: () => sparkStore.patchBlock(heatPid, { inputId: setpointLink }),
     });
   }
   if (profile && !linkEq(setpointLink, profile.data.targetId)) {
     issues.push({
       desc: `Profile Setpoint does not match: ${linkStr(setpointLink)}`,
-      autofix: adjust(profile, (block) => (block.data.targetId = setpointLink)),
+      autofix: () => sparkStore.patchBlock(profile, { targetId: setpointLink }),
+    });
+  }
+
+  if (
+    setpoint.data.claimedBy.id == null &&
+    setpoint.data.settingMode === SettingMode.CLAIMED
+  ) {
+    issues.push({
+      desc: `Setpoint is inactive: ${linkStr(setpointLink)}`,
+      autofix: () => createBlockDialogPromise(setpoint),
     });
   }
 

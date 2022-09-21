@@ -1,11 +1,10 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/quantity';
-
-import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/const';
-import { MetricsConfig } from '../Metrics/types';
+import { QTreeNode } from 'quasar';
+import { defineComponent, PropType } from 'vue';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { MetricsConfig } from '../types';
 
 export default defineComponent({
   name: 'MetricsEditor',
@@ -21,7 +20,7 @@ export default defineComponent({
       emit('update:config', config);
     }
 
-    function editLeaf(node: QuasarNode): void {
+    function editLeaf(node: QTreeNode): void {
       createDialog({
         component: 'MetricsDisplayDialog',
         componentProps: {
@@ -32,18 +31,18 @@ export default defineComponent({
       }).onOk((config) => saveConfig(config));
     }
 
-    function renamed(node: QuasarNode): string {
+    function renamed(node: QTreeNode): string {
       return props.config.renames[node.value] || node.title;
     }
 
-    function freshDuration(node: QuasarNode): string {
+    function freshDuration(node: QTreeNode): string {
       return durationString(
-        props.config.freshDuration[node.value] ?? DEFAULT_FRESH_DURATION,
+        props.config.freshDuration[node.value] ?? DEFAULT_METRICS_EXPIRY,
       );
     }
 
-    function decimals(node: QuasarNode): number {
-      return props.config.decimals[node.value] ?? DEFAULT_DECIMALS;
+    function decimals(node: QTreeNode): number {
+      return props.config.decimals[node.value] ?? DEFAULT_METRICS_DECIMALS;
     }
 
     return {
@@ -58,7 +57,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <QueryEditor :config="config" @update:config="saveConfig">
+  <QueryEditor
+    :config="config"
+    @update:config="saveConfig"
+  >
     <template #leaf="{ node }">
       <div @click="editLeaf(node)">
         {{ node.label }}

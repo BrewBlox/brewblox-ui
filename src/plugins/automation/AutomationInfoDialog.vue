@@ -1,7 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
 import { useDialog } from '@/composables';
+import { matchesType } from '@/utils/objects';
+import { durationString, shortDateString } from '@/utils/quantity';
 import {
   BlockPatchImpl,
   BlockValueImpl,
@@ -12,11 +12,8 @@ import {
   TimeAbsoluteImpl,
   TimeElapsedImpl,
   WebhookImpl,
-} from '@/shared-types';
-import { shortDateString } from '@/utils/formatting';
-import { matchesType } from '@/utils/objects';
-import { durationString } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { defineComponent, PropType } from 'vue';
 import {
   AutomationImpl,
   AutomationTemplate,
@@ -40,43 +37,42 @@ export const operatorSymbols: OperatorOption[] = [
 ];
 
 const operator = (impl: BlockValueImpl): string =>
-  operatorSymbols.find(op => op.value === impl.operator)?.label ?? '???';
-
+  operatorSymbols.find((op) => op.value === impl.operator)?.label ?? '???';
 
 const prettifiers: Record<string, (impl: AutomationImpl) => string> = {
-  BlockPatch: impl =>
+  BlockPatch: (impl) =>
     matchesType<BlockPatchImpl>('BlockPatch', impl)
       ? `Edit block '${impl.blockId}'`
       : `Invalid data: type=${impl.type}`,
-  BlockValue: impl =>
+  BlockValue: (impl) =>
     matchesType<BlockValueImpl>('BlockValue', impl)
       ? `${impl.blockId} '${impl.key}' ${operator(impl)} ${impl.value}`
       : `Invalid data: type=${impl.type}`,
-  JSApply: impl =>
+  JSApply: (impl) =>
     matchesType<JSApplyImpl>('JSApply', impl)
       ? 'Scripted action is applied'
       : `Invalid data: type=${impl.type}`,
-  JSCheck: impl =>
+  JSCheck: (impl) =>
     matchesType<JSCheckImpl>('JSCheck', impl)
       ? 'Scripted condition is checked'
       : `Invalid data: type=${impl.type}`,
-  TaskEdit: impl =>
+  TaskEdit: (impl) =>
     matchesType<TaskEditImpl>('TaskEdit', impl)
       ? `Edit task with ref '${impl.ref || '<not set>'}'`
       : `Invalid data: type=${impl.type}`,
-  TaskStatus: impl =>
+  TaskStatus: (impl) =>
     matchesType<TaskStatusImpl>('TaskStatus', impl)
       ? `Task with ref '${impl.ref}' must be ${impl.status}`
       : `Invalid data: type=${impl.type}`,
-  TimeAbsolute: impl =>
+  TimeAbsolute: (impl) =>
     matchesType<TimeAbsoluteImpl>('TimeAbsolute', impl)
       ? `Current date/time must be past ${shortDateString(impl.time)}`
       : `Invalid data: type=${impl.type}`,
-  TimeElapsed: impl =>
+  TimeElapsed: (impl) =>
     matchesType<TimeElapsedImpl>('TimeElapsed', impl)
       ? `Step must have been active for ${durationString(impl.duration)}`
       : `Invalid data: type=${impl.type}`,
-  Webhook: impl =>
+  Webhook: (impl) =>
     matchesType<WebhookImpl>('Webhook', impl)
       ? `Send HTTP ${impl.method} request to ${impl.url}`
       : `Invalid data: type=${impl.type}`,
@@ -85,7 +81,6 @@ const prettifiers: Record<string, (impl: AutomationImpl) => string> = {
 interface HasImpl {
   impl: AutomationImpl;
 }
-
 
 export default defineComponent({
   name: 'AutomationInfoDialog',
@@ -104,17 +99,10 @@ export default defineComponent({
       default: undefined,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     function pretty({ impl }: HasImpl): string {
       return prettifiers[impl.type]?.(impl) ?? 'Unknown';
@@ -149,7 +137,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="onDialogOK"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-expansion-item
         v-for="step in modelValue.steps"
         :key="step.id"
@@ -161,27 +149,19 @@ export default defineComponent({
       >
         <div class="q-pl-md">
           <div class="q-pl-sm step-data">
-            <div>
-              Preconditions
-            </div>
+            <div>Preconditions</div>
             <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
             <div class="listed">{{ prettyList(step.preconditions) }}</div>
-            <div>
-              Actions
-            </div>
+            <div>Actions</div>
             <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
             <div class="listed">{{ prettyList(step.actions) }}</div>
-            <div>
-              Transitions
-            </div>
+            <div>Transitions</div>
             <div
               v-for="trans in step.transitions"
               :key="trans.id"
               class="step-data"
             >
-              <div>
-                To step {{ nextStepTitle(trans) }} if...
-              </div>
+              <div>To step {{ nextStepTitle(trans) }} if...</div>
               <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
               <div class="listed">{{ prettyList(trans.conditions) }}</div>
             </div>
@@ -200,7 +180,10 @@ export default defineComponent({
   </q-dialog>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .pre-line
   white-space: pre-line
 

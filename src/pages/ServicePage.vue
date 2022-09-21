@@ -1,8 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useFeatureStore } from '@/store/features';
 import { Service, useServiceStore } from '@/store/services';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ServicePage',
@@ -42,10 +41,13 @@ export default defineComponent({
     v-if="pageComponent !== null"
     :service-id="serviceId"
   />
-  <q-page v-else class="page-height text-h5 darkened">
+  <q-page
+    v-else
+    class="page-height text-h5 darkened"
+  >
     <PageError>
       <span v-if="service !== null">
-        Invalid service page for <b>{{ serviceId }}</b>.
+        Invalid service page for <b>{{ serviceId }} </b>.
       </span>
       <span v-else>
         Service <b>{{ serviceId }}</b> not found.

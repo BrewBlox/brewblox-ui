@@ -1,11 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { TiltService } from '@/plugins/tilt/types';
-import { Service, useServiceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TiltActions',
@@ -18,7 +17,6 @@ export default defineComponent({
   setup(props) {
     const systemStore = useSystemStore();
     const serviceStore = useServiceStore();
-    const router = useRouter();
 
     const service = computed<TiltService | null>(() =>
       serviceStore.serviceById(props.serviceId),
@@ -29,34 +27,21 @@ export default defineComponent({
     );
 
     const isHomePage = computed<boolean>({
-      get: () => systemStore.config.homePage === `/service/${props.serviceId}`,
+      get: () =>
+        userUISettings.value.homePage === `/service/${props.serviceId}`,
       set: (v) => {
         const homePage =
           v && service.value ? `/service/${props.serviceId}` : null;
-        systemStore.saveConfig({ homePage });
+        systemStore.patchUserUISettings({ homePage });
       },
     });
-
-    const listed = computed<boolean>({
-      get: () => service.value?.listed ?? true,
-      set: (v) => {
-        if (service.value) {
-          serviceStore.saveService({ ...service.value, listed: v });
-        }
-      },
-    });
-
-    function removeService(service: Maybe<Service>): void {
-      startRemoveService(service, router);
-    }
 
     return {
       startChangeServiceTitle,
-      removeService,
+      startRemoveService,
       service,
       serviceTitle,
       isHomePage,
-      listed,
     };
   },
 });
@@ -69,16 +54,15 @@ export default defineComponent({
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
-    <ToggleAction v-model="listed" label="Show in sidebar" />
     <ActionItem
       icon="edit"
-      label="Rename service"
+      label="Change service name"
       @click="startChangeServiceTitle(service)"
     />
     <ActionItem
       icon="delete"
       label="Remove service from UI"
-      @click="removeService(service)"
+      @click="startRemoveService(service, $router)"
     />
   </ActionSubmenu>
 </template>

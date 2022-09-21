@@ -1,5 +1,5 @@
-import { autoComponents } from '@/utils/component-ref';
+import { globComponents } from '@/utils/component-ref';
 
-const parts = autoComponents(require.context('./'));
+const parts = globComponents(import.meta.globEager('./*.vue'));
 
 export default parts;

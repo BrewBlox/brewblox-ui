@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
 import { deepCopy } from '@/utils/objects';
+import { defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'BlockFieldDialog',
@@ -26,22 +25,17 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
-    const local = ref<any>(deepCopy(props.modelValue));
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
+    const local = ref<any>();
 
     function save(): void {
       onDialogOK(local.value);
     }
+
+    onBeforeMount(() => (local.value = deepCopy(props.modelValue)));
 
     return {
       dialogRef,
@@ -62,19 +56,30 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <component
         :is="field.component"
-        v-model="local"
+        :model-value="local"
         v-bind="field.componentProps"
         :service-id="address.serviceId"
         :block-id="address.id"
         :comparison="comparison"
         editable
+        @update:model-value="(v) => (local = v)"
       />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

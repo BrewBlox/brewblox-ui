@@ -1,19 +1,17 @@
-import { Plugin } from 'vue';
-
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { useServiceStore } from '@/store/services';
-import { autoRegister, cref } from '@/utils/component-ref';
-
-import { sparkType } from './const';
+import { cref, globRegister } from '@/utils/component-ref';
+import { Plugin } from 'vue';
+import { SPARK_SERVICE_TYPE } from './const';
 import features from './features';
 import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
 import { useBlockSnippetStore, useSparkStore } from './store';
-import { isSparkState } from './utils';
+import { isSparkState } from './utils/info';
 
 // Allows lookups based on the old type ID
 // DeprecatedWidget will update the widget in the datastore
@@ -34,7 +32,7 @@ const plugin: Plugin = {
     const sparkStore = useSparkStore();
     const snippetStore = useBlockSnippetStore();
 
-    autoRegister(app, require.context('./components', true));
+    globRegister(app, import.meta.globEager('./components/**/*.vue'));
 
     deprecated.forEach(featureStore.addWidgetFeature);
     features.forEach(app.use);
@@ -46,7 +44,7 @@ const plugin: Plugin = {
     });
 
     featureStore.addServiceFeature({
-      id: sparkType,
+      id: SPARK_SERVICE_TYPE,
       title: 'Spark Service',
       pageComponent: cref(app, SparkPage),
       configComponent: cref(app, SparkActions),
@@ -69,11 +67,11 @@ const plugin: Plugin = {
 
     eventbus.addListener(`${STATE_TOPIC}/+`, (_, data) => {
       if (isSparkState(data)) {
-        serviceStore.ensureStub({ id: data.key, type: sparkType });
+        serviceStore.ensureStub({ id: data.key, type: SPARK_SERVICE_TYPE });
       }
     });
 
-    startup.onStart(() => snippetStore.start());
+    startup.add(snippetStore);
   },
 };
 

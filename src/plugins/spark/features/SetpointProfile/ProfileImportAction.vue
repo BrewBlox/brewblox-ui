@@ -1,11 +1,9 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { SetpointProfileBlock } from '@/plugins/spark/types';
 import { loadFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
-
+import { SetpointProfileBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ProfileImportAction',
@@ -20,10 +18,7 @@ export default defineComponent({
     },
   },
   setup() {
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<SetpointProfileBlock>();
+    const { patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
     async function showDialog(): Promise<void> {
       loadFile((cfg: Pick<SetpointProfileBlock['data'], 'points'>) => {
@@ -31,8 +26,7 @@ export default defineComponent({
           notify.error('Invalid configuration file');
           return;
         }
-        block.value.data.points = cfg.points;
-        saveBlock();
+        patchBlock({ points: cfg.points });
       });
     }
 
@@ -44,5 +38,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionItem v-bind="{...$attrs, ...$props}" @click="showDialog" />
+  <ActionItem
+    v-bind="{ ...$attrs, ...$props }"
+    @click="showDialog"
+  />
 </template>

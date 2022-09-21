@@ -1,9 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
-
-import { Quantity } from '@/shared-types';
 import { tempQty } from '@/utils/quantity';
-
+import { Quantity } from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref } from 'vue';
 import { QuickstartAction } from '../types';
 import { FridgeConfig, FridgeOpts } from './types';
 
@@ -49,7 +47,7 @@ export default defineComponent({
             Initial setpoint value
           </q-item-label>
           <p>
-            The setup creates a Setpoint for your fridge.<br>
+            The setup creates a Setpoint for your fridge.<br />
             You can set the initial values now.
           </p>
         </q-item-section>
@@ -66,9 +64,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="done"
+      />
     </template>
   </WizardBody>
 </template>

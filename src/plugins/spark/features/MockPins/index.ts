@@ -1,11 +1,10 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType, MockPinsBlock } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
-
+import { BlockType, MockPinsBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './MockPinsWidget.vue';
 
 const type = BlockType.MockPins;
@@ -17,7 +16,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MockPinsBlock> = {
       type,
-      generate: () => ({
+      generate: (): MockPinsBlock['data'] => ({
         channels: [],
       }),
     };

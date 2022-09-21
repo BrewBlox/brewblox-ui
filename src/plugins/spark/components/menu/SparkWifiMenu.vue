@@ -1,9 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-
+import { computed, defineComponent } from 'vue';
 import SparkEspWifiCard from './SparkEspWifiCard.vue';
 import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
 
@@ -28,9 +26,8 @@ export default defineComponent({
 
     const platformVendor = computed<'esp' | 'particle' | 'sim' | 'unknown'>(
       () => {
-        const platform = sparkStore.statusByService(
-          props.serviceId,
-        )?.devicePlatform;
+        const status = sparkStore.statusByService(props.serviceId);
+        const platform = status?.controller?.platform;
         if (platform === 'p1' || platform === 'photon') {
           return 'particle';
         }

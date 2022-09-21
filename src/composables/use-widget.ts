@@ -1,8 +1,7 @@
-import { computed, ComputedRef, inject, Ref, ref, UnwrapRef, watch } from 'vue';
-
 import { useFeatureStore } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { InvalidateKey, WidgetIdKey } from '@/symbols';
+import { computed, ComputedRef, inject, Ref, ref, UnwrapRef, watch } from 'vue';
 
 export interface UseWidgetComponent<WidgetT extends Widget> {
   widgetId: string;
@@ -13,6 +12,8 @@ export interface UseWidgetComponent<WidgetT extends Widget> {
 
   saveWidget(widget?: WidgetT): Promise<void>;
   saveConfig(config?: WidgetT['config']): Promise<void>;
+  patchWidget(patch: Partial<WidgetT>): Promise<void>;
+  patchConfig(patch: Partial<WidgetT['config']>): Promise<void>;
   invalidate(): void;
 }
 
@@ -72,6 +73,19 @@ export const useWidget: UseWidgetComposable = {
       await widgetStore.saveWidget({ ...widget.value, config: c });
     }
 
+    async function patchWidget(patch: Partial<WidgetT>): Promise<void> {
+      await widgetStore.saveWidget({ ...widget.value, ...patch });
+    }
+
+    async function patchConfig(
+      patch: Partial<WidgetT['config']>,
+    ): Promise<void> {
+      await widgetStore.saveWidget({
+        ...widget.value,
+        config: { ...widget.value.config, ...patch },
+      });
+    }
+
     return {
       widgetId,
       widget,
@@ -80,6 +94,8 @@ export const useWidget: UseWidgetComposable = {
       featureTitle,
       saveWidget,
       saveConfig,
+      patchWidget,
+      patchConfig,
       invalidate,
     };
   },

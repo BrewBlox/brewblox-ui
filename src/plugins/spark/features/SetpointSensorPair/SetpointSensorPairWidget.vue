@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
-
-import { useSparkStore } from '../../store';
+import { useSparkStore } from '@/plugins/spark/store';
+import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
 import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
 
@@ -73,7 +71,7 @@ export default defineComponent({
 
     <component :is="context.mode">
       <template #warnings>
-        <BlockEnableToggle data-key="settingEnabled">
+        <BlockEnableToggle>
           <template #enabled>
             <span v-html="enabledString" />
           </template>

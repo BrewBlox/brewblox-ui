@@ -1,16 +1,15 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { dateString, shortDateString } from '@/utils/formatting';
+import { dateString, shortDateString } from '@/utils/quantity';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'DatetimeField',
   props: {
     ...useField.props,
     modelValue: {
-      type: [Number, String, Date] as PropType<number | string | Date | null>,
+      type: [Date] as PropType<Date | null>,
       default: null,
     },
     short: {
@@ -33,26 +32,17 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    emitNumber: {
-      type: Boolean,
-      default: false,
-    },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
 
-    function save(v: Date): void {
-      const result = props.emitNumber
-        ? v.getTime()
-        : v;
-      emit('update:modelValue', result);
+    function save(v: Date | null): void {
+      emit('update:modelValue', v);
     }
 
-    const displayValue = computed<string>(
-      () => props.short
+    const displayValue = computed<string>(() =>
+      props.short
         ? shortDateString(props.modelValue, props.clearLabel)
         : dateString(props.modelValue, props.clearLabel),
     );
@@ -62,9 +52,10 @@ export default defineComponent({
         return;
       }
 
-      const date = new Date(
-        props.modelValue
-        || (props.defaultNow ? new Date().getTime() : 0));
+      const date =
+        props.modelValue == null && props.defaultNow
+          ? new Date()
+          : props.modelValue;
 
       createDialog({
         component: 'DatetimeDialog',
@@ -77,8 +68,7 @@ export default defineComponent({
           resetIcon: props.resetIcon,
           rules: props.rules,
         },
-      })
-        .onOk(save);
+      }).onOk(save);
     }
 
     return {
@@ -91,11 +81,17 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+  <LabeledField
+    v-bind="{ ...$attrs, ...$props }"
+    @click="openDialog"
+  >
     <slot name="value">
       {{ displayValue }}
     </slot>
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
   </LabeledField>

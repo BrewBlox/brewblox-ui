@@ -1,8 +1,7 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'GraphAnnotationDialog',
@@ -13,17 +12,10 @@ export default defineComponent({
       default: '',
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
     const local = ref<string>(props.modelValue);
 
     function save(): void {
@@ -40,8 +32,7 @@ export default defineComponent({
         componentProps: {
           modelValue: local.value,
         },
-      })
-        .onOk((v: string) => local.value = v);
+      }).onOk((v: string) => (local.value = v));
     }
 
     return {
@@ -65,7 +56,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.ctrl.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-input
         v-model="local"
         label="Title"
@@ -77,10 +68,25 @@ export default defineComponent({
         </template>
       </q-input>
       <template #actions>
-        <q-btn flat label="Remove" color="primary" @click="remove" />
+        <q-btn
+          flat
+          label="Remove"
+          color="primary"
+          @click="remove"
+        />
         <q-space />
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

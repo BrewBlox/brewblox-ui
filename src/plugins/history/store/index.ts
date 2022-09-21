@@ -1,19 +1,18 @@
-import { defineStore } from 'pinia';
-import { exportFile } from 'quasar';
-
 import { concatById, filterById, findById } from '@/utils/collections';
-import { isoDateString } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
-import { bloxQty, JSQuantity } from '@/utils/quantity';
-
+import { bloxQty, isoDateString, JSQuantity } from '@/utils/quantity';
+import { defineStore } from 'pinia';
+import { exportFile } from 'quasar';
 import type {
   ApiQuery,
   CsvPrecision,
+  GraphConfig,
   HistorySource,
   LoggedSession,
   QueryParams,
 } from '../types';
+import { upgradeGraphConfig } from '../utils';
 import { historyApi, sessionApi } from './api';
 
 function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
@@ -87,13 +86,10 @@ export const useHistoryStore = defineStore('historyStore', {
           : this.transform(data);
       };
       this.stream.onclose = () => {
+        this.streamConnected = false;
         setTimeout(() => this.connect(), 2000);
       };
       this.stream.onerror = () => {
-        if (this.streamConnected) {
-          notify.error('History connection closed. Retrying...');
-          this.streamConnected = false;
-        }
         this.stream?.close();
         this.stream = null;
       };
@@ -175,17 +171,49 @@ export const useHistoryStore = defineStore('historyStore', {
       );
     },
 
+    async downloadGraphCsv(
+      config: GraphConfig,
+      precision: CsvPrecision,
+      header: string,
+    ): Promise<void> {
+      await this.downloadCsv({
+        params: config.params,
+        fields: config.fields,
+        precision,
+        fileName: `${header}.csv`,
+      });
+    },
+
     async start(): Promise<void> {
-      const onChange = (session: LoggedSession): void => {
-        this.sessions = concatById(this.sessions, session);
-      };
-      const onDelete = (id: string): void => {
-        this.sessions = filterById(this.sessions, { id });
-      };
-
       this.sessions = await sessionApi.fetch();
-      sessionApi.subscribe(onChange, onDelete);
 
+      // check if any sessions must be upgraded
+      [...this.sessions].forEach((session) => {
+        let dirty = false;
+        session.notes.forEach((note) => {
+          if (note.type === 'Graph') {
+            const upgraded = upgradeGraphConfig(note.config);
+            if (upgraded) {
+              dirty = true;
+              note.config = upgraded;
+            }
+          }
+        });
+        if (dirty) {
+          // Immediately set upgraded session, to prevent rendering with invalid data
+          concatById(this.sessions, session);
+          this.saveSession(session);
+        }
+      });
+
+      sessionApi.subscribe(
+        (session: LoggedSession): void => {
+          this.sessions = concatById(this.sessions, session);
+        },
+        (id: string): void => {
+          this.sessions = filterById(this.sessions, { id });
+        },
+      );
       this.connect();
     },
   },

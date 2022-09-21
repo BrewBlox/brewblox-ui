@@ -1,29 +1,19 @@
 <script lang="ts">
-import isMatch from 'lodash/isMatch';
-import { nanoid } from 'nanoid';
-import { DialogChainObject } from 'quasar';
-import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import {
-  Block,
-  BlockConfig,
-  BlockIntfType,
-  ComparedBlockType,
-  UserBlockType,
-} from '@/plugins/spark/types';
-import {
-  isCompatible,
-  isSystemBlockType,
-  makeBlockIdRules,
-} from '@/plugins/spark/utils';
+import { BlockConfig, ComparedBlockType } from '@/plugins/spark/types';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
+import { isCompatible, isSystemBlockType } from '@/plugins/spark/utils/info';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter, nullFilter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
-
+import { Block, BlockIntfType, UserBlockType } from 'brewblox-proto/ts';
+import isMatch from 'lodash/isMatch';
+import { nanoid } from 'nanoid';
+import { DialogChainObject } from 'quasar';
+import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 import { useWizard } from '../composables';
 
 export default defineComponent({
@@ -163,7 +153,6 @@ export default defineComponent({
           id: blockId.value,
           serviceId: serviceId.value,
           type: selected.value.value,
-          groups: [0],
           data: specStore.blockSpecByType(selected.value.value).generate(),
         });
         activeBlock.value = sparkStore.blockById(
@@ -356,7 +345,7 @@ export default defineComponent({
           <q-icon name="mdi-information">
             <q-tooltip>
               The name of the Spark Controller block.
-              <br>Multiple widgets can display the same block. <br>Rules:
+              <br />Multiple widgets can display the same block. <br />Rules:
               <ul>
                 <li>The name must not be empty.</li>
                 <li>The name must be unique.</li>
@@ -371,7 +360,11 @@ export default defineComponent({
           </q-icon>
         </template>
       </q-input>
-      <q-btn flat label="Back" @click="onBack" />
+      <q-btn
+        flat
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <template v-if="discoveredType">
         <q-btn

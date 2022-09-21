@@ -1,9 +1,7 @@
-import { AxiosResponse } from 'axios';
-
-import { UI_NAMESPACE, WS_HOST } from '@/const';
+import { SESSION_NAMESPACE, WS_HOST } from '@/const';
 import { createApi } from '@/database/api';
 import { http } from '@/utils/http';
-
+import { AxiosResponse } from 'axios';
 import { CsvQuery, LoggedSession } from '../types';
 
 export const historyApi = {
@@ -27,5 +25,5 @@ export const historyApi = {
 };
 
 export const sessionApi = createApi<LoggedSession>({
-  namespace: `${UI_NAMESPACE}:logged-sessions`,
+  namespace: SESSION_NAMESPACE,
 });

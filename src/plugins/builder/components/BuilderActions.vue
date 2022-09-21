@@ -1,12 +1,10 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { defineComponent, PropType } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { loadFile } from '@/utils/import-export';
-
+import { nanoid } from 'nanoid';
+import { defineComponent, PropType } from 'vue';
+import { useRouter } from 'vue-router';
 import { startAddLayout } from '../utils';
 
 export default defineComponent({
@@ -53,7 +51,11 @@ export default defineComponent({
   <ActionMenu>
     <template #actions>
       <slot name="actions" />
-      <ActionItem icon="add" label="New Layout" @click="createLayout" />
+      <ActionItem
+        icon="add"
+        label="New Layout"
+        @click="createLayout"
+      />
       <ActionItem
         icon="mdi-file-import"
         label="Import Layout"
@@ -61,7 +63,10 @@ export default defineComponent({
       />
     </template>
     <template #menus>
-      <LayoutActions :layout="layout" @selected="selectLayout" />
+      <LayoutActions
+        :layout="layout"
+        @selected="selectLayout"
+      />
       <slot name="menus" />
     </template>
     <slot />

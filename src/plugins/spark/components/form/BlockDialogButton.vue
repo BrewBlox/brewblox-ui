@@ -1,10 +1,9 @@
 <script lang="ts">
+import { useSparkStore } from '@/plugins/spark/store';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { Block } from 'brewblox-proto/ts';
 import isString from 'lodash/isString';
 import { computed, defineComponent } from 'vue';
-
-import { useSparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
-import { createBlockDialog } from '@/utils/dialog';
 
 function validateBlockId(v: unknown): boolean {
   return v === null || isString(v);

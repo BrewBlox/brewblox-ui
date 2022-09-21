@@ -1,14 +1,11 @@
 <script lang="ts">
+import { useGlobals, useWidget } from '@/composables';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
 import clamp from 'lodash/clamp';
 import { nanoid } from 'nanoid';
 import { dom } from 'quasar';
 import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue';
-
-import { useGlobals, useWidget } from '@/composables';
-import { spliceById } from '@/utils/collections';
-import { createDialog } from '@/utils/dialog';
-
-import { emptyGraphConfig } from '../const';
 import { useHistoryStore } from '../store';
 import {
   LoggedSession,
@@ -16,7 +13,7 @@ import {
   SessionNote,
   SharedGraphConfig,
 } from '../types';
-import { sharedWidgetConfigs } from '../utils';
+import { emptyGraphConfig, sharedWidgetConfigs } from '../utils';
 import SessionHeaderField from './SessionHeaderField.vue';
 import { SessionLogWidget } from './types';
 
@@ -191,14 +188,17 @@ export default defineComponent({
   <div>
     <slot name="warnings" />
 
-    <div v-if="session !== null" class="column q-ma-md">
+    <div
+      v-if="session !== null"
+      class="column q-ma-md"
+    >
       <SessionHeaderField
         :session="session"
         class="col q-mb-sm"
         @update:session="saveSession"
       />
 
-      <draggable
+      <vue-draggable
         ref="noteboxRef"
         v-model="notes"
         :disabled="dense"
@@ -239,7 +239,10 @@ export default defineComponent({
                     />
                   </template>
                 </InputField>
-                <div v-if="element.type === 'Graph'" class="col-auto row">
+                <div
+                  v-if="element.type === 'Graph'"
+                  class="col-auto row"
+                >
                   <q-btn
                     icon="settings"
                     flat
@@ -284,14 +287,24 @@ export default defineComponent({
             </div>
           </div>
         </template>
-      </draggable>
+      </vue-draggable>
 
       <div class="col row justify-end q-mt-sm">
-        <q-btn fab-mini color="secondary" icon="add">
+        <q-btn
+          fab-mini
+          color="secondary"
+          icon="add"
+        >
           <q-menu>
             <q-list>
-              <ActionItem label="Add text note" @click="addTextNote" />
-              <ActionItem label="Add graph" @click="addGraphNote" />
+              <ActionItem
+                label="Add text note"
+                @click="addTextNote"
+              />
+              <ActionItem
+                label="Add graph"
+                @click="addGraphNote"
+              />
             </q-list>
           </q-menu>
         </q-btn>

@@ -1,26 +1,17 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-
+import { TempSensorOneWireBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 
 export default defineComponent({
   name: 'TempSensorOneWireWidget',
   setup() {
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
-    const {
-      serviceId,
-      blockId,
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<TempSensorOneWireBlock>();
+    const { context, inDialog } = useContext.setup();
+    const { serviceId, blockId, block, patchBlock } =
+      useBlockWidget.setup<TempSensorOneWireBlock>();
 
     const hasValue = computed<boolean>(
       () => block.value.data.value.value !== null,
@@ -40,7 +31,7 @@ export default defineComponent({
       context,
       inDialog,
       block,
-      saveBlock,
+      patchBlock,
       hasValue,
       startSwap,
     };
@@ -57,20 +48,25 @@ export default defineComponent({
     <template #toolbar>
       <BlockWidgetToolbar has-mode-toggle>
         <template #actions>
-          <ActionItem icon="mdi-swap-horizontal" label="Swap OneWire address" @click="startSwap" />
+          <ActionItem
+            icon="mdi-swap-horizontal"
+            label="Swap OneWire address"
+            @click="startSwap"
+          />
         </template>
       </BlockWidgetToolbar>
     </template>
 
     <div>
       <CardWarning v-if="!hasValue">
-        <template #message>
-          OneWire Sensor could not be read.
-        </template>
+        <template #message> OneWire Sensor could not be read. </template>
       </CardWarning>
 
       <div class="q-ma-md row justify-center">
-        <div v-if="hasValue" class="col-auto row items-center">
+        <div
+          v-if="hasValue"
+          class="col-auto row items-center"
+        >
           <q-icon
             name="mdi-thermometer"
             size="md"
@@ -95,14 +91,14 @@ export default defineComponent({
             title="Offset"
             label="Offset"
             class="col-grow"
-            @update:model-value="v => { block.data.offset = v; saveBlock(); }"
+            @update:model-value="(v) => patchBlock({ offset: v })"
           />
           <InputField
             :model-value="block.data.address"
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="v => { block.data.address = v; saveBlock(); }"
+            @update:model-value="(v) => patchBlock({ address: v })"
           />
         </div>
       </template>

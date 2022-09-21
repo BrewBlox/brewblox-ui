@@ -1,8 +1,7 @@
-import { DialogChainObject } from 'quasar';
-
-import { Block } from '@/plugins/spark/types';
 import { Dashboard } from '@/store/dashboards';
 import { Widget } from '@/store/widgets';
+import { Block } from 'brewblox-proto/ts';
+import { DialogChainObject } from 'quasar';
 
 /**
  * Output from Wizard dialogs

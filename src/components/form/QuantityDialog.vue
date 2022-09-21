@@ -1,13 +1,11 @@
 <script lang="ts">
+import { useDialog } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { isQuantity } from '@/utils/identity';
+import { bloxQty, prettyUnit } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
 import round from 'lodash/round';
 import { computed, defineComponent, PropType, ref } from 'vue';
-
-import { useDialog } from '@/composables';
-import { Quantity } from '@/plugins/spark/types';
-import { createDialog } from '@/utils/dialog';
-import { prettyUnit } from '@/utils/formatting';
-import { isQuantity } from '@/utils/identity';
-import { bloxQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'QuantityDialog',
@@ -92,8 +90,18 @@ export default defineComponent({
         </template>
       </q-input>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

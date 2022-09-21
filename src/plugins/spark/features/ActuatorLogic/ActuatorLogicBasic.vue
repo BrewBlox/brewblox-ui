@@ -1,19 +1,18 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_LOGIC_RESULT } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
+import { prettyLink } from '@/utils/quantity';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
   DigitalCompare,
   LogicResult,
-} from '@/plugins/spark/types';
-import { createDialog } from '@/utils/dialog';
-import { prettyLink } from '@/utils/formatting';
-
-import { useSparkStore } from '../../store';
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
-import { logicResultTitles, nonErrorResults } from './const';
+import { nonErrorResults } from './const';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { ExpressionError } from './types';
 import {
@@ -33,7 +32,7 @@ export default defineComponent({
   name: 'ActuatorLogicBasic',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block, saveBlock } =
+    const { serviceId, block, patchBlock } =
       useBlockWidget.setup<ActuatorLogicBlock>();
 
     const digital = computed<
@@ -85,7 +84,7 @@ export default defineComponent({
         ? null
         : {
             index,
-            message: logicResultTitles[result],
+            message: ENUM_LABELS_LOGIC_RESULT[result],
             indicator: '-'.repeat(index) + '^',
           };
     });
@@ -100,7 +99,7 @@ export default defineComponent({
     const result = computed<string>(() =>
       err.value
         ? `Error: ${err.value.message}`
-        : logicResultTitles[block.value.data.result],
+        : ENUM_LABELS_LOGIC_RESULT[block.value.data.result],
     );
 
     function editDigital(key: string, cmp: DigitalCompare): void {
@@ -112,8 +111,10 @@ export default defineComponent({
           title: 'Edit comparison',
         },
       }).onOk((cmp) => {
-        block.value.data.digital.splice(digitalIdx(key), 1, cmp);
-        saveBlock();
+        const { digital } = block.value.data;
+        patchBlock({
+          digital: [...digital].splice(digitalIdx(key), 1, cmp),
+        });
       });
     }
 
@@ -126,8 +127,8 @@ export default defineComponent({
           title: 'Edit comparison',
         },
       }).onOk((cmp) => {
-        block.value.data.analog.splice(analogIdx(key), 1, cmp);
-        saveBlock();
+        const { analog } = block.value.data;
+        patchBlock({ analog: [...analog].splice(analogIdx(key), 1, cmp) });
       });
     }
 
@@ -151,7 +152,10 @@ export default defineComponent({
 
     <div class="widget-body">
       <div class="row wrap q-pa-sm">
-        <LabeledField label="Expression" class="col-grow">
+        <LabeledField
+          label="Expression"
+          class="col-grow"
+        >
           <span
             v-for="({ char, color }, idx) in expression"
             :key="`expression-${idx}`"
@@ -160,14 +164,20 @@ export default defineComponent({
             {{ char }}
           </span>
         </LabeledField>
-        <LabeledField label="Result" class="col-grow">
+        <LabeledField
+          label="Result"
+          class="col-grow"
+        >
           <div :class="err && 'text-negative'">
             {{ result }}
           </div>
         </LabeledField>
       </div>
 
-      <LabeledField label="Active comparisons" tag-class="col-grow">
+      <LabeledField
+        label="Active comparisons"
+        tag-class="col-grow"
+      >
         <div class="row q-gutter-xs col-grow">
           <q-chip
             v-for="{ key, cmp, pretty } in digital"
@@ -178,7 +188,10 @@ export default defineComponent({
             @click="editDigital(key, cmp)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div class="text-lime-6 text-bold col-auto" style="width: 1em">
+              <div
+                class="text-lime-6 text-bold col-auto"
+                style="width: 1em"
+              >
                 {{ key }}
               </div>
               <q-icon
@@ -204,7 +217,10 @@ export default defineComponent({
             @click="editAnalog(key, cmp)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div class="text-orange-6 text-bold col-auto" style="width: 1em">
+              <div
+                class="text-orange-6 text-bold col-auto"
+                style="width: 1em"
+              >
                 {{ key }}
               </div>
               <q-icon

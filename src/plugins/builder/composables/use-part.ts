@@ -1,5 +1,4 @@
 import { computed, ComputedRef } from 'vue';
-
 import { BORDER_KEY, SCALE_KEY } from '../const';
 import { FlowPart } from '../types';
 
@@ -17,25 +16,15 @@ export interface UsePartComposable {
 
 export const usePart: UsePartComposable = {
   setup(part: FlowPart): UsePartComponent {
-    const sizeX = computed<number>(
-      () => part.size[0],
-    );
+    const sizeX = computed<number>(() => part.size[0]);
 
-    const sizeY = computed<number>(
-      () => part.size[1],
-    );
+    const sizeY = computed<number>(() => part.size[1]);
 
-    const flipped = computed<boolean>(
-      () => part.flipped === true,
-    );
+    const flipped = computed<boolean>(() => part.flipped === true);
 
-    const bordered = computed<boolean>(
-      () => part.settings[BORDER_KEY] ?? true,
-    );
+    const bordered = computed<boolean>(() => part.settings[BORDER_KEY] ?? true);
 
-    const scale = computed<number>(
-      () => part.settings[SCALE_KEY] ?? 1,
-    );
+    const scale = computed<number>(() => part.settings[SCALE_KEY] ?? 1);
 
     return {
       sizeX,

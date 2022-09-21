@@ -1,116 +1,118 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
-import { Block, DigitalState, IoChannel } from '@/plugins/spark/types';
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import {
   channelName,
   findLimitations,
-  isBlockDriven,
   limitationString,
-} from '@/plugins/spark/utils';
-import { IoArrayBlock, Link } from '@/shared-types';
-import { makeTypeFilter } from '@/utils/functional';
+} from '@/plugins/spark/utils/formatting';
+import { ifCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
-
-import { useSparkStore } from '../../store';
+import {
+  Block,
+  BlockIntfType,
+  BlockOrIntfType,
+  BlockType,
+  ChannelCapabilities,
+  DigitalActuatorBlock,
+  DigitalState,
+  FastPwmBlock,
+  IoArrayInterfaceBlock,
+  IoChannel,
+  Link,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface EditableChannel extends IoChannel {
   name: string;
-  driver: DigitalActuatorBlock | null;
+  digitalActuator: DigitalActuatorBlock | null;
+  pwmActuator: FastPwmBlock | null;
+  actuatorClaimed: boolean;
+  compatibleTypes: BlockOrIntfType[];
 }
-
-interface Claim {
-  driverId: string;
-  channelId: number;
-}
-
-const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
-  BlockType.DigitalActuator,
-);
 
 export default defineComponent({
   name: 'IoArray',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block } = useBlockWidget.setup<IoArrayBlock>();
-
-    const claims = computed<Claim[]>(() =>
-      sparkStore
-        .blocksByService(serviceId)
-        .filter(actuatorFilter)
-        .filter((b) => b.data.hwDevice.id === block.value.id)
-        .map((b) => ({ driverId: b.id, channelId: b.data.channel })),
-    );
+    const { serviceId, block } = useBlockWidget.setup<IoArrayInterfaceBlock>();
 
     const channels = computed<EditableChannel[]>(() =>
-      block.value.data.channels.map((channel: IoChannel) => {
-        const { id } = channel;
-        const claim = claims.value.find((c) => c.channelId === id);
-        const name = channelName(block.value, id) ?? 'Unknown';
-        const driver = sparkStore.blockById<DigitalActuatorBlock>(
-          serviceId,
-          claim?.driverId,
-        );
-        return { id, driver, name };
+      block.value.data.channels.map((c): EditableChannel => {
+        const actuator = sparkStore.blockByLink(serviceId, c.claimedBy);
+        const compatibleTypes: BlockOrIntfType[] = [];
+        if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT) {
+          compatibleTypes.push(BlockOrIntfType.DigitalActuator);
+        }
+        if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ) {
+          compatibleTypes.push(BlockOrIntfType.FastPwm);
+        }
+        return {
+          ...c,
+          compatibleTypes,
+          name: channelName(block.value, c.id) ?? 'Unknown',
+          digitalActuator: ifCompatible(
+            actuator,
+            BlockIntfType.ActuatorDigitalInterface,
+          ),
+          pwmActuator: ifCompatible(actuator, BlockType.FastPwm),
+          actuatorClaimed: actuator?.data.claimedBy.id != null,
+        };
       }),
     );
 
-    function driverLink(channel: EditableChannel): Link {
-      return bloxLink(channel.driver?.id ?? null, BlockType.DigitalActuator);
-    }
-
-    function driverDriven(block: Block): boolean {
-      return isBlockDriven(block);
-    }
-
-    function driverLimitations(block: Block): string | null {
+    function actuatorLimitations(block: Block): string | null {
       return limitationString(findLimitations(block));
     }
 
-    async function saveDriver(
+    async function replaceActuator(
       channel: EditableChannel,
       link: Link,
     ): Promise<void> {
-      const currentDriver = channel.driver;
-      if (currentDriver && currentDriver.id === link.id) {
-        return;
-      }
-      if (currentDriver) {
-        currentDriver.data.channel = 0;
-        await sparkStore.saveBlock(currentDriver);
-      }
-      if (link.id) {
-        const newDriver = sparkStore.blockById<DigitalActuatorBlock>(
-          serviceId,
-          link.id,
-        )!;
-        const { id, type } = block.value;
-        newDriver.data.hwDevice = bloxLink(id, type);
-        newDriver.data.channel = channel.id;
-        await sparkStore.saveBlock(newDriver);
-      }
+      setExclusiveChannelActuator(
+        sparkStore.blockByLink(serviceId, link),
+        bloxLink(block.value.id),
+        channel.id,
+      );
     }
 
-    async function saveState(
+    async function updateDigitalState(
       channel: EditableChannel,
-      state: DigitalState,
+      storedState: DigitalState,
     ): Promise<void> {
-      if (channel.driver) {
-        channel.driver.data.desiredState = state;
-        await sparkStore.saveBlock(channel.driver);
+      await sparkStore.patchBlock(channel.digitalActuator, { storedState });
+    }
+
+    async function updatePwmSetting(channel: EditableChannel): Promise<void> {
+      if (channel.pwmActuator) {
+        createDialog({
+          component: 'SliderDialog',
+          componentProps: {
+            modelValue: channel.pwmActuator.data.storedSetting,
+            title: 'Edit PWM setting',
+            label: 'Pwm %',
+            min: 0,
+            max: 100,
+            quickActions: PWM_SELECT_OPTIONS,
+          },
+        }).onOk((storedSetting) =>
+          sparkStore.patchBlock(channel.pwmActuator, { storedSetting }),
+        );
       }
     }
 
     return {
+      BlockType,
       serviceId,
+      block,
       channels,
-      driverDriven,
-      driverLimitations,
-      saveState,
-      driverLink,
-      saveDriver,
+      actuatorLimitations,
+      replaceActuator,
+      updateDigitalState,
+      updatePwmSetting,
     };
   },
 });
@@ -121,41 +123,51 @@ export default defineComponent({
     <div
       v-for="channel in channels"
       :key="channel.id"
-      class="
-        col
-        row
-        q-gutter-x-sm q-gutter-y-xs q-mt-none
-        items-stretch
-        justify-start
-      "
+      class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
     >
-      <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
+      <div class="col-auto q-pt-sm self-baseline text-h6 min-width-md">
         {{ channel.name }}
       </div>
       <div class="col-auto row items-baseline min-width-sm">
         <DigitalStateButton
-          v-if="channel.driver"
-          :disable="driverDriven(channel.driver)"
-          :model-value="channel.driver.data.desiredState"
+          v-if="channel.digitalActuator"
+          :disable="channel.actuatorClaimed"
+          :model-value="channel.digitalActuator.data.desiredState"
           :pending="
-            channel.driver.data.state !== channel.driver.data.desiredState
+            channel.digitalActuator.data.state !==
+            channel.digitalActuator.data.desiredState
           "
-          :pending-reason="driverLimitations(channel.driver)"
+          :pending-reason="actuatorLimitations(channel.digitalActuator)"
           class="col-auto self-center"
-          @update:model-value="(v) => saveState(channel, v)"
+          @update:model-value="(v) => updateDigitalState(channel, v)"
         />
-        <div v-else class="darkened text-italic q-pa-sm">
+        <div
+          v-else-if="channel.pwmActuator"
+          class="col-auto clickable rounded-borders depth-1 text-bold"
+        >
+          <q-btn
+            unelevated
+            :disable="channel.actuatorClaimed"
+            :label="`${channel.pwmActuator.data.desiredSetting}%`"
+            @click="updatePwmSetting(channel)"
+          />
+        </div>
+        <div
+          v-else
+          class="darkened text-italic q-pa-sm"
+        >
           Not set
         </div>
       </div>
       <LinkField
-        :model-value="driverLink(channel)"
+        :model-value="channel.claimedBy"
         :service-id="serviceId"
-        title="Driver"
-        label="Driver"
+        :compatible="channel.compatibleTypes"
+        title="Actuator"
+        label="Actuator"
         dense
         class="col-grow"
-        @update:model-value="(link) => saveDriver(channel, link)"
+        @update:model-value="(link) => replaceActuator(channel, link)"
       />
     </div>
   </div>

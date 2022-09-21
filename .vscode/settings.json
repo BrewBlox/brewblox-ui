@@ -3,28 +3,26 @@
   "volar.autoCompleteRefs": false,
   "volar.codeLens.scriptSetupTools": false,
   "volar.codeLens.pugTools": false,
-  "volar.takeOverMode.enabled": true,
+  "volar.takeOverMode.enabled": "auto",
+  "volar.vueserver.useSecondServer": true,
   "eslint.run": "onType",
   "html.autoClosingTags": true,
   "[vue]": {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[javascript]": {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "jest.autoRun": {
-    "watch": false,
-    "onSave": "test-file"
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "files.watcherExclude": {
-    "dev/node-red/**": true,
-    "dev/redis/**": true,
-    "dev/simulator__*/**": true,
-    "dev/tilt_share/**": true,
-    "dev/traefik/brewblox.*": true,
-    "dev/victoria/**": true
+  "[dockercompose]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

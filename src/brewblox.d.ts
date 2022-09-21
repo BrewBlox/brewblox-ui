@@ -1,3 +1,11 @@
+/// <reference types="vite/client" />
+
+declare const __BREWBLOX_BUILD_DATE: string;
+declare const __BREWBLOX_PERFORMANCE: boolean;
+declare const __BREWBLOX_API_PROTOCOL: 'http' | 'https' | undefined;
+declare const __BREWBLOX_API_HOST: string | undefined;
+declare const __BREWBLOX_API_PORT: number | undefined;
+
 interface PanArguments {
   evt: MouseEvent | TouchEvent;
   position: { top: number; left: number };
@@ -59,24 +67,6 @@ interface HasType {
 
 type Patch<T> = HasId & Partial<T>;
 
-interface QuasarNode {
-  value: any;
-  label: string;
-  title: string;
-  children?: QuasarNode[];
-
-  icon?: string;
-  iconColor?: string;
-  img?: string;
-  avatar?: string;
-  disabled?: boolean;
-  expandable?: boolean;
-  selectable?: boolean;
-  handler?: (node: QuasarNode) => void;
-  tickable?: boolean;
-  noTick?: boolean;
-  tickStrategy?: string;
-  lazy?: boolean;
-  header?: string;
-  body?: string;
-}
+type DeepNonNullable<T> = {
+  [P in keyof T]-?: NonNullable<T[P]>;
+};

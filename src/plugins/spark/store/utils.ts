@@ -1,11 +1,7 @@
-import capitalize from 'lodash/capitalize';
-
-import { Block } from '@/shared-types';
+import { BlockAddress, BlockFieldAddress } from '@/plugins/spark/types';
 import { ServiceStatus } from '@/store/services';
 import { findById } from '@/utils/collections';
-
-import { ApiSparkStatus, BlockAddress, BlockFieldAddress } from '../types';
-import { SparkStatus } from '../types';
+import { Block, SparkStatusDescription } from 'brewblox-proto/ts';
 
 export function findBlockById<T extends Block>(
   blocks: Block[],
@@ -39,66 +35,60 @@ export function findBlockFieldByAddress(
   return block.data[addr.field] ?? null;
 }
 
-export function asSparkStatus(
-  serviceId: string,
-  status: ApiSparkStatus | null,
-): SparkStatus {
+function statusDesc(status: SparkStatusDescription | null): [string, string] {
   if (!status) {
-    return {
-      serviceId,
-      isServiceReachable: false,
-      deviceAddress: null,
-      connectionKind: null,
-    };
-  }
-
-  return {
-    serviceId,
-    isServiceReachable: true,
-    deviceAddress: status.device_address,
-    devicePlatform: status.device_info?.platform,
-    connectionKind: status.connection_kind,
-    isCompatibleFirmware: status.handshake_info?.is_compatible_firmware,
-    isLatestFirmware: status.handshake_info?.is_latest_firmware,
-    isValidDeviceId: status.handshake_info?.is_valid_device_id,
-    isAutoconnecting: status.is_autoconnecting,
-    isConnected: status.is_connected,
-    isAcknowledged: status.is_acknowledged,
-    isSynchronized: status.is_synchronized,
-    isUpdating: status.is_updating,
-  };
-}
-
-function statusDesc(status: SparkStatus): [string, string] {
-  if (status.isConnected) {
-    if (status.isSynchronized) {
-      return ['synchronized', 'green'];
-    } else if (status.isCompatibleFirmware) {
-      return ['synchronizing', 'yellow'];
-    } else if (status.isAcknowledged) {
-      return ['incompatible firmware', 'orange'];
-    } else {
-      return ['Waiting for handshake', 'yellow'];
-    }
-  } else if (status.isServiceReachable) {
-    return ['waiting for connection', 'red'];
-  } else {
     return ['unreachable', 'red'];
   }
+  const cs = status.connection_status;
+
+  if (cs === 'DISCONNECTED') {
+    return ['Waiting for connection', 'red'];
+  }
+
+  if (cs === 'CONNECTED') {
+    return ['Waiting for handshake', 'yellow'];
+  }
+
+  if (cs === 'ACKNOWLEDGED') {
+    if (status.firmware_error === 'INCOMPATIBLE') {
+      return ['Incompatible firmware', 'orange'];
+    } else if (status.identity_error === 'INCOMPATIBLE') {
+      return ['Invalid device ID', 'orange'];
+    } else {
+      return ['Waiting for synchronization', 'yellow'];
+    }
+  }
+
+  if (cs === 'UPDATING') {
+    return ['Updating', 'orange'];
+  }
+
+  if (cs === 'SYNCHRONIZED') {
+    if (status.firmware_error == 'MISMATCHED') {
+      return ['Firmware update available', 'lime'];
+    } else if (status.identity_error === 'WILDCARD_ID') {
+      return ['Service --device-id not set', 'lime'];
+    } else {
+      return ['Synchronized', 'green'];
+    }
+  }
+
+  return ['Unknown', 'red'];
 }
 
 const iconOpts = {
-  simulation: 'mdi-console',
-  wifi: 'mdi-access-point',
-  usb: 'mdi-usb-port',
-  unknown: undefined,
+  SIMULATION: 'mdi-console',
+  LAN: 'mdi-access-point',
+  USB: 'mdi-usb-port',
 };
 
-export function asServiceStatus(status: SparkStatus): ServiceStatus {
-  const id = status.serviceId;
-  const [descText, color] = statusDesc(status);
-  const connectionKind = status.connectionKind ?? 'unknown';
-  const icon = iconOpts[connectionKind];
-  const desc = capitalize(`${connectionKind} (${descText})`);
+export function asServiceStatus(
+  id: string,
+  status: SparkStatusDescription | null,
+): ServiceStatus {
+  const [desc, color] = statusDesc(status);
+  const icon = status?.connection_kind
+    ? iconOpts[status.connection_kind]
+    : undefined;
   return { id, color, desc, icon };
 }

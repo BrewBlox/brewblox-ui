@@ -1,14 +1,13 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
-import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { createDialog } from '@/utils/dialog';
 import { loadFile, saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
+import { Block } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'SparkImportMenu',
@@ -122,7 +121,10 @@ export default defineComponent({
   >
     <Card>
       <template #toolbar>
-        <Toolbar :title="serviceId" subtitle="Import/Export blocks" />
+        <Toolbar
+          :title="serviceId"
+          subtitle="Import/Export blocks"
+        />
       </template>
 
       <q-card-section>
@@ -153,7 +155,10 @@ export default defineComponent({
           <q-item-section>
             Reported problems during last import:
             <ul>
-              <li v-for="(msg, idx) in messages" :key="idx">
+              <li
+                v-for="(msg, idx) in messages"
+                :key="idx"
+              >
                 {{ msg }}
               </li>
             </ul>

@@ -1,21 +1,23 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import {
+  startChangeDateFormat,
   startChangeGravityUnit,
   startChangeKeyboardLayout,
   startChangeTempUnit,
+  startChangeTimeFormat,
   startChangeTimezone,
   startEditBuilderTouchDelay,
   useSystemStore,
 } from '@/store/system';
+import { startupDone, userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { computed, defineComponent } from 'vue';
 
 interface ConfigService {
   serviceId: string;
@@ -23,7 +25,7 @@ interface ConfigService {
   configComponent: string;
 }
 
-const orderSorter = makeObjectSorter<{ order: number }>('order');
+const sorter = makeObjectSorter<Dashboard>('title');
 
 export default defineComponent({
   name: 'AdminPage',
@@ -33,29 +35,23 @@ export default defineComponent({
     const featureStore = useFeatureStore();
     const serviceStore = useServiceStore();
     const builderStore = useBuilderStore();
-    const startupDone = computed<boolean>(() => systemStore.startupDone);
 
     const experimental = computed<boolean>({
-      get: () => systemStore.config.experimental,
-      set: (v) => systemStore.saveConfig({ experimental: v }),
-    });
-
-    const showSidebarLayouts = computed<boolean>({
-      get: () => systemStore.config.showSidebarLayouts,
-      set: (v) => systemStore.saveConfig({ showSidebarLayouts: v }),
+      get: () => userUISettings.value.experimental,
+      set: (v) => systemStore.patchUserUISettings({ experimental: v }),
     });
 
     const buildDate = computed<string>(
-      () => process.env.BLOX_DATE ?? 'UNKNOWN',
+      () => __BREWBLOX_BUILD_DATE ?? 'UNKNOWN',
     );
 
     const dashboards = computed<Dashboard[]>(() =>
-      [...dashboardStore.dashboards].sort(orderSorter),
+      [...dashboardStore.dashboards].sort(sorter),
     );
 
     const serviceComponents = computed<ConfigService[]>(() =>
       [...serviceStore.services]
-        .sort(orderSorter)
+        .sort(sorter)
         .map((v) => ({
           serviceId: v.id,
           title: v.title,
@@ -65,7 +61,7 @@ export default defineComponent({
     );
 
     const layouts = computed<BuilderLayout[]>(() =>
-      [...builderStore.layouts].sort(orderSorter),
+      [...builderStore.layouts].sort(sorter),
     );
 
     return {
@@ -74,10 +70,11 @@ export default defineComponent({
       startChangeTempUnit,
       startChangeGravityUnit,
       startChangeTimezone,
+      startChangeDateFormat,
+      startChangeTimeFormat,
       startEditBuilderTouchDelay,
       startupDone,
       experimental,
-      showSidebarLayouts,
       buildDate,
       dashboards,
       serviceComponents,
@@ -90,10 +87,11 @@ export default defineComponent({
 <template>
   <q-page class="page-height overflow-auto">
     <PageError v-if="!startupDone" />
-    <div v-else class="column q-pa-lg">
-      <div class="text-h5">
-        System
-      </div>
+    <div
+      v-else
+      class="column q-pa-lg"
+    >
+      <div class="text-h5">System</div>
 
       <ActionItem
         label="Start a wizard"
@@ -113,11 +111,6 @@ export default defineComponent({
           <ToggleAction
             v-model="experimental"
             label="Experimental features"
-            :colored="false"
-          />
-          <ToggleAction
-            v-model="showSidebarLayouts"
-            label="Show builder layouts in sidebar"
             :colored="false"
           />
           <ActionItem
@@ -141,6 +134,16 @@ export default defineComponent({
             @click="startChangeTimezone"
           />
           <ActionItem
+            icon="mdi-calendar-outline"
+            label="Date formatting"
+            @click="startChangeDateFormat"
+          />
+          <ActionItem
+            icon="mdi-clock-outline"
+            label="Time formatting"
+            @click="startChangeTimeFormat"
+          />
+          <ActionItem
             icon="mdi-gesture-tap-hold"
             label="Accidental touch prevention"
             @click="startEditBuilderTouchDelay"
@@ -161,9 +164,7 @@ export default defineComponent({
               <q-icon name="mdi-factory" />
             </q-item-section>
             <q-item-section>
-              <q-item-label caption>
-                Build date
-              </q-item-label>
+              <q-item-label caption> Build date </q-item-label>
               {{ buildDate }}
             </q-item-section>
           </q-item>
@@ -175,11 +176,12 @@ export default defineComponent({
         <q-separator />
       </div>
 
-      <div class="text-h5">
-        Dashboards
-      </div>
+      <div class="text-h5">Dashboards</div>
 
-      <div v-if="dashboards.length === 0" class="text-italic fade-2">
+      <div
+        v-if="dashboards.length === 0"
+        class="text-italic fade-2"
+      >
         There are no dashboards
       </div>
 
@@ -192,18 +194,22 @@ export default defineComponent({
         expand-icon-class="fade-4"
         switch-toggle-side
       >
-        <DashboardActions :dashboard-id="dash.id" class="q-ml-md" />
+        <DashboardActions
+          :dashboard-id="dash.id"
+          class="q-ml-md"
+        />
       </q-expansion-item>
 
       <div class="q-my-md">
         <q-separator />
       </div>
 
-      <div class="text-h5">
-        Services
-      </div>
+      <div class="text-h5">Services</div>
 
-      <div v-if="serviceComponents.length === 0" class="text-italic fade-2">
+      <div
+        v-if="serviceComponents.length === 0"
+        class="text-italic fade-2"
+      >
         There are no services
       </div>
 
@@ -227,11 +233,12 @@ export default defineComponent({
         <q-separator />
       </div>
 
-      <div class="text-h5">
-        Builder layouts
-      </div>
+      <div class="text-h5">Builder layouts</div>
 
-      <div v-if="layouts.length === 0" class="text-italic fade-2">
+      <div
+        v-if="layouts.length === 0"
+        class="text-italic fade-2"
+      >
         There are no builder layouts
       </div>
 
@@ -244,7 +251,11 @@ export default defineComponent({
         expand-icon-class="fade-4"
         switch-toggle-side
       >
-        <LayoutActions class="q-ml-md" :layout="layout" no-label>
+        <LayoutActions
+          class="q-ml-md"
+          :layout="layout"
+          no-label
+        >
           <ActionItem
             :to="`/builder/${layout.id}`"
             icon="mdi-tools"

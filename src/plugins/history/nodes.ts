@@ -1,13 +1,10 @@
+import { splitPostfixed } from '@/utils/parsing';
+import { prettyUnit } from '@/utils/quantity';
 import capitalize from 'lodash/capitalize';
 import escapeRegExp from 'lodash/escapeRegExp';
-import flatMap from 'lodash/flatMap';
 import set from 'lodash/set';
 import startCase from 'lodash/startCase';
-
-import { prettyUnit } from '@/utils/formatting';
-import { splitPostfixed } from '@/utils/parsing';
-
-import { QueryTarget } from './types';
+import { QTreeNode } from 'quasar';
 
 function sentenceCased(s: string): string {
   return capitalize(startCase(s));
@@ -39,8 +36,8 @@ function nodeRecurser(
   parent: string[],
   key: string,
   val: string | any,
-  partial: Partial<QuasarNode>,
-): QuasarNode {
+  partial: Partial<QTreeNode>,
+): QTreeNode {
   const value = [...parent, key].join('/');
 
   // Leaf nodes
@@ -66,8 +63,8 @@ function nodeRecurser(
 
 export function nodeBuilder(
   fields: { [measurement: string]: string[] },
-  partial: Partial<QuasarNode> = {},
-): QuasarNode[] {
+  partial: Partial<QTreeNode<any>> = {},
+): QTreeNode[] {
   const raw = Object.entries(fields).reduce((acc, [k, fieldKeys]) => {
     fieldKeys.forEach((fkey) => {
       const splitKeys = fkey
@@ -88,13 +85,13 @@ export function nodeBuilder(
   return Object.entries(raw).map(([k, v]) => nodeRecurser([], k, v, partial));
 }
 
-export function filteredNodes(nodes: QuasarNode[], filter: string): string[] {
+export function filteredNodes(nodes: QTreeNode[], filter: string): string[] {
   const exp = new RegExp(escapeRegExp(filter), 'i');
 
-  const compare = (node: QuasarNode): boolean =>
-    exp.test(node.label) || exp.test(node.value);
+  const compare = (node: QTreeNode): boolean =>
+    exp.test(node.label ?? '') || exp.test(node.value);
 
-  const checkNode = (node: QuasarNode): string[] => {
+  const checkNode = (node: QTreeNode): string[] => {
     const selected = (node.children ?? []).flatMap(checkNode);
     if (selected.length > 0 || compare(node)) {
       selected.push(node.value);
@@ -103,30 +100,4 @@ export function filteredNodes(nodes: QuasarNode[], filter: string): string[] {
   };
 
   return nodes.flatMap((n) => checkNode(n));
-}
-
-export function targetSplitter(targets: QueryTarget[]): string[] {
-  return flatMap(targets, (tar) =>
-    tar.fields.map((f) => `${tar.measurement}/${f}`),
-  );
-}
-
-export function targetBuilder(
-  vals: string[],
-  knownFields: Mapped<string[]>,
-): QueryTarget[] {
-  return vals.reduce((acc: QueryTarget[], v: string) => {
-    const [measurement, ...keys] = v.split('/');
-    const field = keys.join('/');
-    const existing = acc.find((t) => t.measurement === measurement);
-    if (!knownFields[measurement]?.includes(field)) {
-      return acc;
-    }
-    if (existing) {
-      existing.fields.push(field);
-      return acc;
-    }
-    acc.push({ measurement, fields: [field] });
-    return acc;
-  }, []);
 }

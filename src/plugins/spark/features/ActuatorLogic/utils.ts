@@ -1,13 +1,16 @@
 import {
+  ENUM_LABELS_ANALOG_OP,
+  ENUM_LABELS_DIGITAL_OP,
+  ENUM_LABELS_DIGITAL_STATE,
+} from '@/plugins/spark/const';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { tempQty } from '@/utils/quantity';
+import {
   ActuatorLogicBlock,
   AnalogCompare,
   BlockIntfType,
   DigitalCompare,
-} from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
-import { tempQty } from '@/utils/quantity';
-
-import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './const';
+} from 'brewblox-proto/ts';
 import { ExpressionError } from './types';
 
 export const keyCode = (s: string): number => s.charCodeAt(0);
@@ -173,7 +176,9 @@ export function shiftRemainingComparisons(
 }
 
 export function prettyDigital(cmp: DigitalCompare): string {
-  return `${digitalOpTitles[cmp.op]} ${digitalStateTitles[cmp.rhs]}`;
+  return `${ENUM_LABELS_DIGITAL_OP[cmp.op]} ${
+    ENUM_LABELS_DIGITAL_STATE[cmp.rhs]
+  }`;
 }
 
 export function prettyAnalog(
@@ -184,5 +189,5 @@ export function prettyAnalog(
     ? tempQty(cmp.rhs)
     : `${cmp.rhs}%`;
 
-  return `${analogOpTitles[cmp.op]} ${rhs}`;
+  return `${ENUM_LABELS_ANALOG_OP[cmp.op]} ${rhs}`;
 }

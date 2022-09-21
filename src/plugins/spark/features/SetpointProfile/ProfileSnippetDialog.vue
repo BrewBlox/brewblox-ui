@@ -1,13 +1,12 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';
-import { BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
+import { BlockType, SetpointProfileBlock } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 const typeName = BlockType.SetpointProfile;
 
@@ -79,14 +78,16 @@ export default defineComponent({
         },
       })
         .onOk(async () => {
-          block.value.data.start = new Date().getTime() / 1000;
-          block.value.data.points = points;
-          await sparkStore.saveBlock(block.value);
+          await sparkStore.patchBlock(block.value, {
+            points,
+            start: new Date().toISOString(),
+          });
           onDialogOK();
         })
         .onCancel(async () => {
-          block.value.data.points = points;
-          await sparkStore.saveBlock(block.value);
+          await sparkStore.patchBlock(block.value, {
+            points,
+          });
           onDialogOK();
         });
     }
@@ -142,7 +143,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-dialog ref="dialogRef" v-bind="dialogProps" @hide="onDialogHide">
+  <q-dialog
+    ref="dialogRef"
+    v-bind="dialogProps"
+    @hide="onDialogHide"
+  >
     <DialogCard v-bind="{ title, message, html }">
       <q-select
         v-model="selected"
@@ -153,23 +158,38 @@ export default defineComponent({
       >
         <template #no-option>
           <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
+            <q-item-section class="text-grey"> No results </q-item-section>
           </q-item>
         </template>
-        <template v-if="!!selected" #after>
-          <q-btn flat round icon="edit" @click="editSelected">
+        <template
+          v-if="!!selected"
+          #after
+        >
+          <q-btn
+            flat
+            round
+            icon="edit"
+            @click="editSelected"
+          >
             <q-tooltip>Rename profile</q-tooltip>
           </q-btn>
-          <q-btn flat round icon="delete" @click="removeSelected">
+          <q-btn
+            flat
+            round
+            icon="delete"
+            @click="removeSelected"
+          >
             <q-tooltip>Remove profile</q-tooltip>
           </q-btn>
         </template>
       </q-select>
 
       <template #actions>
-        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          @click="onDialogCancel"
+        />
         <q-space />
         <q-btn
           :disable="!selected"
@@ -185,7 +205,12 @@ export default defineComponent({
           label="save"
           @click="saveSelected"
         />
-        <q-btn color="primary" flat label="New" @click="createSnippet" />
+        <q-btn
+          color="primary"
+          flat
+          label="New"
+          @click="createSnippet"
+        />
       </template>
     </DialogCard>
   </q-dialog>

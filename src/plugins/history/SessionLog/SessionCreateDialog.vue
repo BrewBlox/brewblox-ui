@@ -1,14 +1,12 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
-
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
-
-import { emptyGraphConfig } from '../const';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
+import { emptyGraphConfig } from '../utils';
 import SessionSelectField from './SessionSelectField.vue';
 
 export default defineComponent({
@@ -39,7 +37,7 @@ export default defineComponent({
     const example: LoggedSession = {
       id: nanoid(),
       title: 'Example session',
-      date: new Date().getTime(),
+      date: new Date().toISOString(),
       tags: [...props.widgetTags],
       notes: [
         {
@@ -128,7 +126,7 @@ export default defineComponent({
       const session: LoggedSession = {
         id,
         title: sessionTitle.value,
-        date: new Date().getTime(),
+        date: new Date().toISOString(),
         notes: sourceNotes(),
         tags: tags.value,
       };
@@ -185,7 +183,10 @@ export default defineComponent({
         class="tag-select"
         @update:model-value="saveTags"
       >
-        <template v-if="customTags" #append>
+        <template
+          v-if="customTags"
+          #append
+        >
           <q-btn
             icon="mdi-backup-restore"
             flat
@@ -199,8 +200,18 @@ export default defineComponent({
         </template>
       </TagSelectField>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

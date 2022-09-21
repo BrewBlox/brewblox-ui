@@ -25,7 +25,7 @@ variables:
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: '14.x'
+      versionSpec: '16.x'
     displayName: 'Install Node.js'
 
   - bash: |
@@ -40,13 +40,19 @@ steps:
     displayName: Install
 
   - bash: |
-      yarn lint
-      yarn test
-    displayName: Test
+      yarn build
+      du -h dist/
+    displayName: Build
+    env:
+      NODE_OPTIONS: --max_old_space_size=16384
 
   - bash: |
-      yarn build
-    displayName: Build dist
+      yarn lint
+    displayName: Lint
+
+  - bash: |
+      yarn test:ci
+    displayName: Test
 
   - bash: |
       docker run --rm --privileged multiarch/qemu-user-static --reset -p yes

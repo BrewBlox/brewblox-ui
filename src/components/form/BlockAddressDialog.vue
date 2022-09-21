@@ -1,18 +1,14 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import type {
-  Block,
-  BlockAddress,
-  ComparedBlockType,
-} from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import type { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { Block } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
   id: v?.id ?? null,
@@ -195,9 +191,7 @@ export default defineComponent({
         </q-tooltip>
         <template #no-option>
           <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
+            <q-item-section class="text-grey">No results</q-item-section>
           </q-item>
         </template>
         <template #after>
@@ -210,15 +204,32 @@ export default defineComponent({
           >
             <q-tooltip>Show {{ block.id }}</q-tooltip>
           </q-btn>
-          <q-btn v-else flat round disable icon="mdi-launch" />
+          <q-btn
+            v-else
+            flat
+            round
+            disable
+            icon="mdi-launch"
+          />
 
-          <q-btn v-if="creatable" flat round icon="add" @click="createBlock">
+          <q-btn
+            v-if="creatable"
+            flat
+            round
+            icon="add"
+            @click="createBlock"
+          >
             <q-tooltip>Create new block</q-tooltip>
           </q-btn>
         </template>
       </q-select>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!localOk"
           flat

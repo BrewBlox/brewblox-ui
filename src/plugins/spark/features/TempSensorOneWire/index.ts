@@ -1,18 +1,12 @@
-import { Plugin } from 'vue';
-
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  BlockFieldSpec,
-  BlockSpec,
-  BlockType,
-  TempSensorOneWireBlock,
-} from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import { deltaTempQty, tempQty } from '@/utils/quantity';
-
+import { BlockType, TempSensorOneWireBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './TempSensorOneWireWidget.vue';
 
 const type = BlockType.TempSensorOneWire;
@@ -24,7 +18,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<TempSensorOneWireBlock> = {
       type,
-      generate: () => ({
+      generate: (): TempSensorOneWireBlock['data'] => ({
         value: tempQty(20),
         offset: deltaTempQty(0),
         address: '',

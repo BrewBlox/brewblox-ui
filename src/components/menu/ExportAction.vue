@@ -1,8 +1,7 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useWidget } from '@/composables';
 import { saveFile } from '@/utils/import-export';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ExportAction',
@@ -22,7 +21,10 @@ export default defineComponent({
     async function startExport(): Promise<void> {
       const { id, dashboard, pinnedPosition, ...exported } = widget.value;
       void { id, dashboard, pinnedPosition };
-      saveFile(exported, `brewblox-${widget.value.title}-${widget.value.feature}.json`);
+      saveFile(
+        exported,
+        `brewblox-${widget.value.title}-${widget.value.feature}.json`,
+      );
     }
 
     return {
@@ -33,5 +35,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionItem v-bind="{...$attrs, ...$props}" @click="startExport" />
+  <ActionItem
+    v-bind="{ ...$attrs, ...$props }"
+    @click="startExport"
+  />
 </template>

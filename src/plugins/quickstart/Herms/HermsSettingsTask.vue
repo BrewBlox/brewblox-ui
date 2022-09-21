@@ -1,12 +1,15 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
-import { Quantity } from '@/shared-types';
-import { useSystemStore } from '@/store/system';
+import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty, prettyUnit } from '@/utils/formatting';
-import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
-
+import {
+  bloxQty,
+  deltaTempQty,
+  prettyQty,
+  prettyUnit,
+  tempQty,
+} from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { QuickstartAction } from '../types';
 import { HermsConfig, HermsOpts } from './types';
 
@@ -28,8 +31,6 @@ export default defineComponent({
   },
   emits: ['update:config', 'back', 'next', 'close'],
   setup(props, { emit }) {
-    const systemStore = useSystemStore();
-
     const hltFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const bkFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const hltVolume = ref<number>(25);
@@ -38,7 +39,7 @@ export default defineComponent({
     const mashTarget = ref<Quantity>(tempQty(67));
     const mashActual = ref<Quantity>(tempQty(65));
 
-    const userTemp = computed<string>(() => systemStore.units.temperature);
+    const userTemp = computed<string>(() => userUnits.value.temperature);
 
     const hltKp = computed<Quantity>(() =>
       bloxQty(
@@ -195,16 +196,14 @@ export default defineComponent({
       </q-item>
       <q-item>
         <q-item-section>
-          <q-item-label class="text-subtitle1">
-            Mash tun heating
-          </q-item-label>
+          <q-item-label class="text-subtitle1"> Mash tun heating </q-item-label>
           <p>
             To heat the wort in your mash tun, it is pumped through a coil in
             the HLT.
-            <br>
+            <br />
             We don't want to use a static HLT temperature a bit higher than the
             mash tun.
-            <br>
+            <br />
             We can do better than that, by using a third PID to change the HLT
             setpoint dynamically.
           </p>
@@ -286,9 +285,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="done"
+      />
     </template>
   </WizardBody>
 </template>

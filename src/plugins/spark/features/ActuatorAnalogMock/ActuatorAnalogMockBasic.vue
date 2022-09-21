@@ -1,24 +1,19 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
+import { ActuatorAnalogMockBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ActuatorAnalogMockBasic',
   setup() {
-    const {
-      serviceId,
-      block,
-      isDriven,
-      saveBlock,
-    } = useBlockWidget.setup<ActuatorAnalogMockBlock>();
+    const { serviceId, block, isClaimed, patchBlock } =
+      useBlockWidget.setup<ActuatorAnalogMockBlock>();
 
     return {
       serviceId,
       block,
-      isDriven,
-      saveBlock,
+      isClaimed,
+      patchBlock,
     };
   },
 });
@@ -30,14 +25,16 @@ export default defineComponent({
 
     <div class="widget-body row">
       <SliderField
-        :model-value="block.data.setting"
-        :readonly="isDriven"
+        :model-value="block.data.storedSetting"
+        :readonly="isClaimed"
         title="Analog actuator Setting"
         label="Setting"
         tag="big"
         class="col-grow"
-        :tag-class="{'text-orange': block.data.setting !== block.data.desiredSetting}"
-        @update:model-value="v => { block.data.desiredSetting = v; saveBlock(); }"
+        :tag-class="{
+          'text-orange': block.data.desiredSetting !== block.data.storedSetting,
+        }"
+        @update:model-value="(v) => patchBlock({ storedSetting: v })"
       />
       <LabeledField
         :model-value="block.data.value"
@@ -47,7 +44,7 @@ export default defineComponent({
         class="col-grow"
       />
       <div class="col-break" />
-      <DrivenIndicator
+      <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"
@@ -57,7 +54,7 @@ export default defineComponent({
         :service-id="serviceId"
         type="analog"
         class="col-grow"
-        @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
+        @update:model-value="(v) => patchBlock({ constrainedBy: v })"
       />
     </div>
   </div>

@@ -1,13 +1,6 @@
+import { BloxField, Link, Quantity } from 'brewblox-proto/ts';
 import LibQty from 'js-quantities';
 import isString from 'lodash/isString';
-
-import {
-  BloxField,
-  DefinedLink,
-  DefinedQuantity,
-  Link,
-  Quantity,
-} from '@/shared-types';
 
 interface UnitGroup {
   name: string;
@@ -93,13 +86,14 @@ export const isBloxField = (obj: unknown): obj is BloxField =>
 export const isQuantity = (obj: unknown): obj is Quantity =>
   isBloxField(obj) && obj.__bloxtype === 'Quantity';
 
-export const isDefinedQuantity = (obj: unknown): obj is DefinedQuantity =>
-  isQuantity(obj) && isFinite(obj.value!);
+export const isDefinedQuantity = (
+  obj: unknown,
+): obj is DeepNonNullable<Quantity> => isQuantity(obj) && isFinite(obj.value!);
 
 export const isLink = (obj: unknown): obj is Link =>
   isBloxField(obj) && obj.__bloxtype === 'Link';
 
-export const isDefinedLink = (obj: unknown): obj is DefinedLink =>
+export const isDefinedLink = (obj: unknown): obj is DeepNonNullable<Link> =>
   isLink(obj) && obj.id != null && obj.type != null;
 
 export const isDurationString = (v: unknown): v is string =>

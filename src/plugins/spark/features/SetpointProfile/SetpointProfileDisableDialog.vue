@@ -1,18 +1,17 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { calculateProfileValues } from '@/plugins/spark/utils';
+import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/objects';
+import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 import {
   Quantity,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
-} from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
-import { prettyUnit } from '@/utils/formatting';
-import { deepCopy } from '@/utils/objects';
-import { bloxQty, tempQty } from '@/utils/quantity';
+  SettingMode,
+} from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'SetpointProfileDisableDialog',
@@ -39,8 +38,7 @@ export default defineComponent({
     );
 
     if (!setpoint) {
-      profile.data.enabled = false;
-      sparkStore.saveBlock(profile);
+      sparkStore.patchBlock(profile, { enabled: false });
       onDialogOK();
     }
 
@@ -65,14 +63,15 @@ export default defineComponent({
       }).onOk((v) => (setpointSetting.value.value = v));
     }
 
-    function confirm(): void {
-      if (setpoint) {
-        sparkStore.modifyBlock(setpoint, (block) => {
-          block.data.settingEnabled = setpointEnabled.value;
-          block.data.storedSetting = setpointSetting.value;
-        });
-      }
-      sparkStore.modifyBlock(profile, (block) => (block.data.enabled = false));
+    async function confirm(): Promise<void> {
+      await sparkStore.patchBlock(profile, {
+        enabled: false,
+      });
+      await sparkStore.patchBlock(setpoint, {
+        enabled: setpointEnabled.value,
+        storedSetting: setpointSetting.value,
+        settingMode: SettingMode.STORED,
+      });
       onDialogOK();
     }
 
@@ -100,13 +99,13 @@ export default defineComponent({
     @keyup.enter="confirm"
   >
     <DialogCard v-bind="{ title, message, html }">
-      <template #title>
-        Desired Setpoint settings
-      </template>
+      <template #title> Desired Setpoint settings </template>
       <template #message>
-        Your Setpoint Profile will now stop driving the Setpoint. <br>
-        <br>
-        Please confirm the new settings for <i>{{ setpointId }}</i>.
+        Your Setpoint Profile will now release its claim on
+        <i> {{ setpointId }} </i>.
+        <br />
+        <br />
+        Please confirm the new settings for <i> {{ setpointId }} </i>.
       </template>
 
       <q-toggle
@@ -131,8 +130,18 @@ export default defineComponent({
       </q-input>
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="confirm" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="confirm"
+        />
       </template>
     </DialogCard>
   </q-dialog>

@@ -1,23 +1,19 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  ActuatorPwmBlock,
-  AnalogConstraintsObj,
-  BlockFieldSpec,
-  BlockIntfType,
-  BlockSpec,
-  BlockType,
-} from '@/plugins/spark/types';
-import {
-  blockWidgetSelector,
-  prettifyConstraints,
-} from '@/plugins/spark/utils';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, durationString } from '@/utils/quantity';
-
+import {
+  ActuatorPwmBlock,
+  AnalogConstraintsObj,
+  BlockIntfType,
+  BlockType,
+  SettingMode,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './ActuatorPwmWidget.vue';
 
 const type = BlockType.ActuatorPwm;
@@ -29,27 +25,25 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorPwmBlock> = {
       type,
-      generate: () => ({
+      generate: (): ActuatorPwmBlock['data'] => ({
         actuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
-        drivenActuatorId: bloxLink(
-          null,
-          BlockIntfType.ActuatorDigitalInterface,
-          true,
-        ),
         period: bloxQty('4s'),
+        storedSetting: 0,
         desiredSetting: 0,
         setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
         enabled: true,
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorPwmBlock>[] = [
       {
         type,
-        key: 'desiredSetting',
-        title: 'Duty Setting',
+        key: 'storedSetting',
+        title: 'Stored duty setting',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',
@@ -86,8 +80,18 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'desiredSetting',
+        title: 'Desired duty setting',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: '0-100',
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'setting',
-        title: 'Duty Setting',
+        title: 'Duty setting',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',
@@ -97,7 +101,7 @@ const plugin: Plugin = {
       {
         type,
         key: 'value',
-        title: 'Duty Achieved',
+        title: 'Duty achieved',
         component: 'NumberValEdit',
         generate: () => 0,
         valueHint: '0-100',

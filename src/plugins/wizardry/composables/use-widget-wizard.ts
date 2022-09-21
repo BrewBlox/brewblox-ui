@@ -1,8 +1,6 @@
+import { useFeatureStore } from '@/store/features';
 import { nanoid } from 'nanoid';
 import { PropType } from 'vue';
-
-import { useFeatureStore } from '@/store/features';
-
 import {
   useWizard,
   UseWizardComponent,

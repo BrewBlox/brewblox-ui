@@ -1,8 +1,6 @@
 <script lang="ts">
+import { clampRotation } from '@/utils/quantity';
 import { defineComponent, PropType } from 'vue';
-
-import { clampRotation } from '@/utils/formatting';
-
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -13,10 +11,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:part',
-    'remove:part',
-  ],
+  emits: ['update:part', 'remove:part'],
   setup(props, { emit }) {
     function rotate(rotation: number): void {
       const rotate = clampRotation(props.part.rotate + rotation);

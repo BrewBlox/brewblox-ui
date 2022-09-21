@@ -1,5 +1,5 @@
 import { mqttTopicExp } from '@/utils/misc';
-
+import { describe, expect, it } from 'vitest';
 
 describe('MQTT helpers', () => {
   it('mqttTopicExp()', () => {

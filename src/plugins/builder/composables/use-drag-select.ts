@@ -1,7 +1,5 @@
-import { Ref, ref } from 'vue';
-
 import { rotatedSize } from '@/utils/coordinates';
-
+import { Ref, ref } from 'vue';
 import { SQUARE_SIZE } from '../const';
 import { FlowPart } from '../types';
 
@@ -53,8 +51,7 @@ export const useDragSelect: UseDragSelectComposable = {
         selectAreaRef.value.setAttribute('y', `${startY}`);
         selectAreaRef.value.setAttribute('width', `${endX - startX}`);
         selectAreaRef.value.setAttribute('height', `${endY - startY}`);
-      }
-      else {
+      } else {
         selectAreaRef.value.setAttribute('width', '0');
         selectAreaRef.value.setAttribute('height', '0');
       }
@@ -89,17 +86,19 @@ export const useDragSelect: UseDragSelectComposable = {
       const endX = area.endX / SQUARE_SIZE;
       const endY = area.endY / SQUARE_SIZE;
 
-      return part => {
+      return (part) => {
         // Part X/Y position is always in the top left corner,
         // but rotation will impact the end coordinates for non-square parts
         // We can ignore flipping, as all parts are rectangular
         const [sizeX, sizeY] = rotatedSize(part.rotate, part.size);
 
         // The selection must touch all squares occupied by the part
-        return startX <= part.x + 1
-          && startY <= part.y + 1
-          && endX >= part.x + sizeX - 1
-          && endY >= part.y + sizeY - 1;
+        return (
+          startX <= part.x + 1 &&
+          startY <= part.y + 1 &&
+          endX >= part.x + sizeX - 1 &&
+          endY >= part.y + sizeY - 1
+        );
       };
     }
 

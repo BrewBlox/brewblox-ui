@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineComponent, PropType, reactive } from 'vue';
-
 import { GpioChange } from '../types';
 import { FridgeConfig } from './types';
 
@@ -34,9 +33,7 @@ export default defineComponent({
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
-          <q-item-label class="text-subtitle1">
-            Output channels
-          </q-item-label>
+          <q-item-label class="text-subtitle1"> Output channels </q-item-label>
         </q-item-section>
       </q-item>
       <q-item class="text-weight-light">
@@ -66,9 +63,18 @@ export default defineComponent({
       <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Next" color="primary" @click="taskDone" />
+      <q-btn
+        unelevated
+        label="Next"
+        color="primary"
+        @click="taskDone"
+      />
     </template>
   </WizardBody>
 </template>

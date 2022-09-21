@@ -1,19 +1,17 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
 import {
   BlockIntfType,
   DigitalActuatorBlock,
   DS2408Block,
   DS2408ConnectMode,
   MotorValveBlock,
-} from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
-import { createDialog } from '@/utils/dialog';
-
-import { useSparkStore } from '../../store';
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 const connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
   { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },
@@ -25,7 +23,8 @@ export default defineComponent({
   setup() {
     const sparkStore = useSparkStore();
     const { context } = useContext.setup();
-    const { serviceId, block, saveBlock } = useBlockWidget.setup<DS2408Block>();
+    const { serviceId, block, patchBlock } =
+      useBlockWidget.setup<DS2408Block>();
 
     const valveMode = computed<boolean>(
       () => block.value.data.connectMode === DS2408ConnectMode.CONNECT_VALVE,
@@ -55,17 +54,16 @@ export default defineComponent({
             message,
             saveFunc: () =>
               linked.forEach((block) => {
-                block.data.hwDevice.id = null;
-                sparkStore.saveBlock(block);
+                sparkStore.patchBlock(block, {
+                  hwDevice: { ...block.data.hwDevice, id: null },
+                });
               }),
           },
         }).onOk(() => {
-          block.value.data.connectMode = mode;
-          saveBlock();
+          patchBlock({ connectMode: mode });
         });
       } else {
-        block.value.data.connectMode = mode;
-        saveBlock();
+        patchBlock({ connectMode: mode });
       }
     }
 
@@ -73,7 +71,7 @@ export default defineComponent({
       connectModeOpts,
       context,
       block,
-      saveBlock,
+      patchBlock,
       valveMode,
       setConnectMode,
     };
@@ -89,9 +87,7 @@ export default defineComponent({
 
     <div>
       <CardWarning v-if="!block.data.connected">
-        <template #message>
-          DS2408 is not connected
-        </template>
+        <template #message> DS2408 is not connected </template>
       </CardWarning>
       <div class="column">
         <q-btn-toggle
@@ -119,12 +115,7 @@ export default defineComponent({
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.address = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ address: v })"
           />
         </div>
       </template>

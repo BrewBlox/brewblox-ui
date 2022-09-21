@@ -1,31 +1,20 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import {
-  Block,
-  PidBlock,
-  SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { isBlockDriven } from '@/plugins/spark/utils';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { fixedNumber, prettyQty } from '@/utils/formatting';
-
-import { useSparkStore } from '../../store';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { fixedNumber, prettyQty } from '@/utils/quantity';
+import { Block, PidBlock, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'PidBasic',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, blockId, block, saveBlock } =
-      useBlockWidget.setup<PidBlock>();
+    const { serviceId, blockId, block } = useBlockWidget.setup<PidBlock>();
 
     const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
       sparkStore.blockByLink(serviceId, block.value.data.inputId),
-    );
-
-    const inputDriven = computed<boolean>(() =>
-      isBlockDriven(inputBlock.value),
     );
 
     const outputBlock = computed<Block | null>(() =>
@@ -36,11 +25,6 @@ export default defineComponent({
 
     function fit(v: number): number {
       return Math.min(v, 100);
-    }
-
-    function enable(): void {
-      block.value.data.enabled = true;
-      saveBlock();
     }
 
     function showInput(): void {
@@ -54,7 +38,7 @@ export default defineComponent({
 
       const setpointId = inputBlock.value.id;
       const setpointChain = sparkStore
-        .driveChainsByService(serviceId)
+        .claimsByService(serviceId)
         .find((chain) => chain.target === setpointId);
 
       if (setpointChain) {
@@ -88,13 +72,10 @@ export default defineComponent({
       prettyQty,
       fixedNumber,
       block,
-      saveBlock,
       inputBlock,
-      inputDriven,
       outputBlock,
       kp,
       fit,
-      enable,
       showInput,
       editInput,
       showOutput,
@@ -108,12 +89,17 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
-      <SettingValueField editable class="col-grow" @click="editInput">
-        <template #header>
-          Input
-        </template>
+      <SettingValueField
+        editable
+        class="col-grow"
+        @click="editInput"
+      >
+        <template #header> Input </template>
         <template #valueIcon>
-          <q-icon name="mdi-thermometer" color="green-3" />
+          <q-icon
+            name="mdi-thermometer"
+            color="green-3"
+          />
         </template>
         <template #value>
           {{ prettyQty(block.data.inputValue) }}
@@ -122,12 +108,17 @@ export default defineComponent({
           {{ prettyQty(block.data.inputSetting) }}
         </template>
       </SettingValueField>
-      <SettingValueField editable class="col-grow" @click="showOutput">
-        <template #header>
-          Output
-        </template>
+      <SettingValueField
+        editable
+        class="col-grow"
+        @click="showOutput"
+      >
+        <template #header> Output </template>
         <template #valueIcon>
-          <q-icon v-if="kp === null" name="mdi-calculator-variant" />
+          <q-icon
+            v-if="kp === null"
+            name="mdi-calculator-variant"
+          />
           <HeatingIcon
             v-else-if="kp > 0"
             color="red"
@@ -150,9 +141,7 @@ export default defineComponent({
       <div class="col-break" />
 
       <div class="col row no-wrap q-gutter-x-sm q-mr-md">
-        <div class="col-auto self-center text-bold">
-          P
-        </div>
+        <div class="col-auto self-center text-bold">P</div>
         <q-slider
           :model-value="fit(block.data.p)"
           readonly
@@ -160,9 +149,7 @@ export default defineComponent({
           thumb-path=""
         />
 
-        <div class="col-auto self-center text-bold">
-          I
-        </div>
+        <div class="col-auto self-center text-bold">I</div>
         <q-slider
           :model-value="fit(block.data.i)"
           :max="100"
@@ -171,9 +158,7 @@ export default defineComponent({
           thumb-path=""
         />
 
-        <div class="col-auto self-center text-bold">
-          D
-        </div>
+        <div class="col-auto self-center text-bold">D</div>
         <q-slider
           :model-value="fit(block.data.d)"
           :max="100"

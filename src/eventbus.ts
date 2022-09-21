@@ -1,10 +1,11 @@
-import mqtt from 'mqtt';
-import { nanoid } from 'nanoid';
-
+// import mqtt from 'mqtt';
 import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';
 import { popById } from '@/utils/collections';
 import { mqttTopicExp } from '@/utils/misc';
 import { notify } from '@/utils/notify';
+import * as mqtt from 'mqtt/dist/mqtt.min';
+import { nanoid } from 'nanoid';
+import { Ref, ref } from 'vue';
 
 export type EventCallback = (topic: string, evt: any) => unknown;
 
@@ -19,6 +20,7 @@ export class BrewbloxEventbus {
   private client: mqtt.MqttClient | null = null;
   private topics: Set<string> = new Set();
   private listeners: EventListener[] = [];
+  public readonly connected: Ref<boolean> = ref(false);
 
   public async connect(): Promise<void> {
     const opts: mqtt.IClientOptions = {
@@ -28,15 +30,19 @@ export class BrewbloxEventbus {
       path: '/eventbus',
       rejectUnauthorized: false,
     };
-    const client = mqtt.connect(undefined, opts);
+    const client = mqtt.connect(opts);
     this.client = client;
     this.checkIOSBug();
 
-    client.on('error', e => {
+    client.on('error', (e) => {
       notify.error(`mqtt error: ${e}`);
     });
     client.on('connect', () => {
-      this.topics.forEach(topic => client.subscribe(topic));
+      this.topics.forEach((topic) => client.subscribe(topic));
+      this.connected.value = true;
+    });
+    client.on('close', () => {
+      this.connected.value = false;
     });
     client.on('message', (topic, body: Buffer) => {
       if (body.length === 0) {
@@ -44,17 +50,19 @@ export class BrewbloxEventbus {
       }
       const data = JSON.parse(body.toString());
       this.listeners
-        .filter(listener => listener.exp.test(topic))
-        .forEach(listener => listener.callback(topic, data));
+        .filter((listener) => listener.exp.test(topic))
+        .forEach((listener) => listener.callback(topic, data));
     });
   }
 
   private checkIOSBug(): void {
     if (IS_IOS && WS_PROTOCOL === 'wss') {
       setTimeout(
-        () => this.client?.connected || notify.error({
-          timeout: 0,
-          message: `
+        () =>
+          this.client?.connected ||
+          notify.error({
+            timeout: 0,
+            message: `
           Failed to connect to the eventbus.
           <a
             href="https://brewblox.netlify.app/user/troubleshooting.html#known-issues-workarounds"
@@ -64,20 +72,21 @@ export class BrewbloxEventbus {
             This may be caused by an iOS bug.
           </a>
           `,
-          html: true,
-          actions: [
-            {
-              label: 'Dismiss',
-              textColor: 'white',
-            },
-            {
-              label: 'Switch to HTTP',
-              textColor: 'white',
-              handler: () => location.protocol = 'http:',
-            },
-          ],
-        }),
-        5000);
+            html: true,
+            actions: [
+              {
+                label: 'Dismiss',
+                textColor: 'white',
+              },
+              {
+                label: 'Switch to HTTP',
+                textColor: 'white',
+                handler: () => (location.protocol = 'http:'),
+              },
+            ],
+          }),
+        5000,
+      );
     }
   }
 

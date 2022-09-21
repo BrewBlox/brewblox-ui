@@ -1,8 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
-
+import { dateString } from '@/utils/quantity';
+import { computed, defineComponent, PropType } from 'vue';
 import { LoggedSession } from '../types';
 import SessionHeaderDialog from './SessionHeaderDialog.vue';
 
@@ -14,13 +13,9 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:session',
-  ],
+  emits: ['update:session'],
   setup(props, { emit }) {
-    const tags = computed<string[]>(
-      () => props.session.tags ?? [],
-    );
+    const tags = computed<string[]>(() => props.session.tags ?? []);
 
     function showDialog(): void {
       createDialog({
@@ -29,11 +24,11 @@ export default defineComponent({
           modelValue: props.session,
           title: 'Edit session',
         },
-      })
-        .onOk(v => emit('update:session', v));
+      }).onOk((v) => emit('update:session', v));
     }
 
     return {
+      dateString,
       tags,
       showDialog,
     };
@@ -52,7 +47,10 @@ export default defineComponent({
       anchor="bottom right"
       self="top right"
     >
-      <div class="row wrap q-gutter-xs" style="max-width: 350px">
+      <div
+        class="row wrap q-gutter-xs"
+        style="max-width: 350px"
+      >
         <q-badge
           v-for="tag in tags"
           :key="`tag--${tag}`"
@@ -62,12 +60,15 @@ export default defineComponent({
         </q-badge>
       </div>
     </q-tooltip>
-    <div class="col-auto text-italic text-bold" style="font-size: 120%">
+    <div
+      class="col-auto text-italic text-bold"
+      style="font-size: 120%"
+    >
       {{ session.title }}
     </div>
     <q-space />
     <div class="col-auto">
-      {{ new Date(session.date).toLocaleString() }}
+      {{ dateString(session.date) }}
     </div>
   </div>
 </template>

@@ -1,9 +1,8 @@
 <script lang="ts">
+import { useField } from '@/composables';
+import { fixedNumber } from '@/utils/quantity';
 import { QField } from 'quasar';
 import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
-
-import { useField } from '@/composables';
-import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'LabeledField',
@@ -30,26 +29,22 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    'click',
-  ],
+  emits: ['click'],
   setup(props, { slots, emit }) {
     const fieldRef = ref<QField>();
     const { activeSlots } = useField.setup();
 
-    const displayValue = computed<string>(
-      () => {
-        if (slots.control || slots.default) {
-          return ''; // parent has custom implementation
-        }
-        if (props.modelValue == null || props.modelValue === '') {
-          return '<not set>';
-        }
-        return props.number
-          ? fixedNumber(props.modelValue, props.decimals)
-          : `${props.modelValue}`;
-      },
-    );
+    const displayValue = computed<string>(() => {
+      if (slots.control || slots.default) {
+        return ''; // parent has custom implementation
+      }
+      if (props.modelValue == null || props.modelValue === '') {
+        return '<not set>';
+      }
+      return props.number
+        ? fixedNumber(props.modelValue, props.decimals)
+        : `${props.modelValue}`;
+    });
 
     onMounted(() => {
       if (fieldRef.value) {
@@ -93,12 +88,20 @@ export default defineComponent({
           <slot>
             {{ displayValue }}
           </slot>
-          <small v-if="!!suffix" class="q-ml-xs darkish">{{ suffix }}</small>
+          <small
+            v-if="!!suffix"
+            class="q-ml-xs darkish"
+          >
+            {{ suffix }}
+          </small>
         </component>
       </slot>
     </template>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
 

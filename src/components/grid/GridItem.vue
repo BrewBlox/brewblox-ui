@@ -1,11 +1,9 @@
 <script lang="ts">
+import { useWidgetStore, Widget } from '@/store/widgets';
+import { deepCopy } from '@/utils/objects';
 import clamp from 'lodash/clamp';
 import debounce from 'lodash/debounce';
 import { computed, defineComponent, ref, watch } from 'vue';
-
-import { useWidgetStore, Widget } from '@/store/widgets';
-import { deepCopy } from '@/utils/objects';
-
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE, MIN_COLS, MIN_ROWS } from './const';
 
 const MAX_TICK_DELTA = 15;
@@ -83,6 +81,7 @@ export default defineComponent({
         }`,
         gridColumnEnd: `span ${currentCols.value || cols}`,
         gridRowEnd: `span ${currentRows.value || rows}`,
+        border: props.editable ? '1px solid silver' : '',
       };
     });
 
@@ -383,7 +382,10 @@ export default defineComponent({
       v-touch-pan.mouse="resizePanHandler"
       class="grid-item-resize-handle"
     >
-      <q-icon name="mdi-resize-bottom-right" size="30px" />
+      <q-icon
+        name="mdi-resize-bottom-right"
+        size="30px"
+      />
     </button>
     <!-- Item drag button -->
     <button
@@ -392,7 +394,10 @@ export default defineComponent({
       class="grid-item-move-handle grid-item-movable"
     >
       <div class="column q-gutter-sm items-center">
-        <q-icon name="mdi-gesture-swipe-horizontal" size="50px" />
+        <q-icon
+          name="mdi-gesture-swipe-horizontal"
+          size="50px"
+        />
         <div>Drag to reposition</div>
         <q-btn
           :icon="localWidget.pinnedPosition ? 'mdi-pin' : undefined"
@@ -409,7 +414,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .grid-item
   position: relative
 

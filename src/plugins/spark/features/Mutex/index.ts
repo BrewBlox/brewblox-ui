@@ -1,12 +1,11 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType, MutexBlock } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxQty } from '@/utils/quantity';
-
+import { BlockType, MutexBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './MutexWidget.vue';
 
 const type = BlockType.Mutex;
@@ -18,8 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MutexBlock> = {
       type,
-      generate: () => ({
-        differentActuatorWait: bloxQty('0s'),
+      generate: (): MutexBlock['data'] => ({
         waitRemaining: bloxQty('0s'),
       }),
     };

@@ -1,21 +1,22 @@
 <script lang="ts">
-import { computed, defineComponent, watch } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useBuilderStore } from '@/plugins/builder/store';
-import { useSystemStore } from '@/store/system';
+import { startupDone } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { computed, defineComponent, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { BuilderLayout } from './types';
+
+const sorter = makeObjectSorter<BuilderLayout>('title');
 
 export default defineComponent({
   name: 'IndexPage',
   setup() {
-    const systemStore = useSystemStore();
     const builderStore = useBuilderStore();
     const router = useRouter();
 
     const builderPage = computed<string | null>(() => {
-      if (!systemStore.startupDone) {
+      if (!startupDone.value) {
         return null;
       }
 
@@ -24,9 +25,8 @@ export default defineComponent({
       }
 
       const layout =
-        null ??
         builderStore.layoutById(builderStore.lastLayoutId) ??
-        [...builderStore.layouts].sort(makeObjectSorter('order'))[0] ??
+        [...builderStore.layouts].sort(sorter)[0] ??
         null;
 
       return layout ? `/builder/${layout.id}` : null;

@@ -1,8 +1,7 @@
 import { BuilderLayout } from '@/plugins/builder/types';
-import { Block } from '@/plugins/spark/types';
 import { DisplayOpts } from '@/plugins/spark/types';
-import { GpioModuleChannel, PidBlock } from '@/shared-types';
 import { Widget } from '@/store/widgets';
+import { Block, GpioModuleChannel, PidBlock } from 'brewblox-proto/ts';
 
 export interface IoChannelAddress {
   blockId: string;
@@ -14,6 +13,11 @@ export interface GpioChange {
   blockId: string;
   modulePosition: number;
   channels: GpioModuleChannel[];
+}
+
+export interface QuickstartPatch<T extends Block> {
+  blockId: string;
+  patch: Partial<T['data']>;
 }
 
 export interface DisplayBlock {
@@ -31,7 +35,7 @@ export interface QuickstartConfig {
   widgets: Widget[];
   changedGpio: GpioChange[];
   createdBlocks: Block[];
-  changedBlocks: Block[];
+  changedBlocks: QuickstartPatch<Block>[];
   renamedBlocks: { [old: string]: string };
   displayedBlocks: DisplayBlock[];
 }

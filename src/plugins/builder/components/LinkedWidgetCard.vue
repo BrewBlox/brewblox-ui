@@ -1,10 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { makeObjectSorter } from '@/utils/functional';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -91,9 +89,7 @@ export default defineComponent({
   >
     <template #no-option>
       <q-item>
-        <q-item-section class="text-grey">
-          No results
-        </q-item-section>
+        <q-item-section class="text-grey"> No results </q-item-section>
       </q-item>
     </template>
     <template #error>

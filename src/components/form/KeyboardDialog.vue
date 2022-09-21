@@ -1,21 +1,12 @@
 <script lang="ts">
-import 'simple-keyboard/build/css/index.css';
-
-import Keyboard from 'simple-keyboard';
-import KeyboardLayouts from 'simple-keyboard-layouts';
-import {
-  computed,
-  defineComponent,
-  nextTick,
-  onMounted,
-  PropType,
-  ref,
-} from 'vue';
-
 import { useDialog } from '@/composables';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { isDurationString } from '@/utils/identity';
 import { makeRuleValidator } from '@/utils/rules';
+import Keyboard from 'simple-keyboard';
+import KeyboardLayouts from 'simple-keyboard-layouts';
+import 'simple-keyboard/build/css/index.css';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 type BoardType = 'text' | 'number' | 'duration';
 
@@ -66,10 +57,10 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const systemStore = useSystemStore();
     const { dialogProps, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
 
+    const keyboardElementRef = ref<HTMLElement | null>(null);
     const keyboard = ref<Keyboard | null>(null);
     const local = ref<string>(`${props.modelValue ?? ''}`);
 
@@ -92,7 +83,7 @@ export default defineComponent({
         return custom;
       }
       const layouts = new KeyboardLayouts();
-      const layoutName = systemStore.config.keyboardLayout;
+      const layoutName = userUISettings.value.keyboardLayout;
       return layouts.get(layoutName);
     }
 
@@ -137,26 +128,28 @@ export default defineComponent({
       }
     }
 
-    onMounted(async () => {
-      await nextTick();
-      keyboard.value = new Keyboard({
-        onChange,
-        onKeyPress,
-        theme: 'hg-theme-default keyboard-theme-brewblox',
-        layout: findLayout(),
-        newLineOnEnter: true,
-        display: {
-          '{bksp}': '⌫',
-          '{enter}': 'Enter',
-          '{tab}': 'tab ⇥',
-          '{lock}': 'Caps Lock',
-          '{shift}': '⇧',
-          '{space}': ' ',
-          '{esc}': '⊗',
-        },
-        buttonTheme: [{ buttons: '-', class: 'text-h5' }],
-      });
-      keyboard.value.setInput(local.value);
+    const onWatcherDone = watch(keyboardElementRef, (el) => {
+      if (el) {
+        keyboard.value = new Keyboard(el, {
+          onChange,
+          onKeyPress,
+          theme: 'hg-theme-default keyboard-theme-brewblox',
+          newLineOnEnter: true,
+          display: {
+            '{bksp}': '⌫',
+            '{enter}': 'Enter',
+            '{tab}': 'tab ⇥',
+            '{lock}': 'Caps Lock',
+            '{shift}': '⇧',
+            '{space}': ' ',
+            '{esc}': '⊗',
+          },
+          buttonTheme: [{ buttons: '-', class: 'text-h5' }],
+          ...findLayout(),
+        });
+        keyboard.value.setInput(local.value);
+        onWatcherDone();
+      }
     });
 
     return {
@@ -164,6 +157,7 @@ export default defineComponent({
       dialogProps,
       onDialogHide,
       onDialogCancel,
+      keyboardElementRef,
       keyboard,
       local,
       lockActive,
@@ -214,9 +208,17 @@ export default defineComponent({
           />
         </template>
       </q-input>
-      <div class="simple-keyboard" />
+      <div
+        ref="keyboardElementRef"
+        class="simple-keyboard"
+      />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!valid"
           flat
@@ -242,6 +244,7 @@ export default defineComponent({
 
 .simple-keyboard
   max-width: 850px
+  margin: 0
 
   &.keyboard-theme-brewblox
     background-color: $dark

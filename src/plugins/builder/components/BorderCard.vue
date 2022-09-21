@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -27,5 +26,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <ToggleCard v-bind="{...$attrs, ...$props}" />
+  <ToggleCard v-bind="{ ...$attrs, ...$props }" />
 </template>

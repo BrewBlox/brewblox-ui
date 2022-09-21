@@ -1,18 +1,17 @@
 <script lang="ts">
-import DOMPurify from 'dompurify';
-import { marked } from 'marked';
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
-
+import { dateString } from '@/utils/quantity';
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
+import { computed, defineComponent } from 'vue';
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
-import { saveGraphToFile, selectGraphPrecision } from '../utils';
+import { selectGraphPrecision } from '../utils';
 import SessionCreateDialog from './SessionCreateDialog.vue';
 import SessionLoadDialog from './SessionLoadDialog.vue';
 import SessionLogBasic from './SessionLogBasic.vue';
@@ -33,7 +32,7 @@ export default defineComponent({
     const historyStore = useHistoryStore();
     const dashboardStore = useDashboardStore();
     const { context } = useContext.setup();
-    const { widget, config, saveConfig } = useWidget.setup<SessionLogWidget>();
+    const { widget, config, patchConfig } = useWidget.setup<SessionLogWidget>();
 
     const sessions = computed<LoggedSession[]>(() => historyStore.sessions);
 
@@ -60,8 +59,7 @@ export default defineComponent({
           ],
         },
       }).onOk((session: LoggedSession) => {
-        config.value.currentSession = session.id;
-        saveConfig();
+        patchConfig({ currentSession: session.id });
       });
     }
 
@@ -72,18 +70,12 @@ export default defineComponent({
           title: 'Open existing session',
         },
       }).onOk((session: LoggedSession) => {
-        config.value.currentSession = session?.id ?? null;
-        saveConfig();
+        patchConfig({ currentSession: session?.id ?? null });
       });
     }
 
     function exitSession(): void {
-      config.value.currentSession = null;
-      saveConfig();
-    }
-
-    function renderDate(date: number | null): string {
-      return date !== null ? new Date(date).toLocaleString() : '??';
+      patchConfig({ currentSession: null });
     }
 
     function* sessionLines(): Generator<string, void, unknown> {
@@ -95,7 +87,7 @@ export default defineComponent({
           yield note.value;
         }
         if (note.type === 'Graph') {
-          yield `${renderDate(note.start)} - ${renderDate(note.end)}`;
+          yield `${dateString(note.start)} - ${dateString(note.end)}`;
           yield '';
           for (const annotation of note.config.layout?.annotations ?? []) {
             yield `${annotation.x} :: ${annotation.text}`;
@@ -110,7 +102,7 @@ export default defineComponent({
       if (session.value === null) {
         return;
       }
-      const name = `${widget.value.title} ${session.value.title} ${renderDate(
+      const name = `${widget.value.title} ${session.value.title} ${dateString(
         session.value.date,
       )}`;
       const lines: string[] = [name, ...sessionLines()];
@@ -125,10 +117,10 @@ export default defineComponent({
       if (session.value === null) {
         return;
       }
-      const sessionDate = renderDate(session.value.date);
+      const sessionDate = dateString(session.value.date);
       const validNotes = notes.value
         .filter(graphFilter)
-        .filter((v) => v.config.targets.length);
+        .filter((v) => v.config.fields.length);
 
       if (!validNotes.length) {
         notify.warn('No valid graph notes found');
@@ -143,7 +135,7 @@ export default defineComponent({
       notify.info('Generating CSV... This may take a few seconds.');
 
       for (const note of validNotes) {
-        await saveGraphToFile(
+        await historyStore.downloadGraphCsv(
           note.config,
           precision,
           `${session.value.title}__${note.title}__${sessionDate}`,
@@ -175,9 +167,10 @@ export default defineComponent({
           message: `Do you want remove session '${activeSession.title}'?`,
         },
       }).onOk(() => {
-        config.value.currentSession =
-          sessions.value.find((s) => s.id !== activeSession?.id)?.id ?? null;
-        saveConfig();
+        const active = sessions.value.find((s) => s.id !== activeSession?.id);
+        patchConfig({
+          currentSession: active?.id ?? null,
+        });
         historyStore.removeSession(activeSession);
       });
     }
@@ -244,7 +237,10 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
     <component :is="context.mode">
-      <template v-if="session === null" #warnings>
+      <template
+        v-if="session === null"
+        #warnings
+      >
         <div class="column">
           <div class="text-italic text-h6 q-pa-md darkened text-center">
             Open or create a session to get started.

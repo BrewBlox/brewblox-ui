@@ -1,23 +1,21 @@
 <script lang="ts">
-import { defineComponent, PropType, ref, watch } from 'vue';
-
-import { digitalConstraintLabels } from '@/plugins/spark/const';
-import { useSparkStore } from '@/plugins/spark/store';
-import type {
-  DigitalConstraint,
-  DigitalConstraintKey,
-  DigitalConstraintsObj,
-  MutexedConstraint,
-} from '@/plugins/spark/types';
-import { BlockType, MutexBlock, Quantity } from '@/plugins/spark/types';
+import { ENUM_LABELS_DIGITAL_CONSTRAINT } from '@/plugins/spark/const';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty } from '@/utils/quantity';
+import {
+  BlockType,
+  DigitalConstraint,
+  DigitalConstraintKey,
+  DigitalConstraintsObj,
+  MutexedConstraint,
+  Quantity,
+} from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref, watch } from 'vue';
 
-const constraintOpts: SelectOption[] = Object.entries(
-  digitalConstraintLabels,
-).map(([k, v]) => ({ value: k, label: v }));
+const constraintOpts = selectable(ENUM_LABELS_DIGITAL_CONSTRAINT);
 
 const defaultValues: Record<DigitalConstraintKey, DigitalConstraint> = {
   minOff: {
@@ -40,7 +38,6 @@ const defaultValues: Record<DigitalConstraintKey, DigitalConstraint> = {
     remaining: bloxQty('0s'),
     mutexed: {
       mutexId: bloxLink(null, BlockType.Mutex),
-      hasCustomHoldTime: false,
       extraHoldTime: bloxQty('0s'),
       hasLock: false,
     },
@@ -61,7 +58,6 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const sparkStore = useSparkStore();
     const constraints = ref<DigitalConstraint[]>([]);
 
     watch(
@@ -74,22 +70,8 @@ export default defineComponent({
       emit('update:modelValue', { constraints: constraints.value });
     }
 
-    function isCustom(constraint: MutexedConstraint): boolean {
-      return constraint.mutexed.hasCustomHoldTime;
-    }
-
     function holdTime(constraint: MutexedConstraint): Quantity {
-      if (isCustom(constraint)) {
-        return constraint.mutexed.extraHoldTime;
-      } else if (constraint.mutexed.mutexId.id) {
-        const mutex = sparkStore.blockById<MutexBlock>(
-          props.serviceId,
-          constraint.mutexed.mutexId.id,
-        );
-        return mutex?.data.differentActuatorWait ?? bloxQty('0s');
-      } else {
-        return bloxQty('0s');
-      }
+      return constraint.mutexed.extraHoldTime;
     }
 
     function add(): void {
@@ -115,7 +97,6 @@ export default defineComponent({
     return {
       constraints,
       save,
-      isCustom,
       holdTime,
       add,
       remove,
@@ -154,36 +135,13 @@ export default defineComponent({
           label="Extra lock time"
           message="The Mutex will be kept locked for this duration after the actuator turns off."
           class="col-grow"
-          :tooltip="
-            isCustom(constraint)
-              ? null
-              : 'Using default value from Mutex block.'
-          "
           @update:model-value="
             (v) => {
               constraint.mutexed.extraHoldTime = v;
-              constraint.mutexed.hasCustomHoldTime = true;
               save();
             }
           "
-        >
-          <template #append>
-            <template v-if="isCustom(constraint)">
-              <q-btn
-                flat
-                round
-                icon="mdi-backup-restore"
-                size="sm"
-                @click.stop="
-                  constraint.mutexed.hasCustomHoldTime = false;
-                  save();
-                "
-              >
-                <q-tooltip>Use default value from Mutex block.</q-tooltip>
-              </q-btn>
-            </template>
-          </template>
-        </DurationField>
+        />
       </template>
       <DurationField
         v-if="'minOff' in constraint"
@@ -239,20 +197,33 @@ export default defineComponent({
       />
 
       <div class="col-auto column justify-center darkish">
-        <q-btn icon="delete" flat round @click="remove(idx)">
+        <q-btn
+          icon="delete"
+          flat
+          round
+          @click="remove(idx)"
+        >
           <q-tooltip>Remove constraint</q-tooltip>
         </q-btn>
       </div>
     </div>
     <div class="col row justify-end">
-      <q-btn icon="add" round outline @click="add">
+      <q-btn
+        icon="add"
+        round
+        outline
+        @click="add"
+      >
         <q-tooltip>Add constraint</q-tooltip>
       </q-btn>
     </div>
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .limiting
   text-color: orange
 

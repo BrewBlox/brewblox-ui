@@ -1,22 +1,20 @@
-import { defineStore } from 'pinia';
-
-import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
+import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
+import { upgradeMetricsConfig } from '@/plugins/history/utils';
 import { concatById, filterById, findById } from '@/utils/collections';
-import { nullFilter } from '@/utils/functional';
-
+import { defineStore } from 'pinia';
 import api from './api';
 
-const fallbackSpec = (): PartSpec => ({
-  id: '',
+const fallbackBlueprint = (): BuilderBlueprint => ({
+  type: '',
   title: 'Unknown Part',
-  component: 'UnknownPart',
+  component: 'UnknownPartComponent',
   cards: [],
   size: () => [1, 1],
   transitions: () => ({}),
 });
 
 interface BuilderStoreState {
-  specs: PartSpec[];
+  blueprints: BuilderBlueprint[];
   focusWarningEnabled: boolean;
   lastLayoutId: string | null;
   layouts: BuilderLayout[];
@@ -24,27 +22,29 @@ interface BuilderStoreState {
 
 export const useBuilderStore = defineStore('builderStore', {
   state: (): BuilderStoreState => ({
-    specs: [],
+    blueprints: [],
     focusWarningEnabled: true,
     lastLayoutId: null,
     layouts: [],
   }),
   getters: {
     layoutIds: (state): string[] => state.layouts.map((v) => v.id),
-    specIds: (state): string[] => state.specs.map((v) => v.id),
+    blueprintTypes: (state): string[] => state.blueprints.map((v) => v.type),
   },
   actions: {
     layoutById(id: Maybe<string>): BuilderLayout | null {
       return findById(this.layouts, id);
     },
 
-    spec({ type }: { type: string }): PartSpec {
-      return this.specs.find((v) => v.id === type) ?? fallbackSpec();
+    blueprintByType(type: string): BuilderBlueprint {
+      return (
+        this.blueprints.find((v) => v.type === type) ?? fallbackBlueprint()
+      );
     },
 
-    component({ type }: { type: string }): string {
-      const spec = this.spec({ type });
-      return spec.component || spec.id;
+    componentByType(type: string): string {
+      const blueprint = this.blueprintByType(type);
+      return blueprint.component ?? `${blueprint.type}PartComponent`;
     },
 
     async createLayout(layout: BuilderLayout): Promise<void> {
@@ -62,30 +62,36 @@ export const useBuilderStore = defineStore('builderStore', {
       await api.remove(layout); // triggers callback
     },
 
-    async updateLayoutOrder(ids: string[]): Promise<void> {
-      await Promise.all(
-        ids
-          .map((id) => this.layoutById(id))
-          .filter(nullFilter)
-          .map((layout, idx) => {
-            const order = idx + 1;
-            if (order !== layout.order) {
-              this.saveLayout({ ...layout, order });
-            }
-          }),
-      );
-    },
-
     async start(): Promise<void> {
-      const onChange = async (layout: BuilderLayout): Promise<void> => {
-        this.layouts = concatById(this.layouts, layout);
-      };
-      const onDelete = (id: string): void => {
-        this.layouts = filterById(this.layouts, { id });
-      };
-
       this.layouts = await api.fetch();
-      api.subscribe(onChange, onDelete);
+
+      // check if any layouts must be upgraded
+      [...this.layouts].forEach((layout) => {
+        let dirty = false;
+        layout.parts.forEach((part) => {
+          if (part.metrics) {
+            const upgraded = upgradeMetricsConfig(part.metrics);
+            if (upgraded) {
+              dirty = true;
+              part.metrics = upgraded;
+            }
+          }
+        });
+        if (dirty) {
+          // Immediately set upgraded layout, to prevent rendering with invalid data
+          concatById(this.layouts, layout);
+          this.saveLayout(layout);
+        }
+      });
+
+      api.subscribe(
+        (layout: BuilderLayout) => {
+          this.layouts = concatById(this.layouts, layout);
+        },
+        (id: string) => {
+          this.layouts = filterById(this.layouts, { id });
+        },
+      );
     },
   },
 });

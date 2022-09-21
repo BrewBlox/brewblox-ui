@@ -1,12 +1,13 @@
 <script lang="ts">
-import truncate from 'lodash/truncate';
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useField } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import type { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import type { ComparedBlockType } from '@/plugins/spark/types';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
+import { Block, Link } from 'brewblox-proto/ts';
+import truncate from 'lodash/truncate';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'LinkField',
@@ -110,7 +111,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
+  <LabeledField
+    v-bind="{ ...$attrs, ...$props }"
+    @click="openDialog"
+  >
     <slot name="value">
       {{ displayValue }}
     </slot>
@@ -125,7 +129,10 @@ export default defineComponent({
         <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
     </template>
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
   </LabeledField>

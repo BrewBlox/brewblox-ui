@@ -1,10 +1,8 @@
 <script lang="ts">
-import { computed,defineComponent } from 'vue';
-
-import { sparkType } from '@/plugins/spark/const';
+import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { SparkService } from '@/plugins/spark/types';
 import { useServiceStore } from '@/store/services';
-
+import { computed, defineComponent } from 'vue';
 import SparkServiceWatcher from './SparkServiceWatcher.vue';
 
 export default defineComponent({
@@ -15,7 +13,9 @@ export default defineComponent({
   setup() {
     const serviceStore = useServiceStore();
     const services = computed<SparkService[]>(() =>
-      serviceStore.services.filter((service) => service.type === sparkType),
+      serviceStore.services.filter(
+        (service) => service.type === SPARK_SERVICE_TYPE,
+      ),
     );
     return {
       services,

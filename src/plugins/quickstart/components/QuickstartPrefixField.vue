@@ -1,7 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { makeRuleValidator } from '@/utils/rules';
+import { computed, defineComponent, ref } from 'vue';
 
 const rules = [
   (v: any) => /^($|[a-zA-Z])/.test(v) || 'Name must start with a letter',

@@ -1,8 +1,7 @@
 <script lang="ts">
+import { DigitalState } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
 import { computed, defineComponent, PropType } from 'vue';
-
-import { DigitalState } from '@/plugins/spark/types';
 
 const alternatives: Record<number | string, DigitalState> = {
   0: DigitalState.STATE_INACTIVE,
@@ -53,27 +52,24 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const on = DigitalState.STATE_ACTIVE;
     const off = DigitalState.STATE_INACTIVE;
 
     const state = computed<DigitalState>({
-      get: () => Enum.isType(DigitalState, props.modelValue)
-        ? props.modelValue
-        : alternatives[props.modelValue] ?? DigitalState.STATE_UNKNOWN,
-      set: v => emit('update:modelValue', v),
+      get: () =>
+        Enum.isType(DigitalState, props.modelValue)
+          ? props.modelValue
+          : alternatives[props.modelValue] ?? DigitalState.STATE_UNKNOWN,
+      set: (v) => emit('update:modelValue', v),
     });
 
-    const known = computed<boolean>(
-      () => state.value in DigitalState,
-    );
+    const known = computed<boolean>(() => state.value in DigitalState);
 
     function toggle(): void {
       if (!props.disable) {
-        state.value = (state.value === off ? on : off);
+        state.value = state.value === off ? on : off;
       }
     }
 
@@ -92,7 +88,7 @@ export default defineComponent({
 <template>
   <q-btn-toggle
     v-if="known"
-    v-bind="{options, disable, ...$attrs}"
+    v-bind="{ options, disable, ...$attrs }"
     :model-value="state"
     :class="['shadow-1', $attrs.class]"
     dense
@@ -101,14 +97,18 @@ export default defineComponent({
   >
     <template #off>
       <span class="row">
-        <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
+        <q-tooltip v-if="pending && pendingReason">
+          State pending: {{ pendingReason }}
+        </q-tooltip>
         <q-spinner v-if="pending && state === off" />
         <span v-else>Off</span>
       </span>
     </template>
     <template #on>
       <span class="row">
-        <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
+        <q-tooltip v-if="pending && pendingReason">
+          State pending: {{ pendingReason }}
+        </q-tooltip>
         <q-spinner v-if="pending && state === on" />
         <span v-else>On</span>
       </span>

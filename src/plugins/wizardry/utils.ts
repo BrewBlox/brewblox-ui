@@ -1,10 +1,10 @@
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block, ComparedBlockType } from '@/plugins/spark/types';
+import { ComparedBlockType } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
-
+import { Block } from 'brewblox-proto/ts';
 import { WizardDialogResult } from './types';
 
 export async function tryCreateWidget<T>(

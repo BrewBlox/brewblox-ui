@@ -1,9 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, reactive } from 'vue';
-
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
-
+import { computed, defineComponent, PropType, reactive } from 'vue';
 import { defaultLabel } from '../nodes';
 import { GraphAxis, GraphConfig } from '../types';
 
@@ -95,7 +93,11 @@ export default defineComponent({
   >
     <DialogCard v-bind="{ title, message, html }">
       <div class="column q-gutter-xs">
-        <InputField v-model="rename" title="Label" label="Label" />
+        <InputField
+          v-model="rename"
+          title="Label"
+          label="Label"
+        />
         <InputField
           v-model="precision"
           :decimals="0"
@@ -111,7 +113,10 @@ export default defineComponent({
           null-text="automatic"
           clearable
         />
-        <LabeledField label="Y-axis" class="depth-1">
+        <LabeledField
+          label="Y-axis"
+          class="depth-1"
+        >
           <q-btn-toggle
             v-model="axis"
             :options="axisOpts"
@@ -122,8 +127,18 @@ export default defineComponent({
       </div>
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

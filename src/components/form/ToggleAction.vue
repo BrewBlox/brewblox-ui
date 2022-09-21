@@ -21,20 +21,14 @@ export default defineComponent({
       default: 'mdi-checkbox-blank-outline',
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props) {
-    const icon = computed<string>(
-      () => props.modelValue
-        ? props.iconEnabled
-        : props.iconDisabled,
+    const icon = computed<string>(() =>
+      props.modelValue ? props.iconEnabled : props.iconDisabled,
     );
 
-    const color = computed<string>(
-      () => props.modelValue
-        ? 'primary'
-        : 'white',
+    const color = computed<string>(() =>
+      props.modelValue ? 'primary' : 'white',
     );
 
     return {

@@ -1,25 +1,23 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import {
-  BlockFieldSpec,
+  enumHint,
+  prettifyConstraints,
+} from '@/plugins/spark/utils/formatting';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { bloxLink } from '@/utils/link';
+import {
   BlockIntfType,
-  BlockSpec,
   BlockType,
   DigitalConstraintsObj,
   DigitalState,
   MotorValveBlock,
+  SettingMode,
   ValveState,
-} from '@/plugins/spark/types';
-import {
-  blockWidgetSelector,
-  enumHint,
-  prettifyConstraints,
-} from '@/plugins/spark/utils';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { bloxLink } from '@/utils/link';
-
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './MotorValveWidget.vue';
 
 const type = BlockType.MotorValve;
@@ -31,26 +29,27 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MotorValveBlock> = {
       type,
-      generate: () => ({
+      generate: (): MotorValveBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
-        startChannel: 0,
+        channel: 0,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         valveState: ValveState.VALVE_INIT_IDLE,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<MotorValveBlock>[] = [
       {
         type,
-        key: 'desiredState',
-        title: 'State',
+        key: 'storedState',
+        title: 'Stored state',
         component: 'StateValEdit',
         generate: () => DigitalState.STATE_INACTIVE,
         valueHint: enumHint(DigitalState),
-        graphed: true,
-        graphName: 'Desired state',
       },
       {
         type,
@@ -59,6 +58,16 @@ const plugin: Plugin = {
         component: 'DigitalConstraintsValEdit',
         generate: (): DigitalConstraintsObj => ({ constraints: [] }),
         pretty: prettifyConstraints,
+      },
+      {
+        type,
+        key: 'desiredState',
+        title: 'Desired state',
+        component: 'StateValEdit',
+        generate: () => DigitalState.STATE_INACTIVE,
+        valueHint: enumHint(DigitalState),
+        readonly: true,
+        graphed: true,
       },
       {
         type,

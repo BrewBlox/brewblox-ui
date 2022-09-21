@@ -1,8 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-
+import { computed, defineComponent, ref } from 'vue';
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
@@ -57,8 +55,18 @@ export default defineComponent({
       />
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

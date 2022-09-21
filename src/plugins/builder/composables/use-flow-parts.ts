@@ -1,10 +1,8 @@
+import { useBuilderStore } from '@/plugins/builder/store';
+import { deepCopy } from '@/utils/objects';
 import debounce from 'lodash/debounce';
 import { nanoid } from 'nanoid';
 import { computed, Ref, ref, watch, WritableComputedRef } from 'vue';
-
-import { useBuilderStore } from '@/plugins/builder/store';
-import { deepCopy } from '@/utils/objects';
-
 import { calculateNormalizedFlows } from '../calculateFlows';
 import { BuilderLayout, FlowPart, PersistentPart } from '../types';
 import { asPersistentPart, asStatePart, vivifyParts } from '../utils';

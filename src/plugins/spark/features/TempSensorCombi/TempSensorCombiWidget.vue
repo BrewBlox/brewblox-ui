@@ -1,30 +1,23 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { combineFuncLabels } from '@/plugins/spark/const';
-import {
-  BlockIntfType,
-  Link,
-  TempSensorCombiBlock,
-} from '@/plugins/spark/types';
+import { ENUM_LABELS_COMBINE_FUNC } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
+import { prettyQty } from '@/utils/quantity';
+import { BlockIntfType, Link, TempSensorCombiBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
-import { useSparkStore } from '../../store';
-
-const combineFuncOpts: SelectOption[] = Object.entries(combineFuncLabels).map(
-  ([value, label]) => ({ label, value }),
-);
+const combineFuncOpts = selectable(ENUM_LABELS_COMBINE_FUNC);
 
 export default defineComponent({
   name: 'TempSensorCombiWidget',
   setup() {
     const { context, inDialog } = useContext.setup();
     const sparkStore = useSparkStore();
-    const { serviceId, block, saveBlock } =
+    const { serviceId, block, patchBlock } =
       useBlockWidget.setup<TempSensorCombiBlock>();
 
     const hasValue = computed<boolean>(
@@ -44,20 +37,19 @@ export default defineComponent({
           label: 'Sensor',
           serviceId,
         },
-      }).onOk((value: Link) => {
-        block.value.data.sensors.push(value);
-        saveBlock();
+      }).onOk((sensor: Link) => {
+        patchBlock({ sensors: [...block.value.data.sensors, sensor] });
       });
     }
 
-    function removeSensor(idx): void {
-      block.value.data.sensors.splice(idx, 1);
-      saveBlock();
+    function removeSensor(idx: number): void {
+      patchBlock({ sensors: [...block.value.data.sensors].splice(idx, 1) });
     }
 
     function updateSensor(idx: number, value: Link): void {
-      block.value.data.sensors.splice(idx, 1, value);
-      saveBlock();
+      patchBlock({
+        sensors: [...block.value.data.sensors].splice(idx, 1, value),
+      });
     }
 
     function sensorValue(link: Link): string {
@@ -71,7 +63,7 @@ export default defineComponent({
       inDialog,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       sensors,
       hasValue,
       addSensor,
@@ -95,18 +87,17 @@ export default defineComponent({
 
     <div>
       <CardWarning v-if="sensors.length === 0">
-        <template #message>
-          No sensors set.
-        </template>
+        <template #message> No sensors set. </template>
       </CardWarning>
       <CardWarning v-else-if="!hasValue">
-        <template #message>
-          No sensors could be read.
-        </template>
+        <template #message> No sensors could be read. </template>
       </CardWarning>
 
       <div class="q-ma-md row justify-center">
-        <div v-if="hasValue" class="col-auto row items-center">
+        <div
+          v-if="hasValue"
+          class="col-auto row items-center"
+        >
           <q-icon
             name="mdi-thermometer"
             size="md"
@@ -132,12 +123,7 @@ export default defineComponent({
             title="Select function"
             label="Value calculation"
             class="col-grow"
-            @update:model-value="
-              (v) => {
-                block.data.combineFunc = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ combineFunc: v })"
           />
 
           <div class="col-break" />
@@ -156,7 +142,10 @@ export default defineComponent({
               class="col-grow"
               @update:model-value="(v) => updateSensor(idx, v)"
             />
-            <LabeledField label="Value" class="col-auto min-width-sm">
+            <LabeledField
+              label="Value"
+              class="col-auto min-width-sm"
+            >
               {{ sensorValue(link) }}
             </LabeledField>
             <q-btn

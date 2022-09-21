@@ -1,71 +1,44 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ActuatorPwmBlock } from '@/plugins/spark/types';
-import { Link } from '@/shared-types';
-import { fixedNumber, prettyLink, roundedNumber } from '@/utils/formatting';
-
-const quickValues: SelectOption<number>[] = [
-  { label: '0%', value: 0 },
-  { label: '25%', value: 25 },
-  { label: '50%', value: 50 },
-  { label: '75%', value: 75 },
-  { label: '100%', value: 100 },
-];
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
+import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
+import { ActuatorPwmBlock, Link } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ActuatorPwmWidget',
   setup() {
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
+    const { context, inDialog } = useContext.setup();
 
-    const {
-      serviceId,
-      block,
-      saveBlock,
-      isDriven,
-    } = useBlockWidget.setup<ActuatorPwmBlock>();
+    const { serviceId, block, patchBlock, isClaimed } =
+      useBlockWidget.setup<ActuatorPwmBlock>();
 
-    const outputLink = computed<Link>(
-      () => block.value.data.actuatorId,
-    );
+    const outputLink = computed<Link>(() => block.value.data.actuatorId);
 
     const isLimited = computed<boolean>(
-      () => block.value.data.enabled
-        && block.value.data.setting !== block.value.data.desiredSetting,
+      () =>
+        block.value.data.enabled &&
+        block.value.data.setting !== block.value.data.desiredSetting,
     );
 
-    function updateSetting(value: number): void {
-      block.value.data.desiredSetting = value;
-      saveBlock();
-    }
-
-    const pwmDesired = computed<number | null>(
-      () => {
-        const v = block.value.data.desiredSetting;
-        return v
-          ? roundedNumber(v, 0)
-          : v;
-      },
-    );
+    const pwmDesired = computed<number | null>(() => {
+      const v = block.value.data.desiredSetting;
+      return v ? roundedNumber(v, 0) : v;
+    });
 
     return {
       prettyLink,
       fixedNumber,
-      quickValues,
+      PWM_SELECT_OPTIONS,
       context,
       inDialog,
       serviceId,
       block,
-      saveBlock,
-      isDriven,
+      patchBlock,
+      isClaimed,
       outputLink,
       isLimited,
-      updateSetting,
       pwmDesired,
     };
   },
@@ -84,35 +57,32 @@ export default defineComponent({
 
     <div class="q-mx-auto">
       <CardWarning v-if="!outputLink.id">
-        <template #message>
-          PWM has no target actuator configured.
-        </template>
+        <template #message> PWM has no target actuator configured. </template>
       </CardWarning>
-      <BlockEnableToggle
-        :hide-enabled="context.mode === 'Basic'"
-      >
+      <BlockEnableToggle>
         <template #enabled>
-          PWM is enabled and driving <i>{{ prettyLink(outputLink) }}</i>.
+          PWM is enabled and claims <i> {{ prettyLink(outputLink) }} </i>.
         </template>
         <template #disabled>
-          PWM is disabled and not driving <i>{{ prettyLink(outputLink) }}</i>.
+          PWM is disabled and does not claim
+          <i> {{ prettyLink(outputLink) }} </i>.
         </template>
       </BlockEnableToggle>
 
       <div class="widget-body row">
         <div
-          v-if="!isDriven"
+          v-if="!isClaimed"
           class="col-grow row q-mb-sm justify-around q-gutter-xs"
         >
           <div
-            v-for="q in quickValues"
-            :key="'quick'+q.value"
+            v-for="q in PWM_SELECT_OPTIONS"
+            :key="'quick' + q.value"
             class="col-auto clickable rounded-borders"
           >
             <q-btn
               :label="q.label"
               unelevated
-              @click="updateSetting(q.value)"
+              @click="patchBlock({ storedSetting: q.value })"
             />
           </div>
         </div>
@@ -120,15 +90,18 @@ export default defineComponent({
         <div class="col-break" />
 
         <q-slider
-          v-if="!isDriven"
+          v-if="!isClaimed"
           :model-value="pwmDesired"
           class="col-grow q-mt-md q-mx-md'"
           label-always
           color="primary"
-          @change="updateSetting"
+          @change="(v) => patchBlock({ storedSetting: v })"
         />
-        <div v-else class="col-grow text-center text-italic fade-3">
-          This PWM is driven by a PID block. <br>
+        <div
+          v-else
+          class="col-grow text-center text-italic fade-3"
+        >
+          This PWM is claimed by a PID block. <br />
           Manual settings are disabled.
         </div>
 
@@ -148,7 +121,7 @@ export default defineComponent({
 
         <div class="col-break" />
 
-        <DrivenIndicator
+        <ClaimIndicator
           :block-id="block.id"
           :service-id="serviceId"
           class="col-grow"
@@ -159,7 +132,7 @@ export default defineComponent({
           :service-id="serviceId"
           type="analog"
           class="col-grow"
-          @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
+          @update:model-value="(v) => patchBlock({ constrainedBy: v })"
         />
       </div>
 
@@ -173,7 +146,7 @@ export default defineComponent({
             label="Period"
             tag="big"
             class="col-grow"
-            @update:model-value="v => { block.data.period = v; saveBlock(); }"
+            @update:model-value="(v) => patchBlock({ period: v })"
           />
           <LinkField
             :model-value="block.data.actuatorId"
@@ -181,7 +154,7 @@ export default defineComponent({
             title="target"
             label="Digital Actuator Target"
             class="col-grow"
-            @update:model-value="v => { block.data.actuatorId = v; saveBlock(); }"
+            @update:model-value="(v) => patchBlock({ actuatorId: v })"
           />
         </div>
       </template>

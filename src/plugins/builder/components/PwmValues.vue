@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, textTransformation } from '@/plugins/builder/utils';
-import { ActuatorPwmBlock, BlockType } from '@/plugins/spark/types';
-import { preciseNumber } from '@/utils/formatting';
-
+import { preciseNumber } from '@/utils/quantity';
+import { ActuatorPwmBlock, BlockType, FastPwmBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
@@ -39,11 +37,12 @@ export default defineComponent({
   setup(props) {
     const { bordered } = usePart.setup(props.part);
 
-    const { block, isBroken } = useSettingsBlock.setup<ActuatorPwmBlock>(
-      props.part,
-      props.settingsKey,
-      [BlockType.ActuatorPwm],
-    );
+    const { block, isBroken } = useSettingsBlock.setup<
+      ActuatorPwmBlock | FastPwmBlock
+    >(props.part, props.settingsKey, [
+      BlockType.ActuatorPwm,
+      BlockType.FastPwm,
+    ]);
 
     const pwmValue = computed<number | null>(() =>
       block.value?.data.enabled ? block.value.data.value : null,
@@ -89,9 +88,18 @@ export default defineComponent({
       :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
-      <BrokenIcon v-if="isBroken" class="col" />
-      <UnlinkedIcon v-else-if="!block" class="col" />
-      <SleepingIcon v-else-if="!block.data.enabled" class="col" />
+      <BrokenIcon
+        v-if="isBroken"
+        class="col"
+      />
+      <UnlinkedIcon
+        v-else-if="!block"
+        class="col"
+      />
+      <SleepingIcon
+        v-else-if="!block.data.enabled"
+        class="col"
+      />
       <template v-else>
         <PwmIcon class="col" />
         <div class="col text-bold">

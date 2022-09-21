@@ -1,20 +1,18 @@
 <script lang="ts">
-import { defineComponent, PropType, ref, watch } from 'vue';
-
-import { analogConstraintLabels } from '@/plugins/spark/const';
+import { ENUM_LABELS_ANALOG_CONSTRAINT } from '@/plugins/spark/const';
+import { selectable } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
+import { deepCopy } from '@/utils/objects';
 import {
   AnalogConstraint,
   AnalogConstraintKey,
   AnalogConstraintsObj,
   BlockType,
-} from '@/plugins/spark/types';
-import { createDialog } from '@/utils/dialog';
-import { bloxLink } from '@/utils/link';
-import { deepCopy } from '@/utils/objects';
+} from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref, watch } from 'vue';
 
-const constraintOpts: SelectOption[] = Object.entries(
-  analogConstraintLabels,
-).map(([k, v]) => ({ value: k, label: v }));
+const constraintOpts = selectable(ENUM_LABELS_ANALOG_CONSTRAINT);
 
 const defaultValues: Record<AnalogConstraintKey, AnalogConstraint> = {
   min: {
@@ -146,20 +144,33 @@ export default defineComponent({
       />
 
       <div class="col-auto column justify-center darkish">
-        <q-btn icon="delete" flat round @click="remove(idx)">
+        <q-btn
+          icon="delete"
+          flat
+          round
+          @click="remove(idx)"
+        >
           <q-tooltip>Remove constraint</q-tooltip>
         </q-btn>
       </div>
     </div>
     <div class="col row justify-end">
-      <q-btn icon="add" round outline @click="add">
+      <q-btn
+        icon="add"
+        round
+        outline
+        @click="add"
+      >
         <q-tooltip>Add constraint</q-tooltip>
       </q-btn>
     </div>
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .limiting
   color: orange
 

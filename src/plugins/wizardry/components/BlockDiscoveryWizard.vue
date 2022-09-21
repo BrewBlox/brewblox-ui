@@ -1,12 +1,14 @@
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import type { Block, BlockConfig } from '@/plugins/spark/types';
-import { discoverBlocks, makeBlockIdRules } from '@/plugins/spark/utils';
+import { BlockConfig } from '@/plugins/spark/types';
+import { discoverBlocks } from '@/plugins/spark/utils/actions';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { Block } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'BlockDiscoveryWizard',
@@ -161,13 +163,14 @@ export default defineComponent({
       />
 
       <CardWarning v-if="serviceOpts.length === 0">
-        <template #message>
-          There are no Spark services available
-        </template>
+        <template #message> There are no Spark services available </template>
       </CardWarning>
-      <div v-else class="q-pa-sm q-mt-md">
+      <div
+        v-else
+        class="q-pa-sm q-mt-md"
+      >
         {{ featureTitle }} blocks are linked to hardware, and must be
-        discovered. <br>
+        discovered. <br />
         If a block is not shown below, please ensure it is plugged in, and click
         Discover.
       </div>
@@ -185,10 +188,18 @@ export default defineComponent({
             <div class="col-grow self-center">
               {{ opt.id }}
             </div>
-            <q-btn flat icon="edit" @click.stop="startChangeBlockId(opt)">
+            <q-btn
+              flat
+              icon="edit"
+              @click.stop="startChangeBlockId(opt)"
+            >
               <q-tooltip>Rename block</q-tooltip>
             </q-btn>
-            <q-btn flat icon="mdi-launch" @click.stop="createBlockDialog(opt)">
+            <q-btn
+              flat
+              icon="mdi-launch"
+              @click.stop="createBlockDialog(opt)"
+            >
               <q-tooltip>Edit block</q-tooltip>
             </q-btn>
           </div>
@@ -197,9 +208,18 @@ export default defineComponent({
     </div>
 
     <template #actions>
-      <q-btn flat label="Back" @click="onBack" />
+      <q-btn
+        flat
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
-      <q-btn :loading="busy" flat label="Discover" @click="discover" />
+      <q-btn
+        :loading="busy"
+        flat
+        label="Discover"
+        @click="discover"
+      />
       <q-btn
         v-if="optionalWidget"
         :disable="!selectedBlock"

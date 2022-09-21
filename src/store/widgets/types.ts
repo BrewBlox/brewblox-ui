@@ -1,5 +1,4 @@
-import { StoreObject } from '@/shared-types';
-
+import { StoreObject } from 'brewblox-proto/ts';
 
 /**
  * Persistent data for dashboard widgets.

@@ -1,15 +1,13 @@
 <script lang="ts">
-import difference from 'lodash/difference';
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import type { Block } from '@/plugins/spark/types';
 import { BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-
+import type { Block } from 'brewblox-proto/ts';
+import difference from 'lodash/difference';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
 import { BlockChange, EditableBlockField } from './types';
 
 interface EditableBlockChange {
@@ -153,7 +151,10 @@ export default defineComponent({
         {{ change.blockId }}
         <q-tooltip>Service: {{ change.serviceId }}</q-tooltip>
       </div>
-      <ActionMenu dense round>
+      <ActionMenu
+        dense
+        round
+      >
         <template #actions>
           <ActionItem
             label="Remove block change"
@@ -202,7 +203,10 @@ export default defineComponent({
       <div class="col-shrink">
         {{ field.specField.title }}
       </div>
-      <div v-if="field.value !== null" class="col row justify-end q-pr-md">
+      <div
+        v-if="field.value !== null"
+        class="col row justify-end q-pr-md"
+      >
         <component
           :is="field.specField.component"
           v-bind="field.specField.componentProps"
@@ -221,18 +225,28 @@ export default defineComponent({
     </div>
     <q-item v-if="unknownValues.length">
       <q-item-section avatar>
-        <q-icon name="warning" color="warning" />
+        <q-icon
+          name="warning"
+          color="warning"
+        />
       </q-item-section>
       <q-item-section>
         Unknown fields: {{ unknownValues.map((v) => `'${v}'`).join(', ') }}
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn flat label="Remove" @click="saveChange()" />
+        <q-btn
+          flat
+          label="Remove"
+          @click="saveChange()"
+        />
       </q-item-section>
     </q-item>
     <q-item v-if="!block">
       <q-item-section avatar>
-        <q-icon name="warning" color="warning" />
+        <q-icon
+          name="warning"
+          color="warning"
+        />
       </q-item-section>
       <q-item-section> Block not found </q-item-section>
     </q-item>

@@ -1,25 +1,25 @@
 import { useBuilderStore } from '@/plugins/builder/store';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import {
-  BlockType,
-  DigitalActuatorBlock,
-  OneWireGpioModuleBlock,
-  PidBlock,
-} from '@/plugins/spark/types';
-import { startAddBlockToDisplay } from '@/plugins/spark/utils';
+import { startAddBlockToDisplay } from '@/plugins/spark/utils/actions';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore } from '@/store/widgets';
 import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
-
+import {
+  BlockType,
+  DigitalActuatorBlock,
+  OneWireGpioModuleBlock,
+  PidBlock,
+} from 'brewblox-proto/ts';
 import {
   GpioChange,
   IoChannelAddress,
   PidConfig,
   QuickstartAction,
   QuickstartConfig,
+  QuickstartPatch,
 } from './types';
 
 const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
@@ -45,7 +45,7 @@ export function resetGpioChanges(serviceId: string): GpioChange[] {
 export function unlinkedActuators(
   serviceId: string,
   channels: IoChannelAddress[],
-): DigitalActuatorBlock[] {
+): QuickstartPatch<DigitalActuatorBlock>[] {
   return (
     useSparkStore()
       .blocksByService(serviceId)
@@ -59,30 +59,21 @@ export function unlinkedActuators(
         ),
       )
       // Unlink them from channel
-      .map((block) => {
-        block.data.channel = 0;
-        return block;
-      })
+      .map((block) => ({
+        blockId: block.id,
+        patch: { channel: 0 },
+      }))
   );
 }
 
 export function changedIoModules(
   serviceId: string,
   changes: GpioChange[],
-): OneWireGpioModuleBlock[] {
-  const sparkStore = useSparkStore();
-  return changes
-    .map((change) => {
-      const block = sparkStore.blockById<OneWireGpioModuleBlock>(
-        serviceId,
-        change.blockId,
-      );
-      if (block) {
-        block.data.channels = change.channels;
-      }
-      return block;
-    })
-    .filter(nullFilter);
+): QuickstartPatch<OneWireGpioModuleBlock>[] {
+  return changes.map((change) => {
+    const { blockId, channels } = change;
+    return { blockId, patch: { channels } };
+  });
 }
 
 export function createOutputActions(): QuickstartAction[] {
@@ -109,7 +100,12 @@ export function createOutputActions(): QuickstartAction[] {
     // Change blocks
     async (config: QuickstartConfig) => {
       await Promise.all(
-        config.changedBlocks.map((block) => sparkStore.saveBlock(block)),
+        config.changedBlocks.map((change) =>
+          sparkStore.patchBlock(
+            sparkStore.blockById(config.serviceId, change.blockId),
+            change.patch,
+          ),
+        ),
       );
     },
 
@@ -132,7 +128,6 @@ export function createOutputActions(): QuickstartAction[] {
         const dashboard: Dashboard = {
           id: config.dashboardId,
           title: config.dashboardTitle,
-          order: dashboardStore.dashboardIds.length + 1,
         };
         await dashboardStore.createDashboard(dashboard);
       }
@@ -191,7 +186,7 @@ export function withoutPrefix(prefix: string, val: string): string {
 }
 
 export const pidDefaults = (): PidBlock['data'] =>
-  useBlockSpecStore().blockSpecByType(BlockType.Pid).generate();
+  useBlockSpecStore().blockSpecByType<PidBlock>(BlockType.Pid).generate();
 
 export const makeBeerCoolConfig = (): PidConfig => ({
   kp: inverseTempQty(-50),

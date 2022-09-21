@@ -1,4 +1,6 @@
 <script lang="ts">
+import { useSparkStore } from '@/plugins/spark/store';
+import { createBlockWizard } from '@/plugins/wizardry';
 import {
   computed,
   defineComponent,
@@ -7,10 +9,6 @@ import {
   reactive,
   ref,
 } from 'vue';
-
-import { useSparkStore } from '@/plugins/spark/store';
-import { createBlockWizard } from '@/plugins/wizardry';
-
 import { GpioChange, IoChannelAddress } from '../types';
 import { resetGpioChanges } from '../utils';
 import { BrewKettleConfig } from './types';
@@ -89,12 +87,22 @@ export default defineComponent({
           </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn flat round icon="refresh" @click="discover">
+          <q-btn
+            flat
+            round
+            icon="refresh"
+            @click="discover"
+          >
             <q-tooltip>Discover OneWire blocks</q-tooltip>
           </q-btn>
         </q-item-section>
         <q-item-section class="col-auto">
-          <q-btn flat round icon="add" @click="startBlockWizard">
+          <q-btn
+            flat
+            round
+            icon="add"
+            @click="startBlockWizard"
+          >
             <q-tooltip>Create new Block</q-tooltip>
           </q-btn>
         </q-item-section>
@@ -102,7 +110,7 @@ export default defineComponent({
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
-            Select which hardware should be used for each function.<br>
+            Select which hardware should be used for each function.<br />
             You can unplug or heat sensors to identify them. The current value
             will be shown under each dropdown menu.
           </p>
@@ -137,7 +145,11 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
       <q-btn
         :disable="!valuesOk"

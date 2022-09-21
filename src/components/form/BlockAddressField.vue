@@ -1,12 +1,12 @@
 <script lang="ts">
-import truncate from 'lodash/truncate';
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useField } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import type { Block, ComparedBlockType } from '@/plugins/spark/types';
-import type { BlockAddress } from '@/plugins/spark/types';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import type { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { Block } from 'brewblox-proto/ts';
+import truncate from 'lodash/truncate';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'BlockAddressField',
@@ -122,9 +122,16 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
+  <LabeledField
+    v-bind="{ ...$attrs, ...$props }"
+    @click="openDialog"
+  >
     {{ displayValue }}
-    <q-item-label v-if="broken" caption class="text-negative q-mt-xs">
+    <q-item-label
+      v-if="broken"
+      caption
+      class="text-negative q-mt-xs"
+    >
       Block {{ modelValue.id }} not found
     </q-item-label>
     <template #append>
@@ -137,10 +144,17 @@ export default defineComponent({
       >
         <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
-      <q-icon v-if="broken" name="error" color="negative" />
+      <q-icon
+        v-if="broken"
+        name="error"
+        color="negative"
+      />
     </template>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
   </LabeledField>

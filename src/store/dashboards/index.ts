@@ -1,8 +1,5 @@
-import { defineStore } from 'pinia';
-
 import { concatById, filterById, findById } from '@/utils/collections';
-import { nullFilter } from '@/utils/functional';
-
+import { defineStore } from 'pinia';
 import api from './api';
 import type { Dashboard } from './types';
 
@@ -34,20 +31,6 @@ export const useDashboardStore = defineStore('dashboardStore', {
 
     async saveDashboard(dashboard: Dashboard): Promise<void> {
       await api.persist(dashboard); // triggers callback
-    },
-
-    async updateDashboardOrder(ids: string[]): Promise<void> {
-      await Promise.all(
-        ids
-          .map((id) => this.dashboardById(id))
-          .filter(nullFilter)
-          .map((dashboard, idx) => {
-            const order = idx + 1;
-            if (order !== dashboard.order) {
-              this.saveDashboard({ ...dashboard, order });
-            }
-          }),
-      );
     },
 
     async removeDashboard(dashboard: Dashboard): Promise<void> {

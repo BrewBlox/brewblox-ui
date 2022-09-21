@@ -1,21 +1,20 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { prettyBlock } from '@/plugins/spark/utils/formatting';
+import { isBlockClaimed } from '@/plugins/spark/utils/info';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { matchesType } from '@/utils/objects';
+import { bloxQty, fixedNumber, prettyQty, tempQty } from '@/utils/quantity';
 import {
+  ActuatorOffsetBlock,
   Block,
+  BlockType,
   PidBlock,
   Quantity,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { isBlockDriven, prettyBlock } from '@/plugins/spark/utils';
-import { ActuatorOffsetBlock, BlockType } from '@/shared-types';
-import { createBlockDialog } from '@/utils/dialog';
-import { fixedNumber, prettyQty } from '@/utils/formatting';
-import { matchesType } from '@/utils/objects';
-import { bloxQty, tempQty } from '@/utils/quantity';
-
-import { useSparkStore } from '../../store';
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface GridOpts {
   start?: number;
@@ -26,22 +25,21 @@ export default defineComponent({
   name: 'PidFull',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block, saveBlock } = useBlockWidget.setup<PidBlock>();
+    const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();
 
     const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
       sparkStore.blockByLink(serviceId, block.value.data.inputId),
     );
 
-    const inputDriven = computed<boolean>(() =>
-      isBlockDriven(inputBlock.value),
+    const inputClaimed = computed<boolean>(() =>
+      isBlockClaimed(inputBlock.value, sparkStore.claims),
     );
 
     const inputStoredSetting = computed<Quantity | null>({
       get: () => inputBlock.value?.data.storedSetting ?? null,
       set: (q) => {
         if (inputBlock.value && q) {
-          inputBlock.value.data.storedSetting = q;
-          sparkStore.saveBlock(inputBlock.value);
+          sparkStore.patchBlock(inputBlock.value, { storedSetting: q });
         }
       },
     });
@@ -82,8 +80,7 @@ export default defineComponent({
         } else {
           qty.value = 0;
         }
-        block.value.data.boilPointAdjust = qty;
-        saveBlock();
+        patchBlock({ boilPointAdjust: qty });
       },
     });
 
@@ -96,8 +93,7 @@ export default defineComponent({
         const numV = offsetOutput.value
           ? bloxQty(qty).to('degC').value
           : qty.value;
-        block.value.data.boilMinOutput = numV ?? 0;
-        saveBlock();
+        patchBlock({ boilMinOutput: numV ?? 0 });
       },
     });
 
@@ -122,9 +118,9 @@ export default defineComponent({
       fixedNumber,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       inputBlock,
-      inputDriven,
+      inputClaimed,
       inputStoredSetting,
       outputBlock,
       baseOutput,
@@ -154,28 +150,23 @@ export default defineComponent({
         label="Input Block"
         html
         message="
-              <p>A PID block drives its output to regulate its input.</p>
+              <p>A PID block sets its target setting to regulate its input value.</p>
               <p>
-                This input is a process value:
-                something that has a target value and an actual value.
-                In most cases, this will be a sensor and setpoint pair.
+                This input is a ProcessValue:
+                something that has a target setting and an measured value.
+                In most cases, the input will be a Setpoint block.
               </p>
-              <p>The input target minus the input value is called the error</p>
+              <p>The input setting minus the input value is called the error</p>
               "
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.inputId = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ inputId: v })"
       />
       <div class="col-grow">
         <QuantityField
           v-if="inputBlock !== null"
           v-model="inputStoredSetting"
-          :readonly="inputDriven"
-          :class="[{ darkened: !inputBlock.data.settingEnabled }, 'col']"
+          :readonly="inputClaimed"
+          :class="[{ darkened: !inputBlock.data.enabled }, 'col']"
           label="Setting"
           tag="b"
         />
@@ -203,7 +194,13 @@ export default defineComponent({
       >
         <q-tooltip>Edit {{ prettyBlock(inputBlock) }}</q-tooltip>
       </q-btn>
-      <q-btn v-else disable flat class="col-auto" icon="mdi-cancel" />
+      <q-btn
+        v-else
+        disable
+        flat
+        class="col-auto"
+        icon="mdi-cancel"
+      />
 
       <!-- Output row -->
       <div class="col-break" />
@@ -216,23 +213,18 @@ export default defineComponent({
         label="Output Block"
         html
         message="
-              <p>The PID sets its output block to the result from the PID calculation.</p>
+              <p>The PID sets its output block setting to the result from the PID calculation.</p>
               <p>
                 The output value is the sum of 3 parts derived from the input error:
                 Proportional, Integral and Derivative.
               </p>
               <p>
                 The output block is an 'analog' actuator.
-                A digital actuator can be driven indirectly via a PWM actuator.
+                The analog actuator may in turn set the setting for a digital actuator.
               </p>
               "
         class="col-grow"
-        @update:model-value="
-          (v) => {
-            block.data.outputId = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ outputId: v })"
       />
       <LabeledField
         :model-value="block.data.outputSetting"
@@ -257,7 +249,13 @@ export default defineComponent({
       >
         <q-tooltip>Edit {{ prettyBlock(outputBlock) }}</q-tooltip>
       </q-btn>
-      <q-btn v-else disable flat icon="mdi-cancel" class="col-auto" />
+      <q-btn
+        v-else
+        disable
+        flat
+        icon="mdi-cancel"
+        class="col-auto"
+      />
     </div>
 
     <q-separator inset />
@@ -270,9 +268,7 @@ export default defineComponent({
         </LabeledField>
       </div>
 
-      <div class="span-1 self-center text-center">
-        *
-      </div>
+      <div class="span-1 self-center text-center">*</div>
 
       <div class="span-2">
         <QuantityField
@@ -289,16 +285,14 @@ export default defineComponent({
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
               "
           borderless
-          @update:model-value="
-            (v) => {
-              block.data.kp = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(kp) => patchBlock({ kp })"
         />
       </div>
 
-      <div :style="grid({ start: 9 })" class="self-center text-center">
+      <div
+        :style="grid({ start: 9 })"
+        class="self-center text-center"
+      >
         =
       </div>
 
@@ -316,9 +310,7 @@ export default defineComponent({
         </LabeledField>
       </div>
 
-      <div class="span-1 self-center text-center">
-        *
-      </div>
+      <div class="span-1 self-center text-center">*</div>
 
       <div class="span-2">
         <QuantityField
@@ -329,9 +321,7 @@ export default defineComponent({
         />
       </div>
 
-      <div class="span-1 self-center text-center">
-        /
-      </div>
+      <div class="span-1 self-center text-center">/</div>
 
       <div class="span-2">
         <DurationField
@@ -365,18 +355,11 @@ export default defineComponent({
               <p>Setting Ti to zero will disable the integrator.</p>
               "
           borderless
-          @update:model-value="
-            (v) => {
-              block.data.ti = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(ti) => patchBlock({ ti })"
         />
       </div>
 
-      <div class="span-1 self-center text-center">
-        =
-      </div>
+      <div class="span-1 self-center text-center">=</div>
 
       <div class="span-2">
         <InputField
@@ -396,12 +379,7 @@ export default defineComponent({
               </p>
               "
           borderless
-          @update:model-value="
-            (v) => {
-              block.data.integralReset = v || 0.001;
-              saveBlock();
-            }
-          "
+          @update:model-value="(v) => patchBlock({ integralReset: v || 0.001 })"
         />
       </div>
 
@@ -416,9 +394,7 @@ export default defineComponent({
         </LabeledField>
       </div>
 
-      <div class="span-1 self-center text-center">
-        *
-      </div>
+      <div class="span-1 self-center text-center">*</div>
 
       <div class="span-2">
         <QuantityField
@@ -429,9 +405,7 @@ export default defineComponent({
         />
       </div>
 
-      <div class="span-1 self-center text-center">
-        *
-      </div>
+      <div class="span-1 self-center text-center">*</div>
 
       <div class="span-2">
         <DurationField
@@ -461,18 +435,11 @@ export default defineComponent({
               </p>
               "
           borderless
-          @update:model-value="
-            (v) => {
-              block.data.td = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(td) => patchBlock({ td })"
         />
       </div>
 
-      <div class="span-1 q-pt-sm self-center text-center">
-        =
-      </div>
+      <div class="span-1 q-pt-sm self-center text-center">=</div>
 
       <div class="span-2 calc-line">
         <LabeledField label="D">
@@ -531,7 +498,10 @@ export default defineComponent({
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .grid-container
   display: grid
   grid-template-columns: repeat(11, 1fr)

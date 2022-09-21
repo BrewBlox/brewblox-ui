@@ -1,20 +1,18 @@
 <script lang="ts">
+import { useContext, useWidget } from '@/composables';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
+import { Widget } from '@/store/widgets';
+import { createDialog } from '@/utils/dialog';
+import { isJsonEqual } from '@/utils/objects';
+import { bloxQty, durationString } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
 import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { useContext, useWidget } from '@/composables';
-import { defaultPresets, emptyGraphConfig } from '@/plugins/history/const';
-import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { Quantity } from '@/shared-types';
-import { Widget } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
-import { isJsonEqual } from '@/utils/objects';
-import { bloxQty, durationString } from '@/utils/quantity';
-
 import { addBlockGraph } from './utils';
 
 export default defineComponent({
@@ -22,17 +20,10 @@ export default defineComponent({
   setup() {
     const router = useRouter();
 
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
+    const { context, inDialog } = useContext.setup();
 
-    const {
-      widgetId,
-      widget,
-      config,
-      saveWidget,
-    } = useWidget.setup<Widget<GraphConfig>>();
+    const { widgetId, widget, config, saveWidget } =
+      useWidget.setup<Widget<GraphConfig>>();
 
     function cloned(): GraphConfig {
       return cloneDeep(defaults(config.value, emptyGraphConfig()));
@@ -63,9 +54,7 @@ export default defineComponent({
       sourceRevision.value = new Date();
     }
 
-    const title = computed<string>(
-      () => widget.value.title,
-    );
+    const title = computed<string>(() => widget.value.title);
 
     async function saveConfig(config: GraphConfig): Promise<void> {
       delete config.layout.title;
@@ -93,8 +82,7 @@ export default defineComponent({
           title: 'Custom graph duration',
           label: 'Duration',
         },
-      })
-        .onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
+      }).onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
     }
 
     function showGraphPage(): void {
@@ -155,7 +143,7 @@ export default defineComponent({
         v-bind="{
           config,
           sourceRevision,
-          renderRevision
+          renderRevision,
         }"
         use-presets
         use-range
@@ -167,19 +155,37 @@ export default defineComponent({
     <template #toolbar>
       <WidgetToolbar has-mode-toggle>
         <template #actions>
-          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphPage" />
-          <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />
-          <ExportGraphAction :config="config" :header="widget.title" />
-          <ActionItem icon="refresh" label="Refresh" @click="regraph" />
+          <ActionItem
+            icon="mdi-chart-line"
+            label="Show maximized"
+            @click="showGraphPage"
+          />
+          <ActionItem
+            icon="add"
+            label="Add block to graph"
+            @click="startAddBlockGraph"
+          />
+          <ExportGraphAction
+            :config="config"
+            :header="widget.title"
+          />
+          <ActionItem
+            icon="refresh"
+            label="Refresh"
+            @click="regraph"
+          />
         </template>
         <template #menus>
           <WidgetActions />
           <GraphRangeSubmenu
             :layout="config.layout"
-            :save="v => saveLayout(v)"
+            :save="(v) => saveLayout(v)"
           />
           <ActionSubmenu label="Timespan">
-            <div class="row wrap" style="max-width: 200px">
+            <div
+              class="row wrap"
+              style="max-width: 200px"
+            >
               <q-btn
                 v-for="(preset, idx) in presets"
                 :key="idx"
@@ -207,20 +213,21 @@ export default defineComponent({
       v-if="context.mode === 'Basic'"
       class="fit"
     >
-      <q-resize-observer :debounce="200" @resize="refresh" />
+      <q-resize-observer
+        :debounce="200"
+        @resize="refresh"
+      />
       <HistoryGraph
         ref="widgetGraphRef"
         :graph-id="widgetGraphId"
         v-bind="{
           config,
           sourceRevision,
-          renderRevision
+          renderRevision,
         }"
       />
     </div>
-    <div
-      v-if="context.mode === 'Full'"
-    >
+    <div v-if="context.mode === 'Full'">
       <GraphEditor
         :config="config"
         @update:config="saveConfig"

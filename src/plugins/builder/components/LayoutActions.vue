@@ -1,20 +1,21 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType } from 'vue';
-import { useRoute } from 'vue-router';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import {
   startAddLayout,
   startChangeLayoutTitle,
+  startRemoveLayout,
 } from '@/plugins/builder/utils';
 import { useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { useWidgetStore, Widget } from '@/store/widgets';
+import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default defineComponent({
   name: 'LayoutActions',
@@ -36,29 +37,19 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const route = useRoute();
 
-    const layoutIds = computed<string[]>(() => builderStore.layoutIds);
-
     const title = computed<string>(() => props.layout?.title ?? 'Unknown');
 
     const label = computed<string | null>(() =>
       props.noLabel ? null : title.value,
     );
 
-    const listed = computed<boolean>({
-      get: () => props.layout?.listed ?? true,
-      set: (v) => {
-        if (props.layout) {
-          builderStore.saveLayout({ ...props.layout, listed: v });
-        }
-      },
-    });
-
     const isHomePage = computed<boolean>({
-      get: () => systemStore.config.homePage === `/brewery/${props.layout?.id}`,
+      get: () =>
+        userUISettings.value.homePage === `/brewery/${props.layout?.id}`,
       set: (v) => {
         const homePage =
           v && props.layout ? `/brewery/${props.layout.id}` : null;
-        systemStore.saveConfig({ homePage });
+        systemStore.patchUserUISettings({ homePage });
       },
     });
 
@@ -84,10 +75,6 @@ export default defineComponent({
       saveFile(exported, `brewblox-${props.layout.title}-layout.json`);
     }
 
-    function renameLayout(): void {
-      startChangeLayoutTitle(props.layout);
-    }
-
     function clearParts(): void {
       createDialog({
         component: 'ConfirmDialog',
@@ -100,26 +87,6 @@ export default defineComponent({
         if (props.layout) {
           builderStore.saveLayout({ ...props.layout, parts: [] });
         }
-      });
-    }
-
-    function removeLayout(): void {
-      if (!props.layout) {
-        return;
-      }
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: 'Remove layout',
-          message: `Are you sure you wish to remove ${props.layout.title}?`,
-          noBackdropDismiss: true,
-        },
-      }).onOk(async () => {
-        if (props.layout) {
-          await builderStore.removeLayout(props.layout).catch(() => {});
-        }
-        const [id] = layoutIds.value;
-        selectLayout(id || null);
       });
     }
 
@@ -169,35 +136,44 @@ export default defineComponent({
 
     return {
       label,
-      listed,
       inEditor,
       isHomePage,
       selectLayout,
       copyLayout,
-      renameLayout,
+      startChangeLayoutTitle,
       createLayoutWidget,
       exportLayout,
       clearParts,
-      removeLayout,
+      startRemoveLayout,
     };
   },
 });
 </script>
 
 <template>
-  <ActionSubmenu v-if="!!layout" v-bind="{ label, ...$attrs }">
+  <ActionSubmenu
+    v-if="!!layout"
+    v-bind="{ label, ...$attrs }"
+  >
     <slot />
     <ToggleAction
       v-model="isHomePage"
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
-    <ToggleAction v-model="listed" label="Show in sidebar" />
-    <ActionItem icon="file_copy" label="Copy layout" @click="copyLayout()" />
-    <ActionItem icon="edit" label="Rename layout" @click="renameLayout" />
+    <ActionItem
+      icon="file_copy"
+      label="Copy layout"
+      @click="copyLayout()"
+    />
+    <ActionItem
+      icon="edit"
+      label="Change layout name"
+      @click="startChangeLayoutTitle(layout)"
+    />
     <ActionItem
       icon="dashboard"
-      label="Show layout on dashboard"
+      label="Create widget for layout"
       @click="createLayoutWidget"
     />
     <ActionItem
@@ -205,7 +181,15 @@ export default defineComponent({
       label="Export layout"
       @click="exportLayout"
     />
-    <ActionItem icon="delete" label="Remove all parts" @click="clearParts" />
-    <ActionItem icon="delete" label="Remove layout" @click="removeLayout" />
+    <ActionItem
+      icon="delete"
+      label="Remove all parts"
+      @click="clearParts"
+    />
+    <ActionItem
+      icon="delete"
+      label="Remove layout"
+      @click="startRemoveLayout(layout, $router)"
+    />
   </ActionSubmenu>
 </template>

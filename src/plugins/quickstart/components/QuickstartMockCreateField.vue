@@ -1,12 +1,14 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import { BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
-import { SparkStatus } from '@/plugins/spark/types';
-import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
+import {
+  BlockType,
+  SparkStatusDescription,
+  TempSensorMockBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'QuickstartMockCreateField',
@@ -25,12 +27,12 @@ export default defineComponent({
     const specStore = useBlockSpecStore();
     const finished = ref(false);
 
-    const status = computed<SparkStatus | null>(() =>
+    const status = computed<SparkStatusDescription | null>(() =>
       sparkStore.statusByService(props.serviceId),
     );
 
     const isSimulation = computed<boolean>(
-      () => status.value?.connectionKind === 'simulation',
+      () => status.value?.connection_kind === 'SIMULATION',
     );
 
     async function createMockSensors(): Promise<void> {
@@ -46,7 +48,6 @@ export default defineComponent({
         const block: TempSensorMockBlock = {
           id: suggestId(name, validator),
           serviceId: props.serviceId,
-          groups: [0],
           type: BlockType.TempSensorMock,
           data: spec.generate(),
         };
@@ -81,7 +82,7 @@ export default defineComponent({
         />
         <div class="col-grow text-italic">
           '{{ serviceId }}' is a simulation service without physical sensors.
-          <br>
+          <br />
           Click here to create Temp Sensor (Mock) blocks.
         </div>
       </div>

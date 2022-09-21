@@ -1,6 +1,6 @@
-import { Block } from '@/plugins/spark/types';
 import { BlockFieldSpec } from '@/plugins/spark/types';
 import { Widget } from '@/store/widgets';
+import { Block } from 'brewblox-proto/ts';
 
 export interface BlockChange<BlockT extends Block = Block> {
   id: string;
@@ -16,13 +16,15 @@ export interface ChangeAction {
   changes: BlockChange[];
 }
 
+export interface QuickActionsConfigOld {
+  serviceId?: string;
+  steps?: ChangeAction[];
+}
+
 export interface QuickActionsConfig {
-  serviceId?: string; // deprecated
-  steps?: ChangeAction[]; // deprecated
+  version: '1.1';
   actions: ChangeAction[];
   lastActionId?: string;
-  changeIdMigrated: boolean;
-  serviceIdMigrated: boolean;
 }
 
 export interface QuickActionsChange {

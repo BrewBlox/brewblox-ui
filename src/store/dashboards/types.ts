@@ -1,4 +1,4 @@
-import { StoreObject } from '@/shared-types';
+import { StoreObject } from 'brewblox-proto/ts';
 
 /**
  * Persistent data for dashboard objects.
@@ -15,12 +15,8 @@ export interface Dashboard extends StoreObject {
   title: string;
 
   /**
-   * Sorting order among other dashboards.
+   * Dashboards are rendered in a tree structure,
+   * and can be placed in a folder.
    */
-  order: number;
-
-  /**
-   * Whether the dashboard is shown in the sidebar. Defaults to true.
-   */
-  listed?: boolean;
+  parentFolder?: string | null;
 }

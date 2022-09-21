@@ -1,9 +1,7 @@
+import type { Widget } from '@/store/widgets/types';
+import { findById } from '@/utils/collections';
 import isString from 'lodash/isString';
 import { defineStore } from 'pinia';
-
-import type { Widget } from '@/store/widgets';
-import { findById } from '@/utils/collections';
-
 import type {
   ComponentResult,
   QuickstartFeature,
@@ -85,6 +83,10 @@ export const useFeatureStore = defineStore('featureStore', {
     },
     widgetRemoveActions(id: string): WidgetRemoveAction[] {
       return this.widgetById(id)?.removeActions ?? [];
+    },
+    upgradeWidget(widget: Widget): Widget | null {
+      const func = this.widgetById(widget.feature)?.upgrade;
+      return func ? func(widget) : null;
     },
     addWidgetFeature(feature: WidgetFeature): void {
       if (feature.wizard === true && feature.generateConfig === undefined) {

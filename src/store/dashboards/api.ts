@@ -1,10 +1,9 @@
-import { UI_NAMESPACE } from '@/const';
+import { DASHBOARD_NAMESPACE } from '@/const';
 import { createApi } from '@/database/api';
-
 import { Dashboard } from './types';
 
 export const api = createApi<Dashboard>({
-  namespace: `${UI_NAMESPACE}:dashboards`,
+  namespace: DASHBOARD_NAMESPACE,
 });
 
 export default api;

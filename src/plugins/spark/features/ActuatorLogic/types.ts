@@ -1,4 +1,3 @@
-
 export interface ExpressionError {
   index: number;
   message: string;

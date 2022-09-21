@@ -1,7 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { RenderedItem } from '@/components/grid/types';
 import { useGlobals } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
@@ -10,6 +7,8 @@ import { useWidgetStore, Widget } from '@/store/widgets';
 import { startChangeDashboardTitle } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { computed, defineComponent, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 const widgetSorter = makeObjectSorter<Widget>('order');
 
@@ -66,14 +65,6 @@ export default defineComponent({
       })),
     );
 
-    function editTitle(): void {
-      if (dashboard.value) {
-        startChangeDashboardTitle(dashboard.value, (newId) =>
-          router.replace(`/dashboard/${newId}`),
-        );
-      }
-    }
-
     watch(
       () => dashboardId.value,
       () => (widgetEditable.value = false),
@@ -112,22 +103,30 @@ export default defineComponent({
       showWizard,
       widgets,
       dashboardItems,
-      editTitle,
+      startChangeDashboardTitle,
     };
   },
 });
 </script>
 
 <template>
-  <q-page class="page-height" @dblclick="showWizard(true)">
+  <q-page
+    class="page-height"
+    @dblclick="showWizard(true)"
+  >
     <PageError v-if="!dashboard">
-      <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
+      <span>
+        Unknown dashboard: <b>{{ dashboardId }}</b>
+      </span>
     </PageError>
     <template v-else>
       <TitleTeleport>
-        <span class="cursor-pointer" @click="editTitle">{{
-          dashboard.title
-        }}</span>
+        <span
+          class="cursor-pointer"
+          @click="startChangeDashboardTitle(dashboard, $router)"
+        >
+          {{ dashboard.title }}
+        </span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn
@@ -139,11 +138,12 @@ export default defineComponent({
           class="self-center"
           @click="widgetEditable = !widgetEditable"
         >
-          <q-tooltip v-if="!widgetEditable">
-            Rearrange widgets
-          </q-tooltip>
+          <q-tooltip v-if="!widgetEditable"> Rearrange widgets </q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center">
+        <ActionMenu
+          round
+          class="self-center"
+        >
           <q-tooltip> Dashboard actions </q-tooltip>
           <template #menus>
             <DashboardActions :dashboard-id="dashboardId" />
@@ -152,7 +152,10 @@ export default defineComponent({
       </ButtonsTeleport>
 
       <q-scroll-area class="fit">
-        <div v-if="dashboardItems.length === 0" class="absolute-center">
+        <div
+          v-if="dashboardItems.length === 0"
+          class="absolute-center"
+        >
           <q-btn
             unelevated
             color="secondary"

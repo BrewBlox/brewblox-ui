@@ -1,13 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  BlockAddress,
-  BlockType,
-  TempSensorOneWireBlock,
-} from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { BlockType, TempSensorOneWireBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'TempSensorSwapDialog',
@@ -70,14 +66,25 @@ export default defineComponent({
       if (valid.value && leftBlock.value && rightBlock.value) {
         const leftData = leftBlock.value.data;
         const rightData = rightBlock.value.data;
-        const addresses = [leftData.address, rightData.address];
-        const busIds = [leftData.oneWireBusId, rightData.oneWireBusId];
-        leftData.address = addresses[1];
-        leftData.oneWireBusId = busIds[1];
-        rightData.address = addresses[0];
-        rightData.oneWireBusId = busIds[0];
-        sparkStore.saveBlock(leftBlock.value);
-        sparkStore.saveBlock(rightBlock.value);
+
+        const [leftAddress, rightAddress] = [
+          leftData.address,
+          rightData.address,
+        ];
+        const [leftBusId, rightBusId] = [
+          leftData.oneWireBusId,
+          rightData.oneWireBusId,
+        ];
+
+        sparkStore.patchBlock(leftBlock.value, {
+          address: rightAddress,
+          oneWireBusId: rightBusId,
+        });
+        sparkStore.patchBlock(rightBlock.value, {
+          address: leftAddress,
+          oneWireBusId: leftBusId,
+        });
+
         onDialogOK();
       }
     }
@@ -115,7 +122,12 @@ export default defineComponent({
         title="Choose sensor B"
       />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!valid"
           flat

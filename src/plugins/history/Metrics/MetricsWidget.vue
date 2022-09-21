@@ -1,8 +1,6 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-
 import { useContext } from '@/composables';
-
+import { defineComponent, ref } from 'vue';
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
 
@@ -39,6 +37,9 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
 
-    <component :is="context.mode" :revision="revision" />
+    <component
+      :is="context.mode"
+      :revision="revision"
+    />
   </Card>
 </template>

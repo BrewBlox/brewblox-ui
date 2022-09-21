@@ -1,10 +1,46 @@
 import { useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialogPromise } from '@/utils/dialog';
-
+import defaults from 'lodash/defaults';
 import { typeName as graphType } from './Graph/const';
-import { useHistoryStore } from './store';
-import { CsvPrecision, GraphConfig, SharedGraphConfig } from './types';
+import {
+  CsvPrecision,
+  GraphConfig,
+  MetricsConfig,
+  QueryParams,
+  QueryTarget,
+  SharedGraphConfig,
+} from './types';
+
+export const defaultPresets = (): QueryParams[] => [
+  { duration: '10m' },
+  { duration: '1h' },
+  { duration: '1d' },
+  { duration: '3d' },
+  { duration: '7d' },
+  { duration: '14d' },
+  { duration: '30d' },
+];
+
+export const emptyGraphConfig = (): GraphConfig => ({
+  version: '1.0',
+  layout: {},
+  params: {},
+  fields: [],
+  renames: {},
+  axes: {},
+  colors: {},
+  precision: {},
+});
+
+export const emptyMetricsConfig = (): MetricsConfig => ({
+  version: '1.0',
+  fields: [],
+  renames: {},
+  params: {},
+  freshDuration: {},
+  decimals: {},
+});
 
 export function sharedWidgetConfigs(
   excluded: string[] = [],
@@ -50,18 +86,68 @@ export async function selectGraphPrecision(): Promise<
   });
 }
 
-export async function saveGraphToFile(
-  config: GraphConfig,
-  precision: CsvPrecision,
-  header: string,
-): Promise<void> {
-  const historyStore = useHistoryStore();
-  await historyStore.downloadCsv({
-    params: config.params,
-    fields: config.targets.flatMap((t) =>
-      t.fields.map((f) => `${t.measurement}/${f}`),
-    ),
-    precision,
-    fileName: `${header}.csv`,
-  });
+export function upgradeGraphConfig(config: any): GraphConfig | null {
+  if (config.version == null) {
+    if (config.targets) {
+      config.fields = config.targets.flatMap((t: QueryTarget) =>
+        t.fields.map((f) => `${t.measurement}/${f}`),
+      );
+    }
+
+    // Only pick known properties
+    const {
+      version,
+      params,
+      fields,
+      renames,
+      layout,
+      axes,
+      colors,
+      precision,
+    } = config as GraphConfig;
+
+    return defaults<GraphConfig, GraphConfig>(
+      {
+        version,
+        params,
+        fields,
+        renames,
+        layout,
+        axes,
+        colors,
+        precision,
+      },
+      emptyGraphConfig(),
+    );
+  }
+
+  return null;
+}
+
+export function upgradeMetricsConfig(config: any): MetricsConfig | null {
+  if (config.version == null) {
+    if (config.targets) {
+      config.fields = config.targets.flatMap((t: QueryTarget) =>
+        t.fields.map((f) => `${t.measurement}/${f}`),
+      );
+    }
+
+    // Only pick known properties
+    const { version, params, fields, renames, freshDuration, decimals } =
+      config as MetricsConfig;
+
+    return defaults<MetricsConfig, MetricsConfig>(
+      {
+        version,
+        params,
+        fields,
+        renames,
+        freshDuration,
+        decimals,
+      },
+      emptyMetricsConfig(),
+    );
+  }
+
+  return null;
 }

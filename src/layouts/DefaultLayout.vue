@@ -1,23 +1,19 @@
 <script lang="ts">
+import { useGlobals } from '@/composables';
+import { startCreateFolder } from '@/store/sidebar/utils';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { useGlobals } from '@/composables';
-import { useSystemStore } from '@/store/system';
-
 export default defineComponent({
   name: 'DefaultLayout',
   setup() {
-    const systemStore = useSystemStore();
     const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
     const router = useRouter();
 
-    const devMode = Boolean(process.env.DEV);
-    const dashboardEditing = ref<boolean>(false);
-    const serviceEditing = ref<boolean>(false);
-    const builderEditing = ref<boolean>(false);
+    const devMode = Boolean(import.meta.env.DEV);
+    const editing = ref<boolean>(false);
 
     const _drawerOpen = ref<boolean>(
       localStorage.getItem('drawer') ?? !dense.value,
@@ -30,38 +26,26 @@ export default defineComponent({
       },
     });
 
-    const showSidebarLayouts = computed<boolean>(
-      () =>
-        systemStore.config.showSidebarLayouts ||
-        /^\/(builder|brewery)/.test(router.currentRoute.value.path),
-    );
-
-    function stopEditing(): void {
-      dashboardEditing.value = false;
-      serviceEditing.value = false;
-      builderEditing.value = false;
-    }
-
     function routeActive(route: string): boolean {
       return Boolean(router.currentRoute.value.path.match(route));
     }
 
     return {
       devMode,
-      dashboardEditing,
-      serviceEditing,
-      builderEditing,
+      editing,
       drawerOpen,
-      showSidebarLayouts,
-      stopEditing,
       routeActive,
+      startCreateFolder,
     };
   },
 });
 </script>
 
 <template>
-  <q-layout view="hHh Lpr fFf" style="overflow: hidden">
+  <q-layout
+    view="hHh Lpr fFf"
+    style="overflow: hidden"
+  >
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
         <portal-target name="toolbar-title" />
@@ -74,19 +58,18 @@ export default defineComponent({
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="drawerOpen" class="column" elevated>
+    <q-drawer
+      v-model="drawerOpen"
+      class="column"
+      elevated
+    >
       <SidebarNavigator />
 
       <q-scroll-area
         class="col"
-        :thumb-style="{ opacity: 0.5, background: 'silver' }"
+        :thumb-style="{ opacity: '0.5', background: 'silver' }"
       >
-        <DashboardIndex v-model:editing="dashboardEditing" />
-        <BreweryIndex
-          v-if="showSidebarLayouts"
-          v-model:editing="builderEditing"
-        />
-        <ServiceIndex v-model:editing="serviceEditing" />
+        <SidebarIndex :editing="editing" />
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
@@ -99,10 +82,28 @@ export default defineComponent({
         >
           <q-tooltip> Theming </q-tooltip>
         </q-btn>
+        <q-space />
+        <q-btn
+          flat
+          round
+          icon="mdi-folder-plus"
+          @click="startCreateFolder(null)"
+        >
+          <q-tooltip>Add folder</q-tooltip>
+        </q-btn>
+        <q-btn
+          :color="editing ? 'primary' : ''"
+          flat
+          round
+          icon="edit"
+          @click="editing = !editing"
+        >
+          <q-tooltip>Edit sidebar</q-tooltip>
+        </q-btn>
       </div>
     </q-drawer>
 
-    <q-page-container style="overflow: hidden" @click="stopEditing">
+    <q-page-container style="overflow: hidden">
       <router-view />
     </q-page-container>
   </q-layout>

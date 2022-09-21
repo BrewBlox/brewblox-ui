@@ -108,3 +108,19 @@ export function concatById<T extends HasId>(arr: T[], obj: T): T[] {
 export function filterById<T extends HasId>(arr: T[], obj: T | HasId): T[] {
   return [...arr.filter((v) => v.id !== obj.id)];
 }
+
+/**
+ * Converts an object of labels to an array of label+value objects,
+ * used by Quasar select components.
+ *
+ * @param labels value-label mapping
+ * @returns
+ */
+export function selectable<T extends string>(
+  labels: Record<T, string>,
+): SelectOption<T>[] {
+  return Object.entries(labels).map(([value, label]) => ({
+    label,
+    value,
+  })) as SelectOption<T>[];
+}

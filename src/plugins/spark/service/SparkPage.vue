@@ -1,27 +1,27 @@
 <script lang="ts">
-import { computed, defineComponent, watch } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type {
-  BlockRelation,
   BlockRelationNode,
   PageMode,
   SparkService,
-  SparkStatus,
 } from '@/plugins/spark/types';
-import { BlockType } from '@/shared-types';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
-
+import {
+  BlockRelation,
+  BlockType,
+  SparkStatusDescription,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, watch } from 'vue';
 import SparkListView from './SparkListView.vue';
-import Troubleshooter from './Troubleshooter.vue';
+import SparkTroubleshooter from './SparkTroubleshooter.vue';
 
 export default defineComponent({
   name: 'SparkPage',
   components: {
-    Troubleshooter,
+    SparkTroubleshooter,
     SparkListView,
   },
   props: {
@@ -62,15 +62,12 @@ export default defineComponent({
         sparkStore.lastBlocksAtByService(props.serviceId) != null,
     );
 
-    const status = computed<SparkStatus | null>(() =>
+    const status = computed<SparkStatusDescription | null>(() =>
       sparkStore.statusByService(props.serviceId),
     );
 
     const statusNok = computed<boolean>(
-      () =>
-        isAvailable.value &&
-        status.value !== null &&
-        (!status.value.isSynchronized || !!status.value.isUpdating),
+      () => status.value?.connection_status !== 'SYNCHRONIZED',
     );
 
     const pageMode = computed<PageMode>({
@@ -122,10 +119,19 @@ export default defineComponent({
 <template>
   <q-page class="page-height">
     <TitleTeleport>
-      <span class="cursor-pointer" @click="editTitle">{{ title }}</span>
+      <span
+        class="cursor-pointer"
+        @click="editTitle"
+      >
+        {{ title }}
+      </span>
     </TitleTeleport>
     <ButtonsTeleport>
-      <q-btn-group rounded outline class="q-pa-xs self-center">
+      <q-btn-group
+        rounded
+        outline
+        class="q-pa-xs self-center"
+      >
         <q-btn
           :unelevated="pageMode === 'List'"
           :outline="pageMode !== 'List'"
@@ -160,8 +166,11 @@ export default defineComponent({
     </ButtonsTeleport>
 
     <!-- Troubleshooter -->
-    <div v-if="statusNok" class="q-pa-lg row">
-      <Troubleshooter :service-id="serviceId" />
+    <div
+      v-if="statusNok"
+      class="q-pa-lg row"
+    >
+      <SparkTroubleshooter :service-id="serviceId" />
     </div>
 
     <!-- Relations graph display -->
@@ -170,11 +179,13 @@ export default defineComponent({
       :service-id="serviceId"
       :nodes="nodes"
       :edges="edges"
-      can-create
       class="fit"
     />
 
     <!-- Block list display -->
-    <SparkListView v-else-if="pageMode === 'List'" :service-id="serviceId" />
+    <SparkListView
+      v-else-if="pageMode === 'List'"
+      :service-id="serviceId"
+    />
   </q-page>
 </template>

@@ -1,18 +1,14 @@
 <script lang="ts">
-import { Notify } from 'quasar';
-import { computed, defineComponent, ref, watch } from 'vue';
-
 import { useSystemStore } from '@/store/system';
+import { userUnitsDefined } from '@/user-settings';
+import { Notify } from 'quasar';
+import { defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'ConfigWatcher',
   setup() {
     const systemStore = useSystemStore();
     const notifyHandle = ref<(() => unknown) | null>(null);
-
-    const userDefinedUnits = computed<boolean>(
-      () => systemStore.userDefinedUnits,
-    );
 
     function showPrompt(): void {
       notifyHandle.value = Notify.create({
@@ -24,19 +20,19 @@ export default defineComponent({
           {
             label: 'Celsius',
             textColor: 'white',
-            handler: () => systemStore.saveUnits({ temperature: 'degC' }),
+            handler: () => systemStore.patchUserUnits({ temperature: 'degC' }),
           },
           {
             label: 'Fahrenheit',
             textColor: 'white',
-            handler: () => systemStore.saveUnits({ temperature: 'degF' }),
+            handler: () => systemStore.patchUserUnits({ temperature: 'degF' }),
           },
         ],
       }) as () => unknown;
     }
 
     watch(
-      () => userDefinedUnits.value,
+      () => userUnitsDefined.value,
       (newV) => {
         if (!newV) {
           showPrompt();

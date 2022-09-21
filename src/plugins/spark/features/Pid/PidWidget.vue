@@ -1,12 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { PidBlock } from '@/plugins/spark/types';
-import { Link } from '@/shared-types';
-import { prettyLink } from '@/utils/formatting';
-
+import { prettyLink } from '@/utils/quantity';
+import { Link, PidBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
 import { startRelationsDialog } from './relations';
@@ -19,23 +16,11 @@ export default defineComponent({
   },
   setup() {
     const { context, inDialog } = useContext.setup();
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<PidBlock>();
+    const { block } = useBlockWidget.setup<PidBlock>();
 
-    const inputLink = computed<Link>(
-      () => block.value.data.inputId,
-    );
+    const inputLink = computed<Link>(() => block.value.data.inputId);
 
-    const outputLink = computed<Link>(
-      () => block.value.data.outputId,
-    );
-
-    function enable(): void {
-      block.value.data.enabled = true;
-      saveBlock();
-    }
+    const outputLink = computed<Link>(() => block.value.data.outputId);
 
     function showRelations(): void {
       startRelationsDialog(block.value);
@@ -48,7 +33,6 @@ export default defineComponent({
       block,
       inputLink,
       outputLink,
-      enable,
       showRelations,
     };
   },
@@ -76,33 +60,29 @@ export default defineComponent({
     <component :is="context.mode">
       <template #warnings>
         <CardWarning v-if="!inputLink.id">
-          <template #message>
-            PID has no input block configured.
-          </template>
+          <template #message> PID has no input block configured. </template>
         </CardWarning>
 
         <CardWarning v-if="!outputLink.id">
-          <template #message>
-            PID has no output block configured.
-          </template>
+          <template #message> PID has no output block configured. </template>
         </CardWarning>
 
         <template v-if="inputLink.id && outputLink.id">
           <CardWarning v-if="block.data.enabled && !block.data.active">
             <template #message>
               <span>
-                PID is inactive and not driving <i>{{ prettyLink(outputLink) }}</i>.
+                PID is inactive.
+                <i> {{ prettyLink(outputLink) }} </i> is claimed but inactive.
               </span>
             </template>
           </CardWarning>
-          <BlockEnableToggle
-            :hide-enabled="context.mode === 'Basic'"
-          >
+          <BlockEnableToggle :hide-enabled="context.mode === 'Basic'">
             <template #enabled>
-              PID is enabled and driving <i>{{ prettyLink(outputLink) }}</i>.
+              PID is enabled and claims <i> {{ prettyLink(outputLink) }} </i>.
             </template>
             <template #disabled>
-              PID is disabled and not driving <i>{{ prettyLink(outputLink) }}</i>.
+              PID is disabled and does not claim
+              <i> {{ prettyLink(outputLink) }} </i>.
             </template>
           </BlockEnableToggle>
         </template>

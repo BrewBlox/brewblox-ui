@@ -1,4 +1,4 @@
-import { StoreObject } from '@/shared-types';
+import { StoreObject } from 'brewblox-proto/ts';
 
 /**
  * Persistent data for service objects.
@@ -16,14 +16,10 @@ export interface Service<ConfigT = any> extends StoreObject {
   title: string;
 
   /**
-   * Sorting order among other services.
+   * Services are rendered in a tree structure,
+   * and can be placed in a folder.
    */
-  order: number;
-
-  /**
-   * Whether the service is shown in the sidebar. Defaults to true.
-   */
-  listed?: boolean;
+  parentFolder?: string | null;
 
   /**
    * Foreign key to `ServiceFeature.id`

@@ -1,26 +1,20 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
-import { prettifyConstraints } from '@/plugins/spark/utils';
-import { DigitalConstraintsObj } from '@/shared-types';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
+import { DigitalConstraintsObj } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'DigitalConstraintsValEdit',
   props: {
     ...useValEdit.props,
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<DigitalConstraintsObj>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<DigitalConstraintsObj>();
 
-    const displayString = computed<string>(
-      () => prettifyConstraints(field.value),
+    const displayString = computed<string>(() =>
+      prettifyConstraints(field.value),
     );
 
     return {
@@ -34,8 +28,12 @@ export default defineComponent({
 
 <template>
   <div v-if="editable">
-    <div v-if="!comparison" class="text-warning q-mb-sm">
-      Values will replace all existing constraints on <i>{{ blockId }}</i>.
+    <div
+      v-if="!comparison"
+      class="text-warning q-mb-sm"
+    >
+      Values will replace all existing constraints on
+      <i> {{ blockId }} </i>.
     </div>
     <DigitalConstraints
       v-model="field"

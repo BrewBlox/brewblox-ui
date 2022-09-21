@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block, DeprecatedObjectBlock } from '@/plugins/spark/types';
+import { Block, DeprecatedObjectBlock } from 'brewblox-proto/ts';
+import { defineComponent, onBeforeMount, ref } from 'vue';
 
 export default defineComponent({
   name: 'DeprecatedObjectWidget',
@@ -38,7 +37,10 @@ export default defineComponent({
 <template>
   <Card>
     <template #toolbar>
-      <Toolbar :title="widget.title" :subtitle="featureTitle" />
+      <Toolbar
+        :title="widget.title"
+        :subtitle="featureTitle"
+      />
     </template>
 
     <div class="widget-body">
@@ -52,7 +54,12 @@ export default defineComponent({
         label="Type"
         class="col-grow"
       />
-      <q-btn icon="delete" flat class="col-grow" @click="removeBlock" />
+      <q-btn
+        icon="delete"
+        flat
+        class="col-grow"
+        @click="removeBlock"
+      />
     </div>
   </Card>
 </template>

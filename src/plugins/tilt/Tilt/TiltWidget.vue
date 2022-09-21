@@ -1,10 +1,8 @@
 <script lang="ts">
-import { debounce } from 'quasar';
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { findById } from '@/utils/collections';
-
+import { debounce } from 'quasar';
+import { computed, defineComponent } from 'vue';
 import { fieldLabels } from '../const';
 import { useTiltStore } from '../store';
 import { TiltStateValue } from '../types';
@@ -67,22 +65,32 @@ export default defineComponent({
       <WidgetToolbar has-mode-toggle />
     </template>
 
-    <div v-if="context.mode === 'Basic'" class="widget-body">
-      <TiltValues v-if="value" :state="value" :hidden="config.hidden" />
+    <div
+      v-if="context.mode === 'Basic'"
+      class="widget-body"
+    >
+      <TiltValues
+        v-if="value"
+        :state="value"
+        :hidden="config.hidden"
+      />
       <CardWarning v-else-if="config.serviceId && config.mac">
-        <template #message>
-          Tilt not found
-        </template>
+        <template #message> Tilt not found </template>
       </CardWarning>
       <CardWarning v-else>
-        <template #message>
-          No Tilt selected
-        </template>
+        <template #message> No Tilt selected </template>
       </CardWarning>
     </div>
 
-    <div v-if="context.mode === 'Full'" class="widget-body column q-mt-none">
-      <SelectField v-model="tiltId" label="Tilt" :options="tiltOpts" />
+    <div
+      v-if="context.mode === 'Full'"
+      class="widget-body column q-mt-none"
+    >
+      <SelectField
+        v-model="tiltId"
+        label="Tilt"
+        :options="tiltOpts"
+      />
       <ActionSubmenu label="Shown values">
         <ToggleAction
           v-for="(label, key) in fieldLabels"

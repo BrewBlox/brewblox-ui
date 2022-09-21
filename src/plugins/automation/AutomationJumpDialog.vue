@@ -1,8 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-
+import { computed, defineComponent, ref } from 'vue';
 import { useAutomationStore } from './store';
 import { AutomationProcess, AutomationStep } from './types';
 
@@ -79,7 +77,12 @@ export default defineComponent({
         @confirm="(v) => save(v)"
       />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!local"
           flat

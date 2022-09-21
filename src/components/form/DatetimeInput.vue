@@ -5,10 +5,7 @@ import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
-type DateFormatType =
-  | 'date'
-  | 'number'
-  | 'string'
+type DateFormatType = 'date' | 'number' | 'string';
 
 export default defineComponent({
   name: 'DatetimeInput',
@@ -30,36 +27,26 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: [
-    'update:model-value',
-  ],
+  emits: ['update:model-value'],
   setup(props, { emit }) {
-
     function asDate(v: Date | number | string | null): Date | null {
       if (typeof v === 'number') {
         return new Date(v);
-      }
-      else if (typeof v === 'string') {
+      } else if (typeof v === 'string') {
         return parseISO(v);
-      }
-      else if (v instanceof Date) {
+      } else if (v instanceof Date) {
         return v;
-      }
-      else {
+      } else {
         return null;
       }
     }
 
     function asDateString(v: Date | null): string {
-      return v !== null && isValid(v)
-        ? format(v, 'yyyy-MM-dd')
-        : '';
+      return v !== null && isValid(v) ? format(v, 'yyyy-MM-dd') : '';
     }
 
     function asTimeString(v: Date | null): string {
-      return v !== null && isValid(v)
-        ? format(v, 'HH:mm:ss')
-        : '';
+      return v !== null && isValid(v) ? format(v, 'HH:mm:ss') : '';
     }
 
     function save(v: Date | null): void {
@@ -75,28 +62,26 @@ export default defineComponent({
 
     const local = ref<Date | null>(asDate(props.modelValue));
 
-    function combine(dateVal: string | undefined, timeVal: string | undefined): Date | null {
+    function combine(
+      dateVal: string | undefined,
+      timeVal: string | undefined,
+    ): Date | null {
       const dv = dateVal ?? asDateString(local.value);
       const tv = timeVal ?? asTimeString(local.value);
       return parseISO(`${dv} ${tv}`);
     }
 
-    const dateString = computed<string>(
-      () => asDateString(local.value),
-    );
+    const dateString = computed<string>(() => asDateString(local.value));
 
-    const timeString = computed<string>(
-      () => asTimeString(local.value),
-    );
+    const timeString = computed<string>(() => asTimeString(local.value));
 
     watch(
       () => props.modelValue,
-      v => {
+      (v) => {
         const dt = asDate(v);
         if (dt === null) {
           local.value = null;
-        }
-        else if (!local.value || !isEqual(dt, local.value)) {
+        } else if (!local.value || !isEqual(dt, local.value)) {
           local.value = dt;
         }
       },
@@ -121,7 +106,7 @@ export default defineComponent({
       stack-label
       class="col-grow"
       v-bind="dateAttrs"
-      @change="v => save(combine(v, undefined))"
+      @change="(v: any) => save(combine(v, undefined))"
     />
     <q-input
       :model-value="timeString"
@@ -131,7 +116,7 @@ export default defineComponent({
       stack-label
       class="col-grow"
       v-bind="timeAttrs"
-      @change="v => save(combine(undefined, v))"
+      @change="(v: any) => save(combine(undefined, v))"
     />
   </div>
 </template>

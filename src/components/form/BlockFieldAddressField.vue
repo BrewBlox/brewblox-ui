@@ -1,16 +1,16 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useField } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
-  Block,
   BlockFieldAddress,
   BlockFieldSpec,
   ComparedBlockType,
 } from '@/plugins/spark/types';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { prettyAny } from '@/utils/formatting';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { prettyAny } from '@/utils/quantity';
+import { Block } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'BlockFieldAddressField',
@@ -135,20 +135,29 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
-    <div v-if="fieldSpec" class="q-gutter-y-xs">
+  <LabeledField
+    v-bind="{ ...$attrs, ...$props }"
+    @click="openDialog"
+  >
+    <div
+      v-if="fieldSpec"
+      class="q-gutter-y-xs"
+    >
       <span> {{ modelValue.id }} &raquo; {{ fieldSpec.title }} </span>
-      <span v-if="showValue" class="text-secondary">
+      <span
+        v-if="showValue"
+        class="text-secondary"
+      >
         &raquo; {{ fieldDisplayValue }}
       </span>
     </div>
-    <div v-else-if="readonly">
-      No field selected
-    </div>
-    <div v-else>
-      Click to assign
-    </div>
-    <q-item-label v-if="broken" caption class="text-negative q-mt-xs">
+    <div v-else-if="readonly">No field selected</div>
+    <div v-else>Click to assign</div>
+    <q-item-label
+      v-if="broken"
+      caption
+      class="text-negative q-mt-xs"
+    >
       Block {{ modelValue.id }} not found
     </q-item-label>
     <template #append>
@@ -161,10 +170,17 @@ export default defineComponent({
       >
         <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
-      <q-icon v-if="broken" name="error" color="negative" />
+      <q-icon
+        v-if="broken"
+        name="error"
+        color="negative"
+      />
     </template>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
   </LabeledField>

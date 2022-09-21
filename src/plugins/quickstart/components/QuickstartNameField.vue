@@ -1,8 +1,6 @@
 <script lang="ts">
-
-import { computed, defineComponent } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'QuickstartNameField',
@@ -16,15 +14,11 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'update:modelValue',
-    'clear',
-  ],
+  emits: ['update:modelValue', 'clear'],
   setup(props, { emit }) {
-
     const local = computed<string>({
       get: () => props.modelValue,
-      set: v => emit('update:modelValue', v),
+      set: (v) => emit('update:modelValue', v),
     });
 
     function showKeyboard(): void {
@@ -33,8 +27,7 @@ export default defineComponent({
         componentProps: {
           modelValue: local.value,
         },
-      })
-        .onOk(v => local.value = v);
+      }).onOk((v) => (local.value = v));
     }
 
     return {
@@ -66,7 +59,11 @@ export default defineComponent({
           <q-tooltip>Reset to default</q-tooltip>
         </q-btn>
         <KeyboardButton @click="showKeyboard" />
-        <q-icon v-if="!!$slots.help" name="mdi-information" size="20px">
+        <q-icon
+          v-if="!!$slots.help"
+          name="mdi-information"
+          size="20px"
+        >
           <q-tooltip>
             <slot name="help" />
           </q-tooltip>

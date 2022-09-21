@@ -1,9 +1,4 @@
-import {
-  createRouter,
-  createWebHistory,
-  Router,
-  RouteRecordRaw,
-} from 'vue-router';
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -45,26 +40,23 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
-  { // Always leave this as last one
+  {
+    // Always leave this as last one
     path: '/:catchAll(.*)',
-    component: () => import('@/pages/404.vue'),
+    component: () => import('@/pages/404Page.vue'),
   },
 ];
 
-export default function (/* { store, ssrContext } */): Router {
-  const router = createRouter({
-    scrollBehavior: () => ({ left: 0, top: 0 }),
-    routes,
-    history: createWebHistory(process.env.VUE_ROUTER_BASE),
-  });
+const router = createRouter({
+  scrollBehavior: () => ({ left: 0, top: 0 }),
+  routes,
+  history: createWebHistory('/ui/'),
+});
 
-  // Strip hash on fresh page loads
-  // We use the hash to handle back button in dialogs
-  router.beforeResolve((to, from, next) => {
-    from.fullPath === '/' && to.hash
-      ? next({ path: to.path, hash: '' })
-      : next();
-  });
+// Strip hash on fresh page loads
+// We use the hash to handle back button in dialogs
+router.beforeResolve((to, from, next) => {
+  from.fullPath === '/' && to.hash ? next({ path: to.path, hash: '' }) : next();
+});
 
-  return router;
-}
+export default router;

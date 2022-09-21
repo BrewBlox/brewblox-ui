@@ -1,10 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, ref, watch } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { WS_HOST } from '@/const';
 import { useSparkStore } from '@/plugins/spark/store';
-
+import { computed, defineComponent, onBeforeUnmount, ref, watch } from 'vue';
 import { SparkDisplayWidget } from './types';
 
 const WIDTH = 320;
@@ -15,7 +13,7 @@ export default defineComponent({
   setup() {
     const sparkStore = useSparkStore();
     const { context } = useContext.setup();
-    const { config, saveConfig } = useWidget.setup<SparkDisplayWidget>();
+    const { config, patchConfig } = useWidget.setup<SparkDisplayWidget>();
 
     const connected = ref(true);
     let preventReconnection = false;
@@ -33,7 +31,7 @@ export default defineComponent({
 
     const serviceId = computed<string | null>({
       get: () => config.value.serviceId,
-      set: (serviceId) => saveConfig({ ...config.value, serviceId }),
+      set: (serviceId) => patchConfig({ serviceId }),
     });
 
     const url = computed<string>(
@@ -42,18 +40,19 @@ export default defineComponent({
 
     const isValid = computed<boolean>(
       () =>
-        sparkStore.statusByService(serviceId.value)?.connectionKind ===
-        'simulation',
+        sparkStore.statusByService(serviceId.value)?.connection_kind ===
+        'SIMULATION',
     );
 
     const error = computed<string | null>(() => {
-      if (!sparkStore.has(serviceId.value)) {
+      const status = sparkStore.statusByService(serviceId.value);
+      if (!status) {
         return 'No service configured';
       }
-      if (!sparkStore.statusByService(serviceId.value)?.isSynchronized) {
+      if (status.connection_status !== 'SYNCHRONIZED') {
         return 'Service is not connected';
       }
-      if (!isValid.value) {
+      if (status.connection_kind !== 'SIMULATION') {
         return 'Service is not a simulation';
       }
       return null;
@@ -304,13 +303,19 @@ export default defineComponent({
       v-if="context.mode === 'Basic' && error"
       class="col row justify-center items-center text-h5 q-gutter-x-md q-my-lg"
     >
-      <q-icon name="warning" color="warning" />
+      <q-icon
+        name="warning"
+        color="warning"
+      />
       <div class="col-auto">
         {{ error }}
       </div>
     </div>
 
-    <div v-if="context.mode === 'Full'" class="widget-body row">
+    <div
+      v-if="context.mode === 'Full'"
+      class="widget-body row"
+    >
       <q-select
         v-model="serviceId"
         :options="serviceIds"
@@ -323,7 +328,10 @@ export default defineComponent({
   </Card>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 .display
   margin: 0 auto
 

@@ -1,8 +1,6 @@
 <script lang="ts">
-import { defineComponent, PropType, reactive } from 'vue';
-
 import { tempQty } from '@/utils/quantity';
-
+import { defineComponent, PropType, reactive } from 'vue';
 import { QuickstartAction } from '../types';
 import { FermentConfig, FermentMode, FermentOpts } from './types';
 
@@ -68,7 +66,7 @@ export default defineComponent({
           <p>
             To change which temperature is actively controlled, you will change
             which setpoint is used as input by the PIDs. The quick actions on
-            your dashboard will help you switch and reconfigure the PIDs.<br>
+            your dashboard will help you switch and reconfigure the PIDs.<br />
           </p>
           <p>You can set the initial values now.</p>
         </q-item-section>
@@ -103,9 +101,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="done"
+      />
     </template>
   </WizardBody>
 </template>

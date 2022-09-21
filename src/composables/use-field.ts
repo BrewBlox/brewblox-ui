@@ -2,53 +2,53 @@ import { computed, ComputedRef, getCurrentInstance, PropType } from 'vue';
 
 export interface UseFieldProps {
   tag: {
-    type: PropType<string>,
-    default: string,
-  },
+    type: PropType<string>;
+    default: string;
+  };
   title: {
-    type: PropType<string>,
-    default: string,
-  },
+    type: PropType<string>;
+    default: string;
+  };
   label: {
-    type: PropType<string>,
-    default: string,
-  },
+    type: PropType<string>;
+    default: string;
+  };
   message: {
-    type: PropType<string>,
-    default: string,
-  },
+    type: PropType<string>;
+    default: string;
+  };
   html: {
-    type: PropType<boolean>,
-    default: boolean,
-  },
+    type: PropType<boolean>;
+    default: boolean;
+  };
   tooltip: {
-    type: PropType<string>,
-    default: string,
-  },
+    type: PropType<string>;
+    default: string;
+  };
   readonly: {
-    type: PropType<boolean>,
-    default: boolean,
-  },
+    type: PropType<boolean>;
+    default: boolean;
+  };
   dialogProps: {
-    type: PropType<AnyDict>,
-    default: () => AnyDict,
-  },
+    type: PropType<AnyDict>;
+    default: () => AnyDict;
+  };
   tagProps: {
-    type: PropType<AnyDict>,
-    default: () => AnyDict,
-  },
+    type: PropType<AnyDict>;
+    default: () => AnyDict;
+  };
   tagClass: {
-    type: PropType<string | string[] | AnyDict>,
-    default: string,
-  },
+    type: PropType<string | string[] | AnyDict>;
+    default: string;
+  };
   tagStyle: {
-    type: PropType<string | string[] | AnyDict>,
-    default: string,
-  },
+    type: PropType<string | string[] | AnyDict>;
+    default: string;
+  };
   rules: {
-    type: PropType<InputRule[]>,
-    default: () => InputRule[],
-  },
+    type: PropType<InputRule[]>;
+    default: () => InputRule[];
+  };
 }
 
 export interface UseFieldComponent {
@@ -124,11 +124,10 @@ export const useField: UseFieldComposable = {
     },
   },
   setup() {
-    const { slots } = getCurrentInstance()!;
+    const instance = getCurrentInstance()!;
 
-    const activeSlots = computed<string[]>(
-      () => Object.keys(slots)
-        .filter(s => fieldSlots.includes(s)),
+    const activeSlots = computed<string[]>(() =>
+      Object.keys(instance.slots).filter((s) => fieldSlots.includes(s)),
     );
 
     return {

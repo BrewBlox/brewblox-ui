@@ -1,22 +1,20 @@
-import isArray from 'lodash/isArray';
-import { Enum } from 'typescript-string-enums';
-
+import { useFeatureStore } from '@/store/features';
+import { isLink } from '@/utils/identity';
 import {
   Block,
+  BlockClaim,
   BlockIntfType,
   BlockType,
+  COMPATIBLE_TYPES,
+  DisplaySettingsBlock,
   SparkPatchEvent,
   SparkStateEvent,
   SparkUpdateEvent,
   SystemBlockType,
-} from '@/shared-types';
-import { useFeatureStore } from '@/store/features';
-import { isLink } from '@/utils/identity';
-
-import { compatibleTypes } from '../const';
-import { useSparkStore } from '../store';
+} from 'brewblox-proto/ts';
+import isArray from 'lodash/isArray';
+import { Enum } from 'typescript-string-enums';
 import { BlockAddress, ComparedBlockType } from '../types';
-import { getDisplaySettingsBlock } from './system';
 
 export function isCompatible(
   type: Maybe<string>,
@@ -34,7 +32,17 @@ export function isCompatible(
   if (isArray(intf)) {
     return intf.some((i) => isCompatible(type, i));
   }
-  return Boolean(compatibleTypes[intf]?.includes(type));
+  return Boolean(COMPATIBLE_TYPES[intf]?.includes(type));
+}
+
+export function isBlockCompatible<T extends Block>(
+  block: Maybe<Block>,
+  intf: ComparedBlockType,
+): block is T {
+  if (block == null) {
+    return false;
+  }
+  return isCompatible(block.type, intf);
 }
 
 export function ifCompatible<T extends Block>(
@@ -57,15 +65,6 @@ export function isBlockDisplayReady(addr: BlockAddress): boolean {
   ]);
 }
 
-export function isBlockDisplayed(addr: BlockAddress): boolean {
-  return (
-    addr.id !== null &&
-    !!getDisplaySettingsBlock(addr.serviceId)?.data.widgets.find((w) =>
-      Object.values(w).find((v) => isLink(v) && v.id === addr.id),
-    )
-  );
-}
-
 export function isBlockVolatile(block: Maybe<Block>): boolean {
   return block?.meta?.volatile === true;
 }
@@ -78,11 +77,24 @@ export function isBlockRemovable(block: Maybe<Block>): boolean {
   );
 }
 
-export const isBlockDriven = (block: Maybe<Block>): boolean =>
+export function isBlockDisplayed(
+  addr: BlockAddress,
+  display: DisplaySettingsBlock,
+): boolean {
+  return (
+    addr.id !== null &&
+    !!display?.data.widgets.find((w) =>
+      Object.values(w).find((v) => isLink(v) && v.id === addr.id),
+    )
+  );
+}
+
+export const isBlockClaimed = (
+  block: Maybe<Block>,
+  claims: Mapped<BlockClaim[]>,
+): boolean =>
   block != null &&
-  useSparkStore()
-    .driveChainsByService(block.serviceId)
-    .some((chain) => chain.target === block.id);
+  !!claims[block.serviceId]?.some((claim) => claim.target === block.id);
 
 export const isSparkState = (data: unknown): data is SparkStateEvent =>
   (data as SparkStateEvent).type === 'Spark.state';

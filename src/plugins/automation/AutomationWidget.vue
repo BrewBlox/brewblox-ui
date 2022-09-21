@@ -1,12 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { HOST } from '@/const';
 import { findById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { shortDateString } from '@/utils/formatting';
-
+import { shortDateString } from '@/utils/quantity';
+import { computed, defineComponent } from 'vue';
 import AutomationInfoDialog from './AutomationInfoDialog.vue';
 import AutomationJumpDialog from './AutomationJumpDialog.vue';
 import { settableStates } from './const';
@@ -182,21 +180,23 @@ export default defineComponent({
     <template #toolbar>
       <WidgetToolbar>
         <template #actions>
-          <ActionItem icon="settings" label="Editor" @click="startEditor" />
+          <ActionItem
+            icon="settings"
+            label="Editor"
+            @click="startEditor"
+          />
         </template>
       </WidgetToolbar>
     </template>
 
     <div class="widget-body column">
       <CardWarning v-if="!automationAvailable">
-        <template #message>
-          No automation service detected.
-        </template>
+        <template #message> No automation service detected. </template>
       </CardWarning>
       <div class="col-grow text-h6 text-secondary">
         Running processes
         <q-tooltip>
-          A process executes the steps in a template. <br>
+          A process executes the steps in a template. <br />
           Closing the UI will not interrupt any processes.
         </q-tooltip>
       </div>
@@ -235,17 +235,27 @@ export default defineComponent({
           </q-btn>
         </div>
         <div class="text-italic q-pr-sm">
-          {{ status }}
+          {{ pd.status }}
           <q-tooltip>
-            <div class="monospace darkish" style="white-space: pre-line">
-              {{ history || 'No history available' }}
+            <div
+              class="monospace darkish"
+              style="white-space: pre-line"
+            >
+              {{ pd.history || 'No history available' }}
             </div>
           </q-tooltip>
         </div>
-        <div v-if="pd.error" class="text-negative q-pr-sm">
+        <div
+          v-if="pd.error"
+          class="text-negative q-pr-sm"
+        >
           {{ pd.error }}
         </div>
-        <div v-for="task in tasks" :key="task.id" class="row q-mr-sm q-mb-sm">
+        <div
+          v-for="task in tasks"
+          :key="task.id"
+          class="row q-mr-sm q-mb-sm"
+        >
           <div class="col-grow self-center q-pl-sm text-italic">
             {{ task.title }} ({{ task.ref }}) {{ task.status }}
           </div>
@@ -280,7 +290,7 @@ export default defineComponent({
       <div class="text-h6 text-secondary">
         Available templates
         <q-tooltip>
-          Templates are the blueprints for processes. <br>
+          Templates are the blueprints for processes. <br />
           You can use the automation editor to create or change templates.
         </q-tooltip>
       </div>
@@ -314,7 +324,7 @@ export default defineComponent({
       <div class="text-h6 text-secondary">
         All tasks
         <q-tooltip>
-          Tasks are used to coordinate manual actions. <br>
+          Tasks are used to coordinate manual actions. <br />
           Processes can create tasks, and wait for the user to mark them as
           finished.
         </q-tooltip>
@@ -327,7 +337,12 @@ export default defineComponent({
         <div class="col-grow">
           {{ task.title }} ({{ task.ref }}) {{ task.status }}
         </div>
-        <q-btn flat class="col-auto" icon="delete" @click="removeTask(task)">
+        <q-btn
+          flat
+          class="col-auto"
+          icon="delete"
+          @click="removeTask(task)"
+        >
           <q-tooltip>Remove task</q-tooltip>
         </q-btn>
         <q-btn

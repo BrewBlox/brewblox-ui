@@ -2,49 +2,54 @@
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "1-55d75cbee5631853c77cd22f26e9a81c",
-    "config": {},
-    "order": 4,
-    "feature": "Automation",
     "title": "Ministry of Silly Walks",
+    "feature": "Automation",
     "cols": 4,
+    "order": 5,
+    "rows": 5,
     "dashboard": "dashboard-home",
-    "rows": 5
+    "config": {}
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "117a2504-85b7-43c4-a48d-37bf5d6821cd",
+    "title": "Stopwatch",
+    "feature": "Stopwatch",
+    "cols": 4,
+    "order": 10,
+    "rows": 2,
+    "dashboard": "dashboard-home",
     "config": {
       "session": null
-    },
-    "order": 9,
-    "feature": "Stopwatch",
-    "title": "Stopwatch",
-    "cols": 4,
-    "dashboard": "dashboard-home",
-    "rows": 2
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "16458fe8-374f-4dcd-aa76-68706eeaf690",
+    "title": "HERMS Graph",
+    "feature": "Graph",
+    "cols": 7,
+    "order": 1,
+    "pinnedPosition": {
+      "x": 1,
+      "y": 6
+    },
+    "rows": 5,
+    "dashboard": "herms",
     "config": {
-      "layout": {},
+      "version": "1.0",
       "params": {
         "duration": "10m"
       },
-      "targets": [
-        {
-          "measurement": "sparkey",
-          "fields": [
-            "HERMS HLT Sensor/value[degC]",
-            "HERMS MT Sensor/value[degC]",
-            "HERMS BK Sensor/value[degC]",
-            "HERMS HLT Setpoint/setting[degC]",
-            "HERMS MT Setpoint/setting[degC]",
-            "HERMS BK Setpoint/setting[degC]",
-            "HERMS HLT PWM/value",
-            "HERMS BK PWM/value"
-          ]
-        }
+      "fields": [
+        "sparkey/HERMS HLT Sensor/value[degC]",
+        "sparkey/HERMS MT Sensor/value[degC]",
+        "sparkey/HERMS BK Sensor/value[degC]",
+        "sparkey/HERMS HLT Setpoint/setting[degC]",
+        "sparkey/HERMS MT Setpoint/setting[degC]",
+        "sparkey/HERMS BK Setpoint/setting[degC]",
+        "sparkey/HERMS HLT PWM/value",
+        "sparkey/HERMS BK PWM/value"
       ],
       "renames": {
         "sparkey/HERMS HLT Sensor/value[degC]": "HLT temperature",
@@ -56,28 +61,34 @@
         "sparkey/HERMS HLT PWM/value": "HLT PWM value",
         "sparkey/HERMS BK PWM/value": "BK PWM value"
       },
+      "layout": {},
       "axes": {
         "sparkey/HERMS HLT PWM/value": "y2",
         "sparkey/HERMS BK PWM/value": "y2"
       },
       "colors": {},
       "precision": {}
-    },
+    }
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "2-UtLY_8z24JlcbI8oLrJ",
+    "title": "Sequence",
+    "feature": "Sequence",
+    "cols": 4,
     "order": 1,
-    "feature": "Graph",
-    "pinnedPosition": {
-      "x": 1,
-      "y": 6
-    },
-    "title": "HERMS Graph",
-    "cols": 7,
-    "dashboard": "herms",
-    "rows": 5
+    "pinnedPosition": null,
+    "rows": 4,
+    "dashboard": "dashboard-home",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "Sequence"
+    }
   },
   {
     "namespace": "brewblox-ui-store:logged-sessions",
     "id": "3d15296d-0abd-4d45-383c-0bec436ae319",
-    "date": 1579688563640,
+    "title": "Teddy",
     "notes": [
       {
         "id": "66ea94b9-1c2a-6218-6469-a9b353e45e77",
@@ -93,48 +104,51 @@
         "start": null,
         "end": null,
         "config": {
+          "version": "1.0",
+          "params": {},
+          "fields": [],
+          "renames": {},
           "layout": {
             "annotations": []
           },
-          "params": {},
-          "targets": [],
-          "renames": {},
           "axes": {},
-          "colors": {}
+          "colors": {},
+          "precision": {}
         },
         "col": 12
       }
     ],
+    "date": 1579688563640,
     "tags": [
       "on: Home Dashboard"
-    ],
-    "title": "Teddy"
+    ]
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "4bd955e4-e9ae-4413-8b2f-b0ff661d51d9",
+    "title": "HERMS Process",
+    "feature": "Builder",
+    "cols": 11,
+    "order": 1,
+    "pinnedPosition": {
+      "x": 1,
+      "y": 1
+    },
+    "rows": 5,
+    "dashboard": "herms",
     "config": {
       "currentLayoutId": "d7ccf061-a75e-46ad-991c-1beae66dcf18",
       "layoutIds": [
         "d7ccf061-a75e-46ad-991c-1beae66dcf18"
       ]
-    },
-    "order": 1,
-    "feature": "Builder",
-    "pinnedPosition": {
-      "x": 1,
-      "y": 1
-    },
-    "title": "HERMS Process",
-    "cols": 11,
-    "dashboard": "herms",
-    "rows": 5
+    }
   },
   {
     "namespace": "brewblox-ui-store:layouts",
     "id": "68426d4c-edb9-4616-b13c-c6dbabbec725",
-    "width": 20,
+    "title": "Gone With the Layout",
     "height": 15,
+    "width": 20,
     "parts": [
       {
         "type": "Conical",
@@ -888,31 +902,35 @@
         "settings": {},
         "flipped": false
       }
-    ],
-    "title": "Gone With the Layout"
+    ]
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "71803ee0-6e9b-4d82-a17f-b6c4ae155add",
+    "title": "Ferment Graph",
+    "feature": "Graph",
+    "cols": 6,
+    "order": 1,
+    "pinnedPosition": {
+      "x": 5,
+      "y": 1
+    },
+    "rows": 5,
+    "dashboard": "fermentation",
     "config": {
-      "layout": {},
+      "version": "1.0",
       "params": {
         "duration": "10m"
       },
-      "targets": [
-        {
-          "measurement": "sparkey",
-          "fields": [
-            "Ferment Fridge Sensor/value[degC]",
-            "Ferment Beer Sensor/value[degC]",
-            "Ferment Fridge Setting/setting[degC]",
-            "Ferment Beer Setting/setting[degC]",
-            "Ferment Cool PWM/value",
-            "Ferment Heat PWM/value",
-            "Ferment Cool Actuator/state",
-            "Ferment Heat Actuator/state"
-          ]
-        }
+      "fields": [
+        "sparkey/Ferment Fridge Sensor/value[degC]",
+        "sparkey/Ferment Beer Sensor/value[degC]",
+        "sparkey/Ferment Fridge Setting/setting[degC]",
+        "sparkey/Ferment Beer Setting/setting[degC]",
+        "sparkey/Ferment Cool PWM/value",
+        "sparkey/Ferment Heat PWM/value",
+        "sparkey/Ferment Cool Actuator/state",
+        "sparkey/Ferment Heat Actuator/state"
       ],
       "renames": {
         "sparkey/Ferment Fridge Sensor/value[degC]": "Fridge temperature",
@@ -924,6 +942,7 @@
         "sparkey/Ferment Cool Actuator/state": "Cool Pin state",
         "sparkey/Ferment Heat Actuator/state": "Heat Pin state"
       },
+      "layout": {},
       "axes": {
         "sparkey/Ferment Cool PWM/value": "y2",
         "sparkey/Ferment Heat PWM/value": "y2",
@@ -932,41 +951,55 @@
       },
       "colors": {},
       "precision": {}
-    },
-    "order": 1,
-    "feature": "Graph",
+    }
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "7ms71ZOvuHMFK-rO3tALF",
+    "title": "Temp Sensor (External)",
+    "feature": "TempSensorExternal",
+    "cols": 4,
+    "order": 2,
     "pinnedPosition": {
       "x": 5,
       "y": 1
     },
-    "title": "Ferment Graph",
-    "cols": 6,
-    "dashboard": "fermentation",
-    "rows": 5
+    "rows": 3,
+    "dashboard": "dashboard-home",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "Temp Sensor (External)"
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "90922e82-b366-48a5-b081-536f7aa917d1",
+    "title": "Ferment Process",
+    "feature": "Builder",
+    "cols": 4,
+    "order": 1,
+    "pinnedPosition": {
+      "x": 1,
+      "y": 1
+    },
+    "rows": 5,
+    "dashboard": "fermentation",
     "config": {
       "currentLayoutId": "fab0168f-ad53-499d-a690-a0273d95abf1",
       "layoutIds": [
         "fab0168f-ad53-499d-a690-a0273d95abf1"
       ]
-    },
-    "order": 1,
-    "feature": "Builder",
-    "pinnedPosition": {
-      "x": 1,
-      "y": 1
-    },
-    "title": "Ferment Process",
-    "cols": 4,
-    "dashboard": "fermentation",
-    "rows": 5
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "93c393d1-3a4b-41cd-ba3a-e9ba9d1aa2c0",
+    "title": "Quick Values",
+    "feature": "QuickValues",
+    "cols": 4,
+    "order": 7,
+    "rows": 4,
+    "dashboard": "dashboard-home",
     "config": {
       "addr": {
         "serviceId": "spock",
@@ -996,59 +1029,59 @@
           1
         ]
       ]
-    },
-    "order": 7,
-    "feature": "QuickValues",
-    "title": "Quick Values",
-    "cols": 4,
-    "dashboard": "dashboard-home",
-    "rows": 4
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "a06350b4-5499-11e9-8647-d663bd873d93",
+    "title": "item-invalid",
+    "feature": "SetpointSensorPair",
+    "cols": 3,
+    "order": 1,
+    "rows": 3,
+    "dashboard": "derp",
     "config": {
       "serviceId": "sparkey",
       "blockId": "BLARGH"
-    },
-    "order": 1,
-    "feature": "SetpointSensorPair",
-    "title": "item-invalid",
-    "cols": 3,
-    "dashboard": "derp",
-    "rows": 3
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "a06355e6-5499-11e9-8647-d663bd873d93",
+    "title": "item-unknown",
+    "feature": "UnknownType",
+    "cols": 3,
+    "order": 2,
+    "rows": 3,
+    "dashboard": "derp",
     "config": {
       "serviceId": "sparkey",
       "blockId": "setpoint-1"
-    },
-    "order": 2,
-    "feature": "UnknownType",
-    "title": "item-unknown",
-    "cols": 3,
-    "dashboard": "derp",
-    "rows": 3
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "a06358fc-5499-11e9-8647-d663bd873d93",
+    "title": "item-invalid-unknown",
+    "feature": "Warbl",
+    "cols": 3,
+    "order": 3,
+    "rows": 3,
+    "dashboard": "derp",
     "config": {
       "serviceId": "sparkey",
       "blockId": "BLORP"
-    },
-    "order": 3,
-    "feature": "Warbl",
-    "title": "item-invalid-unknown",
-    "cols": 3,
-    "dashboard": "derp",
-    "rows": 3
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "a06358fc-5499-11e9-8647-d663bd873d95",
+    "title": "Charles",
+    "feature": "QuickActions",
+    "cols": 4,
+    "order": 4,
+    "rows": 3,
+    "dashboard": "dashboard-home",
     "config": {
       "serviceId": "sparkey",
       "serviceIdMigrated": true,
@@ -1078,7 +1111,7 @@
                   "value": 10,
                   "unit": "degC"
                 },
-                "settingEnabled": true
+                "enabled": true
               },
               "id": "80edc81a-8ee6-4ad7-8c55-ca924def3258",
               "serviceId": "sparkey"
@@ -1117,7 +1150,7 @@
                   "value": 20,
                   "unit": "degC"
                 },
-                "settingEnabled": true
+                "enabled": true
               },
               "id": "90f603ac-7d3e-46d6-a784-822e44e68dd9",
               "serviceId": "sparkey"
@@ -1149,89 +1182,82 @@
             }
           ]
         }
-      ]
-    },
-    "order": 3,
-    "feature": "QuickActions",
-    "title": "Charles",
-    "cols": 4,
-    "dashboard": "dashboard-home",
-    "rows": 3
+      ],
+      "version": "1.0"
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "a0635bb8-5499-11e9-8647-d663bd873d93",
+    "title": "item-service-unknown",
+    "feature": "SetpointSensorPair",
+    "cols": 3,
+    "order": 3,
+    "rows": 3,
+    "dashboard": "derp",
     "config": {
       "serviceId": "ZORP",
       "blockId": "BLORP"
-    },
-    "order": 3,
-    "feature": "SetpointSensorPair",
-    "title": "item-service-unknown",
-    "cols": 3,
-    "dashboard": "derp",
-    "rows": 3
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "a0636b12-5499-11e9-8647-d663bd873d94",
+    "title": "inspector",
+    "feature": "Metrics",
+    "cols": 4,
+    "order": 3,
+    "rows": 4,
+    "dashboard": "dashboard-home",
     "config": {
-      "targets": [
-        {
-          "measurement": "sparkey",
-          "fields": [
-            "actuator-pwm-1/setting",
-            "actuator-pwm-1/value"
-          ]
-        }
+      "version": "1.0",
+      "params": {},
+      "fields": [
+        "sparkey/actuator-pwm-1/setting",
+        "sparkey/actuator-pwm-1/value"
       ],
       "renames": {
         "sparkey/actuator-pwm-1/value": "actuator value"
       },
       "freshDuration": {},
       "decimals": {}
-    },
-    "order": 2,
-    "feature": "Metrics",
-    "title": "inspector",
-    "cols": 4,
-    "dashboard": "dashboard-home",
-    "rows": 4
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "aa8d6d3e-9b7d-4ee6-92a8-a0aecef8a7bb",
+    "title": "Spark Sim Display",
+    "feature": "SparkDisplay",
+    "cols": 4,
+    "order": 9,
+    "rows": 3,
+    "dashboard": "dashboard-home",
     "config": {
       "serviceId": null
-    },
-    "order": 9,
-    "feature": "SparkDisplay",
-    "title": "Spark Sim Display",
-    "cols": 4,
-    "dashboard": "dashboard-home",
-    "rows": 3
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "b4376a3c-13f3-45aa-8e76-3f6a0eac4c1e",
-    "config": {
-      "blockId": "Ferment Temperature Profile",
-      "serviceId": "sparkey"
-    },
-    "order": 3,
+    "title": "Ferment Temperature Profile",
     "feature": "SetpointProfile",
+    "cols": 6,
+    "order": 3,
     "pinnedPosition": {
       "x": 5,
       "y": 6
     },
-    "title": "Ferment Temperature Profile",
-    "cols": 6,
+    "rows": 4,
     "dashboard": "fermentation",
-    "rows": 4
+    "config": {
+      "blockId": "Ferment Temperature Profile",
+      "serviceId": "sparkey"
+    }
   },
   {
     "namespace": "brewblox-ui-store:autm-template",
     "id": "ba342aed-d4ab-43aa-8286-1e7fed8f2afe",
+    "title": "ON/OFF",
     "steps": [
       {
         "id": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
@@ -1350,25 +1376,34 @@
           }
         ]
       }
-    ],
-    "title": "ON/OFF"
+    ]
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "bb7aa0b4-a045-ad38-4887-308967ca8d63",
+    "title": "Mr Beancounter",
+    "feature": "SessionLog",
+    "cols": 4,
+    "order": 6,
+    "rows": 5,
+    "dashboard": "dashboard-home",
     "config": {
       "currentSession": "3d15296d-0abd-4d45-383c-0bec436ae319"
-    },
-    "order": 5,
-    "feature": "SessionLog",
-    "title": "Mr Beancounter",
-    "cols": 4,
-    "dashboard": "dashboard-home",
-    "rows": 5
+    }
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "c431165b-1da0-41ce-90fd-596cf38db577",
+    "title": "Ferment Control",
+    "feature": "TempControl",
+    "cols": 4,
+    "order": 2,
+    "pinnedPosition": {
+      "x": 1,
+      "y": 6
+    },
+    "rows": 4,
+    "dashboard": "fermentation",
     "config": {
       "serviceId": "sparkey",
       "coolPid": {
@@ -1475,23 +1510,14 @@
           }
         }
       ]
-    },
-    "order": 2,
-    "feature": "TempControl",
-    "pinnedPosition": {
-      "x": 1,
-      "y": 6
-    },
-    "title": "Ferment Control",
-    "cols": 4,
-    "dashboard": "fermentation",
-    "rows": 4
+    }
   },
   {
     "namespace": "brewblox-ui-store:layouts",
     "id": "d7ccf061-a75e-46ad-991c-1beae66dcf18",
-    "width": 26,
+    "title": "HERMS Layout",
     "height": 11,
+    "width": 26,
     "parts": [
       {
         "id": "79bf4412-0ad1-4325-8b58-891c33c1f53d",
@@ -2384,37 +2410,37 @@
         "x": 0,
         "y": 9
       }
-    ],
-    "title": "HERMS Layout"
+    ]
   },
   {
     "namespace": "brewblox-ui-store:dashboards",
     "id": "dashboard-home",
-    "order": 2,
-    "title": "Home Dashboard"
+    "title": "Home Dashboard",
+    "order": 2
   },
   {
     "namespace": "brewblox-ui-store:system-config",
     "id": "default",
+    "builderTouchDelayed": "dense",
+    "homePage": "/dashboard/dashboard-home",
+    "showSidebarLayouts": true,
     "timeZone": {
       "name": "Europe/Amsterdam",
       "posixValue": "CET-1CEST,M3.5.0,M10.5.0/3"
     },
-    "homePage": "/dashboard/dashboard-home",
-    "builderTouchDelayed": "dense",
-    "showSidebarLayouts": true,
     "keyboardLayout": "english",
     "experimental": true
   },
   {
     "namespace": "brewblox-ui-store:dashboards",
     "id": "derp",
-    "order": 5,
-    "title": "Derp Dashboard"
+    "title": "Derp Dashboard",
+    "order": 5
   },
   {
     "namespace": "brewblox-ui-store:autm-template",
     "id": "eaa6154b-a5ec-4cab-a655-31985e2c5a9d",
+    "title": "Test Template",
     "steps": [
       {
         "id": "bdc00a5d-ccfe-4699-8cc2-2cdb73eeb1d1",
@@ -3381,18 +3407,27 @@
           }
         ]
       }
-    ],
-    "title": "Test Template"
+    ]
   },
   {
     "namespace": "brewblox-ui-store:dashboards",
     "id": "Empty-dashboard",
-    "order": 1,
-    "title": "Empty dashboard"
+    "title": "Empty dashboard",
+    "order": 1
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "f1233d1b-597b-411a-8f38-a4a569d03466",
+    "title": "HERMS Actions",
+    "feature": "QuickActions",
+    "cols": 4,
+    "order": 2,
+    "pinnedPosition": {
+      "x": 8,
+      "y": 6
+    },
+    "rows": 5,
+    "dashboard": "herms",
     "config": {
       "serviceId": "sparkey",
       "changeIdMigrated": true,
@@ -3406,7 +3441,7 @@
               "id": "08d7f410-83c7-45cb-a6ea-4d721b013f77",
               "blockId": "HERMS HLT Setpoint",
               "data": {
-                "settingEnabled": false
+                "enabled": false
               },
               "confirmed": {},
               "serviceId": "sparkey"
@@ -3415,7 +3450,7 @@
               "id": "6e784ce5-faf0-4241-a224-f18c509edebc",
               "blockId": "HERMS MT Setpoint",
               "data": {
-                "settingEnabled": false
+                "enabled": false
               },
               "confirmed": {},
               "serviceId": "sparkey"
@@ -3424,7 +3459,7 @@
               "id": "59f95a88-dd51-4020-8d76-e3068fc3344c",
               "blockId": "HERMS BK Setpoint",
               "data": {
-                "settingEnabled": false
+                "enabled": false
               },
               "confirmed": {},
               "serviceId": "sparkey"
@@ -3440,7 +3475,7 @@
               "serviceId": "sparkey",
               "blockId": "HERMS MT Setpoint",
               "data": {
-                "settingEnabled": false
+                "enabled": false
               },
               "confirmed": {}
             },
@@ -3449,7 +3484,7 @@
               "serviceId": "sparkey",
               "blockId": "HERMS HLT Setpoint",
               "data": {
-                "settingEnabled": true,
+                "enabled": true,
                 "storedSetting": {
                   "__bloxtype": "Quantity",
                   "value": 70,
@@ -3471,7 +3506,7 @@
               "serviceId": "sparkey",
               "blockId": "HERMS MT Setpoint",
               "data": {
-                "settingEnabled": true,
+                "enabled": true,
                 "storedSetting": {
                   "__bloxtype": "Quantity",
                   "value": 66.7,
@@ -3502,7 +3537,7 @@
               "serviceId": "sparkey",
               "blockId": "HERMS BK Setpoint",
               "data": {
-                "settingEnabled": true,
+                "enabled": true,
                 "storedSetting": {
                   "__bloxtype": "Quantity",
                   "value": 100,
@@ -3516,23 +3551,14 @@
           ]
         }
       ]
-    },
-    "order": 2,
-    "feature": "QuickActions",
-    "pinnedPosition": {
-      "x": 8,
-      "y": 6
-    },
-    "title": "HERMS Actions",
-    "cols": 4,
-    "dashboard": "herms",
-    "rows": 5
+    }
   },
   {
     "namespace": "brewblox-ui-store:layouts",
     "id": "fab0168f-ad53-499d-a690-a0273d95abf1",
-    "width": 8,
+    "title": "Ferment Layout",
     "height": 10,
+    "width": 8,
     "parts": [
       {
         "id": "66b53e3e-5812-4a17-9bb0-b8b8227c42df",
@@ -3636,57 +3662,56 @@
           "sizeY": 1
         }
       }
-    ],
-    "title": "Ferment Layout"
+    ]
   },
   {
     "namespace": "brewblox-ui-store:dashboards",
     "id": "fermentation",
-    "order": 3,
-    "title": "Fermentation"
+    "title": "Fermentation",
+    "order": 3
   },
   {
     "namespace": "brewblox-ui-store:dashboards",
     "id": "herms",
-    "order": 4,
-    "title": "HERMS"
+    "title": "HERMS",
+    "order": 4
   },
   {
     "namespace": "brewblox-ui-store:services",
     "id": "sparkey",
-    "config": {},
-    "order": 1,
+    "title": "Spark Controller 'sparkey'",
     "type": "Spark",
-    "title": "Spark Controller 'sparkey'"
+    "order": 1,
+    "config": {}
   },
   {
     "namespace": "brewblox-ui-store:services",
     "id": "spock",
-    "config": {},
-    "order": 2,
+    "title": "Spark Controller 'spock'",
     "type": "Spark",
-    "title": "Spark Controller 'spock'"
+    "order": 2,
+    "config": {}
   },
   {
     "namespace": "brewblox-ui-store:services",
     "id": "tilt",
-    "config": {},
-    "order": 3,
+    "title": "tilt",
     "type": "Tilt",
-    "title": "tilt"
+    "order": 3,
+    "config": {}
   },
   {
     "namespace": "brewblox-ui-store:dashboard-items",
     "id": "W7x6m1W_B-U-8_5_LZ3ho",
+    "title": "Countdown",
+    "feature": "Countdown",
+    "cols": 4,
+    "order": 8,
+    "rows": 3,
+    "dashboard": "dashboard-home",
     "config": {
       "baseDuration": 10000,
       "session": null
-    },
-    "order": 8,
-    "feature": "Countdown",
-    "title": "Countdown",
-    "cols": 4,
-    "dashboard": "dashboard-home",
-    "rows": 3
+    }
   }
 ]

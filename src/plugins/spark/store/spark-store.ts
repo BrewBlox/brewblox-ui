@@ -1,32 +1,30 @@
-import { defineStore } from 'pinia';
-
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
-import {
-  BlockDriveChain,
-  BlockRelation,
-  Link,
-  SparkPatchEvent,
-} from '@/shared-types';
+import type {
+  BlockAddress,
+  BlockFieldAddress,
+  SparkExported,
+  SparkSessionConfig,
+} from '@/plugins/spark/types';
 import { useServiceStore } from '@/store/services';
 import { useWidgetStore } from '@/store/widgets';
 import { concatById, filterById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
-
-import type {
-  BlockAddress,
-  SparkExported,
-  SparkSessionConfig,
-  SparkStatus,
-} from '../types';
-import type { Block, BlockFieldAddress } from '../types';
-import { isBlockVolatile, isSparkPatch, isSparkState } from '../utils';
+import {
+  Block,
+  BlockClaim,
+  BlockRelation,
+  Link,
+  SparkPatchEvent,
+  SparkStatusDescription,
+} from 'brewblox-proto/ts';
+import { defineStore } from 'pinia';
+import { isBlockVolatile, isSparkPatch, isSparkState } from '../utils/info';
 import * as sparkApi from './spark-api';
 import {
   asServiceStatus,
-  asSparkStatus,
   findBlockByAddress,
   findBlockById,
   findBlockFieldByAddress,
@@ -53,9 +51,9 @@ interface SparkStoreState {
   blocks: ByService<Block[]>;
   volatileBlocks: ByService<Block[]>;
   discoveredBlockIds: ByService<string[]>;
-  statuses: ByService<SparkStatus | null>;
+  statuses: ByService<SparkStatusDescription | null>;
   relations: ByService<BlockRelation[]>;
-  driveChains: ByService<BlockDriveChain[]>;
+  claims: ByService<BlockClaim[]>;
   lastBlocksAt: ByService<Date | null>;
   lastStatusAt: ByService<Date | null>;
   sessionConfigs: ByService<SparkSessionConfig>;
@@ -71,7 +69,7 @@ export const useSparkStore = defineStore('sparkStore', {
     discoveredBlockIds: {},
     statuses: {},
     relations: {},
-    driveChains: {},
+    claims: {},
     lastBlocksAt: {},
     lastStatusAt: {},
     sessionConfigs: {},
@@ -151,7 +149,7 @@ export const useSparkStore = defineStore('sparkStore', {
       return this.has(serviceId) ? this.discoveredBlockIds[serviceId] : [];
     },
 
-    statusByService(serviceId: Maybe<string>): SparkStatus | null {
+    statusByService(serviceId: Maybe<string>): SparkStatusDescription | null {
       return this.has(serviceId) ? this.statuses[serviceId] : null;
     },
 
@@ -159,8 +157,8 @@ export const useSparkStore = defineStore('sparkStore', {
       return this.has(serviceId) ? this.relations[serviceId] : [];
     },
 
-    driveChainsByService(serviceId: Maybe<string>): BlockDriveChain[] {
-      return this.has(serviceId) ? this.driveChains[serviceId] : [];
+    claimsByService(serviceId: Maybe<string>): BlockClaim[] {
+      return this.has(serviceId) ? this.claims[serviceId] : [];
     },
 
     lastBlocksAtByService(serviceId: Maybe<string>): Date | null {
@@ -218,14 +216,17 @@ export const useSparkStore = defineStore('sparkStore', {
       }
     },
 
-    async modifyBlock<T extends Block>(
-      block: T,
-      func: (actual: T) => Awaitable<unknown>,
+    async patchBlock<T extends Block>(
+      block: Maybe<T>,
+      data: Partial<T['data']>,
     ): Promise<void> {
-      const actual = deepCopy(this.blockByAddress<T>(block));
-      if (actual) {
-        await func(actual);
-        return this.saveBlock(actual);
+      if (block == null) {
+        return;
+      }
+      if (isBlockVolatile(block)) {
+        this.setVolatileBlock({ ...block, data: { ...block.data, ...data } });
+      } else {
+        await sparkApi.patchBlock(block, data); // triggers patch event
       }
     },
 
@@ -292,7 +293,7 @@ export const useSparkStore = defineStore('sparkStore', {
     invalidateBlocks(serviceId: string): void {
       this.blocks[serviceId] = [];
       this.relations[serviceId] = [];
-      this.driveChains[serviceId] = [];
+      this.claims[serviceId] = [];
       this.lastBlocksAt[serviceId] = null;
     },
 
@@ -340,15 +341,16 @@ export const useSparkStore = defineStore('sparkStore', {
     async fetchAll(serviceId: string): Promise<boolean> {
       const serviceStore = useServiceStore();
       const status = await sparkApi.fetchSparkStatus(serviceId);
-      this.updateStatus(status);
-      serviceStore.updateStatus(asServiceStatus(status));
-      if (status.isSynchronized) {
+      this.updateStatus(serviceId, status);
+      serviceStore.updateStatus(asServiceStatus(serviceId, status));
+      const synchronized = status?.connection_status === 'SYNCHRONIZED';
+      if (synchronized) {
         await Promise.all([
           this.fetchDiscoveredBlocks(serviceId),
           this.fetchBlocks(serviceId),
         ]);
       }
-      return !!status.isSynchronized;
+      return synchronized;
     },
 
     async serviceExport(serviceId: string): Promise<SparkExported> {
@@ -383,11 +385,11 @@ export const useSparkStore = defineStore('sparkStore', {
 
     updateComputed(
       serviceId: string,
-      newRelations: BlockRelation[],
-      newDriveChains: BlockDriveChain[],
+      relations: BlockRelation[],
+      claims: BlockClaim[],
     ): void {
-      this.relations[serviceId] = newRelations;
-      this.driveChains[serviceId] = newDriveChains;
+      this.relations[serviceId] = relations;
+      this.claims[serviceId] = claims;
     },
 
     patchBlocks(evt: SparkPatchEvent): void {
@@ -400,8 +402,10 @@ export const useSparkStore = defineStore('sparkStore', {
       ];
     },
 
-    updateStatus(status: SparkStatus): void {
-      const { serviceId } = status;
+    updateStatus(
+      serviceId: string,
+      status: SparkStatusDescription | null,
+    ): void {
       this.statuses[serviceId] = status;
       this.lastStatusAt[serviceId] = new Date();
     },
@@ -448,7 +452,7 @@ export const useSparkStore = defineStore('sparkStore', {
       this.discoveredBlockIds[serviceId] = [];
       this.statuses[serviceId] = null;
       this.relations[serviceId] = [];
-      this.driveChains[serviceId] = [];
+      this.claims[serviceId] = [];
       this.lastBlocksAt[serviceId] = null;
       this.lastStatusAt[serviceId] = null;
       this.sessionConfigs[serviceId] = defaultSessionConfig();
@@ -458,17 +462,20 @@ export const useSparkStore = defineStore('sparkStore', {
         (_, evt) => {
           if (isSparkState(evt)) {
             const serviceStore = useServiceStore();
-            const status = asSparkStatus(serviceId, evt.data.status);
-            const blocks = evt.data.blocks.map(deserialize);
+            if (evt.data) {
+              const blocks = evt.data.blocks.map(deserialize);
+              const { status, relations, claims } = evt.data;
 
-            this.updateBlocks(serviceId, blocks);
-            this.updateStatus(status);
-            this.updateComputed(
-              serviceId,
-              evt.data.relations,
-              evt.data.drive_chains,
-            );
-            serviceStore.updateStatus(asServiceStatus(status));
+              this.updateBlocks(serviceId, blocks);
+              this.updateStatus(serviceId, status);
+              this.updateComputed(serviceId, relations, claims);
+              serviceStore.updateStatus(asServiceStatus(serviceId, status));
+            } else {
+              this.updateBlocks(serviceId, []);
+              this.updateStatus(serviceId, null);
+              this.updateComputed(serviceId, [], []);
+              serviceStore.updateStatus(asServiceStatus(serviceId, null));
+            }
           }
         },
       );
@@ -500,7 +507,7 @@ export const useSparkStore = defineStore('sparkStore', {
       delete this.discoveredBlockIds[serviceId];
       delete this.statuses[serviceId];
       delete this.relations[serviceId];
-      delete this.driveChains[serviceId];
+      delete this.claims[serviceId];
       delete this.lastBlocksAt[serviceId];
       delete this.lastStatusAt[serviceId];
       delete this.sessionConfigs[serviceId];

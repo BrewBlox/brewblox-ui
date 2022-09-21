@@ -1,44 +1,36 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
-
+import { computed, defineComponent } from 'vue';
 import { WebframeWidget } from './types';
 
 export default defineComponent({
   name: 'WebframeWidget',
   setup() {
-    const {
-      config,
-      saveConfig,
-    } = useWidget.setup<WebframeWidget>();
-    const {
-      context,
-    } = useContext.setup();
+    const { config, patchConfig } = useWidget.setup<WebframeWidget>();
+    const { context } = useContext.setup();
 
     const scale = computed<number>({
       get: () => config.value.scale || 1,
-      set: scale => saveConfig({ ...config.value, scale }),
+      set: (scale) => patchConfig({ scale }),
     });
 
     const pctScale = computed<number>({
       get: () => scale.value * 100,
-      set: v => scale.value = (v || 100) / 100,
+      set: (v) => (scale.value = (v || 100) / 100),
     });
 
     const url = computed<string>({
       get: () => config.value.url,
-      set: url => saveConfig({ ...config.value, url }),
+      set: (url) => patchConfig({ url }),
     });
 
     const counterScale = computed<number>(
       // value * scale * counterScale == value
-      () => ((1 - scale.value) / scale.value) + 1,
+      () => (1 - scale.value) / scale.value + 1,
     );
 
     return {
       config,
-      saveConfig,
       context,
       url,
       scale,
@@ -48,7 +40,6 @@ export default defineComponent({
   },
 });
 </script>
-
 
 <template>
   <Card no-scroll>
@@ -91,7 +82,7 @@ export default defineComponent({
         message="URLs must include the http:// or https:// prefix."
         class="col-grow"
         tag-style="word-break: break-word"
-        :dialog-props="{ fontSize:'100%' }"
+        :dialog-props="{ fontSize: '100%' }"
       />
 
       <InputField
@@ -102,9 +93,7 @@ export default defineComponent({
         class="col-grow"
         suffix="%"
         :decimals="0"
-        :rules="[
-          v => v === null || v > 0 || 'Value must be > 0',
-        ]"
+        :rules="[(v) => v === null || v > 0 || 'Value must be > 0']"
       />
     </div>
   </Card>

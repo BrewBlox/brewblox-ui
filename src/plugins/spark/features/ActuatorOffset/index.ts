@@ -1,23 +1,20 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { bloxLink } from '@/utils/link';
+import { deltaTempQty } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
   AnalogConstraintsObj,
-  BlockFieldSpec,
   BlockIntfType,
-  BlockSpec,
   BlockType,
   ReferenceKind,
-} from '@/plugins/spark/types';
-import {
-  blockWidgetSelector,
-  prettifyConstraints,
-} from '@/plugins/spark/utils';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { bloxLink } from '@/utils/link';
-
+  SettingMode,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './ActuatorOffsetWidget.vue';
 
 const type = BlockType.ActuatorOffset;
@@ -29,31 +26,28 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorOffsetBlock> = {
       type,
-      generate: () => ({
+      generate: (): ActuatorOffsetBlock['data'] => ({
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
-        drivenTargetId: bloxLink(
-          null,
-          BlockIntfType.SetpointSensorPairInterface,
-          true,
-        ),
         referenceId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         referenceSettingOrValue: ReferenceKind.REF_SETTING,
-        desiredSetting: 0,
-        setting: 0,
-        value: 0,
+        storedSetting: deltaTempQty(0),
+        desiredSetting: deltaTempQty(null),
+        setting: deltaTempQty(null),
+        value: deltaTempQty(null),
         constrainedBy: { constraints: [] },
         enabled: true,
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorOffsetBlock>[] = [
       {
         type,
-        key: 'desiredSetting',
-        title: 'Target offset',
-        component: 'NumberValEdit',
-        generate: () => 0,
-        valueHint: 'degC or %, depending on target',
+        key: 'storedSetting',
+        title: 'Stored offset',
+        component: 'QuantityValEdit',
+        generate: () => deltaTempQty(0),
       },
       {
         type,
@@ -88,21 +82,28 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'desiredSetting',
+        title: 'Desired offset',
+        component: 'QuantityValEdit',
+        generate: () => deltaTempQty(0),
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'setting',
-        title: 'Target offset',
-        component: 'NumberValEdit',
-        generate: () => 0,
-        valueHint: 'number',
+        title: 'Actual setting',
+        component: 'QuantityValEdit',
+        generate: () => deltaTempQty(0),
         readonly: true,
         graphed: true,
       },
       {
         type,
         key: 'value',
-        title: 'Actual offset',
-        component: 'NumberValEdit',
-        generate: () => 0,
-        valueHint: 'number',
+        title: 'Achieved offset',
+        component: 'QuantityValEdit',
+        generate: () => deltaTempQty(0),
         readonly: true,
         graphed: true,
       },

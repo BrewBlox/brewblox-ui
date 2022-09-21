@@ -1,21 +1,21 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Spark3PinsBlock } from '@/plugins/spark/types';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber } from '@/utils/quantity';
+import { Spark3PinsBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'Spark3PinsWidget',
   setup() {
     const { context } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<Spark3PinsBlock>();
+    const { block, patchBlock } = useBlockWidget.setup<Spark3PinsBlock>();
+
     return {
       fixedNumber,
       context,
       block,
-      saveBlock,
+      patchBlock,
     };
   },
 });
@@ -30,7 +30,10 @@ export default defineComponent({
     <div>
       <IoArray />
 
-      <div v-if="context.mode === 'Full'" class="widget-body row">
+      <div
+        v-if="context.mode === 'Full'"
+        class="widget-body row"
+      >
         <q-separator inset />
         <div class="col-break" />
 
@@ -41,9 +44,9 @@ export default defineComponent({
           <q-toggle
             :model-value="block.data.enableIoSupply5V"
             dense
-            @update:model-value="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
+            @update:model-value="(v) => patchBlock({ enableIoSupply5V: v })"
           />
-        </labeledfield>
+        </LabeledField>
         <LabeledField
           label="Enable 12V"
           class="col-grow"
@@ -51,7 +54,7 @@ export default defineComponent({
           <q-toggle
             :model-value="block.data.enableIoSupply12V"
             dense
-            @update:model-value="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
+            @update:model-value="(v) => patchBlock({ enableIoSupply12V: v })"
           />
         </LabeledField>
 

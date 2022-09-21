@@ -1,20 +1,15 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
-
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import {
-  Block,
-  BlockAddress,
-  BlockConfig,
-  BlockType,
-} from '@/plugins/spark/types';
-import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { BlockAddress, BlockConfig } from '@/plugins/spark/types';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { useWidgetStore } from '@/store/widgets';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
+import { Block, BlockType } from 'brewblox-proto/ts';
+import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
 type CreateMode = 'new' | 'existing';
 
@@ -134,7 +129,6 @@ export default defineComponent({
           id: newBlockId.value,
           serviceId: serviceId.value,
           type: props.featureId,
-          groups: [0],
           data: newBlockData.value,
         });
       }
@@ -284,7 +278,7 @@ export default defineComponent({
             <q-icon name="mdi-information">
               <q-tooltip>
                 The name of the Spark Controller block.
-                <br>Multiple widgets can display the same block. <br>Rules:
+                <br />Multiple widgets can display the same block. <br />Rules:
                 <ul>
                   <li>The name must not be empty.</li>
                   <li>The name must be unique.</li>
@@ -311,7 +305,11 @@ export default defineComponent({
     </div>
 
     <template #actions>
-      <q-btn flat label="Back" @click="onBack" />
+      <q-btn
+        flat
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <q-btn
         :disable="!canCreate"

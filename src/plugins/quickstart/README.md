@@ -14,7 +14,7 @@ New Quickstart runs will be initialized with empty objects for both, and are exp
 An example Task component:
 
 ```ts
-import { defineComponent, PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 
 interface ExampleConfig {
   name: string;
@@ -35,20 +35,15 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'update:actions',
-    'back',
-    'next',
-    'close',
-  ],
+  emits: ['update:config', 'update:actions', 'back', 'next', 'close'],
   setup(props, { emit }) {
     const temperature = computed<number>({
       get: () => props.config.temperature,
-      set: v => emit('update:config', {
-        ...props.config,
-        temperature: v,
-      }),
+      set: (v) =>
+        emit('update:config', {
+          ...props.config,
+          temperature: v,
+        }),
     });
 
     function addAction(action: ExampleAction): void {

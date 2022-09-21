@@ -1,6 +1,5 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
-
 import { FridgeConfig, FridgeConfigNames } from './types';
 
 const defaultNames: FridgeConfigNames = {

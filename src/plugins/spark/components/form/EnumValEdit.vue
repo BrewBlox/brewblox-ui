@@ -1,8 +1,6 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
-
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'EnumValEdit',
@@ -17,14 +15,9 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<string>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<string>();
 
     return {
       field,
@@ -35,7 +28,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <div v-if="editable" class="row no-wrap q-gutter-x-xs">
+  <div
+    v-if="editable"
+    class="row no-wrap q-gutter-x-xs"
+  >
     <q-select
       v-model="field"
       :options="options"

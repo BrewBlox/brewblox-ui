@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent, inject, PropType, provide, reactive, ref } from 'vue';
-
 import { WidgetContext } from '@/store/features';
 import { ContextKey, InvalidateKey, WidgetIdKey } from '@/symbols';
 import { deepCopy } from '@/utils/objects';
+import { defineComponent, inject, PropType, provide, reactive, ref } from 'vue';
 
 export default defineComponent({
   name: 'WidgetProvider',
@@ -19,7 +18,7 @@ export default defineComponent({
   },
   setup(props) {
     const valid = ref(true);
-    const invalidateParent = inject(InvalidateKey, () => { });
+    const invalidateParent = inject(InvalidateKey, () => {});
 
     function invalidate(): void {
       valid.value = false;

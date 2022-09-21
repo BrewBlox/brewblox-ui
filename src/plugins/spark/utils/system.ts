@@ -1,4 +1,5 @@
 import { useSparkStore } from '@/plugins/spark/store';
+import { makeTypeFilter } from '@/utils/functional';
 import {
   Block,
   DisplaySettingsBlock,
@@ -6,10 +7,8 @@ import {
   Spark3PinsBlock,
   SysInfoBlock,
   SystemBlockType,
-  TicksBlock,
   WiFiSettingsBlock,
-} from '@/shared-types';
-import { makeTypeFilter } from '@/utils/functional';
+} from 'brewblox-proto/ts';
 
 type SysBlockFn<BlockT extends Block> = (
   serviceId: string | null | undefined,
@@ -34,9 +33,6 @@ export const getSysInfoBlock: SysBlockFn<SysInfoBlock> = (serviceId) =>
 export const getWiFiSettingsBlock: SysBlockFn<WiFiSettingsBlock> = (
   serviceId,
 ) => getSysBlock(serviceId, SystemBlockType.WiFiSettings);
-
-export const getTicksBlock: SysBlockFn<TicksBlock> = (serviceId) =>
-  getSysBlock(serviceId, SystemBlockType.Ticks);
 
 export const getSpark2PinsBlock: SysBlockFn<Spark2PinsBlock> = (serviceId) =>
   getSysBlock(serviceId, SystemBlockType.Spark2Pins);

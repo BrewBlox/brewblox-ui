@@ -1,26 +1,16 @@
 <script lang="ts">
-import { Enum } from 'typescript-string-enums';
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
+import { ENUM_LABELS_ANALOG_OP } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  AnalogCompare,
-  AnalogCompareOp,
-  BlockIntfType,
-  Quantity,
-} from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { selectable } from '@/utils/collections';
 import { isQuantity } from '@/utils/identity';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, tempQty } from '@/utils/quantity';
+import { AnalogCompare, BlockIntfType, Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { analogOpTitles } from './const';
-
-const operatorOpts = Enum.values(AnalogCompareOp).map((value) => ({
-  value,
-  label: analogOpTitles[value],
-}));
+const operatorOpts = selectable(ENUM_LABELS_ANALOG_OP);
 
 export default defineComponent({
   name: 'AnalogCompareEdit',
@@ -118,8 +108,18 @@ export default defineComponent({
         />
       </div>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

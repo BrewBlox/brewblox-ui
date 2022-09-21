@@ -1,8 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-
 import { QuickstartFeature, useFeatureStore } from '@/store/features';
-
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useWizard } from '../composables';
 
 export default defineComponent({
@@ -70,9 +68,7 @@ export default defineComponent({
     <q-card-section>
       <q-item>
         <q-item-section class="text-weight-light">
-          <q-item-label class="text-subtitle1">
-            Control blocks
-          </q-item-label>
+          <q-item-label class="text-subtitle1"> Control blocks </q-item-label>
           <p>
             Control blocks are small elements that run on the Brewblox Spark
             that are combined into a control system. Examples of control blocks
@@ -83,9 +79,7 @@ export default defineComponent({
             setups. This wizard creates new blocks and sets up relations between
             them.
           </p>
-          <q-item-label class="text-subtitle1">
-            Tuning
-          </q-item-label>
+          <q-item-label class="text-subtitle1"> Tuning </q-item-label>
           <p>
             This wizard uses settings that we think will work for the average
             setup. You might have a more powerful heater, a smaller kettle or a
@@ -95,9 +89,7 @@ export default defineComponent({
             Do some test runs, look at the PID graphs and make adjustments to
             tune them to your hardware.
           </p>
-          <q-item-label class="text-subtitle1">
-            Dashboard
-          </q-item-label>
+          <q-item-label class="text-subtitle1"> Dashboard </q-item-label>
           <p>
             This wizard will create a new dashboard to show the most relevant
             values in your setup. The dashboard will have a graph, a graphical
@@ -108,9 +100,7 @@ export default defineComponent({
       </q-item>
     </q-card-section>
     <div class="q-mx-md q-mb-md q-px-sm q-gutter-sm column">
-      <div class="text-subtitle1">
-        Please select a brewing process
-      </div>
+      <div class="text-subtitle1">Please select a brewing process</div>
       <ListSelect
         v-model="model"
         :options="wizardOpts"
@@ -121,7 +111,11 @@ export default defineComponent({
     </div>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="onBack" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <q-btn
         :disable="!model"

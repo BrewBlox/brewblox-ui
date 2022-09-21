@@ -1,14 +1,16 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
-import { ifCompatible } from '@/plugins/spark/utils';
-import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
+import { ifCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
-import { prettyUnit } from '@/utils/formatting';
-import { tempQty } from '@/utils/quantity';
+import { prettyUnit, tempQty } from '@/utils/quantity';
+import {
+  BlockType,
+  Quantity,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'SetpointSettingDialog',
@@ -30,7 +32,7 @@ export default defineComponent({
       BlockType.SetpointSensorPair,
     );
 
-    const enabled = ref<boolean>(block?.data.settingEnabled ?? false);
+    const enabled = ref<boolean>(block?.data.enabled ?? false);
     const setting = ref<Quantity>(block?.data.storedSetting ?? tempQty(null));
 
     const notation = prettyUnit(setting.value.unit);
@@ -52,9 +54,9 @@ export default defineComponent({
 
     function save(): void {
       if (block) {
-        sparkStore.modifyBlock(block, (actual) => {
-          actual.data.settingEnabled = enabled.value;
-          actual.data.storedSetting = setting.value;
+        sparkStore.patchBlock(block, {
+          enabled: enabled.value,
+          storedSetting: setting.value,
         });
         onDialogOK();
       }
@@ -85,13 +87,7 @@ export default defineComponent({
   >
     <DialogCard v-bind="{ title, message, html }">
       <div
-        class="
-          row
-          items-center
-          q-gutter-x-md q-mx-md q-py-sm q-mt-sm
-          clickable
-          rounded-borders
-        "
+        class="row items-center q-gutter-x-md q-mx-md q-py-sm q-mt-sm clickable rounded-borders"
         @click="enabled = !enabled"
       >
         <q-icon
@@ -102,15 +98,17 @@ export default defineComponent({
         />
         <div class="col">
           <small class="col fade-5">Click to toggle</small>
-          <div v-show="enabled" class="col">
-            <slot name="enabled">
-              Setpoint is enabled.
-            </slot>
+          <div
+            v-show="enabled"
+            class="col"
+          >
+            <slot name="enabled"> Setpoint is enabled. </slot>
           </div>
-          <div v-show="!enabled" class="col">
-            <slot name="disabled">
-              Setpoint is disabled.
-            </slot>
+          <div
+            v-show="!enabled"
+            class="col"
+          >
+            <slot name="disabled"> Setpoint is disabled. </slot>
           </div>
         </div>
       </div>
@@ -132,7 +130,12 @@ export default defineComponent({
       </q-input>
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!isValid"
           flat

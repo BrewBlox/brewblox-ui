@@ -1,7 +1,14 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, PropType } from 'vue';
-
 import { useSparkStore } from '@/plugins/spark/store';
+import { discoverBlocks } from '@/plugins/spark/utils/actions';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { useFeatureStore } from '@/store/features';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
+import { prettyQty } from '@/utils/quantity';
 import {
   Block,
   BlockIntfType,
@@ -10,18 +17,8 @@ import {
   DS2413Block,
   OneWireGpioModuleBlock,
   TempSensorOneWireBlock,
-} from '@/plugins/spark/types';
-import {
-  discoverBlocks,
-  isCompatible,
-  makeBlockIdRules,
-} from '@/plugins/spark/utils';
-import { useFeatureStore } from '@/store/features';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
-import { makeObjectSorter } from '@/utils/functional';
-import { matchesType } from '@/utils/objects';
-
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, onBeforeMount, PropType } from 'vue';
 import { QuickstartConfig } from '../types';
 
 export default defineComponent({
@@ -138,12 +135,12 @@ export default defineComponent({
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
-            OneWire devices are discovered after they are plugged in. <br>
+            OneWire devices are discovered after they are plugged in. <br />
             Here you can give your discovered blocks a meaningful name.
           </p>
           <p>
             If you unplug a discovered device, it will be shown as disconnected.
-            <br>
+            <br />
             Use this to quickly identify its block.
           </p>
           <p>
@@ -165,7 +162,10 @@ export default defineComponent({
           >
             <q-item>
               <q-item-section>
-                <q-item-label caption class="text-italic darkish">
+                <q-item-label
+                  caption
+                  class="text-italic darkish"
+                >
                   {{ widgetTitle(block) }}
                 </q-item-label>
                 <div style="font-size: larger">
@@ -192,9 +192,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Next" color="primary" @click="$emit('next')" />
+      <q-btn
+        unelevated
+        label="Next"
+        color="primary"
+        @click="$emit('next')"
+      />
     </template>
   </WizardBody>
 </template>

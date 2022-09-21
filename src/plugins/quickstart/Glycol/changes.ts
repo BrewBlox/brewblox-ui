@@ -1,7 +1,16 @@
-import { nanoid } from 'nanoid';
-
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { useFeatureStore } from '@/store/features';
+import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
+import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
+import {
+  bloxQty,
+  deltaTempQty,
+  inverseTempQty,
+  tempQty,
+} from '@/utils/quantity';
 import {
   ActuatorPwmBlock,
   Block,
@@ -13,21 +22,12 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
-import { Widget } from '@/store/widgets';
-import { bloxLink } from '@/utils/link';
-import {
-  bloxQty,
-  deltaTempQty,
-  durationMs,
-  inverseTempQty,
-  tempQty,
-} from '@/utils/quantity';
-
+  SettingMode,
+  TransitionDurationPreset,
+} from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
 import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock, PidConfig } from '../types';
+import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
@@ -55,7 +55,9 @@ const makeGlycolConfig = (): PidConfig => ({
   td: bloxQty('5m'),
 });
 
-export function defineChangedBlocks(config: GlycolConfig): Block[] {
+export function defineChangedBlocks(
+  config: GlycolConfig,
+): QuickstartPatch<Block>[] {
   const channels = config.heated
     ? [config.heatChannel!, config.coolChannel]
     : [config.coolChannel];
@@ -68,96 +70,87 @@ export function defineChangedBlocks(config: GlycolConfig): Block[] {
 export function defineCreatedBlocks(config: GlycolConfig): Block[] {
   const { serviceId, names } = config;
   const { beerSetting, glycolSetting } = config.glycolOpts;
-  const groups = [0];
 
   const heatingBlocks = [names.heatPid, names.heatPwm, names.heatAct];
 
-  const blocks: [
-    SetpointSensorPairBlock,
-    SetpointProfileBlock,
-    MutexBlock,
-    DigitalActuatorBlock,
-    DigitalActuatorBlock,
-    ActuatorPwmBlock,
-    ActuatorPwmBlock,
-    PidBlock,
-    PidBlock,
-  ] = [
+  const blocks: Block[] = [
     // Setpoint
-    {
+    typed<SetpointSensorPairBlock>({
       id: names.beerSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.beerSensor),
+        enabled: true,
         storedSetting: beerSetting,
-        settingEnabled: true,
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
+    }),
     // Profile
-    {
+    typed<SetpointProfileBlock>({
       id: names.beerProfile,
       type: BlockType.SetpointProfile,
       serviceId,
-      groups,
       data: {
-        start: new Date().getTime() / 1000,
+        start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(names.beerSetpoint),
         points: [
           {
-            time: 0,
+            time: bloxQty('0s'),
             temperature: beerSetting,
           },
           {
-            time: durationMs('7d') / 1000,
+            time: bloxQty('7d'),
             temperature: beerSetting,
           },
           {
-            time: durationMs('10d') / 1000,
+            time: bloxQty('10d'),
             temperature: bloxQty(beerSetting).copy(beerSetting.value! + 3),
           },
         ],
-        drivenTargetId: bloxLink(null),
       },
-    },
+    }),
     // Mutex
-    {
+    typed<MutexBlock>({
       id: names.mutex,
       type: BlockType.Mutex,
       serviceId,
-      groups,
       data: {
-        differentActuatorWait: bloxQty('5m'),
         waitRemaining: bloxQty('0s'),
       },
-    },
+    }),
     // Digital Actuators
-    {
+    typed<DigitalActuatorBlock>({
       id: names.coolAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.coolChannel.blockId),
         channel: config.coolChannel.channelId,
         invert: false,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
         constrainedBy: {
           constraints: [
             {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('15m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),
@@ -169,25 +162,29 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           ],
         },
       },
-    },
-    {
+    }),
+    typed<DigitalActuatorBlock>({
       id: names.heatAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.heatChannel?.blockId ?? null),
         channel: config.heatChannel?.channelId ?? 0,
         invert: false,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
         constrainedBy: {
           constraints: [
             {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('15m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),
@@ -195,45 +192,46 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           ],
         },
       },
-    },
+    }),
     // PWM
-    {
+    typed<ActuatorPwmBlock>({
       id: names.coolPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('10m'),
         actuatorId: bloxLink(names.coolAct),
-        drivenActuatorId: bloxLink(null),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
-    {
+    }),
+    typed<ActuatorPwmBlock>({
       id: names.heatPwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('10s'),
         actuatorId: bloxLink(names.heatAct),
-        drivenActuatorId: bloxLink(null),
-        setting: 0,
+        storedSetting: 0,
         desiredSetting: 0,
+        setting: 0,
         value: 0,
         constrainedBy: { constraints: [] },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.coolPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         ...makeGlycolBeerCoolConfig(),
@@ -241,12 +239,11 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         inputId: bloxLink(names.beerSetpoint),
         outputId: bloxLink(names.coolPwm),
       },
-    },
-    {
+    }),
+    typed<PidBlock>({
       id: names.heatPid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         ...makeGlycolBeerHeatConfig(),
@@ -254,46 +251,48 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         inputId: bloxLink(names.beerSetpoint),
         outputId: bloxLink(names.heatPwm),
       },
-    },
+    }),
   ];
 
   if (config.glycolControl === 'Control') {
-    const glycolControlBlocks: [
-      SetpointSensorPairBlock,
-      DigitalActuatorBlock,
-      ActuatorPwmBlock,
-      PidBlock,
-    ] = [
+    const glycolControlBlocks: Block[] = [
       // Setpoint
-      {
+      typed<SetpointSensorPairBlock>({
         id: names.glycolSetpoint,
         type: BlockType.SetpointSensorPair,
         serviceId,
-        groups,
         data: {
           sensorId: bloxLink(names.glycolSensor),
+          enabled: true,
           storedSetting: glycolSetting,
-          settingEnabled: true,
+          desiredSetting: tempQty(null),
           setting: tempQty(null),
           value: tempQty(null),
           valueUnfiltered: tempQty(null),
           filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
           resetFilter: false,
+          claimedBy: bloxLink(null),
+          settingMode: SettingMode.STORED,
         },
-      },
+      }),
       // Digital actuator
-      {
+      typed<DigitalActuatorBlock>({
         id: names.glycolAct,
         type: BlockType.DigitalActuator,
         serviceId,
-        groups,
         data: {
           hwDevice: bloxLink(config.glycolChannel!.blockId),
           channel: config.glycolChannel!.channelId,
           invert: false,
+          storedState: DigitalState.STATE_INACTIVE,
           desiredState: DigitalState.STATE_INACTIVE,
           state: DigitalState.STATE_INACTIVE,
+          transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+          transitionDurationSetting: bloxQty('0s'),
+          transitionDurationValue: bloxQty('0s'),
+          claimedBy: bloxLink(null),
+          settingMode: SettingMode.STORED,
           constrainedBy: {
             constraints: [
               { minOff: bloxQty('5m'), remaining: bloxQty('0s') },
@@ -301,29 +300,29 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
             ],
           },
         },
-      },
+      }),
       // PWM
-      {
+      typed<ActuatorPwmBlock>({
         id: names.glycolPwm,
         type: BlockType.ActuatorPwm,
         serviceId,
-        groups,
         data: {
           enabled: true,
           period: bloxQty('30m'),
           actuatorId: bloxLink(names.glycolAct),
-          drivenActuatorId: bloxLink(null),
-          setting: 0,
+          storedSetting: 0,
           desiredSetting: 0,
+          setting: 0,
           value: 0,
           constrainedBy: { constraints: [] },
+          claimedBy: bloxLink(null),
+          settingMode: SettingMode.STORED,
         },
-      },
-      {
+      }),
+      typed<PidBlock>({
         id: names.glycolPid,
         type: BlockType.Pid,
         serviceId,
-        groups,
         data: {
           ...pidDefaults(),
           ...makeGlycolConfig(),
@@ -331,7 +330,7 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           inputId: bloxLink(names.glycolSetpoint),
           outputId: bloxLink(names.glycolPwm),
         },
-      },
+      }),
     ];
 
     blocks.push(...glycolControlBlocks);
@@ -346,10 +345,9 @@ export function defineWidgets(
   config: GlycolConfig,
   layouts: BuilderLayout[],
 ): Widget[] {
-  const systemStore = useSystemStore();
   const featureStore = useFeatureStore();
   const { serviceId, dashboardId, names, prefix, glycolControl } = config;
-  const tempUnit = systemStore.units.temperature;
+  const tempUnit = userUnits.value.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
@@ -381,18 +379,14 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.beerSensor}/value[${tempUnit}]`,
-            `${names.beerSetpoint}/setting[${tempUnit}]`,
-            `${names.coolPwm}/value`,
-            `${names.coolAct}/state`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.beerSensor}/value[${tempUnit}]`,
+        `${serviceId}/${names.beerSetpoint}/setting[${tempUnit}]`,
+        `${serviceId}/${names.coolPwm}/value`,
+        `${serviceId}/${names.coolAct}/state`,
       ],
       renames: {
         [`${serviceId}/${names.beerSensor}/value[${tempUnit}]`]:
@@ -412,9 +406,9 @@ export function defineWidgets(
   };
 
   if (config.heated) {
-    graph.config.targets[0].fields.push(
-      `${names.heatPwm}/value`,
-      `${names.heatAct}/state`,
+    graph.config.fields.push(
+      `${serviceId}/${names.heatPwm}/value`,
+      `${serviceId}/${names.heatAct}/state`,
     );
     Object.assign(graph.config.renames, {
       [`${serviceId}/${names.heatPwm}/value`]: 'Heat PWM value',

@@ -1,27 +1,6 @@
-import {
-  defaultLabel,
-  nodeBuilder,
-  targetBuilder,
-  targetSplitter,
-} from '../nodes';
-import { QueryTarget } from '../types';
-
-const targets = (): QueryTarget[] => [
-  {
-    measurement: 'sparkey',
-    fields: ['actuator-pwm-1/setting', 'actuator-pwm-1/value'],
-  },
-  {
-    measurement: 'spock',
-    fields: [' Combined Influx points'],
-  },
-];
-
-const flatFields = (): string[] => [
-  'sparkey/actuator-pwm-1/setting',
-  'sparkey/actuator-pwm-1/value',
-  'spock/ Combined Influx points',
-];
+import { QTreeNode } from 'quasar';
+import { describe, expect, it } from 'vitest';
+import { defaultLabel, nodeBuilder } from '../nodes';
 
 const groupedFields = (): Mapped<string[]> => ({
   sparkey: ['actuator-pwm-1/setting', 'actuator-pwm-1/value'],
@@ -32,29 +11,7 @@ const groupedFields = (): Mapped<string[]> => ({
   ],
 });
 
-const knownFields = (): Mapped<string[]> => ({
-  sparkey: [
-    'actuator-pwm-1/setting',
-    'actuator-pwm-1/value',
-    'HERMS MT PID/d',
-    'Logic Actuator/result',
-    'Logic Input 1/desiredState',
-    'Logic Input 1/state',
-    'Logic Input 2/desiredState',
-    'Logic Input 2/state',
-  ],
-  spock: [
-    ' Combined Influx points',
-    'Ferment Cool PID/p',
-    'Ferment Cool PWM/desiredSetting',
-    'Ferment Cool PWM/setting',
-    'Ferment Cool PWM/value',
-    'Ferment Fridge Sensor/connected',
-    'Ferment Heat PID/p',
-  ],
-});
-
-const nodes = (): QuasarNode[] => [
+const nodes = (): QTreeNode[] => [
   {
     label: 'sparkey',
     title: '',
@@ -121,18 +78,6 @@ const nodes = (): QuasarNode[] => [
     ],
   },
 ];
-
-describe('Targets and fields', () => {
-  it('should split targets into fields', () => {
-    expect(targetSplitter(targets())).toMatchObject(flatFields());
-  });
-  it('should build fields into targets', () => {
-    expect(targetBuilder(flatFields(), knownFields())).toMatchObject(targets());
-    expect(
-      targetBuilder([...flatFields(), 'leftovers'], knownFields()),
-    ).toMatchObject(targets());
-  });
-});
 
 describe('Node labels', () => {
   it('should generate default labels', () => {

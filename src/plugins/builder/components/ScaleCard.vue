@@ -2,7 +2,6 @@
 import range from 'lodash/range';
 import { debounce } from 'quasar';
 import { computed, defineComponent, PropType } from 'vue';
-
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -33,44 +32,40 @@ export default defineComponent({
       default: 'Scale',
     },
   },
-  emits: [
-    'update:part',
-  ],
+  emits: ['update:part'],
   setup(props, { emit }) {
-    const scales = computed<number[]>(
-      () => {
-        const [defaultX, defaultY] = props.defaultSize;
-        const [big, small] = defaultY > defaultX
-          ? [defaultY, defaultX]
-          : [defaultX, defaultY];
+    const scales = computed<number[]>(() => {
+      const [defaultX, defaultY] = props.defaultSize;
+      const [big, small] =
+        defaultY > defaultX ? [defaultY, defaultX] : [defaultX, defaultY];
 
-        // We only want scale values where both X and Y size are integer
-        // Iterate between small === minSize and big === maxSize
-        // Step size ensures small is integer
-        // Filter all values where the scaled big is not integer
-        return range(props.minSize, Math.floor(props.maxSize * (small / big)) + 1)
-          .map(smallScaled => smallScaled / small)
-          .filter(scale => (big * scale) % 1 === 0);
-      },
-    );
+      // We only want scale values where both X and Y size are integer
+      // Iterate between small === minSize and big === maxSize
+      // Step size ensures small is integer
+      // Filter all values where the scaled big is not integer
+      return range(props.minSize, Math.floor(props.maxSize * (small / big)) + 1)
+        .map((smallScaled) => smallScaled / small)
+        .filter((scale) => (big * scale) % 1 === 0);
+    });
 
-    const index = computed<number>(
-      () => {
-        const scale = props.part.settings[props.settingsKey] ?? 1;
-        const idx = scales.value.findIndex(v => v === scale);
-        return Math.max(idx, 0);
-      },
-    );
+    const index = computed<number>(() => {
+      const scale = props.part.settings[props.settingsKey] ?? 1;
+      const idx = scales.value.findIndex((v) => v === scale);
+      return Math.max(idx, 0);
+    });
 
     const save = debounce(
-      (idx: number): void => emit('update:part', {
-        ...props.part,
-        settings: {
-          ...props.part.settings,
-          [props.settingsKey]: scales.value[idx],
-        },
-      }),
-      50, true);
+      (idx: number): void =>
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            [props.settingsKey]: scales.value[idx],
+          },
+        }),
+      50,
+      true,
+    );
 
     return {
       scales,

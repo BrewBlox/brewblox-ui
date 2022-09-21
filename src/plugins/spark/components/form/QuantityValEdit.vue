@@ -1,25 +1,19 @@
 <script lang="ts">
+import { useValEdit } from '@/plugins/spark/composables';
+import { createDialog } from '@/utils/dialog';
+import { prettyQty, prettyUnit, roundedNumber } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
 import isFinite from 'lodash/isFinite';
 import { computed, defineComponent, ref } from 'vue';
-
-import { useValEdit } from '@/plugins/spark/composables';
-import { Quantity } from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
-import { prettyQty, prettyUnit, roundedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'QuantityValEdit',
   props: {
     ...useValEdit.props,
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<Quantity>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<Quantity>();
     const local = ref<number | null>(roundedNumber(field.value.value));
 
     function syncField(): void {
@@ -28,13 +22,9 @@ export default defineComponent({
       }
     }
 
-    const displayValue = computed<string>(
-      () => prettyQty(field.value),
-    );
+    const displayValue = computed<string>(() => prettyQty(field.value));
 
-    const notation = computed<string>(
-      () => prettyUnit(field.value),
-    );
+    const notation = computed<string>(() => prettyUnit(field.value));
 
     function showKeyboard(): void {
       createDialog({
@@ -44,11 +34,10 @@ export default defineComponent({
           type: 'number',
           suffix: notation.value,
         },
-      })
-        .onOk(v => {
-          local.value = v;
-          syncField();
-        });
+      }).onOk((v) => {
+        local.value = v;
+        syncField();
+      });
     }
 
     return {
@@ -65,7 +54,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <div v-if="editable" class="row no-wrap">
+  <div
+    v-if="editable"
+    class="row no-wrap"
+  >
     <q-input
       v-model.number="local"
       :dense="dense"

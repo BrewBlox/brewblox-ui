@@ -6,6 +6,7 @@ import {
   popById,
   spliceById,
 } from '@/utils/collections';
+import { describe, expect, it } from 'vitest';
 
 interface TestObj extends HasId {
   v1: string;
@@ -16,21 +17,20 @@ interface TestObj extends HasId {
 }
 
 describe('HasId array manipulation', () => {
-  const mkArr = (): TestObj[] => ([
+  const mkArr = (): TestObj[] => [
     { id: 'id-1', v1: 'one', nesting: { nested: 1 } },
     { id: 'id-2', v1: 'two', nesting: { nested: 2 } },
     { id: 'id-3', v1: 'three', nesting: { nested: 3 } },
     { id: 'id-dup', v1: 'dup1', nesting: { nested: 0 } },
     { id: 'id-dup', v1: 'dup2', nesting: { nested: 0 } },
-  ]);
+  ];
   const empty = (): TestObj => ({ id: '', v1: '', nesting: { nested: 0 } });
 
   it('findById()', () => {
     const arr = mkArr();
 
     expect(findById(arr, 'nope')).toBeNull();
-    expect(findById(arr, 'nope', empty()))
-      .toMatchObject({ id: '' });
+    expect(findById(arr, 'nope', empty())).toMatchObject({ id: '' });
     expect(findById(arr, 'id-2')).toMatchObject(arr[1]);
     expect(findById(arr, 'id-dup')).toMatchObject({ v1: 'dup1' });
   });
@@ -73,7 +73,11 @@ describe('HasId array manipulation', () => {
 
     // input is not modified
     const arr = mkArr();
-    const changed = concatById(arr, { id: 'id-1', v1: 'changed', nesting: { nested: 0 } });
+    const changed = concatById(arr, {
+      id: 'id-1',
+      v1: 'changed',
+      nesting: { nested: 0 },
+    });
     expect(arr[0].v1).toBe('one');
     expect(changed[0].v1).toBe('changed');
   });

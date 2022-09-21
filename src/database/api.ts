@@ -1,7 +1,6 @@
 import { database } from '@/database';
-import { StoreObject } from '@/shared-types';
 import { deserialize } from '@/utils/parsing';
-
+import { StoreObject } from 'brewblox-proto/ts';
 import { ChangeCb, DeleteCb } from './types';
 
 export interface DatabaseApi<T extends StoreObject> {
@@ -26,14 +25,16 @@ export interface DatabaseApiArgs {
   parsed?: boolean;
 }
 
-export function createApi<T extends StoreObject>(args: DatabaseApiArgs): DatabaseApi<T> {
-  const hydrate: ((v: any) => any) = args.parsed ? deserialize : (v => v);
+export function createApi<T extends StoreObject>(
+  args: DatabaseApiArgs,
+): DatabaseApi<T> {
+  const hydrate: (v: any) => any = args.parsed ? deserialize : (v) => v;
   const { namespace } = args;
   return {
     subscribe(onChanged: ChangeCb<T>, onDeleted: DeleteCb): void {
       database.subscribe({
         namespace,
-        onChanged: v => onChanged(hydrate(v)),
+        onChanged: (v) => onChanged(hydrate(v)),
         onDeleted,
       });
     },

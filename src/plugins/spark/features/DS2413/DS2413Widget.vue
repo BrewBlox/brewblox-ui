@@ -1,23 +1,19 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DS2413Block } from '@/plugins/spark/types';
+import { DS2413Block } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'DS2413Widget',
   setup() {
     const { context } = useContext.setup();
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<DS2413Block>();
+    const { block, patchBlock } = useBlockWidget.setup<DS2413Block>();
 
     return {
       context,
       block,
-      saveBlock,
+      patchBlock,
     };
   },
 });
@@ -31,9 +27,7 @@ export default defineComponent({
 
     <div>
       <CardWarning v-if="!block.data.connected">
-        <template #message>
-          DS2413 is not connected
-        </template>
+        <template #message> DS2413 is not connected </template>
       </CardWarning>
       <IoArray />
 
@@ -51,7 +45,7 @@ export default defineComponent({
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="v => { block.data.address = v; saveBlock(); }"
+            @update:model-value="(v) => patchBlock({ address: v })"
           />
         </div>
       </template>

@@ -1,6 +1,12 @@
 <script lang="ts">
+import { filteredNodes, nodeBuilder } from '@/plugins/history/nodes';
+import { useHistoryStore } from '@/plugins/history/store';
+import type { QueryConfig } from '@/plugins/history/types';
+import { createDialog } from '@/utils/dialog';
+import { bloxQty } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
 import isEqual from 'lodash/isEqual';
-import { LooseDictionary, QTree } from 'quasar';
+import { QTree, QTreeNode } from 'quasar';
 import {
   computed,
   defineComponent,
@@ -10,18 +16,6 @@ import {
   ref,
   watch,
 } from 'vue';
-
-import {
-  filteredNodes,
-  nodeBuilder,
-  targetBuilder,
-  targetSplitter,
-} from '@/plugins/history/nodes';
-import { useHistoryStore } from '@/plugins/history/store';
-import type { QueryConfig } from '@/plugins/history/types';
-import { Quantity } from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
-import { bloxQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'QueryEditor',
@@ -116,13 +110,13 @@ export default defineComponent({
       emit('update:config', config);
     }
 
-    function nodeHandler(node: QuasarNode): void {
+    function nodeHandler(node: QTreeNode): void {
       if (!treeRef.value!.isTicked(node.value)) {
         treeRef.value?.setTicked([node.value], true);
       }
     }
 
-    function nodeFilter(node: LooseDictionary, filter: string): boolean {
+    function nodeFilter(node: QTreeNode, filter: string): boolean {
       return (
         node?.value?.toLowerCase().match(filter.toLowerCase()) !== undefined
       );
@@ -141,7 +135,7 @@ export default defineComponent({
 
     const fields = computed<Mapped<string[]>>(() => historyStore.fields);
 
-    const nodes = computed<QuasarNode[]>(() =>
+    const nodes = computed<QTreeNode[]>(() =>
       nodeBuilder(fields.value, {
         selectable: true,
         handler: nodeHandler,
@@ -150,11 +144,11 @@ export default defineComponent({
     );
 
     const ticked = computed<string[]>({
-      get: () => targetSplitter(props.config.targets),
-      set: (vals) =>
+      get: () => props.config.fields,
+      set: (fields) =>
         saveConfig({
           ...props.config,
-          targets: targetBuilder(vals, fields.value),
+          fields,
         }),
     });
 
@@ -209,7 +203,13 @@ export default defineComponent({
       class="col-auto min-width-sm"
     />
 
-    <q-btn flat dense icon="mdi-expand-all" class="self-end" @click="expand">
+    <q-btn
+      flat
+      dense
+      icon="mdi-expand-all"
+      class="self-end"
+      @click="expand"
+    >
       <q-tooltip>Expand</q-tooltip>
     </q-btn>
     <q-btn
@@ -246,7 +246,10 @@ export default defineComponent({
     >
       <template #header-leaf="props">
         <div class="q-pa-xs full-width editable hoverable rounded-borders">
-          <slot name="leaf" :node="props.node" />
+          <slot
+            name="leaf"
+            :node="props.node"
+          />
         </div>
       </template>
     </q-tree>

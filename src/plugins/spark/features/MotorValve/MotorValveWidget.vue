@@ -1,12 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
-import { getSpark3PinsBlock } from '@/plugins/spark/utils';
-
-import { useSparkStore } from '../../store';
+import { useSparkStore } from '@/plugins/spark/store';
+import { getSpark3PinsBlock } from '@/plugins/spark/utils/system';
+import { MotorValveBlock, Spark3PinsBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
 
@@ -31,10 +29,7 @@ export default defineComponent({
     );
 
     function enable12V(): void {
-      if (spark3Pins.value) {
-        spark3Pins.value.data.enableIoSupply12V = true;
-        sparkStore.saveBlock(spark3Pins.value);
-      }
+      sparkStore.patchBlock(spark3Pins.value, { enableIoSupply12V: true });
     }
 
     return {
@@ -73,9 +68,7 @@ export default defineComponent({
             />
           </template>
         </CardWarning>
-        <CardWarning
-          v-else-if="!block.data.hwDevice.id || !block.data.startChannel"
-        >
+        <CardWarning v-else-if="!block.data.hwDevice.id || !block.data.channel">
           <template #message>
             <span>This Motor Valve has no channel selected.</span>
           </template>

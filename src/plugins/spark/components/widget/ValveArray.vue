@@ -1,113 +1,72 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Block, BlockType, MotorValveBlock } from '@/plugins/spark/types';
-import { DigitalState, IoChannel } from '@/plugins/spark/types';
+import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import {
   channelName,
   findLimitations,
-  isBlockDriven,
   limitationString,
-} from '@/plugins/spark/utils';
-import { IoArrayBlock, Link } from '@/shared-types';
-import { makeTypeFilter } from '@/utils/functional';
+} from '@/plugins/spark/utils/formatting';
 import { bloxLink } from '@/utils/link';
-
-import { useSparkStore } from '../../store';
+import {
+  Block,
+  BlockType,
+  DigitalState,
+  IoArrayInterfaceBlock,
+  IoChannel,
+  Link,
+  MotorValveBlock,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface EditableChannel extends IoChannel {
   name: string;
-  driver: MotorValveBlock | null;
+  actuator: MotorValveBlock | null;
 }
-
-interface Claim {
-  driverId: string;
-  channelId: number;
-}
-
-const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
 
 export default defineComponent({
   name: 'ValveArray',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block } = useBlockWidget.setup<IoArrayBlock>();
-
-    const claims = computed<Claim[]>(() =>
-      sparkStore
-        .blocksByService(serviceId)
-        .filter(motorValveFilter)
-        .filter((b) => b.data.hwDevice.id === block.value.id)
-        .map((b) => ({ driverId: b.id, channelId: b.data.startChannel })),
-    );
+    const { serviceId, block } = useBlockWidget.setup<IoArrayInterfaceBlock>();
 
     const channels = computed<EditableChannel[]>(() =>
-      block.value.data.channels.map((channel: IoChannel) => {
-        const { id } = channel;
-        const claim = claims.value.find((c) => c.channelId === id);
-        const name = channelName(block.value, id) ?? 'Unknown';
-        const driver = sparkStore.blockById<MotorValveBlock>(
-          serviceId,
-          claim?.driverId,
-        );
-        return { id, driver, name };
-      }),
+      block.value.data.channels.map((channel: IoChannel) => ({
+        ...channel,
+        name: channelName(block.value, channel.id) ?? 'Unknown',
+        actuator: sparkStore.blockByLink(serviceId, channel.claimedBy),
+      })),
     );
 
-    function driverLink(channel: EditableChannel): Link {
-      return bloxLink(channel.driver?.id ?? null, BlockType.MotorValve);
-    }
-
-    function driverDriven(block: Block): boolean {
-      return isBlockDriven(block);
-    }
-
-    function driverLimitations(block: Block): string | null {
+    function actuatorLimitations(block: Block): string | null {
       return limitationString(findLimitations(block));
     }
 
-    async function saveDriver(
+    async function replaceActuator(
       channel: EditableChannel,
       link: Link,
     ): Promise<void> {
-      if (channel.driver && channel.driver.id === link.id) {
-        return;
-      }
-      if (channel.driver) {
-        channel.driver.data.startChannel = 0;
-        await sparkStore.saveBlock(channel.driver);
-      }
-      if (link.id) {
-        const newDriver = sparkStore.blockById<MotorValveBlock>(
-          serviceId,
-          link.id,
-        )!;
-        const { id, type } = block.value;
-        newDriver.data.hwDevice = bloxLink(id, type);
-        newDriver.data.startChannel = channel.id;
-        await sparkStore.saveBlock(newDriver);
-      }
+      setExclusiveChannelActuator(
+        sparkStore.blockByLink(serviceId, link),
+        bloxLink(block.value.id),
+        channel.id,
+      );
     }
 
-    async function saveState(
+    async function updateDigitalState(
       channel: EditableChannel,
-      state: DigitalState,
+      desiredState: DigitalState,
     ): Promise<void> {
-      if (channel.driver) {
-        channel.driver.data.desiredState = state;
-        await sparkStore.saveBlock(channel.driver);
-      }
+      await sparkStore.patchBlock(channel.actuator, { desiredState });
     }
 
     return {
-      channels,
-      driverDriven,
-      driverLimitations,
-      saveState,
-      driverLink,
+      BlockType,
       serviceId,
-      saveDriver,
+      channels,
+      actuatorLimitations,
+      updateDigitalState,
+      replaceActuator,
     };
   },
 });
@@ -118,41 +77,39 @@ export default defineComponent({
     <div
       v-for="channel in channels"
       :key="`channel-${channel.id}`"
-      class="
-        col
-        row
-        q-gutter-x-sm q-gutter-y-xs q-mt-none
-        items-stretch
-        justify-start
-      "
+      class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
     >
       <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
         {{ channel.name }}
       </div>
       <div class="col-auto row items-baseline min-width-sm">
         <DigitalStateButton
-          v-if="channel.driver"
-          :disable="driverDriven(channel.driver)"
-          :model-value="channel.driver.data.desiredState"
+          v-if="channel.actuator"
+          :disable="channel.actuator.data.claimedBy.id"
+          :model-value="channel.actuator.data.desiredState"
           :pending="
-            channel.driver.data.state !== channel.driver.data.desiredState
+            channel.actuator.data.state !== channel.actuator.data.desiredState
           "
-          :pending-reason="driverLimitations(channel.driver)"
+          :pending-reason="actuatorLimitations(channel.actuator)"
           class="col-auto self-center"
-          @update:model-value="(v) => saveState(channel, v)"
+          @update:model-value="(v) => updateDigitalState(channel, v)"
         />
-        <div v-else class="darkened text-italic q-pa-sm">
+        <div
+          v-else
+          class="darkened text-italic q-pa-sm"
+        >
           Not set
         </div>
       </div>
       <LinkField
-        :model-value="driverLink(channel)"
+        :model-value="channel.claimedBy"
         :service-id="serviceId"
+        :compatible="BlockType.MotorValve"
         title="Driver"
         label="Driver"
         dense
         class="col-grow"
-        @update:model-value="(link) => saveDriver(channel, link)"
+        @update:model-value="(link) => replaceActuator(channel, link)"
       />
     </div>
   </div>

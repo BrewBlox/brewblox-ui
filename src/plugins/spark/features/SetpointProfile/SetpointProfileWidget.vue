@@ -1,13 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Link, SetpointProfileBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyLink } from '@/utils/formatting';
 import { deepCopy, isJsonEqual } from '@/utils/objects';
-
+import { prettyLink } from '@/utils/quantity';
+import { Link, SetpointProfileBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';
@@ -29,17 +27,15 @@ export default defineComponent({
   },
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { block, saveBlock } = useBlockWidget.setup<SetpointProfileBlock>();
+    const { block, patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
     const usedData = ref<SetpointProfileData>(deepCopy(block.value.data));
     const revision = ref<Date>(new Date());
 
-    const target = computed<Link>(
-      () => block.value.data.targetId,
-    );
+    const target = computed<Link>(() => block.value.data.targetId);
 
-    const graphProps = computed<GraphProps>(
-      () => profileGraphProps(block.value),
+    const graphProps = computed<GraphProps>(() =>
+      profileGraphProps(block.value),
     );
 
     function refresh(): void {
@@ -49,10 +45,8 @@ export default defineComponent({
 
     function changeEnabled(enabled: boolean): void {
       if (enabled) {
-        block.value.data.enabled = enabled;
-        saveBlock();
-      }
-      else {
+        patchBlock({ enabled });
+      } else {
         createDialog({
           component: SetpointProfileDisableDialog,
           componentProps: {
@@ -88,11 +82,14 @@ export default defineComponent({
 <template>
   <PreviewCard
     show-initial
-    :enabled="inDialog && context.mode ==='Full'"
+    :enabled="inDialog && context.mode === 'Full'"
     :no-scroll="context.mode === 'Basic'"
   >
     <template #preview>
-      <GenericGraph v-bind="graphProps" :revision="revision" />
+      <GenericGraph
+        v-bind="graphProps"
+        :revision="revision"
+      />
     </template>
 
     <template #toolbar>
@@ -119,10 +116,12 @@ export default defineComponent({
           @change="changeEnabled"
         >
           <template #enabled>
-            Setpoint Profile is enabled and driving <i>{{ prettyLink(target) }}</i>.
+            Setpoint Profile is enabled and claims
+            <i> {{ prettyLink(target) }} </i>.
           </template>
           <template #disabled>
-            Setpoint Profile is disabled and not driving <i>{{ prettyLink(target) }}</i>.
+            Setpoint Profile is disabled and does not claim
+            <i> {{ prettyLink(target) }} </i>.
           </template>
         </BlockEnableToggle>
       </template>

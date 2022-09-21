@@ -1,20 +1,18 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  BlockFieldSpec,
-  BlockIntfType,
-  BlockSpec,
-  BlockType,
-  FilterChoice,
-  SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import { deltaTempQty, tempQty } from '@/utils/quantity';
-
+import {
+  BlockIntfType,
+  BlockType,
+  FilterChoice,
+  SetpointSensorPairBlock,
+  SettingMode,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './SetpointSensorPairWidget.vue';
 
 const type = BlockType.SetpointSensorPair;
@@ -26,16 +24,19 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SetpointSensorPairBlock> = {
       type,
-      generate: () => ({
+      generate: (): SetpointSensorPairBlock['data'] => ({
         sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
         storedSetting: tempQty(20),
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         resetFilter: false,
-        settingEnabled: true,
+        enabled: true,
         filter: FilterChoice.FILTER_15s,
         filterThreshold: deltaTempQty(5),
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       }),
     };
 
@@ -43,13 +44,13 @@ const plugin: Plugin = {
       {
         type,
         key: 'storedSetting',
-        title: 'Setting',
+        title: 'Stored setting',
         component: 'QuantityValEdit',
         generate: () => tempQty(20),
       },
       {
         type,
-        key: 'settingEnabled',
+        key: 'enabled',
         title: 'Enabled',
         component: 'BoolValEdit',
         generate: () => true,
@@ -64,14 +65,23 @@ const plugin: Plugin = {
       {
         type,
         key: 'sensorId',
-        title: 'Linked Sensor',
+        title: 'Linked sensor',
         component: 'LinkValEdit',
         generate: () => bloxLink(null, BlockIntfType.TempSensorInterface),
       },
       {
         type,
+        key: 'desiredSetting',
+        title: 'Desired setting',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'setting',
-        title: 'Setting (actual)',
+        title: 'Actual setting',
         component: 'QuantityValEdit',
         generate: () => tempQty(20),
         readonly: true,

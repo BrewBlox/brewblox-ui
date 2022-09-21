@@ -1,21 +1,19 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-
+import { useSparkStore } from '@/plugins/spark/store';
+import { SparkService } from '@/plugins/spark/types';
 import {
-  cleanUnusedNames,
   discoverBlocks,
   saveHwInfo,
   startResetBlocks,
-} from '@/plugins/spark/utils';
+} from '@/plugins/spark/utils/actions';
+import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { Service, useServiceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
-
-import { useSparkStore } from '../store';
-import { SparkService } from '../types';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'SparkActions',
@@ -26,7 +24,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const router = useRouter();
     const systemStore = useSystemStore();
     const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
@@ -36,20 +33,12 @@ export default defineComponent({
     );
 
     const isHomePage = computed<boolean>({
-      get: () => systemStore.config.homePage === `/service/${props.serviceId}`,
+      get: () =>
+        userUISettings.value.homePage === `/service/${props.serviceId}`,
       set: (v) => {
         const homePage =
           v && service.value ? `/service/${props.serviceId}` : null;
-        systemStore.saveConfig({ homePage });
-      },
-    });
-
-    const listed = computed<boolean>({
-      get: () => service.value?.listed ?? true,
-      set: (v) => {
-        if (service.value) {
-          serviceStore.saveService({ ...service.value, listed: v });
-        }
+        systemStore.patchUserUISettings({ homePage });
       },
     });
 
@@ -72,10 +61,6 @@ export default defineComponent({
       }
     }
 
-    function removeService(service: Maybe<Service>): void {
-      startRemoveService(service, router);
-    }
-
     return {
       startResetBlocks,
       saveHwInfo,
@@ -83,10 +68,9 @@ export default defineComponent({
       createBlockWizard,
       cleanUnusedNames,
       startChangeServiceTitle,
-      removeService,
+      startRemoveService,
       service,
       isHomePage,
-      listed,
       serviceReboot,
       controllerReboot,
       startDialog,
@@ -98,9 +82,7 @@ export default defineComponent({
 <template>
   <ActionSubmenu>
     <CardWarning v-if="!service">
-      <template #message>
-        Service is not available
-      </template>
+      <template #message> Service is not available </template>
     </CardWarning>
     <template v-else>
       <ActionItem
@@ -158,16 +140,15 @@ export default defineComponent({
         icon="home"
         :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
-      <ToggleAction v-model="listed" label="Show in sidebar" />
       <ActionItem
         icon="edit"
-        label="Rename service"
+        label="Change service name"
         @click="startChangeServiceTitle(service)"
       />
       <ActionItem
         icon="delete"
         label="Remove service from UI"
-        @click="removeService(service)"
+        @click="startRemoveService(service, $router)"
       />
     </template>
   </ActionSubmenu>

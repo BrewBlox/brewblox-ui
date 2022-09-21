@@ -1,7 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
-
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_LOGIC_RESULT } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
+import { nonNullString, prettyLink } from '@/utils/quantity';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
@@ -12,15 +16,10 @@ import {
   DigitalCompareOp,
   DigitalState,
   LogicResult,
-} from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
-import { createDialog } from '@/utils/dialog';
-import { prettyLink } from '@/utils/formatting';
-import { bloxLink } from '@/utils/link';
-
-import { useSparkStore } from '../../store';
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
-import { characterTitles, logicResultTitles, nonErrorResults } from './const';
+import { characterTitles, nonErrorResults } from './const';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { ExpressionError } from './types';
 import {
@@ -44,23 +43,22 @@ export default defineComponent({
   name: 'ActuatorLogicFull',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, block, saveBlock } =
+    const { serviceId, block, patchBlock } =
       useBlockWidget.setup<ActuatorLogicBlock>();
     const localExpression = ref<string | null>(null);
     const delayedSave = ref<number | null>(null);
 
     function commit(): void {
-      if (localExpression.value !== null) {
-        block.value.data.expression = localExpression.value;
-        saveBlock(block.value);
+      if (localExpression.value != null) {
+        patchBlock({ expression: localExpression.value });
       }
     }
 
-    function saveExpression(expr: string | null): void {
+    function saveExpression(expr: string | number | null): void {
       if (delayedSave.value !== null) {
         clearTimeout(delayedSave.value);
       }
-      localExpression.value = expr ?? '';
+      localExpression.value = nonNullString(expr);
       delayedSave.value = window.setTimeout(commit, 1000);
     }
 
@@ -117,7 +115,7 @@ export default defineComponent({
         ? null
         : {
             index,
-            message: logicResultTitles[result],
+            message: ENUM_LABELS_LOGIC_RESULT[result],
             indicator: '-'.repeat(index) + '^',
           };
     });
@@ -126,28 +124,37 @@ export default defineComponent({
       () =>
         syntaxCheck(expression.value) ??
         comparisonCheck(block.value.data) ??
-        (localExpression.value === null ? firmwareError.value : null),
+        (localExpression.value == null ? firmwareError.value : null),
     );
 
     function addComparison(compared: Block): void {
       if (isCompatible(compared.type, BlockIntfType.ActuatorDigitalInterface)) {
-        block.value.data.digital.push({
-          op: DigitalCompareOp.OP_VALUE_IS,
-          id: bloxLink(compared.id, compared.type),
-          rhs: DigitalState.STATE_ACTIVE,
-          result: LogicResult.RESULT_EMPTY,
+        patchBlock({
+          digital: [
+            ...block.value.data.digital,
+            {
+              op: DigitalCompareOp.OP_VALUE_IS,
+              id: bloxLink(compared.id, compared.type),
+              rhs: DigitalState.STATE_ACTIVE,
+              result: LogicResult.RESULT_EMPTY,
+            },
+          ],
         });
       } else if (
         isCompatible(compared.type, BlockIntfType.ProcessValueInterface)
       ) {
-        block.value.data.analog.push({
-          op: AnalogCompareOp.OP_VALUE_GE,
-          id: bloxLink(compared.id, compared.type),
-          rhs: 25,
-          result: LogicResult.RESULT_EMPTY,
+        patchBlock({
+          analog: [
+            ...block.value.data.analog,
+            {
+              op: AnalogCompareOp.OP_VALUE_GE,
+              id: bloxLink(compared.id, compared.type),
+              rhs: 25,
+              result: LogicResult.RESULT_EMPTY,
+            },
+          ],
         });
       }
-      saveBlock();
     }
 
     function editDigital(key: string, cmp: DigitalCompare): void {
@@ -159,8 +166,10 @@ export default defineComponent({
           title: 'Edit comparison',
         },
       }).onOk((cmp) => {
-        block.value.data.digital.splice(digitalIdx(key), 1, cmp);
-        saveBlock();
+        const { digital } = block.value.data;
+        patchBlock({
+          digital: [...digital].splice(digitalIdx(key), 1, cmp),
+        });
       });
     }
 
@@ -173,34 +182,36 @@ export default defineComponent({
           modelValue: cmp,
         },
       }).onOk((cmp) => {
-        block.value.data.analog.splice(analogIdx(key), 1, cmp);
-        saveBlock();
+        const { analog } = block.value.data;
+        patchBlock({
+          analog: [...analog].splice(analogIdx(key), 1, cmp),
+        });
       });
     }
 
     function removeDigital(key: string): void {
-      block.value.data.digital.splice(digitalIdx(key), 1);
-      block.value.data.expression = shiftRemainingComparisons(
-        expression.value,
-        key,
-      );
-      saveBlock();
+      const { digital } = block.value.data;
+      const removedIdx = digitalIdx(key);
+      patchBlock({
+        digital: digital.filter((_, idx) => idx !== removedIdx),
+        expression: shiftRemainingComparisons(expression.value, key),
+      });
     }
 
     function removeAnalog(key: string): void {
-      block.value.data.analog.splice(analogIdx(key), 1);
-      block.value.data.expression = shiftRemainingComparisons(
-        expression.value,
-        key,
-      );
-      saveBlock();
+      const { analog } = block.value.data;
+      const removedIdx = analogIdx(key);
+      patchBlock({
+        analog: analog.filter((_, idx) => idx !== removedIdx),
+        expression: shiftRemainingComparisons(expression.value, key),
+      });
     }
 
     return {
       prettyLink,
       serviceId,
       block,
-      saveBlock,
+      patchBlock,
       validBlocks,
       saveExpression,
       expression,
@@ -257,7 +268,10 @@ export default defineComponent({
         <div>{{ err ? err.message : '---' }}</div>
       </div>
 
-      <LabeledField label="Active comparisons" tag-class="col-grow">
+      <LabeledField
+        label="Active comparisons"
+        tag-class="col-grow"
+      >
         <div class="row q-gutter-xs col-grow">
           <q-chip
             v-for="{ key, cmp, pretty } in digital"
@@ -270,7 +284,10 @@ export default defineComponent({
             @remove="removeDigital(key)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div class="text-lime-6 text-bold col-auto" style="width: 1em">
+              <div
+                class="text-lime-6 text-bold col-auto"
+                style="width: 1em"
+              >
                 {{ key }}
               </div>
               <q-icon
@@ -298,7 +315,10 @@ export default defineComponent({
             @remove="removeAnalog(key)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div class="text-orange-6 text-bold col-auto" style="width: 1em">
+              <div
+                class="text-orange-6 text-bold col-auto"
+                style="width: 1em"
+              >
                 {{ key }}
               </div>
               <q-icon
@@ -378,12 +398,7 @@ export default defineComponent({
         :service-id="serviceId"
         title="Digital Actuator target"
         label="Digital Actuator target"
-        @update:model-value="
-          (v) => {
-            block.data.targetId = v;
-            saveBlock();
-          }
-        "
+        @update:model-value="(v) => patchBlock({ targetId: v })"
       />
     </div>
   </div>

@@ -1,8 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useContext, useGlobals } from '@/composables';
-
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'Card',
@@ -28,41 +26,32 @@ export default defineComponent({
       () => !props.noScroll && context.size === 'Fixed',
     );
 
-    const cardClass = computed<string>(
-      () => {
-        const listed = [
-          `card__${context.container}`,
-          `card__${props.size}`,
-          'depth-2',
-        ];
-        if (dense.value) {
-          listed.push('card__dense');
-        }
-        if (props.noScroll) {
-          listed.push('card__no-scroll');
-        }
-        return listed.join(' ');
-      },
-    );
+    const cardClass = computed<string>(() => {
+      const listed = [
+        `card__${context.container}`,
+        `card__${props.size}`,
+        'depth-2',
+      ];
+      if (dense.value) {
+        listed.push('card__dense');
+      }
+      if (props.noScroll) {
+        listed.push('card__no-scroll');
+      }
+      return listed.join(' ');
+    });
 
     const toolbarClass = computed<string>(
       () => `toolbar__${context.container}`,
     );
 
-    const bodyClass = computed<string>(
-      () => `content__${context.container}`,
-    );
-
-    const contentComponent = computed<string>(
-      () => scrollable.value ? 'q-scroll-area' : 'div',
-    );
+    const bodyClass = computed<string>(() => `content__${context.container}`);
 
     return {
       scrollable,
       cardClass,
       toolbarClass,
       bodyClass,
-      contentComponent,
     };
   },
 });
@@ -79,13 +68,20 @@ export default defineComponent({
         v-if="$slots.actions"
         class="fit column"
       >
-        <component
-          :is="contentComponent"
+        <q-scroll-area
+          v-if="scrollable"
           :class="['col', contentClass]"
           visible
         >
           <slot />
-        </component>
+        </q-scroll-area>
+        <div
+          v-else
+          :class="['col', contentClass]"
+        >
+          <slot />
+        </div>
+
         <div class="col-auto">
           <q-separator />
           <q-card-actions align="right">
@@ -95,14 +91,21 @@ export default defineComponent({
       </div>
 
       <!-- Without actions -->
-      <component
-        :is="contentComponent"
-        v-else
-        :class="['fit', contentClass]"
-        visible
-      >
-        <slot />
-      </component>
+      <template v-else>
+        <q-scroll-area
+          v-if="scrollable"
+          :class="['fit', contentClass]"
+          visible
+        >
+          <slot />
+        </q-scroll-area>
+        <div
+          v-else
+          :class="['fit', contentClass]"
+        >
+          <slot />
+        </div>
+      </template>
     </div>
   </div>
 </template>

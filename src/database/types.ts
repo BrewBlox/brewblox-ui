@@ -1,4 +1,4 @@
-import { StoreObject } from '@/shared-types';
+import { StoreObject } from 'brewblox-proto/ts';
 
 export type ChangeCb<T> = (obj: T) => unknown;
 export type DeleteCb = (id: string) => unknown;
@@ -10,7 +10,6 @@ export interface EventHandler<T = StoreObject> {
 }
 
 export interface BrewbloxDatabase {
-
   /**
    * Connect to actual database.
    * Is called by App.vue during create
@@ -37,7 +36,10 @@ export interface BrewbloxDatabase {
    * @param namespace collection ID.
    * @param objId unique document ID.
    */
-  fetchById<T extends StoreObject>(namespace: string, objId: string): Promise<T | null>;
+  fetchById<T extends StoreObject>(
+    namespace: string,
+    objId: string,
+  ): Promise<T | null>;
 
   /**
    * Save a new document to the store.

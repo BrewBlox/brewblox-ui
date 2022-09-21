@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'SelectedLayoutDialog',
@@ -62,8 +61,18 @@ export default defineComponent({
         @confirm="(v) => save(v)"
       />
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save(local)" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save(local)"
+        />
       </template>
     </DialogCard>
   </q-dialog>

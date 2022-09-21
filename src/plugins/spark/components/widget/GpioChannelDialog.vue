@@ -1,9 +1,8 @@
 <script lang="ts">
+import { useDialog } from '@/composables';
+import { GpioDeviceType, GpioModuleChannel, GpioPins } from 'brewblox-proto/ts';
 import clamp from 'lodash/clamp';
 import { computed, defineComponent, PropType, reactive, watch } from 'vue';
-
-import { useDialog } from '@/composables';
-import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
 
 type EditingKind =
   | 'UNKNOWN'
@@ -43,7 +42,7 @@ function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
 function inferEditingMode({ deviceType }: GpioModuleChannel): EditingMode {
   if (/_2P_BIDIRECTIONAL/.test(deviceType)) {
     return 'BIDIRECTIONAL';
-  } else if (/_1P_HIGH_SIDE/.test(deviceType)) {
+  } else if (/(_1P_HIGH_SIDE|_SSR_1P)/.test(deviceType)) {
     return 'PLUS';
   } else if (/_1P_LOW_SIDE/.test(deviceType)) {
     return 'MINUS';
@@ -271,7 +270,10 @@ export default defineComponent({
 
         <div class="col-break" />
 
-        <LabeledField label="Multiply pins" class="col-6">
+        <LabeledField
+          label="Multiply pins"
+          class="col-6"
+        >
           <div class="text-weight-light">
             Control parallel devices or deliver more power to a single device.
           </div>
@@ -293,7 +295,12 @@ export default defineComponent({
         />
       </div>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           flat
           label="OK"

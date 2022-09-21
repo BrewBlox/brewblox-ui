@@ -1,10 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 const typeValidator = (v: unknown): boolean =>
   typeof v === 'string' && ['text', 'number'].includes(v);
@@ -129,7 +128,12 @@ export default defineComponent({
         </template>
       </q-input>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!isValid"
           flat

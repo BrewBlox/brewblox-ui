@@ -1,10 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DisplaySettingsBlock } from '@/plugins/spark/types';
-
+import { DisplaySettingsBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 import DisplaySettingsBasic from './DisplaySettingsBasic.vue';
 import DisplaySettingsFull from './DisplaySettingsFull.vue';
 
@@ -16,14 +14,10 @@ export default defineComponent({
   },
   setup() {
     const { context } = useContext.setup();
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<DisplaySettingsBlock>();
+    const { patchBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
 
     function clearSlots(): void {
-      block.value.data.widgets = [];
-      saveBlock();
+      patchBlock({ widgets: [] });
     }
 
     return {
@@ -39,7 +33,11 @@ export default defineComponent({
     <template #toolbar>
       <BlockWidgetToolbar has-mode-toggle>
         <template #actions>
-          <ActionItem icon="clear" label="Clear slots" @click="clearSlots" />
+          <ActionItem
+            icon="clear"
+            label="Clear slots"
+            @click="clearSlots"
+          />
         </template>
       </BlockWidgetToolbar>
     </template>

@@ -1,9 +1,7 @@
-import isString from 'lodash/isString';
-import { Router } from 'vue-router';
-
 import { useFeatureStore } from '@/store/features';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
-
+import isString from 'lodash/isString';
+import { Router } from 'vue-router';
 import { createDialog } from './dialog';
 import { notify } from './notify';
 
@@ -33,7 +31,7 @@ export async function startCreateService(
     });
   } else {
     const service = await feature.wizard(stub);
-    await serviceStore.appendService(service);
+    await serviceStore.createService(service);
     notify.done(`Added ${feature.title} <b>${service.id}</b>`);
     if (router) {
       router.push(`/service/${service.id}`);
@@ -83,9 +81,9 @@ export function startRemoveService(
     },
   }).onOk(() => {
     const serviceStore = useServiceStore();
+    serviceStore.removeService(service);
     if (router.currentRoute.value.path === `/service/${service.id}`) {
       router.replace('/');
     }
-    serviceStore.removeService(service);
   });
 }

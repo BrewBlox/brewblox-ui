@@ -1,6 +1,5 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
-
 import { BrewKettleBlockNames, BrewKettleConfig } from './types';
 
 const defaultNames: BrewKettleBlockNames = {
@@ -11,7 +10,6 @@ const defaultNames: BrewKettleBlockNames = {
   kettleAct: 'Actuator',
 };
 
-
 export default defineComponent({
   name: 'BrewKettleNamingTask',
   props: {
@@ -20,21 +18,18 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
     const localConfig = computed<BrewKettleConfig>({
       get: () => props.config,
-      set: cfg => emit('update:config', {
-        ...cfg,
-        widgets: [],
-        createdBlocks: [],
-        changedBlocks: [],
-        renamedBlocks: {},
-      }),
+      set: (cfg) =>
+        emit('update:config', {
+          ...cfg,
+          widgets: [],
+          createdBlocks: [],
+          changedBlocks: [],
+          renamedBlocks: {},
+        }),
     });
 
     return {

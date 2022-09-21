@@ -1,18 +1,16 @@
 <script lang="ts">
-import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-
-import { FlowPart, PartSpec, PersistentPart } from '../types';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref } from 'vue';
+import { BuilderBlueprint, FlowPart, PersistentPart } from '../types';
 import { asStatePart, coord2grid } from '../utils';
 
 interface PartDisplay {
   part: FlowPart;
-  spec: PartSpec;
+  blueprint: BuilderBlueprint;
 }
 
 function asFlowPart(part: PersistentPart): FlowPart {
@@ -39,13 +37,15 @@ export default defineComponent({
 
     const available = computed<PartDisplay[]>(() => {
       const filter = new RegExp(partFilter.value || '', 'i');
-      return builderStore.specs
-        .filter((spec) => `${spec.id}|${spec.title}`.match(filter))
+      return builderStore.blueprints
+        .filter((blueprint) =>
+          `${blueprint.type}|${blueprint.title}`.match(filter),
+        )
         .sort(makeObjectSorter('title'))
-        .map((spec) => ({
-          spec,
+        .map((blueprint) => ({
+          blueprint,
           part: asFlowPart({
-            type: spec.id,
+            type: blueprint.type,
             id: nanoid(),
             x: 0,
             y: 0,
@@ -125,7 +125,7 @@ export default defineComponent({
             <div class="row">
               <q-item
                 v-for="v in available"
-                :key="v.spec.id"
+                :key="v.blueprint.type"
                 clickable
                 class="col-6"
                 @click="selectPart(v)"
@@ -139,7 +139,7 @@ export default defineComponent({
                     <PartWrapper :part="v.part" />
                   </svg>
                 </q-item-section>
-                <q-item-section>{{ v.spec.title }}</q-item-section>
+                <q-item-section>{{ v.blueprint.title }}</q-item-section>
               </q-item>
             </div>
           </q-card-section>

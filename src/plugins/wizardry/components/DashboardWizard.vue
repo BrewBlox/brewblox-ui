@@ -1,7 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
-
 import { useWizard } from '@/plugins/wizardry/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { makeDashboardIdRules } from '@/utils/dashboards';
@@ -9,6 +6,8 @@ import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { makeUrlSafe } from '@/utils/url';
+import { computed, defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const idRules = makeDashboardIdRules();
 const idValidator = makeRuleValidator(idRules);
@@ -27,6 +26,7 @@ export default defineComponent({
     setDialogTitle('Dashboard wizard');
 
     const dashboardTitle = ref<string>('New dashboard');
+    const dashboardDir = ref<string>();
 
     const _dashboardId = ref<string | null>(null);
     const dashboardId = computed<string>({
@@ -60,6 +60,15 @@ export default defineComponent({
       }).onOk((v) => (dashboardId.value = v));
     }
 
+    function showDirKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: dashboardDir.value,
+        },
+      }).onOk((v) => (dashboardDir.value = v));
+    }
+
     async function createDashboard(): Promise<void> {
       if (!valid.value) {
         return;
@@ -67,7 +76,7 @@ export default defineComponent({
       const dashboard: Dashboard = {
         id: dashboardId.value,
         title: dashboardTitle.value || dashboardId.value,
-        order: dashboardStore.dashboardIds.length + 1,
+        dir: dashboardDir.value,
       };
 
       await dashboardStore.createDashboard(dashboard);
@@ -79,12 +88,14 @@ export default defineComponent({
     return {
       onBack,
       dashboardId,
+      dashboardDir,
       suggestDashboardId,
       idRules,
       valid,
       dashboardTitle,
       showIdKeyboard,
       showTitleKeyboard,
+      showDirKeyboard,
       createDashboard,
     };
   },
@@ -96,16 +107,11 @@ export default defineComponent({
     <q-card-section>
       <q-item>
         <q-item-section>
-          <q-input v-model="dashboardTitle" label="Dashboard Title">
-            <template #append>
-              <KeyboardButton @click="showTitleKeyboard" />
-            </template>
-          </q-input>
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <q-input v-model="dashboardId" :rules="idRules" label="Dashboard URL">
+          <q-input
+            v-model="dashboardId"
+            :rules="idRules"
+            label="Dashboard URL"
+          >
             <template #append>
               <KeyboardButton @click="showIdKeyboard" />
             </template>
@@ -124,10 +130,40 @@ export default defineComponent({
           </q-btn>
         </q-item-section>
       </q-item>
+      <q-item>
+        <q-item-section>
+          <q-input
+            v-model="dashboardTitle"
+            label="Dashboard title"
+            hint="This is what the dashboard will be called in the UI"
+          >
+            <template #append>
+              <KeyboardButton @click="showTitleKeyboard" />
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section>
+          <q-input
+            v-model="dashboardDir"
+            label="Dashboard directory"
+            hint="Use / to create nested directories"
+          >
+            <template #append>
+              <KeyboardButton @click="showDirKeyboard" />
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="onBack" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <q-btn
         :disable="!valid"

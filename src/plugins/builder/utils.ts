@@ -1,25 +1,21 @@
-import defaults from 'lodash/defaults';
-import range from 'lodash/range';
-import reduce from 'lodash/reduce';
-import { nanoid } from 'nanoid';
-
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block, ComparedBlockType } from '@/plugins/spark/types';
-import { BlockAddress } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils';
+import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
+import { createBlockDialog } from '@/utils/block-dialog';
 import {
   Coordinates,
   CoordinatesParam,
   rotatedSize,
 } from '@/utils/coordinates';
-import {
-  createBlockDialog,
-  createDialog,
-  createDialogPromise,
-} from '@/utils/dialog';
+import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
-
+import { Block } from 'brewblox-proto/ts';
+import defaults from 'lodash/defaults';
+import range from 'lodash/range';
+import reduce from 'lodash/reduce';
+import { nanoid } from 'nanoid';
+import { Router } from 'vue-router';
 import {
   CENTER,
   DEFAULT_LAYOUT_HEIGHT,
@@ -69,12 +65,12 @@ export function asPersistentPart(
 }
 
 export function asStatePart(part: PersistentPart): StatePart {
-  const spec = useBuilderStore().spec(part);
+  const blueprint = useBuilderStore().blueprintByType(part.type);
   return {
     ...part,
-    transitions: spec.transitions(part),
-    size: spec.size(part),
-    canInteract: spec.interactHandler !== undefined,
+    transitions: blueprint.transitions(part),
+    size: blueprint.size(part),
+    canInteract: blueprint.interactHandler !== undefined,
   };
 }
 
@@ -296,24 +292,24 @@ export function showDrivingBlockDialog(
   settingsKey: string,
   intf: ComparedBlockType,
 ): void {
-  const sparkStore = useSparkStore();
+  // const sparkStore = useSparkStore();
   const block = settingsBlock(part, settingsKey, intf);
 
   if (!block) {
     return showAbsentBlock(part, settingsKey);
   }
 
-  const driveChain = sparkStore
-    .driveChainsByService(block.serviceId)
-    .find((chain) => chain.target === block.id);
+  // const claim = sparkStore
+  //   .claimsByService(block.serviceId)
+  //   .find((c) => c.target === block.id);
 
-  const actual =
-    driveChain !== undefined
-      ? sparkStore.blockById(block.serviceId, driveChain.source)
-      : block;
+  // const actual =
+  //   claim !== undefined
+  //     ? sparkStore.blockById(block.serviceId, claim.source)
+  //     : block;
 
-  if (actual) {
-    createBlockDialog(actual, { mode: 'Basic' });
+  if (block) {
+    createBlockDialog(block, { mode: 'Basic' });
   }
 }
 
@@ -386,7 +382,9 @@ export function vivifyParts(
         part.id = part.id ?? nanoid();
         part.type = deprecatedTypes[part.type] ?? part.type;
 
-        const [sizeX, sizeY] = builderStore.spec(part).size(part);
+        const [sizeX, sizeY] = builderStore
+          .blueprintByType(part.type)
+          .size(part);
         sizes[part.id] = sizeX * sizeY;
         return part;
       })
@@ -420,7 +418,7 @@ export async function startAddLayout(
     component: 'InputDialog',
     componentProps: {
       modelValue: 'Brewery Layout',
-      title: 'Add Layout',
+      title: 'New Layout',
       message: 'Create a new Brewery Builder layout',
     },
   });
@@ -435,12 +433,11 @@ export async function startAddLayout(
     width: source?.width ?? DEFAULT_LAYOUT_WIDTH,
     height: source?.height ?? DEFAULT_LAYOUT_HEIGHT,
     parts: deepCopy(source?.parts) ?? [],
-    order: builderStore.layouts.length + 1,
   });
   return id;
 }
 
-export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
+export function startChangeLayoutTitle(layout: Maybe<BuilderLayout>): void {
   if (!layout) {
     return;
   }
@@ -455,6 +452,34 @@ export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
   }).onOk((title: string) => {
     if (layout) {
       builderStore.saveLayout({ ...layout, title });
+    }
+  });
+}
+
+export function startRemoveLayout(
+  layout: Maybe<BuilderLayout>,
+  router: Router,
+): void {
+  if (!layout) {
+    return;
+  }
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: 'Remove layout',
+      message: `Are you sure you wish to remove ${layout.title}?`,
+      noBackdropDismiss: true,
+    },
+  }).onOk(async () => {
+    if (layout) {
+      const builderStore = useBuilderStore();
+      await builderStore.removeLayout(layout).catch(() => {});
+    }
+    const path = router.currentRoute.value.path;
+    if (path === `/brewery/${layout.id}`) {
+      router.replace('/brewery');
+    } else if (path === `/builder/${layout.id}`) {
+      router.replace('/builder');
     }
   });
 }

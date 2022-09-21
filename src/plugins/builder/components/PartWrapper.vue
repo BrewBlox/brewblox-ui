@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useBuilderStore } from '@/plugins/builder/store';
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
-
+import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import parts from '../parts';
 
@@ -31,10 +29,7 @@ export default defineComponent({
   setup(props) {
     const builderStore = useBuilderStore();
     const { sizeX, sizeY } = usePart.setup(props.part);
-
-    const component = computed<string>(() =>
-      builderStore.component(props.part),
-    );
+    const component = builderStore.componentByType(props.part.type);
 
     const rotateTransform = computed<string>(() => {
       const [partSizeX, partSizeY] = props.part.size;

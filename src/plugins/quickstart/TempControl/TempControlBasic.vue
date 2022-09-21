@@ -1,22 +1,26 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useContext, useWidget } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { ProfileValues } from '@/plugins/spark/types';
-import { calculateProfileValues } from '@/plugins/spark/utils';
+import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { concatById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
+import {
+  bloxQty,
+  dateString,
+  prettyQty,
+  shortDateString,
+  tempQty,
+} from '@/utils/quantity';
 import {
   PidBlock,
   Quantity,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
-} from '@/shared-types';
-import { concatById } from '@/utils/collections';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { prettyQty, shortDateString } from '@/utils/formatting';
-import { notify } from '@/utils/notify';
-import { bloxQty, tempQty } from '@/utils/quantity';
-
+} from 'brewblox-proto/ts';
+import { computed, defineComponent, ref } from 'vue';
 import { PidConfig } from '../types';
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlSyncView from './TempControlSyncView.vue';
@@ -30,7 +34,7 @@ export default defineComponent({
   },
   setup() {
     const { context } = useContext.setup();
-    const { config, saveConfig } = useWidget.setup<TempControlWidget>();
+    const { config, patchConfig } = useWidget.setup<TempControlWidget>();
     const sparkStore = useSparkStore();
 
     const problems = ref<TempControlProblem[]>([]);
@@ -75,15 +79,12 @@ export default defineComponent({
         return value ?? tempQty(null);
       },
       set: (value) => {
-        if (setpoint.value) {
-          setpoint.value.data.storedSetting = value;
-          sparkStore.saveBlock(setpoint.value);
-        }
+        sparkStore.patchBlock(setpoint.value, { storedSetting: value });
       },
     });
 
     const setpointEnabled = computed<boolean | null>({
-      get: () => setpoint.value?.data.settingEnabled ?? null,
+      get: () => setpoint.value?.data.enabled ?? null,
       set: (value) => setControl(!!value),
     });
 
@@ -99,18 +100,16 @@ export default defineComponent({
         }
 
         if (!value) {
-          profile.value.data.enabled = false;
-          sparkStore.saveBlock(profile.value);
+          sparkStore.patchBlock(profile.value, { enabled: false });
           return;
         }
 
-        const start = new Date((profile.value.data.start || 0) * 1000);
         createDialog({
           component: 'ConfirmDialog',
           componentProps: {
             title: 'Start profile',
             message: `
-          Profile start time is ${start.toLocaleString()}.
+          Profile start time is ${dateString(profile.value.data.start)}.
           Do you want to reset this value to current date and time?
           `,
             nok: 'No',
@@ -120,14 +119,14 @@ export default defineComponent({
           if (!profile.value || !setpoint.value) {
             return;
           }
-          if (reset) {
-            profile.value.data.start = new Date().getTime() / 1000;
-          }
-          profile.value.data.enabled = true;
-          setpoint.value.data.settingEnabled = true;
 
-          await sparkStore.saveBlock(setpoint.value);
-          await sparkStore.saveBlock(profile.value);
+          await sparkStore.patchBlock(setpoint.value, {
+            enabled: true,
+          });
+          await sparkStore.patchBlock(profile.value, {
+            enabled: true,
+            start: reset ? new Date().toISOString() : undefined,
+          });
         });
       },
     });
@@ -163,15 +162,13 @@ export default defineComponent({
       if (leading === 'pid') {
         const { kp, td, ti } = pid.data;
         tempMode.value[`${kind}Config`] = { kp, td, ti };
-        config.value.modes = concatById(config.value.modes, tempMode.value);
-        saveConfig();
+        patchConfig({ modes: concatById(config.value.modes, tempMode.value) });
       }
 
       if (leading === 'mode') {
         const config = tempMode.value[`${kind}Config`];
         if (config) {
-          pid.data = { ...pid.data, ...config };
-          sparkStore.saveBlock(pid);
+          sparkStore.patchBlock(pid, config);
         }
       }
     }
@@ -186,13 +183,15 @@ export default defineComponent({
 
     async function setControl(enabled: boolean): Promise<void> {
       if (profile.value && !enabled) {
-        profile.value.data.enabled = false;
-        await sparkStore.saveBlock(profile.value);
+        await sparkStore.patchBlock(profile.value, {
+          enabled: false,
+        });
       }
 
       if (setpoint.value) {
-        setpoint.value.data.settingEnabled = enabled;
-        await sparkStore.saveBlock(setpoint.value);
+        await sparkStore.patchBlock(setpoint.value, {
+          enabled: enabled,
+        });
       }
     }
 
@@ -200,8 +199,7 @@ export default defineComponent({
       const mode = config.value.modes.find((v) => v.id === id);
 
       if (!mode) {
-        config.value.activeMode = null;
-        saveConfig();
+        patchConfig({ activeMode: null });
         return;
       }
 
@@ -213,20 +211,20 @@ export default defineComponent({
           title: `Apply ${mode.title} mode`,
           showConfirm: true,
           saveMode: (mode: TempControlMode) => {
-            config.value.modes = concatById(config.value.modes, mode);
-            saveConfig();
+            patchConfig({ modes: concatById(config.value.modes, mode) });
           },
         },
       }).onOk(async () => {
+        let activeMode: string | null = null;
         try {
           await applyMode(config.value, mode);
-          config.value.activeMode = mode.id;
+          activeMode = mode.id;
           notify.done(`Applied ${mode.title} mode`);
         } catch (e: any) {
-          config.value.activeMode = null;
+          activeMode = null;
           notify.error(e.message);
         } finally {
-          await saveConfig();
+          patchConfig({ activeMode });
         }
       });
     }
@@ -304,7 +302,11 @@ export default defineComponent({
         tag-class="text-secondary"
       />
 
-      <LabeledField v-if="!setpoint" label="Setpoint setting" class="col-grow">
+      <LabeledField
+        v-if="!setpoint"
+        label="Setpoint setting"
+        class="col-grow"
+      >
         <b>{{
           differentSetpoints ? 'PID setpoints mismatched' : 'No setpoint set'
         }}</b>
@@ -324,17 +326,30 @@ export default defineComponent({
         <span v-else> --- </span>
       </LabeledField>
 
-      <LabeledField v-if="!profile" label="Setpoint Profile" class="col-grow">
+      <LabeledField
+        v-if="!profile"
+        label="Setpoint Profile"
+        class="col-grow"
+      >
         Not set
       </LabeledField>
     </div>
 
-    <q-item tag="label" @click="selectControlMode">
+    <q-item
+      tag="label"
+      @click="selectControlMode"
+    >
       <q-item-section>
         <q-item-label>Control mode</q-item-label>
       </q-item-section>
-      <q-item-section avatar class="q-pr-sm text-big">
-        <span v-if="tempMode" class="text-primary">
+      <q-item-section
+        avatar
+        class="q-pr-sm text-big"
+      >
+        <span
+          v-if="tempMode"
+          class="text-primary"
+        >
           {{ tempMode.title }}
         </span>
         <span v-else> Manual </span>
@@ -350,28 +365,47 @@ export default defineComponent({
       </q-item-section>
     </q-item>
 
-    <q-item tag="label" :disable="!profile">
+    <q-item
+      tag="label"
+      :disable="!profile"
+    >
       <q-item-section>
-        <q-item-label>Setpoint driven by Profile</q-item-label>
+        <q-item-label>Setpoint claimed by Profile</q-item-label>
       </q-item-section>
       <q-item-section avatar>
-        <q-toggle v-model="profileEnabled" :disable="!profile" />
+        <q-toggle
+          v-model="profileEnabled"
+          :disable="!profile"
+        />
       </q-item-section>
     </q-item>
 
-    <q-item tag="label" class="col-grow" @click="troubleshoot">
+    <q-item
+      tag="label"
+      class="col-grow"
+      @click="troubleshoot"
+    >
       <q-item-section>
         <q-item-label>Check for problems</q-item-label>
       </q-item-section>
-      <q-item-section v-if="detected" class="fade-4 col-auto">
+      <q-item-section
+        v-if="detected"
+        class="fade-4 col-auto"
+      >
         Last checked: {{ shortDateString(detected) }}
       </q-item-section>
       <q-item-section avatar>
-        <q-icon name="mdi-refresh" class="q-pr-md" />
+        <q-icon
+          name="mdi-refresh"
+          class="q-pr-md"
+        />
       </q-item-section>
     </q-item>
 
-    <div v-if="detected" class="column q-gutter-y-sm q-px-sm">
+    <div
+      v-if="detected"
+      class="column q-gutter-y-sm q-px-sm"
+    >
       <LabeledField
         v-for="(problem, idx) in problems"
         :key="`problem-${detected}-${idx}`"
@@ -385,7 +419,11 @@ export default defineComponent({
         @click="autofix(problem)"
       >
         <template #before>
-          <q-icon name="warning" color="warning" size="lg" />
+          <q-icon
+            name="warning"
+            color="warning"
+            size="lg"
+          />
         </template>
         <div v-html="problem.desc" />
       </LabeledField>

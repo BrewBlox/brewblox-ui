@@ -1,7 +1,10 @@
-import { nanoid } from 'nanoid';
-
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { useFeatureStore } from '@/store/features';
+import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
+import { bloxLink } from '@/utils/link';
+import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 import {
   ActuatorPwmBlock,
   Block,
@@ -11,15 +14,12 @@ import {
   FilterChoice,
   PidBlock,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/types';
-import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
-import { Widget } from '@/store/widgets';
-import { bloxLink } from '@/utils/link';
-import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
-
+  SettingMode,
+  TransitionDurationPreset,
+} from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
 import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock } from '../types';
+import { DisplayBlock, QuickstartPatch } from '../types';
 import {
   changedIoModules,
   pidDefaults,
@@ -29,7 +29,9 @@ import {
 } from '../utils';
 import { BrewKettleConfig } from './types';
 
-export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
+export function defineChangedBlocks(
+  config: BrewKettleConfig,
+): QuickstartPatch<Block>[] {
   return [
     ...unlinkedActuators(config.serviceId, [config.kettleChannel]),
     ...changedIoModules(config.serviceId, config.changedGpio),
@@ -37,7 +39,6 @@ export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
 }
 
 export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
-  const groups = [0];
   const { serviceId, names } = config;
 
   const blocks: [
@@ -50,58 +51,65 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
       id: names.kettleSetpoint,
       type: BlockType.SetpointSensorPair,
       serviceId,
-      groups,
       data: {
         sensorId: bloxLink(names.kettleSensor),
+        enabled: false,
         storedSetting: tempQty(70),
-        settingEnabled: false,
+        desiredSetting: tempQty(null),
         setting: tempQty(null),
         value: tempQty(null),
         valueUnfiltered: tempQty(null),
         filterThreshold: deltaTempQty(5),
         filter: FilterChoice.FILTER_15s,
         resetFilter: false,
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     },
     {
       id: names.kettleAct,
       type: BlockType.DigitalActuator,
       serviceId,
-      groups,
       data: {
         hwDevice: bloxLink(config.kettleChannel.blockId),
         channel: config.kettleChannel.channelId,
+        storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
         constrainedBy: {
           constraints: [],
         },
+        transitionDurationPreset: TransitionDurationPreset.ST_OFF,
+        transitionDurationSetting: bloxQty('0s'),
+        transitionDurationValue: bloxQty('0s'),
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     },
     {
       id: names.kettlePwm,
       type: BlockType.ActuatorPwm,
       serviceId,
-      groups,
       data: {
         enabled: true,
         period: bloxQty('2s'),
         actuatorId: bloxLink(names.kettleAct),
-        drivenActuatorId: bloxLink(null),
+        storedSetting: 0,
         setting: 0,
         desiredSetting: 0,
         value: 0,
         constrainedBy: {
           constraints: [],
         },
+        claimedBy: bloxLink(null),
+        settingMode: SettingMode.STORED,
       },
     },
     {
       id: names.kettlePid,
       type: BlockType.Pid,
       serviceId,
-      groups,
       data: {
         ...pidDefaults(),
         enabled: true,
@@ -122,10 +130,9 @@ export function defineWidgets(
   config: BrewKettleConfig,
   layouts: BuilderLayout[],
 ): Widget[] {
-  const systemStore = useSystemStore();
   const featureStore = useFeatureStore();
   const { serviceId, names, dashboardId, prefix } = config;
-  const userTemp = systemStore.units.temperature;
+  const userTemp = userUnits.value.temperature;
   const genericSettings = {
     dashboard: dashboardId,
     cols: 4,
@@ -163,17 +170,13 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      version: '1.0',
       layout: {},
       params: { duration: '10m' },
-      targets: [
-        {
-          measurement: serviceId,
-          fields: [
-            `${names.kettleSensor}/value[${userTemp}]`,
-            `${names.kettleSetpoint}/setting[${userTemp}]`,
-            `${names.kettlePwm}/value`,
-          ],
-        },
+      fields: [
+        `${serviceId}/${names.kettleSensor}/value[${userTemp}]`,
+        `${serviceId}/${names.kettleSetpoint}/setting[${userTemp}]`,
+        `${serviceId}/${names.kettlePwm}/value`,
       ],
       renames: {
         [`${serviceId}/${names.kettleSensor}/value[${userTemp}]`]:

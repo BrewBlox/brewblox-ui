@@ -1,13 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, watch } from 'vue';
-
 import {
   ComponentResult,
   useFeatureStore,
   WidgetContext,
 } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
-
+import { computed, defineComponent, PropType, watch } from 'vue';
 import { BlockConfig } from '../types';
 import { ListRenderAddress } from './types';
 
@@ -74,7 +72,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <WidgetProvider :widget-id="widgetId" :context="context">
+  <WidgetProvider
+    :widget-id="widgetId"
+    :context="context"
+  >
     <component
       :is="widgetComponent.component"
       v-if="widgetComponent"

@@ -1,26 +1,23 @@
 {
   "blocks": [
     {
-      "nid": 1,
-      "groups": [
-        7
-      ],
-      "type": "Groups",
-      "data": {
-        "active": [
-          0,
-          7
-        ]
-      },
       "id": "ActiveGroups",
-      "serviceId": "spock"
+      "nid": 1,
+      "type": "ErrorObject",
+      "serviceId": "spock",
+      "data": {
+        "error": "KeyError('No transcoder found for identifier (65534, 0)')",
+        "identifier": [
+          65534,
+          0
+        ]
+      }
     },
     {
+      "id": "actuator-1",
       "nid": 208,
-      "groups": [
-        0
-      ],
       "type": "ActuatorAnalogMock",
+      "serviceId": "spock",
       "data": {
         "minSetting": 10,
         "maxSetting": 30,
@@ -29,16 +26,13 @@
         "desiredSetting": 10,
         "setting": 0,
         "value": 0
-      },
-      "id": "actuator-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "actuator-pwm-1",
       "nid": 209,
-      "groups": [
-        0
-      ],
       "type": "ActuatorPwm",
+      "serviceId": "spock",
       "data": {
         "actuatorId": {
           "__bloxtype": "Link",
@@ -80,28 +74,22 @@
         },
         "enabled": false,
         "desiredSetting": 0
-      },
-      "id": "actuator-pwm-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "balancer-1",
       "nid": 200,
-      "groups": [
-        0
-      ],
       "type": "Balancer",
+      "serviceId": "spock",
       "data": {
         "clients": []
-      },
-      "id": "balancer-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "DisplaySettings",
       "nid": 7,
-      "groups": [
-        7
-      ],
       "type": "DisplaySettings",
+      "serviceId": "spock",
       "data": {
         "widgets": [
           {
@@ -149,40 +137,13 @@
         "timeZone": "CET-1CEST,M3.5.0,M10.5.0/3",
         "tempUnit": 0,
         "brightness": 0
-      },
-      "id": "DisplaySettings",
-      "serviceId": "spock"
+      }
     },
     {
-      "nid": 218,
-      "groups": [
-        0
-      ],
-      "type": "TempSensorMock",
-      "data": {
-        "connected": true,
-        "value": {
-          "__bloxtype": "Quantity",
-          "unit": "degC",
-          "readonly": true,
-          "value": 0
-        },
-        "setting": {
-          "__bloxtype": "Quantity",
-          "unit": "degC",
-          "value": 0
-        },
-        "fluctuations": []
-      },
       "id": "mock-sensor-1",
-      "serviceId": "spock"
-    },
-    {
-      "nid": 219,
-      "groups": [
-        0
-      ],
+      "nid": 218,
       "type": "TempSensorMock",
+      "serviceId": "spock",
       "data": {
         "connected": true,
         "value": {
@@ -197,16 +158,13 @@
           "value": 0
         },
         "fluctuations": []
-      },
+      }
+    },
+    {
       "id": "mock-sensor-2",
-      "serviceId": "spock"
-    },
-    {
-      "nid": 220,
-      "groups": [
-        0
-      ],
+      "nid": 219,
       "type": "TempSensorMock",
+      "serviceId": "spock",
       "data": {
         "connected": true,
         "value": {
@@ -221,16 +179,34 @@
           "value": 0
         },
         "fluctuations": []
-      },
-      "id": "mock-sensor-3",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "mock-sensor-3",
+      "nid": 220,
+      "type": "TempSensorMock",
+      "serviceId": "spock",
+      "data": {
+        "connected": true,
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0
+        },
+        "fluctuations": []
+      }
+    },
+    {
+      "id": "mutex-1",
       "nid": 201,
-      "groups": [
-        0
-      ],
       "type": "Mutex",
+      "serviceId": "spock",
       "data": {
         "differentActuatorWait": {
           "__bloxtype": "Quantity",
@@ -243,16 +219,13 @@
           "readonly": true,
           "value": 0
         }
-      },
-      "id": "mutex-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "New|DS2408-1",
       "nid": 230,
-      "groups": [
-        0
-      ],
       "type": "DS2408",
+      "serviceId": "spock",
       "data": {
         "address": "29555555555555da",
         "connected": false,
@@ -263,16 +236,13 @@
           "id": null
         },
         "channels": []
-      },
-      "id": "New|DS2408-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "New|DS2413-1",
       "nid": 229,
-      "groups": [
-        0
-      ],
       "type": "DS2413",
+      "serviceId": "spock",
       "data": {
         "address": "3a44444444444406",
         "connected": false,
@@ -282,16 +252,13 @@
           "id": null
         },
         "channels": []
-      },
-      "id": "New|DS2413-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-1",
       "nid": 221,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "spock",
       "data": {
         "address": "2811111111111111",
         "value": {
@@ -310,16 +277,13 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-2",
       "nid": 222,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "spock",
       "data": {
         "address": "2822222222222222",
         "value": {
@@ -338,16 +302,13 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-2",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-3",
       "nid": 223,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "spock",
       "data": {
         "address": "2833333333333333",
         "value": {
@@ -366,16 +327,13 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-3",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-4",
       "nid": 226,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "spock",
       "data": {
         "address": "28222222222222de",
         "value": {
@@ -394,16 +352,13 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-4",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-5",
       "nid": 227,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "spock",
       "data": {
         "address": "281111111111117e",
         "value": {
@@ -422,16 +377,13 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-5",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "New|TempSensorOneWire-6",
       "nid": 228,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "spock",
       "data": {
         "address": "28333333333333be",
         "value": {
@@ -450,16 +402,13 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "New|TempSensorOneWire-6",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "offset-1",
       "nid": 211,
-      "groups": [
-        0
-      ],
       "type": "ActuatorOffset",
+      "serviceId": "spock",
       "data": {
         "targetId": {
           "__bloxtype": "Link",
@@ -482,28 +431,22 @@
         },
         "enabled": false,
         "desiredSetting": 0
-      },
-      "id": "offset-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "OneWireBus",
       "nid": 4,
-      "groups": [
-        7
-      ],
       "type": "OneWireBus",
+      "serviceId": "spock",
       "data": {
         "address": []
-      },
-      "id": "OneWireBus",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "pid-1",
       "nid": 212,
-      "groups": [
-        0
-      ],
       "type": "Pid",
+      "serviceId": "spock",
       "data": {
         "inputId": {
           "__bloxtype": "Link",
@@ -582,16 +525,13 @@
         "boilMinOutput": 0,
         "boilModeActive": false,
         "derivativeFilter": 0
-      },
-      "id": "pid-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "pin-actuator-1",
       "nid": 215,
-      "groups": [
-        0
-      ],
       "type": "DigitalActuator",
+      "serviceId": "spock",
       "data": {
         "hwDevice": {
           "__bloxtype": "Link",
@@ -629,16 +569,13 @@
         "state": 0,
         "invert": false,
         "desiredState": 0
-      },
-      "id": "pin-actuator-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "pin-actuator-2",
       "nid": 216,
-      "groups": [
-        0
-      ],
       "type": "DigitalActuator",
+      "serviceId": "spock",
       "data": {
         "hwDevice": {
           "__bloxtype": "Link",
@@ -676,16 +613,13 @@
         "state": 0,
         "invert": false,
         "desiredState": 0
-      },
-      "id": "pin-actuator-2",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "pin-actuator-3",
       "nid": 217,
-      "groups": [
-        0
-      ],
       "type": "DigitalActuator",
+      "serviceId": "spock",
       "data": {
         "hwDevice": {
           "__bloxtype": "Link",
@@ -697,16 +631,13 @@
         "state": 0,
         "invert": false,
         "desiredState": 0
-      },
-      "id": "pin-actuator-3",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "profile-1",
       "nid": 202,
-      "groups": [
-        0
-      ],
       "type": "SetpointProfile",
+      "serviceId": "spock",
       "data": {
         "points": [
           {
@@ -747,16 +678,13 @@
           "driven": true,
           "id": null
         }
-      },
-      "id": "profile-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "sensor-1",
       "nid": 204,
-      "groups": [
-        0
-      ],
       "type": "TempSensorMock",
+      "serviceId": "spock",
       "data": {
         "connected": true,
         "value": {
@@ -771,14 +699,13 @@
           "value": 0
         },
         "fluctuations": []
-      },
-      "id": "sensor-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "sensor-inactive",
       "nid": 203,
-      "groups": [],
       "type": "TempSensorMock",
+      "serviceId": "spock",
       "data": {
         "value": {
           "__bloxtype": "Quantity",
@@ -793,16 +720,13 @@
           "value": 0
         },
         "fluctuations": []
-      },
-      "id": "sensor-inactive",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "sensor-onewire-1",
       "nid": 205,
-      "groups": [
-        0
-      ],
       "type": "TempSensorOneWire",
+      "serviceId": "spock",
       "data": {
         "offset": {
           "__bloxtype": "Quantity",
@@ -821,23 +745,20 @@
           "type": "OneWireBus",
           "id": null
         }
-      },
-      "id": "sensor-onewire-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "setpoint-sensor-pair-1",
       "nid": 206,
-      "groups": [
-        0
-      ],
       "type": "SetpointSensorPair",
+      "serviceId": "spock",
       "data": {
         "sensorId": {
           "__bloxtype": "Link",
           "type": "TempSensorInterface",
           "id": "sensor-1"
         },
-        "settingEnabled": true,
+        "enabled": true,
         "storedSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -868,18 +789,15 @@
           "value": 0
         },
         "resetFilter": false
-      },
-      "id": "setpoint-sensor-pair-1",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "setpoint-sensor-pair-2",
       "nid": 207,
-      "groups": [
-        0
-      ],
       "type": "SetpointSensorPair",
+      "serviceId": "spock",
       "data": {
-        "settingEnabled": true,
+        "enabled": true,
         "storedSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
@@ -915,16 +833,13 @@
           "value": 0
         },
         "resetFilter": false
-      },
-      "id": "setpoint-sensor-pair-2",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "SparkPins",
       "nid": 19,
-      "groups": [
-        7
-      ],
       "type": "Spark3Pins",
+      "serviceId": "spock",
       "data": {
         "enableIoSupply5V": true,
         "enableIoSupply12V": true,
@@ -932,16 +847,13 @@
         "voltage5": 0,
         "voltage12": 0,
         "channels": []
-      },
-      "id": "SparkPins",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "SystemInfo",
       "nid": 2,
-      "groups": [
-        7
-      ],
       "type": "SysInfo",
+      "serviceId": "spock",
       "data": {
         "deviceId": "",
         "version": "",
@@ -951,32 +863,26 @@
         "protocolDate": "",
         "command": 0,
         "trace": []
-      },
-      "id": "SystemInfo",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "TouchSettings",
       "nid": 6,
-      "groups": [
-        7
-      ],
       "type": "TouchSettings",
+      "serviceId": "spock",
       "data": {
         "calibrated": 1,
         "xBitsPerPixelX16": 64,
         "yBitsPerPixelX16": 64,
         "xOffset": 0,
         "yOffset": 0
-      },
-      "id": "TouchSettings",
-      "serviceId": "spock"
+      }
     },
     {
+      "id": "WiFiSettings",
       "nid": 5,
-      "groups": [
-        7
-      ],
       "type": "WiFiSettings",
+      "serviceId": "spock",
       "data": {
         "ssid": "",
         "password": "",
@@ -984,19 +890,10 @@
         "cipher": 0,
         "signal": 0,
         "ip": ""
-      },
-      "id": "WiFiSettings",
-      "serviceId": "spock"
+      }
     }
   ],
   "store": [
-    {
-      "keys": [
-        "ActiveGroups",
-        1
-      ],
-      "data": {}
-    },
     {
       "keys": [
         "SystemInfo",
@@ -1043,6 +940,13 @@
       "keys": [
         "SparkPins",
         19
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "ActiveGroups",
+        1
       ],
       "data": {}
     },

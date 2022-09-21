@@ -1,7 +1,6 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
+import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'SliderDialog',
@@ -36,17 +35,10 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const local = ref<number>(props.modelValue);
 
@@ -80,21 +72,43 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-item>
         <q-item-section class="q-pt-md">
-          <q-slider v-model="local" :min="min" :max="max" label-always />
+          <q-slider
+            v-model="local"
+            :min="min"
+            :max="max"
+            label-always
+          />
         </q-item-section>
       </q-item>
       <q-item v-if="quickActions.length">
-        <q-item-section v-for="q in quickActions" :key="'quick'+q.value">
-          <q-btn unelevated :label="q.label" @click="apply(q.value)" />
+        <q-item-section
+          v-for="q in quickActions"
+          :key="'quick' + q.value"
+        >
+          <q-btn
+            unelevated
+            :label="q.label"
+            @click="apply(q.value)"
+          />
         </q-item-section>
       </q-item>
 
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

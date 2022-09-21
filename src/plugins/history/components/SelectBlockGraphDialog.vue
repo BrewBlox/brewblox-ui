@@ -1,22 +1,19 @@
 <script lang="ts">
-import mapValues from 'lodash/mapValues';
-import { computed, defineComponent, PropType, ref } from 'vue';
-
 import { useDialog } from '@/composables';
-import { sparkType } from '@/plugins/spark/const';
+import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
-  Block,
   BlockAddress,
   BlockFieldSpec,
-  BlockType,
   SparkService,
 } from '@/plugins/spark/types';
-import { makeBlockGraphConfig } from '@/plugins/spark/utils';
+import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import { useServiceStore } from '@/store/services';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils/block-dialog';
 import { makeTypeFilter } from '@/utils/functional';
-
+import { Block, BlockType } from 'brewblox-proto/ts';
+import mapValues from 'lodash/mapValues';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { GraphConfig } from '../types';
 
 export default defineComponent({
@@ -41,7 +38,9 @@ export default defineComponent({
     const specStore = useBlockSpecStore();
 
     const services = computed<SparkService[]>(() =>
-      serviceStore.services.filter(makeTypeFilter<SparkService>(sparkType)),
+      serviceStore.services.filter(
+        makeTypeFilter<SparkService>(SPARK_SERVICE_TYPE),
+      ),
     );
 
     const block = ref<Block | null>(sparkStore.blockByAddress(props.address));
@@ -125,7 +124,10 @@ export default defineComponent({
   >
     <DialogCard v-bind="{ title, message, html }">
       <div class="q-pa-sm q-gutter-md">
-        <div v-if="services.length === 0" class="text-italic fade-2">
+        <div
+          v-if="services.length === 0"
+          class="text-italic fade-2"
+        >
           No Spark services found
         </div>
         <ListSelect
@@ -148,9 +150,7 @@ export default defineComponent({
         >
           <template #no-option>
             <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
+              <q-item-section class="text-grey"> No results </q-item-section>
             </q-item>
           </template>
           <template #after>
@@ -174,7 +174,12 @@ export default defineComponent({
         />
       </div>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           :disable="!block || !selectedFields.length"
           flat

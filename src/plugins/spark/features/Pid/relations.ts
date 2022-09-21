@@ -1,13 +1,9 @@
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  BlockRelation,
-  BlockRelationNode,
-  PidBlock,
-} from '@/plugins/spark/types';
-import { Link } from '@/shared-types';
+import { BlockRelationNode } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { createDialog } from '@/utils/dialog';
 import { isLink } from '@/utils/identity';
+import { BlockRelation, Link, PidBlock } from 'brewblox-proto/ts';
 
 function findLinks(serviceId: string, id: string | null): BlockRelation[] {
   const block = useSparkStore().blockById(serviceId, id);
@@ -20,7 +16,7 @@ function findLinks(serviceId: string, id: string | null): BlockRelation[] {
     Link,
   ][];
 
-  const filtered = links.filter(([, link]) => !link.driven && link.id);
+  const filtered = links.filter(([, link]) => link.id != null);
 
   const relations: BlockRelation[] = filtered.map(([k, link]) => ({
     source: id,
@@ -38,8 +34,9 @@ function findLinks(serviceId: string, id: string | null): BlockRelation[] {
 function relations(block: PidBlock): BlockRelation[] {
   const chain = findLinks(block.serviceId, block.id);
 
-  // Setpoints may be driven by something else (profile, setpoint driver, etc)
-  // Just display the block that's actually driving, ignore any blocks driving the driver
+  // Setpoints may be claimed by something else (profile, setpoint driver, etc)
+  // Just display the block that directly claims the setpoint.
+  // Ignore any blocks that claim this block in turn.
   const setpointId = block.data.inputId.id;
   if (!setpointId) {
     return chain;

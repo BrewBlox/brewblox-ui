@@ -1,16 +1,7 @@
-import { Plugin } from 'vue';
-
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import {
-  BlockFieldSpec,
-  BlockIntfType,
-  BlockSpec,
-  BlockType,
-  FilterChoice,
-  PidBlock,
-} from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import {
@@ -22,7 +13,13 @@ import {
   inverseTempQty,
   tempQty,
 } from '@/utils/quantity';
-
+import {
+  BlockIntfType,
+  BlockType,
+  FilterChoice,
+  PidBlock,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import widget from './PidWidget.vue';
 
 const type = BlockType.Pid;
@@ -34,7 +31,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<PidBlock> = {
       type,
-      generate: () => ({
+      generate: (): PidBlock['data'] => ({
         inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
         inputValue: tempQty(0),
@@ -53,7 +50,6 @@ const plugin: Plugin = {
         integral: deltaTempMultHourQty(0),
         derivative: deltaTempPerMinuteQty(0),
         derivativeFilter: FilterChoice.FILTER_NONE,
-        drivenOutputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
         integralReset: 0,
         boilPointAdjust: deltaTempQty(0),
         boilMinOutput: 0,

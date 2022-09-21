@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber } from '@/utils/quantity';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'SliderField',
@@ -45,11 +44,8 @@ export default defineComponent({
       type: Array as PropType<SelectOption[]>,
       default: () => [],
     },
-
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
 
@@ -57,8 +53,8 @@ export default defineComponent({
       emit('update:modelValue', v);
     }
 
-    const displayValue = computed<string>(
-      () => fixedNumber(props.modelValue, props.decimals),
+    const displayValue = computed<string>(() =>
+      fixedNumber(props.modelValue, props.decimals),
     );
 
     function openDialog(): void {
@@ -80,8 +76,7 @@ export default defineComponent({
           step: props.step,
           quickActions: props.quickActions,
         },
-      })
-        .onOk(change);
+      }).onOk(change);
     }
 
     return {
@@ -94,12 +89,18 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+  <LabeledField
+    v-bind="{ ...$attrs, ...$props }"
+    @click="openDialog"
+  >
     <slot name="value">
       {{ displayValue }}
     </slot>
 
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
+    <template
+      v-for="slot in activeSlots"
+      #[slot]
+    >
       <slot :name="slot" />
     </template>
   </LabeledField>

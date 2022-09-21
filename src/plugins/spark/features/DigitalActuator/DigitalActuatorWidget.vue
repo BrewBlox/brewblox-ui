@@ -1,21 +1,25 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_TRANSITION_PRESET } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { channelName } from '@/plugins/spark/utils/formatting';
+import { selectable } from '@/utils/collections';
+import { makeTypeFilter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
+import { prettyQty } from '@/utils/quantity';
 import {
   Block,
   BlockType,
+  ChannelCapabilities,
   DigitalActuatorBlock,
   DS2408Block,
   DS2408ConnectMode,
-} from '@/plugins/spark/types';
-import { channelName } from '@/plugins/spark/utils/formatting';
-import { IoArrayBlock } from '@/shared-types';
-import { makeTypeFilter } from '@/utils/functional';
-import { matchesType } from '@/utils/objects';
-
-import { useSparkStore } from '../../store';
+  IoArrayInterfaceBlock,
+  TransitionDurationPreset,
+} from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 
 interface Claim {
   driverId: string;
@@ -36,17 +40,31 @@ const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
   BlockType.DigitalActuator,
 );
 
+const transitionPresetOpts = selectable(ENUM_LABELS_TRANSITION_PRESET);
+
 export default defineComponent({
   name: 'DigitalActuatorWidget',
   setup() {
     const sparkStore = useSparkStore();
     const { inDialog, context } = useContext.setup();
-    const { serviceId, block, saveBlock, isDriven, limitations } =
+    const { serviceId, block, patchBlock, isClaimed, limitations } =
       useBlockWidget.setup<DigitalActuatorBlock>();
 
-    const hwBlock = computed<IoArrayBlock | null>(() =>
+    const hwBlock = computed<IoArrayInterfaceBlock | null>(() =>
       sparkStore.blockById(serviceId, block.value.data.hwDevice.id),
     );
+
+    const softStartSupported = computed<boolean>(() => {
+      const channel = hwBlock.value?.data.channels.find(
+        (c) => c.id === block.value.data.channel,
+      );
+      return (
+        channel != null &&
+        Boolean(
+          channel.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ,
+        )
+      );
+    });
 
     const claims = computed<Claim[]>(() => {
       if (!hwBlock.value) {
@@ -87,20 +105,24 @@ export default defineComponent({
           serviceId,
           claim.driverId,
         )!;
-        driver.data.channel = 0;
-        await sparkStore.saveBlock(driver);
+        await sparkStore.patchBlock(driver, { channel: 0 });
       }
-      block.value.data.channel = channelId;
-      await saveBlock();
+      await patchBlock({ channel: channelId });
     }
 
     return {
+      prettyQty,
+      TransitionDurationPreset,
+      setExclusiveChannelActuator,
+      transitionPresetOpts,
+      ChannelCapabilities,
       inDialog,
       context,
       serviceId,
       block,
-      saveBlock,
-      isDriven,
+      patchBlock,
+      softStartSupported,
+      isClaimed,
       limitations,
       channelOpts,
       claimChannel,
@@ -128,68 +150,98 @@ export default defineComponent({
       </CardWarning>
 
       <div class="widget-body row">
-        <LabeledField class="col" tag-class="full-width row justify-center">
+        <LabeledField
+          class="col"
+          tag-class="full-width row justify-center"
+        >
           <DigitalStateButton
             :model-value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
             :pending-reason="limitations"
-            :disable="isDriven"
+            :disable="isClaimed"
             dense
             class="col-auto"
-            @update:model-value="
-              (v) => {
-                block.data.desiredState = v;
-                saveBlock();
-              }
-            "
+            @update:model-value="(v) => patchBlock({ storedState: v })"
           />
         </LabeledField>
 
         <template v-if="context.mode === 'Full'">
           <div class="col-break" />
 
-          <LinkField
-            :model-value="block.data.hwDevice"
+          <ChannelSelectField
+            :model-value="{
+              hwDevice: block.data.hwDevice,
+              channel: block.data.channel,
+            }"
             :service-id="serviceId"
-            :creatable="false"
-            :block-filter="targetFilter"
-            title="Pin Array"
-            label="Target Pin Array"
+            :capabilities="ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT"
+            clearable
+            title="Target channel"
+            label="Channel"
             class="col-grow"
             @update:model-value="
-              (v) => {
-                block.data.hwDevice = v;
-                block.data.channel = 0;
-                saveBlock();
-              }
+              ({ hwDevice, channel }) =>
+                setExclusiveChannelActuator(block, hwDevice, channel)
             "
           />
-          <SelectField
-            :model-value="block.data.channel"
-            :options="channelOpts"
-            :readonly="!block.data.hwDevice.id"
-            title="Pin Channel"
-            label="Pin Channel"
+          <LabeledField
+            label="Invert"
             class="col-grow"
-            @update:model-value="claimChannel"
-          />
-          <LabeledField label="Invert" class="col-grow">
+          >
             <q-toggle
               :model-value="block.data.invert"
               dense
-              @update:model-value="
-                (v) => {
-                  block.data.invert = v;
-                  saveBlock();
-                }
-              "
+              @update:model-value="(v) => patchBlock({ invert: v })"
             />
           </LabeledField>
+
+          <div class="col-break" />
+
+          <template v-if="softStartSupported">
+            <SelectField
+              :model-value="block.data.transitionDurationPreset"
+              :options="transitionPresetOpts"
+              title="Soft start preset"
+              label="Soft start preset"
+              class="col-grow"
+              @update:model-value="
+                (v) => patchBlock({ transitionDurationPreset: v })
+              "
+            />
+            <DurationField
+              v-if="
+                block.data.transitionDurationPreset ===
+                TransitionDurationPreset.ST_CUSTOM
+              "
+              :model-value="block.data.transitionDurationSetting"
+              title="Custom soft start duration"
+              label="Soft start"
+              class="col-grow"
+              @update:model-value="
+                (v) => patchBlock({ transitionDurationSetting: v })
+              "
+            />
+            <LabeledField
+              v-else
+              label="Soft start"
+              class="col-grow"
+            >
+              {{ prettyQty(block.data.transitionDurationValue) }}
+            </LabeledField>
+          </template>
+          <template v-else>
+            <LabeledField
+              label="Soft start"
+              class="col-grow"
+            >
+              Soft start is not supported on target channel
+            </LabeledField>
+          </template>
         </template>
 
         <div class="col-break" />
 
-        <DrivenIndicator
+        <ClaimIndicator
           :block-id="block.id"
           :service-id="serviceId"
           class="col-grow"
@@ -199,12 +251,7 @@ export default defineComponent({
           :service-id="serviceId"
           type="digital"
           class="col-grow"
-          @update:model-value="
-            (v) => {
-              block.data.constrainedBy = v;
-              saveBlock();
-            }
-          "
+          @update:model-value="(v) => patchBlock({ constrainedBy: v })"
         />
       </div>
     </div>

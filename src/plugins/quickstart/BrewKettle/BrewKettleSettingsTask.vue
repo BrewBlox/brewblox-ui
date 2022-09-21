@@ -1,10 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
-
-import { Quantity } from '@/shared-types';
-import { useSystemStore } from '@/store/system';
+import { userUnits } from '@/user-settings';
 import { bloxQty, deltaTempQty } from '@/utils/quantity';
-
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { QuickstartAction } from '../types';
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 
@@ -22,10 +20,9 @@ export default defineComponent({
   },
   emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
-    const systemStore = useSystemStore();
     const fullPowerDelta = ref<Quantity>(deltaTempQty(2));
 
-    const userTemp = computed<string>(() => systemStore.units.temperature);
+    const userTemp = computed<string>(() => userUnits.value.temperature);
 
     const kp = computed<Quantity>(() =>
       bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
@@ -73,9 +70,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="taskDone" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="taskDone"
+      />
     </template>
   </WizardBody>
 </template>

@@ -1,11 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useField } from '@/composables';
-import { Quantity } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { prettyQty } from '@/utils/formatting';
 import { isQuantity } from '@/utils/identity';
+import { prettyQty } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'InlineQuantityField',
@@ -25,12 +24,10 @@ export default defineComponent({
       default: 2,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const displayValue = computed<string>(
-      () => prettyQty(props.modelValue, props.decimals),
+    const displayValue = computed<string>(() =>
+      prettyQty(props.modelValue, props.decimals),
     );
 
     function change(v: Quantity): void {
@@ -50,8 +47,7 @@ export default defineComponent({
           html: props.html,
           label: props.label,
         },
-      })
-        .onOk(change);
+      }).onOk(change);
     }
 
     return {

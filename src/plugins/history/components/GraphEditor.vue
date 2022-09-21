@@ -1,9 +1,8 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
 import { createDialog } from '@/utils/dialog';
-
-import { DEFAULT_PRECISION } from '../const';
+import { QTreeNode } from 'quasar';
+import { defineComponent, PropType } from 'vue';
+import { DEFAULT_GRAPH_DECIMALS } from '../const';
 import { GraphConfig } from '../types';
 
 export default defineComponent({
@@ -24,7 +23,7 @@ export default defineComponent({
       emit('update:config', config);
     }
 
-    function editLeaf(node: QuasarNode): void {
+    function editLeaf(node: QTreeNode): void {
       createDialog({
         component: 'GraphDisplayDialog',
         componentProps: {
@@ -36,7 +35,7 @@ export default defineComponent({
     }
 
     return {
-      DEFAULT_PRECISION,
+      DEFAULT_GRAPH_DECIMALS,
       saveConfig,
       editLeaf,
     };
@@ -45,7 +44,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <QueryEditor :config="config" @update:config="saveConfig">
+  <QueryEditor
+    :config="config"
+    @update:config="saveConfig"
+  >
     <template #settings>
       <GraphPeriodEditor
         v-if="!noPeriod"
@@ -64,7 +66,9 @@ export default defineComponent({
             dense
           />
           <LabeledField
-            :model-value="config.precision[node.value] || DEFAULT_PRECISION"
+            :model-value="
+              config.precision[node.value] || DEFAULT_GRAPH_DECIMALS
+            "
             label="Decimals in label"
             dense
           />

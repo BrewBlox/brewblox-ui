@@ -1,4 +1,14 @@
 <script lang="ts">
+import { addSource } from '@/plugins/history/sources/graph';
+import { useHistoryStore } from '@/plugins/history/store';
+import {
+  GraphConfig,
+  GraphSource,
+  QueryParams,
+  QueryTarget,
+} from '@/plugins/history/types';
+import { defaultPresets } from '@/plugins/history/utils';
+import { isJsonEqual } from '@/utils/objects';
 import debounce from 'lodash/debounce';
 import { Layout, PlotData } from 'plotly.js';
 import {
@@ -11,17 +21,6 @@ import {
   ref,
   watch,
 } from 'vue';
-
-import { defaultPresets } from '@/plugins/history/const';
-import { addSource } from '@/plugins/history/sources/graph';
-import { useHistoryStore } from '@/plugins/history/store';
-import {
-  GraphConfig,
-  GraphSource,
-  QueryParams,
-  QueryTarget,
-} from '@/plugins/history/types';
-import { isJsonEqual } from '@/utils/objects';
 
 export default defineComponent({
   name: 'HistoryGraph',
@@ -82,14 +81,6 @@ export default defineComponent({
       return `${props.graphId}/${target.measurement}`;
     }
 
-    const targets = computed<QueryTarget[]>(() => props.config.targets ?? []);
-
-    const fields = computed<string[]>(() =>
-      targets.value.flatMap((t) =>
-        t.fields.map((f) => `${t.measurement}/${f}`),
-      ),
-    );
-
     const layout = computed<Partial<Layout>>(() => props.config.layout ?? {});
 
     const source = computed<GraphSource | null>(
@@ -98,7 +89,7 @@ export default defineComponent({
 
     const error = computed<string | null>(() => {
       if (!source.value) {
-        return fields.value.length > 0
+        return props.config.fields.length > 0
           ? 'No data sources'
           : 'No fields selected';
       }
@@ -115,12 +106,12 @@ export default defineComponent({
     function createSource(): void {
       addSource(
         props.graphId,
-        props.config.params ?? {},
-        props.config.renames ?? {},
-        props.config.axes ?? {},
-        props.config.colors ?? {},
-        props.config.precision ?? {},
-        fields.value,
+        props.config.params,
+        props.config.renames,
+        props.config.axes,
+        props.config.colors,
+        props.config.precision,
+        props.config.fields,
       );
     }
 
@@ -149,6 +140,16 @@ export default defineComponent({
     watch(
       () => props.sourceRevision,
       () => resetSource(),
+    );
+
+    watch(
+      () => source.value,
+      (newV: GraphSource | null) => {
+        if (newV?.truncated) {
+          resetSource();
+        }
+      },
+      { deep: true },
     );
 
     onMounted(() => {
@@ -187,12 +188,21 @@ export default defineComponent({
       :is="useTeleport ? 'ButtonsTeleport' : 'div'"
       :class="useTeleport ? '' : 'col-auto row justify-end z-top'"
     >
-      <ActionMenu v-if="useRange" icon="mdi-arrow-expand-vertical">
+      <ActionMenu
+        v-if="useRange"
+        icon="mdi-arrow-expand-vertical"
+      >
         <template #menus>
-          <GraphRangeSubmenu :layout="layout" :save="(v) => saveLayout(v)" />
+          <GraphRangeSubmenu
+            :layout="layout"
+            :save="(v) => saveLayout(v)"
+          />
         </template>
       </ActionMenu>
-      <ActionMenu v-if="usePresets" icon="mdi-timelapse">
+      <ActionMenu
+        v-if="usePresets"
+        icon="mdi-timelapse"
+      >
         <template #menus>
           <ActionSubmenu label="Presets">
             <ActionItem
@@ -211,12 +221,18 @@ export default defineComponent({
       v-if="error"
       class="col row justify-center items-center text-h5 q-gutter-x-md"
     >
-      <q-icon name="warning" color="negative" />
+      <q-icon
+        name="warning"
+        color="negative"
+      />
       <div class="col-auto">
         {{ error }}
       </div>
     </div>
-    <div v-else class="col">
+    <div
+      v-else
+      class="col"
+    >
       <GenericGraph
         ref="displayRef"
         :data="graphData"

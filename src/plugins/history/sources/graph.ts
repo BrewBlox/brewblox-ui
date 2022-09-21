@@ -1,8 +1,7 @@
-import forEach from 'lodash/forEach';
-import last from 'lodash/last';
-import parseDuration from 'parse-duration';
-
-import { DEFAULT_PRECISION, MAX_POINTS } from '@/plugins/history/const';
+import {
+  DEFAULT_GRAPH_DECIMALS,
+  MAX_GRAPH_POINTS,
+} from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { useHistoryStore } from '@/plugins/history/store';
 import {
@@ -14,10 +13,13 @@ import {
   QueryParams,
   TimeSeriesRangesResult,
 } from '@/plugins/history/types';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber } from '@/utils/quantity';
+import forEach from 'lodash/forEach';
+import last from 'lodash/last';
+import parseDuration from 'parse-duration';
 
 function boundedConcat(left: number[] = [], right: number[] = []): number[] {
-  const sliced = Math.max(left.length + right.length - MAX_POINTS, 0);
+  const sliced = Math.max(left.length + right.length - MAX_GRAPH_POINTS, 0);
   if (sliced > left.length) {
     return right.slice(sliced - left.length);
   }
@@ -43,7 +45,7 @@ function fieldLabel(
   value: number | undefined,
 ): string {
   const label = source.renames[key] || defaultLabel(key);
-  const precision = source.precision[key] ?? DEFAULT_PRECISION;
+  const precision = source.precision[key] ?? DEFAULT_GRAPH_DECIMALS;
   const prop = source.axes[key] === 'y2' ? 'style="color: #aef"' : '';
   return `<span ${prop}>${label}</span><br>${fixedNumber(value, precision)}`;
 }
@@ -92,6 +94,10 @@ function transformer(
         }
       });
     }
+
+    source.truncated = Object.values(source.values).some(
+      (vals) => vals.x.length === MAX_GRAPH_POINTS,
+    );
   }
   return source;
 }
@@ -120,6 +126,7 @@ export async function addSource(
     command: 'ranges',
     fields: validFields,
     values: {},
+    truncated: false,
   };
   await useHistoryStore().addSource(source);
 }

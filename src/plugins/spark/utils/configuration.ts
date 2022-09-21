@@ -1,8 +1,3 @@
-import defaults from 'lodash/defaults';
-import keyBy from 'lodash/keyBy';
-import mapValues from 'lodash/mapValues';
-import pick from 'lodash/pick';
-
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
@@ -11,11 +6,21 @@ import {
   BlockFieldSpec,
   ProfileValues,
 } from '@/plugins/spark/types';
-import { Block, SetpointProfileBlock } from '@/shared-types';
-import { prettyUnit } from '@/utils/formatting';
 import { isQuantity } from '@/utils/identity';
-import { notify } from '@/utils/notify';
-import { bloxQty } from '@/utils/quantity';
+import { bloxLink } from '@/utils/link';
+import { bloxQty, durationMs, parseDate, prettyUnit } from '@/utils/quantity';
+import {
+  Block,
+  BlockIntfType,
+  IoDriverInterfaceBlock,
+  Link,
+  SetpointProfileBlock,
+} from 'brewblox-proto/ts';
+import defaults from 'lodash/defaults';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
+import pick from 'lodash/pick';
+import { isBlockCompatible } from './info';
 
 export const asBlockAddress = (block: Block): BlockAddress =>
   pick(block, ['id', 'serviceId', 'type']);
@@ -68,57 +73,35 @@ export function makeBlockGraphConfig<BlockT extends Block = Block>(
       `${f.graphName ?? f.title} ${prettyUnit(postfix(block.data[f.key]))}`,
   );
 
-  const targets = [
-    {
-      measurement: block.serviceId,
-      fields: graphedFields.map(
-        (f) => `${block.id}/${f.key}${postfix(block.data[f.key])}`,
-      ),
-    },
-  ];
+  const fields = graphedFields.map(
+    (f) =>
+      `${block.serviceId}/${block.id}/${f.key}${postfix(block.data[f.key])}`,
+  );
 
   return {
+    version: '1.0',
     params: queryParams,
     axes: defaults(graphAxes, fieldAxes),
     layout: defaults({ title: block.id }, graphLayout),
-    targets,
+    fields,
     renames,
     colors: {},
     precision: {},
   };
 }
 
-export async function discoverBlocks(
-  serviceId: string | null,
-  show = true,
-): Promise<string[]> {
-  const sparkStore = useSparkStore();
-  if (!sparkStore.has(serviceId)) {
-    return [];
-  }
-  const discovered = await sparkStore.fetchDiscoveredBlocks(serviceId);
-  if (show) {
-    notify.info({
-      icon: 'mdi-magnify-plus-outline',
-      message:
-        discovered.length > 0
-          ? `Discovered <i>${discovered.join(', ')}</i>.`
-          : 'Discovered no new blocks.',
-    });
-  }
-  return discovered;
-}
-
 export function calculateProfileValues(
   block: SetpointProfileBlock | null,
 ): ProfileValues | null {
-  if (!block || !block.data.enabled || !block.data.drivenTargetId.id) {
+  if (!block || !block.data.enabled || !block.data.targetId.id) {
     return null;
   }
 
-  const now = new Date().getTime() / 1000;
-  const start = block.data.start || 0;
-  const idx = block.data.points.findIndex((point) => start + point.time > now);
+  const now = new Date().getTime();
+  const start = parseDate(block.data.start)?.getTime() ?? 0;
+  const idx = block.data.points.findIndex(
+    (point) => start + durationMs(point.time) > now,
+  );
   if (idx < 1) {
     return null;
   }
@@ -127,9 +110,10 @@ export function calculateProfileValues(
   const unit = prev.temperature.unit;
   const prevVal = prev.temperature.value as number;
   const nextVal = next.temperature.value as number;
-  const duration = next.time - prev.time || 1;
+  const duration = durationMs(next.time) - durationMs(prev.time) || 1;
   const currentVal =
-    prevVal + ((now - start + prev.time) * (nextVal - prevVal)) / duration;
+    prevVal +
+    ((now - start + durationMs(prev.time)) * (nextVal - prevVal)) / duration;
 
   return {
     prev: bloxQty(prevVal, unit),
@@ -147,4 +131,57 @@ export function calculateWiFiPct(dbm: number): number {
     return 100;
   }
   return Math.round(-0.0154 * dbm * dbm - 0.3794 * dbm + 98.182);
+}
+
+export async function unlinkChannelActuators(
+  serviceId: string,
+  hwDevice: Link,
+  channel: number,
+): Promise<void> {
+  if (!hwDevice.id || !channel) {
+    return;
+  }
+
+  const sparkStore = useSparkStore();
+
+  await Promise.all(
+    sparkStore
+      .blocksByService(serviceId)
+      .filter((block): block is IoDriverInterfaceBlock =>
+        isBlockCompatible(block, BlockIntfType.IoDriverInterface),
+      )
+      .filter(
+        (block) =>
+          block.data.hwDevice.id === hwDevice.id &&
+          block.data.channel === channel,
+      )
+      .map((block) =>
+        sparkStore.patchBlock(block, { hwDevice: bloxLink(null), channel: 0 }),
+      ),
+  );
+}
+
+export async function setExclusiveChannelActuator(
+  actuator: Maybe<Block>,
+  hwDevice: Link,
+  channel: number,
+): Promise<void> {
+  if (
+    !isBlockCompatible<IoDriverInterfaceBlock>(
+      actuator,
+      BlockIntfType.IoDriverInterface,
+    )
+  ) {
+    return;
+  }
+
+  if (
+    actuator.data.hwDevice.id === hwDevice.id &&
+    actuator.data.channel === channel
+  ) {
+    return; // no change
+  }
+
+  await unlinkChannelActuators(actuator.serviceId, hwDevice, channel);
+  await useSparkStore().patchBlock(actuator, { hwDevice, channel });
 }

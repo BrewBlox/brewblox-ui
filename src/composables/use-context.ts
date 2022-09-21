@@ -1,7 +1,6 @@
-import { computed, ComputedRef, inject, UnwrapRef } from 'vue';
-
 import { WidgetContext } from '@/store/features';
 import { ContextKey } from '@/symbols';
+import { computed, ComputedRef, inject, UnwrapRef } from 'vue';
 
 export interface UseContextComponent {
   context: UnwrapRef<WidgetContext>;
@@ -21,9 +20,7 @@ export const useContext: UseContextComposable = {
       throw new Error('No widget context injected');
     }
 
-    const inDialog = computed<boolean>(
-      () => context.container === 'Dialog',
-    );
+    const inDialog = computed<boolean>(() => context.container === 'Dialog');
 
     function toggleMode(): void {
       context.mode = context.mode === 'Basic' ? 'Full' : 'Basic';

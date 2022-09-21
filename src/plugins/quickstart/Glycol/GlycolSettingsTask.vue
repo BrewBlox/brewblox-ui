@@ -1,9 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
-
-import { Quantity } from '@/shared-types';
 import { tempQty } from '@/utils/quantity';
-
+import { Quantity } from 'brewblox-proto/ts';
+import { defineComponent, PropType, ref } from 'vue';
 import { QuickstartAction } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 
@@ -55,9 +53,7 @@ export default defineComponent({
             The setup creates a setpoint for your beer temperature and your
             glycol temperature.
           </p>
-          <p v-else>
-            The setup creates a setpoint for your beer temperature.
-          </p>
+          <p v-else>The setup creates a setpoint for your beer temperature.</p>
           <p>You can set the initial values now.</p>
         </q-item-section>
       </q-item>
@@ -81,9 +77,18 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="$emit('back')" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="done"
+      />
     </template>
   </WizardBody>
 </template>

@@ -1,44 +1,28 @@
 <script lang="ts">
-import { computed, defineComponent, onMounted } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
-import { shortDateString } from '@/utils/formatting';
+import { shortDateString } from '@/utils/quantity';
+import { DateString } from 'brewblox-proto/ts';
+import { computed, defineComponent, onMounted } from 'vue';
 
 export default defineComponent({
   name: 'DateValEdit',
   props: {
     ...useValEdit.props,
-    timeScale: {
-      type: Number,
-      default: 1,
-    },
   },
-  emits: [
-    ...useValEdit.emits,
-  ],
-  setup(props) {
-    const {
-      field,
-      startEdit,
-    } = useValEdit.setup<number>(props.modelValue);
+  emits: [...useValEdit.emits],
+  setup() {
+    const { field, startEdit } = useValEdit.setup<DateString | null>();
 
-    const scaledField = computed<number>({
-      get: () => field.value * props.timeScale,
-      set: v => field.value = Math.round(v / props.timeScale),
-    });
-
-    const displayVal = computed<string>(
-      () => shortDateString(scaledField.value),
-    );
+    const displayVal = computed<string>(() => shortDateString(field.value));
 
     onMounted(() => {
-      if (field.value === 0) {
-        scaledField.value = new Date().getTime();
+      if (field.value == null) {
+        field.value = new Date().toISOString();
       }
     });
 
     return {
-      scaledField,
+      field,
       displayVal,
       startEdit,
     };
@@ -49,8 +33,7 @@ export default defineComponent({
 <template>
   <DatetimeField
     v-if="editable"
-    v-model="scaledField"
-    emit-number
+    v-model="field"
   />
   <div
     v-else

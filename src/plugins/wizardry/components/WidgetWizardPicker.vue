@@ -1,11 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-
 import { useFeatureStore } from '@/store/features';
-import { useSystemStore } from '@/store/system';
+import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useWizard } from '../composables';
 
 interface WidgetFeatureOption {
@@ -22,7 +20,6 @@ export default defineComponent({
   },
   emits: [...useWizard.emits],
   setup() {
-    const systemStore = useSystemStore();
     const featureStore = useFeatureStore();
     const feature = ref<WidgetFeatureOption | null>(null);
     const wizardActive = ref<boolean>(false);
@@ -38,7 +35,7 @@ export default defineComponent({
     onBeforeMount(() => reset());
 
     const experimental = computed<boolean>(
-      () => systemStore.config.experimental,
+      () => userUISettings.value.experimental,
     );
 
     const wizardOpts = computed<WidgetFeatureOption[]>(() =>
@@ -119,7 +116,10 @@ export default defineComponent({
     @done="onDone"
   />
 
-  <WizardBody v-else @keyup.ctrl.enter="next">
+  <WizardBody
+    v-else
+    @keyup.ctrl.enter="next"
+  >
     <div class="widget-body column">
       <q-input
         v-model="filter"
@@ -143,7 +143,11 @@ export default defineComponent({
     </div>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="onBack" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <q-btn
         :disable="!valuesOk"

@@ -1,6 +1,4 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-
 import { useDialog, useGlobals } from '@/composables';
 import {
   ComponentResult,
@@ -9,6 +7,7 @@ import {
   WidgetMode,
 } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'WidgetDialog',
@@ -72,7 +71,10 @@ export default defineComponent({
     transition-show="fade"
     @hide="onDialogHide"
   >
-    <WidgetProvider :widget-id="widgetId" :context="context">
+    <WidgetProvider
+      :widget-id="widgetId"
+      :context="context"
+    >
       <component
         :is="widgetComponent.component"
         v-if="widgetComponent"

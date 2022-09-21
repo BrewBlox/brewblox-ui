@@ -1,10 +1,9 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
 import { fieldLabels } from '@/plugins/tilt/const';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltFieldIndex, TiltStateValue } from '@/plugins/tilt/types';
-import { fixedNumber, prettyQty, shortDateString } from '@/utils/formatting';
+import { fixedNumber, prettyQty, shortDateString } from '@/utils/quantity';
+import { defineComponent, PropType } from 'vue';
 
 const fieldClass = 'col-5 col-grow q-my-none';
 

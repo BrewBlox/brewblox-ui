@@ -1,10 +1,8 @@
 <script lang="ts">
-import { useMeta } from 'quasar';
-import { defineComponent } from 'vue';
-
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
+import { defineComponent } from 'vue';
 
 /**
  * Order of startup is important here.
@@ -22,11 +20,6 @@ async function onAppSetup(): Promise<void> {
 export default defineComponent({
   name: 'App',
   setup() {
-    useMeta({
-      script: process.env.DEV
-        ? { devtools: { src: 'http://localhost:8098' } }
-        : {},
-    });
     onAppSetup();
     return {};
   },
@@ -35,5 +28,5 @@ export default defineComponent({
 
 <template>
   <router-view />
-  <Watchers />
+  <WatcherContainer />
 </template>

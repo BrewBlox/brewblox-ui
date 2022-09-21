@@ -1,14 +1,13 @@
 <script lang="ts">
+import { useGlobals } from '@/composables';
+import { startupDone, userUISettings } from '@/user-settings';
+import { concatById } from '@/utils/collections';
+import { isAbsoluteUrl } from '@/utils/url';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { useGlobals } from '@/composables';
-import { useSystemStore } from '@/store/system';
-import { concatById } from '@/utils/collections';
-import { isAbsoluteUrl } from '@/utils/url';
-
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
+import { useMetrics } from './composables/use-metrics';
 import { useBuilderStore } from './store';
 import { FlowPart, PersistentPart } from './types';
 import { coord2grid, startChangeLayoutTitle } from './utils';
@@ -22,7 +21,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const systemStore = useSystemStore();
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const { localStorage } = useQuasar();
@@ -30,10 +28,8 @@ export default defineComponent({
 
     const pending = ref<FlowPart | null>(null);
 
-    const startupDone = computed<boolean>(() => systemStore.startupDone);
-
     const delayTouch = computed<boolean>(() => {
-      const { builderTouchDelayed } = systemStore.config;
+      const { builderTouchDelayed } = userUISettings.value;
       return (
         builderTouchDelayed === 'always' ||
         (builderTouchDelayed === 'dense' && dense.value)
@@ -42,6 +38,7 @@ export default defineComponent({
 
     const layoutId = computed<string | null>(() => props.routeId);
 
+    useMetrics.setup(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 
@@ -70,14 +67,16 @@ export default defineComponent({
     }
 
     function isClickable(part: FlowPart): boolean {
-      return builderStore.spec(part).interactHandler !== undefined;
+      return (
+        builderStore.blueprintByType(part.type).interactHandler !== undefined
+      );
     }
 
     function interact(part: FlowPart | null): void {
       if (!part) {
         return;
       }
-      const handler = builderStore.spec(part).interactHandler;
+      const handler = builderStore.blueprintByType(part.type).interactHandler;
       if (!handler) {
         return;
       }
@@ -150,7 +149,12 @@ export default defineComponent({
     </div>
     <template v-else>
       <TitleTeleport>
-        <span class="cursor-pointer" @click="editTitle">{{ layoutTitle }}</span>
+        <span
+          class="cursor-pointer"
+          @click="editTitle"
+        >
+          {{ layoutTitle }}
+        </span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn
@@ -162,7 +166,11 @@ export default defineComponent({
         >
           <q-tooltip>Open editor</q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center" label="Layout actions">
+        <ActionMenu
+          round
+          class="self-center"
+          label="Layout actions"
+        >
           <template #menus>
             <LayoutActions :layout="layout" />
           </template>
@@ -176,11 +184,20 @@ export default defineComponent({
         </ActionMenu>
       </ButtonsTeleport>
 
-      <div class="fit" @click="pending = null">
-        <span v-if="parts.length === 0" class="absolute-center">
+      <div
+        class="fit"
+        @click="pending = null"
+      >
+        <span
+          v-if="parts.length === 0"
+          class="absolute-center"
+        >
           {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
         </span>
-        <svg ref="svgRef" class="fit">
+        <svg
+          ref="svgRef"
+          class="fit"
+        >
           <g ref="svgContentRef">
             <g
               v-for="part in flowParts"
@@ -232,7 +249,10 @@ export default defineComponent({
   </q-page>
 </template>
 
-<style lang="sass" scoped>
+<style
+  lang="sass"
+  scoped
+>
 @import './grid.sass'
 
 .inactive

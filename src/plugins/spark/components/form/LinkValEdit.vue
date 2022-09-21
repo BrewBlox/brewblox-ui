@@ -1,10 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
-
 import { useValEdit } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isCompatible } from '@/plugins/spark/utils';
-import { Link } from '@/shared-types';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { Link } from 'brewblox-proto/ts';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'LinkValEdit',
@@ -14,7 +13,7 @@ export default defineComponent({
   emits: [...useValEdit.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { field, startEdit } = useValEdit.setup<Link>(props.modelValue);
+    const { field, startEdit } = useValEdit.setup<Link>();
 
     const blockIdOpts = computed<string[]>(() =>
       sparkStore
@@ -63,7 +62,11 @@ export default defineComponent({
     item-aligned
     @filter="filterFn"
   />
-  <div v-else class="clickable q-pa-sm rounded-borders" @click="startEdit">
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ displayVal }}
   </div>
 </template>
