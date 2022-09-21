@@ -70,7 +70,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       mutexed: {
         mutexId: bloxLink(names.mutex),
         extraHoldTime: bloxQty('0s'),
-        hasCustomHoldTime: true,
         hasLock: false,
       },
       remaining: bloxQty('0s'),
@@ -89,7 +88,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       type: BlockType.Mutex,
       serviceId,
       data: {
-        differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       },
     }),

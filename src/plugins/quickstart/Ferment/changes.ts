@@ -109,7 +109,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
       type: BlockType.Mutex,
       serviceId,
       data: {
-        differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       },
     }),
@@ -144,7 +143,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('45m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),
@@ -175,7 +173,6 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('20m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),

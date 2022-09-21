@@ -75,7 +75,6 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
       type: BlockType.Mutex,
       serviceId,
       data: {
-        differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       },
     }),
@@ -110,7 +109,6 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('45m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),
@@ -141,7 +139,6 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('20m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),

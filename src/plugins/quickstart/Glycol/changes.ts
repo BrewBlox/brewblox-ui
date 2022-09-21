@@ -125,7 +125,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
       type: BlockType.Mutex,
       serviceId,
       data: {
-        differentActuatorWait: bloxQty('5m'),
         waitRemaining: bloxQty('0s'),
       },
     }),
@@ -152,7 +151,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('15m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),
@@ -187,7 +185,6 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
               mutexed: {
                 mutexId: bloxLink(names.mutex),
                 extraHoldTime: bloxQty('15m'),
-                hasCustomHoldTime: true,
                 hasLock: false,
               },
               remaining: bloxQty('0s'),

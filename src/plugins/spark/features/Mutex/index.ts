@@ -18,7 +18,6 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<MutexBlock> = {
       type,
       generate: (): MutexBlock['data'] => ({
-        differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       }),
     };

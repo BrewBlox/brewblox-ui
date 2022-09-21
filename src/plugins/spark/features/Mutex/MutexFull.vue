@@ -43,27 +43,10 @@ export default defineComponent({
           <p>
             The Mutex can also prevent switching between two actuators too
             quickly.<br />
-            If you set the extra lock time to 45 minutes, a heater can only turn
-            on after the cooler has been inactive for 45 minutes.
+            If you set the extra lock time in a Mutex constraint to 45 minutes,
+            a heater can only turn on after the cooler has been inactive for 45
+            minutes.
           </p>
-          <p>
-            <b>
-              If you set the extra lock time in a Mutex constraint, it will
-              override this setting.
-            </b>
-          </p>
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <DurationField
-            :model-value="block.data.differentActuatorWait"
-            title="Extra lock time"
-            label="Extra lock time after an actuator turns off"
-            @update:model-value="
-              (v) => patchBlock({ differentActuatorWait: v })
-            "
-          />
         </q-item-section>
       </q-item>
     </q-card-section>
