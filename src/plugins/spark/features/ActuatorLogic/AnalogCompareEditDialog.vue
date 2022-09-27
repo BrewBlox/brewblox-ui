@@ -2,12 +2,12 @@
 import { useDialog } from '@/composables';
 import { ENUM_LABELS_ANALOG_OP } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isCompatible } from '@/plugins/spark/utils/info';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { selectable } from '@/utils/collections';
 import { isQuantity } from '@/utils/identity';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, tempQty } from '@/utils/quantity';
-import { AnalogCompare, BlockIntfType, Quantity } from 'brewblox-proto/ts';
+import { AnalogCompare, BlockType, Quantity } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 const operatorOpts = selectable(ENUM_LABELS_ANALOG_OP);
@@ -32,13 +32,12 @@ export default defineComponent({
       useDialog.setup();
     const local = ref<AnalogCompare>(deepCopy(props.modelValue));
 
-    const isTemp = computed<boolean>(() => {
-      const block = sparkStore.blockById(props.serviceId, local.value.id.id);
-      return (
-        block != null &&
-        isCompatible(block.type, BlockIntfType.SetpointSensorPairInterface)
-      );
-    });
+    const isTemp = computed<boolean>(() =>
+      isBlockCompatible(
+        sparkStore.blockById(props.serviceId, local.value.id.id),
+        [BlockType.SetpointSensorPair, BlockType.ActuatorOffset],
+      ),
+    );
 
     const rhs = computed<Quantity | number>({
       get: () => {

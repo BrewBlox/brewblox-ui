@@ -8,7 +8,7 @@ import { tempQty } from '@/utils/quantity';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
-  BlockIntfType,
+  BlockType,
   DigitalCompare,
 } from 'brewblox-proto/ts';
 import { ExpressionError } from './types';
@@ -185,7 +185,10 @@ export function prettyAnalog(
   cmp: AnalogCompare,
   blockType: string | null,
 ): string {
-  const rhs = isCompatible(blockType, BlockIntfType.SetpointSensorPairInterface)
+  const rhs = isCompatible(blockType, [
+    BlockType.SetpointSensorPair,
+    BlockType.ActuatorOffset,
+  ])
     ? tempQty(cmp.rhs)
     : `${cmp.rhs}%`;
 

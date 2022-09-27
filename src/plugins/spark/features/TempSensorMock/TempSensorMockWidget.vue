@@ -25,14 +25,14 @@ export default defineComponent({
     }
 
     function updateFluctuation(idx: number, fluct: Fluctuation): void {
-      patchBlock({
-        fluctuations: [...block.value.data.fluctuations].splice(idx, 1, fluct),
-      });
+      const fluctuations = [...block.value.data.fluctuations];
+      fluctuations[idx] = fluct;
+      patchBlock({ fluctuations });
     }
 
     function removeFluctuation(idx: number): void {
       patchBlock({
-        fluctuations: [...block.value.data.fluctuations].splice(idx, 1),
+        fluctuations: block.value.data.fluctuations.filter((_, i) => i !== idx),
       });
     }
 

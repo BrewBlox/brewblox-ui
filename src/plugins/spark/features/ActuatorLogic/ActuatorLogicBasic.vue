@@ -111,10 +111,9 @@ export default defineComponent({
           title: 'Edit comparison',
         },
       }).onOk((cmp) => {
-        const { digital } = block.value.data;
-        patchBlock({
-          digital: [...digital].splice(digitalIdx(key), 1, cmp),
-        });
+        const digital = [...block.value.data.digital];
+        digital[digitalIdx(key)] = cmp;
+        patchBlock({ digital });
       });
     }
 
@@ -127,8 +126,9 @@ export default defineComponent({
           title: 'Edit comparison',
         },
       }).onOk((cmp) => {
-        const { analog } = block.value.data;
-        patchBlock({ analog: [...analog].splice(analogIdx(key), 1, cmp) });
+        const analog = [...block.value.data.analog];
+        analog[analogIdx(key)] = cmp;
+        patchBlock({ analog });
       });
     }
 
