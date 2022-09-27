@@ -43,13 +43,15 @@ export default defineComponent({
     }
 
     function removeSensor(idx: number): void {
-      patchBlock({ sensors: [...block.value.data.sensors].splice(idx, 1) });
+      patchBlock({
+        sensors: block.value.data.sensors.filter((_, i) => i !== idx),
+      });
     }
 
     function updateSensor(idx: number, value: Link): void {
-      patchBlock({
-        sensors: [...block.value.data.sensors].splice(idx, 1, value),
-      });
+      const sensors = [...block.value.data.sensors];
+      sensors[idx] = value;
+      patchBlock({ sensors });
     }
 
     function sensorValue(link: Link): string {
