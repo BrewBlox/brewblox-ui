@@ -1285,9 +1285,9 @@ braces@^3.0.2, braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"brewblox-proto@https://github.com/brewblox/brewblox-proto#cc41302b":
+"brewblox-proto@https://github.com/brewblox/brewblox-proto#74b839bf":
   version "1.0.0"
-  resolved "https://github.com/brewblox/brewblox-proto#cc41302bf2d147c843688e31618f8b2d6570a78e"
+  resolved "https://github.com/brewblox/brewblox-proto#74b839bf05cb0b52780b2f2c0f5abdad24b0ad79"
   dependencies:
     typescript-string-enums "^1.0.0"
 

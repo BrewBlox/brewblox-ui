@@ -48,6 +48,16 @@ const plugin: Plugin = {
         title: 'Sensor Setting',
         component: 'QuantityValEdit',
         generate: () => tempQty(20),
+        graphed: true,
+      },
+      {
+        type,
+        key: 'value',
+        title: 'Sensor value',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+        readonly: true,
+        graphed: true,
       },
     ];
 
