@@ -4,6 +4,7 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
 import {
   BlockIntfType,
   DigitalActuatorBlock,
@@ -41,30 +42,34 @@ export default defineComponent({
         )
         .filter((b) => b.data.hwDevice.id === block.value.id);
 
-      if (linked.length) {
-        const names = linked.map((block) => `'${block.id}'`).join(', ');
-        const verbs = linked.length > 1 ? ['have', 'them'] : ['has', 'it'];
-        const message =
-          `${names} ${verbs[0]} this block set as output. ` +
-          `Do you wish to unlink ${verbs[1]}?`;
-        createDialog({
-          component: 'SaveConfirmDialog',
-          componentProps: {
-            title: 'Switch DS2408 mode',
-            message,
-            saveFunc: () =>
-              linked.forEach((block) => {
-                sparkStore.patchBlock(block, {
-                  hwDevice: { ...block.data.hwDevice, id: null },
-                });
-              }),
-          },
-        }).onOk(() => {
-          patchBlock({ connectMode: mode });
-        });
-      } else {
+      if (linked.length === 0) {
         patchBlock({ connectMode: mode });
+        return;
       }
+
+      const names = linked.map((block) => `'${block.id}'`).join(', ');
+      const [has, it] = linked.length > 1 ? ['have', 'them'] : ['has', 'it'];
+      const message =
+        `${names} ${has} this block set as output. ` +
+        `Do you wish to unlink ${it}?`;
+
+      createDialog({
+        component: 'SaveConfirmDialog',
+        componentProps: {
+          title: 'Switch DS2408 mode',
+          message,
+        },
+      }).onOk(async (saved: boolean) => {
+        if (saved) {
+          for (const actuator of linked) {
+            await sparkStore.patchBlock(actuator, {
+              hwDevice: bloxLink(null),
+              channel: 0,
+            });
+          }
+        }
+        patchBlock({ connectMode: mode });
+      });
     }
 
     return {
