@@ -40,6 +40,13 @@ const plugin: Plugin = {
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
+      analyze: (block: MotorValveBlock) => {
+        const { hwDevice, channel } = block.data;
+        if (hwDevice.id == null || channel == 0) {
+          return 'Invalid';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<MotorValveBlock>[] = [

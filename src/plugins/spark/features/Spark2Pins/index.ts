@@ -21,6 +21,7 @@ const plugin: Plugin = {
         soundAlarm: false,
         hardware: Spark2Hardware.HW_UNKNOWN,
       }),
+      analyze: () => 'Active',
     };
 
     const feature: WidgetFeature = {

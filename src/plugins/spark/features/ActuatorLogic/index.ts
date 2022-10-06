@@ -33,6 +33,19 @@ const plugin: Plugin = {
         digital: [],
         expression: '',
       }),
+      analyze: (block: ActuatorLogicBlock) => {
+        const { enabled, targetId, result } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (targetId.id == null) {
+          return 'Invalid';
+        }
+        if (!nonErrorResults.includes(result)) {
+          return 'Invalid';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorLogicBlock>[] = [

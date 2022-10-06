@@ -24,6 +24,16 @@ const plugin: Plugin = {
         lastUpdated: null,
         value: tempQty(null),
       }),
+      analyze: (block: TempSensorExternalBlock) => {
+        const { enabled, value } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (value.value == null) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<TempSensorExternalBlock>[] = [

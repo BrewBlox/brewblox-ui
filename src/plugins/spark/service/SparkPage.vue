@@ -2,6 +2,7 @@
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type {
   BlockRelationNode,
+  BlockStatus,
   PageMode,
   SparkService,
 } from '@/plugins/spark/types';
@@ -10,6 +11,7 @@ import { useServiceStore } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
 import {
+  Block,
   BlockRelation,
   BlockType,
   SparkStatusDescription,
@@ -17,6 +19,13 @@ import {
 import { computed, defineComponent, watch } from 'vue';
 import SparkListView from './SparkListView.vue';
 import SparkTroubleshooter from './SparkTroubleshooter.vue';
+
+const statusColors: Record<BlockStatus, string> = {
+  Active: 'green',
+  Inactive: 'yellow',
+  Disabled: 'white',
+  Invalid: 'red',
+};
 
 export default defineComponent({
   name: 'SparkPage',
@@ -78,6 +87,14 @@ export default defineComponent({
         sparkStore.updateSessionConfig(props.serviceId, { pageMode: v }),
     });
 
+    function nodeColor(block: Block): string {
+      const status = specStore.blockSpecByType(block.type)?.analyze(block);
+      if (!status) {
+        return 'grey';
+      }
+      return statusColors[status];
+    }
+
     const nodes = computed<BlockRelationNode[]>(() =>
       sparkStore
         .blocksByService(props.serviceId)
@@ -87,6 +104,7 @@ export default defineComponent({
             id: block.id,
             type: featureStore.widgetTitle(block.type),
             name: block.type === BlockType.SysInfo ? title.value : undefined,
+            color: nodeColor(block),
           }),
         )
         .sort(makeObjectSorter('type')),

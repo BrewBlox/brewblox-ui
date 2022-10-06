@@ -35,7 +35,7 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
   }
 
   function addBlockSpec<T extends Block>(spec: BlockSpec<T>): void {
-    blockSpecs.value = [...blockSpecs.value, spec];
+    blockSpecs.value = [...blockSpecs.value, spec as unknown as BlockSpec];
   }
 
   function fieldSpecsByType(type: Maybe<BlockType>): BlockFieldSpec[] {

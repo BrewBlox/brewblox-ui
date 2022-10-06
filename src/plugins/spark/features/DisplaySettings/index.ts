@@ -20,6 +20,7 @@ const plugin: Plugin = {
         name: 'Display settings',
         widgets: [],
       }),
+      analyze: () => 'Active',
     };
 
     const fieldSpecs: BlockFieldSpec<DisplaySettingsBlock>[] = [

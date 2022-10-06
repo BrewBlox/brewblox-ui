@@ -23,6 +23,12 @@ const plugin: Plugin = {
         channels: [],
         connectMode: DS2408ConnectMode.CONNECT_VALVE,
       }),
+      analyze: (block: DS2408Block) => {
+        if (!block.data.connected) {
+          return 'Invalid';
+        }
+        return 'Active';
+      },
     };
 
     const feature: WidgetFeature = {

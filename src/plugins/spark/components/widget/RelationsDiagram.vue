@@ -63,7 +63,7 @@ export default defineComponent({
         : nodes;
       const unknownNodes: BlockRelationNode[] = [...referencedIds]
         .filter((id) => !nodeIds.has(id))
-        .map((id) => ({ id, type: UNKNOWN_TYPE }));
+        .map((id) => ({ id, type: UNKNOWN_TYPE, color: 'red' }));
       return [...knownNodes, ...unknownNodes];
     }
 

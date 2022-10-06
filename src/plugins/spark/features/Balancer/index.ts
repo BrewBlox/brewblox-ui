@@ -19,6 +19,7 @@ const plugin: Plugin = {
       generate: (): BalancerBlock['data'] => ({
         clients: [],
       }),
+      analyze: () => 'Active',
     };
 
     const feature: WidgetFeature = {

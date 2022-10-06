@@ -61,6 +61,7 @@ function nodes(serviceId: string): BlockRelationNode[] {
   return sparkStore.blocksByService(serviceId).map((block) => ({
     id: block.id,
     type: featureStore.widgetTitle(block.type),
+    color: 'cyan',
   }));
 }
 

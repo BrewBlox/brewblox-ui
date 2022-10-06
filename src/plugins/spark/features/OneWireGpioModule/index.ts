@@ -38,6 +38,13 @@ const plugin: Plugin = {
         openLoad: GpioPins.NONE,
         clearFaults: false, // write-only
       }),
+      analyze: (block: OneWireGpioModuleBlock) => {
+        const { moduleStatus } = block.data;
+        if (moduleStatus != GpioModuleStatus.NONE) {
+          return 'Invalid';
+        }
+        return 'Active';
+      },
     };
 
     const feature: WidgetFeature = {

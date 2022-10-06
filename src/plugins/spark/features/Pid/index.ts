@@ -55,6 +55,19 @@ const plugin: Plugin = {
         boilMinOutput: 0,
         boilModeActive: false,
       }),
+      analyze: (block: PidBlock) => {
+        const { enabled, inputId, outputId, active } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (inputId.id == null || outputId == null) {
+          return 'Invalid';
+        }
+        if (!active) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<PidBlock>[] = [

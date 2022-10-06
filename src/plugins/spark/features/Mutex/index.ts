@@ -20,6 +20,7 @@ const plugin: Plugin = {
       generate: (): MutexBlock['data'] => ({
         waitRemaining: bloxQty('0s'),
       }),
+      analyze: () => 'Active',
     };
 
     const feature: WidgetFeature = {

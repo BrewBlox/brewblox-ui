@@ -22,6 +22,12 @@ const plugin: Plugin = {
         connected: false,
         channels: [],
       }),
+      analyze: (block: DS2413Block) => {
+        if (!block.data.connected) {
+          return 'Invalid';
+        }
+        return 'Active';
+      },
     };
 
     const feature: WidgetFeature = {
