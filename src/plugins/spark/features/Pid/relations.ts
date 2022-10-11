@@ -1,4 +1,4 @@
-import { useSparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockRelationNode } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { createDialog } from '@/utils/dialog';
@@ -58,10 +58,11 @@ function relations(block: PidBlock): BlockRelation[] {
 function nodes(serviceId: string): BlockRelationNode[] {
   const featureStore = useFeatureStore();
   const sparkStore = useSparkStore();
+  const specStore = useBlockSpecStore();
   return sparkStore.blocksByService(serviceId).map((block) => ({
     id: block.id,
     type: featureStore.widgetTitle(block.type),
-    color: 'cyan',
+    status: specStore.blockSpecByType(block.type)?.analyze(block),
   }));
 }
 

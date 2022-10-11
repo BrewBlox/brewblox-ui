@@ -50,6 +50,9 @@ export default defineComponent({
     const graphWidth = ref<number>(0);
     const graphHeight = ref<number>(0);
 
+    const renderedNodes = ref<BlockRelationNode[]>();
+    const renderedEdges = ref<BlockRelation[]>();
+
     function relevantNodes(
       nodes: BlockRelationNode[],
       edges: BlockRelation[],
@@ -63,7 +66,7 @@ export default defineComponent({
         : nodes;
       const unknownNodes: BlockRelationNode[] = [...referencedIds]
         .filter((id) => !nodeIds.has(id))
-        .map((id) => ({ id, type: UNKNOWN_TYPE, color: 'red' }));
+        .map((id) => ({ id, type: UNKNOWN_TYPE }));
       return [...knownNodes, ...unknownNodes];
     }
 
@@ -102,6 +105,23 @@ export default defineComponent({
       if (!svgRef.value || !gRef.value) {
         return;
       }
+
+      if (!nodes || !edges) {
+        return;
+      }
+
+      if (
+        isJsonEqual(nodes, renderedNodes.value) &&
+        isJsonEqual(edges, renderedEdges.value)
+      ) {
+        return;
+      }
+
+      nodes = deepCopy(nodes);
+      edges = deepCopy(edges);
+
+      renderedNodes.value = nodes;
+      renderedEdges.value = edges;
 
       const graph = await elk.layout({
         id: 'root',
@@ -166,6 +186,14 @@ export default defineComponent({
         .attr('height', LABEL_HEIGHT)
         .on('click', (evt, d) => openSettings(d.id));
 
+      nodeSelect
+        .append('xhtml:div')
+        .attr(
+          'class',
+          (d) => `relation-node-status status-${d.status?.toLowerCase()}`,
+        )
+        .text('⚫');
+
       // create the top-level divs in the SVG foreignObject elements
       // Save the selection to a variable to easily add multiple children
       const nodeContentSelect = nodeSelect
@@ -207,25 +235,16 @@ export default defineComponent({
         .on('dblclick.zoom', resetZoom.value);
     }
 
-    const debouncedDrawGraph = debounce(drawGraph, 500, {
-      leading: true,
+    const debouncedDrawGraph = debounce(drawGraph, 100, {
+      leading: false,
       trailing: true,
     });
 
     onMounted(() => {
-      watch(
-        [() => props.nodes, () => props.edges],
-        ([nodes, edges], [oldNodes, oldEdges]) => {
-          if (
-            nodes &&
-            edges &&
-            !isJsonEqual([nodes, edges], [oldNodes, oldEdges])
-          ) {
-            debouncedDrawGraph(deepCopy(nodes), deepCopy(edges));
-          }
-        },
-        { immediate: true },
-      );
+      drawGraph(props.nodes, props.edges);
+      watch([() => props.nodes, () => props.edges], () => {
+        debouncedDrawGraph(props.nodes, props.edges);
+      });
     });
 
     return {
@@ -260,33 +279,55 @@ export default defineComponent({
 </template>
 
 <style lang="sass">
-.relation-node-content:hover
-  opacity: 0.8
+.relation-node-status
+  position: absolute
+  padding-left: 4px
+  padding-top: 2px
+  font-family: monospace
+  font-size: 10px
+
+  &.status-active
+    color: $positive
+  &.status-inactive
+    color: $warning
+  &.status-disabled
+    color: $grey-6
+  &.status-invalid
+    color: $negative
 
 .relation-node-content
   height: 50px
   width: 150px
   background-color: #fff
+  border-radius: 6px
   cursor: pointer
   display: flex
   flex-flow: column nowrap
   justify-content: space-around
+  &:hover
+    opacity: 0.8
   > div
     width: 100%
     text-align: center
     font-weight: 300
-    padding: 0px 10px
     overflow: hidden
     white-space: nowrap
     text-overflow: ellipsis
-  > .title
-    font-size: 12px
-    color: green
-  > .name
-    font-size: 14px
+    font-size: 11px
+    font-weight: 300
     color: black
+  > .title
+    color: $grey-12
+    padding-left: 8px
+    padding-right: 8px
+  > .name
+    font-weight: 500
+    font-size: 12px
+    padding-left: 8px
+    padding-right: 8px
 
 .relation-edge
   stroke: #aaa
   fill: none
+  stroke-width: 2px
 </style>

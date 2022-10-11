@@ -53,7 +53,7 @@ export interface BlockLimitation {
 export interface BlockRelationNode {
   id: string;
   type: string;
-  color: string;
+  status?: BlockStatus;
   name?: string; // overrides `id` for rendering
   title?: string; // overrides `type` for rendering
 }
