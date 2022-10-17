@@ -33,9 +33,9 @@ export default defineComponent({
       !!props.modelValue ? color.value : props.nullText,
     );
 
-    const colorStyle = computed<Mapped<string | null>>(() => ({
+    const colorStyle = computed<Mapped<string | undefined>>(() => ({
       color: color.value,
-      backgroundColor: props.modelValue ? color.value : null,
+      backgroundColor: props.modelValue ? color.value : undefined,
       border: `1px ${props.modelValue ? 'solid' : 'dashed'} ${color.value}`,
       borderRadius: '50%',
       height: '20px',

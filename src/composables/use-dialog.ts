@@ -105,7 +105,7 @@ export const useDialog: UseDialogComposable = {
     provide(InvalidateKey, hide);
 
     // expose public methods required by Dialog plugin
-    Object.assign(instance.proxy, { show, hide });
+    Object.assign(instance.proxy as any, { show, hide });
 
     // We want the dialog to be part of the navigation stack.
     // This lets mobile users close dialogs by using the back button.

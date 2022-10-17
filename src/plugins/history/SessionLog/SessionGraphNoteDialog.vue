@@ -55,7 +55,7 @@ export default defineComponent({
             icon="restore"
             flat
             round
-            @click="local.start = new Date().getTime()"
+            @click="local.start = new Date().toISOString()"
           />
           <q-btn
             :disable="local.start == null"
@@ -79,7 +79,7 @@ export default defineComponent({
             icon="restore"
             flat
             round
-            @click="local.end = new Date().getTime()"
+            @click="local.end = new Date().toISOString()"
           />
           <q-btn
             :disable="local.end == null"
