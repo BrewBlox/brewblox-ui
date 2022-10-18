@@ -85,10 +85,7 @@ export default defineComponent({
   </div>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .subtitle
   opacity: 0.8
   font-style: italic

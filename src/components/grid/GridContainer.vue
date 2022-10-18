@@ -127,10 +127,7 @@ export default defineComponent({
   </div>
 </template>
 
-<style
-  scoped
-  lang="scss"
->
+<style scoped lang="scss">
 // Grid square / gap size values are hardcoded here at 100px/20px
 
 .grid-container {

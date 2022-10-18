@@ -369,10 +369,7 @@ export default defineComponent({
   </div>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .container
   display: grid
   grid-template-columns: repeat(10, 1fr)

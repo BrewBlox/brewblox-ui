@@ -1149,10 +1149,7 @@ export default defineComponent({
   </q-page>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .q-page-container
   max-height: 100vh
   max-width: 100vw

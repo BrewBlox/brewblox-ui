@@ -328,10 +328,7 @@ export default defineComponent({
   </Card>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .display
   margin: 0 auto
 

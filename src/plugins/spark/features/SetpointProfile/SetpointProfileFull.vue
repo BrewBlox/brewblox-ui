@@ -299,10 +299,7 @@ export default defineComponent({
   </div>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .profile-point:nth-child(even) > label
   background: rgba($green-5, 0.05)
 
