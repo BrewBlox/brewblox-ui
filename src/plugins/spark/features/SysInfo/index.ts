@@ -37,6 +37,7 @@ const plugin: Plugin = {
         tempUnit: DisplayTempUnit.TEMP_CELSIUS,
         displayBrightness: 255,
       }),
+      analyze: () => 'Active',
     };
 
     const feature: WidgetFeature = {

@@ -27,6 +27,16 @@ const plugin: Plugin = {
         combineFunc: SensorCombiFunc.SENSOR_COMBI_FUNC_AVG,
         value: tempQty(20),
       }),
+      analyze: (block: TempSensorCombiBlock) => {
+        const { sensors, value } = block.data;
+        if (sensors.length === 0 || sensors.find((s) => s.id == null)) {
+          return 'Invalid';
+        }
+        if (value.value == null) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<TempSensorCombiBlock>[] = [

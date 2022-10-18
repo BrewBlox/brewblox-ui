@@ -1,6 +1,12 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { GpioDeviceType, GpioModuleChannel, GpioPins } from 'brewblox-proto/ts';
+import { bloxLink } from '@/utils/link';
+import {
+  ChannelCapabilities,
+  GpioDeviceType,
+  GpioModuleChannel,
+  GpioPins,
+} from 'brewblox-proto/ts';
 import clamp from 'lodash/clamp';
 import { computed, defineComponent, PropType, reactive, watch } from 'vue';
 
@@ -200,6 +206,9 @@ export default defineComponent({
         deviceType !== props.channel.deviceType ||
         width !== props.channel.width;
       const pinsMask = changed ? GpioPins.NONE : props.channel.pinsMask;
+      const capabilities = changed
+        ? ChannelCapabilities.CHAN_SUPPORTS_NONE
+        : props.channel.capabilities;
 
       const channel: GpioModuleChannel = {
         id,
@@ -207,6 +216,8 @@ export default defineComponent({
         pinsMask,
         deviceType,
         width,
+        capabilities,
+        claimedBy: bloxLink(null),
       };
 
       onDialogOK(channel);

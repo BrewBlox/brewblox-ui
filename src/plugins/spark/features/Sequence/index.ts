@@ -33,6 +33,16 @@ const plugin: Plugin = {
         error: SequenceError.NONE,
         instructions: [],
       }),
+      analyze: (block: SequenceBlock) => {
+        const { enabled, status } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (status === SequenceStatus.ERROR) {
+          return 'Invalid';
+        }
+        return 'Active';
+      },
     };
 
     const feature: WidgetFeature = {

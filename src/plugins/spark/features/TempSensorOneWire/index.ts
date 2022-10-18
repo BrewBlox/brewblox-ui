@@ -24,6 +24,16 @@ const plugin: Plugin = {
         address: '',
         oneWireBusId: bloxLink(null),
       }),
+      analyze: (block: TempSensorOneWireBlock) => {
+        const { value, address, oneWireBusId } = block.data;
+        if (!address || oneWireBusId.id == null) {
+          return 'Invalid';
+        }
+        if (value.value == null) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<TempSensorOneWireBlock>[] = [

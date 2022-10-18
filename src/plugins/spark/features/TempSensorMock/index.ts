@@ -23,6 +23,12 @@ const plugin: Plugin = {
         fluctuations: [],
         connected: true,
       }),
+      analyze: (block: TempSensorMockBlock) => {
+        if (!block.data.connected) {
+          return 'Invalid';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<TempSensorMockBlock>[] = [

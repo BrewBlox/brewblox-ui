@@ -44,6 +44,11 @@ export default defineComponent({
       props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
     );
 
+    const heatedDesc = computed<'Yes' | 'No'>({
+      get: () => (heated.value ? 'Yes' : 'No'),
+      set: (v) => (heated.value = v === 'Yes'),
+    });
+
     const channelSame = computed<boolean>(
       () =>
         (heated.value &&
@@ -120,6 +125,7 @@ export default defineComponent({
 
     return {
       heated,
+      heatedDesc,
       glycolControl,
       coolChannel,
       heatChannel,
@@ -195,13 +201,13 @@ export default defineComponent({
       >
         <div class="q-gutter-lg">
           <q-radio
-            v-model="heated"
-            :val="false"
+            v-model="heatedDesc"
+            val="No"
             label="No"
           />
           <q-radio
-            v-model="heated"
-            :val="true"
+            v-model="heatedDesc"
+            val="Yes"
             label="Yes"
           />
         </div>

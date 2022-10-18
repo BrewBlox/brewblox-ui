@@ -1,7 +1,9 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
 import { isLink } from '@/utils/identity';
 import { bloxLink } from '@/utils/link';
 import {
@@ -11,6 +13,7 @@ import {
   DisplaySettingsBlock,
   DisplaySlot,
   Link,
+  SysInfoBlock,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
@@ -28,11 +31,14 @@ const validTypes: BlockOrIntfType[] = [
   BlockType.Pid,
 ];
 
+const sysInfoFilter = makeTypeFilter<SysInfoBlock>(BlockType.SysInfo);
+
 export default defineComponent({
   name: 'DisplaySettingsFull',
   setup() {
     const { serviceId, block, patchBlock } =
       useBlockWidget.setup<DisplaySettingsBlock>();
+    const sparkStore = useSparkStore();
 
     const slots = computed<(DisplaySlot | null)[]>(() => {
       const slots = Array(6).fill(null);
@@ -40,6 +46,17 @@ export default defineComponent({
         slots[w.pos - 1] = w;
       });
       return slots;
+    });
+
+    const sysInfo = computed<SysInfoBlock | undefined>(() =>
+      sparkStore.blocksByService(serviceId).find(sysInfoFilter),
+    );
+
+    const displayBrightness = computed<number>({
+      get: () => sysInfo.value?.data.displayBrightness ?? 255,
+      set: (displayBrightness) => {
+        sparkStore.patchBlock(sysInfo.value, { displayBrightness });
+      },
     });
 
     function slotLink(slot: DisplaySlot | null): Link {
@@ -140,6 +157,7 @@ export default defineComponent({
       validTypes,
       serviceId,
       block,
+      displayBrightness,
       patchBlock,
       slots,
       slotLink,
@@ -212,11 +230,10 @@ export default defineComponent({
           class="col-grow min-width-md"
         >
           <q-slider
+            v-model="displayBrightness"
             label
-            :model-value="block.data.brightness || 255"
             :min="20"
             :max="255"
-            @change="(v) => patchBlock({ brightness: v })"
           />
         </q-field>
       </div>
@@ -224,10 +241,7 @@ export default defineComponent({
   </div>
 </template>
 
-<style
-  scoped
-  lang="sass"
->
+<style scoped lang="sass">
 .grid-container
   display: grid
   grid-template-columns: repeat(3, 1fr)

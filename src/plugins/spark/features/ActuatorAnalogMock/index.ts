@@ -37,6 +37,16 @@ const plugin: Plugin = {
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
+      analyze: (block: ActuatorAnalogMockBlock) => {
+        const { enabled, setting } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (setting == null) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorAnalogMockBlock>[] = [

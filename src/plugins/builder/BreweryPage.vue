@@ -249,10 +249,7 @@ export default defineComponent({
   </q-page>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 @import './grid.sass'
 
 .inactive

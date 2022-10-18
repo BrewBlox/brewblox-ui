@@ -163,10 +163,7 @@ export default defineComponent({
   </PreviewCard>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .fluctuation:nth-child(even) > label
   background: rgba($green-5, 0.05)
 

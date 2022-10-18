@@ -84,10 +84,7 @@ export default defineComponent({
   </g>
 </template>
 
-<style
-  lang="scss"
-  scoped
->
+<style lang="scss" scoped>
 :deep(.coil-liquid path) {
   stroke-linecap: round;
 }

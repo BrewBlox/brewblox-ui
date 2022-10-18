@@ -155,10 +155,7 @@ export default defineComponent({
   </q-dialog>
 </template>
 
-<style
-  scoped
-  lang="sass"
->
+<style scoped lang="sass">
 .mirrored
   -webkit-transform: scaleX(-1)
   transform: scaleX(-1)

@@ -37,6 +37,19 @@ const plugin: Plugin = {
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
+      analyze: (block: ActuatorPwmBlock) => {
+        const { enabled, setting, actuatorId } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (actuatorId.id == null) {
+          return 'Invalid';
+        }
+        if (setting == null) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorPwmBlock>[] = [

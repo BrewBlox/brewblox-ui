@@ -5,8 +5,8 @@ import vue from '@vitejs/plugin-vue';
 import * as fs from 'fs';
 import { ServerOptions } from 'https';
 import * as path from 'path';
-import CheckerPlugin from 'vite-plugin-checker';
 import { defineConfig, PluginOption, UserConfig } from 'vite';
+import CheckerPlugin from 'vite-plugin-checker';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }): UserConfig => {
