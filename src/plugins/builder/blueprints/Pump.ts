@@ -7,6 +7,7 @@ import {
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
 import {
+  scheduleSoftStartRefresh,
   settingsBlock,
   showAbsentBlock,
   showDrivingBlockDialog,
@@ -93,12 +94,12 @@ const blueprint: BuilderBlueprint = {
     } else if (claimed) {
       showDrivingBlockDialog(part, PUMP_KEY, PUMP_TYPES);
     } else if (block.type === BlockType.DigitalActuator) {
-      sparkStore.patchBlock(block, {
-        storedState:
-          block.data.state === DigitalState.STATE_ACTIVE
-            ? DigitalState.STATE_INACTIVE
-            : DigitalState.STATE_ACTIVE,
-      });
+      const storedState =
+        block.data.state === DigitalState.STATE_INACTIVE
+          ? DigitalState.STATE_ACTIVE
+          : DigitalState.STATE_INACTIVE;
+      sparkStore.patchBlock(block, { storedState });
+      scheduleSoftStartRefresh(block);
     } else if (isCompatible(block.type, PWM_PUMP_TYPES)) {
       const limiterWarning = block.data.constrainedBy?.constraints.length
         ? 'The value may be limited by constraints'
@@ -112,9 +113,9 @@ const blueprint: BuilderBlueprint = {
           label: 'Percentage output',
           quickActions: PWM_SELECT_OPTIONS,
         },
-      }).onOk((value: number) => {
-        sparkStore.patchBlock(block, { storedSetting: value });
-      });
+      }).onOk((storedSetting: number) =>
+        sparkStore.patchBlock(block, { storedSetting }),
+      );
     }
   },
 };

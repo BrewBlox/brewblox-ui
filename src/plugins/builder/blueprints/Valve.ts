@@ -12,7 +12,11 @@ import {
   DigitalState,
   MotorValveBlock,
 } from 'brewblox-proto/ts';
-import { settingsAddress, settingsBlock } from '../utils';
+import {
+  scheduleSoftStartRefresh,
+  settingsAddress,
+  settingsBlock,
+} from '../utils';
 
 export type ValveT = DigitalActuatorBlock | MotorValveBlock;
 
@@ -58,12 +62,15 @@ const blueprint: BuilderBlueprint = {
     if (hasAddress) {
       const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
       if (block) {
-        useSparkStore().patchBlock(block, {
-          storedState:
-            block.data.state === DigitalState.STATE_ACTIVE
-              ? DigitalState.STATE_INACTIVE
-              : DigitalState.STATE_ACTIVE,
-        });
+        const sparkStore = useSparkStore();
+
+        const storedState =
+          block.data.state === DigitalState.STATE_INACTIVE
+            ? DigitalState.STATE_ACTIVE
+            : DigitalState.STATE_INACTIVE;
+        sparkStore.patchBlock(block, { storedState });
+
+        scheduleSoftStartRefresh(block);
       }
     } else {
       part.settings[CLOSED_KEY] = !part.settings[CLOSED_KEY];
