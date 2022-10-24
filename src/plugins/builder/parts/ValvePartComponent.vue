@@ -80,6 +80,7 @@ export default defineComponent({
 
     return {
       coord2grid,
+      block,
       paths,
       hasAddress,
       isBroken,
@@ -95,6 +96,11 @@ export default defineComponent({
 
 <template>
   <g>
+    <StatusIcon
+      :block="block"
+      cx="6"
+      cy="6"
+    />
     <SvgEmbedded
       v-if="isBroken"
       height="15"

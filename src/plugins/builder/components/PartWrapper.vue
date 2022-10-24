@@ -93,9 +93,13 @@ export default defineComponent({
 <style lang="sass">
 /* not scoped */
 
+
 .BuilderPart
   stroke-linecap: round
   fill: none
+
+  text
+    fill: #fff
 
   .fill
     fill: #fff

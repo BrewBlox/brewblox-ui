@@ -80,7 +80,23 @@ export default defineComponent({
         ry="6"
       />
     </g>
-    <SvgEmbedded
+    <g
+      :x="coord2grid(startX)"
+      :y="coord2grid(startY)"
+      :transform="transform"
+      :width="coord2grid(1)"
+      :height="coord2grid(1)"
+    >
+      <text
+        x="10"
+        y="10"
+        height="15px"
+        width="20"
+        font-weight="bold"
+        >30%4</text
+      >
+    </g>
+    <!-- <SvgEmbedded
       :x="coord2grid(startX)"
       :y="coord2grid(startY)"
       :transform="transform"
@@ -107,6 +123,6 @@ export default defineComponent({
           <small v-if="!!block">%</small>
         </div>
       </template>
-    </SvgEmbedded>
+    </SvgEmbedded> -->
   </g>
 </template>
