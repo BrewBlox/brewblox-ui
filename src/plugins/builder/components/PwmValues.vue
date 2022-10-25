@@ -35,9 +35,11 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { bordered } = usePart.setup(props.part);
+    const width = 1;
+    const height = 1;
 
-    const { block, isBroken } = useSettingsBlock.setup<
+    const { bordered } = usePart.setup(props.part);
+    const { block, blockStatus, isBroken } = useSettingsBlock.setup<
       ActuatorPwmBlock | FastPwmBlock
     >(props.part, props.settingsKey, [
       BlockType.ActuatorPwm,
@@ -48,17 +50,26 @@ export default defineComponent({
       block.value?.data.enabled ? block.value.data.value : null,
     );
 
-    const transform = computed<string>(() =>
-      textTransformation(props.part, [1, 1]),
+    const dimensions = computed(() => ({
+      x: coord2grid(props.startX),
+      y: coord2grid(props.startY),
+      width: coord2grid(width),
+      height: coord2grid(height),
+    }));
+
+    const contentTransform = computed<string>(() =>
+      textTransformation(props.part, [width, height]),
     );
 
     return {
       coord2grid,
       preciseNumber,
+      dimensions,
+      contentTransform,
       block,
+      blockStatus,
       isBroken,
       pwmValue,
-      transform,
       bordered,
     };
   },
@@ -66,63 +77,52 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    :x="dimensions.x"
+    :y="dimensions.y"
+    :width="dimensions.width"
+    :height="dimensions.height"
+    viewBox="0 0 50 50"
+  >
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(1) - 2"
-        :height="coord2grid(1) - 2"
-        :x="coord2grid(startX) + 1"
-        :y="coord2grid(startY) + 1"
+        :width="48"
+        :height="48"
         :stroke="color"
-        stroke-width="2px"
+        stroke-width="2"
+        fill="black"
+        x="1"
+        y="1"
         rx="6"
         ry="6"
       />
     </g>
     <g
-      :x="coord2grid(startX)"
-      :y="coord2grid(startY)"
-      :transform="transform"
-      :width="coord2grid(1)"
-      :height="coord2grid(1)"
+      :transform="contentTransform"
+      class="content"
     >
-      <text
-        x="10"
-        y="10"
-        height="15px"
-        width="20"
-        font-weight="bold"
-        >30%4</text
-      >
-    </g>
-    <!-- <SvgEmbedded
-      :x="coord2grid(startX)"
-      :y="coord2grid(startY)"
-      :transform="transform"
-      :width="coord2grid(1)"
-      :height="coord2grid(1)"
-      content-class="column items-center q-pt-xs"
-    >
-      <BrokenIcon
-        v-if="isBroken"
-        class="col"
-      />
-      <UnlinkedIcon
-        v-else-if="!block"
-        class="col"
-      />
-      <SleepingIcon
-        v-else-if="!block.data.enabled"
-        class="col"
-      />
+      <BrokenSvgIcon v-if="isBroken" />
+      <UnlinkedSvgIcon v-else-if="!block" />
       <template v-else>
-        <PwmIcon class="col" />
-        <div class="col text-bold">
+        <BlockStatusSvg :status="blockStatus" />
+        <PwmSvgIcon
+          width="25"
+          height="25"
+          x="12.5"
+          y="5"
+        />
+        <text
+          x="50%"
+          y="38"
+          font-weight="bold"
+          text-anchor="middle"
+          dominant-baseline="middle"
+        >
           {{ preciseNumber(pwmValue) }}
-          <small v-if="!!block">%</small>
-        </div>
+          <template v-if="pwmValue != null">%</template>
+        </text>
       </template>
-    </SvgEmbedded> -->
-  </g>
+    </g>
+  </svg>
 </template>
