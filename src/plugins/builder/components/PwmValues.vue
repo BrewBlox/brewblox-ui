@@ -87,13 +87,12 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="48"
-        :height="48"
         :stroke="color"
         stroke-width="2"
-        fill="black"
         x="1"
         y="1"
+        width="48"
+        height="48"
         rx="6"
         ry="6"
       />
@@ -110,18 +109,18 @@ export default defineComponent({
           width="25"
           height="25"
           x="12.5"
-          y="5"
+          y="8"
         />
-        <text
-          x="50%"
-          y="38"
-          font-weight="bold"
-          text-anchor="middle"
-          dominant-baseline="middle"
+        <foreignObject
+          y="30"
+          width="50"
+          height="15"
         >
-          {{ preciseNumber(pwmValue) }}
-          <template v-if="pwmValue != null">%</template>
-        </text>
+          <div class="fit builder-text">
+            {{ preciseNumber(pwmValue) }}
+            <small v-if="pwmValue != null">%</small>
+          </div>
+        </foreignObject>
       </template>
     </g>
   </svg>

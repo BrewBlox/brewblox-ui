@@ -32,6 +32,17 @@ export default defineComponent({
     const { source } = useMetrics.setup(null);
     const { sizeX, sizeY, bordered } = usePart.setup(props.part);
 
+    const dimensions = computed(() => ({
+      x: 0,
+      y: 0,
+      width: coord2grid(sizeX.value),
+      height: coord2grid(sizeY.value),
+    }));
+
+    const contentTransform = computed<string>(() =>
+      textTransformation(props.part, [sizeX.value, sizeY.value]),
+    );
+
     function fieldFreshDuration(field: string): number {
       return props.part.metrics?.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
     }
@@ -64,10 +75,8 @@ export default defineComponent({
 
     return {
       durationString,
-      textTransformation,
-      coord2grid,
-      sizeX,
-      sizeY,
+      dimensions,
+      contentTransform,
       color,
       bordered,
       values,
@@ -77,8 +86,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
-    <SvgEmbedded
+  <svg>
+    <!-- <SvgEmbedded
       :transform="textTransformation(part, part.size, false)"
       :width="coord2grid(sizeX)"
       :height="coord2grid(sizeY)"
@@ -105,12 +114,45 @@ export default defineComponent({
           No metrics
         </div>
       </div>
-    </SvgEmbedded>
+    </SvgEmbedded> -->
+    <g
+      class="content"
+      :width="dimensions.width"
+      :height="dimensions.height"
+    >
+      <foreignObject
+        :width="dimensions.width"
+        :height="dimensions.height"
+        :transform="contentTransform"
+      >
+        <div class="full-width column q-py-xs">
+          <div
+            v-for="d in values"
+            :key="d.field"
+            class="column items-center full-width no-wrap"
+          >
+            <div
+              class="col-auto text-small ellipsis q-px-sm"
+              style="max-width: 100%"
+            >
+              {{ d.label }}
+            </div>
+            <div class="col-auto text-bold">{{ d.value }}</div>
+          </div>
+          <div
+            v-if="!values.length"
+            class="self-center q-pt-sm"
+          >
+            No metrics
+          </div>
+        </div>
+      </foreignObject>
+    </g>
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(sizeX) - 2"
-        :height="coord2grid(sizeY) - 2"
+        :width="dimensions.width - 2"
+        :height="dimensions.height - 2"
         :stroke="color"
         x="1"
         y="1"
@@ -119,5 +161,5 @@ export default defineComponent({
         stroke-width="2px"
       />
     </g>
-  </g>
+  </svg>
 </template>

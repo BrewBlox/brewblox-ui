@@ -6,7 +6,6 @@ import {
   textTransformation,
 } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
-import { mdiThermometer } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent, PropType } from 'vue';
 import { SensorT, SENSOR_KEY, SENSOR_TYPES } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
@@ -21,15 +20,29 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const width = 1;
+    const height = 1;
+
     const { bordered, scale } = usePart.setup(props.part);
 
-    const { block, isBroken } = useSettingsBlock.setup<SensorT>(
+    const { block, blockStatus, isBroken } = useSettingsBlock.setup<SensorT>(
       props.part,
       SENSOR_KEY,
       SENSOR_TYPES,
     );
 
-    const temperature = computed<number | null>(
+    const dimensions = computed(() => ({
+      x: 0,
+      y: 0,
+      width: coord2grid(scale.value * width),
+      height: coord2grid(scale.value * height),
+    }));
+
+    const contentTransform = computed<string>(() =>
+      textTransformation(props.part, [width, height]),
+    );
+
+    const tempValue = computed<number | null>(
       () => block.value?.data.value?.value ?? null,
     );
 
@@ -42,14 +55,13 @@ export default defineComponent({
     );
 
     return {
-      mdiThermometer,
-      coord2grid,
-      textTransformation,
       fixedNumber,
-      scale,
       block,
+      blockStatus,
       isBroken,
-      temperature,
+      dimensions,
+      contentTransform,
+      tempValue,
       tempUnit,
       color,
       bordered,
@@ -59,47 +71,39 @@ export default defineComponent({
 </script>
 
 <template>
-  <g :transform="`scale(${scale} ${scale})`">
-    <SvgEmbedded
-      :transform="textTransformation(part, [1, 1])"
-      :width="coord2grid(1)"
-      :height="coord2grid(1)"
-      content-class="column items-center q-pt-xs"
+  <svg
+    :x="dimensions.x"
+    :y="dimensions.y"
+    :width="dimensions.width"
+    :height="dimensions.height"
+    viewBox="0 0 50 50"
+  >
+    <g
+      :transform="contentTransform"
+      class="content"
     >
-      <BrokenIcon
-        v-if="isBroken"
-        class="col"
-      />
-      <UnlinkedIcon
-        v-else-if="!block"
-        class="col"
-      />
+      <BrokenSvgIcon v-if="isBroken" />
+      <UnlinkedSvgIcon v-else-if="!block" />
       <template v-else>
-        <div class="col row q-pt-xs">
-          <q-icon
-            :name="mdiThermometer"
-            class="static"
-            size="20px"
-          />
-          <small>{{ tempUnit }}</small>
-        </div>
-        <div class="col text-bold text-center">
-          {{ fixedNumber(temperature, 1) }}
-        </div>
+        <BlockStatusSvg :status="blockStatus" />
+        <SensorSvgIcon
+          x="12.5"
+          y="5"
+          width="25"
+          height="25"
+        />
+        <foreignObject
+          x="0"
+          y="30"
+          width="50"
+          height="16"
+        >
+          <div class="fit builder-text">
+            {{ fixedNumber(tempValue, 1) }}
+            <small>{{ tempUnit }}</small>
+          </div>
+        </foreignObject>
       </template>
-    </SvgEmbedded>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="coord2grid(1) - 2"
-        :height="coord2grid(1) - 2"
-        :stroke="color"
-        stroke-width="2px"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-      />
     </g>
-  </g>
+  </svg>
 </template>

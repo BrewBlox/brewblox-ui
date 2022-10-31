@@ -108,15 +108,6 @@ export default defineComponent({
     :height="dimensions.height"
     viewBox="0 0 100 50"
   >
-    <rect
-      width="98"
-      height="48"
-      fill="black"
-      x="1"
-      y="1"
-      rx="6"
-      ry="6"
-    />
     <BrokenSvgIcon
       v-if="isBroken"
       x="30"
@@ -128,37 +119,39 @@ export default defineComponent({
     <template v-else>
       <BlockStatusSvg :status="blockStatus" />
       <SensorSvgIcon
-        width="16"
-        height="16"
-        x="12"
+        x="12.5"
         y="5"
+        width="25"
+        height="25"
       />
-      <text
-        x="60"
-        y="15"
-        font-weight="bold"
-        text-anchor="middle"
-        dominant-baseline="middle"
-      >
-        {{ fixedNumber(setpointValue, 1) }}
-        {{ setpointUnit }}
-      </text>
-      <SetpointSvgIcon
-        width="16"
+      <foreignObject
+        x="0"
+        y="30"
+        width="50"
         height="16"
-        x="12"
-        y="25"
-      />
-      <text
-        x="60"
-        y="35"
-        font-weight="bold"
-        text-anchor="middle"
-        dominant-baseline="middle"
       >
-        {{ fixedNumber(setpointSetting, 1) }}
-        {{ setpointUnit }}
-      </text>
+        <div class="fit builder-text">
+          {{ fixedNumber(setpointValue, 1) }}
+          <small>{{ setpointUnit }}</small>
+        </div>
+      </foreignObject>
+      <SetpointSvgIcon
+        x="62.5"
+        y="5"
+        width="25"
+        height="25"
+      />
+      <foreignObject
+        x="50"
+        y="30"
+        width="50"
+        height="16"
+      >
+        <div class="fit builder-text">
+          {{ fixedNumber(setpointSetting, 1) }}
+          <small>{{ setpointUnit }}</small>
+        </div>
+      </foreignObject>
     </template>
   </svg>
 </template>

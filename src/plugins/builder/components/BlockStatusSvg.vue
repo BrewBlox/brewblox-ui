@@ -18,7 +18,9 @@ export default defineComponent({
   <circle
     cx="8"
     cy="8"
-    r="4"
+    r="3"
+    stroke="black"
+    stroke-width="0.5"
     :class="`block-status__${status}`"
   />
 </template>
