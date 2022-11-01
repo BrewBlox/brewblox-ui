@@ -119,16 +119,16 @@ export default defineComponent({
     <template v-else>
       <BlockStatusSvg :status="blockStatus" />
       <SensorSvgIcon
-        x="12.5"
-        y="5"
-        width="25"
-        height="25"
+        x="20"
+        y="3"
+        width="20"
+        height="20"
       />
       <foreignObject
-        x="0"
-        y="30"
+        x="40"
+        y="5"
         width="50"
-        height="16"
+        height="18"
       >
         <div class="fit builder-text">
           {{ fixedNumber(setpointValue, 1) }}
@@ -136,16 +136,16 @@ export default defineComponent({
         </div>
       </foreignObject>
       <SetpointSvgIcon
-        x="62.5"
-        y="5"
-        width="25"
-        height="25"
+        x="20"
+        y="23"
+        width="20"
+        height="20"
       />
       <foreignObject
-        x="50"
-        y="30"
+        x="40"
+        y="25"
         width="50"
-        height="16"
+        height="18"
       >
         <div class="fit builder-text">
           {{ fixedNumber(setpointSetting, 1) }}

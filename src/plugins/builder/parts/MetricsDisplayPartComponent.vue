@@ -10,7 +10,7 @@ import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
 import { CENTER } from '../const';
 import { FlowPart } from '../types';
-import { coord2grid, liquidOnCoord, textTransformation } from '../utils';
+import { coord2grid, liquidOnCoord } from '../utils';
 
 interface MetricDisplay {
   field: string;
@@ -33,15 +33,9 @@ export default defineComponent({
     const { sizeX, sizeY, bordered } = usePart.setup(props.part);
 
     const dimensions = computed(() => ({
-      x: 0,
-      y: 0,
       width: coord2grid(sizeX.value),
       height: coord2grid(sizeY.value),
     }));
-
-    const contentTransform = computed<string>(() =>
-      textTransformation(props.part, [sizeX.value, sizeY.value]),
-    );
 
     function fieldFreshDuration(field: string): number {
       return props.part.metrics?.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
@@ -76,7 +70,6 @@ export default defineComponent({
     return {
       durationString,
       dimensions,
-      contentTransform,
       color,
       bordered,
       values,
@@ -86,44 +79,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <svg>
-    <!-- <SvgEmbedded
-      :transform="textTransformation(part, part.size, false)"
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
-      class="column"
-    >
-      <div class="full-width column q-py-xs">
-        <div
-          v-for="d in values"
-          :key="d.field"
-          class="column items-center full-width no-wrap"
-        >
-          <div
-            class="col-auto text-small ellipsis q-px-sm"
-            style="max-width: 100%"
-          >
-            {{ d.label }}
-          </div>
-          <div class="col-auto text-bold">{{ d.value }}</div>
-        </div>
-        <div
-          v-if="!values.length"
-          class="self-center q-pt-sm"
-        >
-          No metrics
-        </div>
-      </div>
-    </SvgEmbedded> -->
-    <g
-      class="content"
-      :width="dimensions.width"
-      :height="dimensions.height"
-    >
+  <g>
+    <g class="content">
       <foreignObject
         :width="dimensions.width"
         :height="dimensions.height"
-        :transform="contentTransform"
       >
         <div class="full-width column q-py-xs">
           <div
@@ -161,5 +121,5 @@ export default defineComponent({
         stroke-width="2px"
       />
     </g>
-  </svg>
+  </g>
 </template>

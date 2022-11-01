@@ -213,11 +213,7 @@ export default defineComponent({
       width="50"
       height="50"
     />
-    <StatusIcon
-      :block="block"
-      cx="6"
-      cy="6"
-    />
+    <BlockStatusSvg :status="blockStatus" />
   </g>
 </template>
 

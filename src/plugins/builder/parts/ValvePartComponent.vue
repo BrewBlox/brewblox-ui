@@ -31,11 +31,8 @@ export default defineComponent({
   },
   emits: ['dirty'],
   setup(props, { emit }) {
-    const { hasAddress, block, isBroken } = useSettingsBlock.setup<ValveT>(
-      props.part,
-      VALVE_KEY,
-      VALVE_TYPES,
-    );
+    const { hasAddress, block, blockStatus, isBroken } =
+      useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
 
     const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
 
@@ -80,7 +77,7 @@ export default defineComponent({
 
     return {
       coord2grid,
-      block,
+      blockStatus,
       paths,
       hasAddress,
       isBroken,
@@ -96,11 +93,7 @@ export default defineComponent({
 
 <template>
   <g>
-    <StatusIcon
-      :block="block"
-      cx="6"
-      cy="6"
-    />
+    <BlockStatusSvg :status="blockStatus" />
     <SvgEmbedded
       v-if="isBroken"
       height="15"
