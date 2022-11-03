@@ -2,7 +2,7 @@
 import { coord2grid } from '@/plugins/builder/utils';
 import { userUnits } from '@/user-settings';
 import { makeObjectSorter } from '@/utils/functional';
-import { durationMs, fixedNumber, prettyUnit } from '@/utils/quantity';
+import { durationMs, preciseNumber, prettyUnit } from '@/utils/quantity';
 import { Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
 import { PROFILE_KEY, PROFILE_TYPES } from '../blueprints/ProfileDisplay';
@@ -88,9 +88,8 @@ export default defineComponent({
     const tempUnit = computed<string>(() =>
       prettyUnit(userUnits.value.temperature),
     );
-
     return {
-      fixedNumber,
+      preciseNumber,
       bordered,
       dimensions,
       block,
@@ -122,19 +121,19 @@ export default defineComponent({
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <SetpointSvgIcon
-          x="6"
+          x="4"
           y="16"
           width="20"
           height="20"
         />
         <foreignObject
           x="20"
-          y="10"
+          y="8"
           width="80"
           height="18"
         >
           <div class="fit builder-text">
-            Now: {{ fixedNumber(currentValue, 0) }}
+            <small>Now:</small> {{ preciseNumber(currentValue) }}
             <small v-if="currentValue != null">{{ tempUnit }}</small>
           </div>
         </foreignObject>
@@ -145,7 +144,7 @@ export default defineComponent({
           height="18"
         >
           <div class="fit builder-text">
-            Next: {{ fixedNumber(nextValue, 0) }}
+            <small>Next:</small> {{ preciseNumber(nextValue) }}
             <small v-if="nextValue != null">{{ tempUnit }}</small>
           </div>
         </foreignObject>

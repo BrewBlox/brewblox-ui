@@ -2,6 +2,7 @@
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
+import { userUnits } from '@/user-settings';
 import { makeTypeFilter } from '@/utils/functional';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { mdiThermometer } from '@quasar/extras/mdi-v5';
@@ -80,7 +81,7 @@ export default defineComponent({
     );
 
     const setpointUnit = computed<string>(() =>
-      prettyUnit(block.value?.data.desiredSetting),
+      prettyUnit(userUnits.value.temperature),
     );
 
     return {

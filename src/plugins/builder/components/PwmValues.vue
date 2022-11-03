@@ -105,11 +105,11 @@ export default defineComponent({
       <UnlinkedSvgIcon v-else-if="!block" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
-        <PwmSvgIcon
+        <AnalogSvgIcon
+          x="12.5"
+          y="5"
           width="25"
           height="25"
-          x="12.5"
-          y="8"
         />
         <foreignObject
           y="30"
