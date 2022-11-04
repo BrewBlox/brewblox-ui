@@ -39,19 +39,19 @@ export default defineComponent({
         <slot name="header" />
       </div>
 
-      <div class="grid-icon text-h4">
+      <div class="grid-icon text-h5">
         <slot name="valueIcon" />
       </div>
-      <div class="grid-value text-h5">
+      <div class="grid-value text-h6">
         <slot name="value" />
       </div>
 
-      <div class="grid-icon text-amber-4 text-h4">
+      <div class="grid-icon">
         <slot name="settingIcon">
           <q-icon name="mdi-unfold-more-horizontal" />
         </slot>
       </div>
-      <div class="grid-value text-h6 text-amber-4">
+      <div class="grid-value text-h6">
         <slot name="setting" />
       </div>
     </div>

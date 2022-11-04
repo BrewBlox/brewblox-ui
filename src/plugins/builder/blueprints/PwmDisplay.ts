@@ -1,7 +1,7 @@
 import { SCALE_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import {
-  showDrivingBlockDialog,
+  showPartBlockDialog,
   universalTransitions,
 } from '@/plugins/builder/utils';
 import { BlockType } from 'brewblox-proto/ts';
@@ -50,7 +50,7 @@ const blueprint: BuilderBlueprint = {
   size,
   transitions: (part) =>
     universalTransitions(size(part), part.settings[FLOW_TOGGLE_KEY]),
-  interactHandler: (part) => showDrivingBlockDialog(part, PWM_KEY, PWM_TYPES),
+  interactHandler: (part) => showPartBlockDialog(part, PWM_KEY, PWM_TYPES),
 };
 
 export default blueprint;

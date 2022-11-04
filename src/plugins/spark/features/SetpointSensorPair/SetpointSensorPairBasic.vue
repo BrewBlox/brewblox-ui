@@ -49,13 +49,23 @@ export default defineComponent({
         @click="editSetting"
       >
         <template #valueIcon>
-          <q-icon
-            name="mdi-thermometer"
-            color="green-3"
+          <SensorSvgIcon
+            x="0"
+            y="0"
+            width="30"
+            height="30"
           />
         </template>
         <template #value>
           {{ prettyQty(block.data.value) }}
+        </template>
+        <template #settingIcon>
+          <SetpointSvgIcon
+            x="0"
+            y="0"
+            width="30"
+            height="30"
+          />
         </template>
         <template #setting>
           <template v-if="isClaimed">

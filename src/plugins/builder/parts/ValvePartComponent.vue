@@ -94,27 +94,26 @@ export default defineComponent({
 <template>
   <g>
     <BlockStatusSvg :status="blockStatus" />
-    <SvgEmbedded
+    <UnlinkedSvgIcon
       v-if="isBroken"
+      x="0"
+      y="0"
       height="15"
       width="15"
-    >
-      <UnlinkedIcon
-        size="15px"
-        class="self-end"
-      />
-    </SvgEmbedded>
-    <SvgEmbedded
-      v-else-if="pending"
-      :height="coord2grid(1)"
-      :width="coord2grid(1)"
+    />
+    <foreignObject
+      v-if="pending"
+      x="3"
+      y="3"
+      height="44"
+      width="44"
     >
       <q-spinner
         size="44px"
         class="col"
         color="blue-grey-5"
       />
-    </SvgEmbedded>
+    </foreignObject>
     <g
       key="valve-outer"
       class="outline"

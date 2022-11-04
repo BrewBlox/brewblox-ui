@@ -1,5 +1,5 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { showDrivingBlockDialog } from '@/plugins/builder/utils';
+import { showPartBlockDialog } from '@/plugins/builder/utils';
 import { BlockType } from 'brewblox-proto/ts';
 
 export const PWM_KEY = 'pwm';
@@ -36,7 +36,7 @@ const blueprint: BuilderBlueprint = {
   ],
   size: (part) => [part.settings.sizeX || DEFAULT_SIZE_X, SIZE_Y],
   transitions: () => ({}),
-  interactHandler: (part) => showDrivingBlockDialog(part, PWM_KEY, PWM_TYPES),
+  interactHandler: (part) => showPartBlockDialog(part, PWM_KEY, PWM_TYPES),
 };
 
 export default blueprint;

@@ -4,8 +4,7 @@ import { coord2grid } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { makeTypeFilter } from '@/utils/functional';
-import { fixedNumber, prettyUnit } from '@/utils/quantity';
-import { mdiThermometer } from '@quasar/extras/mdi-v5';
+import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import {
   BlockType,
   PidBlock,
@@ -80,21 +79,19 @@ export default defineComponent({
       () => block.value?.data.value.value ?? null,
     );
 
-    const setpointUnit = computed<string>(() =>
+    const tempUnit = computed<string>(() =>
       prettyUnit(userUnits.value.temperature),
     );
 
     return {
-      mdiThermometer,
-      coord2grid,
-      fixedNumber,
+      preciseNumber,
       block,
       blockStatus,
       isBroken,
       dimensions,
       setpointSetting,
       setpointValue,
-      setpointUnit,
+      tempUnit,
     };
   },
 });
@@ -132,25 +129,25 @@ export default defineComponent({
         height="18"
       >
         <div class="fit builder-text">
-          {{ fixedNumber(setpointValue, 1) }}
-          <small>{{ setpointUnit }}</small>
+          {{ preciseNumber(setpointValue) }}
+          <small>{{ tempUnit }}</small>
         </div>
       </foreignObject>
       <SetpointSvgIcon
         x="20"
-        y="23"
+        y="25"
         width="20"
         height="20"
       />
       <foreignObject
         x="40"
-        y="25"
+        y="27"
         width="50"
         height="18"
       >
         <div class="fit builder-text">
-          {{ fixedNumber(setpointSetting, 1) }}
-          <small>{{ setpointUnit }}</small>
+          {{ preciseNumber(setpointSetting) }}
+          <small>{{ tempUnit }}</small>
         </div>
       </foreignObject>
     </template>
