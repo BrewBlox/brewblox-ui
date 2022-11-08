@@ -10,11 +10,10 @@ import {
   scheduleSoftStartRefresh,
   settingsBlock,
   showAbsentBlock,
-  showDrivingBlockDialog,
 } from '@/plugins/builder/utils';
 import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isBlockClaimed, isCompatible } from '@/plugins/spark/utils/info';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
 import {
   ActuatorPwmBlock,
@@ -84,15 +83,12 @@ const blueprint: BuilderBlueprint = {
     const sparkStore = useSparkStore();
     const hasAddr = !!part.settings[PUMP_KEY]?.id;
     const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
-    const claimed = isBlockClaimed(block, sparkStore.claims);
 
     if (!hasAddr) {
       part.settings.enabled = !part.settings.enabled;
       savePart(part);
     } else if (block === null) {
       showAbsentBlock(part, PUMP_KEY);
-    } else if (claimed) {
-      showDrivingBlockDialog(part, PUMP_KEY, PUMP_TYPES);
     } else if (block.type === BlockType.DigitalActuator) {
       const storedState =
         block.data.state === DigitalState.STATE_INACTIVE

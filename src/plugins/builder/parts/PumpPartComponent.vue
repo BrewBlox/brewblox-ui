@@ -1,6 +1,8 @@
 <script lang="ts">
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
 import { liquidOnCoord, settingsBlock } from '@/plugins/builder/utils';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockStatus } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import {
   ActuatorPwmBlock,
@@ -27,12 +29,20 @@ export default defineComponent({
   },
   emits: ['update:part', 'dirty'],
   setup(props, { emit }) {
+    const specStore = useBlockSpecStore();
+
     const hasAddress = computed<boolean>(
       () => props.part.settings[PUMP_KEY]?.id != null,
     );
 
     const block = computed<PumpT | null>(() =>
       settingsBlock(props.part, PUMP_KEY, PUMP_TYPES),
+    );
+
+    const blockStatus = computed<BlockStatus | undefined>(() =>
+      block.value
+        ? specStore.blockSpecByType(block.value.type)?.analyze(block.value)
+        : undefined,
     );
 
     const enabled = computed<boolean>(() => {
@@ -96,7 +106,9 @@ export default defineComponent({
     });
 
     return {
+      block,
       hasAddress,
+      blockStatus,
       enabled,
       liquids,
       duration,
@@ -201,10 +213,7 @@ export default defineComponent({
       width="50"
       height="50"
     />
-    <PowerIcon
-      v-if="hasAddress"
-      transform="translate(15,-5)"
-    />
+    <BlockStatusSvg :status="blockStatus" />
   </g>
 </template>
 

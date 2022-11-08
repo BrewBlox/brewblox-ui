@@ -157,13 +157,6 @@ export default defineComponent({
         .join('path')
         .attr('class', 'relation-edge');
 
-      // Create a node element for every node in the graph
-      const nodeSelect = diagram
-        .selectAll<SVGForeignObjectElement, ElkRelationNode>('.relation-node')
-        .data(graph.children as ElkRelationNode[], (d) => d.id)
-        .join('foreignObject')
-        .attr('class', 'relation-node');
-
       // Edge configuration:
       // Create a straight line between start, end, and all bend points of the edge
       edgeSelect.attr('d', (d): string => {
@@ -177,34 +170,55 @@ export default defineComponent({
       });
 
       // Node configuration:
+      // Create an SVG element for each node in the graph
       // Set overall position and size of the node element
       // We'll add its children below
-      nodeSelect
+      // Create a node element for every node in the graph
+      const nodeSelect = diagram
+        .selectAll<SVGForeignObjectElement, ElkRelationNode>('.relation-node')
+        .data(graph.children as ElkRelationNode[], (d) => d.id)
+        .join('svg')
+        .attr('class', 'relation-node')
         .attr('x', (d) => d.x)
         .attr('y', (d) => d.y)
         .attr('width', LABEL_WIDTH)
         .attr('height', LABEL_HEIGHT)
         .on('click', (evt, d) => openSettings(d.id));
 
+      // SVG objects can't have a background color
+      // Add a rect to serve as background
       nodeSelect
-        .append('xhtml:div')
-        .attr(
-          'class',
-          (d) => `relation-node-status status-${d.status?.toLowerCase()}`,
-        )
-        .text('⚫');
+        .append('rect')
+        .attr('class', 'background')
+        .attr('width', LABEL_WIDTH)
+        .attr('height', LABEL_HEIGHT)
+        .attr('rx', 6)
+        .attr('ry', 6);
 
-      // create the top-level divs in the SVG foreignObject elements
-      // Save the selection to a variable to easily add multiple children
+      // Add status icons
+      nodeSelect
+        .append('circle')
+        .attr('class', (d) => `status__${d.status}`)
+        .attr('cx', 6)
+        .attr('cy', 6)
+        .attr('r', 4);
+
+      // We want to use the HTML text rendering features for content
+      // Add a foreign object to render content
       const nodeContentSelect = nodeSelect
+        .append('foreignObject')
+        .attr('width', LABEL_WIDTH)
+        .attr('height', LABEL_HEIGHT)
         .append('xhtml:div')
         .attr('class', 'relation-node-content');
 
+      // Add content title
       nodeContentSelect
         .append('xhtml:div')
         .attr('class', 'title')
         .text((d) => d.type);
 
+      // Add content name
       nodeContentSelect
         .append('xhtml:div')
         .attr('class', 'name')
@@ -279,55 +293,47 @@ export default defineComponent({
 </template>
 
 <style lang="sass">
-.relation-node-status
-  position: absolute
-  padding-left: 4px
-  padding-top: 2px
-  font-family: monospace
-  font-size: 10px
-
-  &.status-active
-    color: $positive
-  &.status-inactive
-    color: $warning
-  &.status-disabled
-    color: $grey-6
-  &.status-invalid
-    color: $negative
-
-.relation-node-content
-  height: 50px
-  width: 150px
-  background-color: #fff
-  border-radius: 6px
-  cursor: pointer
-  display: flex
-  flex-flow: column nowrap
-  justify-content: space-around
-  &:hover
-    opacity: 0.8
-  > div
-    width: 100%
-    text-align: center
-    font-weight: 300
-    overflow: hidden
-    white-space: nowrap
-    text-overflow: ellipsis
-    font-size: 11px
-    font-weight: 300
-    color: black
-  > .title
-    color: $grey-12
-    padding-left: 8px
-    padding-right: 8px
-  > .name
-    font-weight: 500
-    font-size: 12px
-    padding-left: 8px
-    padding-right: 8px
-
 .relation-edge
   stroke: #aaa
   fill: none
   stroke-width: 2px
+
+.relation-node
+  cursor: pointer
+  > .background
+    fill: #fff
+    &:hover
+      opacity: 0.8
+  > .status
+    &__Active
+      fill: $green-7
+    &__Inactive
+      fill: $warning
+    &__Disabled
+      fill: $grey-6
+    &__Invalid
+      fill: $negative
+    &__undefined
+      fill: none
+
+.relation-node-content
+  width: 100%
+  height: 100%
+  display: flex
+  flex-flow: column nowrap
+  justify-content: space-around
+  padding: 2px 8px
+  > div
+    overflow: hidden
+    white-space: nowrap
+    text-align: center
+    text-overflow: ellipsis
+  > .title
+    font-weight: 300
+    font-size: 11px
+    color: $grey-12
+  > .name
+    font-weight: 500
+    font-size: 12px
+    color: black
 </style>

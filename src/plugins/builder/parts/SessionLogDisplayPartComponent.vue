@@ -8,7 +8,7 @@ import { computed, defineComponent, PropType } from 'vue';
 import { WIDGET_KEY } from '../blueprints/SessionLogDisplay';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
-import { coord2grid, textTransformation } from '../utils';
+import { coord2grid } from '../utils';
 
 export default defineComponent({
   name: 'SessionLogDisplayPartComponent',
@@ -22,6 +22,11 @@ export default defineComponent({
     const widgetStore = useWidgetStore();
     const historyStore = useHistoryStore();
     const { sizeX, sizeY, bordered } = usePart.setup(props.part);
+
+    const dimensions = computed(() => ({
+      width: coord2grid(sizeX.value),
+      height: coord2grid(sizeY.value),
+    }));
 
     const isLinked = computed<boolean>(() =>
       Boolean(props.part.settings[WIDGET_KEY]),
@@ -48,10 +53,7 @@ export default defineComponent({
 
     return {
       mdiTextSubject,
-      coord2grid,
-      textTransformation,
-      sizeX,
-      sizeY,
+      dimensions,
       bordered,
       isLinked,
       isBroken,
@@ -63,46 +65,44 @@ export default defineComponent({
 
 <template>
   <g>
-    <SvgEmbedded
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
-    >
-      <div class="col row no-wrap items-center q-pa-sm full-width">
-        <BrokenIcon v-if="isBroken" />
-        <q-icon
-          v-else
-          :name="mdiTextSubject"
-          size="40px"
-          class="col-auto static"
-        />
-
-        <div
-          v-if="sizeX >= 1"
-          class="col text-center ellipsis"
-          style="font-size: 130%"
+    <g class="content">
+      <BrokenSvgIcon
+        v-if="isBroken"
+        x="30"
+      />
+      <UnlinkedSvgIcon
+        v-else-if="!isLinked"
+        x="30"
+      />
+      <template v-else>
+        <foreignObject
+          v-if="dimensions.width > 50"
+          x="0"
+          y="5"
+          :width="dimensions.width"
+          :height="dimensions.height - 5"
         >
-          {{ displayText }}
-        </div>
-      </div>
-    </SvgEmbedded>
+          <div
+            class="fit builder-text"
+            style="font-size: 130%"
+          >
+            {{ displayText }}
+          </div>
+        </foreignObject>
+        <SessionSvgIcon v-else />
+      </template>
+    </g>
+
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(sizeX) - 2"
-        :height="coord2grid(sizeY) - 2"
+        :width="dimensions.width - 2"
+        :height="dimensions.height - 2"
         x="1"
         y="1"
         rx="6"
         ry="6"
         stroke-width="2px"
-      />
-      <line
-        v-if="!isLinked && sizeX === 1"
-        :transform="textTransformation(part, part.size)"
-        x1="10"
-        y1="10"
-        :x2="coord2grid(sizeX) - 10"
-        :y2="coord2grid(sizeY) - 10"
       />
     </g>
   </g>

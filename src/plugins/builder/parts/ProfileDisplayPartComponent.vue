@@ -1,8 +1,8 @@
 <script lang="ts">
 import { coord2grid } from '@/plugins/builder/utils';
+import { userUnits } from '@/user-settings';
 import { makeObjectSorter } from '@/utils/functional';
-import { durationMs, fixedNumber } from '@/utils/quantity';
-import { mdiArrowRightBold } from '@quasar/extras/mdi-v5';
+import { durationMs, preciseNumber, prettyUnit } from '@/utils/quantity';
 import { Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
 import { PROFILE_KEY, PROFILE_TYPES } from '../blueprints/ProfileDisplay';
@@ -20,7 +20,12 @@ export default defineComponent({
   setup(props) {
     const { sizeX, sizeY, bordered } = usePart.setup(props.part);
 
-    const { block, isBroken, address } =
+    const dimensions = computed(() => ({
+      width: coord2grid(sizeX.value),
+      height: coord2grid(sizeY.value),
+    }));
+
+    const { block, blockStatus, isBroken } =
       useSettingsBlock.setup<SetpointProfileBlock>(
         props.part,
         PROFILE_KEY,
@@ -80,65 +85,76 @@ export default defineComponent({
       return point ? point.temperature.value : null;
     });
 
+    const tempUnit = computed<string>(() =>
+      prettyUnit(userUnits.value.temperature),
+    );
     return {
-      coord2grid,
-      fixedNumber,
-      mdiArrowRightBold,
+      preciseNumber,
       bordered,
-      sizeX,
-      sizeY,
+      dimensions,
       block,
-      address,
+      blockStatus,
       isBroken,
       currentValue,
       nextValue,
+      tempUnit,
     };
   },
 });
 </script>
 
 <template>
-  <g>
-    <SvgEmbedded
-      :width="coord2grid(2)"
-      :height="coord2grid(1)"
-      content-class="column items-center q-pt-xs"
-    >
-      <BrokenIcon
+  <svg
+    :width="dimensions.width"
+    :height="dimensions.height"
+    viewBox="0 0 100 50"
+  >
+    <g class="content">
+      <BrokenSvgIcon
         v-if="isBroken"
-        class="col"
+        x="30"
       />
-      <UnlinkedIcon
+      <UnlinkedSvgIcon
         v-else-if="!block"
-        class="col"
+        x="30"
       />
-      <div
-        v-else
-        class="col column q-ma-xs"
-      >
-        <small class="col-auto"> Setpoint Profile </small>
-        <div class="col row">
-          <div class="col">
-            {{ fixedNumber(currentValue, 0) }}
+      <template v-else>
+        <BlockStatusSvg :status="blockStatus" />
+        <SetpointSvgIcon
+          x="4"
+          y="16"
+          width="20"
+          height="20"
+        />
+        <foreignObject
+          x="20"
+          y="8"
+          width="80"
+          height="18"
+        >
+          <div class="fit builder-text">
+            <small>Now:</small> {{ preciseNumber(currentValue) }}
+            <small v-if="currentValue != null">{{ tempUnit }}</small>
           </div>
-          <div class="col">
-            <q-icon
-              :name="mdiArrowRightBold"
-              size="20px"
-              class="static"
-            />
+        </foreignObject>
+        <foreignObject
+          x="20"
+          y="25"
+          width="80"
+          height="18"
+        >
+          <div class="fit builder-text">
+            <small>Next:</small> {{ preciseNumber(nextValue) }}
+            <small v-if="nextValue != null">{{ tempUnit }}</small>
           </div>
-          <div class="col">
-            {{ fixedNumber(nextValue, 0) }}
-          </div>
-        </div>
-      </div>
-    </SvgEmbedded>
+        </foreignObject>
+      </template>
+    </g>
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(sizeX) - 2"
-        :height="coord2grid(sizeY) - 2"
+        :width="dimensions.width - 2"
+        :height="dimensions.height - 2"
         x="1"
         y="1"
         rx="6"
@@ -146,5 +162,5 @@ export default defineComponent({
         stroke-width="2px"
       />
     </g>
-  </g>
+  </svg>
 </template>

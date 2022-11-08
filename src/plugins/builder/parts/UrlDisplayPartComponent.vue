@@ -15,6 +15,11 @@ export default defineComponent({
   setup(props) {
     const { sizeX, sizeY, bordered } = usePart.setup(props.part);
 
+    const dimensions = computed(() => ({
+      width: coord2grid(sizeX.value),
+      height: coord2grid(sizeY.value),
+    }));
+
     const url = computed<string>(() => props.part.settings['url'] || '');
 
     const titleText = computed<string>(
@@ -22,10 +27,8 @@ export default defineComponent({
     );
 
     return {
-      coord2grid,
+      dimensions,
       textTransformation,
-      sizeX,
-      sizeY,
       bordered,
       url,
       titleText,
@@ -39,8 +42,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(sizeX) - 2"
-        :height="coord2grid(sizeY) - 2"
+        :width="dimensions.width - 2"
+        :height="dimensions.height - 2"
         x="1"
         y="1"
         rx="6"
@@ -48,17 +51,16 @@ export default defineComponent({
         stroke="white"
       />
     </g>
-    <SvgEmbedded
-      :transform="textTransformation(part, part.size, false)"
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
+    <foreignObject
+      :width="dimensions.width"
+      :height="dimensions.height"
     >
       <div
-        class="text-bold text-center q-mt-sm grid-label"
+        class="fit text-bold text-center q-mt-sm grid-label"
         style="text-decoration: underline; font-size: 130%"
       >
         {{ titleText }}
       </div>
-    </SvgEmbedded>
+    </foreignObject>
   </g>
 </template>

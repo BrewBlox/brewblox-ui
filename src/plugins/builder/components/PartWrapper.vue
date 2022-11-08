@@ -93,9 +93,13 @@ export default defineComponent({
 <style lang="sass">
 /* not scoped */
 
+
 .BuilderPart
   stroke-linecap: round
   fill: none
+
+  text
+    fill: #fff
 
   .fill
     fill: #fff
@@ -123,4 +127,12 @@ export default defineComponent({
   fill: dodgerblue
   fill-opacity: 0.5
   opacity: 0.5
+
+.builder-text
+  font-size: 12px
+  font-weight: 500
+  text-align: center
+  line-height: 1
+  vertical-align: middle
+  display: inline-block
 </style>

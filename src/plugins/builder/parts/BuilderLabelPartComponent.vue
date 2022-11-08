@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
-import { coord2grid, textTransformation } from '../utils';
+import { coord2grid } from '../utils';
 
 export default defineComponent({
   name: 'BuilderLabelPartComponent',
@@ -15,6 +15,11 @@ export default defineComponent({
   setup(props) {
     const { sizeX, sizeY } = usePart.setup(props.part);
 
+    const dimensions = computed(() => ({
+      width: coord2grid(sizeX.value),
+      height: coord2grid(sizeY.value),
+    }));
+
     const text = computed<string>(
       () => props.part.settings.text || '[click to edit]',
     );
@@ -22,10 +27,7 @@ export default defineComponent({
     const fontSize = computed<number>(() => props.part.settings.fontSize || 16);
 
     return {
-      textTransformation,
-      coord2grid,
-      sizeX,
-      sizeY,
+      dimensions,
       text,
       fontSize,
     };
@@ -34,18 +36,15 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
-    <SvgEmbedded
-      :transform="textTransformation(part, part.size, false)"
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
+  <foreignObject
+    :width="dimensions.width"
+    :height="dimensions.height"
+  >
+    <div
+      class="fit text-bold q-pa-sm"
+      :style="{ 'font-size': `${fontSize}pt` }"
     >
-      <div
-        class="col-auto text-bold full-width q-pa-sm"
-        :style="{ 'font-size': `${fontSize}pt` }"
-      >
-        {{ text }}
-      </div>
-    </SvgEmbedded>
-  </g>
+      {{ text }}
+    </div>
+  </foreignObject>
 </template>

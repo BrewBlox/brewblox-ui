@@ -37,31 +37,23 @@ export default defineComponent({
       }
 
       const setpointId = inputBlock.value.id;
-      const setpointChain = sparkStore
-        .claimsByService(serviceId)
-        .find((chain) => chain.target === setpointId);
+      const setpointClaimedById = inputBlock.value.data.claimedBy.id;
+      let message = `Edit settings for the <i>${setpointId}</i> Setpoint.`;
 
-      if (setpointChain) {
-        const actual =
-          setpointChain !== undefined
-            ? sparkStore.blockById(serviceId, setpointChain.source)
-            : inputBlock.value;
-
-        createBlockDialog(actual);
-      } else {
-        createDialog({
-          component: 'SetpointSettingDialog',
-          componentProps: {
-            title: 'Edit Setpoint',
-            message: `
-            Edit settings for the PID Setpoint. <br>
-            <i>${blockId}</i> and actuators will be inactive if <i>${setpointId}</i> is disabled.
-            `,
-            html: true,
-            address: inputBlock.value,
-          },
-        });
+      if (setpointClaimedById) {
+        message += `<br> <i>${setpointId}</i> is claimed by <i>${setpointClaimedById}</i>.
+        The setting will be overridden until the claiming block is disabled.`;
       }
+
+      createDialog({
+        component: 'SetpointSettingDialog',
+        componentProps: {
+          title: 'Edit Setpoint',
+          message,
+          html: true,
+          address: inputBlock.value,
+        },
+      });
     }
 
     function showOutput(): void {
@@ -96,13 +88,23 @@ export default defineComponent({
       >
         <template #header> Input </template>
         <template #valueIcon>
-          <q-icon
-            name="mdi-thermometer"
-            color="green-3"
+          <SensorSvgIcon
+            x="0"
+            y="0"
+            width="30"
+            height="30"
           />
         </template>
         <template #value>
           {{ prettyQty(block.data.inputValue) }}
+        </template>
+        <template #settingIcon>
+          <SetpointSvgIcon
+            x="0"
+            y="0"
+            width="30"
+            height="30"
+          />
         </template>
         <template #setting>
           {{ prettyQty(block.data.inputSetting) }}
@@ -115,23 +117,33 @@ export default defineComponent({
       >
         <template #header> Output </template>
         <template #valueIcon>
-          <q-icon
-            v-if="kp === null"
-            name="mdi-calculator-variant"
+          <CoolingSvgIcon
+            v-if="kp && kp < 0"
+            x="0"
+            y="0"
+            width="30"
+            height="30"
+            stroke="dodgerblue"
           />
-          <HeatingIcon
-            v-else-if="kp > 0"
-            color="red"
-            :svg-props="{ 'stroke-width': '2px' }"
-          />
-          <CoolingIcon
-            v-else-if="kp < 0"
-            color="dodgerblue"
-            :svg-props="{ 'stroke-width': '2px' }"
+          <HeatingSvgIcon
+            v-else
+            x="0"
+            y="0"
+            width="30"
+            height="30"
+            fill="red"
           />
         </template>
         <template #value>
           {{ fixedNumber(block.data.outputValue) }} %
+        </template>
+        <template #settingIcon>
+          <SetpointSvgIcon
+            x="0"
+            y="0"
+            width="30"
+            height="30"
+          />
         </template>
         <template #setting>
           {{ fixedNumber(block.data.outputSetting) }} %

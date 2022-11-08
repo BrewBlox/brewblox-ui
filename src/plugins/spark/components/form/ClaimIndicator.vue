@@ -25,25 +25,16 @@ export default defineComponent({
         .find((c) => c.target === props.blockId),
     );
 
-    const claimText = computed<string[]>(() => {
-      if (!claim.value) {
-        return [];
-      }
-      return [...claim.value.intermediate, claim.value.source].map(
-        (id, idx) => {
-          return idx === 0
-            ? `Claimed by <i>${id}</i>`
-            : `&emsp; which is claimed by <i>${id}</i>`;
-        },
-      );
-    });
+    const claimedBy = computed<string | null>(() =>
+      claim.value ? claim.value.intermediate[0] ?? claim.value.source : null,
+    );
 
-    function showSource(): void {
-      if (claim.value) {
+    function showClaimingBlock(): void {
+      if (claimedBy.value) {
         createBlockDialog(
           {
             serviceId: props.serviceId,
-            id: claim.value.source,
+            id: claimedBy.value,
             type: null,
           },
           { mode: 'Basic' },
@@ -53,8 +44,8 @@ export default defineComponent({
 
     return {
       claim,
-      claimText,
-      showSource,
+      claimedBy,
+      showClaimingBlock,
     };
   },
 });
@@ -68,9 +59,9 @@ export default defineComponent({
     <template v-if="claim">
       <div
         class="col-auto q-pa-sm q-gutter-x-sm text-indigo-4 row"
-        @click="showSource"
+        @click="showClaimingBlock"
       >
-        <q-tooltip>Edit {{ claim.source }}</q-tooltip>
+        <q-tooltip>Edit {{ claimedBy }}</q-tooltip>
         <q-icon
           name="mdi-fast-forward-outline"
           class="col-auto"
@@ -78,10 +69,10 @@ export default defineComponent({
         />
         <div class="col-auto darkish text-small">
           <div>
-            Claimed by <i>{{ claim.source }}</i>
+            <i>{{ claim.source }}</i>
           </div>
           <div
-            v-for="(id, idx) in claim.intermediate"
+            v-for="(id, idx) in [...claim.intermediate, blockId]"
             :key="'intermediate-' + id"
             :style="`margin-left: ${idx * 5}px`"
           >

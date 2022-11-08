@@ -3,11 +3,7 @@ import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { isBlockCompatible, isCompatible } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog } from '@/utils/block-dialog';
-import {
-  Coordinates,
-  CoordinatesParam,
-  rotatedSize,
-} from '@/utils/coordinates';
+import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 import { durationMs } from '@/utils/quantity';
@@ -245,10 +241,9 @@ export function textTransformation(
   textSize: [number, number],
   counterRotate = true,
 ): string {
-  const [sizeX] = rotatedSize(part.rotate, textSize);
   const transforms: string[] = [];
   if (part.flipped) {
-    transforms.push(`translate(${coord2grid(sizeX)}, 0) scale(-1,1)`);
+    transforms.push(`translate(${coord2grid(textSize[0])}, 0) scale(-1,1)`);
   }
   if (part.rotate && counterRotate) {
     transforms.push(
@@ -293,7 +288,7 @@ export function showSettingsBlock(
     : showAbsentBlock(part, settingsKey);
 }
 
-export function showDrivingBlockDialog(
+export function showPartBlockDialog(
   part: PersistentPart,
   settingsKey: string,
   intf: ComparedBlockType,
@@ -304,15 +299,6 @@ export function showDrivingBlockDialog(
   if (!block) {
     return showAbsentBlock(part, settingsKey);
   }
-
-  // const claim = sparkStore
-  //   .claimsByService(block.serviceId)
-  //   .find((c) => c.target === block.id);
-
-  // const actual =
-  //   claim !== undefined
-  //     ? sparkStore.blockById(block.serviceId, claim.source)
-  //     : block;
 
   if (block) {
     createBlockDialog(block, { mode: 'Basic' });

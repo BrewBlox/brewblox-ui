@@ -172,24 +172,26 @@ export function fixedNumber(value: Maybe<number>, digits = 2): string {
  * Returns placeholder string '-' * precision if input is a not a number.
  *
  * ```ts
- * preciseNumber(99.13863, 3, 2) // => '99.1'
- * preciseNumber(100.232452, 3, 2) // => '100'
- * preciseNumber(1.1, 3, 2) // => '1.10'
+ * preciseNumber(99.13863, 3) // => '99.1'
+ * preciseNumber(100.232452, 3) // => '100'
+ * preciseNumber(1.1, 3) // => '1.10'
+ * preciseNumber(0.006, 3) // => '0.01'
  * ```
  *
  * @param value
- * @param precision
- * @param digits
+ * @param characters
  * @returns
  */
 export function preciseNumber(
   value: Maybe<number>,
-  precision = 3,
-  digits = 2,
+  characters = 3,
 ): string | number {
-  return isNumber(value)
-    ? round(value, digits).toPrecision(precision)
-    : '-'.repeat(precision);
+  if (!isNumber(value)) {
+    return '-'.repeat(characters);
+  }
+  const strV = value.toFixed(0);
+  const fractionDigits = Math.max(characters - strV.length, 0);
+  return value.toFixed(fractionDigits);
 }
 
 /**

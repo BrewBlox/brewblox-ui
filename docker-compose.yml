@@ -18,6 +18,7 @@ services:
       --retentionPeriod=100y
       --influxMeasurementFieldSeparator=/
       --http.pathPrefix=/victoria
+      --search.latencyOffset=10s
 
   redis:
     image: redis:6.0
