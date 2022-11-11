@@ -68,11 +68,11 @@ export default defineComponent({
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"
-        x="30"
+        :x="dimensions.width / 2 - 20"
       />
       <UnlinkedSvgIcon
         v-else-if="!isLinked"
-        x="30"
+        :x="dimensions.width / 2 - 20"
       />
       <template v-else>
         <foreignObject

@@ -139,8 +139,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="dimensions.width - 2"
-        :height="dimensions.height - 2"
+        :width="100 - 2"
+        :height="50 - 2"
         :stroke="color"
         stroke-width="2px"
         x="1"

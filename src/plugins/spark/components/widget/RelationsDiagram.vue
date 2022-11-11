@@ -198,9 +198,9 @@ export default defineComponent({
       // Add status icons
       nodeSelect
         .append('circle')
-        .attr('class', (d) => `status__${d.status}`)
-        .attr('cx', 6)
-        .attr('cy', 6)
+        .attr('class', (d) => `status-icon status__${d.status}`)
+        .attr('cx', 7)
+        .attr('cy', 7)
         .attr('r', 4);
 
       // We want to use the HTML text rendering features for content
@@ -304,15 +304,18 @@ export default defineComponent({
     fill: #fff
     &:hover
       opacity: 0.8
+  > .status-icon
+    stroke: black
+    stroke-width: 0.5
   > .status
     &__Active
       fill: $green-7
     &__Inactive
-      fill: $warning
+      fill: $orange-7
     &__Disabled
-      fill: $grey-6
+      fill: $grey-8
     &__Invalid
-      fill: $negative
+      fill: $red-8
     &__undefined
       fill: none
 
@@ -331,7 +334,7 @@ export default defineComponent({
   > .title
     font-weight: 300
     font-size: 11px
-    color: $grey-12
+    color: black
   > .name
     font-weight: 500
     font-size: 12px

@@ -30,11 +30,11 @@ export default defineComponent({
   &__Active
     fill: $green-7
   &__Inactive
-    fill: $warning
+    fill: $orange-7
   &__Disabled
-    fill: $grey-6
+    fill: $grey-8
   &__Invalid
-    fill: $negative
+    fill: $red-8
   &__null
     fill: none
 </style>
