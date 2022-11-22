@@ -1,10 +1,6 @@
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { Widget } from '@/store/widgets';
-import { userUnits } from '@/user-settings';
 import { cref } from '@/utils/component-ref';
-import { isQuantity } from '@/utils/identity';
-import { bloxQty } from '@/utils/quantity';
-import isEmpty from 'lodash/isEmpty';
 import { nanoid } from 'nanoid';
 import { Plugin } from 'vue';
 import widget from './QuickActionsWidget.vue';
@@ -24,7 +20,7 @@ const plugin: Plugin = {
         rows: 5,
       },
       generateConfig: () => ({
-        version: '1.1',
+        version: '1.2',
         actions: [
           {
             id: nanoid(),
@@ -36,90 +32,64 @@ const plugin: Plugin = {
       upgrade: (widget: Widget<unknown>): Widget<QuickActionsConfig> | null => {
         let dirty = false;
 
-        const userTemp = userUnits.value.temperature;
-        const otherTemp = userTemp === 'degC' ? 'degF' : 'degC';
-
         const config = widget.config as QuickActionsConfig &
           QuickActionsConfigOld;
 
-        if (config.version !== '1.1') {
+        if (config.version !== '1.2') {
+          dirty = true;
+
           if (config.steps) {
-            dirty = true;
             config.actions = config.steps;
             config.steps = undefined;
           }
 
-          // Change IDs were added after initial release
-          config.actions.forEach((action) =>
+          config.actions.forEach((action) => {
+            // Change IDs were added after initial release
             action.changes
               .filter((change) => change.id === undefined)
               .forEach((change) => {
                 change.id = nanoid();
-                dirty = true;
-              }),
-          );
+              });
 
-          // Service IDs became a key of individual changes
-          config.actions.forEach((action) =>
+            // Service IDs became a key of individual changes
             action.changes
               .filter((change) => change.serviceId === undefined)
               .forEach((change) => {
                 change.serviceId = config.serviceId!;
-                dirty = true;
-              }),
-          );
+              });
 
-          // The editable setting moved from 'desiredSetting' to 'storedSetting'
-          config.actions.forEach((action) =>
+            // The editable setting moved from 'desiredSetting' to 'storedSetting'
             action.changes
               .filter((change) => change.data.desiredSetting !== undefined)
               .forEach((change) => {
                 change.data.storedSetting = change.data.desiredSetting;
-                dirty = true;
-              }),
-          );
+                change.data.desiredSetting = undefined;
+              });
 
-          // The editable setting moved from 'desiredState' to 'storedState'
-          config.actions.forEach((action) =>
+            // The editable setting moved from 'desiredState' to 'storedState'
             action.changes
               .filter((change) => change.data.desiredState !== undefined)
               .forEach((change) => {
                 change.data.storedState = change.data.desiredState;
-                dirty = true;
-              }),
-          );
+                change.data.desiredState = undefined;
+              });
 
-          config.version = '1.1';
+            // Setpoint 'settingEnabled' was renamed to 'enabled'
+            action.changes
+              .filter((change) => change.data.settingEnabled !== undefined)
+              .forEach((change) => {
+                change.data.enabled = change.data.settingEnabled;
+                change.data.settingEnabled = undefined;
+              });
+          });
         }
 
-        // Convert units if user changed system temperature
-        config.actions.forEach((action) =>
-          action.changes.forEach((change) => {
-            const updates: AnyDict = {};
-            for (const key in change.data) {
-              const value = change.data[key];
-              if (isQuantity(value) && value.unit.includes(otherTemp)) {
-                updates[key] = bloxQty(value)
-                  .to(value.unit.replace(otherTemp, userTemp))
-                  .toJSON();
-              }
-            }
-            if (!isEmpty(updates)) {
-              dirty = true;
-              change.data = {
-                ...change.data,
-                ...updates,
-              };
-            }
-          }),
-        );
-
         if (dirty) {
-          // Recreate to lose unexpected properties
+          // Recreate to exclude unexpected properties
           const upgraded: Widget<QuickActionsConfig> = {
             ...widget,
             config: {
-              version: '1.1',
+              version: '1.2',
               actions: config.actions,
               lastActionId: config.lastActionId,
             },
