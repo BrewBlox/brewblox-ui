@@ -220,10 +220,7 @@ export default defineComponent({
   </div>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .limiting
   text-color: orange
 

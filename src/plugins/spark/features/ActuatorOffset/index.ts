@@ -39,6 +39,19 @@ const plugin: Plugin = {
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
+      analyze: (block: ActuatorOffsetBlock) => {
+        const { enabled, setting, targetId, referenceId } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (targetId.id == null || referenceId.id == null) {
+          return 'Invalid';
+        }
+        if (setting.value == null) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<ActuatorOffsetBlock>[] = [

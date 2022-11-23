@@ -327,10 +327,7 @@ export default defineComponent({
   </q-dialog>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .heat-field
   background: rgba($red, 0.1)
 

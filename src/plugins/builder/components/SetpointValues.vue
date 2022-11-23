@@ -2,16 +2,9 @@
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
+import { userUnits } from '@/user-settings';
 import { makeTypeFilter } from '@/utils/functional';
-import { contrastColor } from '@/utils/misc';
-import { fixedNumber, prettyUnit } from '@/utils/quantity';
-import {
-  mdiAlertCircleOutline,
-  mdiBullseyeArrow,
-  mdiSleep,
-  mdiSwapVerticalBold,
-  mdiThermometer,
-} from '@quasar/extras/mdi-v5';
+import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import {
   BlockType,
   PidBlock,
@@ -45,14 +38,13 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    backgroundColor: {
-      type: String,
-      default: '',
-    },
   },
   setup(props) {
+    const width = 2;
+    const height = 1;
+
     const sparkStore = useSparkStore();
-    const { address, block, isBroken } =
+    const { address, block, blockStatus, isBroken } =
       useSettingsBlock.setup<SetpointSensorPairBlock>(
         props.part,
         props.settingsKey,
@@ -60,9 +52,12 @@ export default defineComponent({
       );
     const { serviceId } = address.value;
 
-    const textColor = computed<string>(() =>
-      props.backgroundColor ? contrastColor(props.backgroundColor) : 'white',
-    );
+    const dimensions = computed(() => ({
+      x: coord2grid(props.startX),
+      y: coord2grid(props.startY),
+      width: coord2grid(width),
+      height: coord2grid(height),
+    }));
 
     const isUsed = computed<boolean>(
       () =>
@@ -74,20 +69,6 @@ export default defineComponent({
           .some((blk) => blk.data.inputId.id === address.value.id),
     );
 
-    const settingIcon = computed<string>(() => {
-      if (block.value == null) {
-        return mdiAlertCircleOutline;
-      }
-      const { enabled, claimedBy } = block.value.data;
-      if (!enabled) {
-        return mdiSleep;
-      }
-      if (claimedBy.id != null) {
-        return mdiSwapVerticalBold;
-      }
-      return mdiBullseyeArrow;
-    });
-
     const setpointSetting = computed<number | null>(() =>
       block.value && isUsed.value
         ? block.value.data.desiredSetting.value
@@ -98,73 +79,77 @@ export default defineComponent({
       () => block.value?.data.value.value ?? null,
     );
 
-    const setpointUnit = computed<string>(() =>
-      prettyUnit(block.value?.data.desiredSetting),
+    const tempUnit = computed<string>(() =>
+      prettyUnit(userUnits.value.temperature),
     );
 
     return {
-      mdiThermometer,
-      coord2grid,
-      fixedNumber,
-      textColor,
+      preciseNumber,
       block,
+      blockStatus,
       isBroken,
-      settingIcon,
+      dimensions,
       setpointSetting,
       setpointValue,
-      setpointUnit,
+      tempUnit,
     };
   },
 });
 </script>
 
 <template>
-  <g
+  <svg
     v-if="block || !hideUnset"
-    :transform="`translate(${coord2grid(startX)}, ${coord2grid(startY)})`"
+    :x="dimensions.x"
+    :y="dimensions.y"
+    :width="dimensions.width"
+    :height="dimensions.height"
+    viewBox="0 0 100 50"
   >
-    <SvgEmbedded
-      :width="coord2grid(2)"
-      :height="coord2grid(1)"
-    >
-      <BrokenIcon
-        v-if="isBroken"
-        class="col"
+    <BrokenSvgIcon
+      v-if="isBroken"
+      x="30"
+    />
+    <UnlinkedSvgIcon
+      v-else-if="!block"
+      x="30"
+    />
+    <template v-else>
+      <BlockStatusSvg :status="blockStatus" />
+      <SensorSvgIcon
+        x="20"
+        y="3"
+        width="20"
+        height="20"
       />
-      <UnlinkedIcon
-        v-else-if="!block"
-        class="col"
-      />
-      <div
-        v-else
-        class="col column q-ma-xs"
-        :style="{ color: textColor }"
+      <foreignObject
+        x="40"
+        y="5"
+        width="50"
+        height="18"
       >
-        <div class="col row q-gutter-x-xs">
-          <q-icon
-            :name="mdiThermometer"
-            size="20px"
-            class="static col-auto"
-          />
-          <q-space />
-          <div class="col-auto text-bold">
-            {{ fixedNumber(setpointValue, 1) }}
-            <small>{{ setpointUnit }}</small>
-          </div>
+        <div class="fit builder-text">
+          {{ preciseNumber(setpointValue) }}
+          <small>{{ tempUnit }}</small>
         </div>
-        <div class="col row q-gutter-x-xs">
-          <q-icon
-            :name="settingIcon"
-            size="20px"
-            class="static col-auto"
-          />
-          <q-space />
-          <div class="col-auto text-bold">
-            {{ fixedNumber(setpointSetting, 1) }}
-            <small>{{ setpointUnit }}</small>
-          </div>
+      </foreignObject>
+      <SetpointSvgIcon
+        x="20"
+        y="25"
+        width="20"
+        height="20"
+      />
+      <foreignObject
+        x="40"
+        y="27"
+        width="50"
+        height="18"
+      >
+        <div class="fit builder-text">
+          {{ preciseNumber(setpointSetting) }}
+          <small>{{ tempUnit }}</small>
         </div>
-      </div>
-    </SvgEmbedded>
-  </g>
+      </foreignObject>
+    </template>
+  </svg>
 </template>

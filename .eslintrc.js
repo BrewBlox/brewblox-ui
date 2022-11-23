@@ -62,6 +62,7 @@ module.exports = {
         ignores: ['Card', 'Toolbar'],
       },
     ],
+    'vue/no-v-text-v-html-on-component': 0,
   },
   overrides: [
     {

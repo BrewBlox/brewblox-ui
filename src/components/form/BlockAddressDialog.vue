@@ -21,8 +21,8 @@ export default defineComponent({
   props: {
     ...useDialog.props,
     modelValue: {
-      type: Object as PropType<BlockAddress>,
-      default: () => asAddr(null),
+      type: Object as PropType<BlockAddress | null>,
+      default: null,
     },
     label: {
       type: String,
@@ -61,11 +61,15 @@ export default defineComponent({
     const featureStore = useFeatureStore();
     const local = ref<BlockAddress | null>(null);
 
+    const modelValueAddr = computed<BlockAddress>(
+      () => props.modelValue ?? asAddr(null),
+    );
+
     const serviceIds = computed<string[]>(() => sparkStore.serviceIds);
 
     const serviceId = computed<string>({
       get: () => {
-        const { serviceId } = local.value ?? props.modelValue;
+        const { serviceId } = local.value ?? modelValueAddr.value;
         return serviceId && serviceIds.value.includes(serviceId)
           ? serviceId
           : serviceIds.value[0] ?? '';
@@ -75,14 +79,14 @@ export default defineComponent({
           local.value = {
             serviceId,
             id: null,
-            type: props.modelValue.type,
+            type: modelValueAddr.value.type,
           };
         }
       },
     });
 
     const typeFilter = computed<(type: string) => boolean>(() => {
-      const intf = props.compatible ?? props.modelValue.type;
+      const intf = props.compatible ?? modelValueAddr.value.type;
       return (type) => isCompatible(type, intf);
     });
 
@@ -116,7 +120,7 @@ export default defineComponent({
     function createBlock(): void {
       createBlockWizard(
         serviceId.value,
-        props.compatible ?? props.modelValue.type,
+        props.compatible ?? modelValueAddr.value.type,
       ).onOk(({ block }) => {
         if (block) {
           local.value = asAddr(block);
@@ -130,7 +134,7 @@ export default defineComponent({
           local.value ?? {
             id: null,
             serviceId: serviceId.value,
-            type: props.modelValue.type,
+            type: modelValueAddr.value.type,
           },
         );
       }

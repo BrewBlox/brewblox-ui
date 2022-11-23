@@ -50,6 +50,9 @@ export default defineComponent({
     const graphWidth = ref<number>(0);
     const graphHeight = ref<number>(0);
 
+    const renderedNodes = ref<BlockRelationNode[]>();
+    const renderedEdges = ref<BlockRelation[]>();
+
     function relevantNodes(
       nodes: BlockRelationNode[],
       edges: BlockRelation[],
@@ -103,6 +106,23 @@ export default defineComponent({
         return;
       }
 
+      if (!nodes || !edges) {
+        return;
+      }
+
+      if (
+        isJsonEqual(nodes, renderedNodes.value) &&
+        isJsonEqual(edges, renderedEdges.value)
+      ) {
+        return;
+      }
+
+      nodes = deepCopy(nodes);
+      edges = deepCopy(edges);
+
+      renderedNodes.value = nodes;
+      renderedEdges.value = edges;
+
       const graph = await elk.layout({
         id: 'root',
         layoutOptions: {
@@ -137,13 +157,6 @@ export default defineComponent({
         .join('path')
         .attr('class', 'relation-edge');
 
-      // Create a node element for every node in the graph
-      const nodeSelect = diagram
-        .selectAll<SVGForeignObjectElement, ElkRelationNode>('.relation-node')
-        .data(graph.children as ElkRelationNode[], (d) => d.id)
-        .join('foreignObject')
-        .attr('class', 'relation-node');
-
       // Edge configuration:
       // Create a straight line between start, end, and all bend points of the edge
       edgeSelect.attr('d', (d): string => {
@@ -157,26 +170,55 @@ export default defineComponent({
       });
 
       // Node configuration:
+      // Create an SVG element for each node in the graph
       // Set overall position and size of the node element
       // We'll add its children below
-      nodeSelect
+      // Create a node element for every node in the graph
+      const nodeSelect = diagram
+        .selectAll<SVGForeignObjectElement, ElkRelationNode>('.relation-node')
+        .data(graph.children as ElkRelationNode[], (d) => d.id)
+        .join('svg')
+        .attr('class', 'relation-node')
         .attr('x', (d) => d.x)
         .attr('y', (d) => d.y)
         .attr('width', LABEL_WIDTH)
         .attr('height', LABEL_HEIGHT)
         .on('click', (evt, d) => openSettings(d.id));
 
-      // create the top-level divs in the SVG foreignObject elements
-      // Save the selection to a variable to easily add multiple children
+      // SVG objects can't have a background color
+      // Add a rect to serve as background
+      nodeSelect
+        .append('rect')
+        .attr('class', 'background')
+        .attr('width', LABEL_WIDTH)
+        .attr('height', LABEL_HEIGHT)
+        .attr('rx', 6)
+        .attr('ry', 6);
+
+      // Add status icons
+      nodeSelect
+        .append('circle')
+        .attr('class', (d) => `status-icon status__${d.status}`)
+        .attr('cx', 7)
+        .attr('cy', 7)
+        .attr('r', 4);
+
+      // We want to use the HTML text rendering features for content
+      // Add a foreign object to render content
       const nodeContentSelect = nodeSelect
+        .append('foreignObject')
+        .attr('width', LABEL_WIDTH)
+        .attr('height', LABEL_HEIGHT)
         .append('xhtml:div')
         .attr('class', 'relation-node-content');
 
+      // Add content title
       nodeContentSelect
         .append('xhtml:div')
         .attr('class', 'title')
         .text((d) => d.type);
 
+      // Add content name
       nodeContentSelect
         .append('xhtml:div')
         .attr('class', 'name')
@@ -207,25 +249,16 @@ export default defineComponent({
         .on('dblclick.zoom', resetZoom.value);
     }
 
-    const debouncedDrawGraph = debounce(drawGraph, 500, {
-      leading: true,
+    const debouncedDrawGraph = debounce(drawGraph, 100, {
+      leading: false,
       trailing: true,
     });
 
     onMounted(() => {
-      watch(
-        [() => props.nodes, () => props.edges],
-        ([nodes, edges], [oldNodes, oldEdges]) => {
-          if (
-            nodes &&
-            edges &&
-            !isJsonEqual([nodes, edges], [oldNodes, oldEdges])
-          ) {
-            debouncedDrawGraph(deepCopy(nodes), deepCopy(edges));
-          }
-        },
-        { immediate: true },
-      );
+      drawGraph(props.nodes, props.edges);
+      watch([() => props.nodes, () => props.edges], () => {
+        debouncedDrawGraph(props.nodes, props.edges);
+      });
     });
 
     return {
@@ -260,33 +293,50 @@ export default defineComponent({
 </template>
 
 <style lang="sass">
-.relation-node-content:hover
-  opacity: 0.8
-
-.relation-node-content
-  height: 50px
-  width: 150px
-  background-color: #fff
-  cursor: pointer
-  display: flex
-  flex-flow: column nowrap
-  justify-content: space-around
-  > div
-    width: 100%
-    text-align: center
-    font-weight: 300
-    padding: 0px 10px
-    overflow: hidden
-    white-space: nowrap
-    text-overflow: ellipsis
-  > .title
-    font-size: 12px
-    color: green
-  > .name
-    font-size: 14px
-    color: black
-
 .relation-edge
   stroke: #aaa
   fill: none
+  stroke-width: 2px
+
+.relation-node
+  cursor: pointer
+  > .background
+    fill: #fff
+    &:hover
+      opacity: 0.8
+  > .status-icon
+    stroke: black
+    stroke-width: 0.5
+  > .status
+    &__Active
+      fill: $green-7
+    &__Inactive
+      fill: $orange-7
+    &__Disabled
+      fill: $grey-8
+    &__Invalid
+      fill: $red-8
+    &__undefined
+      fill: none
+
+.relation-node-content
+  width: 100%
+  height: 100%
+  display: flex
+  flex-flow: column nowrap
+  justify-content: space-around
+  padding: 2px 8px
+  > div
+    overflow: hidden
+    white-space: nowrap
+    text-align: center
+    text-overflow: ellipsis
+  > .title
+    font-weight: 300
+    font-size: 11px
+    color: black
+  > .name
+    font-weight: 500
+    font-size: 12px
+    color: black
 </style>

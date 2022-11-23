@@ -19,6 +19,8 @@ export type ComparedBlockType = BlockOrIntfType | BlockOrIntfType[] | null;
 
 export type PageMode = 'Relations' | 'List';
 
+export type BlockStatus = 'Active' | 'Inactive' | 'Disabled' | 'Invalid';
+
 export interface SparkSessionConfig {
   pageMode: PageMode;
   sorting: string;
@@ -51,6 +53,7 @@ export interface BlockLimitation {
 export interface BlockRelationNode {
   id: string;
   type: string;
+  status?: BlockStatus;
   name?: string; // overrides `id` for rendering
   title?: string; // overrides `type` for rendering
 }
@@ -133,4 +136,5 @@ export interface BlockFieldSpec<T extends Block = Block> {
 export interface BlockSpec<T extends Block = Block> {
   type: T['type'];
   generate: () => T['data'];
+  analyze: (block: T) => BlockStatus;
 }

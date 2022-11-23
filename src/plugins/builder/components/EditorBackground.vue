@@ -53,10 +53,7 @@ export default defineComponent({
   </g>
 </template>
 
-<style
-  lang="scss"
-  scoped
->
+<style lang="scss" scoped>
 $grid-line: rgba(255, 255, 255, 0.15);
 
 .grid-background {

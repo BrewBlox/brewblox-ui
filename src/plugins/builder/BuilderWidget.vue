@@ -271,10 +271,7 @@ export default defineComponent({
   </Card>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 @import './grid.sass'
 
 .inactive

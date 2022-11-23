@@ -19,6 +19,7 @@ const plugin: Plugin = {
       generate: (): MockPinsBlock['data'] => ({
         channels: [],
       }),
+      analyze: () => 'Active',
     };
 
     const feature: WidgetFeature = {

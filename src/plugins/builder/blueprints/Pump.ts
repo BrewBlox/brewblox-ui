@@ -7,13 +7,13 @@ import {
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
 import {
+  scheduleSoftStartRefresh,
   settingsBlock,
   showAbsentBlock,
-  showDrivingBlockDialog,
 } from '@/plugins/builder/utils';
 import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isBlockClaimed, isCompatible } from '@/plugins/spark/utils/info';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
 import {
   ActuatorPwmBlock,
@@ -83,22 +83,19 @@ const blueprint: BuilderBlueprint = {
     const sparkStore = useSparkStore();
     const hasAddr = !!part.settings[PUMP_KEY]?.id;
     const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
-    const claimed = isBlockClaimed(block, sparkStore.claims);
 
     if (!hasAddr) {
       part.settings.enabled = !part.settings.enabled;
       savePart(part);
     } else if (block === null) {
       showAbsentBlock(part, PUMP_KEY);
-    } else if (claimed) {
-      showDrivingBlockDialog(part, PUMP_KEY, PUMP_TYPES);
     } else if (block.type === BlockType.DigitalActuator) {
-      sparkStore.patchBlock(block, {
-        storedState:
-          block.data.state === DigitalState.STATE_ACTIVE
-            ? DigitalState.STATE_INACTIVE
-            : DigitalState.STATE_ACTIVE,
-      });
+      const storedState =
+        block.data.state === DigitalState.STATE_INACTIVE
+          ? DigitalState.STATE_ACTIVE
+          : DigitalState.STATE_INACTIVE;
+      sparkStore.patchBlock(block, { storedState });
+      scheduleSoftStartRefresh(block);
     } else if (isCompatible(block.type, PWM_PUMP_TYPES)) {
       const limiterWarning = block.data.constrainedBy?.constraints.length
         ? 'The value may be limited by constraints'
@@ -112,9 +109,9 @@ const blueprint: BuilderBlueprint = {
           label: 'Percentage output',
           quickActions: PWM_SELECT_OPTIONS,
         },
-      }).onOk((value: number) => {
-        sparkStore.patchBlock(block, { storedSetting: value });
-      });
+      }).onOk((storedSetting: number) =>
+        sparkStore.patchBlock(block, { storedSetting }),
+      );
     }
   },
 };

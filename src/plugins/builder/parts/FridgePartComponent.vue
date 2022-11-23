@@ -65,17 +65,17 @@ export default defineComponent({
         :y2="coord2grid(shelfY)"
       />
     </g>
-    <SvgEmbedded
-      :transform="textTransformation(part, part.size, false)"
+    <foreignObject
       :width="coord2grid(sizeX)"
       :height="coord2grid(sizeY)"
+      :transform="textTransformation(part, [sizeX, sizeY], false)"
     >
       <div
-        class="col-auto text-bold text-center q-pt-sm full-width"
-        style="font-size: 130%"
+        class="fit builder-text"
+        style="font-size: 130%; padding-top: 15px"
       >
         {{ titleText }}
       </div>
-    </SvgEmbedded>
+    </foreignObject>
   </g>
 </template>

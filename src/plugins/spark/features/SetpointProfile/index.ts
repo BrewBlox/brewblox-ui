@@ -29,6 +29,16 @@ const plugin: Plugin = {
         enabled: false,
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
       }),
+      analyze: (block: SetpointProfileBlock) => {
+        const { enabled, targetId } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (targetId.id == null) {
+          return 'Invalid';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<SetpointProfileBlock>[] = [

@@ -180,10 +180,7 @@ export default defineComponent({
   </q-dialog>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .pre-line
   white-space: pre-line
 

@@ -38,6 +38,19 @@ const plugin: Plugin = {
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
+      analyze: (block: SetpointSensorPairBlock) => {
+        const { enabled, sensorId, setting, value } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (sensorId.id == null) {
+          return 'Invalid';
+        }
+        if (setting.value == null || value.value == null) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<SetpointSensorPairBlock>[] = [

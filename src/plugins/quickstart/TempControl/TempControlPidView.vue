@@ -43,10 +43,7 @@ export default defineComponent({
   </div>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .prop-parent > div > span:first-child
   width: 2em
   float: left

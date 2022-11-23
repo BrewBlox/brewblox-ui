@@ -1,16 +1,10 @@
 <script lang="ts">
 import { coord2grid } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
-import { prettyQty } from '@/utils/quantity';
-import {
-  mdiBullseyeArrow,
-  mdiGauge,
-  mdiPlusMinus,
-  mdiThermometer,
-} from '@quasar/extras/mdi-v5';
+import { userUnits } from '@/user-settings';
+import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
-  Quantity,
   ReferenceKind,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
@@ -18,13 +12,6 @@ import { computed, defineComponent, PropType } from 'vue';
 import { DRIVER_KEY, DRIVER_TYPES } from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';
-
-const icons = {
-  mdiPlusMinus,
-  mdiBullseyeArrow,
-  mdiThermometer,
-  mdiGauge,
-};
 
 export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
@@ -38,11 +25,17 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const { scale, bordered } = usePart.setup(props.part);
 
-    const { block, isBroken } = useSettingsBlock.setup<ActuatorOffsetBlock>(
-      props.part,
-      DRIVER_KEY,
-      DRIVER_TYPES,
-    );
+    const dimensions = computed(() => ({
+      width: coord2grid(2 * scale.value),
+      height: coord2grid(1 * scale.value),
+    }));
+
+    const { block, blockStatus, isBroken } =
+      useSettingsBlock.setup<ActuatorOffsetBlock>(
+        props.part,
+        DRIVER_KEY,
+        DRIVER_TYPES,
+      );
 
     const refBlock = computed<SetpointSensorPairBlock | null>(() =>
       block.value !== null
@@ -53,99 +46,136 @@ export default defineComponent({
         : null,
     );
 
-    const refAmount = computed<Quantity | null>(() => {
+    const refKind = computed<ReferenceKind>(
+      () =>
+        block.value?.data.referenceSettingOrValue ?? ReferenceKind.REF_SETTING,
+    );
+
+    const refAmount = computed<number | null>(() => {
       if (!block.value || !refBlock.value) {
         return null;
       }
-      return block.value.data.referenceSettingOrValue ===
-        ReferenceKind.REF_SETTING
-        ? refBlock.value.data.setting
-        : refBlock.value.data.value;
+      return refKind.value === ReferenceKind.REF_SETTING
+        ? refBlock.value.data.setting.value
+        : refBlock.value.data.value.value;
     });
 
-    const refIcon = computed<keyof typeof icons | ''>(() => {
-      if (!block.value || !refBlock.value) {
-        return '';
+    const setting = computed<number | null>(
+      () => block.value?.data.setting.value ?? null,
+    );
+
+    const appliedSetting = computed<number | null>(() => {
+      if (refAmount.value == null || setting.value == null) {
+        return null;
       }
-      if (
-        block.value.data.referenceSettingOrValue === ReferenceKind.REF_SETTING
-      ) {
-        return 'mdiBullseyeArrow';
-      }
-      return 'mdiThermometer';
+      return refAmount.value + setting.value;
     });
 
-    const actualSetting = computed<Quantity | null>(() => {
-      return block.value?.data.setting ?? null;
-    });
+    const tempUnit = computed<string>(() =>
+      prettyUnit(userUnits.value.temperature),
+    );
 
     return {
-      coord2grid,
+      ReferenceKind,
       prettyQty,
-      icons,
+      fixedNumber,
+      dimensions,
       bordered,
-      isBroken,
       block,
+      blockStatus,
+      isBroken,
       scale,
-      refAmount,
-      refIcon,
-      actualSetting,
+      refKind,
+      setting,
+      appliedSetting,
+      tempUnit,
     };
   },
 });
 </script>
 
 <template>
-  <g :transform="`scale(${scale} ${scale})`">
-    <SvgEmbedded
-      :width="coord2grid(2)"
-      :height="coord2grid(1)"
-    >
-      <BrokenIcon
+  <svg
+    :width="dimensions.width"
+    :height="dimensions.height"
+    viewBox="0 0 100 50"
+  >
+    <g class="content">
+      <BrokenSvgIcon
         v-if="isBroken"
-        class="col"
+        x="30"
       />
-      <UnlinkedIcon
+      <UnlinkedSvgIcon
         v-else-if="!block"
-        class="col"
+        x="30"
       />
-      <SleepingIcon
-        v-else-if="!block.data.enabled"
-        class="col"
-      />
-      <div
-        v-else
-        class="col column q-ma-xs"
-      >
-        <div class="col row q-gutter-x-xs">
-          <q-icon
-            :name="icons[refIcon]"
-            size="20px"
-            class="static col-auto"
-          />
-          <q-space />
-          <div class="col-auto text-bold">
-            {{ prettyQty(refAmount) }}
+      <template v-else>
+        <BlockStatusSvg :status="blockStatus" />
+        <SetpointSvgIcon
+          v-if="refKind === ReferenceKind.REF_SETTING"
+          x="14"
+          y="5"
+          width="20"
+          height="20"
+        />
+        <SensorSvgIcon
+          v-if="refKind === ReferenceKind.REF_VALUE"
+          x="14"
+          y="5"
+          width="20"
+          height="20"
+        />
+        <text
+          x="42"
+          y="20"
+          width="5"
+          height="5"
+        >
+          +
+        </text>
+        <foreignObject
+          x="50"
+          y="5"
+          width="50"
+          height="20"
+        >
+          <div
+            class="fit builder-text"
+            style="vertical-align: baseline"
+          >
+            {{ fixedNumber(setting, 1) }}
+            <small>{{ tempUnit }}</small>
           </div>
-        </div>
-        <div class="col row q-gutter-x-xs">
-          <q-icon
-            :name="icons.mdiPlusMinus"
-            size="20px"
-            class="static col-auto"
-          />
-          <q-space />
-          <div class="col-auto text-bold">
-            {{ prettyQty(actualSetting) }}
+        </foreignObject>
+        <text
+          x="42"
+          y="40"
+          width="5"
+          height="5"
+        >
+          =
+        </text>
+        <foreignObject
+          x="50"
+          y="25"
+          width="50"
+          height="20"
+        >
+          <div
+            class="fit builder-text"
+            style="vertical-align: baseline"
+          >
+            {{ fixedNumber(appliedSetting, 1) }}
+            <small>{{ tempUnit }}</small>
           </div>
-        </div>
-      </div>
-    </SvgEmbedded>
+        </foreignObject>
+      </template>
+    </g>
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(2) - 2"
-        :height="coord2grid(1) - 2"
+        :width="100 - 2"
+        :height="50 - 2"
         x="1"
         y="1"
         rx="6"
@@ -153,5 +183,5 @@ export default defineComponent({
         stroke-width="2px"
       />
     </g>
-  </g>
+  </svg>
 </template>

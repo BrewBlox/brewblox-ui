@@ -65,10 +65,7 @@ export default defineComponent({
   </q-page>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .color
   width: 135px
 .detailed-color

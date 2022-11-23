@@ -1,4 +1,9 @@
-import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import {
+  BlockAddress,
+  BlockStatus,
+  ComparedBlockType,
+} from '@/plugins/spark/types';
 import { Block } from 'brewblox-proto/ts';
 import { computed, ComputedRef } from 'vue';
 import { FlowPart } from '../types';
@@ -8,6 +13,7 @@ export interface useSettingsBlockComponent<BlockT extends Block> {
   hasAddress: ComputedRef<boolean>;
   address: ComputedRef<BlockAddress>;
   block: ComputedRef<BlockT | null>;
+  blockStatus: ComputedRef<BlockStatus | null>;
   isBroken: ComputedRef<boolean>;
 }
 
@@ -25,6 +31,8 @@ export const useSettingsBlock: useSettingsBlockComposable = {
     settingsKey: string,
     intf: ComparedBlockType,
   ): useSettingsBlockComponent<BlockT> {
+    const specStore = useBlockSpecStore();
+
     const address = computed<BlockAddress>(() =>
       settingsAddress(part, settingsKey),
     );
@@ -32,6 +40,14 @@ export const useSettingsBlock: useSettingsBlockComposable = {
     const block = computed<BlockT | null>(() =>
       settingsBlock(part, settingsKey, intf),
     );
+
+    const blockStatus = computed<BlockStatus | null>(() => {
+      if (block.value == null) {
+        return null;
+      }
+      const spec = specStore.blockSpecByType(block.value.type);
+      return spec?.analyze(block.value) ?? null;
+    });
 
     const hasAddress = computed<boolean>(() => address.value.id !== null);
 
@@ -43,6 +59,7 @@ export const useSettingsBlock: useSettingsBlockComposable = {
       hasAddress,
       address,
       block,
+      blockStatus,
       isBroken,
     };
   },

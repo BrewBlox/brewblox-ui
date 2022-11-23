@@ -10,7 +10,7 @@ import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
 import { CENTER } from '../const';
 import { FlowPart } from '../types';
-import { coord2grid, liquidOnCoord, textTransformation } from '../utils';
+import { coord2grid, liquidOnCoord } from '../utils';
 
 interface MetricDisplay {
   field: string;
@@ -31,6 +31,11 @@ export default defineComponent({
   setup(props) {
     const { source } = useMetrics.setup(null);
     const { sizeX, sizeY, bordered } = usePart.setup(props.part);
+
+    const dimensions = computed(() => ({
+      width: coord2grid(sizeX.value),
+      height: coord2grid(sizeY.value),
+    }));
 
     function fieldFreshDuration(field: string): number {
       return props.part.metrics?.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
@@ -64,10 +69,7 @@ export default defineComponent({
 
     return {
       durationString,
-      textTransformation,
-      coord2grid,
-      sizeX,
-      sizeY,
+      dimensions,
       color,
       bordered,
       values,
@@ -78,39 +80,39 @@ export default defineComponent({
 
 <template>
   <g>
-    <SvgEmbedded
-      :transform="textTransformation(part, part.size, false)"
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
-      class="column"
-    >
-      <div class="full-width column q-py-xs">
-        <div
-          v-for="d in values"
-          :key="d.field"
-          class="column items-center full-width no-wrap"
-        >
+    <g class="content">
+      <foreignObject
+        :width="dimensions.width"
+        :height="dimensions.height"
+      >
+        <div class="full-width column q-py-xs">
           <div
-            class="col-auto text-small ellipsis q-px-sm"
-            style="max-width: 100%"
+            v-for="d in values"
+            :key="d.field"
+            class="column items-center full-width no-wrap"
           >
-            {{ d.label }}
+            <div
+              class="col-auto text-small ellipsis q-px-sm"
+              style="max-width: 100%"
+            >
+              {{ d.label }}
+            </div>
+            <div class="col-auto text-bold">{{ d.value }}</div>
           </div>
-          <div class="col-auto text-bold">{{ d.value }}</div>
+          <div
+            v-if="!values.length"
+            class="self-center q-pt-sm"
+          >
+            No metrics
+          </div>
         </div>
-        <div
-          v-if="!values.length"
-          class="self-center q-pt-sm"
-        >
-          No metrics
-        </div>
-      </div>
-    </SvgEmbedded>
+      </foreignObject>
+    </g>
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(sizeX) - 2"
-        :height="coord2grid(sizeY) - 2"
+        :width="dimensions.width - 2"
+        :height="dimensions.height - 2"
         :stroke="color"
         x="1"
         y="1"

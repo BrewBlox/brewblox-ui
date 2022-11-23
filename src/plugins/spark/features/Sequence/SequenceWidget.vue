@@ -1,6 +1,7 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { createDialog } from '@/utils/dialog';
 import { bloxQty } from '@/utils/quantity';
 import {
   Compartment,
@@ -261,6 +262,32 @@ export default defineComponent({
       }
     }
 
+    function toggleEditing(): void {
+      if (!editing.value || !dirty.value) {
+        editing.value = !editing.value;
+        return;
+      }
+
+      createDialog({
+        component: 'SaveConfirmDialog',
+        componentProps: {
+          title: 'Save changes',
+          message: 'You have unsaved changes. Do you want to save them now?',
+        },
+      }).onOk(async (saved: boolean) => {
+        if (saved) {
+          await saveLocal();
+          // do not exit editing mode if we failed to save
+          if (!configError.value) {
+            editing.value = false;
+          }
+        } else {
+          revertLocal();
+          editing.value = false;
+        }
+      });
+    }
+
     // Reset activeInstruction to 0
     // Optionally halt execution
     function reset(enabled: boolean): void {
@@ -321,6 +348,7 @@ export default defineComponent({
       runtimeError,
       revertLocal,
       saveLocal,
+      toggleEditing,
       reset,
       play,
       pause,
@@ -360,7 +388,7 @@ export default defineComponent({
         <q-btn
           flat
           icon="mdi-stop"
-          :disable="inactive || playing"
+          :disable="inactive || playing || ended"
           @click="reset(false)"
         />
         <q-btn
@@ -417,7 +445,7 @@ export default defineComponent({
           :label="editing ? 'Stop editing' : 'Edit instructions'"
           icon="edit"
           color="secondary"
-          @click="editing = !editing"
+          @click="toggleEditing"
         />
       </div>
     </div>

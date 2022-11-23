@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { defineComponent, PropType } from 'vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'SaveConfirmDialog',
@@ -14,21 +14,14 @@ export default defineComponent({
       type: String,
       default: 'Do you want to save your changes before closing?',
     },
-    saveFunc: {
-      type: Function as PropType<() => Awaitable<unknown>>,
-      required: true,
-    },
   },
   emits: [...useDialog.emits],
-  setup(props) {
+  setup() {
     const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
     async function done(save: boolean): Promise<void> {
-      if (save) {
-        await props.saveFunc();
-      }
-      onDialogOK();
+      onDialogOK(save);
     }
 
     return {

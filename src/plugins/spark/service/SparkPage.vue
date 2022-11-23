@@ -87,6 +87,7 @@ export default defineComponent({
             id: block.id,
             type: featureStore.widgetTitle(block.type),
             name: block.type === BlockType.SysInfo ? title.value : undefined,
+            status: specStore.blockSpecByType(block.type)?.analyze(block),
           }),
         )
         .sort(makeObjectSorter('type')),

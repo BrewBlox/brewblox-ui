@@ -24,6 +24,7 @@ const plugin: Plugin = {
         voltage5: 0,
         voltage12: 0,
       }),
+      analyze: () => 'Active',
     };
 
     const fieldSpecs: BlockFieldSpec<Spark3PinsBlock>[] = [

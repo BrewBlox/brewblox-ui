@@ -145,10 +145,7 @@ export default defineComponent({
   </q-scroll-area>
 </template>
 
-<style
-  scoped
-  lang="sass"
->
+<style scoped lang="sass">
 code
   background-color: grey
   padding: 5px

@@ -96,10 +96,7 @@ export default defineComponent({
   </Card>
 </template>
 
-<style
-  lang="sass"
-  scoped
->
+<style lang="sass" scoped>
 .combined-wrapper
   height: 800px
   max-height: 90vh

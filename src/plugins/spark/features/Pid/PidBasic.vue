@@ -1,17 +1,23 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
+import { userUnits } from '@/user-settings';
 import { createBlockDialog } from '@/utils/block-dialog';
-import { createDialog } from '@/utils/dialog';
-import { fixedNumber, prettyQty } from '@/utils/quantity';
-import { Block, PidBlock, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
+import {
+  Block,
+  BlockType,
+  PidBlock,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import { isBlockCompatible } from '../../utils/info';
 
 export default defineComponent({
   name: 'PidBasic',
   setup() {
     const sparkStore = useSparkStore();
-    const { serviceId, blockId, block } = useBlockWidget.setup<PidBlock>();
+    const { serviceId, block } = useBlockWidget.setup<PidBlock>();
 
     const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
       sparkStore.blockByLink(serviceId, block.value.data.inputId),
@@ -21,6 +27,13 @@ export default defineComponent({
       sparkStore.blockByLink(serviceId, block.value.data.outputId),
     );
 
+    const outputSuffix = computed<string>(() => {
+      if (isBlockCompatible(outputBlock.value, BlockType.ActuatorOffset)) {
+        return prettyUnit(userUnits.value.temperature);
+      }
+      return '%';
+    });
+
     const kp = computed<number | null>(() => block.value.data.kp.value);
 
     function fit(v: number): number {
@@ -28,44 +41,11 @@ export default defineComponent({
     }
 
     function showInput(): void {
-      createBlockDialog(inputBlock.value);
-    }
-
-    function editInput(): void {
-      if (!inputBlock.value) {
-        return;
-      }
-
-      const setpointId = inputBlock.value.id;
-      const setpointChain = sparkStore
-        .claimsByService(serviceId)
-        .find((chain) => chain.target === setpointId);
-
-      if (setpointChain) {
-        const actual =
-          setpointChain !== undefined
-            ? sparkStore.blockById(serviceId, setpointChain.source)
-            : inputBlock.value;
-
-        createBlockDialog(actual);
-      } else {
-        createDialog({
-          component: 'SetpointSettingDialog',
-          componentProps: {
-            title: 'Edit Setpoint',
-            message: `
-            Edit settings for the PID Setpoint. <br>
-            <i>${blockId}</i> and actuators will be inactive if <i>${setpointId}</i> is disabled.
-            `,
-            html: true,
-            address: inputBlock.value,
-          },
-        });
-      }
+      createBlockDialog(inputBlock.value, { mode: 'Basic' });
     }
 
     function showOutput(): void {
-      createBlockDialog(outputBlock.value);
+      createBlockDialog(outputBlock.value, { mode: 'Basic' });
     }
 
     return {
@@ -74,10 +54,10 @@ export default defineComponent({
       block,
       inputBlock,
       outputBlock,
+      outputSuffix,
       kp,
       fit,
       showInput,
-      editInput,
       showOutput,
     };
   },
@@ -92,17 +72,27 @@ export default defineComponent({
       <SettingValueField
         editable
         class="col-grow"
-        @click="editInput"
+        @click="showInput"
       >
         <template #header> Input </template>
         <template #valueIcon>
-          <q-icon
-            name="mdi-thermometer"
-            color="green-3"
+          <SensorSvgIcon
+            x="0"
+            y="0"
+            width="30"
+            height="30"
           />
         </template>
         <template #value>
           {{ prettyQty(block.data.inputValue) }}
+        </template>
+        <template #settingIcon>
+          <SetpointSvgIcon
+            x="0"
+            y="0"
+            width="30"
+            height="30"
+          />
         </template>
         <template #setting>
           {{ prettyQty(block.data.inputSetting) }}
@@ -115,26 +105,36 @@ export default defineComponent({
       >
         <template #header> Output </template>
         <template #valueIcon>
-          <q-icon
-            v-if="kp === null"
-            name="mdi-calculator-variant"
+          <CoolingSvgIcon
+            v-if="kp && kp < 0"
+            x="0"
+            y="0"
+            width="30"
+            height="30"
           />
-          <HeatingIcon
-            v-else-if="kp > 0"
-            color="red"
-            :svg-props="{ 'stroke-width': '2px' }"
-          />
-          <CoolingIcon
-            v-else-if="kp < 0"
-            color="dodgerblue"
-            :svg-props="{ 'stroke-width': '2px' }"
+          <HeatingSvgIcon
+            v-else
+            x="0"
+            y="0"
+            width="30"
+            height="30"
           />
         </template>
         <template #value>
-          {{ fixedNumber(block.data.outputValue) }} %
+          {{ fixedNumber(block.data.outputValue) }}
+          <small>{{ outputSuffix }}</small>
+        </template>
+        <template #settingIcon>
+          <SetpointSvgIcon
+            x="0"
+            y="0"
+            width="30"
+            height="30"
+          />
         </template>
         <template #setting>
-          {{ fixedNumber(block.data.outputSetting) }} %
+          {{ fixedNumber(block.data.outputSetting) }}
+          <small>{{ outputSuffix }}</small>
         </template>
       </SettingValueField>
 

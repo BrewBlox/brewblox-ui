@@ -26,7 +26,6 @@ export default defineComponent({
     setDialogTitle('Dashboard wizard');
 
     const dashboardTitle = ref<string>('New dashboard');
-    const dashboardDir = ref<string>();
 
     const _dashboardId = ref<string | null>(null);
     const dashboardId = computed<string>({
@@ -60,15 +59,6 @@ export default defineComponent({
       }).onOk((v) => (dashboardId.value = v));
     }
 
-    function showDirKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: dashboardDir.value,
-        },
-      }).onOk((v) => (dashboardDir.value = v));
-    }
-
     async function createDashboard(): Promise<void> {
       if (!valid.value) {
         return;
@@ -76,7 +66,6 @@ export default defineComponent({
       const dashboard: Dashboard = {
         id: dashboardId.value,
         title: dashboardTitle.value || dashboardId.value,
-        dir: dashboardDir.value,
       };
 
       await dashboardStore.createDashboard(dashboard);
@@ -88,14 +77,12 @@ export default defineComponent({
     return {
       onBack,
       dashboardId,
-      dashboardDir,
       suggestDashboardId,
       idRules,
       valid,
       dashboardTitle,
       showIdKeyboard,
       showTitleKeyboard,
-      showDirKeyboard,
       createDashboard,
     };
   },
@@ -139,19 +126,6 @@ export default defineComponent({
           >
             <template #append>
               <KeyboardButton @click="showTitleKeyboard" />
-            </template>
-          </q-input>
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <q-input
-            v-model="dashboardDir"
-            label="Dashboard directory"
-            hint="Use / to create nested directories"
-          >
-            <template #append>
-              <KeyboardButton @click="showDirKeyboard" />
             </template>
           </q-input>
         </q-item-section>

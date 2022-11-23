@@ -47,6 +47,19 @@ const plugin: Plugin = {
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
+      analyze: (block: FastPwmBlock) => {
+        const { enabled, hwDevice, channel, setting } = block.data;
+        if (!enabled) {
+          return 'Disabled';
+        }
+        if (hwDevice.id == null || channel == 0) {
+          return 'Invalid';
+        }
+        if (setting == null) {
+          return 'Inactive';
+        }
+        return 'Active';
+      },
     };
 
     const fieldSpecs: BlockFieldSpec<FastPwmBlock>[] = [

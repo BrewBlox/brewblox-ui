@@ -394,7 +394,7 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
     config: {
-      version: '1.1',
+      version: '1.2',
       actions: [
         {
           name: 'Disable all setpoints',
