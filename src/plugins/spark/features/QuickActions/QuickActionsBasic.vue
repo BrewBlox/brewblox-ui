@@ -64,7 +64,6 @@ export default defineComponent({
     );
 
     async function saveAction(action: ChangeAction): Promise<void> {
-      console.log('save', action);
       const { id, name, changes } = action;
       await patchConfig({
         actions: spliceById([...actions.value], { id, name, changes }),
