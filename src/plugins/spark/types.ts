@@ -10,7 +10,10 @@ import {
   AnyConstraintKey,
   Block,
   BlockOrIntfType,
+  DateString,
   Quantity,
+  SparkDeviceDescription,
+  SparkFirmwareDescription,
   StoreObject,
 } from 'brewblox-proto/ts';
 import { Layout } from 'plotly.js';
@@ -42,6 +45,9 @@ export interface SparkStoreEntry {
 export interface SparkExported {
   blocks: Block[];
   store: SparkStoreEntry[];
+  timestamp?: DateString;
+  firmware?: SparkFirmwareDescription;
+  device?: SparkDeviceDescription;
 }
 
 export interface BlockLimitation {
