@@ -361,9 +361,33 @@ export const useSparkStore = defineStore('sparkStore', {
       serviceId: string,
       exported: SparkExported,
     ): Promise<string[]> {
-      const importLog = await sparkApi.serviceImport(serviceId, exported);
+      const messages = await sparkApi.serviceImport(serviceId, exported);
       await this.fetchBlocks(serviceId);
-      return importLog;
+      return messages;
+    },
+
+    async storedBackupAll(serviceId: string): Promise<string[]> {
+      return await sparkApi.storedBackupAll(serviceId);
+    },
+
+    async storedBackupSave(
+      serviceId: string,
+      name: string,
+    ): Promise<SparkExported> {
+      return await sparkApi.storedBackupSave(serviceId, name);
+    },
+
+    async storedBackupRead(
+      serviceId: string,
+      name: string,
+    ): Promise<SparkExported> {
+      return await sparkApi.storedBackupRead(serviceId, name);
+    },
+
+    async storedBackupLoad(serviceId: string, name: string): Promise<string[]> {
+      const messages = await sparkApi.storedBackupLoad(serviceId, name);
+      await this.fetchBlocks(serviceId);
+      return messages;
     },
 
     async flashFirmware(serviceId: string): Promise<any> {

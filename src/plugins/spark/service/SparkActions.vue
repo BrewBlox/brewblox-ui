@@ -117,8 +117,8 @@ export default defineComponent({
       />
       <ActionItem
         icon="mdi-file-export"
-        label="Import/Export blocks"
-        @click="startDialog('SparkImportMenu')"
+        label="Controller backups"
+        @click="startDialog('SparkBackupMenu')"
       />
       <ActionItem
         icon="mdi-power-plug"

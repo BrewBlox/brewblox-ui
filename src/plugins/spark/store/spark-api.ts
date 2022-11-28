@@ -151,6 +151,51 @@ export const serviceImport = (
     .then((resp) => resp.data.messages)
     .catch(intercept(`Failed to import blocks in ${serviceId}`));
 
+export const storedBackupAll = (serviceId: string): Promise<string[]> =>
+  http
+    .post<{ name: string }[]>(
+      `/${encodeURIComponent(serviceId)}/blocks/backup/stored/all`,
+      {},
+    )
+    .then((resp) => resp.data.map((v) => v.name))
+    .catch(intercept(`Failed to list all backups in ${serviceId}`));
+
+export const storedBackupSave = (
+  serviceId: string,
+  name: string,
+): Promise<SparkExported> =>
+  http
+    .post<{ name: string }, AxiosResponse<SparkExported>>(
+      `/${encodeURIComponent(serviceId)}/blocks/backup/stored/save`,
+      { name },
+    )
+    .then((resp) => resp.data)
+    .catch(intercept(`Failed to save Spark backup ${name} in ${serviceId}`));
+
+export const storedBackupRead = (
+  serviceId: string,
+  name: string,
+): Promise<SparkExported> =>
+  http
+    .post<{ name: string }, AxiosResponse<SparkExported>>(
+      `/${encodeURIComponent(serviceId)}/blocks/backup/stored/read`,
+      { name },
+    )
+    .then((resp) => resp.data)
+    .catch(intercept(`Failed to read Spark backup ${name} in ${serviceId}`));
+
+export const storedBackupLoad = (
+  serviceId: string,
+  name: string,
+): Promise<string[]> =>
+  http
+    .post<{ name: string }, AxiosResponse<{ messages: string[] }>>(
+      `/${encodeURIComponent(serviceId)}/blocks/backup/stored/load`,
+      { name },
+    )
+    .then((resp) => resp.data.messages)
+    .catch(intercept(`Failed to load Spark backup ${name} in ${serviceId}`));
+
 export const serviceReboot = (serviceId: string): Promise<any> =>
   http
     .post(`/${encodeURIComponent(serviceId)}/system/reboot/service`, {})
