@@ -1,4 +1,4 @@
-import { BlockIds, SparkExported } from '@/plugins/spark/types';
+import { BlockIds, SparkBackup } from '@/plugins/spark/types';
 import { http, intercept } from '@/utils/http';
 import { notify } from '@/utils/notify';
 import { AxiosResponse } from 'axios';
@@ -133,25 +133,25 @@ export const flashFirmware = (serviceId: string): Promise<any> =>
     .then((resp) => resp.data)
     .catch(intercept(`Failed to update firmware on ${serviceId}`));
 
-export const serviceExport = (serviceId: string): Promise<SparkExported> =>
+export const serviceExport = (serviceId: string): Promise<SparkBackup> =>
   http
-    .post<SparkExported>(`/${encodeURIComponent(serviceId)}/blocks/backup/save`)
+    .post<SparkBackup>(`/${encodeURIComponent(serviceId)}/blocks/backup/save`)
     .then((resp) => resp.data)
     .catch(intercept(`Failed to fetch export blocks from ${serviceId}`));
 
 export const serviceImport = (
   serviceId: string,
-  exported: SparkExported,
+  exported: SparkBackup,
 ): Promise<string[]> =>
   http
-    .post<SparkExported, AxiosResponse<{ messages: string[] }>>(
+    .post<SparkBackup, AxiosResponse<{ messages: string[] }>>(
       `/${encodeURIComponent(serviceId)}/blocks/backup/load`,
       exported,
     )
     .then((resp) => resp.data.messages)
     .catch(intercept(`Failed to import blocks in ${serviceId}`));
 
-export const storedBackupAll = (serviceId: string): Promise<string[]> =>
+export const allStoredBackup = (serviceId: string): Promise<string[]> =>
   http
     .post<{ name: string }[]>(
       `/${encodeURIComponent(serviceId)}/blocks/backup/stored/all`,
@@ -160,31 +160,19 @@ export const storedBackupAll = (serviceId: string): Promise<string[]> =>
     .then((resp) => resp.data.map((v) => v.name))
     .catch(intercept(`Failed to list all backups in ${serviceId}`));
 
-export const storedBackupSave = (
+export const saveStoredBackup = (
   serviceId: string,
   name: string,
-): Promise<SparkExported> =>
+): Promise<SparkBackup> =>
   http
-    .post<{ name: string }, AxiosResponse<SparkExported>>(
+    .post<{ name: string }, AxiosResponse<SparkBackup>>(
       `/${encodeURIComponent(serviceId)}/blocks/backup/stored/save`,
       { name },
     )
     .then((resp) => resp.data)
     .catch(intercept(`Failed to save Spark backup ${name} in ${serviceId}`));
 
-export const storedBackupRead = (
-  serviceId: string,
-  name: string,
-): Promise<SparkExported> =>
-  http
-    .post<{ name: string }, AxiosResponse<SparkExported>>(
-      `/${encodeURIComponent(serviceId)}/blocks/backup/stored/read`,
-      { name },
-    )
-    .then((resp) => resp.data)
-    .catch(intercept(`Failed to read Spark backup ${name} in ${serviceId}`));
-
-export const storedBackupLoad = (
+export const loadStoredBackup = (
   serviceId: string,
   name: string,
 ): Promise<string[]> =>
@@ -195,6 +183,32 @@ export const storedBackupLoad = (
     )
     .then((resp) => resp.data.messages)
     .catch(intercept(`Failed to load Spark backup ${name} in ${serviceId}`));
+
+export const uploadStoredBackup = (
+  serviceId: string,
+  data: SparkBackup,
+): Promise<SparkBackup> =>
+  http
+    .post<SparkBackup, AxiosResponse<SparkBackup>>(
+      `/${encodeURIComponent(serviceId)}/blocks/backup/stored/upload`,
+      data,
+    )
+    .then((resp) => resp.data)
+    .catch(intercept(`Failed to upload Spark backup in ${serviceId}`));
+
+export const downloadStoredBackup = (
+  serviceId: string,
+  name: string,
+): Promise<SparkBackup> =>
+  http
+    .post<{ name: string }, AxiosResponse<SparkBackup>>(
+      `/${encodeURIComponent(serviceId)}/blocks/backup/stored/download`,
+      { name },
+    )
+    .then((resp) => resp.data)
+    .catch(
+      intercept(`Failed to download Spark backup ${name} in ${serviceId}`),
+    );
 
 export const serviceReboot = (serviceId: string): Promise<any> =>
   http

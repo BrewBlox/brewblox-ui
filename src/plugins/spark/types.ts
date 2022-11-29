@@ -42,12 +42,15 @@ export interface SparkStoreEntry {
   data: any;
 }
 
-export interface SparkExported {
-  blocks: Block[];
-  store: SparkStoreEntry[];
+export interface SparkBackup {
+  // optional metadata
+  name?: string;
   timestamp?: DateString;
   firmware?: SparkFirmwareDescription;
   device?: SparkDeviceDescription;
+
+  blocks: Block[];
+  store: SparkStoreEntry[];
 }
 
 export interface BlockLimitation {

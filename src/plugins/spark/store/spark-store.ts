@@ -3,7 +3,7 @@ import { eventbus } from '@/eventbus';
 import type {
   BlockAddress,
   BlockFieldAddress,
-  SparkExported,
+  SparkBackup,
   SparkSessionConfig,
 } from '@/plugins/spark/types';
 import { useServiceStore } from '@/store/services';
@@ -353,41 +353,48 @@ export const useSparkStore = defineStore('sparkStore', {
       return synchronized;
     },
 
-    async serviceExport(serviceId: string): Promise<SparkExported> {
+    async serviceExport(serviceId: string): Promise<SparkBackup> {
       return await sparkApi.serviceExport(serviceId);
     },
 
     async serviceImport(
       serviceId: string,
-      exported: SparkExported,
+      data: SparkBackup,
     ): Promise<string[]> {
-      const messages = await sparkApi.serviceImport(serviceId, exported);
+      const messages = await sparkApi.serviceImport(serviceId, data);
       await this.fetchBlocks(serviceId);
       return messages;
     },
 
-    async storedBackupAll(serviceId: string): Promise<string[]> {
-      return await sparkApi.storedBackupAll(serviceId);
+    async allStoredBackup(serviceId: string): Promise<string[]> {
+      return await sparkApi.allStoredBackup(serviceId);
     },
 
-    async storedBackupSave(
+    async saveStoredBackup(
       serviceId: string,
       name: string,
-    ): Promise<SparkExported> {
-      return await sparkApi.storedBackupSave(serviceId, name);
+    ): Promise<SparkBackup> {
+      return await sparkApi.saveStoredBackup(serviceId, name);
     },
 
-    async storedBackupRead(
-      serviceId: string,
-      name: string,
-    ): Promise<SparkExported> {
-      return await sparkApi.storedBackupRead(serviceId, name);
-    },
-
-    async storedBackupLoad(serviceId: string, name: string): Promise<string[]> {
-      const messages = await sparkApi.storedBackupLoad(serviceId, name);
+    async loadStoredBackup(serviceId: string, name: string): Promise<string[]> {
+      const messages = await sparkApi.loadStoredBackup(serviceId, name);
       await this.fetchBlocks(serviceId);
       return messages;
+    },
+
+    async uploadStoredBackup(
+      serviceId: string,
+      data: SparkBackup,
+    ): Promise<SparkBackup> {
+      return await sparkApi.uploadStoredBackup(serviceId, data);
+    },
+
+    async downloadStoredBackup(
+      serviceId: string,
+      name: string,
+    ): Promise<SparkBackup> {
+      return await sparkApi.downloadStoredBackup(serviceId, name);
     },
 
     async flashFirmware(serviceId: string): Promise<any> {
