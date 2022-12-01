@@ -82,7 +82,8 @@ export default defineComponent({
             componentProps: {
               title: 'Overwrite backup?',
               message: `'${name}' already exists. Do you want to overwrite it?`,
-              nok: true,
+              ok: 'Yes',
+              nok: 'No',
             },
           });
           // cancelled
