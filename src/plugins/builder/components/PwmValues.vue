@@ -61,6 +61,10 @@ export default defineComponent({
       textTransformation(props.part, [width, height]),
     );
 
+    function clicky(evt: any): void {
+      console.log(evt);
+    }
+
     return {
       coord2grid,
       preciseNumber,
@@ -71,6 +75,7 @@ export default defineComponent({
       isBroken,
       pwmValue,
       bordered,
+      clicky,
     };
   },
 });
@@ -83,6 +88,8 @@ export default defineComponent({
     :width="dimensions.width"
     :height="dimensions.height"
     viewBox="0 0 50 50"
+    class="clickable"
+    @click="clicky"
   >
     <g class="outline">
       <rect

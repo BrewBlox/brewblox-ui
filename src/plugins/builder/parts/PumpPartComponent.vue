@@ -1,8 +1,6 @@
 <script lang="ts">
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
-import { liquidOnCoord, settingsBlock } from '@/plugins/builder/utils';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockStatus } from '@/plugins/spark/types';
+import { liquidOnCoord } from '@/plugins/builder/utils';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import {
   ActuatorPwmBlock,
@@ -17,6 +15,7 @@ import {
   PUMP_TYPES,
   PWM_PUMP_TYPES,
 } from '../blueprints/Pump';
+import { useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -29,20 +28,14 @@ export default defineComponent({
   },
   emits: ['update:part', 'dirty'],
   setup(props, { emit }) {
-    const specStore = useBlockSpecStore();
-
     const hasAddress = computed<boolean>(
       () => props.part.settings[PUMP_KEY]?.id != null,
     );
 
-    const block = computed<PumpT | null>(() =>
-      settingsBlock(props.part, PUMP_KEY, PUMP_TYPES),
-    );
-
-    const blockStatus = computed<BlockStatus | undefined>(() =>
-      block.value
-        ? specStore.blockSpecByType(block.value.type)?.analyze(block.value)
-        : undefined,
+    const { block, blockStatus } = useSettingsBlock.setup<PumpT>(
+      props.part,
+      PUMP_KEY,
+      PUMP_TYPES,
     );
 
     const enabled = computed<boolean>(() => {

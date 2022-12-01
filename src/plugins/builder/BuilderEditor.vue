@@ -849,7 +849,7 @@ export default defineComponent({
           'rotate',
           'flip',
           'edit',
-          'interact',
+          // 'interact',
           'delete',
         ].includes(tool)
       ) {
@@ -1085,7 +1085,8 @@ export default defineComponent({
             <PartWrapper
               :part="part"
               :selected="selectedIds.includes(part.id)"
-              :show-hover="activeToolId !== null"
+              :selectable="activeToolId !== null && activeToolId !== 'interact'"
+              :interactable="activeToolId === 'interact'"
               @update:part="savePart"
               @dirty="calculateFlowParts"
             />

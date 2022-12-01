@@ -17,7 +17,11 @@ export default defineComponent({
       type: Object as PropType<FlowPart>,
       required: true,
     },
-    showHover: {
+    interactable: {
+      type: Boolean,
+      default: false,
+    },
+    selectable: {
       type: Boolean,
       default: false,
     },
@@ -72,20 +76,23 @@ export default defineComponent({
 </script>
 
 <template>
-  <g :transform="transformation">
+  <g
+    :transform="transformation"
+    :class="{ interactable, selectable, selected }"
+  >
+    <rect
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
+      class="background"
+      opacity="0"
+    />
     <component
       :is="component"
       v-if="component"
       :part="part"
-      class="BuilderPart"
+      :class="['BuilderPart']"
+      :style="{ 'pointer-events': interactable ? 'all' : 'none' }"
       v-bind="$attrs"
-    />
-    <!-- background element, to make the full part clickable -->
-    <rect
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
-      :class="{ showhover: showHover, selected }"
-      opacity="0"
     />
   </g>
 </template>
@@ -118,12 +125,15 @@ export default defineComponent({
   .q-icon
     stroke-width: 0
 
-.showhover:hover
+.selectable
+  pointer-events: bounding-box
+
+.selectable:hover > .background
   fill: silver
   fill-opacity: 0.5
   opacity: 0.5
 
-.selected
+.selected > .background
   fill: dodgerblue
   fill-opacity: 0.5
   opacity: 0.5
