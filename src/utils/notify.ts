@@ -20,8 +20,8 @@ export const notifyColors: Record<LogLevel, string> = {
 };
 
 export const notifyIcons: Record<LogLevel, string> = {
-  DEBUG: '',
-  INFO: '',
+  DEBUG: 'mdi-bug',
+  INFO: 'mdi-information-variant',
   DONE: 'mdi-check-all',
   WARN: 'warning',
   ERROR: 'error',
@@ -35,8 +35,10 @@ function basicNotify(
   const args = {
     message: '',
     html: true,
-    color: notifyColors[level],
+    color: 'dark-page',
+    iconColor: notifyColors[level],
     icon: notifyIcons[level],
+    classes: 'bordered',
     ...(isString(message) ? { message } : message),
   };
 
