@@ -17,7 +17,7 @@ import {
   FlowPart,
   PersistentPart,
 } from './types';
-import { coord2grid } from './utils';
+import { coord2grid, coord2translate } from './utils';
 
 export default defineComponent({
   name: 'BuilderWidget',
@@ -117,6 +117,7 @@ export default defineComponent({
 
     return {
       coord2grid,
+      coord2translate,
       startSelectLayout,
       inDialog,
       dense,
@@ -219,9 +220,7 @@ export default defineComponent({
           <g
             v-for="part in flowParts"
             :key="`${flowPartsRevision}-${part.id}`"
-            :transform="`translate(${coord2grid(part.x)}, ${coord2grid(
-              part.y,
-            )})`"
+            :transform="coord2translate(part.x, part.y)"
             :class="{
               [part.type]: true,
               pointer: part.canInteract,
@@ -245,9 +244,7 @@ export default defineComponent({
               @click.stop="pending = null"
             />
             <g
-              :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(
-                pending.y,
-              )})`"
+              :transform="coord2translate(pending.x, pending.y)"
               class="pointer"
               @click.stop="interact(pending)"
             >

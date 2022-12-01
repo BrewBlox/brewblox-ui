@@ -10,7 +10,7 @@ import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { useBuilderStore } from './store';
 import { FlowPart, PersistentPart } from './types';
-import { coord2grid, startChangeLayoutTitle } from './utils';
+import { coord2grid, coord2translate, startChangeLayoutTitle } from './utils';
 
 export default defineComponent({
   name: 'BreweryPage',
@@ -115,6 +115,8 @@ export default defineComponent({
     );
 
     return {
+      coord2grid,
+      coord2translate,
       dense,
       layoutId,
       layout,
@@ -127,7 +129,6 @@ export default defineComponent({
       parts,
       flowParts,
       flowPartsRevision,
-      coord2grid,
       isClickable,
       pending,
       interact,
@@ -202,9 +203,7 @@ export default defineComponent({
             <g
               v-for="part in flowParts"
               :key="`${flowPartsRevision}-${part.id}`"
-              :transform="`translate(${coord2grid(part.x)}, ${coord2grid(
-                part.y,
-              )})`"
+              :transform="coord2translate(part.x, part.y)"
               :class="{
                 [part.type]: true,
                 pointer: isClickable(part),
@@ -228,9 +227,7 @@ export default defineComponent({
                 @click.stop="pending = null"
               />
               <g
-                :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(
-                  pending.y,
-                )})`"
+                :transform="coord2translate(pending.x, pending.y)"
                 class="pointer"
                 @click.stop="interact(pending)"
                 @dblclick.stop

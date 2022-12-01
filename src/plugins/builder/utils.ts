@@ -236,6 +236,10 @@ export function grid2coord(val: number): number {
   return Math.round(val / SQUARE_SIZE);
 }
 
+export function coord2translate(x: number, y: number): string {
+  return `translate(${coord2grid(x)}, ${coord2grid(y)})`;
+}
+
 export function textTransformation(
   part: PersistentPart,
   textSize: [number, number],

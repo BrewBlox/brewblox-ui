@@ -42,6 +42,7 @@ import {
 import {
   asStatePart,
   coord2grid,
+  coord2translate,
   grid2coord,
   startAddLayout,
   startChangeLayoutTitle,
@@ -904,6 +905,7 @@ export default defineComponent({
 
     return {
       coord2grid,
+      coord2translate,
 
       dense,
       svgRef,
@@ -1077,9 +1079,7 @@ export default defineComponent({
             v-show="!isFloating(part)"
             :key="`${flowPartsRevision}-${part.id}`"
             :part-id="part.id"
-            :transform="`translate(${coord2grid(part.x)}, ${coord2grid(
-              part.y,
-            )})`"
+            :transform="coord2translate(part.x, part.y)"
             :class="['flowpart', part.type, partClass(part)]"
           >
             <PartWrapper
@@ -1093,16 +1093,12 @@ export default defineComponent({
           <!-- Floating parts -->
           <g
             v-if="floater"
-            :transform="`translate(${coord2grid(floater.x)}, ${coord2grid(
-              floater.y,
-            )})`"
+            :transform="coord2translate(floater.x, floater.y)"
           >
             <g
               v-for="part in floater.parts"
               :key="`floating-${part.id}`"
-              :transform="`translate(${coord2grid(part.x)}, ${coord2grid(
-                part.y,
-              )})`"
+              :transform="coord2translate(part.x, part.y)"
               :class="[part.type, partClass(part)]"
             >
               <PartWrapper
