@@ -7,22 +7,17 @@ import { useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { saveFile } from '@/utils/import-export';
 import { bloxLink } from '@/utils/link';
 import { notify } from '@/utils/notify';
-import { dateString } from '@/utils/quantity';
 import {
   Block,
   BlockIntfType,
   BlockType,
   DisplaySlot,
-  IoArrayInterfaceBlock,
-  IoDriverInterfaceBlock,
 } from 'brewblox-proto/ts';
 import isMatch from 'lodash/isMatch';
 import range from 'lodash/range';
 import { makeBlockIdRules } from './configuration';
-import { channelName } from './formatting';
 import {
   isBlockCompatible,
   isBlockDisplayed,
@@ -239,48 +234,9 @@ export async function startAddBlockToDisplay(
   await new Promise((r) => setTimeout(r, 50));
 }
 
-export function saveHwInfo(serviceId: string): void {
-  const ioDrivers: string[] = [];
-  const addressed: string[] = [];
-  const sparkStore = useSparkStore();
-
-  sparkStore.blocksByService(serviceId).forEach((block) => {
-    if (isBlockCompatible(block, BlockIntfType.IoDriverInterface)) {
-      const actuator = block as IoDriverInterfaceBlock;
-      const { hwDevice, channel } = actuator.data;
-      if (hwDevice.id === null || !channel) {
-        return;
-      }
-      const target = sparkStore.blockById<IoArrayInterfaceBlock>(
-        serviceId,
-        hwDevice.id,
-      );
-      if (target) {
-        ioDrivers.push(
-          `${block.id}: ${target.id} ${channelName(target, channel)}`,
-        );
-      }
-    }
-
-    if (isBlockCompatible(block, BlockIntfType.OneWireDeviceInterface)) {
-      addressed.push(`${block.id}: ${block.data.address}`);
-    }
-  });
-
-  const lines = [
-    `Service: ${serviceId}`,
-    `Date: ${dateString(new Date())}`,
-    '\n[Actuators]',
-    ...ioDrivers,
-    '\n[OneWire addresses]',
-    ...addressed,
-  ];
-  saveFile(lines.join('\n'), `spark-hardware-${serviceId}.txt`, true);
-}
-
 export async function resetBlocks(
   serviceId: string,
-  opts: { restore: boolean; download: boolean },
+  opts: { restore: boolean },
 ): Promise<void> {
   try {
     const addresses: Mapped<string> = {};
@@ -288,10 +244,6 @@ export async function resetBlocks(
 
     if (!sparkStore.has(serviceId)) {
       throw new Error(`Service <b>${serviceId}</b> not found`);
-    }
-
-    if (opts.download) {
-      saveHwInfo(serviceId);
     }
 
     if (opts.restore) {
@@ -345,14 +297,12 @@ export function startResetBlocks(serviceId: string): void {
       noBackdropDismiss: true,
       selectOptions: [
         { label: 'Remember names of discovered blocks', value: 0 },
-        { label: 'Export sensor and pin names', value: 1 },
       ],
       modelValue: [0, 1], // pre-check default actions
     },
   }).onOk((selected: number[]) =>
     resetBlocks(serviceId, {
       restore: selected.includes(0),
-      download: selected.includes(1),
     }),
   );
 }

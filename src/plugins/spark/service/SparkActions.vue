@@ -3,7 +3,6 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { SparkService } from '@/plugins/spark/types';
 import {
   discoverBlocks,
-  saveHwInfo,
   startResetBlocks,
 } from '@/plugins/spark/utils/actions';
 import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
@@ -63,7 +62,6 @@ export default defineComponent({
 
     return {
       startResetBlocks,
-      saveHwInfo,
       discoverBlocks,
       createBlockWizard,
       cleanUnusedNames,
@@ -119,11 +117,6 @@ export default defineComponent({
         icon="mdi-file-export"
         label="Controller backups"
         @click="startDialog('SparkBackupMenu')"
-      />
-      <ActionItem
-        icon="mdi-power-plug"
-        label="Export sensor and pin names"
-        @click="saveHwInfo(serviceId)"
       />
       <ActionItem
         icon="mdi-tag-remove"
