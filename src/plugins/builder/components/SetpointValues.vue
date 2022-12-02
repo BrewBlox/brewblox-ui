@@ -44,7 +44,7 @@ export default defineComponent({
     const height = 1;
 
     const sparkStore = useSparkStore();
-    const { address, block, blockStatus, isBroken } =
+    const { address, block, blockStatus, isBroken, showBlockDialog } =
       useSettingsBlock.setup<SetpointSensorPairBlock>(
         props.part,
         props.settingsKey,
@@ -88,6 +88,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      showBlockDialog,
       dimensions,
       setpointSetting,
       setpointValue,
@@ -105,7 +106,10 @@ export default defineComponent({
     :width="dimensions.width"
     :height="dimensions.height"
     viewBox="0 0 100 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <BrokenSvgIcon
       v-if="isBroken"
       x="30"

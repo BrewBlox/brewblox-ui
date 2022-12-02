@@ -25,7 +25,7 @@ export default defineComponent({
       height: coord2grid(sizeY.value),
     }));
 
-    const { block, blockStatus, isBroken } =
+    const { block, blockStatus, isBroken, showBlockDialog } =
       useSettingsBlock.setup<SetpointProfileBlock>(
         props.part,
         PROFILE_KEY,
@@ -88,6 +88,7 @@ export default defineComponent({
     const tempUnit = computed<string>(() =>
       prettyUnit(userUnits.value.temperature),
     );
+
     return {
       preciseNumber,
       bordered,
@@ -95,6 +96,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      showBlockDialog,
       currentValue,
       nextValue,
       tempUnit,
@@ -108,7 +110,10 @@ export default defineComponent({
     :width="dimensions.width"
     :height="dimensions.height"
     viewBox="0 0 100 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"

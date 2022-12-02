@@ -83,15 +83,13 @@ export default defineComponent({
     <rect
       :width="coord2grid(sizeX)"
       :height="coord2grid(sizeY)"
-      class="background"
-      opacity="0"
+      class="wrapper-background"
     />
     <component
       :is="component"
       v-if="component"
       :part="part"
-      :class="['BuilderPart']"
-      :style="{ 'pointer-events': interactable ? 'all' : 'none' }"
+      class="builder-part"
       v-bind="$attrs"
     />
   </g>
@@ -100,8 +98,8 @@ export default defineComponent({
 <style lang="sass">
 /* not scoped */
 
-
-.BuilderPart
+.builder-part
+  pointer-events: none
   stroke-linecap: round
   fill: none
 
@@ -125,15 +123,21 @@ export default defineComponent({
   .q-icon
     stroke-width: 0
 
+.interactable > .builder-part
+  pointer-events: all
+
 .selectable
   pointer-events: bounding-box
 
-.selectable:hover > .background
+.wrapper-background
+  opacity: 0
+
+.selectable:hover > .wrapper-background
   fill: silver
   fill-opacity: 0.5
   opacity: 0.5
 
-.selected > .background
+.selected > .wrapper-background
   fill: dodgerblue
   fill-opacity: 0.5
   opacity: 0.5
@@ -145,4 +149,17 @@ export default defineComponent({
   line-height: 1
   vertical-align: middle
   display: inline-block
+
+.interaction
+  cursor: pointer
+
+.interaction > .interaction-background
+  width: 100%
+  height: 100%
+  opacity: 0
+
+.interaction:hover > .interaction-background
+  fill: silver
+  fill-opacity: 0.5
+  opacity: 0.5
 </style>

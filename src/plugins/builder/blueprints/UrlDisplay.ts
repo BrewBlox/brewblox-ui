@@ -50,12 +50,6 @@ const blueprint: BuilderBlueprint = {
     part.settings.sizeY || DEFAULT_SIZE_Y,
   ],
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart, { navigate }) => {
-    const { url } = part.settings;
-    if (url) {
-      navigate(url);
-    }
-  },
 };
 
 export default blueprint;

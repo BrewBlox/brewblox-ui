@@ -1,5 +1,7 @@
 <script lang="ts">
+import { isAbsoluteUrl } from '@/utils/url';
 import { computed, defineComponent, PropType } from 'vue';
+import { useRouter } from 'vue-router';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
 import { coord2grid, textTransformation } from '../utils';
@@ -26,19 +28,37 @@ export default defineComponent({
       () => props.part.settings['text'] || url.value || 'Url Display',
     );
 
+    function interact(): void {
+      const { url } = props.part.settings;
+      if (url) {
+        if (isAbsoluteUrl(url)) {
+          window.open(url, '_blank');
+        } else {
+          useRouter().push(url);
+        }
+      }
+    }
+
     return {
       dimensions,
       textTransformation,
       bordered,
       url,
       titleText,
+      interact,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    :width="dimensions.width"
+    :height="dimensions.height"
+    class="interaction"
+    @click="interact"
+  >
+    <rect class="interaction-background" />
     <g class="outline">
       <rect
         v-show="bordered"
@@ -51,10 +71,7 @@ export default defineComponent({
         stroke="white"
       />
     </g>
-    <foreignObject
-      :width="dimensions.width"
-      :height="dimensions.height"
-    >
+    <foreignObject class="fit">
       <div
         class="fit text-bold text-center q-mt-sm grid-label"
         style="text-decoration: underline; font-size: 130%"
@@ -62,5 +79,5 @@ export default defineComponent({
         {{ titleText }}
       </div>
     </foreignObject>
-  </g>
+  </svg>
 </template>

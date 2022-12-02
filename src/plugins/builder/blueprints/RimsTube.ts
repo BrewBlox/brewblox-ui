@@ -3,7 +3,6 @@ import {
   PersistentPart,
   Transitions,
 } from '@/plugins/builder/types';
-import { showPartBlockDialog } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
 import { BlockType } from 'brewblox-proto/ts';
 
@@ -51,8 +50,6 @@ const blueprint: BuilderBlueprint = {
       [rightOut]: [{ outCoords: ENTRY, friction: sizeX - 1 }],
     };
   },
-  interactHandler: (part: PersistentPart) =>
-    showPartBlockDialog(part, PWM_KEY, PWM_TYPES),
 };
 
 export default blueprint;

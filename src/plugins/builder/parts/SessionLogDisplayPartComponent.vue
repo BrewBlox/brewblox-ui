@@ -8,7 +8,7 @@ import { computed, defineComponent, PropType } from 'vue';
 import { WIDGET_KEY } from '../blueprints/SessionLogDisplay';
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
-import { coord2grid } from '../utils';
+import { coord2grid, showLinkedWidgetDialog } from '../utils';
 
 export default defineComponent({
   name: 'SessionLogDisplayPartComponent',
@@ -51,6 +51,10 @@ export default defineComponent({
         : 'Not linked',
     );
 
+    function interact(): void {
+      showLinkedWidgetDialog(props.part, WIDGET_KEY);
+    }
+
     return {
       mdiTextSubject,
       dimensions,
@@ -58,13 +62,20 @@ export default defineComponent({
       isLinked,
       isBroken,
       displayText,
+      interact,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    :width="dimensions.width"
+    :height="dimensions.height"
+    class="interaction"
+    @click="interact"
+  >
+    <rect class="interaction-background" />
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"
@@ -105,5 +116,5 @@ export default defineComponent({
         stroke-width="2px"
       />
     </g>
-  </g>
+  </svg>
 </template>

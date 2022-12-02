@@ -25,11 +25,8 @@ export default defineComponent({
 
     const { bordered, scale } = usePart.setup(props.part);
 
-    const { block, blockStatus, isBroken } = useSettingsBlock.setup<SensorT>(
-      props.part,
-      SENSOR_KEY,
-      SENSOR_TYPES,
-    );
+    const { block, blockStatus, isBroken, showBlockDialog } =
+      useSettingsBlock.setup<SensorT>(props.part, SENSOR_KEY, SENSOR_TYPES);
 
     const dimensions = computed(() => ({
       x: 0,
@@ -59,6 +56,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      showBlockDialog,
       dimensions,
       contentTransform,
       tempValue,
@@ -77,7 +75,10 @@ export default defineComponent({
     :width="dimensions.width"
     :height="dimensions.height"
     viewBox="0 0 50 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g
       :transform="contentTransform"
       class="content"

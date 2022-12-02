@@ -30,7 +30,7 @@ export default defineComponent({
       height: coord2grid(1 * scale.value),
     }));
 
-    const { block, blockStatus, isBroken } =
+    const { block, blockStatus, isBroken, showBlockDialog } =
       useSettingsBlock.setup<ActuatorOffsetBlock>(
         props.part,
         DRIVER_KEY,
@@ -84,6 +84,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      showBlockDialog,
       scale,
       refKind,
       setting,
@@ -99,7 +100,10 @@ export default defineComponent({
     :width="dimensions.width"
     :height="dimensions.height"
     viewBox="0 0 100 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"

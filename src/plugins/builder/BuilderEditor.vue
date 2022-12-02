@@ -8,7 +8,6 @@ import { uniqueFilter } from '@/utils/functional';
 import { loadFile } from '@/utils/import-export';
 import { deepCopy } from '@/utils/objects';
 import { clampRotation } from '@/utils/quantity';
-import { isAbsoluteUrl } from '@/utils/url';
 import * as d3 from 'd3';
 import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
@@ -99,14 +98,6 @@ export default defineComponent({
 
     const focusRef = ref<HTMLElement>();
     const hasFocus = ref<boolean>(true);
-
-    function navigate(url: string): void {
-      if (isAbsoluteUrl(url)) {
-        window.open(url, '_blank');
-      } else {
-        router.push(url);
-      }
-    }
 
     function checkFocus(): void {
       nextTick(() => {
@@ -514,13 +505,6 @@ export default defineComponent({
       activeToolId.value = 'interact';
       if (floater.value) {
         cancelFloater();
-      } else {
-        const part = findHoveredPart();
-        if (part) {
-          builderStore
-            .blueprintByType(part.type)
-            .interactHandler?.(part, { savePart, navigate });
-        }
       }
     }
 
@@ -1085,7 +1069,7 @@ export default defineComponent({
             <PartWrapper
               :part="part"
               :selected="selectedIds.includes(part.id)"
-              :selectable="activeToolId !== null && activeToolId !== 'interact'"
+              :selectable="activeToolId != null && activeToolId !== 'interact'"
               :interactable="activeToolId === 'interact'"
               @update:part="savePart"
               @dirty="calculateFlowParts"

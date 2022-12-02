@@ -1,5 +1,4 @@
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
-import { showSettingsBlock } from '@/plugins/builder/utils';
 import { BlockType } from 'brewblox-proto/ts';
 
 export const DEFAULT_SIZE_X = 2;
@@ -50,8 +49,6 @@ const blueprint: BuilderBlueprint = {
     },
   ],
   size,
-  interactHandler: (part) =>
-    showSettingsBlock(part, SETPOINT_KEY, SETPOINT_TYPES),
 };
 
 export default blueprint;

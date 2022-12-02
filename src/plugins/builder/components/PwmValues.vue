@@ -39,12 +39,12 @@ export default defineComponent({
     const height = 1;
 
     const { bordered } = usePart.setup(props.part);
-    const { block, blockStatus, isBroken } = useSettingsBlock.setup<
-      ActuatorPwmBlock | FastPwmBlock
-    >(props.part, props.settingsKey, [
-      BlockType.ActuatorPwm,
-      BlockType.FastPwm,
-    ]);
+    const { block, blockStatus, isBroken, showBlockDialog } =
+      useSettingsBlock.setup<ActuatorPwmBlock | FastPwmBlock>(
+        props.part,
+        props.settingsKey,
+        [BlockType.ActuatorPwm, BlockType.FastPwm],
+      );
 
     const pwmValue = computed<number | null>(() =>
       block.value?.data.enabled ? block.value.data.value : null,
@@ -61,10 +61,6 @@ export default defineComponent({
       textTransformation(props.part, [width, height]),
     );
 
-    function clicky(evt: any): void {
-      console.log(evt);
-    }
-
     return {
       coord2grid,
       preciseNumber,
@@ -75,7 +71,7 @@ export default defineComponent({
       isBroken,
       pwmValue,
       bordered,
-      clicky,
+      showBlockDialog,
     };
   },
 });
@@ -88,9 +84,10 @@ export default defineComponent({
     :width="dimensions.width"
     :height="dimensions.height"
     viewBox="0 0 50 50"
-    class="clickable"
-    @click="clicky"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g class="outline">
       <rect
         v-show="bordered"

@@ -22,7 +22,6 @@ function asStatePart(part: PersistentPart): StatePart {
     ...part,
     transitions: blueprint.transitions(part),
     size: blueprint.size(part),
-    canInteract: blueprint.interactHandler !== undefined,
   };
 }
 

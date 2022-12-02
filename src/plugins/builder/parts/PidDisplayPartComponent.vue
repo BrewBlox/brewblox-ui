@@ -30,11 +30,8 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const { scale, bordered } = usePart.setup(props.part);
 
-    const { block, blockStatus, isBroken } = useSettingsBlock.setup<PidBlock>(
-      props.part,
-      PID_KEY,
-      PID_TYPES,
-    );
+    const { block, blockStatus, isBroken, showBlockDialog } =
+      useSettingsBlock.setup<PidBlock>(props.part, PID_KEY, PID_TYPES);
 
     const dimensions = computed(() => ({
       x: 0,
@@ -97,6 +94,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      showBlockDialog,
       outputValue,
       outputSetting,
       kp,
@@ -116,7 +114,10 @@ export default defineComponent({
     :width="dimensions.width"
     :height="dimensions.height"
     viewBox="0 0 50 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g class="outline">
       <rect
         v-show="bordered"

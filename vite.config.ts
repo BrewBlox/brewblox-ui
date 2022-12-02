@@ -97,7 +97,10 @@ export default defineConfig(({ command, mode }): UserConfig => {
     build: {
       rollupOptions: {
         plugins: [
-          inject({ Buffer: ['buffer', 'Buffer'], process: 'process/browser' }),
+          inject({
+            Buffer: ['buffer', 'Buffer'],
+            process: 'process/browser',
+          }) as any,
         ],
       },
     },

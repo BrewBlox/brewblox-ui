@@ -6,6 +6,7 @@ import {
   flowOnCoord,
   liquidOnCoord,
 } from '@/plugins/builder/utils';
+import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType, watch } from 'vue';
 import { ValveT, VALVE_KEY, VALVE_TYPES } from '../blueprints/LValve';
@@ -33,15 +34,20 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['dirty'],
+  emits: [...usePart.emits],
   setup(props, { emit }) {
-    const { sizeX } = usePart.setup(props.part);
+    const { sizeX, patchSettings } = usePart.setup(props.part);
 
     const { block } = useSettingsBlock.setup<ValveT>(
       props.part,
       VALVE_KEY,
       VALVE_TYPES,
     );
+
+    const dimensions = computed(() => ({
+      width: coord2grid(1),
+      height: coord2grid(1),
+    }));
 
     const closed = computed<boolean>(() =>
       block.value !== null
@@ -57,6 +63,19 @@ export default defineComponent({
 
     const liquidColor = computed<string[]>(() => liquidOnCoord(props.part, UP));
 
+    function interact(): void {
+      if (block.value) {
+        useSparkStore().patchBlock(block.value, {
+          storedState:
+            block.value.data.state === DigitalState.STATE_ACTIVE
+              ? DigitalState.STATE_INACTIVE
+              : DigitalState.STATE_ACTIVE,
+        });
+      } else {
+        patchSettings({ closed: !props.part.settings.closed });
+      }
+    }
+
     watch(
       () => block.value,
       (newV, oldV) => {
@@ -71,21 +90,29 @@ export default defineComponent({
     );
 
     return {
-      coord2grid,
       paths,
       sizeX,
       block,
+      dimensions,
       closed,
       liquidPath,
       liquidSpeed,
       liquidColor,
+      interact,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    :width="dimensions.width"
+    :height="dimensions.height"
+    viewBox="0 0 50 50"
+    class="interaction"
+    @click="interact"
+  >
+    <rect class="interaction-background" />
     <LiquidStroke
       :paths="[liquidPath]"
       :colors="liquidColor"
@@ -98,9 +125,7 @@ export default defineComponent({
     </g>
     <g
       class="outline fill"
-      :transform="
-        closed ? `translate(${coord2grid(sizeX)}, 0) scale(-1, 1)` : ''
-      "
+      :transform="closed ? 'translate(50, 0) scale(-1, 1)' : ''"
     >
       <path d="M0,21 H10" />
       <path d="M0,29 H10" />
@@ -112,5 +137,5 @@ export default defineComponent({
       :transform="`translate(${closed ? 5 : -5}, 15)`"
       color="black"
     />
-  </g>
+  </svg>
 </template>

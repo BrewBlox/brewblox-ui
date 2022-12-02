@@ -1,11 +1,22 @@
 <script lang="ts">
 import { RIGHT } from '@/plugins/builder/const';
+import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType, watch } from 'vue';
-import { ValveT, VALVE_KEY, VALVE_TYPES } from '../blueprints/Valve';
-import { useSettingsBlock } from '../composables';
+import {
+  CLOSED_KEY,
+  ValveT,
+  VALVE_KEY,
+  VALVE_TYPES,
+} from '../blueprints/Valve';
+import { usePart, useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';
-import { coord2grid, flowOnCoord, liquidOnCoord } from '../utils';
+import {
+  coord2grid,
+  flowOnCoord,
+  liquidOnCoord,
+  scheduleSoftStartRefresh,
+} from '../utils';
 
 const paths = {
   outerValve: [
@@ -29,10 +40,19 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['dirty'],
+  emits: [...usePart.emits],
   setup(props, { emit }) {
+    const sparkStore = useSparkStore();
+
+    const { patchSettings } = usePart.setup(props.part);
+
     const { hasAddress, block, blockStatus, isBroken } =
       useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
+
+    const dimensions = computed(() => ({
+      width: coord2grid(1),
+      height: coord2grid(1),
+    }));
 
     const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
 
@@ -75,8 +95,24 @@ export default defineComponent({
       },
     );
 
+    function interact(): void {
+      if (hasAddress.value) {
+        if (block.value) {
+          const storedState =
+            block.value.data.state === DigitalState.STATE_INACTIVE
+              ? DigitalState.STATE_ACTIVE
+              : DigitalState.STATE_INACTIVE;
+          sparkStore.patchBlock(block.value, { storedState });
+
+          scheduleSoftStartRefresh(block.value);
+        }
+      } else {
+        patchSettings({ [CLOSED_KEY]: !props.part.settings[CLOSED_KEY] });
+      }
+    }
+
     return {
-      coord2grid,
+      dimensions,
       blockStatus,
       paths,
       hasAddress,
@@ -86,13 +122,21 @@ export default defineComponent({
       closed,
       pending,
       valveRotation,
+      interact,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    :width="dimensions.width"
+    :height="dimensions.height"
+    viewBox="0 0 50 50"
+    class="interaction"
+    @click="interact"
+  >
+    <rect class="interaction-background" />
     <BlockStatusSvg :status="blockStatus" />
     <UnlinkedSvgIcon
       v-if="isBroken"
@@ -148,5 +192,5 @@ export default defineComponent({
       :speed="flowSpeed"
       :path="paths.arrows"
     />
-  </g>
+  </svg>
 </template>

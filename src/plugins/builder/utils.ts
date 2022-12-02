@@ -60,9 +60,8 @@ export function settingsBlock<T extends Block>(
 export function asPersistentPart(
   part: PersistentPart | FlowPart,
 ): PersistentPart {
-  const { transitions, size, flows, canInteract, ...persistent } =
-    part as FlowPart;
-  void { transitions, size, flows, canInteract };
+  const { transitions, size, flows, ...persistent } = part as FlowPart;
+  void { transitions, size, flows };
   return persistent;
 }
 
@@ -72,7 +71,6 @@ export function asStatePart(part: PersistentPart): StatePart {
     ...part,
     transitions: blueprint.transitions(part),
     size: blueprint.size(part),
-    canInteract: blueprint.interactHandler !== undefined,
   };
 }
 

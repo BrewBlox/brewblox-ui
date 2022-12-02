@@ -6,15 +6,8 @@ import {
   RIGHT,
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
-import {
-  scheduleSoftStartRefresh,
-  settingsBlock,
-  showAbsentBlock,
-} from '@/plugins/builder/utils';
-import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
-import { useSparkStore } from '@/plugins/spark/store';
+import { settingsBlock } from '@/plugins/builder/utils';
 import { isCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
 import {
   ActuatorPwmBlock,
   BlockType,
@@ -25,8 +18,14 @@ import {
 
 export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock | FastPwmBlock;
 export const PUMP_KEY = 'actuator';
-export const PWM_PUMP_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
-export const PUMP_TYPES = [BlockType.DigitalActuator, ...PWM_PUMP_TYPES];
+export const PWM_PUMP_TYPES = [
+  BlockType.ActuatorPwm,
+  BlockType.FastPwm,
+] as const;
+export const PUMP_TYPES = [
+  BlockType.DigitalActuator,
+  ...PWM_PUMP_TYPES,
+] as const;
 
 const calcPressure = (part: PersistentPart): number => {
   const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
@@ -78,41 +77,6 @@ const blueprint: BuilderBlueprint = {
       [LEFT]: [{ outCoords: RIGHT }],
       [RIGHT]: [{ outCoords: LEFT, pressure }],
     };
-  },
-  interactHandler: (part: PersistentPart, { savePart }) => {
-    const sparkStore = useSparkStore();
-    const hasAddr = !!part.settings[PUMP_KEY]?.id;
-    const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
-
-    if (!hasAddr) {
-      part.settings.enabled = !part.settings.enabled;
-      savePart(part);
-    } else if (block === null) {
-      showAbsentBlock(part, PUMP_KEY);
-    } else if (block.type === BlockType.DigitalActuator) {
-      const storedState =
-        block.data.state === DigitalState.STATE_INACTIVE
-          ? DigitalState.STATE_ACTIVE
-          : DigitalState.STATE_INACTIVE;
-      sparkStore.patchBlock(block, { storedState });
-      scheduleSoftStartRefresh(block);
-    } else if (isCompatible(block.type, PWM_PUMP_TYPES)) {
-      const limiterWarning = block.data.constrainedBy?.constraints.length
-        ? 'The value may be limited by constraints'
-        : '';
-      createDialog({
-        component: 'SliderDialog',
-        componentProps: {
-          modelValue: block.data.storedSetting,
-          title: 'Pump speed',
-          message: limiterWarning,
-          label: 'Percentage output',
-          quickActions: PWM_SELECT_OPTIONS,
-        },
-      }).onOk((storedSetting: number) =>
-        sparkStore.patchBlock(block, { storedSetting }),
-      );
-    }
   },
 };
 

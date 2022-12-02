@@ -18,7 +18,10 @@ import {
 } from 'brewblox-proto/ts';
 import { Layout } from 'plotly.js';
 
-export type ComparedBlockType = BlockOrIntfType | BlockOrIntfType[] | null;
+export type ComparedBlockType =
+  | BlockOrIntfType
+  | readonly BlockOrIntfType[]
+  | null;
 
 export type PageMode = 'Relations' | 'List';
 

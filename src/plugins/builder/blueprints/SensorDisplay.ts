@@ -1,9 +1,6 @@
 import { SCALE_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import {
-  showSettingsBlock,
-  universalTransitions,
-} from '@/plugins/builder/utils';
+import { universalTransitions } from '@/plugins/builder/utils';
 import {
   BlockIntfType,
   TempSensorMockBlock,
@@ -55,7 +52,6 @@ const blueprint: BuilderBlueprint = {
   size,
   transitions: (part) =>
     universalTransitions(size(part), part.settings[FLOW_TOGGLE_KEY]),
-  interactHandler: (part) => showSettingsBlock(part, SENSOR_KEY, SENSOR_TYPES),
 };
 
 export default blueprint;

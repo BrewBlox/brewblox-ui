@@ -1,5 +1,4 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { showLinkedWidgetDialog } from '@/plugins/builder/utils';
 
 export const WIDGET_KEY = 'widgetId';
 export const WIDGET_TYPES = ['SessionLog'];
@@ -34,7 +33,6 @@ const blueprint: BuilderBlueprint = {
   ],
   size: (part) => [part.settings.sizeX || DEFAULT_SIZE_X, SIZE_Y],
   transitions: () => ({}),
-  interactHandler: (part) => showLinkedWidgetDialog(part, WIDGET_KEY),
 };
 
 export default blueprint;

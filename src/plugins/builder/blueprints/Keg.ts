@@ -1,6 +1,5 @@
 import { SCALE_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { showSettingsBlock } from '@/plugins/builder/utils';
 import { BlockType } from 'brewblox-proto/ts';
 
 export const SIZE_X = 2;
@@ -34,8 +33,6 @@ const blueprint: BuilderBlueprint = {
     const scale = settings[SCALE_KEY] ?? 1;
     return [SIZE_X * scale, SIZE_Y * scale];
   },
-  interactHandler: (part) =>
-    showSettingsBlock(part, SETPOINT_KEY, SETPOINT_TYPES),
 };
 
 export default blueprint;

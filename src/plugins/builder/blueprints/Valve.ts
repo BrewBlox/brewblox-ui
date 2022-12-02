@@ -4,7 +4,6 @@ import {
   PersistentPart,
   Transitions,
 } from '@/plugins/builder/types';
-import { useSparkStore } from '@/plugins/spark/store';
 import { ComparedBlockType } from '@/plugins/spark/types';
 import {
   BlockType,
@@ -12,11 +11,7 @@ import {
   DigitalState,
   MotorValveBlock,
 } from 'brewblox-proto/ts';
-import {
-  scheduleSoftStartRefresh,
-  settingsAddress,
-  settingsBlock,
-} from '../utils';
+import { settingsAddress, settingsBlock } from '../utils';
 
 export type ValveT = DigitalActuatorBlock | MotorValveBlock;
 
@@ -25,7 +20,7 @@ export const VALVE_KEY = 'valve';
 export const VALVE_TYPES: ComparedBlockType = [
   BlockType.DigitalActuator,
   BlockType.MotorValve,
-];
+] as const;
 
 const blueprint: BuilderBlueprint = {
   type: 'Valve',
@@ -56,26 +51,6 @@ const blueprint: BuilderBlueprint = {
           [LEFT]: [{ outCoords: RIGHT }],
           [RIGHT]: [{ outCoords: LEFT }],
         };
-  },
-  interactHandler: (part: PersistentPart, { savePart }) => {
-    const hasAddress = settingsAddress(part, VALVE_KEY).id !== null;
-    if (hasAddress) {
-      const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
-      if (block) {
-        const sparkStore = useSparkStore();
-
-        const storedState =
-          block.data.state === DigitalState.STATE_INACTIVE
-            ? DigitalState.STATE_ACTIVE
-            : DigitalState.STATE_INACTIVE;
-        sparkStore.patchBlock(block, { storedState });
-
-        scheduleSoftStartRefresh(block);
-      }
-    } else {
-      part.settings[CLOSED_KEY] = !part.settings[CLOSED_KEY];
-      savePart(part);
-    }
   },
 };
 

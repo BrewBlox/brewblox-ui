@@ -2,13 +2,10 @@
 import { useGlobals } from '@/composables';
 import { startupDone, userUISettings } from '@/user-settings';
 import { concatById } from '@/utils/collections';
-import { isAbsoluteUrl } from '@/utils/url';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
-import { useBuilderStore } from './store';
 import { FlowPart, PersistentPart } from './types';
 import { coord2grid, coord2translate, startChangeLayoutTitle } from './utils';
 
@@ -21,10 +18,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const { localStorage } = useQuasar();
-    const router = useRouter();
 
     const pending = ref<FlowPart | null>(null);
 
@@ -54,40 +49,8 @@ export default defineComponent({
       () => layout.value?.title ?? 'Builder layout',
     );
 
-    function navigate(url: string): void {
-      if (isAbsoluteUrl(url)) {
-        window.open(url, '_blank');
-      } else {
-        router.push(url);
-      }
-    }
-
     function savePart(part: PersistentPart): void {
       parts.value = concatById(parts.value, part);
-    }
-
-    function isClickable(part: FlowPart): boolean {
-      return (
-        builderStore.blueprintByType(part.type).interactHandler !== undefined
-      );
-    }
-
-    function interact(part: FlowPart | null): void {
-      if (!part) {
-        return;
-      }
-      const handler = builderStore.blueprintByType(part.type).interactHandler;
-      if (!handler) {
-        return;
-      }
-      if (pending.value && pending.value.id === part.id) {
-        handler(part, { savePart, navigate });
-        pending.value = null;
-      } else if (delayTouch.value) {
-        pending.value = part;
-      } else {
-        handler(part, { savePart, navigate });
-      }
     }
 
     function editTitle(): void {
@@ -117,6 +80,7 @@ export default defineComponent({
     return {
       coord2grid,
       coord2translate,
+      delayTouch,
       dense,
       layoutId,
       layout,
@@ -129,9 +93,7 @@ export default defineComponent({
       parts,
       flowParts,
       flowPartsRevision,
-      isClickable,
       pending,
-      interact,
       savePart,
       calculateFlowParts,
     };
@@ -206,14 +168,12 @@ export default defineComponent({
               :transform="coord2translate(part.x, part.y)"
               :class="{
                 [part.type]: true,
-                pointer: isClickable(part),
                 inactive: !!pending,
               }"
-              @click.stop="interact(part)"
-              @dblclick.stop
             >
               <PartWrapper
                 :part="part"
+                interactable
                 @update:part="savePart"
                 @dirty="calculateFlowParts"
               />
@@ -229,8 +189,6 @@ export default defineComponent({
               <g
                 :transform="coord2translate(pending.x, pending.y)"
                 class="pointer"
-                @click.stop="interact(pending)"
-                @dblclick.stop
               >
                 <PartWrapper
                   :part="pending"

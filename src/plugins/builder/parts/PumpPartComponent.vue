@@ -1,7 +1,15 @@
 <script lang="ts">
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
-import { liquidOnCoord } from '@/plugins/builder/utils';
+import {
+  coord2grid,
+  liquidOnCoord,
+  scheduleSoftStartRefresh,
+  showAbsentBlock,
+} from '@/plugins/builder/utils';
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
 import {
   ActuatorPwmBlock,
   BlockType,
@@ -15,7 +23,7 @@ import {
   PUMP_TYPES,
   PWM_PUMP_TYPES,
 } from '../blueprints/Pump';
-import { useSettingsBlock } from '../composables';
+import { usePart, useSettingsBlock } from '../composables';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -26,17 +34,21 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['update:part', 'dirty'],
+  emits: [...usePart.emits],
   setup(props, { emit }) {
-    const hasAddress = computed<boolean>(
-      () => props.part.settings[PUMP_KEY]?.id != null,
-    );
+    const sparkStore = useSparkStore();
+    const { patchSettings } = usePart.setup(props.part);
 
-    const { block, blockStatus } = useSettingsBlock.setup<PumpT>(
+    const { block, blockStatus, hasAddress } = useSettingsBlock.setup<PumpT>(
       props.part,
       PUMP_KEY,
       PUMP_TYPES,
     );
+
+    const dimensions = computed(() => ({
+      width: coord2grid(1),
+      height: coord2grid(1),
+    }));
 
     const enabled = computed<boolean>(() => {
       if (block.value === null) {
@@ -87,31 +99,68 @@ export default defineComponent({
 
     onBeforeMount(() => {
       if (props.part.settings.pwm !== undefined) {
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            [PUMP_KEY]: props.part.settings.pwm,
-            pwm: undefined,
-          },
+        patchSettings({
+          [PUMP_KEY]: props.part.settings.pwm,
+          pwm: undefined,
         });
       }
     });
+
+    function interact(): void {
+      if (!hasAddress.value) {
+        patchSettings({ enabled: !props.part.settings.enabled });
+      } else if (block.value == null) {
+        showAbsentBlock(props.part, PUMP_KEY);
+      } else if (block.value.type === BlockType.DigitalActuator) {
+        const storedState =
+          block.value.data.state === DigitalState.STATE_INACTIVE
+            ? DigitalState.STATE_ACTIVE
+            : DigitalState.STATE_INACTIVE;
+        sparkStore.patchBlock(block.value, { storedState });
+        scheduleSoftStartRefresh(block.value);
+      } else if (isCompatible(block.value.type, PWM_PUMP_TYPES)) {
+        const limiterWarning = block.value.data.constrainedBy?.constraints
+          .length
+          ? 'The value may be limited by constraints'
+          : '';
+        createDialog({
+          component: 'SliderDialog',
+          componentProps: {
+            modelValue: block.value.data.storedSetting,
+            title: 'Pump speed',
+            message: limiterWarning,
+            label: 'Percentage output',
+            quickActions: PWM_SELECT_OPTIONS,
+          },
+        }).onOk((storedSetting: number) =>
+          sparkStore.patchBlock(block.value, { storedSetting }),
+        );
+      }
+    }
 
     return {
       block,
       hasAddress,
       blockStatus,
+      dimensions,
       enabled,
       liquids,
       duration,
+      interact,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    :width="dimensions.width"
+    :height="dimensions.height"
+    viewBox="0 0 50 50"
+    class="interaction"
+    @click="interact"
+  >
+    <rect class="interaction-background" />
     <!-- tube liquid bottom-->
     <LiquidStroke
       :paths="['M50,25H0']"
@@ -132,10 +181,10 @@ export default defineComponent({
     />
     <!-- blades -->
     <g
-      class="blades-wrapper"
       transform="translate(25,30)"
+      class="outline"
     >
-      <g class="outline">
+      <g>
         <line
           x1="-14"
           y1="0"
@@ -207,7 +256,7 @@ export default defineComponent({
       height="50"
     />
     <BlockStatusSvg :status="blockStatus" />
-  </g>
+  </svg>
 </template>
 
 <style lang="scss" scoped>
