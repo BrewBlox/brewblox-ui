@@ -29,7 +29,7 @@ export default defineComponent({
     const messages = ref<string[]>([]);
 
     function cleanDate(): string {
-      return formatDate(new Date(), 'yyyy-MM-dd-HH-mm');
+      return formatDate(new Date(), 'yyyy-MM-dd_HH-mm');
     }
 
     async function reloadStoredBackups(): Promise<void> {
@@ -123,7 +123,7 @@ export default defineComponent({
 
     async function saveStoredBackup(): Promise<void> {
       const name = await selectNewName(
-        `blocks-${props.serviceId}-${cleanDate()}`,
+        `blocks_${props.serviceId}_${cleanDate()}`,
       );
       if (name == null) {
         return;
@@ -141,7 +141,7 @@ export default defineComponent({
     async function uploadStoredBackup(): Promise<void> {
       loadFile(async (values: any) => {
         const name = await selectNewName(
-          `blocks-${props.serviceId}-${cleanDate()}`,
+          `blocks_${props.serviceId}_${cleanDate()}`,
         );
         if (name == null) {
           return;
