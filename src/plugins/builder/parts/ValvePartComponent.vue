@@ -2,7 +2,7 @@
 import { RIGHT } from '@/plugins/builder/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, watch } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import {
   CLOSED_KEY,
   ValveT,
@@ -10,13 +10,7 @@ import {
   VALVE_TYPES,
 } from '../blueprints/Valve';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
-import {
-  coord2grid,
-  flowOnCoord,
-  liquidOnCoord,
-  scheduleSoftStartRefresh,
-} from '../utils';
+import { flowOnCoord, liquidOnCoord, scheduleSoftStartRefresh } from '../utils';
 
 const paths = {
   outerValve: [
@@ -34,12 +28,7 @@ const paths = {
 
 export default defineComponent({
   name: 'ValvePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
   emits: [...usePart.emits],
   setup(props, { emit }) {
     const sparkStore = useSparkStore();
@@ -48,11 +37,6 @@ export default defineComponent({
 
     const { hasAddress, block, blockStatus, isBroken } =
       useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
-
-    const dimensions = computed(() => ({
-      width: coord2grid(1),
-      height: coord2grid(1),
-    }));
 
     const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
 
@@ -112,7 +96,6 @@ export default defineComponent({
     }
 
     return {
-      dimensions,
       blockStatus,
       paths,
       hasAddress,
@@ -130,8 +113,7 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     viewBox="0 0 50 50"
     class="interaction"
     @click="interact"

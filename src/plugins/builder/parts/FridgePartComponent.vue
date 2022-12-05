@@ -1,42 +1,40 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 import { coord2grid, textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'FridgePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const { sizeX, sizeY } = usePart.setup(props.part);
 
     const titleText = computed<string>(() => props.part.settings.text || '');
 
-    const shelfY = computed<number>(() => props.part.settings.shelfY || 1);
+    const labelTransform = computed<string>(() =>
+      textTransformation(props.part, [sizeX.value, sizeY.value], false),
+    );
+
+    const shelfHeight = computed<number>(() =>
+      coord2grid(props.part.settings.shelfY || 1),
+    );
 
     return {
-      textTransformation,
-      coord2grid,
+      labelTransform,
       titleText,
-      shelfY,
-      sizeX,
-      sizeY,
+      shelfHeight,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg v-bind="{ width, height }">
     <g class="outline">
       <rect
-        :width="coord2grid(sizeX) - 4"
-        :height="coord2grid(sizeY) - 4"
+        :width="width - 4"
+        :height="height - 4"
         x="2"
         y="2"
         rx="8"
@@ -46,29 +44,28 @@ export default defineComponent({
       <!-- Top divider -->
       <line
         :x1="2"
-        :y1="coord2grid(1)"
-        :x2="coord2grid(sizeX) - 4"
-        :y2="coord2grid(1)"
+        :y1="50"
+        :x2="width - 4"
+        :y2="50"
       />
       <!-- Bottom divider -->
       <line
         :x1="2"
-        :y1="coord2grid(sizeY - 1)"
-        :x2="coord2grid(sizeX) - 4"
-        :y2="coord2grid(sizeY - 1)"
+        :y1="height - 50"
+        :x2="width - 4"
+        :y2="height - 50"
       />
       <!-- Shelf divider-->
       <line
         :x1="2"
-        :y1="coord2grid(shelfY)"
-        :x2="coord2grid(sizeX) - 4"
-        :y2="coord2grid(shelfY)"
+        :y1="shelfHeight"
+        :x2="width - 4"
+        :y2="shelfHeight"
       />
     </g>
     <foreignObject
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
-      :transform="textTransformation(part, [sizeX, sizeY], false)"
+      :transform="labelTransform"
+      class="fit"
     >
       <div
         class="fit builder-text"
@@ -77,5 +74,5 @@ export default defineComponent({
         {{ titleText }}
       </div>
     </foreignObject>
-  </g>
+  </svg>
 </template>

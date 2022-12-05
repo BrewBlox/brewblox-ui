@@ -1,6 +1,27 @@
-import { computed, ComputedRef, getCurrentInstance } from 'vue';
+import { computed, ComputedRef, getCurrentInstance, PropType } from 'vue';
 import { BORDER_KEY, SCALE_KEY } from '../const';
 import { FlowPart } from '../types';
+
+export interface UsePartProps {
+  part: {
+    type: PropType<FlowPart>;
+    required: true;
+  };
+  /**
+   * Element width in SVG units (not grid squares)
+   */
+  width: {
+    type: PropType<number>;
+    required: true;
+  };
+  /**
+   * Element height in SVG units (not grid squares)
+   */
+  height: {
+    type: PropType<number>;
+    required: true;
+  };
+}
 
 export type UsePartEmits = ['update:part', 'dirty'];
 
@@ -15,11 +36,26 @@ export interface UsePartComponent {
 }
 
 export interface UsePartComposable {
+  props: UsePartProps;
   emits: UsePartEmits;
   setup(part: FlowPart): UsePartComponent;
 }
 
 export const usePart: UsePartComposable = {
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    width: {
+      type: Number,
+      required: true,
+    },
+    height: {
+      type: Number,
+      required: true,
+    },
+  },
   emits: ['update:part', 'dirty'],
   setup(part: FlowPart): UsePartComponent {
     const instance = getCurrentInstance()!;

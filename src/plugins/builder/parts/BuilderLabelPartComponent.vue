@@ -1,26 +1,14 @@
 <script lang="ts">
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
-import { coord2grid } from '../utils';
 
 export default defineComponent({
   name: 'BuilderLabelPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
   emits: [...usePart.emits],
   setup(props) {
-    const { sizeX, sizeY, patchSettings } = usePart.setup(props.part);
-
-    const dimensions = computed(() => ({
-      width: coord2grid(sizeX.value),
-      height: coord2grid(sizeY.value),
-    }));
+    const { patchSettings } = usePart.setup(props.part);
 
     const text = computed<string>(
       () => props.part.settings.text || '[click to edit]',
@@ -40,7 +28,6 @@ export default defineComponent({
     }
 
     return {
-      dimensions,
       text,
       fontSize,
       interact,
@@ -51,8 +38,7 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     class="interaction"
     @click="interact"
   >

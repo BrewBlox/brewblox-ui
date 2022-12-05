@@ -1,7 +1,7 @@
 <script lang="ts">
 import { LEFT, UP } from '@/plugins/builder/const';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const lowPaths = {
@@ -23,12 +23,8 @@ const highPaths = {
 
 export default defineComponent({
   name: 'BridgeTubePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const lowLiquid = computed<string[]>(() => liquidOnCoord(props.part, UP));
 
@@ -53,7 +49,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+  >
     <!-- low -->
     <g class="outline">
       <path
@@ -86,5 +85,5 @@ export default defineComponent({
       :speed="highFlowSpeed"
       :path="highPaths.liquid"
     />
-  </g>
+  </svg>
 </template>

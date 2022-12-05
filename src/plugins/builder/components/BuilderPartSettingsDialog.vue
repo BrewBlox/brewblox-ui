@@ -102,8 +102,8 @@ export default defineComponent({
       <div class="widget-body column q-gutter-y-lg">
         <div class="row justify-center">
           <svg
-            :width="`${coord2grid(rotatedSize[0]) * displayScale}px`"
-            :height="`${coord2grid(rotatedSize[1] * displayScale)}px`"
+            :width="200"
+            :height="200"
             :viewBox="`0, 0, ${coord2grid(rotatedSize[0])}, ${coord2grid(
               rotatedSize[1],
             )}`"

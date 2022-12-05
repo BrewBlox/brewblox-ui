@@ -4,29 +4,19 @@ import { useHistoryStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { mdiTextSubject } from '@quasar/extras/mdi-v5';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { WIDGET_KEY } from '../blueprints/SessionLogDisplay';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
-import { coord2grid, showLinkedWidgetDialog } from '../utils';
+import { showLinkedWidgetDialog } from '../utils';
 
 export default defineComponent({
   name: 'SessionLogDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const widgetStore = useWidgetStore();
     const historyStore = useHistoryStore();
-    const { sizeX, sizeY, bordered } = usePart.setup(props.part);
-
-    const dimensions = computed(() => ({
-      width: coord2grid(sizeX.value),
-      height: coord2grid(sizeY.value),
-    }));
+    const { bordered } = usePart.setup(props.part);
 
     const isLinked = computed<boolean>(() =>
       Boolean(props.part.settings[WIDGET_KEY]),
@@ -57,7 +47,6 @@ export default defineComponent({
 
     return {
       mdiTextSubject,
-      dimensions,
       bordered,
       isLinked,
       isBroken,
@@ -70,8 +59,7 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     class="interaction"
     @click="interact"
   >
@@ -79,19 +67,19 @@ export default defineComponent({
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"
-        :x="dimensions.width / 2 - 20"
+        :x="width / 2 - 20"
       />
       <UnlinkedSvgIcon
         v-else-if="!isLinked"
-        :x="dimensions.width / 2 - 20"
+        :x="width / 2 - 20"
       />
       <template v-else>
         <foreignObject
-          v-if="dimensions.width > 50"
+          v-if="width > 50"
           x="0"
           y="5"
-          :width="dimensions.width"
-          :height="dimensions.height - 5"
+          :width="width"
+          :height="height - 5"
         >
           <div
             class="fit builder-text"
@@ -107,8 +95,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="dimensions.width - 2"
-        :height="dimensions.height - 2"
+        :width="width - 2"
+        :height="height - 2"
         x="1"
         y="1"
         rx="6"

@@ -248,11 +248,9 @@ export function textTransformation(
     transforms.push(`translate(${coord2grid(textSize[0])}, 0) scale(-1,1)`);
   }
   if (part.rotate && counterRotate) {
-    transforms.push(
-      `rotate(${-part.rotate},${coord2grid(0.5 * textSize[0])},${coord2grid(
-        0.5 * textSize[1],
-      )})`,
-    );
+    const originX = coord2grid(0.5 * textSize[0]);
+    const originY = coord2grid(0.5 * textSize[1]);
+    transforms.push(`rotate(${-part.rotate},${originX},${originY})`);
   }
   return transforms.join(' ');
 }

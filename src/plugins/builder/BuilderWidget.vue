@@ -193,7 +193,6 @@ export default defineComponent({
           <g
             v-for="part in flowParts"
             :key="`${flowPartsRevision}-${part.id}`"
-            :transform="coord2translate(part.x, part.y)"
             :class="{
               [part.type]: true,
               inactive: pending != null,
@@ -202,6 +201,8 @@ export default defineComponent({
             <PartWrapper
               :part="part"
               :interactable="!delayTouch"
+              :pos-x="part.x"
+              :pos-y="part.y"
               @update:part="savePart"
               @dirty="calculateFlowParts"
             />
@@ -214,14 +215,14 @@ export default defineComponent({
               opacity="0"
               @click.stop="pending = null"
             />
-            <g :transform="coord2translate(pending.x, pending.y)">
-              <PartWrapper
-                :part="pending"
-                interactable
-                @update:part="savePart"
-                @dirty="calculateFlowParts"
-              />
-            </g>
+            <PartWrapper
+              :pos-x="pending.x"
+              :pos-y="pending.y"
+              :part="pending"
+              interactable
+              @update:part="savePart"
+              @dirty="calculateFlowParts"
+            />
           </template>
         </g>
       </svg>

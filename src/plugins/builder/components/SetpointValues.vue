@@ -1,6 +1,4 @@
 <script lang="ts">
-import { FlowPart } from '@/plugins/builder/types';
-import { coord2grid } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { makeTypeFilter } from '@/utils/functional';
@@ -10,27 +8,32 @@ import {
   PidBlock,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
-import { useSettingsBlock } from '../composables';
+import { computed, defineComponent } from 'vue';
+import { usePart, useSettingsBlock } from '../composables';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
 
 export default defineComponent({
   name: 'SetpointValues',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
+    ...usePart.props,
+    width: {
+      type: Number,
+      default: 100,
+    },
+    height: {
+      type: Number,
+      default: 50,
     },
     settingsKey: {
       type: String,
       required: true,
     },
-    startX: {
+    x: {
       type: Number,
       default: 0,
     },
-    startY: {
+    y: {
       type: Number,
       default: 0,
     },
@@ -39,10 +42,8 @@ export default defineComponent({
       default: false,
     },
   },
+  emits: [...usePart.emits],
   setup(props) {
-    const width = 2;
-    const height = 1;
-
     const sparkStore = useSparkStore();
     const { address, block, blockStatus, isBroken, showBlockDialog } =
       useSettingsBlock.setup<SetpointSensorPairBlock>(
@@ -51,13 +52,6 @@ export default defineComponent({
         [BlockType.SetpointSensorPair],
       );
     const { serviceId } = address.value;
-
-    const dimensions = computed(() => ({
-      x: coord2grid(props.startX),
-      y: coord2grid(props.startY),
-      width: coord2grid(width),
-      height: coord2grid(height),
-    }));
 
     const isUsed = computed<boolean>(
       () =>
@@ -89,7 +83,6 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
-      dimensions,
       setpointSetting,
       setpointValue,
       tempUnit,
@@ -101,10 +94,7 @@ export default defineComponent({
 <template>
   <svg
     v-if="block || !hideUnset"
-    :x="dimensions.x"
-    :y="dimensions.y"
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ x, y, width, height }"
     viewBox="0 0 100 50"
     class="interaction"
     @click="showBlockDialog"

@@ -22,16 +22,36 @@ const blueprint: BuilderBlueprint = {
       },
     },
     {
-      component: 'ScaleCard',
+      component: 'SizeCard',
       props: {
-        settingsKey: SCALE_KEY,
-        defaultSize: [SIZE_X, SIZE_Y],
+        settingsKey: 'sizeX',
+        defaultSize: SIZE_X,
+        label: 'Width',
+        min: 2,
+        max: 8,
+      },
+    },
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: 'sizeY',
+        defaultSize: SIZE_Y,
+        label: 'Height',
+        min: 2,
+        max: 20,
       },
     },
   ],
   size: ({ settings }) => {
-    const scale = settings[SCALE_KEY] ?? 1;
-    return [SIZE_X * scale, SIZE_Y * scale];
+    if (settings.sizeX !== undefined || settings.sizeY !== undefined) {
+      return [settings.sizeX || SIZE_X, settings.sizeY || SIZE_Y];
+    }
+    // backwards compatibility with deprecated setting
+    if (settings[SCALE_KEY] !== undefined) {
+      const scale = settings[SCALE_KEY] ?? 1;
+      return [SIZE_X * scale, SIZE_Y * scale];
+    }
+    return [SIZE_X, SIZE_Y];
   },
 };
 

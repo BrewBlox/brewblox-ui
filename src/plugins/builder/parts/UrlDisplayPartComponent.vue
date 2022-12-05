@@ -1,26 +1,16 @@
 <script lang="ts">
 import { isAbsoluteUrl } from '@/utils/url';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
-import { coord2grid, textTransformation } from '../utils';
+import { textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'UrlDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { sizeX, sizeY, bordered } = usePart.setup(props.part);
-
-    const dimensions = computed(() => ({
-      width: coord2grid(sizeX.value),
-      height: coord2grid(sizeY.value),
-    }));
+    const { bordered } = usePart.setup(props.part);
 
     const url = computed<string>(() => props.part.settings['url'] || '');
 
@@ -40,7 +30,6 @@ export default defineComponent({
     }
 
     return {
-      dimensions,
       textTransformation,
       bordered,
       url,
@@ -53,8 +42,8 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    :width="width"
+    :height="height"
     class="interaction"
     @click="interact"
   >
@@ -62,8 +51,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="dimensions.width - 2"
-        :height="dimensions.height - 2"
+        :width="width - 2"
+        :height="height - 2"
         x="1"
         y="1"
         rx="6"

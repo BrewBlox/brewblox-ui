@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useBuilderStore } from '@/plugins/builder/store';
 import { FlowPart } from '@/plugins/builder/types';
-import { coord2grid } from '@/plugins/builder/utils';
+import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
@@ -16,6 +16,14 @@ export default defineComponent({
     part: {
       type: Object as PropType<FlowPart>,
       required: true,
+    },
+    posX: {
+      type: Number,
+      default: 0,
+    },
+    posY: {
+      type: Number,
+      default: 0,
     },
     interactable: {
       type: Boolean,
@@ -34,6 +42,15 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const { sizeX, sizeY } = usePart.setup(props.part);
     const component = builderStore.componentByType(props.part.type);
+
+    const dimensions = computed(() => ({
+      width: coord2grid(sizeX.value),
+      height: coord2grid(sizeY.value),
+    }));
+
+    const positionTransform = computed<string>(() =>
+      coord2translate(props.posX, props.posY),
+    );
 
     const rotateTransform = computed<string>(() => {
       const [partSizeX, partSizeY] = props.part.size;
@@ -54,44 +71,43 @@ export default defineComponent({
     });
 
     const flipTransform = computed<string>(() => {
-      if (!props.part.flipped) {
-        return '';
+      if (props.part.flipped) {
+        return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
       }
-      return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
+      return '';
     });
 
-    const transformation = computed<string>(
-      () => `${rotateTransform.value} ${flipTransform.value}`,
-    );
-
     return {
-      coord2grid,
-      sizeX,
-      sizeY,
       component,
-      transformation,
+      dimensions,
+      positionTransform,
+      rotateTransform,
+      flipTransform,
     };
   },
 });
 </script>
 
 <template>
-  <g
-    :transform="transformation"
-    :class="{ interactable, selectable, selected }"
-  >
-    <rect
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
-      class="wrapper-background"
-    />
-    <component
-      :is="component"
-      v-if="component"
-      :part="part"
-      class="builder-part"
-      v-bind="$attrs"
-    />
+  <g :transform="positionTransform">
+    <g :transform="`${rotateTransform} ${flipTransform}`">
+      <g :class="{ interactable, selectable, selected }">
+        <rect
+          class="select-background"
+          :width="dimensions.width"
+          :height="dimensions.height"
+        />
+        <component
+          :is="component"
+          v-if="component"
+          :part="part"
+          :width="dimensions.width"
+          :height="dimensions.height"
+          class="builder-part"
+          v-bind="$attrs"
+        />
+      </g>
+    </g>
   </g>
 </template>
 
@@ -129,15 +145,15 @@ export default defineComponent({
 .selectable
   pointer-events: bounding-box
 
-.wrapper-background
+.select-background
   opacity: 0
 
-.selectable:hover > .wrapper-background
+.selectable:hover > .select-background
   fill: silver
   fill-opacity: 0.5
   opacity: 0.5
 
-.selected > .wrapper-background
+.selected > .select-background
   fill: dodgerblue
   fill-opacity: 0.5
   opacity: 0.5
@@ -157,6 +173,7 @@ export default defineComponent({
   width: 100%
   height: 100%
   opacity: 0
+  rx: 4
 
 .interaction:hover > .interaction-background
   fill: silver

@@ -1,7 +1,6 @@
 <script lang="ts">
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
 import {
-  coord2grid,
   liquidOnCoord,
   scheduleSoftStartRefresh,
   showAbsentBlock,
@@ -16,7 +15,7 @@ import {
   DigitalActuatorBlock,
   DigitalState,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, onBeforeMount, PropType, watch } from 'vue';
+import { computed, defineComponent, onBeforeMount, watch } from 'vue';
 import {
   PumpT,
   PUMP_KEY,
@@ -24,16 +23,10 @@ import {
   PWM_PUMP_TYPES,
 } from '../blueprints/Pump';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'PumpPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
   emits: [...usePart.emits],
   setup(props, { emit }) {
     const sparkStore = useSparkStore();
@@ -44,11 +37,6 @@ export default defineComponent({
       PUMP_KEY,
       PUMP_TYPES,
     );
-
-    const dimensions = computed(() => ({
-      width: coord2grid(1),
-      height: coord2grid(1),
-    }));
 
     const enabled = computed<boolean>(() => {
       if (block.value === null) {
@@ -142,7 +130,6 @@ export default defineComponent({
       block,
       hasAddress,
       blockStatus,
-      dimensions,
       enabled,
       liquids,
       duration,
@@ -154,8 +141,7 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     viewBox="0 0 50 50"
     class="interaction"
     @click="interact"

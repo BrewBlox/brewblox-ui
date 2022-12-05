@@ -1,9 +1,8 @@
 <script lang="ts">
 import { LEFT } from '@/plugins/builder/const';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
-import { coord2grid, flowOnCoord, liquidOnCoord } from '../utils';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   borders: ['M29,40V30a9,9,0,0,0-9-9H1', 'M21,40V32a3,3,0,0,0-3-3H1'],
@@ -12,23 +11,15 @@ const paths = {
 
 export default defineComponent({
   name: 'FilterBottomPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { sizeX } = usePart.setup(props.part);
-
     const flowSpeed = computed<number>(() => -flowOnCoord(props.part, LEFT));
 
     const liquids = computed<string[]>(() => liquidOnCoord(props.part, LEFT));
 
     return {
-      coord2grid,
       paths,
-      sizeX,
       flowSpeed,
       liquids,
     };
@@ -37,10 +28,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <!-- No viewBox. path auto-adjusts to width -->
+  <svg v-bind="{ width, height }">
     <g class="outline">
       <line
-        :x2="coord2grid(sizeX) - 4"
+        :x2="width - 4"
         x1="2"
         y1="11"
         m
@@ -74,5 +66,5 @@ export default defineComponent({
       :speed="flowSpeed"
       :path="paths.liquid"
     />
-  </g>
+  </svg>
 </template>

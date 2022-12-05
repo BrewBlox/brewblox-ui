@@ -1,26 +1,18 @@
 <script lang="ts">
 import { colorString } from '@/plugins/builder/utils';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'KegPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { scale } = usePart.setup(props.part);
-
     const color = computed<string>(() =>
       colorString(props.part.settings.color),
     );
 
     return {
-      scale,
       color,
     };
   },
@@ -28,7 +20,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g :transform="`scale(${scale} ${scale})`">
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 100 250"
+  >
     <rect
       :fill="color"
       x="10"
@@ -66,10 +61,10 @@ export default defineComponent({
     </g>
     <SetpointValues
       :part="part"
-      :start-y="2"
+      :y="100"
       :background-color="color"
       hide-unset
       settings-key="setpoint"
     />
-  </g>
+  </svg>
 </template>

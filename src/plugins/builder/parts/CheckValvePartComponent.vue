@@ -1,19 +1,15 @@
 <script lang="ts">
 import { RIGHT } from '@/plugins/builder/const';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const liquidPaths = ['M 0,25 h 50', 'M 20,15 L 30,25 L 20,35'];
 
 export default defineComponent({
   name: 'CheckValvePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
 
@@ -29,7 +25,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+  >
     <g
       key="valve-outer"
       class="outline"
@@ -57,5 +56,5 @@ export default defineComponent({
       :speed="flowSpeed"
       path="M0,25H50"
     />
-  </g>
+  </svg>
 </template>

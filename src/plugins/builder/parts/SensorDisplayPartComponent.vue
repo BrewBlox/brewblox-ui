@@ -1,42 +1,23 @@
 <script lang="ts">
 import { CENTER } from '@/plugins/builder/const';
-import {
-  coord2grid,
-  liquidOnCoord,
-  textTransformation,
-} from '@/plugins/builder/utils';
+import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { SensorT, SENSOR_KEY, SENSOR_TYPES } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'SensorDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const width = 1;
-    const height = 1;
-
-    const { bordered, scale } = usePart.setup(props.part);
+    const { bordered } = usePart.setup(props.part);
 
     const { block, blockStatus, isBroken, showBlockDialog } =
       useSettingsBlock.setup<SensorT>(props.part, SENSOR_KEY, SENSOR_TYPES);
 
-    const dimensions = computed(() => ({
-      x: 0,
-      y: 0,
-      width: coord2grid(scale.value * width),
-      height: coord2grid(scale.value * height),
-    }));
-
     const contentTransform = computed<string>(() =>
-      textTransformation(props.part, [width, height]),
+      textTransformation(props.part, [1, 1]),
     );
 
     const tempValue = computed<number | null>(
@@ -57,7 +38,6 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
-      dimensions,
       contentTransform,
       tempValue,
       tempUnit,
@@ -70,10 +50,7 @@ export default defineComponent({
 
 <template>
   <svg
-    :x="dimensions.x"
-    :y="dimensions.y"
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     viewBox="0 0 50 50"
     class="interaction"
     @click="showBlockDialog"

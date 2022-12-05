@@ -1,17 +1,11 @@
 <script lang="ts">
 import { UP } from '@/plugins/builder/const';
-import {
-  coord2grid,
-  elbow,
-  flowOnCoord,
-  liquidOnCoord,
-} from '@/plugins/builder/utils';
+import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, watch } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import { ValveT, VALVE_KEY, VALVE_TYPES } from '../blueprints/LValve';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
 
 const paths = {
   bigEnclosure: `
@@ -28,26 +22,16 @@ const paths = {
 
 export default defineComponent({
   name: 'LValvePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
   emits: [...usePart.emits],
   setup(props, { emit }) {
-    const { sizeX, patchSettings } = usePart.setup(props.part);
+    const { patchSettings } = usePart.setup(props.part);
 
     const { block } = useSettingsBlock.setup<ValveT>(
       props.part,
       VALVE_KEY,
       VALVE_TYPES,
     );
-
-    const dimensions = computed(() => ({
-      width: coord2grid(1),
-      height: coord2grid(1),
-    }));
 
     const closed = computed<boolean>(() =>
       block.value !== null
@@ -91,9 +75,7 @@ export default defineComponent({
 
     return {
       paths,
-      sizeX,
       block,
-      dimensions,
       closed,
       liquidPath,
       liquidSpeed,
@@ -106,8 +88,7 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     viewBox="0 0 50 50"
     class="interaction"
     @click="interact"

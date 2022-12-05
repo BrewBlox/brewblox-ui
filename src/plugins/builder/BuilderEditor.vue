@@ -1063,11 +1063,12 @@ export default defineComponent({
             v-show="!isFloating(part)"
             :key="`${flowPartsRevision}-${part.id}`"
             :part-id="part.id"
-            :transform="coord2translate(part.x, part.y)"
             :class="['flowpart', part.type, partClass(part)]"
           >
             <PartWrapper
               :part="part"
+              :pos-x="part.x"
+              :pos-y="part.y"
               :selected="selectedIds.includes(part.id)"
               :selectable="activeToolId != null && activeToolId !== 'interact'"
               :interactable="activeToolId === 'interact'"
@@ -1083,11 +1084,12 @@ export default defineComponent({
             <g
               v-for="part in floater.parts"
               :key="`floating-${part.id}`"
-              :transform="coord2translate(part.x, part.y)"
               :class="[part.type, partClass(part)]"
             >
               <PartWrapper
                 :part="part"
+                :pos-x="part.x"
+                :pos-y="part.y"
                 selected
               />
             </g>

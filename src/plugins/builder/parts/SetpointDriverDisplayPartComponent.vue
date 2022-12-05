@@ -1,5 +1,4 @@
 <script lang="ts">
-import { coord2grid } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
@@ -8,27 +7,17 @@ import {
   ReferenceKind,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { DRIVER_KEY, DRIVER_TYPES } from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { scale, bordered } = usePart.setup(props.part);
-
-    const dimensions = computed(() => ({
-      width: coord2grid(2 * scale.value),
-      height: coord2grid(1 * scale.value),
-    }));
+    const { bordered } = usePart.setup(props.part);
 
     const { block, blockStatus, isBroken, showBlockDialog } =
       useSettingsBlock.setup<ActuatorOffsetBlock>(
@@ -79,13 +68,11 @@ export default defineComponent({
       ReferenceKind,
       prettyQty,
       fixedNumber,
-      dimensions,
       bordered,
       block,
       blockStatus,
       isBroken,
       showBlockDialog,
-      scale,
       refKind,
       setting,
       appliedSetting,
@@ -97,8 +84,7 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     viewBox="0 0 100 50"
     class="interaction"
     @click="showBlockDialog"

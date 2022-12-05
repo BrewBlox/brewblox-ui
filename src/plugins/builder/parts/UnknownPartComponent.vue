@@ -1,15 +1,11 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'UnknownPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
 });
 </script>
 
