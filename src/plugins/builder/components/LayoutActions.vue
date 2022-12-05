@@ -21,7 +21,7 @@ export default defineComponent({
   name: 'LayoutActions',
   props: {
     layout: {
-      type: Object as PropType<BuilderLayout | null>,
+      type: null as unknown as PropType<BuilderLayout | null>,
       default: null,
     },
     noLabel: {

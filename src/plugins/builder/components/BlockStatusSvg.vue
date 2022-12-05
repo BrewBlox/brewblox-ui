@@ -6,7 +6,7 @@ export default defineComponent({
   name: 'BlockStatusSvg',
   props: {
     status: {
-      type: [String, null] as PropType<BlockStatus | null>,
+      type: null as unknown as PropType<BlockStatus | null>,
       required: true,
     },
   },

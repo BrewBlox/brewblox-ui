@@ -9,8 +9,8 @@ export default defineComponent({
   props: {
     ...useField.props,
     modelValue: {
-      type: [String, Number],
-      default: null,
+      type: null as unknown as PropType<string | number | null>,
+      required: true,
     },
     type: {
       type: String as PropType<'text' | 'number'>,

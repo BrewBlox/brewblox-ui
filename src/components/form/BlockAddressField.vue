@@ -29,8 +29,8 @@ export default defineComponent({
       default: false,
     },
     compatible: {
-      type: [String, Array] as PropType<ComparedBlockType>,
-      default: null,
+      type: [String, Array, null] as PropType<ComparedBlockType>,
+      default: () => null,
     },
     blockFilter: {
       type: Function as PropType<(block: Block) => boolean>,

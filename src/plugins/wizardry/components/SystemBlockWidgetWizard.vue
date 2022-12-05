@@ -1,11 +1,21 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { BlockType } from 'brewblox-proto/ts';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'SystemBlockWidgetWizard',
+  props: {
+    featureId: {
+      type: String as PropType<BlockType>,
+      required: true,
+    },
+  },
 });
 </script>
 
 <template>
-  <BlockWidgetWizard single-mode="existing" />
+  <BlockWidgetWizard
+    :feature-id="featureId"
+    single-mode="existing"
+  />
 </template>

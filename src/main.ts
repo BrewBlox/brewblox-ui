@@ -80,7 +80,7 @@ app.use(misc);
 app.use(automation);
 
 // Local components
-globRegister(app, import.meta.globEager('./components/**/*.vue'));
+globRegister(app, import.meta.glob('./components/**/*.vue', { eager: true }));
 
 // Register objects that require a post-startup callback
 startup.add(useSystemStore());

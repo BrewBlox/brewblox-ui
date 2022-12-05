@@ -87,7 +87,8 @@ export default defineComponent({
   >
     <template #preview>
       <GenericGraph
-        v-bind="graphProps"
+        :data="graphProps.data"
+        :layout="graphProps.layout"
         :revision="revision"
       />
     </template>

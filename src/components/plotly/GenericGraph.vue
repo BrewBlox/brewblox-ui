@@ -64,7 +64,7 @@ export default defineComponent({
   },
   props: {
     data: {
-      type: Array as PropType<PlotData[]>,
+      type: Array as PropType<Partial<PlotData>[]>,
       required: true,
     },
     layout: {

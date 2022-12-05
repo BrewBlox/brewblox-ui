@@ -69,6 +69,7 @@ export default defineComponent({
       @update:model-value="(v) => patchConfig({ serviceId: v })"
     />
     <LinkField
+      v-if="serviceId"
       :model-value="config.coolPid"
       :service-id="serviceId"
       :block-filter="pidFilter"
@@ -78,6 +79,7 @@ export default defineComponent({
       @update:model-value="(v) => patchConfig({ coolPid: v })"
     />
     <LinkField
+      v-if="serviceId"
       :model-value="config.heatPid"
       :service-id="serviceId"
       :block-filter="pidFilter"
@@ -87,6 +89,7 @@ export default defineComponent({
       @update:model-value="(v) => patchConfig({ heatPid: v })"
     />
     <LinkField
+      v-if="serviceId"
       :model-value="config.profile"
       :service-id="serviceId"
       :block-filter="profileFilter"

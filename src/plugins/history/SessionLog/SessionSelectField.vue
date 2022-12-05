@@ -22,7 +22,7 @@ export default defineComponent({
   props: {
     ...useField.props,
     modelValue: {
-      type: Object as PropType<LoggedSession | null>,
+      type: null as unknown as PropType<LoggedSession | null>,
       default: null,
     },
     sessions: {

@@ -11,7 +11,7 @@ export default defineComponent({
   name: 'DatetimeInput',
   props: {
     modelValue: {
-      type: [Date, Number, String] as PropType<Date | number | string | null>,
+      type: null as unknown as PropType<Date | number | string | null>,
       default: null,
     },
     output: {
@@ -27,7 +27,7 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: ['update:model-value'],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     function asDate(v: Date | number | string | null): Date | null {
       if (typeof v === 'number') {
@@ -57,7 +57,7 @@ export default defineComponent({
       if (v && props.output === 'number') {
         output = v.getTime();
       }
-      emit('update:model-value', output);
+      emit('update:modelValue', output);
     }
 
     const local = ref<Date | null>(asDate(props.modelValue));

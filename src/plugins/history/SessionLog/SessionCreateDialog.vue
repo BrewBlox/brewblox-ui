@@ -21,7 +21,7 @@ export default defineComponent({
       required: true,
     },
     preselected: {
-      type: String as PropType<string | null>,
+      type: null as unknown as PropType<string | null>,
       default: null,
     },
   },

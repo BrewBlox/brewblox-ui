@@ -78,5 +78,11 @@ module.exports = {
         'no-console': 'off',
       },
     },
+    {
+      files: ['src/auto-import.d.ts'],
+      rules: {
+        'max-len': 'off',
+      },
+    },
   ],
 };

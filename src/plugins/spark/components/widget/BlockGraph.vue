@@ -3,6 +3,8 @@ import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
 import { deepCopy, isJsonEqual } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
+import isObject from 'lodash/isObject';
+import isString from 'lodash/isString';
 import { Layout } from 'plotly.js';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
@@ -35,7 +37,19 @@ export default defineComponent({
       ...emptyGraphConfig(),
       ...props.config,
     }));
+
     const renderedConfig = ref<GraphConfig>(deepCopy(graphConfig.value));
+
+    const graphTitle = computed<string>(() => {
+      const actual = graphConfig.value.layout.title;
+      if (isString(actual)) {
+        return actual;
+      }
+      if (isObject(actual)) {
+        return actual.text ?? '';
+      }
+      return '';
+    });
 
     watch(
       () => graphConfig.value,
@@ -92,6 +106,7 @@ export default defineComponent({
       sourceRevision,
       dialogOpen,
       graphConfig,
+      graphTitle,
       targetKeys,
       isRightAxis,
       axisLabel,
@@ -131,7 +146,7 @@ export default defineComponent({
           >
             <ExportGraphAction
               :config="graphConfig"
-              :header="graphConfig.layout.title"
+              :header="graphTitle"
             />
             <q-expansion-item label="Display Axis">
               <q-item

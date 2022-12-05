@@ -36,20 +36,20 @@ export default defineComponent({
   name: 'DigitalStateButton',
   props: {
     modelValue: {
-      type: [String, Number] as PropType<DigitalState | number>,
+      type: null as unknown as PropType<DigitalState | number | null>,
       required: true,
     },
     pending: {
       type: Boolean,
-      default: false,
+      default: () => false,
     },
     pendingReason: {
-      type: String,
-      default: null,
+      type: null as unknown as PropType<string | null>,
+      default: () => null,
     },
     disable: {
       type: Boolean,
-      default: false,
+      default: () => false,
     },
   },
   emits: ['update:modelValue'],
@@ -58,10 +58,15 @@ export default defineComponent({
     const off = DigitalState.STATE_INACTIVE;
 
     const state = computed<DigitalState>({
-      get: () =>
-        Enum.isType(DigitalState, props.modelValue)
-          ? props.modelValue
-          : alternatives[props.modelValue] ?? DigitalState.STATE_UNKNOWN,
+      get: () => {
+        if (props.modelValue == null) {
+          return DigitalState.STATE_UNKNOWN;
+        }
+        if (Enum.isType(DigitalState, props.modelValue)) {
+          return props.modelValue;
+        }
+        return alternatives[props.modelValue] ?? DigitalState.STATE_UNKNOWN;
+      },
       set: (v) => emit('update:modelValue', v),
     });
 

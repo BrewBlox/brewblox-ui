@@ -1,17 +1,17 @@
 <script lang="ts">
 import { useDashboardStore } from '@/store/dashboards';
-import { computed, defineComponent, onBeforeMount } from 'vue';
+import { computed, defineComponent, onBeforeMount, PropType } from 'vue';
 
 export default defineComponent({
   name: 'DashboardSelect',
   props: {
     modelValue: {
-      type: String,
-      default: null,
+      type: null as unknown as PropType<string | null>,
+      default: () => null,
     },
     defaultValue: {
-      type: String,
-      default: null,
+      type: null as unknown as PropType<string | null>,
+      default: () => null,
     },
     label: {
       type: String,
