@@ -21,7 +21,7 @@ const size: BuilderBlueprint['size'] = ({ settings }) => {
 
 const blueprint: BuilderBlueprint = {
   type: 'SensorDisplay',
-  title: 'Display: sensor',
+  title: 'Display: Temp Sensor',
   cards: [
     {
       component: 'BlockAddressCard',

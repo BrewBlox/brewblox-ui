@@ -35,7 +35,7 @@ export default defineComponent({
 <template>
   <svg
     v-bind="{ width, height }"
-    viewBox="0 0 50 50"
+    viewBox="0 0 50 200"
   >
     <LiquidStroke
       :paths="[paths.liquid]"

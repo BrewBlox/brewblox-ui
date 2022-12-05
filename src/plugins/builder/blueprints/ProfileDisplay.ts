@@ -16,7 +16,7 @@ const size: BuilderBlueprint['size'] = ({ settings }) => {
 
 const blueprint: BuilderBlueprint = {
   type: 'ProfileDisplay',
-  title: 'Display: setpoint profile',
+  title: 'Display: Setpoint Profile',
   cards: [
     {
       component: 'BlockAddressCard',

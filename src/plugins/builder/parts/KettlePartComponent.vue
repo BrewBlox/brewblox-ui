@@ -58,16 +58,12 @@ export default defineComponent({
         stroke-width="4px"
       />
     </g>
-    <foreignObject
-      :transform="labelTransform"
-      class="fit"
-    >
-      <div
-        class="fit builder-text"
-        style="font-size: 130%; padding-top: 15px"
-      >
-        {{ titleText }}
-      </div>
-    </foreignObject>
+    <BuilderLabelValues
+      :part="part"
+      :width="width"
+      :height="50"
+      settings-key="text"
+      @update:part="(v) => $emit('update:part', v)"
+    />
   </svg>
 </template>

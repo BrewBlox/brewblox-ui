@@ -16,7 +16,7 @@ const size: BuilderBlueprint['size'] = ({ settings }) => {
 
 const blueprint: BuilderBlueprint = {
   type: 'SetpointDriverDisplay',
-  title: 'Display: setpoint driver',
+  title: 'Display: Setpoint Driver',
   cards: [
     {
       component: 'BlockAddressCard',

@@ -17,28 +17,61 @@ export default defineComponent({
       type: Object as PropType<FlowPart>,
       required: true,
     },
-    posX: {
+    /**
+     * Rendered X position (in grid coordinates).
+     * This is not required to be equal to `part.x`.
+     */
+    gridX: {
       type: Number,
       default: 0,
     },
-    posY: {
+    /**
+     * Rendered Y position (in grid coordinates).
+     * This is not required to be equal to `part.y`.
+     */
+    gridY: {
       type: Number,
       default: 0,
     },
+    /**
+     * Mouse events for the wrapped part are enabled.
+     */
     interactable: {
       type: Boolean,
       default: false,
     },
+    /**
+     * The part is highlighted on hover.
+     */
     selectable: {
       type: Boolean,
       default: false,
     },
+    /**
+     * The part is actively selected, and should be highlighted.
+     */
     selected: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Mouse events for the wrapped part are disabled.
+     * The 'preselect' event is emitted on click.
+     */
+    preselectable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * The part is inaccessible, and should be faded.
+     */
+    inactive: {
+      type: Boolean,
+      default: false,
+    },
   },
-  setup(props) {
+  emits: ['preselect'],
+  setup(props, { emit }) {
     const builderStore = useBuilderStore();
     const { sizeX, sizeY } = usePart.setup(props.part);
     const component = builderStore.componentByType(props.part.type);
@@ -49,7 +82,7 @@ export default defineComponent({
     }));
 
     const positionTransform = computed<string>(() =>
-      coord2translate(props.posX, props.posY),
+      coord2translate(props.gridX, props.gridY),
     );
 
     const rotateTransform = computed<string>(() => {
@@ -77,12 +110,17 @@ export default defineComponent({
       return '';
     });
 
+    function preselect(): void {
+      emit('preselect');
+    }
+
     return {
       component,
       dimensions,
       positionTransform,
       rotateTransform,
       flipTransform,
+      preselect,
     };
   },
 });
@@ -91,7 +129,7 @@ export default defineComponent({
 <template>
   <g :transform="positionTransform">
     <g :transform="`${rotateTransform} ${flipTransform}`">
-      <g :class="{ interactable, selectable, selected }">
+      <g :class="{ interactable, selectable, selected, inactive }">
         <rect
           class="select-background"
           :width="dimensions.width"
@@ -106,6 +144,13 @@ export default defineComponent({
           class="builder-part"
           v-bind="$attrs"
         />
+        <rect
+          v-if="preselectable"
+          :width="dimensions.width"
+          :height="dimensions.height"
+          class="preselect-foreground"
+          @click.stop="preselect"
+        />
       </g>
     </g>
   </g>
@@ -113,7 +158,61 @@ export default defineComponent({
 
 <style lang="sass">
 /* not scoped */
+.interactable > .builder-part
+  pointer-events: all
 
+.selectable > .builder-part
+  pointer-events: none
+
+.selectable > .select-background
+  cursor: pointer
+  pointer-events: all
+
+.select-background
+  pointer-events: none
+  opacity: 0
+  rx: 4
+
+.selectable:hover > .select-background
+  fill: silver
+  fill-opacity: 0.5
+  opacity: 0.5
+
+.selected > .select-background
+  fill: dodgerblue
+  fill-opacity: 0.5
+  opacity: 0.5
+
+.inactive
+  opacity: 0.1 !important
+
+.preselect-foreground
+  fill: white
+  opacity: 0
+
+.builder-text
+  font-size: 12px
+  font-weight: 500
+  text-align: center
+  line-height: 1
+  vertical-align: middle
+  display: inline-block
+
+.interaction
+  cursor: pointer
+
+.interaction > .interaction-background
+  width: 100%
+  height: 100%
+  opacity: 0
+  rx: 4
+
+.interaction:hover > .interaction-background
+  fill: silver
+  fill-opacity: 0.5
+  opacity: 0.5
+
+// Generic styling for all part components
 .builder-part
   pointer-events: none
   stroke-linecap: round
@@ -138,45 +237,4 @@ export default defineComponent({
 
   .q-icon
     stroke-width: 0
-
-.interactable > .builder-part
-  pointer-events: all
-
-.selectable
-  pointer-events: bounding-box
-
-.select-background
-  opacity: 0
-
-.selectable:hover > .select-background
-  fill: silver
-  fill-opacity: 0.5
-  opacity: 0.5
-
-.selected > .select-background
-  fill: dodgerblue
-  fill-opacity: 0.5
-  opacity: 0.5
-
-.builder-text
-  font-size: 12px
-  font-weight: 500
-  text-align: center
-  line-height: 1
-  vertical-align: middle
-  display: inline-block
-
-.interaction
-  cursor: pointer
-
-.interaction > .interaction-background
-  width: 100%
-  height: 100%
-  opacity: 0
-  rx: 4
-
-.interaction:hover > .interaction-background
-  fill: silver
-  fill-opacity: 0.5
-  opacity: 0.5
 </style>

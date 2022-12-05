@@ -200,14 +200,17 @@ export default defineComponent({
           >
             <PartWrapper
               :part="part"
+              :grid-x="part.x"
+              :grid-y="part.y"
+              :inactive="pending != null"
               :interactable="!delayTouch"
-              :pos-x="part.x"
-              :pos-y="part.y"
+              :preselectable="delayTouch"
               @update:part="savePart"
               @dirty="calculateFlowParts"
+              @preselect="pending = part"
             />
           </g>
-          <template v-if="pending">
+          <template v-if="pending != null">
             <rect
               width="100%"
               height="100%"
@@ -216,9 +219,9 @@ export default defineComponent({
               @click.stop="pending = null"
             />
             <PartWrapper
-              :pos-x="pending.x"
-              :pos-y="pending.y"
               :part="pending"
+              :grid-x="pending.x"
+              :grid-y="pending.y"
               interactable
               @update:part="savePart"
               @dirty="calculateFlowParts"

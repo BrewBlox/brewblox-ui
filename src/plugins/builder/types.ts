@@ -106,5 +106,4 @@ export interface BuilderTool {
   icon: string;
   shortcut: string;
   cursor: string;
-  partClass?: (part: FlowPart) => string;
 }

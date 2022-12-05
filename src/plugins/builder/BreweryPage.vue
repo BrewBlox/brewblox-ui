@@ -165,21 +165,21 @@ export default defineComponent({
             <g
               v-for="part in flowParts"
               :key="`${flowPartsRevision}-${part.id}`"
-              :class="{
-                [part.type]: true,
-                inactive: !!pending,
-              }"
+              :class="[part.type]"
             >
               <PartWrapper
                 :part="part"
-                :pos-x="part.x"
-                :pos-y="part.y"
-                interactable
+                :grid-x="part.x"
+                :grid-y="part.y"
+                :inactive="pending != null"
+                :interactable="!delayTouch"
+                :preselectable="delayTouch"
                 @update:part="savePart"
                 @dirty="calculateFlowParts"
+                @preselect="pending = part"
               />
             </g>
-            <template v-if="pending">
+            <template v-if="pending != null">
               <rect
                 width="100%"
                 height="100%"
@@ -189,8 +189,8 @@ export default defineComponent({
               />
               <PartWrapper
                 :part="pending"
-                :pos-x="pending.x"
-                :pos-y="pending.y"
+                :grid-x="pending.x"
+                :grid-y="pending.y"
                 interactable
                 @update:part="savePart"
                 @dirty="calculateFlowParts"

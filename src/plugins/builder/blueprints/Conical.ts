@@ -47,8 +47,8 @@ const blueprint: BuilderBlueprint = {
       return [settings.sizeX || SIZE_X, settings.sizeY || SIZE_Y];
     }
     // backwards compatibility with deprecated setting
-    if (settings[SCALE_KEY] !== undefined) {
-      const scale = settings[SCALE_KEY] ?? 1;
+    if (settings[SCALE_KEY] != null) {
+      const scale = Number(settings[SCALE_KEY]);
       return [SIZE_X * scale, SIZE_Y * scale];
     }
     return [SIZE_X, SIZE_Y];

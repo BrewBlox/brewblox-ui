@@ -10,16 +10,36 @@ const blueprint: BuilderBlueprint = {
   cards: [
     { component: 'ColorCard' },
     {
-      component: 'ScaleCard',
+      component: 'SizeCard',
       props: {
-        settingsKey: SCALE_KEY,
-        defaultSize: [SIZE_X, SIZE_Y],
+        settingsKey: 'sizeX',
+        defaultSize: SIZE_X,
+        label: 'Width',
+        min: 1,
+        max: 5,
+      },
+    },
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: 'sizeY',
+        defaultSize: SIZE_Y,
+        label: 'Height',
+        min: 1,
+        max: 10,
       },
     },
   ],
   size: ({ settings }) => {
-    const scale = settings[SCALE_KEY] ?? 1;
-    return [SIZE_X * scale, SIZE_Y * scale];
+    if (settings.sizeX !== undefined || settings.sizeY !== undefined) {
+      return [settings.sizeX || SIZE_X, settings.sizeY || SIZE_Y];
+    }
+    // backwards compatibility with deprecated setting
+    if (settings[SCALE_KEY] != null) {
+      const scale = Number(settings[SCALE_KEY]);
+      return [SIZE_X * scale, SIZE_Y * scale];
+    }
+    return [SIZE_X, SIZE_Y];
   },
   transitions: () => ({}),
 };
