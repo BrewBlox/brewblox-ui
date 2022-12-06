@@ -29,7 +29,8 @@
     "lint:fix:eslint": "yarn lint:eslint --fix",
     "lint:fix:prettier": "prettier --write ./src ./test ./dev/*.js ./*.js ./*.yml",
     "lint:fix": "yarn lint:fix:eslint && yarn lint:fix:prettier",
-    "firmware": "bash dev/update-firmware.sh"
+    "firmware": "bash dev/update-firmware.sh",
+    "components": "vue-global-type-gen && echo 'export {};' >> src/auto-import.d.ts"
   },
   "dependencies": {
     "@quasar/extras": "^1.10.11",
@@ -102,6 +103,7 @@
     "vite": "^3.1.8",
     "vite-plugin-checker": "^0.5.1",
     "vitest": "^0.24.3",
+    "vue-global-type-gen": "^1.1.0",
     "vue-tsc": "^1.0.8"
   },
   "engines": {

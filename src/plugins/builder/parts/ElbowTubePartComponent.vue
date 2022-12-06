@@ -1,8 +1,8 @@
 <script lang="ts">
 import { RIGHT } from '@/plugins/builder/const';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 const paths = {
   borders: [
@@ -14,12 +14,8 @@ const paths = {
 
 export default defineComponent({
   name: 'ElbowTubePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
 
@@ -35,7 +31,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+  >
     <LiquidStroke
       :paths="[paths.liquid]"
       :colors="liquids"
@@ -48,5 +47,5 @@ export default defineComponent({
       <path :d="paths.borders[0]" />
       <path :d="paths.borders[1]" />
     </g>
-  </g>
+  </svg>
 </template>

@@ -163,7 +163,7 @@ export default defineComponent({
       />
       <div class="col-grow">
         <QuantityField
-          v-if="inputBlock !== null"
+          v-if="inputBlock != null && inputStoredSetting != null"
           v-model="inputStoredSetting"
           :readonly="inputClaimed"
           :class="[{ darkened: !inputBlock.data.enabled }, 'col']"

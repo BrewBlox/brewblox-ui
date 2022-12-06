@@ -4,7 +4,6 @@ import { ENUM_LABELS_ANALOG_OP } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { selectable } from '@/utils/collections';
-import { isQuantity } from '@/utils/identity';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, tempQty } from '@/utils/quantity';
 import { AnalogCompare, BlockType, Quantity } from 'brewblox-proto/ts';
@@ -39,13 +38,21 @@ export default defineComponent({
       ),
     );
 
-    const rhs = computed<Quantity | number>({
-      get: () => {
-        const cmp = local.value;
-        return isTemp.value ? tempQty(cmp.rhs) : cmp.rhs;
-      },
+    const rhsQty = computed<Quantity | null>({
+      get: () => (isTemp.value ? tempQty(local.value.rhs) : null),
       set: (v) => {
-        local.value.rhs = isQuantity(v) ? bloxQty(v).to('degC').value ?? 0 : v;
+        if (v == null) {
+          local.value.rhs = 0;
+        } else {
+          local.value.rhs = bloxQty(v).to('degC').value ?? 0;
+        }
+      },
+    });
+
+    const rhsNumber = computed<number | null>({
+      get: () => (isTemp.value ? null : local.value.rhs),
+      set: (v) => {
+        local.value.rhs = v ?? 0;
       },
     });
 
@@ -61,7 +68,8 @@ export default defineComponent({
       operatorOpts,
       local,
       isTemp,
-      rhs,
+      rhsQty,
+      rhsNumber,
       save,
     };
   },
@@ -93,14 +101,14 @@ export default defineComponent({
           @keyup.enter.exact.stop
         />
         <QuantityField
-          v-if="isTemp"
-          v-model="rhs"
+          v-if="rhsQty != null"
+          v-model="rhsQty"
           label="Target value"
           class="col"
         />
         <InputField
-          v-else
-          v-model="rhs"
+          v-else-if="rhsNumber != null"
+          v-model="rhsNumber"
           type="number"
           label="Target value"
           class="col"

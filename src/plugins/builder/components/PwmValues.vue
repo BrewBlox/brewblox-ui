@@ -1,31 +1,35 @@
 <script lang="ts">
-import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, textTransformation } from '@/plugins/builder/utils';
 import { preciseNumber } from '@/utils/quantity';
-import { ActuatorPwmBlock, BlockType, FastPwmBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
+import { PwmBlockT, PWM_KEY, PWM_TYPES } from '../const';
 
 export default defineComponent({
   name: 'PwmValues',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
+    ...usePart.props,
+    width: {
+      type: Number,
+      default: 50,
+    },
+    height: {
+      type: Number,
+      default: 50,
     },
     settingsKey: {
       type: String,
-      required: true,
+      default: PWM_KEY,
     },
     noBorder: {
       type: Boolean,
       default: false,
     },
-    startX: {
+    x: {
       type: Number,
       default: 0,
     },
-    startY: {
+    y: {
       type: Number,
       default: 0,
     },
@@ -34,43 +38,34 @@ export default defineComponent({
       default: '',
     },
   },
+  emits: [...usePart.emits],
   setup(props) {
-    const width = 1;
-    const height = 1;
-
     const { bordered } = usePart.setup(props.part);
-    const { block, blockStatus, isBroken } = useSettingsBlock.setup<
-      ActuatorPwmBlock | FastPwmBlock
-    >(props.part, props.settingsKey, [
-      BlockType.ActuatorPwm,
-      BlockType.FastPwm,
-    ]);
+    const { block, blockStatus, isBroken, showBlockDialog } =
+      useSettingsBlock.setup<PwmBlockT>(
+        props.part,
+        props.settingsKey,
+        PWM_TYPES,
+      );
 
     const pwmValue = computed<number | null>(() =>
       block.value?.data.enabled ? block.value.data.value : null,
     );
 
-    const dimensions = computed(() => ({
-      x: coord2grid(props.startX),
-      y: coord2grid(props.startY),
-      width: coord2grid(width),
-      height: coord2grid(height),
-    }));
-
     const contentTransform = computed<string>(() =>
-      textTransformation(props.part, [width, height]),
+      textTransformation(props.part, [1, 1]),
     );
 
     return {
       coord2grid,
       preciseNumber,
-      dimensions,
       contentTransform,
       block,
       blockStatus,
       isBroken,
       pwmValue,
       bordered,
+      showBlockDialog,
     };
   },
 });
@@ -78,12 +73,12 @@ export default defineComponent({
 
 <template>
   <svg
-    :x="dimensions.x"
-    :y="dimensions.y"
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ x, y, width, height }"
     viewBox="0 0 50 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g class="outline">
       <rect
         v-show="bordered"

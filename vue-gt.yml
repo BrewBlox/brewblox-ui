@@ -1,0 +1,11 @@
+# Configuration file for vue-global-type-gen
+# This generates type definitions for Vue components that are registered globally
+config:
+  out: src/auto-import.d.ts
+  stdout: false
+  lazyComponents: false
+  excludes:
+    - node_modules
+  includes:
+    - src/components/**/*.vue
+    - src/plugins/*/components/**/*.vue

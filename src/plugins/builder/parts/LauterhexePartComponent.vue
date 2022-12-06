@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 const paths = {
   fixture:
@@ -47,6 +48,8 @@ const paths = {
 
 export default defineComponent({
   name: 'LauterhexePartComponent',
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup() {
     return { paths };
   },
@@ -54,7 +57,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 200 50"
+  >
     <g class="outline">
       <path
         :d="paths.fixture"
@@ -66,5 +72,5 @@ export default defineComponent({
         :d="border"
       />
     </g>
-  </g>
+  </svg>
 </template>

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { settingsAddress } from '@/plugins/builder/utils';
-import { BlockAddress } from '@/plugins/spark/types';
+import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '../types';
 
@@ -16,7 +16,7 @@ export default defineComponent({
       required: true,
     },
     compatible: {
-      type: Array as PropType<string[]>,
+      type: [String, Array, null] as PropType<ComparedBlockType>,
       required: true,
     },
     label: {
@@ -53,7 +53,6 @@ export default defineComponent({
   <BlockAddressField
     v-model="address"
     v-bind="{ label, compatible, creatable }"
-    item-aligned
     any-service
   />
 </template>

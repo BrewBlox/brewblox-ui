@@ -61,7 +61,10 @@ const plugin: Plugin = {
     };
 
     startup.add(builderStore);
-    globRegister(app, import.meta.globEager('./components/**/*.vue'));
+    globRegister(
+      app,
+      import.meta.glob('./components/**/*.vue', { eager: true }),
+    );
 
     builderStore.blueprints = Object.values(blueprints);
     featureStore.addWidgetFeature(widget);

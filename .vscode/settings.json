@@ -4,7 +4,6 @@
   "volar.codeLens.scriptSetupTools": false,
   "volar.codeLens.pugTools": false,
   "volar.takeOverMode.enabled": "auto",
-  "volar.vueserver.useSecondServer": true,
   "eslint.run": "onType",
   "html.autoClosingTags": true,
   "[vue]": {

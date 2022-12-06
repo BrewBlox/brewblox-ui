@@ -1,29 +1,22 @@
 <script lang="ts">
 import { CENTER } from '@/plugins/builder/const';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
-import { coord2grid, liquidOnCoord } from '../utils';
+import { liquidOnCoord } from '../utils';
 
 export default defineComponent({
   name: 'SetpointDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { scale, bordered } = usePart.setup(props.part);
+    const { bordered } = usePart.setup(props.part);
 
     const color = computed<string>(
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',
     );
 
     return {
-      coord2grid,
       bordered,
-      scale,
       color,
     };
   },
@@ -31,16 +24,16 @@ export default defineComponent({
 </script>
 
 <template>
-  <g :transform="`scale(${scale} ${scale})`">
-    <SetpointValues
-      :part="part"
-      settings-key="setpoint"
-    />
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 100 50"
+  >
+    <SetpointValues :part="part" />
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(2) - 2"
-        :height="coord2grid(1) - 2"
+        :width="100 - 2"
+        :height="50 - 2"
         :stroke="color"
         stroke-width="2px"
         x="1"
@@ -49,5 +42,5 @@ export default defineComponent({
         ry="6"
       />
     </g>
-  </g>
+  </svg>
 </template>

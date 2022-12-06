@@ -13,6 +13,7 @@ import {
   SystemBlockType,
 } from 'brewblox-proto/ts';
 import isArray from 'lodash/isArray';
+import isString from 'lodash/isString';
 import { Enum } from 'typescript-string-enums';
 import { BlockAddress, ComparedBlockType } from '../types';
 
@@ -32,7 +33,10 @@ export function isCompatible(
   if (isArray(intf)) {
     return intf.some((i) => isCompatible(type, i));
   }
-  return Boolean(COMPATIBLE_TYPES[intf]?.includes(type));
+  if (isString(intf)) {
+    return Boolean(COMPATIBLE_TYPES[intf]?.includes(type));
+  }
+  return false;
 }
 
 export function isBlockCompatible<T extends Block>(

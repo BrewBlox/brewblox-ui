@@ -159,7 +159,6 @@ export default defineComponent({
             :pending="block.data.state !== block.data.desiredState"
             :pending-reason="limitations"
             :disable="isClaimed"
-            dense
             class="col-auto"
             @update:model-value="(v) => patchBlock({ storedState: v })"
           />

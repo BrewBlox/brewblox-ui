@@ -3,7 +3,7 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { prettyQty } from '@/utils/quantity';
 import { Block, BlockIntfType } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 const sensorFilter = (block: Block): boolean =>
   isCompatible(block.type, BlockIntfType.TempSensorInterface);
@@ -12,8 +12,8 @@ export default defineComponent({
   name: 'QuickstartSensorField',
   props: {
     modelValue: {
-      type: String,
-      default: '',
+      type: null as unknown as PropType<string | null>,
+      default: () => null,
     },
     serviceId: {
       type: String,
@@ -25,7 +25,7 @@ export default defineComponent({
     const sparkStore = useSparkStore();
 
     const local = computed<string>({
-      get: () => props.modelValue,
+      get: () => props.modelValue ?? '',
       set: (v) => emit('update:modelValue', v),
     });
 

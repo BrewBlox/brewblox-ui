@@ -1,7 +1,7 @@
 <script lang="ts">
 import { LEFT } from '@/plugins/builder/const';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
@@ -11,12 +11,8 @@ const paths = {
 
 export default defineComponent({
   name: 'DipTubePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const flowSpeed = computed<number>(() => -flowOnCoord(props.part, LEFT));
 
@@ -32,7 +28,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+  >
     <g class="outline">
       <rect
         fill="white"
@@ -60,5 +59,5 @@ export default defineComponent({
       :speed="flowSpeed"
       :path="paths.liquid"
     />
-  </g>
+  </svg>
 </template>

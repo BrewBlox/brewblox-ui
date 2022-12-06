@@ -14,7 +14,10 @@ const plugin: Plugin = {
     const tiltStore = useTiltStore();
     const featureStore = useFeatureStore();
     const serviceStore = useServiceStore();
-    globRegister(app, import.meta.globEager('./components/**/*.vue'));
+    globRegister(
+      app,
+      import.meta.glob('./components/**/*.vue', { eager: true }),
+    );
 
     featureStore.addServiceFeature({
       id: 'Tilt',

@@ -1,7 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { COIL_BOTTOM } from '../blueprints/Coil';
-import { FlowPart } from '../types';
+import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
@@ -38,12 +38,8 @@ const paths = {
 
 export default defineComponent({
   name: 'CoilPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const flowSpeed = computed<number>(() =>
       flowOnCoord(props.part, COIL_BOTTOM),
@@ -63,7 +59,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 150 100"
+  >
     <LiquidStroke
       :paths="paths.liquid"
       :colors="liquids"
@@ -112,7 +111,7 @@ export default defineComponent({
       :speed="flowSpeed"
       path="M50,75H0"
     />
-  </g>
+  </svg>
 </template>
 
 <style lang="scss" scoped>

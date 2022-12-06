@@ -38,6 +38,12 @@ interface ActionDisplay extends ChangeAction {
   diffs: BlockDiff[];
 }
 
+interface AppliedChange {
+  block: Block;
+  patch: { [k: string]: any };
+  confirmed: string[];
+}
+
 export default defineComponent({
   name: 'QuickActionsBasic',
   setup() {
@@ -57,13 +63,10 @@ export default defineComponent({
       () => config.value.lastActionId ?? null,
     );
 
-    function saveActions(values: ChangeAction[] = actions.value): void {
-      patchConfig({
-        actions: values.map(({ id, name, changes }) => ({
-          id,
-          name,
-          changes,
-        })),
+    async function saveAction(action: ChangeAction): Promise<void> {
+      const { id, name, changes } = action;
+      await patchConfig({
+        actions: spliceById([...actions.value], { id, name, changes }),
       });
     }
 
@@ -132,35 +135,53 @@ export default defineComponent({
     }
 
     async function applyChanges(action: ChangeAction): Promise<void> {
-      const changes = action.changes;
-      const actualChanges: [Block, any][] = [];
-      for (const change of changes) {
-        const block = blockByChange(change)!;
-        const fieldSpecs = specStore.fieldSpecsByType(block.type);
-        const actualData = deepCopy(change.data);
-        for (const key in change.data) {
+      let dirty = false;
+
+      const applied: AppliedChange[] = action.changes.map((c) => ({
+        block: blockByChange(c)!,
+        patch: deepCopy(c.data),
+        confirmed: Object.entries(c.confirmed)
+          .filter(([, v]) => v === true)
+          .map(([k]) => k),
+      }));
+
+      // Update data in action where required
+      for (const change of applied) {
+        const fieldSpecs = specStore.fieldSpecsByType(change.block.type);
+        for (const key in change.patch) {
           if (!fieldSpecs.some((c) => c.key === key)) {
-            delete actualData[key];
+            dirty = true;
+            delete change.patch[key];
           }
-          if (change.confirmed?.[key]) {
-            actualData[key] = await confirmActionChange(
-              block,
+          if (change.confirmed.includes(key)) {
+            dirty = true;
+            change.patch[key] = await confirmActionChange(
+              change.block,
               key,
-              actualData[key],
+              change.patch[key],
             );
           }
         }
-        actualChanges.push([block, actualData]);
       }
-      for (const [block, actualData] of actualChanges) {
-        await sparkStore.patchBlock(block, actualData);
+
+      // Users can interrupt the action by cancelling the confirm
+      // Only apply the action when data is final
+      for (const change of applied) {
+        await sparkStore.patchBlock(change.block, change.patch);
       }
-      action.changes = action.changes.map((change, idx) => ({
-        ...change,
-        data: actualChanges[idx][1],
-      }));
-      spliceById(actions.value, action);
-      saveActions();
+
+      if (dirty) {
+        await saveAction({
+          ...action,
+          changes: [
+            // Explicitly create an array to prevent Proxy objects with numbered keys
+            ...action.changes.map((change, idx) => ({
+              ...change,
+              data: applied[idx].patch,
+            })),
+          ],
+        });
+      }
     }
 
     function applyAction(action: ChangeAction): void {

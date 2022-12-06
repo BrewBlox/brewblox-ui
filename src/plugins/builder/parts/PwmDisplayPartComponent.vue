@@ -1,29 +1,19 @@
 <script lang="ts">
 import { CENTER } from '@/plugins/builder/const';
-import { computed, defineComponent, PropType } from 'vue';
-import { PWM_KEY } from '../blueprints/PwmDisplay';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 import { liquidOnCoord } from '../utils';
 
 export default defineComponent({
   name: 'PwmDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { scale } = usePart.setup(props.part);
-
     const color = computed<string>(
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',
     );
 
     return {
-      PWM_KEY,
-      scale,
       color,
     };
   },
@@ -31,11 +21,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <g :transform="`scale(${scale} ${scale})`">
-    <PwmValues
-      :part="part"
-      :settings-key="PWM_KEY"
-      :color="color"
-    />
-  </g>
+  <PwmValues
+    v-bind="{ part, width, height }"
+    :color="color"
+  />
 </template>

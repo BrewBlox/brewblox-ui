@@ -1,14 +1,15 @@
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
-import { containerTransitions } from '@/plugins/builder/utils';
+import {
+  containerTransitions,
+  variableSizeFunc,
+} from '@/plugins/builder/utils';
+import { SIZE_X_KEY, SIZE_Y_KEY } from '../const';
 
 export const DEFAULT_FILL_PCT = 85;
 export const DEFAULT_SIZE_X = 4;
 export const DEFAULT_SIZE_Y = 6;
 
-const size = (part: PersistentPart): [number, number] => [
-  part.settings.sizeX || DEFAULT_SIZE_X,
-  part.settings.sizeY || DEFAULT_SIZE_Y,
-];
+const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
 
 const blueprint: BuilderBlueprint = {
   type: 'Kettle',
@@ -24,7 +25,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeX',
+        settingsKey: SIZE_X_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 2,
@@ -34,7 +35,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeY',
+        settingsKey: SIZE_Y_KEY,
         defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
         min: 2,

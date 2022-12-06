@@ -1,11 +1,16 @@
 <script lang="ts">
-import { RIGHT } from '@/plugins/builder/const';
+import {
+  RIGHT,
+  ValveBlockT,
+  VALVE_KEY,
+  VALVE_TYPES,
+} from '@/plugins/builder/const';
+import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, watch } from 'vue';
-import { ValveT, VALVE_KEY, VALVE_TYPES } from '../blueprints/Valve';
-import { useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
-import { coord2grid, flowOnCoord, liquidOnCoord } from '../utils';
+import { computed, defineComponent, watch } from 'vue';
+import { CLOSED_KEY } from '../blueprints/Valve';
+import { usePart, useSettingsBlock } from '../composables';
+import { flowOnCoord, liquidOnCoord, scheduleSoftStartRefresh } from '../utils';
 
 const paths = {
   outerValve: [
@@ -23,16 +28,15 @@ const paths = {
 
 export default defineComponent({
   name: 'ValvePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
-  emits: ['dirty'],
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props, { emit }) {
+    const sparkStore = useSparkStore();
+
+    const { patchSettings } = usePart.setup(props.part);
+
     const { hasAddress, block, blockStatus, isBroken } =
-      useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
+      useSettingsBlock.setup<ValveBlockT>(props.part, VALVE_KEY, VALVE_TYPES);
 
     const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
 
@@ -75,8 +79,23 @@ export default defineComponent({
       },
     );
 
+    function interact(): void {
+      if (hasAddress.value) {
+        if (block.value) {
+          const storedState =
+            block.value.data.state === DigitalState.STATE_INACTIVE
+              ? DigitalState.STATE_ACTIVE
+              : DigitalState.STATE_INACTIVE;
+          sparkStore.patchBlock(block.value, { storedState });
+
+          scheduleSoftStartRefresh(block.value);
+        }
+      } else {
+        patchSettings({ [CLOSED_KEY]: !props.part.settings[CLOSED_KEY] });
+      }
+    }
+
     return {
-      coord2grid,
       blockStatus,
       paths,
       hasAddress,
@@ -86,13 +105,20 @@ export default defineComponent({
       closed,
       pending,
       valveRotation,
+      interact,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+    class="interaction"
+    @click="interact"
+  >
+    <rect class="interaction-background" />
     <BlockStatusSvg :status="blockStatus" />
     <UnlinkedSvgIcon
       v-if="isBroken"
@@ -148,5 +174,5 @@ export default defineComponent({
       :speed="flowSpeed"
       :path="paths.arrows"
     />
-  </g>
+  </svg>
 </template>

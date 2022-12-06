@@ -1,56 +1,45 @@
 <script lang="ts">
-import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
-import { liquidOnCoord, settingsBlock } from '@/plugins/builder/utils';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockStatus } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils/info';
 import {
-  ActuatorPwmBlock,
-  BlockType,
-  DigitalActuatorBlock,
-  DigitalState,
-} from 'brewblox-proto/ts';
-import { computed, defineComponent, onBeforeMount, PropType, watch } from 'vue';
-import {
-  PumpT,
+  DEFAULT_PUMP_PRESSURE,
+  DigitalBlockT,
+  DIGITAL_TYPES,
+  LEFT,
+  PumpBlockT,
   PUMP_KEY,
   PUMP_TYPES,
-  PWM_PUMP_TYPES,
-} from '../blueprints/Pump';
-import { FlowPart } from '../types';
+  PwmBlockT,
+  PWM_TYPES,
+} from '@/plugins/builder/const';
+import {
+  liquidOnCoord,
+  scheduleSoftStartRefresh,
+  showAbsentBlock,
+} from '@/plugins/builder/utils';
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
+import { DigitalState } from 'brewblox-proto/ts';
+import { computed, defineComponent, onBeforeMount, watch } from 'vue';
+import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'PumpPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
-  emits: ['update:part', 'dirty'],
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props, { emit }) {
-    const specStore = useBlockSpecStore();
+    const sparkStore = useSparkStore();
+    const { patchSettings } = usePart.setup(props.part);
 
-    const hasAddress = computed<boolean>(
-      () => props.part.settings[PUMP_KEY]?.id != null,
-    );
-
-    const block = computed<PumpT | null>(() =>
-      settingsBlock(props.part, PUMP_KEY, PUMP_TYPES),
-    );
-
-    const blockStatus = computed<BlockStatus | undefined>(() =>
-      block.value
-        ? specStore.blockSpecByType(block.value.type)?.analyze(block.value)
-        : undefined,
-    );
+    const { block, blockStatus, hasAddress } =
+      useSettingsBlock.setup<PumpBlockT>(props.part, PUMP_KEY, PUMP_TYPES);
 
     const enabled = computed<boolean>(() => {
       if (block.value === null) {
         return hasAddress.value ? false : Boolean(props.part.settings.enabled);
-      } else if (block.value.type === BlockType.DigitalActuator) {
+      } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
-      } else if (isCompatible(block.value.type, PWM_PUMP_TYPES)) {
+      } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
         return block.value.data.enabled && Boolean(block.value.data.setting);
       } else {
         return false;
@@ -60,8 +49,7 @@ export default defineComponent({
     const liquids = computed<string[]>(() => liquidOnCoord(props.part, LEFT));
 
     const pwmSetting = computed<number>(() =>
-      block.value?.type === BlockType.ActuatorPwm ||
-      block.value?.type === BlockType.FastPwm
+      isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)
         ? Number(block.value.data.setting)
         : 100,
     );
@@ -74,19 +62,38 @@ export default defineComponent({
       return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
     });
 
+    function checkDirty(
+      newV: PumpBlockT | null,
+      oldV: PumpBlockT | null,
+    ): boolean {
+      if (newV == null || oldV == null) {
+        return true;
+      }
+      if (newV.type !== oldV.type) {
+        return true;
+      }
+      if (
+        isBlockCompatible<DigitalBlockT>(newV, DIGITAL_TYPES) &&
+        isBlockCompatible<DigitalBlockT>(oldV, DIGITAL_TYPES)
+      ) {
+        return newV.data.state !== oldV.data.state;
+      }
+      if (
+        isBlockCompatible<PwmBlockT>(newV, PWM_TYPES) &&
+        isBlockCompatible<PwmBlockT>(oldV, PWM_TYPES)
+      ) {
+        return (
+          newV.data.setting !== oldV.data.setting ||
+          newV.data.enabled !== oldV.data.enabled
+        );
+      }
+      return false;
+    }
+
     watch(
       () => block.value,
       (newV, oldV) => {
-        if (
-          newV === null ||
-          oldV === null ||
-          (newV as DigitalActuatorBlock).data.state !==
-            (oldV as DigitalActuatorBlock).data.state ||
-          (newV as ActuatorPwmBlock).data.setting !==
-            (oldV as ActuatorPwmBlock).data.setting ||
-          (newV as ActuatorPwmBlock).data.enabled !==
-            (oldV as ActuatorPwmBlock).data.enabled
-        ) {
+        if (checkDirty(newV, oldV)) {
           emit('dirty');
         }
       },
@@ -94,16 +101,43 @@ export default defineComponent({
 
     onBeforeMount(() => {
       if (props.part.settings.pwm !== undefined) {
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            [PUMP_KEY]: props.part.settings.pwm,
-            pwm: undefined,
-          },
+        patchSettings({
+          [PUMP_KEY]: props.part.settings.pwm,
+          pwm: undefined,
         });
       }
     });
+
+    function interact(): void {
+      if (!hasAddress.value) {
+        patchSettings({ enabled: !props.part.settings.enabled });
+      } else if (block.value == null) {
+        showAbsentBlock(props.part, PUMP_KEY);
+      } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
+        const storedState =
+          block.value.data.state === DigitalState.STATE_INACTIVE
+            ? DigitalState.STATE_ACTIVE
+            : DigitalState.STATE_INACTIVE;
+        sparkStore.patchBlock(block.value, { storedState });
+        scheduleSoftStartRefresh(block.value);
+      } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
+        const limiterWarning = block.value.data.constrainedBy.constraints.length
+          ? 'The value may be limited by constraints'
+          : '';
+        createDialog({
+          component: 'SliderDialog',
+          componentProps: {
+            modelValue: block.value.data.storedSetting,
+            title: 'Pump speed',
+            message: limiterWarning,
+            label: 'Percentage output',
+            quickActions: PWM_SELECT_OPTIONS,
+          },
+        }).onOk((storedSetting: number) =>
+          sparkStore.patchBlock(block.value, { storedSetting }),
+        );
+      }
+    }
 
     return {
       block,
@@ -112,13 +146,20 @@ export default defineComponent({
       enabled,
       liquids,
       duration,
+      interact,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+    class="interaction"
+    @click="interact"
+  >
+    <rect class="interaction-background" />
     <!-- tube liquid bottom-->
     <LiquidStroke
       :paths="['M50,25H0']"
@@ -139,10 +180,10 @@ export default defineComponent({
     />
     <!-- blades -->
     <g
-      class="blades-wrapper"
       transform="translate(25,30)"
+      class="outline"
     >
-      <g class="outline">
+      <g>
         <line
           x1="-14"
           y1="0"
@@ -214,7 +255,7 @@ export default defineComponent({
       height="50"
     />
     <BlockStatusSvg :status="blockStatus" />
-  </g>
+  </svg>
 </template>
 
 <style lang="scss" scoped>

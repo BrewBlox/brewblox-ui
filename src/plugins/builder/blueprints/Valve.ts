@@ -1,31 +1,19 @@
-import { LEFT, RIGHT } from '@/plugins/builder/const';
+import {
+  LEFT,
+  RIGHT,
+  ValveBlockT,
+  VALVE_KEY,
+  VALVE_TYPES,
+} from '@/plugins/builder/const';
 import {
   BuilderBlueprint,
   PersistentPart,
   Transitions,
 } from '@/plugins/builder/types';
-import { useSparkStore } from '@/plugins/spark/store';
-import { ComparedBlockType } from '@/plugins/spark/types';
-import {
-  BlockType,
-  DigitalActuatorBlock,
-  DigitalState,
-  MotorValveBlock,
-} from 'brewblox-proto/ts';
-import {
-  scheduleSoftStartRefresh,
-  settingsAddress,
-  settingsBlock,
-} from '../utils';
-
-export type ValveT = DigitalActuatorBlock | MotorValveBlock;
+import { DigitalState } from 'brewblox-proto/ts';
+import { settingsAddress, settingsBlock } from '../utils';
 
 export const CLOSED_KEY = 'closed';
-export const VALVE_KEY = 'valve';
-export const VALVE_TYPES: ComparedBlockType = [
-  BlockType.DigitalActuator,
-  BlockType.MotorValve,
-];
 
 const blueprint: BuilderBlueprint = {
   type: 'Valve',
@@ -44,7 +32,7 @@ const blueprint: BuilderBlueprint = {
   transitions: (part: PersistentPart): Transitions => {
     const hasAddress = settingsAddress(part, VALVE_KEY).id !== null;
     const block = hasAddress
-      ? settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES)
+      ? settingsBlock<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES)
       : null;
     const closed = hasAddress
       ? block?.data.state !== DigitalState.STATE_ACTIVE
@@ -56,26 +44,6 @@ const blueprint: BuilderBlueprint = {
           [LEFT]: [{ outCoords: RIGHT }],
           [RIGHT]: [{ outCoords: LEFT }],
         };
-  },
-  interactHandler: (part: PersistentPart, { savePart }) => {
-    const hasAddress = settingsAddress(part, VALVE_KEY).id !== null;
-    if (hasAddress) {
-      const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
-      if (block) {
-        const sparkStore = useSparkStore();
-
-        const storedState =
-          block.data.state === DigitalState.STATE_INACTIVE
-            ? DigitalState.STATE_ACTIVE
-            : DigitalState.STATE_INACTIVE;
-        sparkStore.patchBlock(block, { storedState });
-
-        scheduleSoftStartRefresh(block);
-      }
-    } else {
-      part.settings[CLOSED_KEY] = !part.settings[CLOSED_KEY];
-      savePart(part);
-    }
   },
 };
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { DOWN, LEFT, RIGHT, UP } from '@/plugins/builder/const';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
@@ -14,12 +14,8 @@ const paths = {
 
 export default defineComponent({
   name: 'CrossTubePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const speed = computed<Record<Direction, number>>(() => ({
       up: flowOnCoord(props.part, UP),
@@ -45,7 +41,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+  >
     <g class="outline">
       <polyline points="50,21 29,21 29,0" />
       <polyline points="21,0 21,21 0,21" />
@@ -90,5 +89,5 @@ export default defineComponent({
         :speed="speed.right"
       />
     </g>
-  </g>
+  </svg>
 </template>

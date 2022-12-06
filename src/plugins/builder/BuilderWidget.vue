@@ -5,7 +5,6 @@ import { userUISettings } from '@/user-settings';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
-import { isAbsoluteUrl } from '@/utils/url';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
@@ -17,7 +16,7 @@ import {
   FlowPart,
   PersistentPart,
 } from './types';
-import { coord2grid } from './utils';
+import { coord2grid, coord2translate } from './utils';
 
 export default defineComponent({
   name: 'BuilderWidget',
@@ -54,14 +53,6 @@ export default defineComponent({
       },
     );
 
-    function navigate(url: string): void {
-      if (isAbsoluteUrl(url)) {
-        window.open(url, '_blank');
-      } else {
-        router.push(url);
-      }
-    }
-
     function startSelectLayout(): void {
       createDialog({
         component: 'SelectedLayoutDialog',
@@ -97,26 +88,9 @@ export default defineComponent({
       return delayed === 'always' || (delayed === 'dense' && dense.value);
     });
 
-    function interact(part: FlowPart | null): void {
-      if (!part) {
-        return;
-      }
-      const handler = builderStore.blueprintByType(part.type).interactHandler;
-      if (!handler) {
-        return;
-      }
-      if (pending.value && pending.value.id === part.id) {
-        handler(part, { savePart, navigate });
-        pending.value = null;
-      } else if (delayTouch.value) {
-        pending.value = part;
-      } else {
-        handler(part, { savePart, navigate });
-      }
-    }
-
     return {
       coord2grid,
+      coord2translate,
       startSelectLayout,
       inDialog,
       dense,
@@ -131,7 +105,7 @@ export default defineComponent({
       flowParts,
       flowPartsRevision,
       pending,
-      interact,
+      delayTouch,
       savePart,
       calculateFlowParts,
       resetZoom,
@@ -219,24 +193,24 @@ export default defineComponent({
           <g
             v-for="part in flowParts"
             :key="`${flowPartsRevision}-${part.id}`"
-            :transform="`translate(${coord2grid(part.x)}, ${coord2grid(
-              part.y,
-            )})`"
             :class="{
               [part.type]: true,
-              pointer: part.canInteract,
-              inactive: !!pending,
+              inactive: pending != null,
             }"
-            @click.stop="interact(part)"
-            @dblclick.stop
           >
             <PartWrapper
               :part="part"
+              :grid-x="part.x"
+              :grid-y="part.y"
+              :inactive="pending != null"
+              :interactable="!delayTouch"
+              :preselectable="delayTouch"
               @update:part="savePart"
               @dirty="calculateFlowParts"
+              @preselect="pending = part"
             />
           </g>
-          <template v-if="pending">
+          <template v-if="pending != null">
             <rect
               width="100%"
               height="100%"
@@ -244,19 +218,14 @@ export default defineComponent({
               opacity="0"
               @click.stop="pending = null"
             />
-            <g
-              :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(
-                pending.y,
-              )})`"
-              class="pointer"
-              @click.stop="interact(pending)"
-            >
-              <PartWrapper
-                :part="pending"
-                @update:part="savePart"
-                @dirty="calculateFlowParts"
-              />
-            </g>
+            <PartWrapper
+              :part="pending"
+              :grid-x="pending.x"
+              :grid-y="pending.y"
+              interactable
+              @update:part="savePart"
+              @dirty="calculateFlowParts"
+            />
           </template>
         </g>
       </svg>

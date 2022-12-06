@@ -1,28 +1,18 @@
 <script lang="ts">
-import {
-  coord2grid,
-  elbow,
-  flowOnCoord,
-  liquidOnCoord,
-} from '@/plugins/builder/utils';
+import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'RimsTubePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const { sizeX } = usePart.setup(props.part);
 
     const paths = computed<Mapped<string>>(() => {
-      const startLast = coord2grid(sizeX.value - 1);
+      const startLast = props.width - 50;
       return {
         closeLeft: 'M50,10 v30',
         entry: `M71,0 v10 M79,0 v10 M${startLast + 21},0 v10 M${
@@ -68,15 +58,16 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg v-bind="{ width, height }">
     <PwmValues
       :part="part"
-      settings-key="pwm"
+      :width="50"
+      :height="50"
     />
     <LiquidStroke
       :paths="[paths.content]"
       :colors="liquids"
-      class="contentLiquid"
+      class="content-liquid"
     />
     <LiquidStroke
       :paths="[paths.flowPath]"
@@ -93,11 +84,11 @@ export default defineComponent({
       <path :d="paths.casing" />
       <path :d="paths.element" />
     </g>
-  </g>
+  </svg>
 </template>
 
 <style lang="scss" scoped>
-:deep(.contentLiquid path) {
+:deep(.content-liquid path) {
   stroke-width: 30 !important;
   stroke-linecap: butt;
   fill: none;

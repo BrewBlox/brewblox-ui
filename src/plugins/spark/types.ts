@@ -10,12 +10,18 @@ import {
   AnyConstraintKey,
   Block,
   BlockOrIntfType,
+  DateString,
   Quantity,
+  SparkDeviceDescription,
+  SparkFirmwareDescription,
   StoreObject,
 } from 'brewblox-proto/ts';
 import { Layout } from 'plotly.js';
 
-export type ComparedBlockType = BlockOrIntfType | BlockOrIntfType[] | null;
+export type ComparedBlockType =
+  | BlockOrIntfType
+  | readonly BlockOrIntfType[]
+  | null;
 
 export type PageMode = 'Relations' | 'List';
 
@@ -39,7 +45,13 @@ export interface SparkStoreEntry {
   data: any;
 }
 
-export interface SparkExported {
+export interface SparkBackup {
+  // optional metadata
+  name?: string;
+  timestamp?: DateString;
+  firmware?: SparkFirmwareDescription;
+  device?: SparkDeviceDescription;
+
   blocks: Block[];
   store: SparkStoreEntry[];
 }

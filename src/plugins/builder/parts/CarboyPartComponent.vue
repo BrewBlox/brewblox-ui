@@ -1,12 +1,9 @@
 <script lang="ts">
-import { colorString, coord2grid } from '@/plugins/builder/utils';
-import svgpath from 'svgpath';
-import { computed, defineComponent, PropType } from 'vue';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/Carboy';
+import { colorString } from '@/plugins/builder/utils';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 
-const basePath = `
+const path = `
     M89.2,199
     H10.8
     c-5.4,0-9.8-4.4-9.8-9.9
@@ -24,42 +21,15 @@ const basePath = `
 
 export default defineComponent({
   name: 'CarboyPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { sizeX, sizeY } = usePart.setup(props.part);
-
     const color = computed<string>(() =>
       colorString(props.part.settings.color),
     );
 
-    const scaleX = computed<number>(() => sizeX.value / DEFAULT_SIZE_X);
-
-    const scaleY = computed<number>(() => sizeY.value / DEFAULT_SIZE_Y);
-
-    const valueY = computed<number>(() => Math.round(sizeY.value / 4));
-
-    const path = computed<string>(() =>
-      scaleX.value === 1 && scaleY.value === 1
-        ? basePath
-        : svgpath(basePath)
-            .transform(`scale(${scaleX.value} ${scaleY.value})`)
-            .round(1)
-            .toString(),
-    );
-
     return {
-      coord2grid,
       color,
-      sizeX,
-      sizeY,
-      scaleX,
-      scaleY,
-      valueY,
       path,
     };
   },
@@ -67,12 +37,15 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 100 200"
+  >
     <rect
-      :y="coord2grid(1)"
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY - 1) - 2"
       :fill="color"
+      y="50"
+      width="100"
+      height="148"
       rx="8"
       ry="8"
     />
@@ -81,11 +54,9 @@ export default defineComponent({
     </g>
     <SetpointValues
       :part="part"
-      :start-y="valueY"
-      :start-x="sizeX / 2 - 1"
+      :y="50"
       :background-color="color"
-      settings-key="setpoint"
       hide-unset
     />
-  </g>
+  </svg>
 </template>

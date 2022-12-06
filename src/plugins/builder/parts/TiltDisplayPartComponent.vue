@@ -1,10 +1,6 @@
 <script lang="ts">
 import { CENTER } from '@/plugins/builder/const';
-import {
-  coord2grid,
-  liquidOnCoord,
-  textTransformation,
-} from '@/plugins/builder/utils';
+import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
 import { userUnits } from '@/user-settings';
@@ -14,27 +10,17 @@ import {
   prettyQty,
   prettyUnit,
 } from '@/utils/quantity';
-import { computed, defineComponent, PropType } from 'vue';
-import { SIZE_X, SIZE_Y, TILT_ID_KEY } from '../blueprints/TiltDisplay';
+import { computed, defineComponent } from 'vue';
+import { TILT_ID_KEY } from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'TiltDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { bordered, scale } = usePart.setup(props.part);
+    const { bordered } = usePart.setup(props.part);
     const tiltStore = useTiltStore();
-
-    const dimensions = computed(() => ({
-      width: coord2grid(SIZE_X * scale.value),
-      height: coord2grid(SIZE_Y * scale.value),
-    }));
 
     const tiltId = computed<string | null>(
       () => props.part.settings[TILT_ID_KEY] ?? null,
@@ -77,7 +63,6 @@ export default defineComponent({
     return {
       prettyQty,
       preciseNumber,
-      dimensions,
       textTransformation,
       fixedNumber,
       temperature,
@@ -87,14 +72,16 @@ export default defineComponent({
       unitlessGravity,
       color,
       bordered,
-      scale,
     };
   },
 });
 </script>
 
 <template>
-  <g :transform="`scale(${scale} ${scale})`">
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 100 50"
+  >
     <g class="content">
       <SensorSvgIcon
         x="15"
@@ -149,5 +136,5 @@ export default defineComponent({
         ry="6"
       />
     </g>
-  </g>
+  </svg>
 </template>

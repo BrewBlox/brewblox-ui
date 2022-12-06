@@ -8,15 +8,15 @@ import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { Block } from 'brewblox-proto/ts';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'BlockDiscoveryWizard',
   props: {
     ...useWidgetWizard.props,
     activeServiceId: {
-      type: String,
-      default: null,
+      type: null as unknown as PropType<string | null>,
+      default: () => null,
     },
     optionalWidget: {
       type: Boolean,

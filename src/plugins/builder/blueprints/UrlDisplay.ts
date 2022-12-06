@@ -1,4 +1,6 @@
-import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
+import { BuilderBlueprint } from '@/plugins/builder/types';
+import { SIZE_X_KEY, SIZE_Y_KEY } from '../const';
+import { variableSizeFunc } from '../utils';
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 1;
@@ -24,7 +26,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeX',
+        settingsKey: SIZE_X_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 2,
@@ -34,7 +36,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeY',
+        settingsKey: SIZE_Y_KEY,
         defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
         min: 1,
@@ -45,17 +47,8 @@ const blueprint: BuilderBlueprint = {
       component: 'BorderCard',
     },
   ],
-  size: (part: PersistentPart) => [
-    part.settings.sizeX || DEFAULT_SIZE_X,
-    part.settings.sizeY || DEFAULT_SIZE_Y,
-  ],
+  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart, { navigate }) => {
-    const { url } = part.settings;
-    if (url) {
-      navigate(url);
-    }
-  },
 };
 
 export default blueprint;

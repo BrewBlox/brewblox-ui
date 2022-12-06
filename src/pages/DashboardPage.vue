@@ -146,7 +146,10 @@ export default defineComponent({
         >
           <q-tooltip> Dashboard actions </q-tooltip>
           <template #menus>
-            <DashboardActions :dashboard-id="dashboardId" />
+            <DashboardActions
+              v-if="dashboardId != null"
+              :dashboard-id="dashboardId"
+            />
           </template>
         </ActionMenu>
       </ButtonsTeleport>

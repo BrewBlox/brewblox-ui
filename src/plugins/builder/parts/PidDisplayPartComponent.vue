@@ -1,50 +1,35 @@
 <script lang="ts">
-import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
 import {
-  coord2grid,
-  liquidOnCoord,
-  textTransformation,
-} from '@/plugins/builder/utils';
+  CENTER,
+  COLD_WATER,
+  HOT_WATER,
+  PidBlockT,
+  PID_KEY,
+  PID_TYPES,
+} from '@/plugins/builder/const';
+import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { userUnits } from '@/user-settings';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
-import { Block, BlockType, PidBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
-import { PID_KEY, PID_TYPES } from '../blueprints/PidDisplay';
+import { Block, BlockType } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'PidDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const width = 1;
-    const height = 1;
     const sparkStore = useSparkStore();
-    const { scale, bordered } = usePart.setup(props.part);
+    const { bordered } = usePart.setup(props.part);
 
-    const { block, blockStatus, isBroken } = useSettingsBlock.setup<PidBlock>(
-      props.part,
-      PID_KEY,
-      PID_TYPES,
-    );
-
-    const dimensions = computed(() => ({
-      x: 0,
-      y: 0,
-      width: coord2grid(scale.value * width),
-      height: coord2grid(scale.value * height),
-    }));
+    const { block, blockStatus, isBroken, showBlockDialog } =
+      useSettingsBlock.setup<PidBlockT>(props.part, PID_KEY, PID_TYPES);
 
     const contentTransform = computed<string>(() =>
-      textTransformation(props.part, [width, height]),
+      textTransformation(props.part, [1, 1]),
     );
 
     const outputValue = computed<number | null>(() =>
@@ -91,12 +76,11 @@ export default defineComponent({
       preciseNumber,
       mdiCalculatorVariant,
       mdiPlusMinus,
-      scale,
-      dimensions,
       contentTransform,
       block,
       blockStatus,
       isBroken,
+      showBlockDialog,
       outputValue,
       outputSetting,
       kp,
@@ -111,12 +95,12 @@ export default defineComponent({
 
 <template>
   <svg
-    :x="dimensions.x"
-    :y="dimensions.y"
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     viewBox="0 0 50 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g class="outline">
       <rect
         v-show="bordered"

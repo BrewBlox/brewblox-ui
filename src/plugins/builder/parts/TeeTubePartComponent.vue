@@ -1,7 +1,7 @@
 <script lang="ts">
 import { LEFT, RIGHT, UP } from '@/plugins/builder/const';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
@@ -12,12 +12,8 @@ const paths = {
 
 export default defineComponent({
   name: 'TeeTubePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const topSpeed = computed<number>(() => flowOnCoord(props.part, UP));
 
@@ -49,7 +45,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+  >
     <g class="outline">
       <path d="M0,21H21V0" />
       <path d="M50,21H29V0" />
@@ -84,5 +83,5 @@ export default defineComponent({
         :speed="rightSpeed"
       />
     </g>
-  </g>
+  </svg>
 </template>

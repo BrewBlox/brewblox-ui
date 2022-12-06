@@ -23,10 +23,14 @@ import {
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
   deprecatedTypes,
+  SCALE_KEY,
+  SIZE_X_KEY,
+  SIZE_Y_KEY,
   SQUARE_SIZE,
 } from './const';
 import { useBuilderStore } from './store';
 import {
+  BuilderBlueprint,
   BuilderLayout,
   FlowPart,
   PersistentPart,
@@ -60,9 +64,8 @@ export function settingsBlock<T extends Block>(
 export function asPersistentPart(
   part: PersistentPart | FlowPart,
 ): PersistentPart {
-  const { transitions, size, flows, canInteract, ...persistent } =
-    part as FlowPart;
-  void { transitions, size, flows, canInteract };
+  const { transitions, size, flows, ...persistent } = part as FlowPart;
+  void { transitions, size, flows };
   return persistent;
 }
 
@@ -72,7 +75,6 @@ export function asStatePart(part: PersistentPart): StatePart {
     ...part,
     transitions: blueprint.transitions(part),
     size: blueprint.size(part),
-    canInteract: blueprint.interactHandler !== undefined,
   };
 }
 
@@ -236,6 +238,10 @@ export function grid2coord(val: number): number {
   return Math.round(val / SQUARE_SIZE);
 }
 
+export function coord2translate(x: number, y: number): string {
+  return `translate(${coord2grid(x)}, ${coord2grid(y)})`;
+}
+
 export function textTransformation(
   part: PersistentPart,
   textSize: [number, number],
@@ -246,11 +252,9 @@ export function textTransformation(
     transforms.push(`translate(${coord2grid(textSize[0])}, 0) scale(-1,1)`);
   }
   if (part.rotate && counterRotate) {
-    transforms.push(
-      `rotate(${-part.rotate},${coord2grid(0.5 * textSize[0])},${coord2grid(
-        0.5 * textSize[1],
-      )})`,
-    );
+    const originX = coord2grid(0.5 * textSize[0]);
+    const originY = coord2grid(0.5 * textSize[1]);
+    transforms.push(`rotate(${-part.rotate},${originX},${originY})`);
   }
   return transforms.join(' ');
 }
@@ -366,6 +370,29 @@ export function universalTransitions(
     },
     { [CENTER]: coords.map((outCoords) => ({ outCoords, friction: 0.5 })) },
   );
+}
+
+export function variableSizeFunc(
+  defaultSizeX: number,
+  defaultSizeY: number,
+): BuilderBlueprint['size'] {
+  return ({ settings }) => {
+    if (
+      settings[SIZE_X_KEY] !== undefined ||
+      settings[SIZE_Y_KEY] !== undefined
+    ) {
+      return [
+        settings[SIZE_X_KEY] || defaultSizeX,
+        settings[SIZE_Y_KEY] || defaultSizeY,
+      ];
+    }
+    // backwards compatibility with deprecated setting
+    if (settings[SCALE_KEY] != null) {
+      const scale = Number(settings[SCALE_KEY]);
+      return [defaultSizeX * scale, defaultSizeY * scale];
+    }
+    return [defaultSizeX, defaultSizeY];
+  };
 }
 
 export function vivifyParts(

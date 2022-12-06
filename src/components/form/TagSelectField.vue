@@ -8,7 +8,7 @@ export default defineComponent({
     ...useField.props,
     modelValue: {
       type: Array as PropType<string[]>,
-      required: true,
+      default: () => [],
     },
     existing: {
       type: Array as PropType<string[]>,
