@@ -1,16 +1,15 @@
 <script lang="ts">
-import { UP } from '@/plugins/builder/const';
 import {
-  coord2grid,
-  elbow,
-  flowOnCoord,
-  liquidOnCoord,
-} from '@/plugins/builder/utils';
+  UP,
+  ValveBlockT,
+  VALVE_KEY,
+  VALVE_TYPES,
+} from '@/plugins/builder/const';
+import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
+import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, watch } from 'vue';
-import { ValveT, VALVE_KEY, VALVE_TYPES } from '../blueprints/LValve';
+import { computed, defineComponent, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
 
 const paths = {
   bigEnclosure: `
@@ -27,17 +26,12 @@ const paths = {
 
 export default defineComponent({
   name: 'LValvePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
-  emits: ['dirty'],
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props, { emit }) {
-    const { sizeX } = usePart.setup(props.part);
+    const { patchSettings } = usePart.setup(props.part);
 
-    const { block } = useSettingsBlock.setup<ValveT>(
+    const { block } = useSettingsBlock.setup<ValveBlockT>(
       props.part,
       VALVE_KEY,
       VALVE_TYPES,
@@ -57,6 +51,19 @@ export default defineComponent({
 
     const liquidColor = computed<string[]>(() => liquidOnCoord(props.part, UP));
 
+    function interact(): void {
+      if (block.value) {
+        useSparkStore().patchBlock(block.value, {
+          storedState:
+            block.value.data.state === DigitalState.STATE_ACTIVE
+              ? DigitalState.STATE_INACTIVE
+              : DigitalState.STATE_ACTIVE,
+        });
+      } else {
+        patchSettings({ closed: !props.part.settings.closed });
+      }
+    }
+
     watch(
       () => block.value,
       (newV, oldV) => {
@@ -71,21 +78,26 @@ export default defineComponent({
     );
 
     return {
-      coord2grid,
       paths,
-      sizeX,
       block,
       closed,
       liquidPath,
       liquidSpeed,
       liquidColor,
+      interact,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 50"
+    class="interaction"
+    @click="interact"
+  >
+    <rect class="interaction-background" />
     <LiquidStroke
       :paths="[liquidPath]"
       :colors="liquidColor"
@@ -98,9 +110,7 @@ export default defineComponent({
     </g>
     <g
       class="outline fill"
-      :transform="
-        closed ? `translate(${coord2grid(sizeX)}, 0) scale(-1, 1)` : ''
-      "
+      :transform="closed ? 'translate(50, 0) scale(-1, 1)' : ''"
     >
       <path d="M0,21 H10" />
       <path d="M0,29 H10" />
@@ -112,5 +122,5 @@ export default defineComponent({
       :transform="`translate(${closed ? 5 : -5}, 15)`"
       color="black"
     />
-  </g>
+  </svg>
 </template>

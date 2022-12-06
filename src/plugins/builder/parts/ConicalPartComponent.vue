@@ -1,28 +1,19 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'ConicalPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const { scale } = usePart.setup(props.part);
-
-    return {
-      scale,
-    };
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
 });
 </script>
 
 <template>
-  <g :transform="`scale(${scale} ${scale})`">
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 150 450"
+  >
     <g class="outline">
       <!-- Body -->
       <rect
@@ -44,9 +35,8 @@ export default defineComponent({
       <!-- Setpoint -->
       <SetpointValues
         :part="part"
-        :start-y="1"
+        :y="50"
         hide-unset
-        settings-key="setpoint"
       />
     </g>
     <g class="outline legs">
@@ -171,7 +161,7 @@ export default defineComponent({
         d="M72.3,334l-6.3-4H48c0,0-2.8,0.2-2.8,3.2s3.1,2.8,3.1,2.8h16l6.3,4H80v-6H72.3z"
       />
     </g>
-  </g>
+  </svg>
 </template>
 
 <style scoped>

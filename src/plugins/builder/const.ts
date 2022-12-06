@@ -1,3 +1,19 @@
+import {
+  ActuatorOffsetBlock,
+  ActuatorPwmBlock,
+  BlockIntfType,
+  BlockType,
+  DigitalActuatorBlock,
+  FastPwmBlock,
+  MotorValveBlock,
+  PidBlock,
+  SetpointProfileBlock,
+  SetpointSensorPairBlock,
+  TempSensorCombiBlock,
+  TempSensorExternalBlock,
+  TempSensorMockBlock,
+  TempSensorOneWireBlock,
+} from 'brewblox-proto/ts';
 import { BuilderTool } from './types';
 
 export const DEFAULT_LAYOUT_WIDTH = 20;
@@ -31,6 +47,50 @@ export const LIQUID_CORNER = 8;
 // Generic settings values
 export const SCALE_KEY = 'scale';
 export const BORDER_KEY = 'bordered';
+export const FLOW_TOGGLE_KEY = 'flowEnabled';
+export const LABEL_KEY = 'text';
+export const SIZE_X_KEY = 'sizeX';
+export const SIZE_Y_KEY = 'sizeY';
+
+// Block links
+export type PwmBlockT = ActuatorPwmBlock | FastPwmBlock;
+export const PWM_KEY = 'pwm';
+export const PWM_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm] as const;
+
+export type SensorBlockT =
+  | TempSensorOneWireBlock
+  | TempSensorCombiBlock
+  | TempSensorMockBlock
+  | TempSensorExternalBlock;
+export const SENSOR_KEY = 'sensor';
+export const SENSOR_TYPES = [BlockIntfType.TempSensorInterface] as const;
+
+export type SetpointBlockT = SetpointSensorPairBlock;
+export const SETPOINT_KEY = 'setpoint';
+export const SETPOINT_TYPES = [BlockType.SetpointSensorPair] as const;
+
+export type DriverBlockT = ActuatorOffsetBlock;
+export const DRIVER_KEY = 'setpointDriver';
+export const DRIVER_TYPES = [BlockType.ActuatorOffset] as const;
+
+export type ValveBlockT = DigitalActuatorBlock | MotorValveBlock;
+export const VALVE_KEY = 'valve';
+export const VALVE_TYPES = [BlockType.MotorValve, BlockType.DigitalActuator];
+
+export type PidBlockT = PidBlock;
+export const PID_KEY = 'pid';
+export const PID_TYPES = [BlockType.Pid] as const;
+
+export type ProfileBlockT = SetpointProfileBlock;
+export const PROFILE_KEY = 'profile';
+export const PROFILE_TYPES = [BlockType.SetpointProfile] as const;
+
+export type DigitalBlockT = DigitalActuatorBlock;
+export const DIGITAL_TYPES = [BlockType.DigitalActuator] as const;
+
+export type PumpBlockT = PwmBlockT | DigitalBlockT;
+export const PUMP_KEY = 'actuator';
+export const PUMP_TYPES = [...PWM_TYPES, ...DIGITAL_TYPES] as const;
 
 export const deprecatedTypes = {
   SmallKettle: 'Kettle',
@@ -54,7 +114,6 @@ export const builderTools: BuilderTool[] = [
     icon: 'mdi-select-drag',
     shortcut: 's',
     cursor: 'crosshair',
-    partClass: (part) => (part != null ? 'pointer' : ''),
   },
   {
     value: 'gridresize',

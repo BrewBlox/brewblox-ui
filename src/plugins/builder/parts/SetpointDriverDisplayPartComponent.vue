@@ -1,37 +1,22 @@
 <script lang="ts">
-import { coord2grid } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
-import {
-  ActuatorOffsetBlock,
-  ReferenceKind,
-  SetpointSensorPairBlock,
-} from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
-import { DRIVER_KEY, DRIVER_TYPES } from '../blueprints/SetpointDriverDisplay';
+import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
+import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
 
 export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { scale, bordered } = usePart.setup(props.part);
+    const { bordered } = usePart.setup(props.part);
 
-    const dimensions = computed(() => ({
-      width: coord2grid(2 * scale.value),
-      height: coord2grid(1 * scale.value),
-    }));
-
-    const { block, blockStatus, isBroken } =
-      useSettingsBlock.setup<ActuatorOffsetBlock>(
+    const { block, blockStatus, isBroken, showBlockDialog } =
+      useSettingsBlock.setup<DriverBlockT>(
         props.part,
         DRIVER_KEY,
         DRIVER_TYPES,
@@ -79,12 +64,11 @@ export default defineComponent({
       ReferenceKind,
       prettyQty,
       fixedNumber,
-      dimensions,
       bordered,
       block,
       blockStatus,
       isBroken,
-      scale,
+      showBlockDialog,
       refKind,
       setting,
       appliedSetting,
@@ -96,10 +80,12 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     viewBox="0 0 100 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"

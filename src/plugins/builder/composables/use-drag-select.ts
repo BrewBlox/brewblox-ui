@@ -29,6 +29,7 @@ export interface UseDragSelectComponent {
   updateDragSelect(x: number, y: number): void;
   stopDragSelect(): void;
   makeSelectAreaFilter(): (part: FlowPart) => boolean;
+  getDragDistance(): number;
 }
 
 export interface UseDragSelectComposable {
@@ -102,6 +103,17 @@ export const useDragSelect: UseDragSelectComposable = {
       };
     }
 
+    function getDragDistance(): number {
+      if (!activeSelectArea.value) {
+        return 0;
+      }
+
+      const area = normalizeSelectArea(activeSelectArea.value);
+      const dx = area.endX - area.startX;
+      const dy = area.endY - area.startY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
     return {
       activeSelectArea,
       selectAreaRef,
@@ -109,6 +121,7 @@ export const useDragSelect: UseDragSelectComposable = {
       updateDragSelect,
       stopDragSelect,
       makeSelectAreaFilter,
+      getDragDistance,
     };
   },
 };

@@ -1,13 +1,9 @@
-import { SCALE_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { showSettingsBlock } from '@/plugins/builder/utils';
-import { BlockType } from 'brewblox-proto/ts';
+import { SETPOINT_KEY, SETPOINT_TYPES, SIZE_X_KEY, SIZE_Y_KEY } from '../const';
+import { variableSizeFunc } from '../utils';
 
-export const SETPOINT_KEY = 'setpoint';
-export const SETPOINT_TYPES = [BlockType.SetpointSensorPair];
-
-const SIZE_X = 3;
-const SIZE_Y = 9;
+const DEFAULT_SIZE_X = 3;
+const DEFAULT_SIZE_Y = 9;
 
 const blueprint: BuilderBlueprint = {
   type: 'Conical',
@@ -23,19 +19,27 @@ const blueprint: BuilderBlueprint = {
       },
     },
     {
-      component: 'ScaleCard',
+      component: 'SizeCard',
       props: {
-        settingsKey: SCALE_KEY,
-        defaultSize: [SIZE_X, SIZE_Y],
+        settingsKey: SIZE_X_KEY,
+        defaultSize: DEFAULT_SIZE_X,
+        label: 'Width',
+        min: 2,
+        max: 8,
+      },
+    },
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: SIZE_Y_KEY,
+        defaultSize: DEFAULT_SIZE_Y,
+        label: 'Height',
+        min: 2,
+        max: 20,
       },
     },
   ],
-  size: ({ settings }) => {
-    const scale = settings[SCALE_KEY] ?? 1;
-    return [SIZE_X * scale, SIZE_Y * scale];
-  },
-  interactHandler: (part) =>
-    showSettingsBlock(part, SETPOINT_KEY, SETPOINT_TYPES),
+  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
 };
 
 export default blueprint;

@@ -21,7 +21,7 @@ export default defineComponent({
   props: {
     ...useDialog.props,
     address: {
-      type: Object as PropType<BlockAddress | null>,
+      type: null as unknown as PropType<BlockAddress | null>,
       default: null,
     },
     title: {

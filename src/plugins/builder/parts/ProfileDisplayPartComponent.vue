@@ -1,32 +1,21 @@
 <script lang="ts">
-import { coord2grid } from '@/plugins/builder/utils';
 import { userUnits } from '@/user-settings';
 import { makeObjectSorter } from '@/utils/functional';
 import { durationMs, preciseNumber, prettyUnit } from '@/utils/quantity';
-import { Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
-import { PROFILE_KEY, PROFILE_TYPES } from '../blueprints/ProfileDisplay';
+import { Setpoint } from 'brewblox-proto/ts';
+import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { FlowPart } from '../types';
+import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
 
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { sizeX, sizeY, bordered } = usePart.setup(props.part);
+    const { bordered } = usePart.setup(props.part);
 
-    const dimensions = computed(() => ({
-      width: coord2grid(sizeX.value),
-      height: coord2grid(sizeY.value),
-    }));
-
-    const { block, blockStatus, isBroken } =
-      useSettingsBlock.setup<SetpointProfileBlock>(
+    const { block, blockStatus, isBroken, showBlockDialog } =
+      useSettingsBlock.setup<ProfileBlockT>(
         props.part,
         PROFILE_KEY,
         PROFILE_TYPES,
@@ -88,13 +77,14 @@ export default defineComponent({
     const tempUnit = computed<string>(() =>
       prettyUnit(userUnits.value.temperature),
     );
+
     return {
       preciseNumber,
       bordered,
-      dimensions,
       block,
       blockStatus,
       isBroken,
+      showBlockDialog,
       currentValue,
       nextValue,
       tempUnit,
@@ -105,10 +95,12 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="dimensions.width"
-    :height="dimensions.height"
+    v-bind="{ width, height }"
     viewBox="0 0 100 50"
+    class="interaction"
+    @click="showBlockDialog"
   >
+    <rect class="interaction-background" />
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"

@@ -1,16 +1,16 @@
-import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
-import { showSettingsBlock } from '@/plugins/builder/utils';
-import { BlockType } from 'brewblox-proto/ts';
+import {
+  SETPOINT_KEY,
+  SETPOINT_TYPES,
+  SIZE_X_KEY,
+  SIZE_Y_KEY,
+} from '@/plugins/builder/const';
+import { BuilderBlueprint } from '@/plugins/builder/types';
+import { variableSizeFunc } from '../utils';
 
 export const DEFAULT_SIZE_X = 2;
 export const DEFAULT_SIZE_Y = 4;
-export const SETPOINT_KEY = 'setpoint';
-export const SETPOINT_TYPES = [BlockType.SetpointSensorPair];
 
-const size = (part: PersistentPart): [number, number] => [
-  part.settings.sizeX || DEFAULT_SIZE_X,
-  part.settings.sizeY || DEFAULT_SIZE_Y,
-];
+const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
 
 const blueprint: BuilderBlueprint = {
   type: 'Carboy',
@@ -31,7 +31,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeX',
+        settingsKey: SIZE_X_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 2,
@@ -41,7 +41,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeY',
+        settingsKey: SIZE_Y_KEY,
         defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
         min: 2,
@@ -50,8 +50,6 @@ const blueprint: BuilderBlueprint = {
     },
   ],
   size,
-  interactHandler: (part) =>
-    showSettingsBlock(part, SETPOINT_KEY, SETPOINT_TYPES),
 };
 
 export default blueprint;

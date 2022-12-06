@@ -4,10 +4,11 @@ import {
   BlockStatus,
   ComparedBlockType,
 } from '@/plugins/spark/types';
+import { createBlockDialog } from '@/utils/block-dialog';
 import { Block } from 'brewblox-proto/ts';
 import { computed, ComputedRef } from 'vue';
 import { FlowPart } from '../types';
-import { settingsAddress, settingsBlock } from '../utils';
+import { settingsAddress, settingsBlock, showAbsentBlock } from '../utils';
 
 export interface useSettingsBlockComponent<BlockT extends Block> {
   hasAddress: ComputedRef<boolean>;
@@ -15,6 +16,7 @@ export interface useSettingsBlockComponent<BlockT extends Block> {
   block: ComputedRef<BlockT | null>;
   blockStatus: ComputedRef<BlockStatus | null>;
   isBroken: ComputedRef<boolean>;
+  showBlockDialog: () => void;
 }
 
 export interface useSettingsBlockComposable {
@@ -55,12 +57,19 @@ export const useSettingsBlock: useSettingsBlockComposable = {
       () => block.value === null && hasAddress.value,
     );
 
+    function showBlockDialog(): void {
+      block.value != null
+        ? createBlockDialog(block.value, { mode: 'Basic' })
+        : showAbsentBlock(part, settingsKey);
+    }
+
     return {
       hasAddress,
       address,
       block,
       blockStatus,
       isBroken,
+      showBlockDialog,
     };
   },
 };

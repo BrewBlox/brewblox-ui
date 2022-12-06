@@ -28,7 +28,7 @@ export default defineComponent({
   name: 'QuickstartChannelField',
   props: {
     modelValue: {
-      type: Object as PropType<IoChannelAddress | null>,
+      type: null as unknown as PropType<IoChannelAddress | null>,
       default: null,
     },
     serviceId: {

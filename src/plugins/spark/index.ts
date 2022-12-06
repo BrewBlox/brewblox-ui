@@ -32,7 +32,10 @@ const plugin: Plugin = {
     const sparkStore = useSparkStore();
     const snippetStore = useBlockSnippetStore();
 
-    globRegister(app, import.meta.globEager('./components/**/*.vue'));
+    globRegister(
+      app,
+      import.meta.glob('./components/**/*.vue', { eager: true }),
+    );
 
     deprecated.forEach(featureStore.addWidgetFeature);
     features.forEach(app.use);

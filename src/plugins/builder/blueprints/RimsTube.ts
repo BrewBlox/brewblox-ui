@@ -3,15 +3,15 @@ import {
   PersistentPart,
   Transitions,
 } from '@/plugins/builder/types';
-import { showPartBlockDialog } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
-import { BlockType } from 'brewblox-proto/ts';
+import { PWM_KEY, PWM_TYPES, SIZE_X_KEY } from '../const';
+import { variableSizeFunc } from '../utils';
 
 export const DEFAULT_SIZE_X = 4;
 export const SIZE_Y = 1;
 export const ENTRY = '1.5,0,0';
-export const PWM_KEY = 'pwm';
-export const PWM_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
+
+const size = variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y);
 
 const blueprint: BuilderBlueprint = {
   type: 'RimsTube',
@@ -20,7 +20,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeX',
+        settingsKey: SIZE_X_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 3,
@@ -39,20 +39,15 @@ const blueprint: BuilderBlueprint = {
       component: 'BorderCard',
     },
   ],
-  size: (part: PersistentPart) => [
-    part.settings.sizeX || DEFAULT_SIZE_X,
-    SIZE_Y,
-  ],
+  size,
   transitions: (part: PersistentPart): Transitions => {
-    const sizeX = part.settings.sizeX || DEFAULT_SIZE_X;
+    const [sizeX] = size(part);
     const rightOut = new Coordinates([sizeX - 0.5, 0, 0]).toString();
     return {
       [ENTRY]: [{ outCoords: rightOut, friction: sizeX - 1 }],
       [rightOut]: [{ outCoords: ENTRY, friction: sizeX - 1 }],
     };
   },
-  interactHandler: (part: PersistentPart) =>
-    showPartBlockDialog(part, PWM_KEY, PWM_TYPES),
 };
 
 export default blueprint;

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useBuilderStore } from '@/plugins/builder/store';
 import { FlowPart } from '@/plugins/builder/types';
-import { coord2grid } from '@/plugins/builder/utils';
+import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 import { computed, defineComponent, PropType } from 'vue';
 import { usePart } from '../composables';
@@ -17,19 +17,73 @@ export default defineComponent({
       type: Object as PropType<FlowPart>,
       required: true,
     },
-    showHover: {
+    /**
+     * Rendered X position (in grid coordinates).
+     * This is not required to be equal to `part.x`.
+     */
+    gridX: {
+      type: Number,
+      default: 0,
+    },
+    /**
+     * Rendered Y position (in grid coordinates).
+     * This is not required to be equal to `part.y`.
+     */
+    gridY: {
+      type: Number,
+      default: 0,
+    },
+    /**
+     * Mouse events for the wrapped part are enabled.
+     */
+    interactable: {
       type: Boolean,
       default: false,
     },
+    /**
+     * The part is highlighted on hover.
+     */
+    selectable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * The part is actively selected, and should be highlighted.
+     */
     selected: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Mouse events for the wrapped part are disabled.
+     * The 'preselect' event is emitted on click.
+     */
+    preselectable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * The part is inaccessible, and should be faded.
+     */
+    inactive: {
+      type: Boolean,
+      default: false,
+    },
   },
-  setup(props) {
+  emits: ['preselect'],
+  setup(props, { emit }) {
     const builderStore = useBuilderStore();
     const { sizeX, sizeY } = usePart.setup(props.part);
     const component = builderStore.componentByType(props.part.type);
+
+    const dimensions = computed(() => ({
+      width: coord2grid(sizeX.value),
+      height: coord2grid(sizeY.value),
+    }));
+
+    const positionTransform = computed<string>(() =>
+      coord2translate(props.gridX, props.gridY),
+    );
 
     const rotateTransform = computed<string>(() => {
       const [partSizeX, partSizeY] = props.part.size;
@@ -50,51 +104,117 @@ export default defineComponent({
     });
 
     const flipTransform = computed<string>(() => {
-      if (!props.part.flipped) {
-        return '';
+      if (props.part.flipped) {
+        return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
       }
-      return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
+      return '';
     });
 
-    const transformation = computed<string>(
-      () => `${rotateTransform.value} ${flipTransform.value}`,
-    );
+    function preselect(): void {
+      emit('preselect');
+    }
 
     return {
-      coord2grid,
-      sizeX,
-      sizeY,
       component,
-      transformation,
+      dimensions,
+      positionTransform,
+      rotateTransform,
+      flipTransform,
+      preselect,
     };
   },
 });
 </script>
 
 <template>
-  <g :transform="transformation">
-    <component
-      :is="component"
-      v-if="component"
-      :part="part"
-      class="BuilderPart"
-      v-bind="$attrs"
-    />
-    <!-- background element, to make the full part clickable -->
-    <rect
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
-      :class="{ showhover: showHover, selected }"
-      opacity="0"
-    />
+  <g :transform="positionTransform">
+    <g :transform="`${rotateTransform} ${flipTransform}`">
+      <g :class="{ interactable, selectable, selected, inactive }">
+        <rect
+          class="select-background"
+          :width="dimensions.width"
+          :height="dimensions.height"
+        />
+        <component
+          :is="component"
+          v-if="component"
+          :part="part"
+          :width="dimensions.width"
+          :height="dimensions.height"
+          class="builder-part"
+          v-bind="$attrs"
+        />
+        <rect
+          v-if="preselectable"
+          :width="dimensions.width"
+          :height="dimensions.height"
+          class="preselect-foreground"
+          @click.stop="preselect"
+        />
+      </g>
+    </g>
   </g>
 </template>
 
 <style lang="sass">
 /* not scoped */
+.interactable > .builder-part
+  pointer-events: all
 
+.selectable > .builder-part
+  pointer-events: none
 
-.BuilderPart
+.selectable > .select-background
+  cursor: pointer
+  pointer-events: all
+
+.select-background
+  pointer-events: none
+  opacity: 0
+  rx: 4
+
+.selectable:hover > .select-background
+  fill: silver
+  fill-opacity: 0.5
+  opacity: 0.5
+
+.selected > .select-background
+  fill: dodgerblue
+  fill-opacity: 0.5
+  opacity: 0.5
+
+.inactive
+  opacity: 0.25 !important
+
+.preselect-foreground
+  fill: white
+  opacity: 0
+
+.builder-text
+  font-size: 12px
+  font-weight: 500
+  text-align: center
+  line-height: 1
+  vertical-align: middle
+  display: inline-block
+
+.interaction
+  cursor: pointer
+
+.interaction > .interaction-background
+  width: 100%
+  height: 100%
+  opacity: 0
+  rx: 4
+
+.interaction:hover > .interaction-background
+  fill: silver
+  fill-opacity: 0.5
+  opacity: 0.5
+
+// Generic styling for all part components
+.builder-part
+  pointer-events: none
   stroke-linecap: round
   fill: none
 
@@ -117,22 +237,4 @@ export default defineComponent({
 
   .q-icon
     stroke-width: 0
-
-.showhover:hover
-  fill: silver
-  fill-opacity: 0.5
-  opacity: 0.5
-
-.selected
-  fill: dodgerblue
-  fill-opacity: 0.5
-  opacity: 0.5
-
-.builder-text
-  font-size: 12px
-  font-weight: 500
-  text-align: center
-  line-height: 1
-  vertical-align: middle
-  display: inline-block
 </style>

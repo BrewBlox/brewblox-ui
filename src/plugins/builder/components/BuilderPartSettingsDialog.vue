@@ -39,8 +39,9 @@ export default defineComponent({
     );
 
     const rotatedSize = computed<[number, number]>(() => {
-      const [x, y] = props.part.size;
-      return clampRotation(props.part.rotate) % 180 ? [y, x] : [x, y];
+      let [x, y] = props.part.size;
+      [x, y] = clampRotation(props.part.rotate) % 180 ? [y, x] : [x, y];
+      return [coord2grid(x), coord2grid(y)];
     });
 
     const displayScale = computed<number>(() => {
@@ -102,12 +103,9 @@ export default defineComponent({
       <div class="widget-body column q-gutter-y-lg">
         <div class="row justify-center">
           <svg
-            :width="`${coord2grid(rotatedSize[0]) * displayScale}px`"
-            :height="`${coord2grid(rotatedSize[1] * displayScale)}px`"
-            :viewBox="`0, 0, ${coord2grid(rotatedSize[0])}, ${coord2grid(
-              rotatedSize[1],
-            )}`"
-            class="col-auto"
+            :height="200"
+            :viewBox="`0 0 ${rotatedSize[0]} ${rotatedSize[1]}`"
+            class="col-grow"
           >
             <PartWrapper
               :key="`menu-${part.id}-${rev}`"

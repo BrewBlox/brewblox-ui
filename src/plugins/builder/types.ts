@@ -42,16 +42,10 @@ export interface PersistentPart {
 export interface StatePart extends PersistentPart {
   transitions: Transitions;
   size: [number, number];
-  canInteract: boolean;
 }
 
 export interface FlowPart extends StatePart {
   flows: CalculatedFlows;
-}
-
-export interface PartApi {
-  savePart: (part: PersistentPart) => unknown;
-  navigate: (url: string) => void;
 }
 
 export interface PartSettingsCard {
@@ -66,7 +60,6 @@ export interface BuilderBlueprint {
   cards: PartSettingsCard[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
-  interactHandler?: (part: PersistentPart, api: PartApi) => void;
 }
 
 export interface BuilderLayout extends StoreObject {
@@ -113,5 +106,4 @@ export interface BuilderTool {
   icon: string;
   shortcut: string;
   cursor: string;
-  partClass?: (part: FlowPart) => string;
 }

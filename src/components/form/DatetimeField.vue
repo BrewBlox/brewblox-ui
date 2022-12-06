@@ -9,7 +9,7 @@ export default defineComponent({
   props: {
     ...useField.props,
     modelValue: {
-      type: [Date] as PropType<Date | null>,
+      type: null as unknown as PropType<Date | null>,
       default: null,
     },
     short: {

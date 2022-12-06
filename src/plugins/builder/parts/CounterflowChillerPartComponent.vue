@@ -1,10 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import {
   CFC_BOTTOM_LEFT,
   CFC_TOP_RIGHT,
 } from '../blueprints/CounterflowChiller';
-import { FlowPart } from '../types';
+import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
@@ -48,12 +48,8 @@ const paths = {
 
 export default defineComponent({
   name: 'CounterflowChillerPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
     const topFlowSpeed = computed<number>(() =>
       flowOnCoord(props.part, CFC_TOP_RIGHT),
@@ -83,16 +79,19 @@ export default defineComponent({
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 150 100"
+  >
     <LiquidStroke
       :paths="paths.topBulbLiquid"
       :colors="topLiquids"
-      class="bulbLiquid"
+      class="bulb-liquid"
     />
     <LiquidStroke
       :paths="paths.bottomBulbLiquid"
       :colors="bottomLiquids"
-      class="bulbLiquid"
+      class="bulb-liquid"
     />
     <g class="outline">
       <path
@@ -119,11 +118,11 @@ export default defineComponent({
       :path="paths.bottomArrows"
       :num-arrows="5"
     />
-  </g>
+  </svg>
 </template>
 
 <style lang="scss" scoped>
-:deep(.bulbLiquid path) {
+:deep(.bulb-liquid path) {
   stroke-width: 18pt !important;
   stroke-linecap: round;
   fill: none;

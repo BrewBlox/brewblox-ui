@@ -1,8 +1,7 @@
 <script lang="ts">
 import { colorString } from '@/plugins/builder/utils';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 
 const paths = {
   edge: `
@@ -35,15 +34,9 @@ const paths = {
 
 export default defineComponent({
   name: 'BeerBottlePartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
   setup(props) {
-    const { scale } = usePart.setup(props.part);
-
     const color = computed<string>(() =>
       colorString(props.part.settings.color),
     );
@@ -51,14 +44,16 @@ export default defineComponent({
     return {
       paths,
       color,
-      scale,
     };
   },
 });
 </script>
 
 <template>
-  <g :transform="`scale(${scale} ${scale})`">
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 100"
+  >
     <g transform="translate(5, 24)">
       <path
         :d="paths.liquid"
@@ -69,5 +64,5 @@ export default defineComponent({
         <path :d="paths.edge" />
       </g>
     </g>
-  </g>
+  </svg>
 </template>

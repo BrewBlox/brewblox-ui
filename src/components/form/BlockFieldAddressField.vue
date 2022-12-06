@@ -29,11 +29,11 @@ export default defineComponent({
       default: 'Field',
     },
     services: {
-      type: Array as PropType<string[] | null>,
+      type: null as unknown as PropType<string[] | null>,
       default: null,
     },
     compatible: {
-      type: [String, Array] as PropType<ComparedBlockType>,
+      type: null as unknown as PropType<ComparedBlockType>,
       default: null,
     },
     blockFilter: {

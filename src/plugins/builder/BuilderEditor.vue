@@ -8,7 +8,6 @@ import { uniqueFilter } from '@/utils/functional';
 import { loadFile } from '@/utils/import-export';
 import { deepCopy } from '@/utils/objects';
 import { clampRotation } from '@/utils/quantity';
-import { isAbsoluteUrl } from '@/utils/url';
 import * as d3 from 'd3';
 import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
@@ -100,14 +99,6 @@ export default defineComponent({
     const focusRef = ref<HTMLElement>();
     const hasFocus = ref<boolean>(true);
 
-    function navigate(url: string): void {
-      if (isAbsoluteUrl(url)) {
-        window.open(url, '_blank');
-      } else {
-        router.push(url);
-      }
-    }
-
     function checkFocus(): void {
       nextTick(() => {
         hasFocus.value = focusRef.value?.matches(':focus-within') === true;
@@ -153,10 +144,6 @@ export default defineComponent({
 
     const cursor = computed<string>(() => activeTool.value?.cursor ?? 'auto');
 
-    function partClass(part: FlowPart): string {
-      return activeTool.value?.partClass?.(part) ?? '';
-    }
-
     const { svgRef, svgContentRef, resetZoom } = useSvgZoom.setup(
       gridDimensions,
       { dragEnabled },
@@ -169,6 +156,7 @@ export default defineComponent({
       updateDragSelect,
       stopDragSelect,
       makeSelectAreaFilter,
+      getDragDistance,
     } = useDragSelect.setup();
 
     function selectLayout(id: string | null): void {
@@ -330,11 +318,11 @@ export default defineComponent({
 
     function toggleSelect(id: string | null): void {
       if (id) {
-        const idx = selectedIds.value.indexOf(id);
-        selectedIds.value =
-          idx >= 0
-            ? [...selectedIds.value.filter((v) => v !== id)]
-            : [...selectedIds.value, id];
+        if (selectedIds.value.length === 1 && selectedIds.value[0] === id) {
+          selectedIds.value = [];
+        } else {
+          selectedIds.value = [id];
+        }
       }
     }
 
@@ -514,13 +502,6 @@ export default defineComponent({
       activeToolId.value = 'interact';
       if (floater.value) {
         cancelFloater();
-      } else {
-        const part = findHoveredPart();
-        if (part) {
-          builderStore
-            .blueprintByType(part.type)
-            .interactHandler?.(part, { savePart, navigate });
-        }
       }
     }
 
@@ -739,7 +720,7 @@ export default defineComponent({
         const { x, y } = d3EventPos(evt);
         updateDragSelect(x, y);
       })
-      .on('end', (evt) => {
+      .on('end', async (evt) => {
         if (floater.value) {
           dropFloater(toCoords(d3EventPos(evt)));
           return;
@@ -755,7 +736,12 @@ export default defineComponent({
         if (shiftKey) {
           selectedIds.value = [...sourceIds, ...targetIds].filter(uniqueFilter);
         } else if (altKey) {
-          selectedIds.value = sourceIds.filter((id) => !targetIds.includes(id));
+          selectedIds.value = [
+            ...sourceIds.filter((id) => !targetIds.includes(id)),
+          ];
+        } else if (getDragDistance() < 10 && findHoveredPart() != null) {
+          // small drag on top of a part
+          // this will be handled by the click handler
         } else {
           selectedIds.value = [...targetIds];
         }
@@ -785,7 +771,7 @@ export default defineComponent({
         else if (start && !isEqual(start, { x, y })) {
           const targetId = this.getAttribute('part-id')!;
           const partIds = selectedIds.value.includes(targetId)
-            ? selectedIds.value
+            ? [...selectedIds.value]
             : [targetId];
           const parts = flowParts.value
             .filter((part) => partIds.includes(part.id))
@@ -849,7 +835,6 @@ export default defineComponent({
           'rotate',
           'flip',
           'edit',
-          'interact',
           'delete',
         ].includes(tool)
       ) {
@@ -945,7 +930,6 @@ export default defineComponent({
       disabledTools,
       toolsMenuExpanded,
       useTool,
-      partClass,
       cursor,
 
       keyHandler,
@@ -1079,13 +1063,15 @@ export default defineComponent({
             v-show="!isFloating(part)"
             :key="`${flowPartsRevision}-${part.id}`"
             :part-id="part.id"
-            :transform="coord2translate(part.x, part.y)"
-            :class="['flowpart', part.type, partClass(part)]"
+            :class="['flowpart', part.type]"
           >
             <PartWrapper
               :part="part"
+              :grid-x="part.x"
+              :grid-y="part.y"
               :selected="selectedIds.includes(part.id)"
-              :show-hover="activeToolId !== null"
+              :selectable="!['interact', 'pan', null].includes(activeToolId)"
+              :interactable="activeToolId === 'interact'"
               @update:part="savePart"
               @dirty="calculateFlowParts"
             />
@@ -1098,11 +1084,12 @@ export default defineComponent({
             <g
               v-for="part in floater.parts"
               :key="`floating-${part.id}`"
-              :transform="coord2translate(part.x, part.y)"
-              :class="[part.type, partClass(part)]"
+              :class="[part.type]"
             >
               <PartWrapper
                 :part="part"
+                :grid-x="part.x"
+                :grid-y="part.y"
                 selected
               />
             </g>

@@ -1,5 +1,6 @@
 import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
+import { emptyGraphConfig } from '@/plugins/history/utils';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockConfig, BlockSpec, BlockWidget } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
@@ -26,7 +27,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   serviceId: string;
   blockId: string;
   block: Ref<UnwrapRef<BlockT>>;
-  graphConfig: WritableComputedRef<GraphConfig | null>;
+  graphConfig: WritableComputedRef<GraphConfig>;
   blockSpec: ComputedRef<BlockSpec<BlockT>>;
   isVolatileBlock: ComputedRef<boolean>;
 
@@ -113,9 +114,11 @@ export const useBlockWidget: UseBlockWidgetComposable = {
         (f) => f.type === block.value.type && f.graphed,
       );
 
-    const graphConfig = computed<GraphConfig | null>({
+    const graphConfig = computed<GraphConfig>({
       get: () =>
-        hasGraph ? makeBlockGraphConfig(block.value, config.value) : null,
+        hasGraph
+          ? makeBlockGraphConfig(block.value, config.value)
+          : emptyGraphConfig(),
       set: (cfg) => {
         if (hasGraph) {
           const updated: BlockConfig = {

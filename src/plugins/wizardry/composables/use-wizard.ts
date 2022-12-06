@@ -3,7 +3,7 @@ import { WizardOutput } from '../types';
 
 export interface UseWizardProps {
   activeDashboardId: {
-    type: PropType<string>;
+    type: PropType<string | null>;
     default: null;
   };
 }
@@ -26,7 +26,7 @@ export interface UseWizardComposable {
 export const useWizard: UseWizardComposable = {
   props: {
     activeDashboardId: {
-      type: String,
+      type: null as unknown as PropType<string | null>,
       default: null,
     },
   },

@@ -1,25 +1,24 @@
-import { SCALE_KEY } from '@/plugins/builder/const';
+import {
+  DRIVER_KEY,
+  DRIVER_TYPES,
+  FLOW_TOGGLE_KEY,
+  SIZE_X_KEY,
+  SIZE_Y_KEY,
+} from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import {
-  showSettingsBlock,
   universalTransitions,
+  variableSizeFunc,
 } from '@/plugins/builder/utils';
-import { BlockType } from 'brewblox-proto/ts';
 
-export const SIZE_X = 2;
-export const SIZE_Y = 1;
-export const DRIVER_KEY = 'setpointDriver';
-export const DRIVER_TYPES = [BlockType.ActuatorOffset];
-export const FLOW_TOGGLE_KEY = 'flowEnabled';
+export const DEFAULT_SIZE_X = 2;
+export const DEFAULT_SIZE_Y = 1;
 
-const size: BuilderBlueprint['size'] = ({ settings }) => {
-  const scale = settings[SCALE_KEY] ?? 1;
-  return [SIZE_X * scale, SIZE_Y * scale];
-};
+const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
 
 const blueprint: BuilderBlueprint = {
   type: 'SetpointDriverDisplay',
-  title: 'Display: setpoint driver',
+  title: 'Display: Setpoint Driver',
   cards: [
     {
       component: 'BlockAddressCard',
@@ -30,10 +29,23 @@ const blueprint: BuilderBlueprint = {
       },
     },
     {
-      component: 'ScaleCard',
+      component: 'SizeCard',
       props: {
-        settingsKey: SCALE_KEY,
-        defaultSize: [SIZE_X, SIZE_Y],
+        settingsKey: SIZE_X_KEY,
+        defaultSize: DEFAULT_SIZE_X,
+        label: 'Width',
+        min: 1,
+        max: 10,
+      },
+    },
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: SIZE_Y_KEY,
+        defaultSize: DEFAULT_SIZE_Y,
+        label: 'Height',
+        min: 1,
+        max: 5,
       },
     },
     {
@@ -50,7 +62,6 @@ const blueprint: BuilderBlueprint = {
   size,
   transitions: (part) =>
     universalTransitions(size(part), part.settings[FLOW_TOGGLE_KEY]),
-  interactHandler: (part) => showSettingsBlock(part, DRIVER_KEY, DRIVER_TYPES),
 };
 
 export default blueprint;

@@ -69,6 +69,9 @@ yarn spark:load
 
 # Build output is hosted at :9001/ui
 yarn build
+
+# Generate import types for global components
+yarn components
 ```
 
 ## Common issues

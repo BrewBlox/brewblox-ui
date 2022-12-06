@@ -1,20 +1,13 @@
 <script lang="ts">
-import { coord2grid, elbow } from '@/plugins/builder/utils';
-import { defineComponent, PropType } from 'vue';
+import { elbow } from '@/plugins/builder/utils';
+import { defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { FlowPart } from '../types';
 
 export default defineComponent({
   name: 'CondenserPartComponent',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const { sizeX, sizeY } = usePart.setup(props.part);
-
+  props: { ...usePart.props },
+  emits: [...usePart.emits],
+  setup() {
     function outlinePath(closed: boolean): string {
       const moveChar = closed ? 'L' : 'M';
       return [
@@ -32,18 +25,18 @@ export default defineComponent({
     const smokeArea = outlinePath(true);
 
     return {
-      coord2grid,
       casing,
       smokeArea,
-      sizeX,
-      sizeY,
     };
   },
 });
 </script>
 
 <template>
-  <g>
+  <svg
+    v-bind="{ width, height }"
+    viewBox="0 0 50 100"
+  >
     <path
       :d="smokeArea"
       fill="lightgrey"
@@ -57,5 +50,5 @@ export default defineComponent({
         :speed="1"
       />
     </g>
-  </g>
+  </svg>
 </template>

@@ -10,7 +10,10 @@ import TempControl from './TempControl';
 
 const plugin: Plugin = {
   install(app) {
-    globRegister(app, import.meta.globEager('./components/**/*.vue'));
+    globRegister(
+      app,
+      import.meta.glob('./components/**/*.vue', { eager: true }),
+    );
 
     const plugins = [
       Ferment,

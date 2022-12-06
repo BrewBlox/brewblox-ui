@@ -132,8 +132,8 @@ export default defineComponent({
               >
                 <q-item-section side>
                   <svg
-                    :width="`${coord2grid(1)}px`"
-                    :height="`${coord2grid(1)}px`"
+                    :width="50"
+                    :height="50"
                     :viewBox="`0 0 ${partViewBox(v)}`"
                   >
                     <PartWrapper :part="v.part" />

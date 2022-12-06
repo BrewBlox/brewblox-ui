@@ -27,7 +27,7 @@ export default defineComponent({
       }),
     },
     services: {
-      type: Array as PropType<string[] | null>,
+      type: null as unknown as PropType<string[] | null>,
       default: null,
     },
     compatible: {

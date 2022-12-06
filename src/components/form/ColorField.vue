@@ -1,15 +1,15 @@
 <script lang="ts">
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'ColorField',
   props: {
     ...useField.props,
     modelValue: {
-      type: String,
-      default: null,
+      type: null as unknown as PropType<string | null>,
+      required: true,
     },
     clearable: {
       type: Boolean,

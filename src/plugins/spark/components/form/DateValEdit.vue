@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useValEdit } from '@/plugins/spark/composables';
-import { shortDateString } from '@/utils/quantity';
+import { parseDate, shortDateString } from '@/utils/quantity';
 import { DateString } from 'brewblox-proto/ts';
 import { computed, defineComponent, onMounted } from 'vue';
 
@@ -21,8 +21,13 @@ export default defineComponent({
       }
     });
 
+    const date = computed<Date>({
+      get: () => parseDate(field.value) ?? new Date(),
+      set: (v: Date) => (field.value = v.toISOString()),
+    });
+
     return {
-      field,
+      date,
       displayVal,
       startEdit,
     };
@@ -33,7 +38,7 @@ export default defineComponent({
 <template>
   <DatetimeField
     v-if="editable"
-    v-model="field"
+    v-model="date"
   />
   <div
     v-else

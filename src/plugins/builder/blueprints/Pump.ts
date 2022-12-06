@@ -1,46 +1,35 @@
 import {
   DEFAULT_PUMP_PRESSURE,
+  DigitalBlockT,
+  DIGITAL_TYPES,
   LEFT,
   MAX_PUMP_PRESSURE,
   MIN_PUMP_PRESSURE,
+  PumpBlockT,
+  PUMP_KEY,
+  PUMP_TYPES,
+  PwmBlockT,
+  PWM_TYPES,
   RIGHT,
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
-import {
-  scheduleSoftStartRefresh,
-  settingsBlock,
-  showAbsentBlock,
-} from '@/plugins/builder/utils';
-import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
-import { useSparkStore } from '@/plugins/spark/store';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
-import {
-  ActuatorPwmBlock,
-  BlockType,
-  DigitalActuatorBlock,
-  DigitalState,
-  FastPwmBlock,
-} from 'brewblox-proto/ts';
-
-export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock | FastPwmBlock;
-export const PUMP_KEY = 'actuator';
-export const PWM_PUMP_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
-export const PUMP_TYPES = [BlockType.DigitalActuator, ...PWM_PUMP_TYPES];
+import { settingsBlock } from '@/plugins/builder/utils';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { DigitalState } from 'brewblox-proto/ts';
 
 const calcPressure = (part: PersistentPart): number => {
-  const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
-  if (block === null) {
+  const block = settingsBlock<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
+  if (block == null) {
     return part.settings.enabled
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
-  if (block.type === BlockType.DigitalActuator) {
+  if (isBlockCompatible<DigitalBlockT>(block, DIGITAL_TYPES)) {
     return block.data.state === DigitalState.STATE_ACTIVE
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
-  if (isCompatible(block.type, PWM_PUMP_TYPES)) {
+  if (isBlockCompatible<PwmBlockT>(block, PWM_TYPES)) {
     return (
       (Number(block.data.value) / 100) *
       (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE)
@@ -78,41 +67,6 @@ const blueprint: BuilderBlueprint = {
       [LEFT]: [{ outCoords: RIGHT }],
       [RIGHT]: [{ outCoords: LEFT, pressure }],
     };
-  },
-  interactHandler: (part: PersistentPart, { savePart }) => {
-    const sparkStore = useSparkStore();
-    const hasAddr = !!part.settings[PUMP_KEY]?.id;
-    const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
-
-    if (!hasAddr) {
-      part.settings.enabled = !part.settings.enabled;
-      savePart(part);
-    } else if (block === null) {
-      showAbsentBlock(part, PUMP_KEY);
-    } else if (block.type === BlockType.DigitalActuator) {
-      const storedState =
-        block.data.state === DigitalState.STATE_INACTIVE
-          ? DigitalState.STATE_ACTIVE
-          : DigitalState.STATE_INACTIVE;
-      sparkStore.patchBlock(block, { storedState });
-      scheduleSoftStartRefresh(block);
-    } else if (isCompatible(block.type, PWM_PUMP_TYPES)) {
-      const limiterWarning = block.data.constrainedBy?.constraints.length
-        ? 'The value may be limited by constraints'
-        : '';
-      createDialog({
-        component: 'SliderDialog',
-        componentProps: {
-          modelValue: block.data.storedSetting,
-          title: 'Pump speed',
-          message: limiterWarning,
-          label: 'Percentage output',
-          quickActions: PWM_SELECT_OPTIONS,
-        },
-      }).onOk((storedSetting: number) =>
-        sparkStore.patchBlock(block, { storedSetting }),
-      );
-    }
   },
 };
 
