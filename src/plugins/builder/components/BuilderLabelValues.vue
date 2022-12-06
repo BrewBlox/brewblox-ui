@@ -2,6 +2,7 @@
 import { createDialog } from '@/utils/dialog';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
+import { LABEL_KEY } from '../const';
 import { textTransformation } from '../utils';
 
 export default defineComponent({
@@ -10,7 +11,7 @@ export default defineComponent({
     ...usePart.props,
     settingsKey: {
       type: String,
-      required: true,
+      default: LABEL_KEY,
     },
     unsetLabel: {
       type: String,

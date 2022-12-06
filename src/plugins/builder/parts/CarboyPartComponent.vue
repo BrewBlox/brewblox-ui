@@ -56,7 +56,6 @@ export default defineComponent({
       :part="part"
       :y="50"
       :background-color="color"
-      settings-key="setpoint"
       hide-unset
     />
   </svg>

@@ -3,7 +3,7 @@ import { coord2grid, textTransformation } from '@/plugins/builder/utils';
 import { preciseNumber } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { PwmBlockT, PWM_TYPES } from '../const';
+import { PwmBlockT, PWM_KEY, PWM_TYPES } from '../const';
 
 export default defineComponent({
   name: 'PwmValues',
@@ -19,7 +19,7 @@ export default defineComponent({
     },
     settingsKey: {
       type: String,
-      required: true,
+      default: PWM_KEY,
     },
     noBorder: {
       type: Boolean,

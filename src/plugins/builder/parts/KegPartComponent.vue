@@ -64,7 +64,6 @@ export default defineComponent({
       :y="100"
       :background-color="color"
       hide-unset
-      settings-key="setpoint"
     />
   </svg>
 </template>

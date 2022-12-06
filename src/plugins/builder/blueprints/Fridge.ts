@@ -1,6 +1,9 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { SIZE_X_KEY, SIZE_Y_KEY } from '../const';
+import { LABEL_KEY, SIZE_X_KEY, SIZE_Y_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
+
+export const SHELF_Y_KEY = 'shelfY';
+export const DEFAULT_SHELF_Y = 1;
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 12;
@@ -12,14 +15,14 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'TextCard',
       props: {
-        settingsKey: 'text',
+        settingsKey: LABEL_KEY,
       },
     },
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'shelfY',
-        defaultSize: 1,
+        settingsKey: SHELF_Y_KEY,
+        defaultSize: DEFAULT_SHELF_Y,
         label: 'Shelf position (from top)',
         min: 1,
         max: 14,

@@ -11,7 +11,6 @@ export default defineComponent({
 <template>
   <BuilderLabelValues
     v-bind="{ ...$props, ...$attrs }"
-    settings-key="text"
     unset-label="[click to edit]"
   />
 </template>

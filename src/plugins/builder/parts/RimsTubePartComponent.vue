@@ -63,12 +63,11 @@ export default defineComponent({
       :part="part"
       :width="50"
       :height="50"
-      settings-key="pwm"
     />
     <LiquidStroke
       :paths="[paths.content]"
       :colors="liquids"
-      class="contentLiquid"
+      class="content-liquid"
     />
     <LiquidStroke
       :paths="[paths.flowPath]"
@@ -89,7 +88,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-:deep(.contentLiquid path) {
+:deep(.content-liquid path) {
   stroke-width: 30 !important;
   stroke-linecap: butt;
   fill: none;

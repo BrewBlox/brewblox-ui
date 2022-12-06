@@ -48,6 +48,7 @@ export const LIQUID_CORNER = 8;
 export const SCALE_KEY = 'scale';
 export const BORDER_KEY = 'bordered';
 export const FLOW_TOGGLE_KEY = 'flowEnabled';
+export const LABEL_KEY = 'text';
 export const SIZE_X_KEY = 'sizeX';
 export const SIZE_Y_KEY = 'sizeY';
 

@@ -2,7 +2,7 @@
 import { CENTER } from '@/plugins/builder/const';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
-import { coord2grid, liquidOnCoord } from '../utils';
+import { liquidOnCoord } from '../utils';
 
 export default defineComponent({
   name: 'SetpointDisplayPartComponent',
@@ -16,7 +16,6 @@ export default defineComponent({
     );
 
     return {
-      coord2grid,
       bordered,
       color,
     };
@@ -29,10 +28,7 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 100 50"
   >
-    <SetpointValues
-      :part="part"
-      settings-key="setpoint"
-    />
+    <SetpointValues :part="part" />
     <g class="outline">
       <rect
         v-show="bordered"

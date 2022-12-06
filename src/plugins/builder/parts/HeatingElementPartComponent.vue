@@ -22,10 +22,7 @@ export default defineComponent({
 <template>
   <!-- No viewBox. width is auto-adjusted -->
   <svg v-bind="{ width, height }">
-    <PwmValues
-      :part="part"
-      settings-key="pwm"
-    />
+    <PwmValues :part="part" />
     <g class="outline">
       <path :d="path" />
     </g>

@@ -37,7 +37,6 @@ export default defineComponent({
         :part="part"
         :y="50"
         hide-unset
-        settings-key="setpoint"
       />
     </g>
     <g class="outline legs">

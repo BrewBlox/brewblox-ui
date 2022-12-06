@@ -6,7 +6,7 @@ import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { BlockType, PidBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { SetpointBlockT, SETPOINT_TYPES } from '../const';
+import { SetpointBlockT, SETPOINT_KEY, SETPOINT_TYPES } from '../const';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
 
@@ -24,7 +24,7 @@ export default defineComponent({
     },
     settingsKey: {
       type: String,
-      required: true,
+      default: SETPOINT_KEY,
     },
     x: {
       type: Number,

@@ -62,7 +62,6 @@ export default defineComponent({
       :part="part"
       :width="width"
       :height="50"
-      settings-key="text"
       @update:part="(v) => $emit('update:part', v)"
     />
   </svg>
