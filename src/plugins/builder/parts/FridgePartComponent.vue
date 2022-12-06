@@ -2,31 +2,18 @@
 import { computed, defineComponent } from 'vue';
 import { DEFAULT_SHELF_Y, SHELF_Y_KEY } from '../blueprints/Fridge';
 import { usePart } from '../composables';
-import { LABEL_KEY } from '../const';
-import { coord2grid, textTransformation } from '../utils';
+import { coord2grid } from '../utils';
 
 export default defineComponent({
   name: 'FridgePartComponent',
   props: { ...usePart.props },
   emits: [...usePart.emits],
   setup(props) {
-    const { sizeX, sizeY } = usePart.setup(props.part);
-
-    const titleText = computed<string>(
-      () => props.part.settings[LABEL_KEY] || '',
-    );
-
-    const labelTransform = computed<string>(() =>
-      textTransformation(props.part, [sizeX.value, sizeY.value], false),
-    );
-
     const shelfHeight = computed<number>(() =>
       coord2grid(props.part.settings[SHELF_Y_KEY] || DEFAULT_SHELF_Y),
     );
 
     return {
-      labelTransform,
-      titleText,
       shelfHeight,
     };
   },
@@ -67,16 +54,11 @@ export default defineComponent({
         :y2="shelfHeight"
       />
     </g>
-    <foreignObject
-      :transform="labelTransform"
-      class="fit"
-    >
-      <div
-        class="fit builder-text"
-        style="font-size: 130%; padding-top: 15px"
-      >
-        {{ titleText }}
-      </div>
-    </foreignObject>
+    <BuilderLabelValues
+      :part="part"
+      :width="width"
+      :height="50"
+      @update:part="(v) => $emit('update:part', v)"
+    />
   </svg>
 </template>

@@ -34,7 +34,7 @@ const blueprint: BuilderBlueprint = {
         settingsKey: SIZE_X_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
-        min: 4,
+        min: 2,
         max: 15,
       },
     },
