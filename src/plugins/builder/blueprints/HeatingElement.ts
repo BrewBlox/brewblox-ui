@@ -1,8 +1,6 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { BlockType } from 'brewblox-proto/ts';
-
-export const PWM_KEY = 'pwm';
-export const PWM_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
+import { PWM_KEY, PWM_TYPES, SIZE_X_KEY } from '../const';
+import { variableSizeFunc } from '../utils';
 
 const DEFAULT_SIZE_X = 5;
 const SIZE_Y = 1;
@@ -22,7 +20,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeX',
+        settingsKey: SIZE_X_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 3,
@@ -33,7 +31,7 @@ const blueprint: BuilderBlueprint = {
       component: 'BorderCard',
     },
   ],
-  size: (part) => [part.settings.sizeX || DEFAULT_SIZE_X, SIZE_Y],
+  size: variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y),
   transitions: () => ({}),
 };
 

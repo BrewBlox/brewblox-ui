@@ -9,7 +9,7 @@ export default defineComponent({
   props: { ...usePart.props },
   emits: [...usePart.emits],
   setup(props) {
-    const { scale, bordered } = usePart.setup(props.part);
+    const { bordered } = usePart.setup(props.part);
 
     const color = computed<string>(
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',
@@ -18,7 +18,6 @@ export default defineComponent({
     return {
       coord2grid,
       bordered,
-      scale,
       color,
     };
   },

@@ -1,45 +1,35 @@
 import {
   DEFAULT_PUMP_PRESSURE,
+  DigitalBlockT,
+  DIGITAL_TYPES,
   LEFT,
   MAX_PUMP_PRESSURE,
   MIN_PUMP_PRESSURE,
+  PumpBlockT,
+  PUMP_KEY,
+  PUMP_TYPES,
+  PwmBlockT,
+  PWM_TYPES,
   RIGHT,
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import {
-  ActuatorPwmBlock,
-  BlockType,
-  DigitalActuatorBlock,
-  DigitalState,
-  FastPwmBlock,
-} from 'brewblox-proto/ts';
-
-export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock | FastPwmBlock;
-export const PUMP_KEY = 'actuator';
-export const PWM_PUMP_TYPES = [
-  BlockType.ActuatorPwm,
-  BlockType.FastPwm,
-] as const;
-export const PUMP_TYPES = [
-  BlockType.DigitalActuator,
-  ...PWM_PUMP_TYPES,
-] as const;
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { DigitalState } from 'brewblox-proto/ts';
 
 const calcPressure = (part: PersistentPart): number => {
-  const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
-  if (block === null) {
+  const block = settingsBlock<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
+  if (block == null) {
     return part.settings.enabled
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
-  if (block.type === BlockType.DigitalActuator) {
+  if (isBlockCompatible<DigitalBlockT>(block, DIGITAL_TYPES)) {
     return block.data.state === DigitalState.STATE_ACTIVE
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
-  if (isCompatible(block.type, PWM_PUMP_TYPES)) {
+  if (isBlockCompatible<PwmBlockT>(block, PWM_TYPES)) {
     return (
       (Number(block.data.value) / 100) *
       (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE)

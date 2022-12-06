@@ -2,10 +2,10 @@
 import { userUnits } from '@/user-settings';
 import { makeObjectSorter } from '@/utils/functional';
 import { durationMs, preciseNumber, prettyUnit } from '@/utils/quantity';
-import { Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
+import { Setpoint } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { PROFILE_KEY, PROFILE_TYPES } from '../blueprints/ProfileDisplay';
 import { usePart, useSettingsBlock } from '../composables';
+import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
 
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
@@ -15,7 +15,7 @@ export default defineComponent({
     const { bordered } = usePart.setup(props.part);
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SetpointProfileBlock>(
+      useSettingsBlock.setup<ProfileBlockT>(
         props.part,
         PROFILE_KEY,
         PROFILE_TYPES,

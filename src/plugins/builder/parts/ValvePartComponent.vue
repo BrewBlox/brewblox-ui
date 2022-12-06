@@ -1,14 +1,14 @@
 <script lang="ts">
-import { RIGHT } from '@/plugins/builder/const';
+import {
+  RIGHT,
+  ValveBlockT,
+  VALVE_KEY,
+  VALVE_TYPES,
+} from '@/plugins/builder/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
-import {
-  CLOSED_KEY,
-  ValveT,
-  VALVE_KEY,
-  VALVE_TYPES,
-} from '../blueprints/Valve';
+import { CLOSED_KEY } from '../blueprints/Valve';
 import { usePart, useSettingsBlock } from '../composables';
 import { flowOnCoord, liquidOnCoord, scheduleSoftStartRefresh } from '../utils';
 
@@ -36,7 +36,7 @@ export default defineComponent({
     const { patchSettings } = usePart.setup(props.part);
 
     const { hasAddress, block, blockStatus, isBroken } =
-      useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
+      useSettingsBlock.setup<ValveBlockT>(props.part, VALVE_KEY, VALVE_TYPES);
 
     const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
 

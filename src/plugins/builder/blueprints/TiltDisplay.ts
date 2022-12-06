@@ -1,17 +1,16 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { universalTransitions } from '@/plugins/builder/utils';
+import {
+  universalTransitions,
+  variableSizeFunc,
+} from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
-import { SCALE_KEY } from '../const';
+import { FLOW_TOGGLE_KEY, SIZE_X_KEY, SIZE_Y_KEY } from '../const';
 
-export const SIZE_X = 2;
-export const SIZE_Y = 1;
-export const FLOW_TOGGLE_KEY = 'flowEnabled';
+export const DEFAULT_SIZE_X = 2;
+export const DEFAULT_SIZE_Y = 1;
 export const TILT_ID_KEY = 'tiltId';
 
-const size: BuilderBlueprint['size'] = ({ settings }) => {
-  const scale = settings[SCALE_KEY] ?? 1;
-  return [SIZE_X * scale, SIZE_Y * scale];
-};
+const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
 
 const blueprint: BuilderBlueprint = {
   type: 'TiltDisplay',
@@ -28,10 +27,23 @@ const blueprint: BuilderBlueprint = {
       },
     },
     {
-      component: 'ScaleCard',
+      component: 'SizeCard',
       props: {
-        settingsKey: SCALE_KEY,
-        defaultSize: [SIZE_X, SIZE_Y],
+        settingsKey: SIZE_X_KEY,
+        defaultSize: DEFAULT_SIZE_X,
+        label: 'Width',
+        min: 1,
+        max: 10,
+      },
+    },
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: SIZE_Y_KEY,
+        defaultSize: DEFAULT_SIZE_Y,
+        label: 'Height',
+        min: 1,
+        max: 5,
       },
     },
     {

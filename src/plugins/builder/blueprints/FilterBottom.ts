@@ -1,5 +1,6 @@
-import { CENTER, LEFT } from '@/plugins/builder/const';
-import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
+import { CENTER, LEFT, SIZE_X_KEY } from '@/plugins/builder/const';
+import { BuilderBlueprint } from '@/plugins/builder/types';
+import { variableSizeFunc } from '../utils';
 
 const DEFAULT_SIZE_X = 4;
 const SIZE_Y = 1;
@@ -11,7 +12,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeX',
+        settingsKey: SIZE_X_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 1,
@@ -20,10 +21,7 @@ const blueprint: BuilderBlueprint = {
     },
     { component: 'LiquidSourceCard' },
   ],
-  size: (part: PersistentPart) => [
-    part.settings.sizeX || DEFAULT_SIZE_X,
-    SIZE_Y,
-  ],
+  size: variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y),
   transitions: () => ({
     [LEFT]: [{ outCoords: CENTER }],
     [CENTER]: [{ outCoords: LEFT }],

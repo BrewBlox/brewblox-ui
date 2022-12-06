@@ -3,13 +3,10 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { makeTypeFilter } from '@/utils/functional';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
-import {
-  BlockType,
-  PidBlock,
-  SetpointSensorPairBlock,
-} from 'brewblox-proto/ts';
+import { BlockType, PidBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
+import { SetpointBlockT, SETPOINT_TYPES } from '../const';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
 
@@ -46,10 +43,10 @@ export default defineComponent({
   setup(props) {
     const sparkStore = useSparkStore();
     const { address, block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SetpointSensorPairBlock>(
+      useSettingsBlock.setup<SetpointBlockT>(
         props.part,
         props.settingsKey,
-        [BlockType.SetpointSensorPair],
+        SETPOINT_TYPES,
       );
     const { serviceId } = address.value;
 

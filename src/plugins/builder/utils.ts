@@ -23,10 +23,14 @@ import {
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
   deprecatedTypes,
+  SCALE_KEY,
+  SIZE_X_KEY,
+  SIZE_Y_KEY,
   SQUARE_SIZE,
 } from './const';
 import { useBuilderStore } from './store';
 import {
+  BuilderBlueprint,
   BuilderLayout,
   FlowPart,
   PersistentPart,
@@ -366,6 +370,29 @@ export function universalTransitions(
     },
     { [CENTER]: coords.map((outCoords) => ({ outCoords, friction: 0.5 })) },
   );
+}
+
+export function variableSizeFunc(
+  defaultSizeX: number,
+  defaultSizeY: number,
+): BuilderBlueprint['size'] {
+  return ({ settings }) => {
+    if (
+      settings[SIZE_X_KEY] !== undefined ||
+      settings[SIZE_Y_KEY] !== undefined
+    ) {
+      return [
+        settings[SIZE_X_KEY] || defaultSizeX,
+        settings[SIZE_Y_KEY] || defaultSizeY,
+      ];
+    }
+    // backwards compatibility with deprecated setting
+    if (settings[SCALE_KEY] != null) {
+      const scale = Number(settings[SCALE_KEY]);
+      return [defaultSizeX * scale, defaultSizeY * scale];
+    }
+    return [defaultSizeX, defaultSizeY];
+  };
 }
 
 export function vivifyParts(

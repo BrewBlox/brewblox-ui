@@ -1,14 +1,20 @@
 <script lang="ts">
-import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
+import {
+  CENTER,
+  COLD_WATER,
+  HOT_WATER,
+  PidBlockT,
+  PID_KEY,
+  PID_TYPES,
+} from '@/plugins/builder/const';
 import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { userUnits } from '@/user-settings';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
-import { Block, BlockType, PidBlock } from 'brewblox-proto/ts';
+import { Block, BlockType } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { PID_KEY, PID_TYPES } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
@@ -20,7 +26,7 @@ export default defineComponent({
     const { bordered } = usePart.setup(props.part);
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<PidBlock>(props.part, PID_KEY, PID_TYPES);
+      useSettingsBlock.setup<PidBlockT>(props.part, PID_KEY, PID_TYPES);
 
     const contentTransform = computed<string>(() =>
       textTransformation(props.part, [1, 1]),

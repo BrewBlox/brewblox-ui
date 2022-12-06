@@ -1,8 +1,9 @@
-import { SCALE_KEY } from '@/plugins/builder/const';
+import { SIZE_X_KEY, SIZE_Y_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
+import { variableSizeFunc } from '../utils';
 
-export const SIZE_X = 1;
-export const SIZE_Y = 2;
+export const DEFAULT_SIZE_X = 1;
+export const DEFAULT_SIZE_Y = 2;
 
 const blueprint: BuilderBlueprint = {
   type: 'BeerBottle',
@@ -12,8 +13,8 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeX',
-        defaultSize: SIZE_X,
+        settingsKey: SIZE_X_KEY,
+        defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 1,
         max: 5,
@@ -22,25 +23,15 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeY',
-        defaultSize: SIZE_Y,
+        settingsKey: SIZE_Y_KEY,
+        defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
         min: 1,
         max: 10,
       },
     },
   ],
-  size: ({ settings }) => {
-    if (settings.sizeX !== undefined || settings.sizeY !== undefined) {
-      return [settings.sizeX || SIZE_X, settings.sizeY || SIZE_Y];
-    }
-    // backwards compatibility with deprecated setting
-    if (settings[SCALE_KEY] != null) {
-      const scale = Number(settings[SCALE_KEY]);
-      return [SIZE_X * scale, SIZE_Y * scale];
-    }
-    return [SIZE_X, SIZE_Y];
-  },
+  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
   transitions: () => ({}),
 };
 

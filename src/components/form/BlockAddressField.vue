@@ -29,7 +29,7 @@ export default defineComponent({
       default: false,
     },
     compatible: {
-      type: [String, Array, null] as PropType<ComparedBlockType>,
+      type: null as unknown as PropType<ComparedBlockType>,
       default: () => null,
     },
     blockFilter: {

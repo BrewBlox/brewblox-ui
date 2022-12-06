@@ -1,7 +1,9 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
+import { SIZE_X_KEY } from '../const';
+import { variableSizeFunc } from '../utils';
 
 export const WIDGET_KEY = 'widgetId';
-export const WIDGET_TYPES = ['SessionLog'];
+export const WIDGET_TYPES = ['SessionLog'] as const;
 
 const DEFAULT_SIZE_X = 1;
 const SIZE_Y = 1;
@@ -13,7 +15,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'sizeX',
+        settingsKey: SIZE_X_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 1,
@@ -31,7 +33,7 @@ const blueprint: BuilderBlueprint = {
       component: 'BorderCard',
     },
   ],
-  size: (part) => [part.settings.sizeX || DEFAULT_SIZE_X, SIZE_Y],
+  size: variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y),
   transitions: () => ({}),
 };
 

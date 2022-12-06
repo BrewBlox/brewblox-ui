@@ -1,9 +1,13 @@
 <script lang="ts">
-import { CENTER } from '@/plugins/builder/const';
+import {
+  CENTER,
+  SensorBlockT,
+  SENSOR_KEY,
+  SENSOR_TYPES,
+} from '@/plugins/builder/const';
 import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
-import { SensorT, SENSOR_KEY, SENSOR_TYPES } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
@@ -14,7 +18,11 @@ export default defineComponent({
     const { bordered } = usePart.setup(props.part);
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SensorT>(props.part, SENSOR_KEY, SENSOR_TYPES);
+      useSettingsBlock.setup<SensorBlockT>(
+        props.part,
+        SENSOR_KEY,
+        SENSOR_TYPES,
+      );
 
     const contentTransform = computed<string>(() =>
       textTransformation(props.part, [1, 1]),

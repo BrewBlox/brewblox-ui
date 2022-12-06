@@ -1,9 +1,9 @@
 <script lang="ts">
 import { coord2grid, textTransformation } from '@/plugins/builder/utils';
 import { preciseNumber } from '@/utils/quantity';
-import { ActuatorPwmBlock, BlockType, FastPwmBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
+import { PwmBlockT, PWM_TYPES } from '../const';
 
 export default defineComponent({
   name: 'PwmValues',
@@ -42,10 +42,10 @@ export default defineComponent({
   setup(props) {
     const { bordered } = usePart.setup(props.part);
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<ActuatorPwmBlock | FastPwmBlock>(
+      useSettingsBlock.setup<PwmBlockT>(
         props.part,
         props.settingsKey,
-        [BlockType.ActuatorPwm, BlockType.FastPwm],
+        PWM_TYPES,
       );
 
     const pwmValue = computed<number | null>(() =>

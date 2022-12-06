@@ -1,10 +1,14 @@
 <script lang="ts">
-import { UP } from '@/plugins/builder/const';
+import {
+  UP,
+  ValveBlockT,
+  VALVE_KEY,
+  VALVE_TYPES,
+} from '@/plugins/builder/const';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
-import { ValveT, VALVE_KEY, VALVE_TYPES } from '../blueprints/LValve';
 import { usePart, useSettingsBlock } from '../composables';
 
 const paths = {
@@ -27,7 +31,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const { patchSettings } = usePart.setup(props.part);
 
-    const { block } = useSettingsBlock.setup<ValveT>(
+    const { block } = useSettingsBlock.setup<ValveBlockT>(
       props.part,
       VALVE_KEY,
       VALVE_TYPES,

@@ -1,5 +1,5 @@
 import { computed, ComputedRef, getCurrentInstance, PropType } from 'vue';
-import { BORDER_KEY, SCALE_KEY } from '../const';
+import { BORDER_KEY } from '../const';
 import { FlowPart } from '../types';
 
 export interface UsePartProps {
@@ -30,7 +30,6 @@ export interface UsePartComponent {
   sizeY: ComputedRef<number>;
   flipped: ComputedRef<boolean>;
   bordered: ComputedRef<boolean>;
-  scale: ComputedRef<number>;
   savePart: (part: FlowPart) => void;
   patchSettings: (patch: any) => void;
 }
@@ -68,8 +67,6 @@ export const usePart: UsePartComposable = {
 
     const bordered = computed<boolean>(() => part.settings[BORDER_KEY] ?? true);
 
-    const scale = computed<number>(() => part.settings[SCALE_KEY] ?? 1);
-
     function savePart(updated: FlowPart): void {
       instance.emit('update:part', updated);
     }
@@ -83,7 +80,6 @@ export const usePart: UsePartComposable = {
       sizeY,
       flipped,
       bordered,
-      scale,
       savePart,
       patchSettings,
     };

@@ -2,14 +2,10 @@
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
-import {
-  ActuatorOffsetBlock,
-  ReferenceKind,
-  SetpointSensorPairBlock,
-} from 'brewblox-proto/ts';
+import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { DRIVER_KEY, DRIVER_TYPES } from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
+import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
 
 export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
@@ -20,7 +16,7 @@ export default defineComponent({
     const { bordered } = usePart.setup(props.part);
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<ActuatorOffsetBlock>(
+      useSettingsBlock.setup<DriverBlockT>(
         props.part,
         DRIVER_KEY,
         DRIVER_TYPES,

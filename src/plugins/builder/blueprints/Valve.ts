@@ -1,26 +1,19 @@
-import { LEFT, RIGHT } from '@/plugins/builder/const';
+import {
+  LEFT,
+  RIGHT,
+  ValveBlockT,
+  VALVE_KEY,
+  VALVE_TYPES,
+} from '@/plugins/builder/const';
 import {
   BuilderBlueprint,
   PersistentPart,
   Transitions,
 } from '@/plugins/builder/types';
-import { ComparedBlockType } from '@/plugins/spark/types';
-import {
-  BlockType,
-  DigitalActuatorBlock,
-  DigitalState,
-  MotorValveBlock,
-} from 'brewblox-proto/ts';
+import { DigitalState } from 'brewblox-proto/ts';
 import { settingsAddress, settingsBlock } from '../utils';
 
-export type ValveT = DigitalActuatorBlock | MotorValveBlock;
-
 export const CLOSED_KEY = 'closed';
-export const VALVE_KEY = 'valve';
-export const VALVE_TYPES: ComparedBlockType = [
-  BlockType.DigitalActuator,
-  BlockType.MotorValve,
-] as const;
 
 const blueprint: BuilderBlueprint = {
   type: 'Valve',
@@ -39,7 +32,7 @@ const blueprint: BuilderBlueprint = {
   transitions: (part: PersistentPart): Transitions => {
     const hasAddress = settingsAddress(part, VALVE_KEY).id !== null;
     const block = hasAddress
-      ? settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES)
+      ? settingsBlock<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES)
       : null;
     const closed = hasAddress
       ? block?.data.state !== DigitalState.STATE_ACTIVE

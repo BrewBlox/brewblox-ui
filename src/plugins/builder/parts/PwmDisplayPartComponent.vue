@@ -1,7 +1,6 @@
 <script lang="ts">
-import { CENTER } from '@/plugins/builder/const';
+import { CENTER, PWM_KEY } from '@/plugins/builder/const';
 import { computed, defineComponent } from 'vue';
-import { PWM_KEY } from '../blueprints/PwmDisplay';
 import { usePart } from '../composables';
 import { liquidOnCoord } from '../utils';
 

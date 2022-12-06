@@ -1,18 +1,20 @@
-import { SCALE_KEY } from '@/plugins/builder/const';
+import {
+  FLOW_TOGGLE_KEY,
+  PWM_KEY,
+  PWM_TYPES,
+  SIZE_X_KEY,
+  SIZE_Y_KEY,
+} from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { universalTransitions } from '@/plugins/builder/utils';
-import { BlockType } from 'brewblox-proto/ts';
+import {
+  universalTransitions,
+  variableSizeFunc,
+} from '@/plugins/builder/utils';
 
-export const SIZE_X = 1;
-export const SIZE_Y = 1;
-export const PWM_KEY = 'pwm';
-export const PWM_TYPES = [BlockType.ActuatorPwm, BlockType.FastPwm];
-export const FLOW_TOGGLE_KEY = 'flowEnabled';
+export const DEFAULT_SIZE_X = 1;
+export const DEFAULT_SIZE_Y = 1;
 
-const size: BuilderBlueprint['size'] = ({ settings }) => {
-  const scale = settings[SCALE_KEY] ?? 1;
-  return [SIZE_X * scale, SIZE_Y * scale];
-};
+const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
 
 const blueprint: BuilderBlueprint = {
   type: 'PwmDisplay',
@@ -27,10 +29,23 @@ const blueprint: BuilderBlueprint = {
       },
     },
     {
-      component: 'ScaleCard',
+      component: 'SizeCard',
       props: {
-        settingsKey: SCALE_KEY,
-        defaultSize: [SIZE_X, SIZE_Y],
+        settingsKey: SIZE_X_KEY,
+        defaultSize: DEFAULT_SIZE_X,
+        label: 'Width',
+        min: 1,
+        max: 5,
+      },
+    },
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: SIZE_Y_KEY,
+        defaultSize: DEFAULT_SIZE_Y,
+        label: 'Height',
+        min: 1,
+        max: 5,
       },
     },
     {
