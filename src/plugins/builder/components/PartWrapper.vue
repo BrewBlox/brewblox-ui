@@ -184,7 +184,7 @@ export default defineComponent({
   opacity: 0.5
 
 .inactive
-  opacity: 0.1 !important
+  opacity: 0.25 !important
 
 .preselect-foreground
   fill: white
