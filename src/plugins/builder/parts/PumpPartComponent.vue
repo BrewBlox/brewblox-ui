@@ -15,10 +15,8 @@ import {
   scheduleSoftStartRefresh,
   showAbsentBlock,
 } from '@/plugins/builder/utils';
-import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, onBeforeMount, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
@@ -30,7 +28,7 @@ export default defineComponent({
     const { part, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
-    const { block, blockStatus, hasAddress } =
+    const { block, blockStatus, hasAddress, showBlockDialog } =
       useSettingsBlock.setup<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
 
     const enabled = computed<boolean>(() => {
@@ -121,21 +119,7 @@ export default defineComponent({
         sparkStore.patchBlock(block.value, { storedState });
         scheduleSoftStartRefresh(block.value);
       } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
-        const limiterWarning = block.value.data.constrainedBy.constraints.length
-          ? 'The value may be limited by constraints'
-          : '';
-        createDialog({
-          component: 'SliderDialog',
-          componentProps: {
-            modelValue: block.value.data.storedSetting,
-            title: 'Pump speed',
-            message: limiterWarning,
-            label: 'Percentage output',
-            quickActions: PWM_SELECT_OPTIONS,
-          },
-        }).onOk((storedSetting: number) =>
-          sparkStore.patchBlock(block.value, { storedSetting }),
-        );
+        showBlockDialog();
       }
     }
 
