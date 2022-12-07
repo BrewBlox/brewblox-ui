@@ -25,18 +25,17 @@ import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'PumpPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props, { emit }) {
+  setup() {
     const sparkStore = useSparkStore();
-    const { patchSettings } = usePart.setup(props.part);
+    const { part, settings, width, height, patchSettings, reflow } =
+      usePart.setup();
 
     const { block, blockStatus, hasAddress } =
-      useSettingsBlock.setup<PumpBlockT>(props.part, PUMP_KEY, PUMP_TYPES);
+      useSettingsBlock.setup<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
 
     const enabled = computed<boolean>(() => {
       if (block.value === null) {
-        return hasAddress.value ? false : Boolean(props.part.settings.enabled);
+        return hasAddress.value ? false : Boolean(settings.value['enabled']);
       } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
       } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
@@ -46,7 +45,7 @@ export default defineComponent({
       }
     });
 
-    const liquids = computed<string[]>(() => liquidOnCoord(props.part, LEFT));
+    const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
 
     const pwmSetting = computed<number>(() =>
       isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)
@@ -56,7 +55,7 @@ export default defineComponent({
 
     const duration = computed<number>(() => {
       const pressure =
-        ((props.part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE) / 100) *
+        ((settings.value['onPressure'] ?? DEFAULT_PUMP_PRESSURE) / 100) *
           pwmSetting.value || 0.01;
       const animationDuration = 60 / pressure;
       return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
@@ -94,15 +93,16 @@ export default defineComponent({
       () => block.value,
       (newV, oldV) => {
         if (checkDirty(newV, oldV)) {
-          emit('dirty');
+          reflow();
         }
       },
     );
 
     onBeforeMount(() => {
-      if (props.part.settings.pwm !== undefined) {
+      const oldBlockAddr = settings.value['pwm'];
+      if (oldBlockAddr !== undefined) {
         patchSettings({
-          [PUMP_KEY]: props.part.settings.pwm,
+          [PUMP_KEY]: oldBlockAddr,
           pwm: undefined,
         });
       }
@@ -110,9 +110,9 @@ export default defineComponent({
 
     function interact(): void {
       if (!hasAddress.value) {
-        patchSettings({ enabled: !props.part.settings.enabled });
+        patchSettings({ enabled: !settings.value['enabled'] });
       } else if (block.value == null) {
-        showAbsentBlock(props.part, PUMP_KEY);
+        showAbsentBlock(part.value, PUMP_KEY);
       } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
         const storedState =
           block.value.data.state === DigitalState.STATE_INACTIVE
@@ -140,6 +140,8 @@ export default defineComponent({
     }
 
     return {
+      width,
+      height,
       block,
       hasAddress,
       blockStatus,

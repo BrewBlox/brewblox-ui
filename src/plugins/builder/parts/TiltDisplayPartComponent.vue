@@ -16,14 +16,12 @@ import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'TiltDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const { bordered } = usePart.setup(props.part);
+  setup() {
+    const { part, settings, width, height, bordered } = usePart.setup();
     const tiltStore = useTiltStore();
 
     const tiltId = computed<string | null>(
-      () => props.part.settings[TILT_ID_KEY] ?? null,
+      () => settings.value[TILT_ID_KEY] ?? null,
     );
 
     const tiltState = computed<TiltStateValue | null>(
@@ -53,7 +51,7 @@ export default defineComponent({
     );
 
     const color = computed<string>(
-      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
     );
 
     const unitlessGravity = computed<boolean>(
@@ -65,6 +63,8 @@ export default defineComponent({
       preciseNumber,
       textTransformation,
       fixedNumber,
+      width,
+      height,
       temperature,
       gravity,
       tempUnit,

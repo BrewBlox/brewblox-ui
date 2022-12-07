@@ -4,13 +4,19 @@ import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'BuilderLabelPartComponent',
-  props: { ...usePart.props },
+  setup() {
+    const { width, height } = usePart.setup();
+    return {
+      width,
+      height,
+    };
+  },
 });
 </script>
 
 <template>
   <BuilderLabelValues
-    v-bind="{ ...$props, ...$attrs }"
+    v-bind="{ width, height }"
     unset-label="[click to edit]"
   />
 </template>

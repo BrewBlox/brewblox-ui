@@ -14,7 +14,8 @@ import {
   TempSensorMockBlock,
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
-import { BuilderTool } from './types';
+import { InjectionKey, WritableComputedRef } from 'vue';
+import { BuilderTool, FlowPart } from './types';
 
 export const DEFAULT_LAYOUT_WIDTH = 20;
 export const DEFAULT_LAYOUT_HEIGHT = 15;
@@ -91,6 +92,10 @@ export const DIGITAL_TYPES = [BlockType.DigitalActuator] as const;
 export type PumpBlockT = PwmBlockT | DigitalBlockT;
 export const PUMP_KEY = 'actuator';
 export const PUMP_TYPES = [...PWM_TYPES, ...DIGITAL_TYPES] as const;
+
+export const PartKey: InjectionKey<WritableComputedRef<FlowPart>> =
+  Symbol('$part');
+export const ReflowKey: InjectionKey<() => void> = Symbol('$reflow');
 
 export const deprecatedTypes = {
   SmallKettle: 'Kettle',

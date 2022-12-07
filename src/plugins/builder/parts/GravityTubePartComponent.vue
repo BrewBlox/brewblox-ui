@@ -11,14 +11,16 @@ const paths = {
 
 export default defineComponent({
   name: 'GravityTubePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
+  setup() {
+    const { part, width, height } = usePart.setup();
 
-    const liquids = computed<string[]>(() => liquidOnCoord(props.part, RIGHT));
+    const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
+
+    const liquids = computed<string[]>(() => liquidOnCoord(part.value, RIGHT));
 
     return {
+      width,
+      height,
       paths,
       flowSpeed,
       liquids,

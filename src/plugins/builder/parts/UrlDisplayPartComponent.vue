@@ -7,30 +7,29 @@ import { textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'UrlDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const { bordered } = usePart.setup(props.part);
+  setup() {
+    const { settings, width, height, bordered } = usePart.setup();
 
-    const url = computed<string>(() => props.part.settings['url'] || '');
+    const url = computed<string>(() => settings.value['url'] || '');
 
     const titleText = computed<string>(
-      () => props.part.settings['text'] || url.value || 'Url Display',
+      () => settings.value['text'] || url.value || 'Url Display',
     );
 
     function interact(): void {
-      const { url } = props.part.settings;
-      if (url) {
-        if (isAbsoluteUrl(url)) {
-          window.open(url, '_blank');
+      if (url.value) {
+        if (isAbsoluteUrl(url.value)) {
+          window.open(url.value, '_blank');
         } else {
-          useRouter().push(url);
+          useRouter().push(url.value);
         }
       }
     }
 
     return {
       textTransformation,
+      width,
+      height,
       bordered,
       url,
       titleText,
@@ -42,8 +41,7 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="width"
-    :height="height"
+    v-bind="{ width, height }"
     class="interaction"
     @click="interact"
   >

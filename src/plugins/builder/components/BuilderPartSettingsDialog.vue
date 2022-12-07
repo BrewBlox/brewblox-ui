@@ -19,7 +19,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [...useDialog.emits, 'update:part', 'remove:part', 'dirty'],
+  emits: [...useDialog.emits, 'update:part', 'remove:part', 'reflow'],
   setup(props, { emit }) {
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
@@ -63,8 +63,8 @@ export default defineComponent({
       emit('remove:part', part);
     }
 
-    function invalidate(): void {
-      emit('dirty');
+    function reflow(): void {
+      emit('reflow');
     }
 
     return {
@@ -78,7 +78,7 @@ export default defineComponent({
       displayScale,
       updatePart,
       removePart,
-      invalidate,
+      reflow,
     };
   },
 });
@@ -110,6 +110,7 @@ export default defineComponent({
             <PartWrapper
               :key="`menu-${part.id}-${rev}`"
               :part="part"
+              @reflow="reflow"
             />
           </svg>
         </div>
@@ -123,7 +124,6 @@ export default defineComponent({
           class="col-auto"
           @update:part="updatePart"
           @remove:part="removePart"
-          @dirty="invalidate"
         />
       </div>
     </Card>

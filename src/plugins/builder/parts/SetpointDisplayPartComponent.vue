@@ -6,16 +6,16 @@ import { liquidOnCoord } from '../utils';
 
 export default defineComponent({
   name: 'SetpointDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const { bordered } = usePart.setup(props.part);
+  setup() {
+    const { part, width, height, bordered } = usePart.setup();
 
     const color = computed<string>(
-      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
     );
 
     return {
+      width,
+      height,
       bordered,
       color,
     };
@@ -28,7 +28,7 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 100 50"
   >
-    <SetpointValues :part="part" />
+    <SetpointValues />
     <g class="outline">
       <rect
         v-show="bordered"

@@ -5,14 +5,14 @@ import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'KegPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const color = computed<string>(() =>
-      colorString(props.part.settings.color),
-    );
+  setup() {
+    const { settings, width, height } = usePart.setup();
+
+    const color = computed<string>(() => colorString(settings.value['color']));
 
     return {
+      width,
+      height,
       color,
     };
   },
@@ -60,7 +60,6 @@ export default defineComponent({
       />
     </g>
     <SetpointValues
-      :part="part"
       :y="100"
       :background-color="color"
       hide-unset

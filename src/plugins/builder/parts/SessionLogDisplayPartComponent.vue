@@ -11,20 +11,17 @@ import { showLinkedWidgetDialog } from '../utils';
 
 export default defineComponent({
   name: 'SessionLogDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
     const widgetStore = useWidgetStore();
     const historyStore = useHistoryStore();
-    const { bordered } = usePart.setup(props.part);
+    const { part, settings, width, height, bordered } = usePart.setup();
 
     const isLinked = computed<boolean>(() =>
-      Boolean(props.part.settings[WIDGET_KEY]),
+      Boolean(settings.value[WIDGET_KEY]),
     );
 
     const widget = computed<Widget | null>(() =>
-      // TODO(Bob)
-      widgetStore.widgetById(props.part.settings[WIDGET_KEY]),
+      widgetStore.widgetById(settings.value[WIDGET_KEY]),
     );
 
     const isBroken = computed<boolean>(() => isLinked.value && !widget.value);
@@ -42,11 +39,13 @@ export default defineComponent({
     );
 
     function interact(): void {
-      showLinkedWidgetDialog(props.part, WIDGET_KEY);
+      showLinkedWidgetDialog(part.value, WIDGET_KEY);
     }
 
     return {
       mdiTextSubject,
+      width,
+      height,
       bordered,
       isLinked,
       isBroken,

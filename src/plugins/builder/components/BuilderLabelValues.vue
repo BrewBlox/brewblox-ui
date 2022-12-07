@@ -8,10 +8,17 @@ import { textTransformation } from '../utils';
 export default defineComponent({
   name: 'BuilderLabelValues',
   props: {
-    ...usePart.props,
     settingsKey: {
       type: String,
       default: LABEL_KEY,
+    },
+    width: {
+      type: Number,
+      required: true,
+    },
+    height: {
+      type: Number,
+      required: true,
     },
     unsetLabel: {
       type: String,
@@ -26,27 +33,24 @@ export default defineComponent({
       default: 0,
     },
   },
-  emits: [...usePart.emits],
   setup(props) {
-    const { sizeX, sizeY } = usePart.setup(props.part);
-
-    const { patchSettings } = usePart.setup(props.part);
+    const { part, settings, sizeX, sizeY, patchSettings } = usePart.setup();
 
     const text = computed<string>(
-      () => props.part.settings[props.settingsKey] || props.unsetLabel,
+      () => settings.value[props.settingsKey] || props.unsetLabel,
     );
 
-    const fontSize = computed<number>(() => props.part.settings.fontSize || 16);
+    const fontSize = computed<number>(() => settings.value['fontSize'] || 16);
 
     const labelTransform = computed<string>(() =>
-      textTransformation(props.part, [sizeX.value, sizeY.value], false),
+      textTransformation(part.value, [sizeX.value, sizeY.value], false),
     );
 
     function interact(): void {
       createDialog({
         component: 'InputDialog',
         componentProps: {
-          modelValue: props.part.settings[props.settingsKey] ?? '',
+          modelValue: settings.value[props.settingsKey] ?? '',
           title: 'Edit label',
           label: 'text',
         },

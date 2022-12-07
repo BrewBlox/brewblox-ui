@@ -8,14 +8,16 @@ const liquidPaths = ['M 0,25 h 50', 'M 20,15 L 30,25 L 20,35'];
 
 export default defineComponent({
   name: 'CheckValvePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
+  setup() {
+    const { part, width, height } = usePart.setup();
 
-    const liquids = computed<string[]>(() => liquidOnCoord(props.part, RIGHT));
+    const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
+
+    const liquids = computed<string[]>(() => liquidOnCoord(part.value, RIGHT));
 
     return {
+      width,
+      height,
       liquidPaths,
       flowSpeed,
       liquids,

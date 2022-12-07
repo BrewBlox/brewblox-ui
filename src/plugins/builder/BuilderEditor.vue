@@ -949,7 +949,7 @@ export default defineComponent({
       :rev="flowPartsRevision"
       @update:part="savePart"
       @remove:part="removePart"
-      @dirty="calculateFlowParts"
+      @reflow="calculateFlowParts"
       @hide="closeMenu"
     />
 
@@ -1067,13 +1067,13 @@ export default defineComponent({
           >
             <PartWrapper
               :part="part"
-              :grid-x="part.x"
-              :grid-y="part.y"
+              :coord-x="part.x"
+              :coord-y="part.y"
               :selected="selectedIds.includes(part.id)"
               :selectable="!['interact', 'pan', null].includes(activeToolId)"
               :interactable="activeToolId === 'interact'"
               @update:part="savePart"
-              @dirty="calculateFlowParts"
+              @reflow="calculateFlowParts"
             />
           </g>
           <!-- Floating parts -->
@@ -1088,8 +1088,8 @@ export default defineComponent({
             >
               <PartWrapper
                 :part="part"
-                :grid-x="part.x"
-                :grid-y="part.y"
+                :coord-x="part.x"
+                :coord-y="part.y"
                 selected
               />
             </g>

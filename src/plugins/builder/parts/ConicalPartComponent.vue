@@ -4,8 +4,14 @@ import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'ConicalPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
+  setup() {
+    const { width, height } = usePart.setup();
+
+    return {
+      width,
+      height,
+    };
+  },
 });
 </script>
 
@@ -34,7 +40,6 @@ export default defineComponent({
       <path d="M25,50c0,0,8.7-17,50-17s50,17,50,17H25z" />
       <!-- Setpoint -->
       <SetpointValues
-        :part="part"
         :y="50"
         hide-unset
       />

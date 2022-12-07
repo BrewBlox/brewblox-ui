@@ -21,14 +21,14 @@ const path = `
 
 export default defineComponent({
   name: 'CarboyPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const color = computed<string>(() =>
-      colorString(props.part.settings.color),
-    );
+  setup() {
+    const { settings, width, height } = usePart.setup();
+
+    const color = computed<string>(() => colorString(settings.value['color']));
 
     return {
+      width,
+      height,
       color,
       path,
     };
@@ -53,7 +53,6 @@ export default defineComponent({
       <path :d="path" />
     </g>
     <SetpointValues
-      :part="part"
       :y="50"
       :background-color="color"
       hide-unset

@@ -8,7 +8,6 @@ import { PwmBlockT, PWM_KEY, PWM_TYPES } from '../const';
 export default defineComponent({
   name: 'PwmValues',
   props: {
-    ...usePart.props,
     width: {
       type: Number,
       default: 50,
@@ -38,22 +37,17 @@ export default defineComponent({
       default: '',
     },
   },
-  emits: [...usePart.emits],
   setup(props) {
-    const { bordered } = usePart.setup(props.part);
+    const { part, bordered } = usePart.setup();
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<PwmBlockT>(
-        props.part,
-        props.settingsKey,
-        PWM_TYPES,
-      );
+      useSettingsBlock.setup<PwmBlockT>(part, props.settingsKey, PWM_TYPES);
 
     const pwmValue = computed<number | null>(() =>
       block.value?.data.enabled ? block.value.data.value : null,
     );
 
     const contentTransform = computed<string>(() =>
-      textTransformation(props.part, [1, 1]),
+      textTransformation(part.value, [1, 1]),
     );
 
     return {
