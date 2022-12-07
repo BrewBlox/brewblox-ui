@@ -48,26 +48,28 @@ const paths = {
 
 export default defineComponent({
   name: 'CounterflowChillerPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
+    const { part, width, height } = usePart.setup();
+
     const topFlowSpeed = computed<number>(() =>
-      flowOnCoord(props.part, CFC_TOP_RIGHT),
+      flowOnCoord(part.value, CFC_TOP_RIGHT),
     );
 
     const bottomFlowSpeed = computed<number>(() =>
-      flowOnCoord(props.part, CFC_BOTTOM_LEFT),
+      flowOnCoord(part.value, CFC_BOTTOM_LEFT),
     );
 
     const topLiquids = computed<string[]>(() =>
-      liquidOnCoord(props.part, CFC_TOP_RIGHT),
+      liquidOnCoord(part.value, CFC_TOP_RIGHT),
     );
 
     const bottomLiquids = computed<string[]>(() =>
-      liquidOnCoord(props.part, CFC_BOTTOM_LEFT),
+      liquidOnCoord(part.value, CFC_BOTTOM_LEFT),
     );
 
     return {
+      width,
+      height,
       paths,
       topFlowSpeed,
       bottomFlowSpeed,

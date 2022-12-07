@@ -9,17 +9,11 @@ import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
 
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const { bordered } = usePart.setup(props.part);
+  setup() {
+    const { part, width, height, bordered } = usePart.setup();
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<ProfileBlockT>(
-        props.part,
-        PROFILE_KEY,
-        PROFILE_TYPES,
-      );
+      useSettingsBlock.setup<ProfileBlockT>(part, PROFILE_KEY, PROFILE_TYPES);
 
     const points = computed<Setpoint[]>(() => {
       if (!block.value) {
@@ -80,6 +74,8 @@ export default defineComponent({
 
     return {
       preciseNumber,
+      width,
+      height,
       bordered,
       block,
       blockStatus,

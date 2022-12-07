@@ -48,10 +48,14 @@ const paths = {
 
 export default defineComponent({
   name: 'LauterhexePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
   setup() {
-    return { paths };
+    const { width, height } = usePart.setup();
+
+    return {
+      width,
+      height,
+      paths,
+    };
   },
 });
 </script>

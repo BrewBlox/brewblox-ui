@@ -13,7 +13,6 @@ const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
 export default defineComponent({
   name: 'SetpointValues',
   props: {
-    ...usePart.props,
     width: {
       type: Number,
       default: 100,
@@ -39,23 +38,22 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [...usePart.emits],
   setup(props) {
     const sparkStore = useSparkStore();
+    const { part } = usePart.setup();
     const { address, block, blockStatus, isBroken, showBlockDialog } =
       useSettingsBlock.setup<SetpointBlockT>(
-        props.part,
+        part,
         props.settingsKey,
         SETPOINT_TYPES,
       );
-    const { serviceId } = address.value;
 
     const isUsed = computed<boolean>(
       () =>
         block.value !== null &&
         block.value.data.enabled &&
         sparkStore
-          .blocksByService(serviceId)
+          .blocksByService(address.value.serviceId)
           .filter(pidFilter)
           .some((blk) => blk.data.inputId.id === address.value.id),
     );

@@ -12,26 +12,28 @@ const paths = {
 
 export default defineComponent({
   name: 'TeeTubePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const topSpeed = computed<number>(() => flowOnCoord(props.part, UP));
+  setup() {
+    const { part, width, height } = usePart.setup();
 
-    const leftSpeed = computed<number>(() => flowOnCoord(props.part, LEFT));
+    const topSpeed = computed<number>(() => flowOnCoord(part.value, UP));
 
-    const rightSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
+    const leftSpeed = computed<number>(() => flowOnCoord(part.value, LEFT));
 
-    const topLiquids = computed<string[]>(() => liquidOnCoord(props.part, UP));
+    const rightSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
+
+    const topLiquids = computed<string[]>(() => liquidOnCoord(part.value, UP));
 
     const leftLiquids = computed<string[]>(() =>
-      liquidOnCoord(props.part, LEFT),
+      liquidOnCoord(part.value, LEFT),
     );
 
     const rightLiquids = computed<string[]>(() =>
-      liquidOnCoord(props.part, RIGHT),
+      liquidOnCoord(part.value, RIGHT),
     );
 
     return {
+      width,
+      height,
       paths,
       topSpeed,
       leftSpeed,

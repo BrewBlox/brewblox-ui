@@ -4,7 +4,7 @@ import {
   DEFAULT_METRICS_EXPIRY,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
-import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
+import { fixedNumber, shortDateString } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
@@ -21,31 +21,28 @@ interface MetricDisplay {
 
 export default defineComponent({
   name: 'MetricsDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
+    const { part, metrics, width, height, bordered } = usePart.setup();
     const { source } = useMetrics.setup(null);
-    const { bordered } = usePart.setup(props.part);
 
     function fieldFreshDuration(field: string): number {
-      return props.part.metrics?.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
+      return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
     }
 
     const values = computed<MetricDisplay[]>(() => {
-      const { metrics } = props.part;
-      if (!metrics || !source.value) {
+      if (!source.value) {
         return [];
       }
       const now = new Date().getTime();
       return source.value.values
-        .filter((v) => metrics.fields.includes(v.field))
+        .filter((v) => metrics.value.fields.includes(v.field))
         .map((v) => ({
           field: v.field,
-          label: metrics.renames[v.field] || defaultLabel(v.field),
+          label: metrics.value.renames[v.field] || defaultLabel(v.field),
           time: shortDateString(v.time),
           value: fixedNumber(
             v.value,
-            metrics.decimals[v.field] ?? DEFAULT_METRICS_DECIMALS,
+            metrics.value.decimals[v.field] ?? DEFAULT_METRICS_DECIMALS,
           ),
           stale:
             !!v.time &&
@@ -54,13 +51,14 @@ export default defineComponent({
     });
 
     const color = computed<string>(
-      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
     );
 
     return {
-      durationString,
-      color,
+      width,
+      height,
       bordered,
+      color,
       values,
     };
   },

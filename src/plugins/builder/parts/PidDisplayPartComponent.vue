@@ -19,17 +19,15 @@ import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'PidDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
     const sparkStore = useSparkStore();
-    const { bordered } = usePart.setup(props.part);
+    const { part, width, height, bordered } = usePart.setup();
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<PidBlockT>(props.part, PID_KEY, PID_TYPES);
+      useSettingsBlock.setup<PidBlockT>(part, PID_KEY, PID_TYPES);
 
     const contentTransform = computed<string>(() =>
-      textTransformation(props.part, [1, 1]),
+      textTransformation(part.value, [1, 1]),
     );
 
     const outputValue = computed<number | null>(() =>
@@ -67,7 +65,7 @@ export default defineComponent({
     });
 
     const color = computed<string>(
-      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
     );
 
     return {
@@ -77,6 +75,8 @@ export default defineComponent({
       mdiCalculatorVariant,
       mdiPlusMinus,
       contentTransform,
+      width,
+      height,
       block,
       blockStatus,
       isBroken,

@@ -6,14 +6,16 @@ import { coord2grid } from '../utils';
 
 export default defineComponent({
   name: 'FridgePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
+    const { settings, width, height } = usePart.setup();
+
     const shelfHeight = computed<number>(() =>
-      coord2grid(props.part.settings[SHELF_Y_KEY] || DEFAULT_SHELF_Y),
+      coord2grid(settings.value[SHELF_Y_KEY] || DEFAULT_SHELF_Y),
     );
 
     return {
+      width,
+      height,
       shelfHeight,
     };
   },
@@ -55,10 +57,8 @@ export default defineComponent({
       />
     </g>
     <BuilderLabelValues
-      :part="part"
       :width="width"
       :height="50"
-      @update:part="(v) => $emit('update:part', v)"
     />
   </svg>
 </template>

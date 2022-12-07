@@ -26,13 +26,12 @@ const paths = {
 
 export default defineComponent({
   name: 'LValvePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props, { emit }) {
-    const { patchSettings } = usePart.setup(props.part);
+  setup() {
+    const { part, settings, width, height, patchSettings, reflow } =
+      usePart.setup();
 
     const { block } = useSettingsBlock.setup<ValveBlockT>(
-      props.part,
+      part,
       VALVE_KEY,
       VALVE_TYPES,
     );
@@ -40,16 +39,16 @@ export default defineComponent({
     const closed = computed<boolean>(() =>
       block.value !== null
         ? Boolean(block.value.data.state === DigitalState.STATE_ACTIVE)
-        : Boolean(props.part.settings.closed),
+        : Boolean(settings.value['closed']),
     );
 
     const liquidPath = computed<string>(() =>
       closed.value ? paths.liquidLeft : paths.liquidRight,
     );
 
-    const liquidSpeed = computed<number>(() => -flowOnCoord(props.part, UP));
+    const liquidSpeed = computed<number>(() => -flowOnCoord(part.value, UP));
 
-    const liquidColor = computed<string[]>(() => liquidOnCoord(props.part, UP));
+    const liquidColor = computed<string[]>(() => liquidOnCoord(part.value, UP));
 
     function interact(): void {
       if (block.value) {
@@ -60,7 +59,7 @@ export default defineComponent({
               : DigitalState.STATE_ACTIVE,
         });
       } else {
-        patchSettings({ closed: !props.part.settings.closed });
+        patchSettings({ closed: !settings.value['closed'] });
       }
     }
 
@@ -72,12 +71,14 @@ export default defineComponent({
           oldV === null ||
           newV.data.state !== oldV.data.state
         ) {
-          emit('dirty');
+          reflow;
         }
       },
     );
 
     return {
+      width,
+      height,
       paths,
       block,
       closed,

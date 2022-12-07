@@ -5,9 +5,9 @@ import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'CondenserPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
   setup() {
+    const { width, height } = usePart.setup();
+
     function outlinePath(closed: boolean): string {
       const moveChar = closed ? 'L' : 'M';
       return [
@@ -25,6 +25,8 @@ export default defineComponent({
     const smokeArea = outlinePath(true);
 
     return {
+      width,
+      height,
       casing,
       smokeArea,
     };
