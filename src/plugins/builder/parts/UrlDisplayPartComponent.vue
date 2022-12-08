@@ -46,6 +46,14 @@ export default defineComponent({
     @click="interact"
   >
     <rect class="interaction-background" />
+    <foreignObject v-bind="{ width, height }">
+      <div
+        class="fit text-bold text-center q-mt-sm grid-label"
+        style="text-decoration: underline; font-size: 130%"
+      >
+        {{ titleText }}
+      </div>
+    </foreignObject>
     <g class="outline">
       <rect
         v-show="bordered"
@@ -58,13 +66,5 @@ export default defineComponent({
         stroke="white"
       />
     </g>
-    <foreignObject class="fit">
-      <div
-        class="fit text-bold text-center q-mt-sm grid-label"
-        style="text-decoration: underline; font-size: 130%"
-      >
-        {{ titleText }}
-      </div>
-    </foreignObject>
   </svg>
 </template>

@@ -67,7 +67,7 @@ export default defineComponent({
 
 <template>
   <svg v-bind="{ width, height }">
-    <foreignObject class="fit">
+    <foreignObject v-bind="{ width, height }">
       <div class="full-width column q-py-xs">
         <div
           v-for="d in values"
