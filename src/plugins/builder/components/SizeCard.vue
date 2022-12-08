@@ -1,15 +1,11 @@
 <script lang="ts">
 import { debounce } from 'quasar';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'SizeCard',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
     settingsKey: {
       type: String,
       required: true,
@@ -32,22 +28,18 @@ export default defineComponent({
     },
   },
   emits: ['update:part'],
-  setup(props, { emit }) {
+  setup(props) {
+    const { settings, patchSettings } = usePart.setup();
+
     const size = computed<number>(() => {
-      const val = props.part.settings[props.settingsKey];
+      const val = settings.value[props.settingsKey];
       return typeof val === 'number' ? val : props.defaultSize;
     });
 
     const save = debounce(
       (val: number): void => {
         const size = typeof val === 'number' ? val : props.defaultSize;
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            [props.settingsKey]: size,
-          },
-        });
+        patchSettings({ [props.settingsKey]: size });
       },
       50,
       true,

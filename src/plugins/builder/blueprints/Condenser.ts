@@ -4,6 +4,7 @@ import {
   CENTER,
   DEFAULT_IO_PRESSURE,
   HOT_WATER,
+  IO_PRESSURE_KEY,
   MAX_IO_PRESSURE,
   MIN_IO_PRESSURE,
   UP,
@@ -20,7 +21,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'PressureCard',
       props: {
-        settingsKey: 'onPressure',
+        settingsKey: IO_PRESSURE_KEY,
         min: MIN_IO_PRESSURE,
         max: MAX_IO_PRESSURE,
         defaultValue: DEFAULT_OUTLET_PRESSURE,
@@ -31,6 +32,9 @@ const blueprint: BuilderBlueprint = {
   transitions: (part: PersistentPart) => {
     const bottomOut = new Coordinates([0.5, SIZE_Y, 0]).toString();
     const bottomCenter = new Coordinates([0.5, SIZE_Y - 0.5, 0]).toString();
+    const pressure = Number(
+      part.settings[IO_PRESSURE_KEY] ?? DEFAULT_OUTLET_PRESSURE,
+    );
     return {
       [UP]: [{ outCoords: CENTER, sink: true }],
       [bottomOut]: [{ outCoords: bottomCenter, sink: true }],
@@ -38,7 +42,7 @@ const blueprint: BuilderBlueprint = {
         {
           outCoords: bottomOut,
           source: true,
-          pressure: part.settings.onPressure ?? DEFAULT_OUTLET_PRESSURE,
+          pressure,
           liquids: [HOT_WATER],
         },
       ],

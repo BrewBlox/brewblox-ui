@@ -3,8 +3,9 @@ import {
   containerTransitions,
   variableSizeFunc,
 } from '@/plugins/builder/utils';
-import { SIZE_X_KEY, SIZE_Y_KEY } from '../const';
+import { COLOR_KEY, LABEL_KEY, SIZE_X_KEY, SIZE_Y_KEY } from '../const';
 
+export const KETTLE_FILL_PCT_KEY = 'fillPct';
 export const DEFAULT_FILL_PCT = 85;
 export const DEFAULT_SIZE_X = 4;
 export const DEFAULT_SIZE_Y = 6;
@@ -18,10 +19,15 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'TextCard',
       props: {
-        settingsKey: 'text',
+        settingsKey: LABEL_KEY,
       },
     },
-    { component: 'ColorCard' },
+    {
+      component: 'ColorCard',
+      props: {
+        settingsKey: COLOR_KEY,
+      },
+    },
     {
       component: 'SizeCard',
       props: {
@@ -45,7 +51,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'fillPct',
+        settingsKey: KETTLE_FILL_PCT_KEY,
         defaultSize: DEFAULT_FILL_PCT,
         label: 'Liquid level (%)',
         min: 0,
@@ -55,7 +61,7 @@ const blueprint: BuilderBlueprint = {
   ],
   size,
   transitions: (part: PersistentPart) =>
-    containerTransitions(size(part), part.settings.color),
+    containerTransitions(size(part), part.settings[COLOR_KEY]),
 };
 
 export default blueprint;

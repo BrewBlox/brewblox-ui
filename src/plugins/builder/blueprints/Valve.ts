@@ -2,6 +2,7 @@ import {
   LEFT,
   RIGHT,
   ValveBlockT,
+  VALVE_CLOSED_KEY,
   VALVE_KEY,
   VALVE_TYPES,
 } from '@/plugins/builder/const';
@@ -12,8 +13,6 @@ import {
 } from '@/plugins/builder/types';
 import { DigitalState } from 'brewblox-proto/ts';
 import { settingsAddress, settingsBlock } from '../utils';
-
-export const CLOSED_KEY = 'closed';
 
 const blueprint: BuilderBlueprint = {
   type: 'Valve',
@@ -36,7 +35,7 @@ const blueprint: BuilderBlueprint = {
       : null;
     const closed = hasAddress
       ? block?.data.state !== DigitalState.STATE_ACTIVE
-      : Boolean(part.settings[CLOSED_KEY]);
+      : Boolean(part.settings[VALVE_CLOSED_KEY]);
 
     return closed
       ? {}

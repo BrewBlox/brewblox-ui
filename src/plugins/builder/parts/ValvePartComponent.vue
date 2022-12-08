@@ -2,13 +2,13 @@
 import {
   RIGHT,
   ValveBlockT,
+  VALVE_CLOSED_KEY,
   VALVE_KEY,
   VALVE_TYPES,
 } from '@/plugins/builder/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
-import { CLOSED_KEY } from '../blueprints/Valve';
 import { usePart, useSettingsBlock } from '../composables';
 import { flowOnCoord, liquidOnCoord, scheduleSoftStartRefresh } from '../utils';
 
@@ -44,7 +44,7 @@ export default defineComponent({
     const closed = computed<boolean>(() =>
       hasAddress.value
         ? block.value?.data.state !== DigitalState.STATE_ACTIVE
-        : Boolean(settings.value[CLOSED_KEY]),
+        : Boolean(settings.value[VALVE_CLOSED_KEY]),
     );
 
     const pending = computed<boolean>(() =>
@@ -90,7 +90,9 @@ export default defineComponent({
           scheduleSoftStartRefresh(block.value);
         }
       } else {
-        patchSettings({ [CLOSED_KEY]: !settings.value[CLOSED_KEY] });
+        patchSettings({
+          [VALVE_CLOSED_KEY]: !settings.value[VALVE_CLOSED_KEY],
+        });
       }
     }
 

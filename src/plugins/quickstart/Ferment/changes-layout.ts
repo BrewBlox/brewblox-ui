@@ -1,4 +1,18 @@
+import {
+  BORDER_KEY,
+  COLOR_KEY,
+  LABEL_KEY,
+  PID_KEY,
+  PROFILE_KEY,
+  SETPOINT_KEY,
+  SIZE_X_KEY,
+  SIZE_Y_KEY,
+  URL_KEY,
+} from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { typed } from '@/utils/misc';
+import { BlockIntfType, BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { FermentConfig } from './types';
@@ -20,8 +34,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            sizeY: 7,
-            text: withPrefix(config.prefix, 'fridge'),
+            [SIZE_Y_KEY]: 7,
+            [LABEL_KEY]: withPrefix(config.prefix, 'fridge'),
           },
         },
         {
@@ -32,11 +46,12 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            color: 'E1AC00',
-            setpoint: {
+            [COLOR_KEY]: 'E1AC00',
+            [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: config.names.beerSetpoint,
-            },
+              id: config.names.beerSetpoint,
+              type: BlockIntfType.SetpointSensorPairInterface,
+            }),
           },
         },
         {
@@ -47,11 +62,12 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            bordered: false,
-            profile: {
+            [BORDER_KEY]: false,
+            [PROFILE_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: config.names.tempProfile,
-            },
+              id: config.names.tempProfile,
+              type: BlockType.SetpointProfile,
+            }),
           },
         },
         {
@@ -62,11 +78,12 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            bordered: false,
-            setpoint: {
+            [BORDER_KEY]: false,
+            [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: config.names.fridgeSetpoint,
-            },
+              id: config.names.fridgeSetpoint,
+              type: BlockIntfType.SetpointSensorPairInterface,
+            }),
           },
         },
         {
@@ -77,11 +94,12 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            bordered: false,
-            pid: {
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: config.names.coolPid,
-            },
+              id: config.names.coolPid,
+              type: BlockType.Pid,
+            }),
           },
         },
         {
@@ -92,11 +110,12 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            bordered: false,
-            pid: {
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: config.names.heatPid,
-            },
+              id: config.names.heatPid,
+              type: BlockType.Pid,
+            }),
           },
         },
         {
@@ -107,11 +126,11 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            bordered: false,
-            text: 'User manual',
-            url: 'https://brewblox.netlify.app/user/ferment_gnanoide.html',
-            sizeX: 4,
-            sizeY: 1,
+            [BORDER_KEY]: false,
+            [LABEL_KEY]: 'User manual',
+            [URL_KEY]: 'https://www.brewblox.com/user/ferment_guide.html',
+            [SIZE_X_KEY]: 4,
+            [SIZE_Y_KEY]: 1,
           },
         },
       ],

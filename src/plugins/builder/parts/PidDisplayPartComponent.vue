@@ -101,18 +101,6 @@ export default defineComponent({
     @click="showBlockDialog"
   >
     <rect class="interaction-background" />
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        width="46"
-        height="46"
-        stroke-width="2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-      />
-    </g>
     <g
       :transform="contentTransform"
       class="content"
@@ -148,6 +136,18 @@ export default defineComponent({
           </div>
         </foreignObject>
       </template>
+    </g>
+    <g class="outline">
+      <rect
+        v-show="bordered"
+        width="46"
+        height="46"
+        stroke-width="2"
+        x="1"
+        y="1"
+        rx="6"
+        ry="6"
+      />
     </g>
   </svg>
 </template>

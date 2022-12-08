@@ -57,6 +57,7 @@ const blueprint: BuilderBlueprint = {
     },
     {
       component: 'BorderCard',
+      props: {},
     },
   ],
   size,

@@ -1,4 +1,5 @@
 import {
+  COLOR_KEY,
   SETPOINT_KEY,
   SETPOINT_TYPES,
   SIZE_X_KEY,
@@ -27,6 +28,9 @@ const blueprint: BuilderBlueprint = {
     },
     {
       component: 'ColorCard',
+      props: {
+        settingsKey: COLOR_KEY,
+      },
     },
     {
       component: 'SizeCard',

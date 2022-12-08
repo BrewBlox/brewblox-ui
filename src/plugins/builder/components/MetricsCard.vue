@@ -2,30 +2,24 @@
 import { MetricsConfig } from '@/plugins/history/types';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import defaults from 'lodash/defaults';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'MetricsCard',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
-  emits: ['update:part'],
-  setup(props, { emit }) {
-    const config = computed<MetricsConfig>(() => {
-      return defaults(props.part.metrics, emptyMetricsConfig());
+  setup() {
+    const { part } = usePart.setup();
+
+    const config = computed<MetricsConfig>({
+      get: () => defaults(part.value.metrics, emptyMetricsConfig()),
+      set: (metrics) => {
+        part.value = { ...part.value, metrics };
+      },
     });
-    function saveConfig(metrics: MetricsConfig): void {
-      const updated: FlowPart = {
-        ...props.part,
-        metrics,
-      };
-      emit('update:part', updated);
-    }
-    return { config, saveConfig };
+
+    return {
+      config,
+    };
   },
 });
 </script>
@@ -34,10 +28,7 @@ export default defineComponent({
   <q-item class="q-ma-none q-mt-xs">
     <q-item-section>
       <q-item-label caption> Metrics </q-item-label>
-      <MetricsEditor
-        :config="config"
-        @update:config="saveConfig"
-      />
+      <MetricsEditor v-model:config="config" />
     </q-item-section>
   </q-item>
 </template>

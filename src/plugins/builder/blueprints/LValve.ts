@@ -3,6 +3,7 @@ import {
   RIGHT,
   UP,
   ValveBlockT,
+  VALVE_CLOSED_KEY,
   VALVE_KEY,
   VALVE_TYPES,
 } from '@/plugins/builder/const';
@@ -31,9 +32,9 @@ const blueprint: BuilderBlueprint = {
   transitions: (part: PersistentPart): Transitions => {
     const block = settingsBlock<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES);
     const closed =
-      block !== null
+      block != null
         ? Boolean(block.data.state === DigitalState.STATE_ACTIVE)
-        : Boolean(part.settings.closed);
+        : Boolean(part.settings[VALVE_CLOSED_KEY]);
     return closed
       ? {
           [UP]: [{ outCoords: LEFT }],

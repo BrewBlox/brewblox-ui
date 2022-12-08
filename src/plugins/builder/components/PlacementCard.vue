@@ -1,35 +1,47 @@
 <script lang="ts">
+import { createDialog } from '@/utils/dialog';
 import { clampRotation } from '@/utils/quantity';
-import { defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { defineComponent, inject } from 'vue';
+import { usePart } from '../composables';
+import { PartRemoveKey } from '../const';
 
 export default defineComponent({
   name: 'PlacementCard',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
+    title: {
+      type: String,
       required: true,
     },
   },
-  emits: ['update:part', 'remove:part'],
-  setup(props, { emit }) {
+  setup(props) {
+    const { part } = usePart.setup();
+    const removePart = inject(PartRemoveKey)!;
+
     function rotate(rotation: number): void {
-      const rotate = clampRotation(props.part.rotate + rotation);
-      emit('update:part', { ...props.part, rotate });
+      const rotate = clampRotation(part.value.rotate + rotation);
+      part.value = { ...part.value, rotate };
     }
 
     function flip(): void {
-      emit('update:part', { ...props.part, flipped: !props.part.flipped });
+      part.value = { ...part.value, flipped: !part.value.flipped };
     }
 
-    function removePart(): void {
-      emit('remove:part', props.part);
+    function startRemovePart(): void {
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Remove part',
+          message: `Are you sure you want to remove <b>${props.title}</b>?`,
+          html: true,
+        },
+      }).onOk(() => removePart());
     }
 
     return {
+      part,
       rotate,
       flip,
-      removePart,
+      startRemovePart,
     };
   },
 });
@@ -61,7 +73,7 @@ export default defineComponent({
       outline
       icon="delete"
       label="delete"
-      @click="removePart"
+      @click="startRemovePart"
     />
   </div>
 </template>

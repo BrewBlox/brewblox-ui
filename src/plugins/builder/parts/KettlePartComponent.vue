@@ -1,8 +1,9 @@
 <script lang="ts">
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
-import { DEFAULT_FILL_PCT } from '../blueprints/Kettle';
+import { DEFAULT_FILL_PCT, KETTLE_FILL_PCT_KEY } from '../blueprints/Kettle';
 import { usePart } from '../composables';
+import { COLOR_KEY } from '../const';
 
 export default defineComponent({
   name: 'KettlePartComponent',
@@ -10,11 +11,13 @@ export default defineComponent({
     const { settings, width, height } = usePart.setup();
 
     const filledHeight = computed<number>(() => {
-      const pct = settings.value['fillPct'] ?? DEFAULT_FILL_PCT;
+      const pct = settings.value[KETTLE_FILL_PCT_KEY] ?? DEFAULT_FILL_PCT;
       return pct * (height.value / 100);
     });
 
-    const color = computed<string>(() => colorString(settings.value['color']));
+    const color = computed<string>(() =>
+      colorString(settings.value[COLOR_KEY]),
+    );
 
     return {
       width,

@@ -1,5 +1,6 @@
 import {
   DEFAULT_PUMP_PRESSURE,
+  IO_PRESSURE_KEY,
   LEFT,
   MAX_PUMP_PRESSURE,
   MIN_PUMP_PRESSURE,
@@ -15,7 +16,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'PressureCard',
       props: {
-        settingsKey: 'onPressure',
+        settingsKey: IO_PRESSURE_KEY,
         min: MIN_PUMP_PRESSURE,
         max: MAX_PUMP_PRESSURE,
         defaultValue: DEFAULT_PUMP_PRESSURE,
@@ -23,10 +24,16 @@ const blueprint: BuilderBlueprint = {
     },
   ],
   transitions: (part: PersistentPart) => {
-    const pressure = part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE;
     return {
       [LEFT]: [{ outCoords: RIGHT }],
-      [RIGHT]: [{ outCoords: LEFT, pressure }],
+      [RIGHT]: [
+        {
+          outCoords: LEFT,
+          pressure: Number(
+            part.settings[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE,
+          ),
+        },
+      ],
     };
   },
 };

@@ -43,9 +43,11 @@ const blueprint: BuilderBlueprint = {
     },
     {
       component: 'BorderCard',
+      props: {},
     },
     {
       component: 'MetricsCard',
+      props: {},
     },
   ],
   size,

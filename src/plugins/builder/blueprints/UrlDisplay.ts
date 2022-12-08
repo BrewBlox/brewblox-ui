@@ -1,5 +1,5 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { SIZE_X_KEY, SIZE_Y_KEY } from '../const';
+import { LABEL_KEY, SIZE_X_KEY, SIZE_Y_KEY, URL_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
 const DEFAULT_SIZE_X = 4;
@@ -12,14 +12,14 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'TextCard',
       props: {
-        settingsKey: 'url',
+        settingsKey: URL_KEY,
         label: 'URL',
       },
     },
     {
       component: 'TextCard',
       props: {
-        settingsKey: 'text',
+        settingsKey: LABEL_KEY,
         label: 'Displayed text',
       },
     },
@@ -45,6 +45,7 @@ const blueprint: BuilderBlueprint = {
     },
     {
       component: 'BorderCard',
+      props: {},
     },
   ],
   size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),

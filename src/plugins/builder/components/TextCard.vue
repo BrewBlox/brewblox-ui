@@ -1,14 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'TextCard',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
     settingsKey: {
       type: String,
       required: true,
@@ -19,17 +15,12 @@ export default defineComponent({
     },
   },
   emits: ['update:part'],
-  setup(props, { emit }) {
+  setup(props) {
+    const { settings, patchSettings } = usePart.setup();
+
     const text = computed<string>({
-      get: () => props.part.settings[props.settingsKey] ?? '',
-      set: (val) =>
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            [props.settingsKey]: val,
-          },
-        }),
+      get: () => settings.value[props.settingsKey] ?? '',
+      set: (val) => patchSettings({ [props.settingsKey]: val }),
     });
 
     return {
@@ -44,6 +35,6 @@ export default defineComponent({
     v-model="text"
     :title="label"
     :label="label"
-    item-aligned
+    auto-grow
   />
 </template>

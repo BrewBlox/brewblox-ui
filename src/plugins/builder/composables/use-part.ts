@@ -50,11 +50,11 @@ export const usePart: UsePartComposable = {
 
     const flipped = computed<boolean>(() => part.value.flipped === true);
 
-    const bordered = computed<boolean>(
-      () => part.value.settings[BORDER_KEY] ?? true,
+    const bordered = computed<boolean>(() =>
+      Boolean(part.value.settings[BORDER_KEY] ?? true),
     );
 
-    function patchSettings(patch: any): void {
+    function patchSettings(patch: Mapped<any>): void {
       settings.value = { ...part.value.settings, ...patch };
     }
 
