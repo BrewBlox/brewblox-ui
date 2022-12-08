@@ -1,6 +1,10 @@
 <script lang="ts">
 import { createDialog } from '@/utils/dialog';
 import { computed, defineComponent } from 'vue';
+import {
+  LABEL_FONT_SIZE_DEFAULT,
+  LABEL_FONT_SIZE_KEY,
+} from '../blueprints/BuilderLabel';
 import { usePart } from '../composables';
 import { LABEL_KEY } from '../const';
 import { textTransformation } from '../utils';
@@ -40,7 +44,9 @@ export default defineComponent({
       () => settings.value[props.settingsKey] || props.unsetLabel,
     );
 
-    const fontSize = computed<number>(() => settings.value['fontSize'] || 16);
+    const fontSize = computed<number>(
+      () => settings.value[LABEL_FONT_SIZE_KEY] || LABEL_FONT_SIZE_DEFAULT,
+    );
 
     const labelTransform = computed<string>(() =>
       textTransformation(part.value, [sizeX.value, sizeY.value], false),

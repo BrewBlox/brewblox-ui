@@ -50,7 +50,7 @@ export interface FlowPart extends StatePart {
 
 export interface PartSettingsCard {
   component: string;
-  props?: Mapped<any>;
+  props: Mapped<any>;
 }
 
 export interface BuilderBlueprint {

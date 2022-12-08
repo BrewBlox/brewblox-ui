@@ -1,14 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'ToggleCard',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
     settingsKey: {
       type: String,
       required: true,
@@ -23,18 +19,13 @@ export default defineComponent({
     },
   },
   emits: ['update:part'],
-  setup(props, { emit }) {
+  setup(props) {
+    const { settings, patchSettings } = usePart.setup();
+
     const value = computed<boolean>({
       get: () =>
-        Boolean(props.part.settings[props.settingsKey] ?? props.defaultValue),
-      set: (v) =>
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            [props.settingsKey]: v,
-          },
-        }),
+        Boolean(settings.value[props.settingsKey] ?? props.defaultValue),
+      set: (v) => patchSettings({ [props.settingsKey]: v }),
     });
 
     return {

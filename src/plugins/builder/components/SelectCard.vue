@@ -1,15 +1,11 @@
 <script lang="ts">
 import isArray from 'lodash/isArray';
 import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'SelectCard',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
     settingsKey: {
       type: String,
       required: true,
@@ -26,17 +22,12 @@ export default defineComponent({
     },
   },
   emits: ['update:part'],
-  setup(props, { emit }) {
+  setup(props) {
+    const { settings, patchSettings } = usePart.setup();
+
     const model = computed({
-      get: () => props.part.settings[props.settingsKey] ?? null,
-      set: (v) =>
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            [props.settingsKey]: v,
-          },
-        }),
+      get: () => settings.value[props.settingsKey] ?? null,
+      set: (v) => patchSettings({ [props.settingsKey]: v }),
     });
 
     const options = computed<SelectOption[]>(() => {

@@ -2,6 +2,7 @@
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
+import { COLOR_KEY } from '../const';
 
 const path = `
     M89.2,199
@@ -24,7 +25,9 @@ export default defineComponent({
   setup() {
     const { settings, width, height } = usePart.setup();
 
-    const color = computed<string>(() => colorString(settings.value['color']));
+    const color = computed<string>(() =>
+      colorString(settings.value[COLOR_KEY]),
+    );
 
     return {
       width,

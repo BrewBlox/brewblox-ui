@@ -1,8 +1,11 @@
 <script lang="ts">
 import {
   DEFAULT_PUMP_PRESSURE,
+  DEPRECATED_PUMP_KEY,
   DigitalBlockT,
   DIGITAL_TYPES,
+  IO_ENABLED_KEY,
+  IO_PRESSURE_KEY,
   LEFT,
   PumpBlockT,
   PUMP_KEY,
@@ -33,7 +36,9 @@ export default defineComponent({
 
     const enabled = computed<boolean>(() => {
       if (block.value === null) {
-        return hasAddress.value ? false : Boolean(settings.value['enabled']);
+        return hasAddress.value
+          ? false
+          : Boolean(settings.value[IO_ENABLED_KEY]);
       } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
       } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
@@ -52,9 +57,10 @@ export default defineComponent({
     );
 
     const duration = computed<number>(() => {
-      const pressure =
-        ((settings.value['onPressure'] ?? DEFAULT_PUMP_PRESSURE) / 100) *
-          pwmSetting.value || 0.01;
+      const onPressure = Number(
+        settings.value[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE,
+      );
+      const pressure = (onPressure / 100) * pwmSetting.value || 0.01;
       const animationDuration = 60 / pressure;
       return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
     });
@@ -97,18 +103,18 @@ export default defineComponent({
     );
 
     onBeforeMount(() => {
-      const oldBlockAddr = settings.value['pwm'];
+      const oldBlockAddr = settings.value[DEPRECATED_PUMP_KEY];
       if (oldBlockAddr !== undefined) {
         patchSettings({
           [PUMP_KEY]: oldBlockAddr,
-          pwm: undefined,
+          [DEPRECATED_PUMP_KEY]: undefined,
         });
       }
     });
 
     function interact(): void {
       if (!hasAddress.value) {
-        patchSettings({ enabled: !settings.value['enabled'] });
+        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
       } else if (block.value == null) {
         showAbsentBlock(part.value, PUMP_KEY);
       } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {

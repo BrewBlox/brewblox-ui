@@ -1,6 +1,10 @@
 import {
   CENTER,
   DEFAULT_IO_PRESSURE,
+  DEPRECATED_IO_PRESSURE_KEY,
+  IO_ENABLED_KEY,
+  IO_LIQUIDS_KEY,
+  IO_PRESSURE_KEY,
   MAX_IO_PRESSURE,
   MIN_IO_PRESSURE,
   UP,
@@ -15,11 +19,14 @@ const blueprint: BuilderBlueprint = {
   title: 'Global inlet: shifted',
   size: () => [SIZE_X, SIZE_Y],
   cards: [
-    { component: 'LiquidSourceCard' },
+    {
+      component: 'LiquidSourceCard',
+      props: {},
+    },
     {
       component: 'PressureCard',
       props: {
-        settingsKey: 'onPressure',
+        settingsKey: IO_PRESSURE_KEY,
         min: MIN_IO_PRESSURE,
         max: MAX_IO_PRESSURE,
         defaultValue: DEFAULT_IO_PRESSURE,
@@ -27,16 +34,19 @@ const blueprint: BuilderBlueprint = {
     },
   ],
   transitions: (part: PersistentPart) => {
-    const enabled = part.settings.enabled ?? !!part.settings.pressure;
+    const enabled = Boolean(
+      part.settings[IO_ENABLED_KEY] ??
+        part.settings[DEPRECATED_IO_PRESSURE_KEY],
+    );
     const pressure = enabled
-      ? part.settings.onPressure ?? DEFAULT_IO_PRESSURE
+      ? part.settings[IO_PRESSURE_KEY] ?? DEFAULT_IO_PRESSURE
       : 0;
     return {
       [CENTER]: [
         {
           outCoords: UP,
           pressure,
-          liquids: enabled ? part.settings.liquids || [] : [],
+          liquids: enabled ? part.settings[IO_LIQUIDS_KEY] || [] : [],
           source: true,
         },
       ],

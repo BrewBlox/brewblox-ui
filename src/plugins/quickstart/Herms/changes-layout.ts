@@ -1,4 +1,21 @@
+import {
+  BORDER_KEY,
+  COLD_WATER,
+  COLOR_KEY,
+  DRIVER_KEY,
+  IO_ENABLED_KEY,
+  IO_LIQUIDS_KEY,
+  IO_PRESSURE_KEY,
+  PID_KEY,
+  PWM_KEY,
+  SETPOINT_KEY,
+  SIZE_X_KEY,
+  VALVE_CLOSED_KEY,
+} from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { typed } from '@/utils/misc';
+import { BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { HermsConfig } from './types';
@@ -15,7 +32,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 0,
-          settings: { color: '#c48600' },
+          settings: {
+            [COLOR_KEY]: '#c48600',
+          },
           flipped: false,
           type: 'Kettle',
           x: 20,
@@ -24,7 +43,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 0,
-          settings: { color: '#9c4b00' },
+          settings: {
+            [COLOR_KEY]: '#9c4b00',
+          },
           flipped: false,
           type: 'Kettle',
           x: 12,
@@ -33,7 +54,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 0,
-          settings: { color: '#b50000' },
+          settings: {
+            [COLOR_KEY]: '#b50000',
+          },
           flipped: false,
           type: 'Kettle',
           x: 4,
@@ -52,8 +75,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            pwm: { serviceId, blockId: names.bkPwm },
-            sizeX: 4,
+            [PWM_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.bkPwm,
+              type: BlockType.ActuatorPwm,
+            }),
+            [SIZE_X_KEY]: 4,
           },
           flipped: true,
           type: 'HeatingElement',
@@ -64,8 +91,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            pwm: { serviceId, blockId: names.hltPwm },
-            sizeX: 4,
+            [PWM_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.hltPwm,
+              type: BlockType.ActuatorPwm,
+            }),
+            [SIZE_X_KEY]: 4,
           },
           flipped: false,
           type: 'HeatingElement',
@@ -93,7 +124,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 0,
-          settings: { sizeX: 4 },
+          settings: {
+            [SIZE_X_KEY]: 4,
+          },
           flipped: true,
           type: 'FilterBottom',
           x: 12,
@@ -103,8 +136,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            setpoint: { serviceId, blockId: names.mtSetpoint },
+            [BORDER_KEY]: false,
+            [SETPOINT_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.mtSetpoint,
+              type: BlockType.SetpointSensorPair,
+            }),
           },
           flipped: false,
           type: 'SetpointDisplay',
@@ -115,8 +152,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            setpoint: { serviceId, blockId: names.bkSetpoint },
+            [BORDER_KEY]: false,
+            [SETPOINT_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.bkSetpoint,
+              type: BlockType.SetpointSensorPair,
+            }),
           },
           flipped: false,
           type: 'SetpointDisplay',
@@ -127,8 +168,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            setpoint: { serviceId, blockId: names.hltSetpoint },
+            [BORDER_KEY]: false,
+            [SETPOINT_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.hltSetpoint,
+              type: BlockType.SetpointSensorPair,
+            }),
           },
           flipped: false,
           type: 'SetpointDisplay',
@@ -273,7 +318,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 180,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 16,
@@ -282,7 +329,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 180,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 19,
@@ -354,7 +403,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 270,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 18,
@@ -399,7 +450,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 270,
-          settings: { enabled: false },
+          settings: {
+            [IO_ENABLED_KEY]: false,
+          },
           flipped: false,
           type: 'Pump',
           x: 17,
@@ -471,7 +524,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 90,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 13,
@@ -480,7 +535,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 90,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 11,
@@ -489,7 +546,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 90,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 9,
@@ -516,7 +575,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 180,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 10,
@@ -525,7 +586,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 180,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 12,
@@ -579,7 +642,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 0,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 14,
@@ -597,7 +662,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 180,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 19,
@@ -624,7 +691,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 270,
-          settings: { enabled: false },
+          settings: {
+            [IO_ENABLED_KEY]: false,
+          },
           flipped: false,
           type: 'Pump',
           x: 7,
@@ -633,7 +702,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 180,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 8,
@@ -642,7 +713,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 180,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 6,
@@ -751,11 +824,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            pid: {
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.mtPid,
-            },
+              id: names.mtPid,
+              type: BlockType.Pid,
+            }),
           },
           flipped: false,
           type: 'PidDisplay',
@@ -766,11 +840,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            pid: {
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.bkPid,
-            },
+              id: names.bkPid,
+              type: BlockType.Pid,
+            }),
           },
           flipped: false,
           type: 'PidDisplay',
@@ -781,11 +856,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            pid: {
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.hltPid,
-            },
+              id: names.hltPid,
+              type: BlockType.Pid,
+            }),
           },
           flipped: false,
           type: 'PidDisplay',
@@ -796,11 +872,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            setpointDriver: {
+            [BORDER_KEY]: false,
+            [DRIVER_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.hltDriver,
-            },
+              id: names.hltDriver,
+              type: BlockType.ActuatorOffset,
+            }),
           },
           flipped: false,
           type: 'SetpointDriverDisplay',
@@ -819,7 +896,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 180,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 1,
@@ -828,7 +907,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 270,
-          settings: { closed: true },
+          settings: {
+            [VALVE_CLOSED_KEY]: true,
+          },
           flipped: false,
           type: 'Valve',
           x: 2,
@@ -837,7 +918,11 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 0,
-          settings: { pressure: 10, liqnanoids: ['#4AA0EF'] },
+          settings: {
+            [IO_ENABLED_KEY]: true,
+            [IO_PRESSURE_KEY]: 10,
+            [IO_LIQUIDS_KEY]: [COLD_WATER],
+          },
           flipped: false,
           type: 'SystemIO',
           x: 0,

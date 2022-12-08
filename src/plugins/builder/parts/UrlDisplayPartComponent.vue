@@ -3,6 +3,7 @@ import { isAbsoluteUrl } from '@/utils/url';
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePart } from '../composables';
+import { LABEL_KEY, URL_KEY } from '../const';
 import { textTransformation } from '../utils';
 
 export default defineComponent({
@@ -10,10 +11,10 @@ export default defineComponent({
   setup() {
     const { settings, width, height, bordered } = usePart.setup();
 
-    const url = computed<string>(() => settings.value['url'] || '');
+    const url = computed<string>(() => settings.value[URL_KEY] || '');
 
     const titleText = computed<string>(
-      () => settings.value['text'] || url.value || 'Url Display',
+      () => settings.value[LABEL_KEY] || url.value || 'Url Display',
     );
 
     function interact(): void {

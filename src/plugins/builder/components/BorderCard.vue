@@ -1,17 +1,13 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { defineComponent } from 'vue';
+import { BORDER_KEY } from '../const';
 
 export default defineComponent({
   name: 'BorderCard',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
     settingsKey: {
       type: String,
-      default: 'bordered',
+      default: BORDER_KEY,
     },
     label: {
       type: String,
@@ -26,5 +22,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <ToggleCard v-bind="{ part, settingsKey, label, defaultValue }" />
+  <ToggleCard v-bind="{ settingsKey, label, defaultValue }" />
 </template>

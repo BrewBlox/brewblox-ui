@@ -2,6 +2,8 @@ import {
   DEFAULT_PUMP_PRESSURE,
   DigitalBlockT,
   DIGITAL_TYPES,
+  IO_ENABLED_KEY,
+  IO_PRESSURE_KEY,
   LEFT,
   MAX_PUMP_PRESSURE,
   MIN_PUMP_PRESSURE,
@@ -20,19 +22,19 @@ import { DigitalState } from 'brewblox-proto/ts';
 const calcPressure = (part: PersistentPart): number => {
   const block = settingsBlock<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
   if (block == null) {
-    return part.settings.enabled
-      ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
+    return part.settings[IO_ENABLED_KEY]
+      ? Number(part.settings[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE)
       : 0;
   }
   if (isBlockCompatible<DigitalBlockT>(block, DIGITAL_TYPES)) {
     return block.data.state === DigitalState.STATE_ACTIVE
-      ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
+      ? Number(part.settings[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE)
       : 0;
   }
   if (isBlockCompatible<PwmBlockT>(block, PWM_TYPES)) {
     return (
       (Number(block.data.value) / 100) *
-      (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE)
+      (part.settings[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE)
     );
   }
   return 0;
@@ -54,7 +56,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'PressureCard',
       props: {
-        settingsKey: 'onPressure',
+        settingsKey: IO_PRESSURE_KEY,
         min: MIN_PUMP_PRESSURE,
         max: MAX_PUMP_PRESSURE,
         defaultValue: DEFAULT_PUMP_PRESSURE,

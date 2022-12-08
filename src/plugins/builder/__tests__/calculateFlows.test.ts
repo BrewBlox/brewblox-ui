@@ -4,7 +4,15 @@ import {
   calculateFlows,
   findPathsFromSources,
 } from '@/plugins/builder/calculateFlows';
-import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
+import {
+  CENTER,
+  COLD_WATER,
+  COLOR_KEY,
+  HOT_WATER,
+  IO_ENABLED_KEY,
+  IO_LIQUIDS_KEY,
+  IO_PRESSURE_KEY,
+} from '@/plugins/builder/const';
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import {
   FlowPart,
@@ -93,9 +101,9 @@ describe('Data describing an input tube', () => {
     rotate: 0,
     type: 'SystemIO',
     settings: {
-      onPressure: 11,
-      enabled: true,
-      liquids: [COLD_WATER],
+      [IO_PRESSURE_KEY]: 11,
+      [IO_ENABLED_KEY]: true,
+      [IO_LIQUIDS_KEY]: [COLD_WATER],
     },
   };
 
@@ -123,7 +131,7 @@ describe('asFlowParts', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        liquids: [COLD_WATER],
+        [IO_LIQUIDS_KEY]: [COLD_WATER],
       },
     },
     {
@@ -160,9 +168,9 @@ describe('A single path without splits', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        onPressure: 6,
-        enabled: true,
-        liquids: [HOT_WATER],
+        [IO_PRESSURE_KEY]: 6,
+        [IO_ENABLED_KEY]: true,
+        [IO_LIQUIDS_KEY]: [HOT_WATER],
       },
     },
     {
@@ -212,9 +220,9 @@ describe('A single path without splits', () => {
           },
         },
         settings: {
-          onPressure: 6,
-          enabled: true,
-          liquids: [HOT_WATER],
+          [IO_PRESSURE_KEY]: 6,
+          [IO_ENABLED_KEY]: true,
+          [IO_LIQUIDS_KEY]: [HOT_WATER],
         },
       },
       {
@@ -269,9 +277,9 @@ describe('A path with a split, but no joins', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        onPressure: 13,
-        enabled: true,
-        liquids: [COLD_WATER],
+        [IO_PRESSURE_KEY]: 13,
+        [IO_ENABLED_KEY]: true,
+        [IO_LIQUIDS_KEY]: [COLD_WATER],
       },
     },
     {
@@ -418,9 +426,9 @@ describe('A path that forks and rejoins', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        enabled: true,
-        onPressure: 11.5,
-        liquids: [COLD_WATER],
+        [IO_ENABLED_KEY]: true,
+        [IO_PRESSURE_KEY]: 11.5,
+        [IO_LIQUIDS_KEY]: [COLD_WATER],
       },
     },
     {
@@ -622,9 +630,9 @@ describe('A single path with a pump', () => {
       rotate: 180,
       type: 'SystemIO',
       settings: {
-        enabled: true,
-        onPressure: 9,
-        liquids: [COLD_WATER],
+        [IO_ENABLED_KEY]: true,
+        [IO_PRESSURE_KEY]: 9,
+        [IO_LIQUIDS_KEY]: [COLD_WATER],
       },
     },
     {
@@ -634,8 +642,8 @@ describe('A single path with a pump', () => {
       rotate: 0,
       type: 'Pump',
       settings: {
-        enabled: false,
-        onPressure: 12,
+        [IO_ENABLED_KEY]: false,
+        [IO_PRESSURE_KEY]: 12,
       },
     },
     {
@@ -662,9 +670,9 @@ describe('A single path with a pump', () => {
           '3,2.5,0': { [COLD_WATER]: 3 },
         },
         settings: {
-          enabled: true,
-          onPressure: 9,
-          liquids: [COLD_WATER],
+          [IO_ENABLED_KEY]: true,
+          [IO_PRESSURE_KEY]: 9,
+          [IO_LIQUIDS_KEY]: [COLD_WATER],
         },
       },
       {
@@ -678,8 +686,8 @@ describe('A single path with a pump', () => {
           '2,2.5,0': { [COLD_WATER]: 3 },
         },
         settings: {
-          enabled: false,
-          onPressure: 12,
+          [IO_ENABLED_KEY]: false,
+          [IO_PRESSURE_KEY]: 12,
         },
       },
       {
@@ -698,7 +706,7 @@ describe('A single path with a pump', () => {
   describe('Two input tubes with different liquid joining', () => {
     it('Should have a flow of value of 9 when the pump is enabled', () => {
       // (input pressure 9 + pump pressure 12) / friction 3 = 7
-      set(parts[1], ['settings', 'enabled'], true);
+      set(parts[1], ['settings', IO_ENABLED_KEY], true);
       const flowParts = asFlowParts(parts.map(asStatePart));
       const partsWithFlow = calculateFlows(flowParts);
       expect(partsWithFlow).toMatchObject([
@@ -712,8 +720,8 @@ describe('A single path with a pump', () => {
             '3,2.5,0': { [COLD_WATER]: 7 },
           },
           settings: {
-            enabled: true,
-            onPressure: 9,
+            [IO_ENABLED_KEY]: true,
+            [IO_PRESSURE_KEY]: 9,
           },
         },
         {
@@ -727,8 +735,8 @@ describe('A single path with a pump', () => {
             '2,2.5,0': { [COLD_WATER]: 7 },
           },
           settings: {
-            enabled: true,
-            onPressure: 12,
+            [IO_ENABLED_KEY]: true,
+            [IO_PRESSURE_KEY]: 12,
           },
         },
         {
@@ -755,9 +763,9 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        enabled: true,
-        onPressure: 15,
-        liquids: [COLD_WATER],
+        [IO_ENABLED_KEY]: true,
+        [IO_PRESSURE_KEY]: 15,
+        [IO_LIQUIDS_KEY]: [COLD_WATER],
       },
     },
     {
@@ -767,9 +775,9 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        enabled: true,
-        onPressure: 15,
-        liquids: [HOT_WATER],
+        [IO_ENABLED_KEY]: true,
+        [IO_PRESSURE_KEY]: 15,
+        [IO_LIQUIDS_KEY]: [HOT_WATER],
       },
     },
     {
@@ -991,9 +999,9 @@ describe('A path with a bridge', () => {
       type: 'SystemIO',
       rotate: 0,
       settings: {
-        liquids: [COLD_WATER],
-        enabled: true,
-        onPressure: 8,
+        [IO_LIQUIDS_KEY]: [COLD_WATER],
+        [IO_ENABLED_KEY]: true,
+        [IO_PRESSURE_KEY]: 8,
       },
     },
     {
@@ -1055,9 +1063,9 @@ describe('A path with a bridge', () => {
         type: 'SystemIO',
         rotate: 0,
         settings: {
-          liquids: [COLD_WATER],
-          enabled: true,
-          onPressure: 8,
+          [IO_LIQUIDS_KEY]: [COLD_WATER],
+          [IO_ENABLED_KEY]: true,
+          [IO_PRESSURE_KEY]: 8,
         },
         flows: {
           '12,2.5,0': {
@@ -1167,7 +1175,9 @@ describe('A kettle with 2 outflows', () => {
     {
       id: '1',
       rotate: 0,
-      settings: { color: '#ff0000' },
+      settings: {
+        [COLOR_KEY]: '#ff0000',
+      },
       flipped: false,
       type: 'Kettle',
       x: 1,
@@ -1186,8 +1196,8 @@ describe('A kettle with 2 outflows', () => {
       id: '3',
       rotate: 0,
       settings: {
-        enabled: true,
-        onPressure: 10,
+        [IO_ENABLED_KEY]: true,
+        [IO_PRESSURE_KEY]: 10,
       },
       flipped: true,
       type: 'Pump',
@@ -1217,8 +1227,8 @@ describe('A kettle with 2 outflows', () => {
       rotate: 0,
       type: 'Pump',
       settings: {
-        enabled: true,
-        onPressure: 10,
+        [IO_ENABLED_KEY]: true,
+        [IO_PRESSURE_KEY]: 10,
       },
       flipped: true,
       x: 5,
@@ -1282,7 +1292,9 @@ describe('A kettle with flow back to itself', () => {
     {
       id: '1',
       rotate: 0,
-      settings: { color: '#ff0000' },
+      settings: {
+        [COLOR_KEY]: '#ff0000',
+      },
       type: 'Kettle',
       x: 1,
       y: 1,
@@ -1330,8 +1342,8 @@ describe('A kettle with flow back to itself', () => {
         id: '4',
         rotate: 270,
         settings: {
-          enabled: false,
-          onPressure: 10,
+          [IO_ENABLED_KEY]: false,
+          [IO_PRESSURE_KEY]: 10,
         },
         type: 'Pump',
         x: 5,
@@ -1388,8 +1400,8 @@ describe('A kettle with flow back to itself', () => {
         id: '4',
         rotate: 270,
         settings: {
-          enabled: true,
-          onPressure: 10,
+          [IO_ENABLED_KEY]: true,
+          [IO_PRESSURE_KEY]: 10,
         },
         type: 'Pump',
         x: 5,
@@ -1443,7 +1455,11 @@ describe('A forking and joining path with a pump in each fork', () => {
     {
       id: '1a',
       rotate: 180,
-      settings: { liquids: ['#DB0023'], enabled: true, onPressure: 0 },
+      settings: {
+        [IO_LIQUIDS_KEY]: ['#DB0023'],
+        [IO_ENABLED_KEY]: true,
+        [IO_PRESSURE_KEY]: 0,
+      },
       flipped: false,
       type: 'SystemIO',
       x: 2,
@@ -1502,7 +1518,9 @@ describe('A forking and joining path with a pump in each fork', () => {
       {
         id: '8',
         rotate: 90,
-        settings: { enabled: false },
+        settings: {
+          [IO_ENABLED_KEY]: false,
+        },
         flipped: false,
         type: 'Pump',
         x: 1,
@@ -1511,7 +1529,9 @@ describe('A forking and joining path with a pump in each fork', () => {
       {
         id: '9',
         rotate: 90,
-        settings: { enabled: false },
+        settings: {
+          [IO_ENABLED_KEY]: false,
+        },
         flipped: false,
         type: 'Pump',
         x: 0,
@@ -1553,7 +1573,10 @@ describe('A forking and joining path with a pump in each fork', () => {
       {
         id: '10',
         rotate: 90,
-        settings: { enabled: true, onPressure: 10 },
+        settings: {
+          [IO_ENABLED_KEY]: true,
+          [IO_PRESSURE_KEY]: 10,
+        },
         flipped: false,
         type: 'Pump',
         x: 1,
@@ -1562,7 +1585,10 @@ describe('A forking and joining path with a pump in each fork', () => {
       {
         id: '11',
         rotate: 90,
-        settings: { enabled: false, onPressure: 10 },
+        settings: {
+          [IO_ENABLED_KEY]: false,
+          [IO_PRESSURE_KEY]: 10,
+        },
         flipped: false,
         type: 'Pump',
         x: 0,
@@ -1599,7 +1625,10 @@ describe('A forking and joining path with a pump in each fork', () => {
       {
         id: '10',
         rotate: 90,
-        settings: { enabled: false, onPressure: 10 },
+        settings: {
+          [IO_ENABLED_KEY]: false,
+          [IO_PRESSURE_KEY]: 10,
+        },
         flipped: false,
         type: 'Pump',
         x: 1,
@@ -1608,7 +1637,10 @@ describe('A forking and joining path with a pump in each fork', () => {
       {
         id: '11',
         rotate: 90,
-        settings: { enabled: true, onPressure: 10 },
+        settings: {
+          [IO_ENABLED_KEY]: true,
+          [IO_PRESSURE_KEY]: 10,
+        },
         flipped: false,
         type: 'Pump',
         x: 0,
@@ -1645,7 +1677,10 @@ describe('A forking and joining path with a pump in each fork', () => {
       {
         id: '10',
         rotate: 90,
-        settings: { enabled: true, onPressure: 10 },
+        settings: {
+          [IO_ENABLED_KEY]: true,
+          [IO_PRESSURE_KEY]: 10,
+        },
         flipped: false,
         type: 'Pump',
         x: 1,
@@ -1654,7 +1689,10 @@ describe('A forking and joining path with a pump in each fork', () => {
       {
         id: '11',
         rotate: 90,
-        settings: { enabled: true, onPressure: 10 },
+        settings: {
+          [IO_ENABLED_KEY]: true,
+          [IO_PRESSURE_KEY]: 10,
+        },
         flipped: false,
         type: 'Pump',
         x: 0,

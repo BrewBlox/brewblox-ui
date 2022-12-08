@@ -2,21 +2,17 @@
 import { settingsAddress } from '@/plugins/builder/utils';
 import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'BlockAddressCard',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
     settingsKey: {
       type: String,
       required: true,
     },
     compatible: {
-      type: [String, Array, null] as PropType<ComparedBlockType>,
+      type: null as unknown as PropType<ComparedBlockType>,
       required: true,
     },
     label: {
@@ -29,17 +25,12 @@ export default defineComponent({
     },
   },
   emits: ['update:part'],
-  setup(props, { emit }) {
+  setup(props) {
+    const { part, patchSettings } = usePart.setup();
+
     const address = computed<BlockAddress>({
-      get: () => settingsAddress(props.part, props.settingsKey),
-      set: (addr) =>
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            [props.settingsKey]: addr,
-          },
-        }),
+      get: () => settingsAddress(part.value, props.settingsKey),
+      set: (addr) => patchSettings({ [props.settingsKey]: addr }),
     });
 
     return {

@@ -2,6 +2,7 @@
 import {
   UP,
   ValveBlockT,
+  VALVE_CLOSED_KEY,
   VALVE_KEY,
   VALVE_TYPES,
 } from '@/plugins/builder/const';
@@ -39,7 +40,7 @@ export default defineComponent({
     const closed = computed<boolean>(() =>
       block.value !== null
         ? Boolean(block.value.data.state === DigitalState.STATE_ACTIVE)
-        : Boolean(settings.value['closed']),
+        : Boolean(settings.value[VALVE_CLOSED_KEY]),
     );
 
     const liquidPath = computed<string>(() =>
@@ -59,7 +60,9 @@ export default defineComponent({
               : DigitalState.STATE_ACTIVE,
         });
       } else {
-        patchSettings({ closed: !settings.value['closed'] });
+        patchSettings({
+          [VALVE_CLOSED_KEY]: !settings.value[VALVE_CLOSED_KEY],
+        });
       }
     }
 
