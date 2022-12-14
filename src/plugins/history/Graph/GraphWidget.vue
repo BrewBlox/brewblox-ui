@@ -13,7 +13,7 @@ import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
 import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { addBlockGraph } from './utils';
+import { addBlockGraph, selectSessionGraph } from './utils';
 
 export default defineComponent({
   name: 'GraphWidget',
@@ -93,6 +93,21 @@ export default defineComponent({
       addBlockGraph(widget.value.id, null);
     }
 
+    async function startLoadSessionGraph(): Promise<void> {
+      const noteConfig = await selectSessionGraph();
+      if (noteConfig != null) {
+        createDialog({
+          component: 'ConfirmDialog',
+          componentProps: {
+            title: 'Import Session Graph',
+            message:
+              'Are you sure you wish to replace the current graph config?',
+            noBackdropDismiss: true,
+          },
+        }).onOk(() => saveConfig(noteConfig));
+      }
+    }
+
     watch(
       () => widget.value.config,
       (newV) => {
@@ -124,6 +139,7 @@ export default defineComponent({
       refresh,
       showGraphPage,
       startAddBlockGraph,
+      startLoadSessionGraph,
     };
   },
 });
@@ -164,6 +180,11 @@ export default defineComponent({
             icon="add"
             label="Add block to graph"
             @click="startAddBlockGraph"
+          />
+          <ActionItem
+            icon="mdi-import"
+            label="Import session graph"
+            @click="startLoadSessionGraph"
           />
           <ExportGraphAction
             :config="config"

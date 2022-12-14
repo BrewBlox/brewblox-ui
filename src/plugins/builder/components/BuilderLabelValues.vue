@@ -1,6 +1,10 @@
 <script lang="ts">
 import { createDialog } from '@/utils/dialog';
 import { computed, defineComponent } from 'vue';
+import {
+  LABEL_FONT_SIZE_DEFAULT,
+  LABEL_FONT_SIZE_KEY,
+} from '../blueprints/BuilderLabel';
 import { usePart } from '../composables';
 import { LABEL_KEY } from '../const';
 import { textTransformation } from '../utils';
@@ -8,10 +12,17 @@ import { textTransformation } from '../utils';
 export default defineComponent({
   name: 'BuilderLabelValues',
   props: {
-    ...usePart.props,
     settingsKey: {
       type: String,
       default: LABEL_KEY,
+    },
+    width: {
+      type: Number,
+      required: true,
+    },
+    height: {
+      type: Number,
+      required: true,
     },
     unsetLabel: {
       type: String,
@@ -26,27 +37,26 @@ export default defineComponent({
       default: 0,
     },
   },
-  emits: [...usePart.emits],
   setup(props) {
-    const { sizeX, sizeY } = usePart.setup(props.part);
-
-    const { patchSettings } = usePart.setup(props.part);
+    const { part, settings, sizeX, sizeY, patchSettings } = usePart.setup();
 
     const text = computed<string>(
-      () => props.part.settings[props.settingsKey] || props.unsetLabel,
+      () => settings.value[props.settingsKey] || props.unsetLabel,
     );
 
-    const fontSize = computed<number>(() => props.part.settings.fontSize || 16);
+    const fontSize = computed<number>(
+      () => settings.value[LABEL_FONT_SIZE_KEY] || LABEL_FONT_SIZE_DEFAULT,
+    );
 
     const labelTransform = computed<string>(() =>
-      textTransformation(props.part, [sizeX.value, sizeY.value], false),
+      textTransformation(part.value, [sizeX.value, sizeY.value], false),
     );
 
     function interact(): void {
       createDialog({
         component: 'InputDialog',
         componentProps: {
-          modelValue: props.part.settings[props.settingsKey] ?? '',
+          modelValue: settings.value[props.settingsKey] ?? '',
           title: 'Edit label',
           label: 'text',
         },

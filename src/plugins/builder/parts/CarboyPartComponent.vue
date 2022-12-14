@@ -2,6 +2,7 @@
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
+import { COLOR_KEY } from '../const';
 
 const path = `
     M89.2,199
@@ -21,14 +22,16 @@ const path = `
 
 export default defineComponent({
   name: 'CarboyPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
+    const { settings, width, height } = usePart.setup();
+
     const color = computed<string>(() =>
-      colorString(props.part.settings.color),
+      colorString(settings.value[COLOR_KEY]),
     );
 
     return {
+      width,
+      height,
       color,
       path,
     };
@@ -53,7 +56,6 @@ export default defineComponent({
       <path :d="path" />
     </g>
     <SetpointValues
-      :part="part"
       :y="50"
       :background-color="color"
       hide-unset

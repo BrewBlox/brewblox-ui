@@ -1,4 +1,4 @@
-import { SIZE_X_KEY, SIZE_Y_KEY } from '@/plugins/builder/const';
+import { COLOR_KEY, SIZE_X_KEY, SIZE_Y_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { variableSizeFunc } from '../utils';
 
@@ -9,7 +9,12 @@ const blueprint: BuilderBlueprint = {
   type: 'BeerBottle',
   title: 'Beer bottle',
   cards: [
-    { component: 'ColorCard' },
+    {
+      component: 'ColorCard',
+      props: {
+        settingsKey: COLOR_KEY,
+      },
+    },
     {
       component: 'SizeCard',
       props: {

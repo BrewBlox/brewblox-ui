@@ -43,18 +43,20 @@ const paths = {
 
 export default defineComponent({
   name: 'ImmersionCoilPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
+    const { part, width, height } = usePart.setup();
+
     const flowSpeed = computed<number>(() =>
-      flowOnCoord(props.part, COIL_TOP_RIGHT),
+      flowOnCoord(part.value, COIL_TOP_RIGHT),
     );
 
     const liquids = computed<string[]>(() =>
-      liquidOnCoord(props.part, COIL_TOP_RIGHT),
+      liquidOnCoord(part.value, COIL_TOP_RIGHT),
     );
 
     return {
+      width,
+      height,
       paths,
       flowSpeed,
       liquids,

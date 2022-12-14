@@ -6,13 +6,11 @@ import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'RimsTubePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const { sizeX } = usePart.setup(props.part);
+  setup() {
+    const { part, width, height, sizeX } = usePart.setup();
 
     const paths = computed<Mapped<string>>(() => {
-      const startLast = props.width - 50;
+      const startLast = width.value - 50;
       return {
         closeLeft: 'M50,10 v30',
         entry: `M71,0 v10 M79,0 v10 M${startLast + 21},0 v10 M${
@@ -40,14 +38,16 @@ export default defineComponent({
     );
 
     const flowSpeed = computed<number>(() =>
-      flowOnCoord(props.part, outCoord.value),
+      flowOnCoord(part.value, outCoord.value),
     );
 
     const liquids = computed<string[]>(() =>
-      liquidOnCoord(props.part, outCoord.value),
+      liquidOnCoord(part.value, outCoord.value),
     );
 
     return {
+      width,
+      height,
       paths,
       sizeX,
       flowSpeed,
@@ -60,7 +60,6 @@ export default defineComponent({
 <template>
   <svg v-bind="{ width, height }">
     <PwmValues
-      :part="part"
       :width="50"
       :height="50"
     />

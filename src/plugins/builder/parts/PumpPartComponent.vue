@@ -1,8 +1,11 @@
 <script lang="ts">
 import {
   DEFAULT_PUMP_PRESSURE,
+  DEPRECATED_PUMP_KEY,
   DigitalBlockT,
   DIGITAL_TYPES,
+  IO_ENABLED_KEY,
+  IO_PRESSURE_KEY,
   LEFT,
   PumpBlockT,
   PUMP_KEY,
@@ -15,28 +18,27 @@ import {
   scheduleSoftStartRefresh,
   showAbsentBlock,
 } from '@/plugins/builder/utils';
-import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, onBeforeMount, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'PumpPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props, { emit }) {
+  setup() {
     const sparkStore = useSparkStore();
-    const { patchSettings } = usePart.setup(props.part);
+    const { part, settings, width, height, patchSettings, reflow } =
+      usePart.setup();
 
-    const { block, blockStatus, hasAddress } =
-      useSettingsBlock.setup<PumpBlockT>(props.part, PUMP_KEY, PUMP_TYPES);
+    const { block, blockStatus, hasAddress, showBlockDialog } =
+      useSettingsBlock.setup<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
 
     const enabled = computed<boolean>(() => {
       if (block.value === null) {
-        return hasAddress.value ? false : Boolean(props.part.settings.enabled);
+        return hasAddress.value
+          ? false
+          : Boolean(settings.value[IO_ENABLED_KEY]);
       } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
       } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
@@ -46,7 +48,7 @@ export default defineComponent({
       }
     });
 
-    const liquids = computed<string[]>(() => liquidOnCoord(props.part, LEFT));
+    const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
 
     const pwmSetting = computed<number>(() =>
       isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)
@@ -55,9 +57,10 @@ export default defineComponent({
     );
 
     const duration = computed<number>(() => {
-      const pressure =
-        ((props.part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE) / 100) *
-          pwmSetting.value || 0.01;
+      const onPressure = Number(
+        settings.value[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE,
+      );
+      const pressure = (onPressure / 100) * pwmSetting.value || 0.01;
       const animationDuration = 60 / pressure;
       return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
     });
@@ -94,25 +97,26 @@ export default defineComponent({
       () => block.value,
       (newV, oldV) => {
         if (checkDirty(newV, oldV)) {
-          emit('dirty');
+          reflow();
         }
       },
     );
 
     onBeforeMount(() => {
-      if (props.part.settings.pwm !== undefined) {
+      const oldBlockAddr = settings.value[DEPRECATED_PUMP_KEY];
+      if (oldBlockAddr !== undefined) {
         patchSettings({
-          [PUMP_KEY]: props.part.settings.pwm,
-          pwm: undefined,
+          [PUMP_KEY]: oldBlockAddr,
+          [DEPRECATED_PUMP_KEY]: undefined,
         });
       }
     });
 
     function interact(): void {
       if (!hasAddress.value) {
-        patchSettings({ enabled: !props.part.settings.enabled });
+        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
       } else if (block.value == null) {
-        showAbsentBlock(props.part, PUMP_KEY);
+        showAbsentBlock(part.value, PUMP_KEY);
       } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
         const storedState =
           block.value.data.state === DigitalState.STATE_INACTIVE
@@ -121,25 +125,13 @@ export default defineComponent({
         sparkStore.patchBlock(block.value, { storedState });
         scheduleSoftStartRefresh(block.value);
       } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
-        const limiterWarning = block.value.data.constrainedBy.constraints.length
-          ? 'The value may be limited by constraints'
-          : '';
-        createDialog({
-          component: 'SliderDialog',
-          componentProps: {
-            modelValue: block.value.data.storedSetting,
-            title: 'Pump speed',
-            message: limiterWarning,
-            label: 'Percentage output',
-            quickActions: PWM_SELECT_OPTIONS,
-          },
-        }).onOk((storedSetting: number) =>
-          sparkStore.patchBlock(block.value, { storedSetting }),
-        );
+        showBlockDialog();
       }
     }
 
     return {
+      width,
+      height,
       block,
       hasAddress,
       blockStatus,

@@ -3,34 +3,34 @@ import { isAbsoluteUrl } from '@/utils/url';
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePart } from '../composables';
+import { LABEL_KEY, URL_KEY } from '../const';
 import { textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'UrlDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const { bordered } = usePart.setup(props.part);
+  setup() {
+    const { settings, width, height, bordered } = usePart.setup();
 
-    const url = computed<string>(() => props.part.settings['url'] || '');
+    const url = computed<string>(() => settings.value[URL_KEY] || '');
 
     const titleText = computed<string>(
-      () => props.part.settings['text'] || url.value || 'Url Display',
+      () => settings.value[LABEL_KEY] || url.value || 'Url Display',
     );
 
     function interact(): void {
-      const { url } = props.part.settings;
-      if (url) {
-        if (isAbsoluteUrl(url)) {
-          window.open(url, '_blank');
+      if (url.value) {
+        if (isAbsoluteUrl(url.value)) {
+          window.open(url.value, '_blank');
         } else {
-          useRouter().push(url);
+          useRouter().push(url.value);
         }
       }
     }
 
     return {
       textTransformation,
+      width,
+      height,
       bordered,
       url,
       titleText,
@@ -42,12 +42,19 @@ export default defineComponent({
 
 <template>
   <svg
-    :width="width"
-    :height="height"
+    v-bind="{ width, height }"
     class="interaction"
     @click="interact"
   >
     <rect class="interaction-background" />
+    <foreignObject v-bind="{ width, height }">
+      <div
+        class="fit text-bold text-center q-mt-sm grid-label"
+        style="text-decoration: underline; font-size: 130%"
+      >
+        {{ titleText }}
+      </div>
+    </foreignObject>
     <g class="outline">
       <rect
         v-show="bordered"
@@ -60,13 +67,5 @@ export default defineComponent({
         stroke="white"
       />
     </g>
-    <foreignObject class="fit">
-      <div
-        class="fit text-bold text-center q-mt-sm grid-label"
-        style="text-decoration: underline; font-size: 130%"
-      >
-        {{ titleText }}
-      </div>
-    </foreignObject>
   </svg>
 </template>

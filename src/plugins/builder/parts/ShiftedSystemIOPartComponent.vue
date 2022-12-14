@@ -20,14 +20,16 @@ const paths = {
 
 export default defineComponent({
   name: 'ShiftedSystemIOPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const flowSpeed = computed<number>(() => -flowOnCoord(props.part, UP));
+  setup() {
+    const { part, width, height } = usePart.setup();
 
-    const liquids = computed<string[]>(() => liquidOnCoord(props.part, UP));
+    const flowSpeed = computed<number>(() => -flowOnCoord(part.value, UP));
+
+    const liquids = computed<string[]>(() => liquidOnCoord(part.value, UP));
 
     return {
+      width,
+      height,
       chevrons,
       paths,
       flowSpeed,

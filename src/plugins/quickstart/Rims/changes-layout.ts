@@ -1,4 +1,16 @@
+import {
+  BORDER_KEY,
+  COLOR_KEY,
+  PID_KEY,
+  PUMP_KEY,
+  PWM_KEY,
+  SETPOINT_KEY,
+  SIZE_X_KEY,
+} from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { typed } from '@/utils/misc';
+import { BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { RimsConfig } from './types';
@@ -16,7 +28,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            color: '#E1AC00',
+            [COLOR_KEY]: '#E1AC00',
           },
           flipped: false,
           type: 'Kettle',
@@ -36,8 +48,12 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            sizeX: 4,
-            pwm: { serviceId, blockId: names.tubePwm },
+            [SIZE_X_KEY]: 4,
+            [PWM_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.tubePwm,
+              type: BlockType.ActuatorPwm,
+            }),
           },
           flipped: false,
           type: 'RimsTube',
@@ -57,8 +73,12 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            setpoint: { serviceId, blockId: names.kettleSetpoint },
+            [BORDER_KEY]: false,
+            [SETPOINT_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.kettleSetpoint,
+              type: BlockType.SetpointSensorPair,
+            }),
           },
           flipped: false,
           type: 'SetpointDisplay',
@@ -69,7 +89,11 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            setpoint: { serviceId, blockId: names.tubeSetpoint },
+            [SETPOINT_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.tubeSetpoint,
+              type: BlockType.SetpointSensorPair,
+            }),
           },
           flipped: false,
           type: 'SetpointDisplay',
@@ -170,8 +194,11 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            enabled: true,
-            actuator: { serviceId, blockId: names.pumpAct },
+            [PUMP_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.pumpAct,
+              type: null,
+            }),
           },
           flipped: true,
           type: 'Pump',
@@ -191,8 +218,12 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            pid: { serviceId, blockId: names.tubePid },
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.tubePid,
+              type: BlockType.Pid,
+            }),
           },
           flipped: false,
           type: 'PidDisplay',
@@ -239,8 +270,12 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            pid: { serviceId, blockId: names.kettlePid },
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
+              serviceId,
+              id: names.kettlePid,
+              type: BlockType.Pid,
+            }),
           },
           flipped: false,
           type: 'PidDisplay',

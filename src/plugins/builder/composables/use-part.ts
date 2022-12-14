@@ -1,87 +1,75 @@
-import { computed, ComputedRef, getCurrentInstance, PropType } from 'vue';
-import { BORDER_KEY } from '../const';
+import { MetricsConfig } from '@/plugins/history/types';
+import { emptyMetricsConfig } from '@/plugins/history/utils';
+import { deepCopy } from '@/utils/objects';
+import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
+import { BORDER_KEY, PartKey, ReflowKey } from '../const';
 import { FlowPart } from '../types';
-
-export interface UsePartProps {
-  part: {
-    type: PropType<FlowPart>;
-    required: true;
-  };
-  /**
-   * Element width in SVG units (not grid squares)
-   */
-  width: {
-    type: PropType<number>;
-    required: true;
-  };
-  /**
-   * Element height in SVG units (not grid squares)
-   */
-  height: {
-    type: PropType<number>;
-    required: true;
-  };
-}
-
-export type UsePartEmits = ['update:part', 'dirty'];
+import { coord2grid } from '../utils';
 
 export interface UsePartComponent {
+  part: WritableComputedRef<FlowPart>;
+  settings: WritableComputedRef<Mapped<any>>;
+  metrics: ComputedRef<MetricsConfig>;
   sizeX: ComputedRef<number>;
   sizeY: ComputedRef<number>;
+  width: ComputedRef<number>;
+  height: ComputedRef<number>;
   flipped: ComputedRef<boolean>;
   bordered: ComputedRef<boolean>;
-  savePart: (part: FlowPart) => void;
-  patchSettings: (patch: any) => void;
+  patchSettings: (patch: Mapped<any>) => void;
+  reflow: () => void;
 }
 
 export interface UsePartComposable {
-  props: UsePartProps;
-  emits: UsePartEmits;
-  setup(part: FlowPart): UsePartComponent;
+  setup(): UsePartComponent;
 }
 
 export const usePart: UsePartComposable = {
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-    width: {
-      type: Number,
-      required: true,
-    },
-    height: {
-      type: Number,
-      required: true,
-    },
-  },
-  emits: ['update:part', 'dirty'],
-  setup(part: FlowPart): UsePartComponent {
-    const instance = getCurrentInstance()!;
+  setup(): UsePartComponent {
+    const part = inject(PartKey)!;
+    const reflow = inject(ReflowKey)!;
 
-    const sizeX = computed<number>(() => part.size[0]);
+    const settings = computed<Mapped<any>>({
+      get: () => part.value.settings,
+      set: (data) => {
+        part.value = { ...part.value, settings: deepCopy(data) };
+      },
+    });
 
-    const sizeY = computed<number>(() => part.size[1]);
+    const metrics = computed<MetricsConfig>(
+      () => part.value.metrics ?? emptyMetricsConfig(),
+    );
 
-    const flipped = computed<boolean>(() => part.flipped === true);
+    const sizeX = computed<number>(() => part.value.size[0]);
 
-    const bordered = computed<boolean>(() => part.settings[BORDER_KEY] ?? true);
+    const sizeY = computed<number>(() => part.value.size[1]);
 
-    function savePart(updated: FlowPart): void {
-      instance.emit('update:part', updated);
-    }
+    const width = computed<number>(() => coord2grid(sizeX.value));
 
-    function patchSettings(patch: any): void {
-      savePart({ ...part, settings: { ...part.settings, ...patch } });
+    const height = computed<number>(() => coord2grid(sizeY.value));
+
+    const flipped = computed<boolean>(() => part.value.flipped === true);
+
+    const bordered = computed<boolean>(() =>
+      Boolean(part.value.settings[BORDER_KEY] ?? true),
+    );
+
+    function patchSettings(patch: Mapped<any>): void {
+      settings.value = { ...part.value.settings, ...patch };
     }
 
     return {
+      part,
+      settings,
+      metrics,
       sizeX,
       sizeY,
+      width,
+      height,
       flipped,
       bordered,
-      savePart,
       patchSettings,
+      reflow,
     };
   },
 };

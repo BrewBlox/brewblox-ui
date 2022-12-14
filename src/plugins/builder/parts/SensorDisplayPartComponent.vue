@@ -12,20 +12,14 @@ import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'SensorDisplayPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const { bordered } = usePart.setup(props.part);
+  setup() {
+    const { part, width, height, bordered } = usePart.setup();
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SensorBlockT>(
-        props.part,
-        SENSOR_KEY,
-        SENSOR_TYPES,
-      );
+      useSettingsBlock.setup<SensorBlockT>(part, SENSOR_KEY, SENSOR_TYPES);
 
     const contentTransform = computed<string>(() =>
-      textTransformation(props.part, [1, 1]),
+      textTransformation(part.value, [1, 1]),
     );
 
     const tempValue = computed<number | null>(
@@ -37,11 +31,13 @@ export default defineComponent({
     );
 
     const color = computed<string>(
-      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
     );
 
     return {
       fixedNumber,
+      width,
+      height,
       block,
       blockStatus,
       isBroken,
@@ -90,6 +86,19 @@ export default defineComponent({
           </div>
         </foreignObject>
       </template>
+    </g>
+    <g class="outline">
+      <rect
+        v-show="bordered"
+        :stroke="color"
+        stroke-width="2"
+        x="1"
+        y="1"
+        width="48"
+        height="48"
+        rx="6"
+        ry="6"
+      />
     </g>
   </svg>
 </template>

@@ -1,4 +1,15 @@
+import {
+  BORDER_KEY,
+  COLOR_KEY,
+  PID_KEY,
+  PWM_KEY,
+  SETPOINT_KEY,
+  SIZE_X_KEY,
+} from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { typed } from '@/utils/misc';
+import { BlockIntfType, BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { BrewKettleConfig } from './types';
@@ -16,7 +27,9 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
         {
           id: nanoid(),
           rotate: 0,
-          settings: { color: '#c48600' },
+          settings: {
+            [COLOR_KEY]: '#c48600',
+          },
           flipped: false,
           type: 'Kettle',
           x: 2,
@@ -26,11 +39,12 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            pwm: {
+            [SIZE_X_KEY]: 4,
+            [PWM_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.kettlePwm,
-            },
-            sizeX: 4,
+              id: names.kettlePwm,
+              type: BlockIntfType.ActuatorAnalogInterface,
+            }),
           },
           flipped: false,
           type: 'HeatingElement',
@@ -41,11 +55,12 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            setpoint: {
+            [BORDER_KEY]: false,
+            [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.kettleSetpoint,
-            },
+              id: names.kettleSetpoint,
+              type: BlockIntfType.SetpointSensorPairInterface,
+            }),
           },
           flipped: false,
           type: 'SetpointDisplay',
@@ -56,11 +71,12 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            bordered: false,
-            pid: {
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.kettlePid,
-            },
+              id: names.kettlePid,
+              type: BlockType.Pid,
+            }),
           },
           flipped: false,
           type: 'PidDisplay',

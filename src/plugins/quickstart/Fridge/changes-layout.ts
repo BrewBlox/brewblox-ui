@@ -1,4 +1,15 @@
+import { SHELF_Y_KEY } from '@/plugins/builder/blueprints/Fridge';
+import {
+  BORDER_KEY,
+  LABEL_KEY,
+  PID_KEY,
+  SETPOINT_KEY,
+  SIZE_Y_KEY,
+} from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { typed } from '@/utils/misc';
+import { BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { FridgeConfig } from './types';
@@ -20,9 +31,9 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            sizeY: 7,
-            text: 'Fridge',
-            shelfY: 4,
+            [SIZE_Y_KEY]: 7,
+            [SHELF_Y_KEY]: 4,
+            [LABEL_KEY]: 'Fridge',
           },
         },
         {
@@ -78,11 +89,12 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            bordered: false,
-            setpoint: {
+            [BORDER_KEY]: false,
+            [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.fridgeSetpoint,
-            },
+              id: names.fridgeSetpoint,
+              type: BlockType.SetpointSensorPair,
+            }),
           },
         },
         {
@@ -93,11 +105,12 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            bordered: false,
-            pid: {
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.coolPid,
-            },
+              id: names.coolPid,
+              type: BlockType.Pid,
+            }),
           },
         },
         {
@@ -108,11 +121,12 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            bordered: false,
-            pid: {
+            [BORDER_KEY]: false,
+            [PID_KEY]: typed<BlockAddress>({
               serviceId,
-              blockId: names.heatPid,
-            },
+              id: names.heatPid,
+              type: BlockType.Pid,
+            }),
           },
         },
       ],

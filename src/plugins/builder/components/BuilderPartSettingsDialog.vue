@@ -2,7 +2,8 @@
 import { useDialog, useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { clampRotation } from '@/utils/quantity';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType, provide } from 'vue';
+import { PartKey, PartRemoveKey, ReflowKey } from '../const';
 import { BuilderBlueprint, FlowPart, PartSettingsCard } from '../types';
 import { coord2grid } from '../utils';
 
@@ -19,24 +20,29 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [...useDialog.emits, 'update:part', 'remove:part', 'dirty'],
+  emits: [...useDialog.emits, 'update:part', 'remove:part', 'reflow'],
   setup(props, { emit }) {
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const { dialogRef, onDialogHide } = useDialog.setup();
 
+    const providedPart = computed<FlowPart>({
+      get: () => props.part,
+      set: (v) => emit('update:part', v),
+    });
+
     const blueprint = computed<BuilderBlueprint>(() =>
       builderStore.blueprintByType(props.part.type),
     );
 
+    const partTitle = computed<string>(
+      () => `${blueprint.value.title} (${props.part.x},${props.part.y})`,
+    );
+
     const cards = computed<PartSettingsCard[]>(() => [
-      { component: 'PlacementCard' },
+      { component: 'PlacementCard', props: { title: partTitle.value } },
       ...blueprint.value.cards,
     ]);
-
-    const partTitle = computed<string>(
-      () => `${blueprint.value.title} ${props.part.x},${props.part.y}`,
-    );
 
     const rotatedSize = computed<[number, number]>(() => {
       let [x, y] = props.part.size;
@@ -55,17 +61,17 @@ export default defineComponent({
       return 2;
     });
 
-    function updatePart(part: FlowPart): void {
-      emit('update:part', part);
+    function reflow(): void {
+      emit('reflow');
     }
 
-    function removePart(part: FlowPart): void {
-      emit('remove:part', part);
+    function removePart(): void {
+      emit('remove:part', props.part);
     }
 
-    function invalidate(): void {
-      emit('dirty');
-    }
+    provide(PartKey, providedPart);
+    provide(ReflowKey, reflow);
+    provide(PartRemoveKey, removePart);
 
     return {
       coord2grid,
@@ -76,9 +82,8 @@ export default defineComponent({
       partTitle,
       rotatedSize,
       displayScale,
-      updatePart,
       removePart,
-      invalidate,
+      reflow,
     };
   },
 });
@@ -110,6 +115,7 @@ export default defineComponent({
             <PartWrapper
               :key="`menu-${part.id}-${rev}`"
               :part="part"
+              @reflow="reflow"
             />
           </svg>
         </div>
@@ -118,12 +124,8 @@ export default defineComponent({
           :is="card.component"
           v-for="(card, idx) in cards"
           :key="`card-${card.component}-${idx}`"
-          :part="part"
-          v-bind="card.props || {}"
+          v-bind="card.props"
           class="col-auto"
-          @update:part="updatePart"
-          @remove:part="removePart"
-          @dirty="invalidate"
         />
       </div>
     </Card>

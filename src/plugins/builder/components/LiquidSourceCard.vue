@@ -1,45 +1,42 @@
 <script lang="ts">
-import { BEER, COLD_WATER, HOT_WATER, WORT } from '@/plugins/builder/const';
+import {
+  BEER,
+  COLD_WATER,
+  DEPRECATED_IO_PRESSURE_KEY,
+  HOT_WATER,
+  IO_ENABLED_KEY,
+  IO_LIQUIDS_KEY,
+  WORT,
+} from '@/plugins/builder/const';
 import { colorString } from '@/plugins/builder/utils';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 const presetColors: string[] = [COLD_WATER, HOT_WATER, BEER, WORT];
 
 export default defineComponent({
   name: 'LiquidSourceCard',
-  props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
-    },
-  },
-  emits: ['update:part'],
-  setup(props, { emit }) {
+  setup() {
+    const { settings, patchSettings } = usePart.setup();
+
     const pressured = computed<boolean>({
       get: () =>
-        props.part.settings.enabled ?? Boolean(props.part.settings.pressure),
+        Boolean(
+          settings.value[IO_ENABLED_KEY] ??
+            settings.value[DEPRECATED_IO_PRESSURE_KEY],
+        ),
       set: (enabled) =>
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            enabled,
-          },
+        patchSettings({
+          [IO_ENABLED_KEY]: enabled,
+          [DEPRECATED_IO_PRESSURE_KEY]: undefined,
         }),
     });
 
     const color = computed<string | null>({
-      get: () => props.part.settings.liquids?.[0] ?? null,
+      get: () => settings.value[IO_LIQUIDS_KEY]?.[0] ?? null,
       set: (v) => {
         const liquids = v ? [colorString(v)] : [];
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            liquids,
-          },
-        });
+        patchSettings({ [IO_LIQUIDS_KEY]: liquids });
       },
     });
 

@@ -6,7 +6,7 @@ import {
 } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { Block } from 'brewblox-proto/ts';
-import { computed, ComputedRef } from 'vue';
+import { computed, ComputedRef, Ref } from 'vue';
 import { FlowPart } from '../types';
 import { settingsAddress, settingsBlock, showAbsentBlock } from '../utils';
 
@@ -21,7 +21,7 @@ export interface useSettingsBlockComponent<BlockT extends Block> {
 
 export interface useSettingsBlockComposable {
   setup<BlockT extends Block>(
-    part: FlowPart,
+    part: Ref<FlowPart>,
     settingsKey: string,
     intf: ComparedBlockType,
   ): useSettingsBlockComponent<BlockT>;
@@ -29,18 +29,18 @@ export interface useSettingsBlockComposable {
 
 export const useSettingsBlock: useSettingsBlockComposable = {
   setup<BlockT extends Block>(
-    part: FlowPart,
+    part: Ref<FlowPart>,
     settingsKey: string,
     intf: ComparedBlockType,
   ): useSettingsBlockComponent<BlockT> {
     const specStore = useBlockSpecStore();
 
     const address = computed<BlockAddress>(() =>
-      settingsAddress(part, settingsKey),
+      settingsAddress(part.value, settingsKey),
     );
 
     const block = computed<BlockT | null>(() =>
-      settingsBlock(part, settingsKey, intf),
+      settingsBlock(part.value, settingsKey, intf),
     );
 
     const blockStatus = computed<BlockStatus | null>(() => {
@@ -60,7 +60,7 @@ export const useSettingsBlock: useSettingsBlockComposable = {
     function showBlockDialog(): void {
       block.value != null
         ? createBlockDialog(block.value, { mode: 'Basic' })
-        : showAbsentBlock(part, settingsKey);
+        : showAbsentBlock(part.value, settingsKey);
     }
 
     return {

@@ -11,14 +11,16 @@ const paths = {
 
 export default defineComponent({
   name: 'StraightInletTubePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const flowSpeed = computed<number>(() => -flowOnCoord(props.part, LEFT));
+  setup() {
+    const { part, width, height } = usePart.setup();
 
-    const liquids = computed<string[]>(() => liquidOnCoord(props.part, LEFT));
+    const flowSpeed = computed<number>(() => -flowOnCoord(part.value, LEFT));
+
+    const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
 
     return {
+      width,
+      height,
       paths,
       flowSpeed,
       liquids,

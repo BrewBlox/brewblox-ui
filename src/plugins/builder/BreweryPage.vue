@@ -169,13 +169,13 @@ export default defineComponent({
             >
               <PartWrapper
                 :part="part"
-                :grid-x="part.x"
-                :grid-y="part.y"
+                :coord-x="part.x"
+                :coord-y="part.y"
                 :inactive="pending != null"
                 :interactable="!delayTouch"
                 :preselectable="delayTouch"
                 @update:part="savePart"
-                @dirty="calculateFlowParts"
+                @reflow="calculateFlowParts"
                 @preselect="pending = part"
               />
             </g>
@@ -189,11 +189,11 @@ export default defineComponent({
               />
               <PartWrapper
                 :part="pending"
-                :grid-x="pending.x"
-                :grid-y="pending.y"
+                :coord-x="pending.x"
+                :coord-y="pending.y"
                 interactable
                 @update:part="savePart"
-                @dirty="calculateFlowParts"
+                @reflow="calculateFlowParts"
               />
             </template>
           </g>

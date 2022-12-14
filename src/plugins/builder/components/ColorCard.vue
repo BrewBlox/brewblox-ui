@@ -1,31 +1,31 @@
 <script lang="ts">
-import { BEER, COLD_WATER, HOT_WATER, WORT } from '@/plugins/builder/const';
+import {
+  BEER,
+  COLD_WATER,
+  COLOR_KEY,
+  HOT_WATER,
+  WORT,
+} from '@/plugins/builder/const';
 import { colorString } from '@/plugins/builder/utils';
-import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { computed, defineComponent } from 'vue';
+import { usePart } from '../composables';
 
 const presetColors: string[] = [COLD_WATER, HOT_WATER, BEER, WORT];
 
 export default defineComponent({
   name: 'ColorCard',
   props: {
-    part: {
-      type: Object as PropType<FlowPart>,
-      required: true,
+    settingsKey: {
+      type: String,
+      default: COLOR_KEY,
     },
   },
-  emits: ['update:part'],
-  setup(props, { emit }) {
+  setup(props) {
+    const { settings, patchSettings } = usePart.setup();
+
     const color = computed<string | null>({
-      get: () => props.part.settings.color,
-      set: (c) =>
-        emit('update:part', {
-          ...props.part,
-          settings: {
-            ...props.part.settings,
-            color: colorString(c),
-          },
-        }),
+      get: () => settings.value[props.settingsKey],
+      set: (c) => patchSettings({ [props.settingsKey]: colorString(c) }),
     });
 
     function toggle(c: string): void {

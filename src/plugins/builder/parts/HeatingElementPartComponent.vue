@@ -4,15 +4,17 @@ import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'HeatingElementPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
+    const { width, height } = usePart.setup();
+
     const path = computed<string>(() => {
-      const straight = props.width - 100;
+      const straight = width.value - 100;
       return `M50,24.7h24c7.1,0,6.6-6.7,14-6.7 h${straight} c0,0,7,0.1,7,7 c0,7-7,7-7,7 H90`;
     });
 
     return {
+      width,
+      height,
       path,
     };
   },
@@ -22,7 +24,7 @@ export default defineComponent({
 <template>
   <!-- No viewBox. width is auto-adjusted -->
   <svg v-bind="{ width, height }">
-    <PwmValues :part="part" />
+    <PwmValues />
     <g class="outline">
       <path :d="path" />
     </g>

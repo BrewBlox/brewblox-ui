@@ -80,7 +80,6 @@ declare module '@vue/runtime-core' {
     SetpointValues: typeof import('src/plugins/builder/components/SetpointValues.vue').default;
     SelectedLayoutDialog: typeof import('src/plugins/builder/components/SelectedLayoutDialog.vue').default;
     SelectCard: typeof import('src/plugins/builder/components/SelectCard.vue').default;
-    ScaleCard: typeof import('src/plugins/builder/components/ScaleCard.vue').default;
     PwmValues: typeof import('src/plugins/builder/components/PwmValues.vue').default;
     PressureCard: typeof import('src/plugins/builder/components/PressureCard.vue').default;
     PowerIcon: typeof import('src/plugins/builder/components/PowerIcon.vue').default;

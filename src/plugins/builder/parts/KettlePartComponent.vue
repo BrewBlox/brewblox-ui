@@ -1,34 +1,27 @@
 <script lang="ts">
-import { colorString, textTransformation } from '@/plugins/builder/utils';
+import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
-import { DEFAULT_FILL_PCT } from '../blueprints/Kettle';
+import { DEFAULT_FILL_PCT, KETTLE_FILL_PCT_KEY } from '../blueprints/Kettle';
 import { usePart } from '../composables';
+import { COLOR_KEY } from '../const';
 
 export default defineComponent({
   name: 'KettlePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
-    const { sizeX, sizeY } = usePart.setup(props.part);
-
-    const titleText = computed<string>(() => props.part.settings.text ?? '');
-
-    const labelTransform = computed<string>(() =>
-      textTransformation(props.part, [sizeX.value, sizeY.value], false),
-    );
+  setup() {
+    const { settings, width, height } = usePart.setup();
 
     const filledHeight = computed<number>(() => {
-      const pct = props.part.settings.fillPct ?? DEFAULT_FILL_PCT;
-      return pct * (props.height / 100);
+      const pct = settings.value[KETTLE_FILL_PCT_KEY] ?? DEFAULT_FILL_PCT;
+      return pct * (height.value / 100);
     });
 
     const color = computed<string>(() =>
-      colorString(props.part.settings.color),
+      colorString(settings.value[COLOR_KEY]),
     );
 
     return {
-      titleText,
-      labelTransform,
+      width,
+      height,
       filledHeight,
       color,
     };
@@ -59,10 +52,8 @@ export default defineComponent({
       />
     </g>
     <BuilderLabelValues
-      :part="part"
       :width="width"
       :height="50"
-      @update:part="(v) => $emit('update:part', v)"
     />
   </svg>
 </template>

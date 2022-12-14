@@ -5,6 +5,9 @@ import { variableSizeFunc } from '../utils';
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 1;
 
+export const LABEL_FONT_SIZE_KEY = 'fontSize';
+export const LABEL_FONT_SIZE_DEFAULT = 16;
+
 const blueprint: BuilderBlueprint = {
   type: 'BuilderLabel',
   title: 'Label: text',
@@ -19,9 +22,9 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: 'fontSize',
+        settingsKey: LABEL_FONT_SIZE_KEY,
         label: 'Font size',
-        defaultSize: 16,
+        defaultSize: LABEL_FONT_SIZE_DEFAULT,
         min: 8,
         max: 40,
       },

@@ -3,8 +3,8 @@ import { useBuilderStore } from '@/plugins/builder/store';
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
-import { computed, defineComponent, PropType } from 'vue';
-import { usePart } from '../composables';
+import { computed, defineComponent, PropType, provide } from 'vue';
+import { PartKey, ReflowKey } from '../const';
 import parts from '../parts';
 
 export default defineComponent({
@@ -18,18 +18,18 @@ export default defineComponent({
       required: true,
     },
     /**
-     * Rendered X position (in grid coordinates).
+     * Rendered X position (in coordinates).
      * This is not required to be equal to `part.x`.
      */
-    gridX: {
+    coordX: {
       type: Number,
       default: 0,
     },
     /**
-     * Rendered Y position (in grid coordinates).
+     * Rendered Y position (in coordinates).
      * This is not required to be equal to `part.y`.
      */
-    gridY: {
+    coordY: {
       type: Number,
       default: 0,
     },
@@ -70,11 +70,21 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['preselect'],
+  emits: ['update:part', 'preselect', 'reflow'],
   setup(props, { emit }) {
     const builderStore = useBuilderStore();
-    const { sizeX, sizeY } = usePart.setup(props.part);
     const component = builderStore.componentByType(props.part.type);
+
+    const providedPart = computed<FlowPart>({
+      get: () => props.part,
+      set: (v) => emit('update:part', v),
+    });
+
+    provide(PartKey, providedPart);
+    provide(ReflowKey, () => emit('reflow'));
+
+    const sizeX = computed<number>(() => props.part.size[0]);
+    const sizeY = computed<number>(() => props.part.size[1]);
 
     const dimensions = computed(() => ({
       width: coord2grid(sizeX.value),
@@ -82,7 +92,7 @@ export default defineComponent({
     }));
 
     const positionTransform = computed<string>(() =>
-      coord2translate(props.gridX, props.gridY),
+      coord2translate(props.coordX, props.coordY),
     );
 
     const rotateTransform = computed<string>(() => {
@@ -138,11 +148,7 @@ export default defineComponent({
         <component
           :is="component"
           v-if="component"
-          :part="part"
-          :width="dimensions.width"
-          :height="dimensions.height"
           class="builder-part"
-          v-bind="$attrs"
         />
         <rect
           v-if="preselectable"

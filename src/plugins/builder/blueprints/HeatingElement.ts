@@ -29,6 +29,7 @@ const blueprint: BuilderBlueprint = {
     },
     {
       component: 'BorderCard',
+      props: {},
     },
   ],
   size: variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y),

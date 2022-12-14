@@ -2,13 +2,13 @@
 import {
   RIGHT,
   ValveBlockT,
+  VALVE_CLOSED_KEY,
   VALVE_KEY,
   VALVE_TYPES,
 } from '@/plugins/builder/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
-import { CLOSED_KEY } from '../blueprints/Valve';
 import { usePart, useSettingsBlock } from '../composables';
 import { flowOnCoord, liquidOnCoord, scheduleSoftStartRefresh } from '../utils';
 
@@ -28,24 +28,23 @@ const paths = {
 
 export default defineComponent({
   name: 'ValvePartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props, { emit }) {
+  setup() {
     const sparkStore = useSparkStore();
 
-    const { patchSettings } = usePart.setup(props.part);
+    const { part, settings, width, height, patchSettings, reflow } =
+      usePart.setup();
 
     const { hasAddress, block, blockStatus, isBroken } =
-      useSettingsBlock.setup<ValveBlockT>(props.part, VALVE_KEY, VALVE_TYPES);
+      useSettingsBlock.setup<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES);
 
-    const flowSpeed = computed<number>(() => flowOnCoord(props.part, RIGHT));
+    const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
 
-    const liquids = computed<string[]>(() => liquidOnCoord(props.part, RIGHT));
+    const liquids = computed<string[]>(() => liquidOnCoord(part.value, RIGHT));
 
     const closed = computed<boolean>(() =>
       hasAddress.value
         ? block.value?.data.state !== DigitalState.STATE_ACTIVE
-        : Boolean(props.part.settings['closed']),
+        : Boolean(settings.value[VALVE_CLOSED_KEY]),
     );
 
     const pending = computed<boolean>(() =>
@@ -74,7 +73,7 @@ export default defineComponent({
       () => block.value,
       (newV, oldV) => {
         if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
-          emit('dirty');
+          reflow();
         }
       },
     );
@@ -91,11 +90,15 @@ export default defineComponent({
           scheduleSoftStartRefresh(block.value);
         }
       } else {
-        patchSettings({ [CLOSED_KEY]: !props.part.settings[CLOSED_KEY] });
+        patchSettings({
+          [VALVE_CLOSED_KEY]: !settings.value[VALVE_CLOSED_KEY],
+        });
       }
     }
 
     return {
+      width,
+      height,
       blockStatus,
       paths,
       hasAddress,

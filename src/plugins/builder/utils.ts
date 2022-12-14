@@ -14,6 +14,7 @@ import {
   FastPwmBlock,
 } from 'brewblox-proto/ts';
 import defaults from 'lodash/defaults';
+import isObject from 'lodash/isObject';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
@@ -23,7 +24,7 @@ import {
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
   deprecatedTypes,
-  SCALE_KEY,
+  DEPRECATED_SCALE_KEY,
   SIZE_X_KEY,
   SIZE_Y_KEY,
   SQUARE_SIZE,
@@ -38,11 +39,27 @@ import {
   Transitions,
 } from './types';
 
+export function settingsProp<T = any>(
+  settings: Mapped<any>,
+  key: string,
+  validator?: string | ((v: any) => boolean),
+): T | undefined {
+  const value = settings[key];
+  if (
+    typeof validator === 'undefined' ||
+    (typeof validator === 'string' && typeof value === validator) ||
+    (typeof validator === 'function' && validator(value))
+  ) {
+    return value as T;
+  }
+  return undefined;
+}
+
 export function settingsAddress(
   part: PersistentPart,
   key: string,
 ): BlockAddress {
-  const obj: any = part.settings[key] ?? {};
+  const obj = settingsProp(part.settings, key, isObject) ?? {};
   return {
     // Older objects use 'blockId' as key
     id: obj.id ?? obj.blockId ?? null,
@@ -182,7 +199,7 @@ export function horizontalChevrons(
   };
 }
 
-export function colorString(val: string | null): string {
+export function colorString(val: Maybe<string>): string {
   return val ? (val.startsWith('#') ? val : `#${val}`) : '';
 }
 
@@ -221,7 +238,7 @@ export function containerTransitions(
         outCoords: item.out,
         pressure: 0,
         friction: 0,
-        liquids: color ? [color] : [],
+        liquids: typeof color === 'string' ? [color] : [],
         source: true,
       },
     ];
@@ -259,11 +276,11 @@ export function textTransformation(
   return transforms.join(' ');
 }
 
-export function elbow(dX: number, dY: number, horizontal: boolean): string {
-  const dx1 = horizontal ? 0.5 * dX : 0;
-  const dy1 = horizontal ? 0 : 0.5 * dY;
-  const dx2 = horizontal ? dX : 0.5 * dX;
-  const dy2 = horizontal ? 0.5 * dY : dY;
+export function elbow(dX: number, dY: number, fromHorizontal: boolean): string {
+  const dx1 = fromHorizontal ? 0.5 * dX : 0;
+  const dy1 = fromHorizontal ? 0 : 0.5 * dY;
+  const dx2 = fromHorizontal ? dX : 0.5 * dX;
+  const dy2 = fromHorizontal ? 0.5 * dY : dY;
   return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
 }
 
@@ -314,7 +331,7 @@ export function showLinkedWidgetDialog(
   key: string,
 ): void {
   const widgetStore = useWidgetStore();
-  const widgetId = part.settings[key];
+  const widgetId = settingsProp<string>(part.settings, key, 'string');
   if (!widgetId) {
     return;
   } else if (widgetStore.widgetIds.includes(widgetId)) {
@@ -377,18 +394,14 @@ export function variableSizeFunc(
   defaultSizeY: number,
 ): BuilderBlueprint['size'] {
   return ({ settings }) => {
-    if (
-      settings[SIZE_X_KEY] !== undefined ||
-      settings[SIZE_Y_KEY] !== undefined
-    ) {
-      return [
-        settings[SIZE_X_KEY] || defaultSizeX,
-        settings[SIZE_Y_KEY] || defaultSizeY,
-      ];
+    const sizeX = settingsProp<number>(settings, SIZE_X_KEY, 'number');
+    const sizeY = settingsProp<number>(settings, SIZE_Y_KEY, 'number');
+    if (sizeX || sizeY) {
+      return [sizeX || defaultSizeX, sizeY || defaultSizeY];
     }
     // backwards compatibility with deprecated setting
-    if (settings[SCALE_KEY] != null) {
-      const scale = Number(settings[SCALE_KEY]);
+    if (settings[DEPRECATED_SCALE_KEY] != null) {
+      const scale = Number(settings[DEPRECATED_SCALE_KEY]);
       return [defaultSizeX * scale, defaultSizeY * scale];
     }
     return [defaultSizeX, defaultSizeY];

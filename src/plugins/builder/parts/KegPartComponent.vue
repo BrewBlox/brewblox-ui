@@ -2,17 +2,20 @@
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
+import { COLOR_KEY } from '../const';
 
 export default defineComponent({
   name: 'KegPartComponent',
-  props: { ...usePart.props },
-  emits: [...usePart.emits],
-  setup(props) {
+  setup() {
+    const { settings, width, height } = usePart.setup();
+
     const color = computed<string>(() =>
-      colorString(props.part.settings.color),
+      colorString(settings.value[COLOR_KEY]),
     );
 
     return {
+      width,
+      height,
       color,
     };
   },
@@ -60,7 +63,6 @@ export default defineComponent({
       />
     </g>
     <SetpointValues
-      :part="part"
       :y="100"
       :background-color="color"
       hide-unset

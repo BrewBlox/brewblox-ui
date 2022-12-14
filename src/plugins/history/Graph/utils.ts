@@ -1,8 +1,10 @@
+import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig, QueryTarget } from '@/plugins/history/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { useWidgetStore, Widget } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
+import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
+import { deepCopy } from '@/utils/objects';
 import isArray from 'lodash/isArray';
 import mergeWith from 'lodash/mergeWith';
 import uniq from 'lodash/uniq';
@@ -45,4 +47,35 @@ export function addBlockGraph(
     await widgetStore.saveWidget({ ...widget, config: merged });
     notify.done(`Added ${cfg.fields.length} fields to <b>${widget.title}</b>`);
   });
+}
+
+export async function selectSessionGraph(): Promise<GraphConfig | null> {
+  const historyStore = useHistoryStore();
+  const selectedId: string | null = await createDialogPromise({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: historyStore.sessions.flatMap((session) =>
+        session.notes
+          .filter((note) => note.type === 'Graph')
+          .map((note) => ({
+            value: `${session.id}:${note.id}`,
+            label: `${session.title} - ${note.title}`,
+            session: session.id,
+            note: note.id,
+          })),
+      ),
+      title: 'Select graph',
+      message: 'Select a session graph. Its fields and names will be copied.',
+    },
+  });
+  if (selectedId) {
+    const [sessionId, noteId] = selectedId.split(':', 2);
+    const note = historyStore
+      .sessionById(sessionId)
+      ?.notes.find((note) => note.id === noteId);
+    if (note && note.type === 'Graph') {
+      return deepCopy(note.config);
+    }
+  }
+  return null;
 }
