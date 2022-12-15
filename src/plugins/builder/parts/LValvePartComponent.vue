@@ -32,7 +32,6 @@ export default defineComponent({
       usePart.setup();
 
     const { block } = useSettingsBlock.setup<ValveBlockT>(
-      part,
       VALVE_KEY,
       VALVE_TYPES,
     );

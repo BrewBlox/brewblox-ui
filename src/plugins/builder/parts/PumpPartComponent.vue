@@ -13,12 +13,7 @@ import {
   PwmBlockT,
   PWM_TYPES,
 } from '@/plugins/builder/const';
-import {
-  liquidOnCoord,
-  scheduleSoftStartRefresh,
-  showAbsentBlock,
-} from '@/plugins/builder/utils';
-import { useSparkStore } from '@/plugins/spark/store';
+import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, onBeforeMount, watch } from 'vue';
@@ -27,33 +22,44 @@ import { usePart, useSettingsBlock } from '../composables';
 export default defineComponent({
   name: 'PumpPartComponent',
   setup() {
-    const sparkStore = useSparkStore();
     const { part, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
-    const { block, blockStatus, hasAddress, showBlockDialog } =
-      useSettingsBlock.setup<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
+    const {
+      block,
+      blockStatus,
+      hasAddress,
+      isBroken,
+      isClaimed,
+      showBlockDialog,
+      showBlockSelectDialog,
+      patchBlock,
+    } = useSettingsBlock.setup<PumpBlockT>(PUMP_KEY, PUMP_TYPES);
+
+    function isDigital(v: Maybe<PumpBlockT>): v is DigitalBlockT {
+      return isBlockCompatible<DigitalBlockT>(v, DIGITAL_TYPES);
+    }
+
+    function isPwm(v: Maybe<PumpBlockT>): v is PwmBlockT {
+      return isBlockCompatible<PwmBlockT>(v, PWM_TYPES);
+    }
 
     const enabled = computed<boolean>(() => {
-      if (block.value === null) {
-        return hasAddress.value
-          ? false
-          : Boolean(settings.value[IO_ENABLED_KEY]);
-      } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
+      if (isDigital(block.value)) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
-      } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
-        return block.value.data.enabled && Boolean(block.value.data.setting);
-      } else {
-        return false;
       }
+
+      if (isPwm(block.value)) {
+        return block.value.data.enabled && Boolean(block.value.data.setting);
+      }
+
+      return hasAddress.value ? false : Boolean(settings.value[IO_ENABLED_KEY]);
     });
 
     const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
 
     const pwmSetting = computed<number>(() =>
-      isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)
-        ? Number(block.value.data.setting)
-        : 100,
+      isPwm(block.value) ? Number(block.value.data.setting) : 100,
     );
 
     const duration = computed<number>(() => {
@@ -75,16 +81,10 @@ export default defineComponent({
       if (newV.type !== oldV.type) {
         return true;
       }
-      if (
-        isBlockCompatible<DigitalBlockT>(newV, DIGITAL_TYPES) &&
-        isBlockCompatible<DigitalBlockT>(oldV, DIGITAL_TYPES)
-      ) {
+      if (isDigital(newV) && isDigital(oldV)) {
         return newV.data.state !== oldV.data.state;
       }
-      if (
-        isBlockCompatible<PwmBlockT>(newV, PWM_TYPES) &&
-        isBlockCompatible<PwmBlockT>(oldV, PWM_TYPES)
-      ) {
+      if (isPwm(newV) && isPwm(oldV)) {
         return (
           newV.data.setting !== oldV.data.setting ||
           newV.data.enabled !== oldV.data.enabled
@@ -113,19 +113,40 @@ export default defineComponent({
     });
 
     function interact(): void {
-      if (!hasAddress.value) {
-        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
-      } else if (block.value == null) {
-        showAbsentBlock(part.value, PUMP_KEY);
-      } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
+      if (isClaimed.value) {
+        showBlockDialog();
+        return;
+      }
+
+      if (isDigital(block.value)) {
         const storedState =
           block.value.data.state === DigitalState.STATE_INACTIVE
             ? DigitalState.STATE_ACTIVE
             : DigitalState.STATE_INACTIVE;
-        sparkStore.patchBlock(block.value, { storedState });
-        scheduleSoftStartRefresh(block.value);
-      } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
+        patchBlock({ storedState }, true);
+        return;
+      }
+
+      if (isPwm(block.value)) {
         showBlockDialog();
+        return;
+      }
+
+      // There's no block
+      // That's an error state only if a block address has been set
+      if (hasAddress.value) {
+        showAbsentBlock(part.value, PUMP_KEY);
+      } else {
+        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
+      }
+    }
+
+    function toggleInteract(): void {
+      if (!isClaimed.value && isPwm(block.value)) {
+        const storedSetting = block.value.data.storedSetting > 0 ? 0 : 100;
+        patchBlock({ storedSetting }, true);
+      } else {
+        interact();
       }
     }
 
@@ -135,10 +156,15 @@ export default defineComponent({
       block,
       hasAddress,
       blockStatus,
+      isBroken,
+      isClaimed,
       enabled,
       liquids,
       duration,
       interact,
+      toggleInteract,
+      showBlockDialog,
+      showBlockSelectDialog,
     };
   },
 });
@@ -161,7 +187,7 @@ export default defineComponent({
     <LiquidStroke
       :paths="['M 17 29 A 8 8 0 1 1 17 31 Z']"
       :colors="liquids"
-      class="ballLiquid"
+      class="pump-ball-liquid"
     />
     <!-- ball outline-->
     <circle
@@ -247,11 +273,43 @@ export default defineComponent({
       height="50"
     />
     <BlockStatusSvg :status="blockStatus" />
+    <foreignObject v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list style="min-width: 100px">
+          <q-item
+            v-close-popup
+            :disable="isBroken || isClaimed"
+            clickable
+            @click="toggleInteract"
+          >
+            <q-item-section>Toggle pump</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            :disable="block == null"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </foreignObject>
   </svg>
 </template>
 
 <style lang="scss" scoped>
-:deep(.ballLiquid path) {
+:deep(.pump-ball-liquid path) {
   stroke-width: 15px !important;
 }
 </style>

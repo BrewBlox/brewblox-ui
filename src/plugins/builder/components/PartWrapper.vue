@@ -140,15 +140,15 @@ export default defineComponent({
   <g :transform="positionTransform">
     <g :transform="`${rotateTransform} ${flipTransform}`">
       <g :class="{ interactable, selectable, selected, inactive }">
-        <rect
-          class="select-background"
-          :width="dimensions.width"
-          :height="dimensions.height"
-        />
         <component
           :is="component"
           v-if="component"
           class="builder-part"
+        />
+        <rect
+          class="select-background"
+          :width="dimensions.width"
+          :height="dimensions.height"
         />
         <rect
           v-if="preselectable"
@@ -180,13 +180,11 @@ export default defineComponent({
   rx: 4
 
 .selectable:hover > .select-background
-  fill: silver
-  fill-opacity: 0.5
-  opacity: 0.5
+  fill: white
+  opacity: 0.2
 
 .selected > .select-background
   fill: dodgerblue
-  fill-opacity: 0.5
   opacity: 0.5
 
 .inactive
@@ -214,9 +212,8 @@ export default defineComponent({
   rx: 4
 
 .interaction:hover > .interaction-background
-  fill: silver
-  fill-opacity: 0.5
-  opacity: 0.5
+  fill: white
+  opacity: 0.2
 
 // Generic styling for all part components
 .builder-part

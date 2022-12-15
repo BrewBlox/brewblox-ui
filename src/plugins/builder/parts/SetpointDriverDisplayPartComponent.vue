@@ -11,10 +11,10 @@ export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered } = usePart.setup();
+    const { width, height, bordered } = usePart.setup();
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<DriverBlockT>(part, DRIVER_KEY, DRIVER_TYPES);
+      useSettingsBlock.setup<DriverBlockT>(DRIVER_KEY, DRIVER_TYPES);
 
     const refBlock = computed<SetpointSensorPairBlock | null>(() =>
       block.value !== null

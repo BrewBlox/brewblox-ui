@@ -188,6 +188,13 @@ export default defineComponent({
       <svg
         ref="svgRef"
         class="fit"
+        @contextmenu="
+          (evt) => {
+            if (!evt.shiftKey) {
+              evt.preventDefault();
+            }
+          }
+        "
       >
         <g ref="svgContentRef">
           <g

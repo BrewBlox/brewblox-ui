@@ -312,13 +312,15 @@ export const useSparkStore = defineStore('sparkStore', {
       return await sparkApi.cleanUnusedNames(serviceId);
     },
 
-    async fetchBlock(block: Block): Promise<void> {
-      const fetched = await sparkApi.fetchBlock(block);
-      if (!isBlockVolatile(block)) {
-        this.blocks[block.serviceId] = concatById(
-          this.blocks[block.serviceId],
-          fetched,
-        );
+    async fetchBlock(block: Maybe<Block>): Promise<void> {
+      if (block) {
+        const fetched = await sparkApi.fetchBlock(block);
+        if (!isBlockVolatile(block)) {
+          this.blocks[block.serviceId] = concatById(
+            this.blocks[block.serviceId],
+            fetched,
+          );
+        }
       }
     },
 

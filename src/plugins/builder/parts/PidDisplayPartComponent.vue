@@ -24,7 +24,7 @@ export default defineComponent({
     const { part, width, height, bordered } = usePart.setup();
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<PidBlockT>(part, PID_KEY, PID_TYPES);
+      useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),

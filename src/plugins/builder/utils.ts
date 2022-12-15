@@ -1,18 +1,12 @@
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
-import { isBlockCompatible, isCompatible } from '@/plugins/spark/utils/info';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
-import { durationMs } from '@/utils/quantity';
-import {
-  Block,
-  BlockType,
-  DigitalActuatorBlock,
-  FastPwmBlock,
-} from 'brewblox-proto/ts';
+import { Block } from 'brewblox-proto/ts';
 import defaults from 'lodash/defaults';
 import isObject from 'lodash/isObject';
 import range from 'lodash/range';
@@ -351,20 +345,6 @@ export function showLinkedWidgetDialog(
         cancel: false,
       },
     });
-  }
-}
-
-export function scheduleSoftStartRefresh(block: Block): void {
-  if (
-    isBlockCompatible<FastPwmBlock | DigitalActuatorBlock>(block, [
-      BlockType.FastPwm,
-      BlockType.DigitalActuator,
-    ])
-  ) {
-    const softStartDuration = durationMs(block.data.transitionDurationValue);
-    if (softStartDuration > 0) {
-      setTimeout(() => useSparkStore().fetchBlock(block), softStartDuration);
-    }
   }
 }
 

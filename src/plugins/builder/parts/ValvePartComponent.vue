@@ -6,11 +6,10 @@ import {
   VALVE_KEY,
   VALVE_TYPES,
 } from '@/plugins/builder/const';
-import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { flowOnCoord, liquidOnCoord, scheduleSoftStartRefresh } from '../utils';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   outerValve: [
@@ -29,13 +28,11 @@ const paths = {
 export default defineComponent({
   name: 'ValvePartComponent',
   setup() {
-    const sparkStore = useSparkStore();
-
     const { part, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
-    const { hasAddress, block, blockStatus, isBroken } =
-      useSettingsBlock.setup<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES);
+    const { hasAddress, block, blockStatus, isBroken, patchBlock } =
+      useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
 
     const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
 
@@ -85,9 +82,7 @@ export default defineComponent({
             block.value.data.state === DigitalState.STATE_INACTIVE
               ? DigitalState.STATE_ACTIVE
               : DigitalState.STATE_INACTIVE;
-          sparkStore.patchBlock(block.value, { storedState });
-
-          scheduleSoftStartRefresh(block.value);
+          patchBlock({ storedState }, true);
         }
       } else {
         patchSettings({

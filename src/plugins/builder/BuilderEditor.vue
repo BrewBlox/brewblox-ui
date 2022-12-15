@@ -1051,9 +1051,17 @@ export default defineComponent({
         ref="svgRef"
         class="fit"
         :style="{ cursor }"
+        @contextmenu="
+          (evt) => {
+            if (!evt.shiftKey) {
+              evt.preventDefault();
+            }
+          }
+        "
       >
         <g ref="svgContentRef">
           <EditorBackground
+            v-if="activeToolId !== 'interact' || floater"
             :width="layout.width"
             :height="layout.height"
           />

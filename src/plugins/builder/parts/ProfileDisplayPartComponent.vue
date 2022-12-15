@@ -10,10 +10,10 @@ import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered } = usePart.setup();
+    const { width, height, bordered } = usePart.setup();
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<ProfileBlockT>(part, PROFILE_KEY, PROFILE_TYPES);
+      useSettingsBlock.setup<ProfileBlockT>(PROFILE_KEY, PROFILE_TYPES);
 
     const points = computed<Setpoint[]>(() => {
       if (!block.value) {

@@ -5,7 +5,7 @@ import { makeTypeFilter } from '@/utils/functional';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { BlockType, PidBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { usePart, useSettingsBlock } from '../composables';
+import { useSettingsBlock } from '../composables';
 import { SetpointBlockT, SETPOINT_KEY, SETPOINT_TYPES } from '../const';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
@@ -40,13 +40,17 @@ export default defineComponent({
   },
   setup(props) {
     const sparkStore = useSparkStore();
-    const { part } = usePart.setup();
-    const { address, block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SetpointBlockT>(
-        part,
-        props.settingsKey,
-        SETPOINT_TYPES,
-      );
+    const {
+      address,
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<SetpointBlockT>(
+      props.settingsKey,
+      SETPOINT_TYPES,
+    );
 
     const isUsed = computed<boolean>(
       () =>
@@ -78,6 +82,7 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       setpointSetting,
       setpointValue,
       tempUnit,
@@ -140,5 +145,25 @@ export default defineComponent({
         </div>
       </foreignObject>
     </template>
+
+    <foreignObject v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list
+          dense
+          style="min-width: 100px"
+        >
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Select block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </foreignObject>
   </svg>
 </template>

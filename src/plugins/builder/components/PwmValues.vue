@@ -40,7 +40,7 @@ export default defineComponent({
   setup(props) {
     const { part, bordered } = usePart.setup();
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<PwmBlockT>(part, props.settingsKey, PWM_TYPES);
+      useSettingsBlock.setup<PwmBlockT>(props.settingsKey, PWM_TYPES);
 
     const pwmValue = computed<number | null>(() =>
       block.value?.data.enabled ? block.value.data.value : null,

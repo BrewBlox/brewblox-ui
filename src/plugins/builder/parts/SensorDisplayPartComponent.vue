@@ -16,7 +16,7 @@ export default defineComponent({
     const { part, width, height, bordered } = usePart.setup();
 
     const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SensorBlockT>(part, SENSOR_KEY, SENSOR_TYPES);
+      useSettingsBlock.setup<SensorBlockT>(SENSOR_KEY, SENSOR_TYPES);
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
