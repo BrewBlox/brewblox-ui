@@ -24,70 +24,68 @@ export interface UseMetricsComponent {
 }
 
 export interface UseMetricsComposable {
-  setup(layoutId: Ref<string | null> | null): UseMetricsComponent;
+  setupProvider(layoutId: Ref<string | null> | null): UseMetricsComponent;
+  setupConsumer(): UseMetricsComponent;
 }
 
 export const useMetrics: UseMetricsComposable = {
-  setup(layoutId: Ref<string | null> | null): UseMetricsComponent {
+  setupProvider(layoutId: Ref<string | null>): UseMetricsComponent {
     const historyStore = useHistoryStore();
+    const builderStore = useBuilderStore();
+    const sourceId = nanoid(6);
+    let activeFields: Set<string> = new Set();
 
-    if (layoutId) {
-      // Provider side
-      const builderStore = useBuilderStore();
-      const sourceId = nanoid(6);
-      let activeFields: Set<string> = new Set();
+    const source = computed<MetricsSource | null>(() =>
+      historyStore.sourceById<MetricsSource>(sourceId),
+    );
 
-      const source = computed<MetricsSource | null>(() =>
-        historyStore.sourceById<MetricsSource>(sourceId),
-      );
-
-      const initMetrics = debounce(
-        (layout: BuilderLayout | null) => {
-          if (!layout) {
-            historyStore.removeSource(source.value);
-            return;
-          }
-
-          const fields = new Set(
-            layout.parts.flatMap((part) => part.metrics?.fields ?? []),
-          );
-
-          if (isEqual(activeFields, fields)) {
-            // nothing to do
-            return;
-          }
-
+    const initMetrics = debounce(
+      (layout: BuilderLayout | null) => {
+        if (!layout) {
           historyStore.removeSource(source.value);
-          addSource(sourceId, {}, {}, [...fields]);
-          activeFields = fields;
-        },
-        500,
-        { trailing: true },
-      );
+          return;
+        }
 
-      watch(
-        () => builderStore.layoutById(layoutId.value),
-        (newV) => initMetrics(newV),
-        { immediate: true },
-      );
+        const fields = new Set(
+          layout.parts.flatMap((part) => part.metrics?.fields ?? []),
+        );
 
-      onBeforeUnmount(() => historyStore.removeSource(source.value));
-      provide(sourceIdKey, sourceId);
+        if (isEqual(activeFields, fields)) {
+          // nothing to do
+          return;
+        }
 
-      return {
-        source,
-      };
-    } else {
-      // Consumer
-      const sourceId = inject(sourceIdKey, null);
+        historyStore.removeSource(source.value);
+        addSource(sourceId, {}, {}, [...fields]);
+        activeFields = fields;
+      },
+      500,
+      { trailing: true },
+    );
 
-      const source = computed<MetricsSource | null>(() =>
-        historyStore.sourceById<MetricsSource>(sourceId),
-      );
+    watch(
+      () => builderStore.layoutById(layoutId.value),
+      (newV) => initMetrics(newV),
+      { immediate: true },
+    );
 
-      return {
-        source,
-      };
-    }
+    onBeforeUnmount(() => historyStore.removeSource(source.value));
+    provide(sourceIdKey, sourceId);
+
+    return {
+      source,
+    };
+  },
+  setupConsumer(): UseMetricsComponent {
+    const historyStore = useHistoryStore();
+    const sourceId = inject(sourceIdKey, null);
+
+    const source = computed<MetricsSource | null>(() =>
+      historyStore.sourceById<MetricsSource>(sourceId),
+    );
+
+    return {
+      source,
+    };
   },
 };

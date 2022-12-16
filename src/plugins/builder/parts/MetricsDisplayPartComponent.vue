@@ -23,7 +23,7 @@ export default defineComponent({
   name: 'MetricsDisplayPartComponent',
   setup() {
     const { part, metrics, width, height, bordered } = usePart.setup();
-    const { source } = useMetrics.setup(null);
+    const { source } = useMetrics.setupConsumer();
 
     function fieldFreshDuration(field: string): number {
       return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;

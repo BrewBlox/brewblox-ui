@@ -4,7 +4,6 @@ import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePart } from '../composables';
 import { LABEL_KEY, URL_KEY } from '../const';
-import { textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'UrlDisplayPartComponent',
@@ -28,7 +27,6 @@ export default defineComponent({
     }
 
     return {
-      textTransformation,
       width,
       height,
       bordered,

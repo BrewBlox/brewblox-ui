@@ -10,7 +10,6 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {},
 });
 </script>
 
@@ -37,4 +36,5 @@ export default defineComponent({
     fill: $red-8
   &__null
     fill: none
+    stroke: none
 </style>

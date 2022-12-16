@@ -146,11 +146,12 @@ export default defineComponent({
           },
         ]"
       >
-        <component
-          :is="component"
-          v-if="component"
-          class="builder-part"
-        />
+        <g class="builder-part">
+          <component
+            :is="component"
+            v-if="component"
+          />
+        </g>
         <rect
           class="selection-overlay"
           :width="dimensions.width"
@@ -168,8 +169,7 @@ export default defineComponent({
   </g>
 </template>
 
-<style lang="sass">
-// Unscoped, to apply styles to all part components
+<style lang="sass" scoped>
 .builder-part-wrapper
   > .selection-overlay
     pointer-events: none
@@ -208,9 +208,12 @@ export default defineComponent({
       opacity: 0.1 !important
       fill-opacity: 0.1 !important
 
-.builder-part
+:deep(.builder-part)
   stroke-linecap: round
   fill: none
+
+  text
+    fill: white
 
   .builder-text
     font-size: 12px
@@ -234,33 +237,10 @@ export default defineComponent({
       fill: white
       opacity: 0.2
 
-  text
-    fill: #fff
-
   .fill
-    fill: #fff
+    fill: white
 
   .outline
     stroke-width: 2px
-    stroke: #fff
-
-  .text
-    stroke-width: 1px
-    stroke: #fff
-
-  .liquid
-    stroke-width: 7px
-
-  .q-icon
-    stroke-width: 0
-
-  .block-status
-    &__Active
-      fill: $positive
-    &__deselected
-      fill: $warning
-    &__Disabled
-      fill: $grey-6
-    &__Invalid
-      fill: $negative
+    stroke: white
 </style>

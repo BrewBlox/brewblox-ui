@@ -7,7 +7,6 @@ import {
   VALVE_TYPES,
 } from '@/plugins/builder/const';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
-import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
@@ -31,10 +30,8 @@ export default defineComponent({
     const { part, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
-    const { block } = useSettingsBlock.setup<ValveBlockT>(
-      VALVE_KEY,
-      VALVE_TYPES,
-    );
+    const { block, patchBlock, blockStatus, isBroken } =
+      useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
 
     const closed = computed<boolean>(() =>
       block.value !== null
@@ -52,7 +49,7 @@ export default defineComponent({
 
     function interact(): void {
       if (block.value) {
-        useSparkStore().patchBlock(block.value, {
+        patchBlock({
           storedState:
             block.value.data.state === DigitalState.STATE_ACTIVE
               ? DigitalState.STATE_INACTIVE
@@ -83,6 +80,8 @@ export default defineComponent({
       height,
       paths,
       block,
+      blockStatus,
+      isBroken,
       closed,
       liquidPath,
       liquidSpeed,
@@ -101,6 +100,17 @@ export default defineComponent({
     @click="interact"
   >
     <rect class="interaction-background" />
+    <BrokenSvgIcon
+      v-if="isBroken"
+      x="0"
+      y="0"
+      height="15"
+      width="15"
+    />
+    <BlockStatusSvg
+      v-else
+      :status="blockStatus"
+    />
     <LiquidStroke
       :paths="[liquidPath]"
       :colors="liquidColor"
@@ -120,9 +130,10 @@ export default defineComponent({
       <path :d="paths.bigEnclosure" />
       <path :d="paths.smallEnclosure" />
     </g>
-    <PowerIcon
+    <PowerSvgIcon
       v-if="block"
-      :transform="`translate(${closed ? 5 : -5}, 15)`"
+      :x="closed ? 25 : 15"
+      y="25"
       color="black"
     />
   </svg>

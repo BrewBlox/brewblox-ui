@@ -16,7 +16,7 @@ export default defineComponent({
         entry: `M71,0 v10 M79,0 v10 M${startLast + 21},0 v10 M${
           startLast + 29
         },0 v10`,
-        content: `M50,25 H${startLast + 48}`,
+        content: `M50,25 H${startLast + 47}`,
         casing:
           `M50,10 H71 M79,10 H${startLast + 21} M${startLast + 29},10 ` +
           `H${startLast + 50 - 4 - 2} ${elbow(4, 4, true)} V36 ${elbow(
@@ -67,6 +67,8 @@ export default defineComponent({
       :paths="[paths.content]"
       :colors="liquids"
       class="content-liquid"
+      stroke-width="30"
+      fill="none"
     />
     <LiquidStroke
       :paths="[paths.flowPath]"
@@ -85,11 +87,3 @@ export default defineComponent({
     </g>
   </svg>
 </template>
-
-<style lang="scss" scoped>
-:deep(.content-liquid path) {
-  stroke-width: 30 !important;
-  stroke-linecap: butt;
-  fill: none;
-}
-</style>

@@ -169,8 +169,7 @@ export default defineComponent({
   </svg>
 </template>
 
-<style scoped>
-.legs {
-  fill: #24333d;
-}
+<style scoped lang="sass">
+.legs
+  fill: #24333d
 </style>

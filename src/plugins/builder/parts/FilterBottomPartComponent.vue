@@ -6,7 +6,7 @@ import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   borders: ['M29,40V30a9,9,0,0,0-9-9H1', 'M21,40V32a3,3,0,0,0-3-3H1'],
-  liquid: 'M0,25H20a5,5,0,0,1,5,5V40',
+  liquid: ['M0,25H20a5,5,0,0,1,5,5V40'],
 };
 
 export default defineComponent({
@@ -61,12 +61,12 @@ export default defineComponent({
       <path :d="paths.borders[1]" />
     </g>
     <LiquidStroke
-      :paths="[paths.liquid]"
+      :paths="paths.liquid"
       :colors="liquids"
     />
     <AnimatedArrows
       :speed="flowSpeed"
-      :path="paths.liquid"
+      :path="paths.liquid[0]"
     />
   </svg>
 </template>

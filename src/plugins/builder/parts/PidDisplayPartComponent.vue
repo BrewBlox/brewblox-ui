@@ -111,7 +111,7 @@ export default defineComponent({
         <BlockStatusSvg :status="blockStatus" />
         <HeatingSvgIcon
           v-if="kp && kp > 0"
-          :fill="outputValue ? HOT_WATER : 'white'"
+          :color="outputValue ? HOT_WATER : 'white'"
           x="12.5"
           y="5"
           width="25"
@@ -119,7 +119,7 @@ export default defineComponent({
         />
         <CoolingSvgIcon
           v-else
-          :stroke="outputValue ? COLD_WATER : 'white'"
+          :color="outputValue ? COLD_WATER : 'white'"
           x="12.5"
           y="5"
           width="25"

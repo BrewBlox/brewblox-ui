@@ -9,11 +9,6 @@ import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 
 const chevrons = horizontalChevrons(15, 25);
-const paths = {
-  borders: ['M30,21 H50', 'M30,29 H50'],
-  liquid: 'M30,25 H50',
-  arrows: 'M25,25 H50',
-};
 
 export default defineComponent({
   name: 'SystemIOPartComponent',
@@ -28,7 +23,6 @@ export default defineComponent({
       width,
       height,
       chevrons,
-      paths,
       flowSpeed,
       liquids,
     };
@@ -42,13 +36,13 @@ export default defineComponent({
     viewBox="0 0 50 50"
   >
     <LiquidStroke
-      :paths="[paths.liquid]"
+      :paths="['M30,25 H50']"
       :colors="liquids"
     />
     <AnimatedArrows
       :num-arrows="1"
       :speed="flowSpeed"
-      :path="paths.arrows"
+      path="M25,25 H50"
     />
     <g class="outline">
       <path
@@ -63,8 +57,8 @@ export default defineComponent({
         v-else
         :d="chevrons.straight"
       />
-      <path :d="paths.borders[0]" />
-      <path :d="paths.borders[1]" />
+      <path d="M30,21 H50" />
+      <path d="M30,29 H50" />
     </g>
   </svg>
 </template>

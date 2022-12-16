@@ -51,6 +51,9 @@ export default defineComponent({
     );
 
     const valveRotation = computed<number>(() => {
+      if (isBroken.value) {
+        return 45;
+      }
       if (!hasAddress.value) {
         return closed.value ? 90 : 0;
       }
@@ -117,13 +120,16 @@ export default defineComponent({
     @click="interact"
   >
     <rect class="interaction-background" />
-    <BlockStatusSvg :status="blockStatus" />
-    <UnlinkedSvgIcon
+    <BrokenSvgIcon
       v-if="isBroken"
       x="0"
       y="0"
       height="15"
       width="15"
+    />
+    <BlockStatusSvg
+      v-else
+      :status="blockStatus"
     />
     <foreignObject
       v-if="pending"
@@ -138,10 +144,7 @@ export default defineComponent({
         color="blue-grey-5"
       />
     </foreignObject>
-    <g
-      key="valve-outer"
-      class="outline"
-    >
+    <g class="outline">
       <path :d="paths.outerValve[0]" />
       <path :d="paths.outerValve[1]" />
     </g>
@@ -156,15 +159,16 @@ export default defineComponent({
       :colors="liquids"
     />
     <g
-      key="valve-inner"
       :transform="`rotate(${valveRotation}, 25, 25)`"
-      class="fill outline inner"
+      class="outline fill"
     >
       <path :d="paths.innerValve[0]" />
       <path :d="paths.innerValve[1]" />
-      <PowerIcon
+      <PowerSvgIcon
         v-if="hasAddress"
         color="black"
+        x="20"
+        y="10.5"
       />
     </g>
     <AnimatedArrows

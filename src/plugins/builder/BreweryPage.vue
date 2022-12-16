@@ -25,7 +25,7 @@ export default defineComponent({
 
     const layoutId = computed<string | null>(() => props.routeId);
 
-    useMetrics.setup(layoutId);
+    useMetrics.setupProvider(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 

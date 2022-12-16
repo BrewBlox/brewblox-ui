@@ -32,7 +32,7 @@ export default defineComponent({
         y="2"
         rx="8"
         ry="8"
-        stroke-width="4px"
+        stroke-width="4"
       />
       <!-- Top divider -->
       <line

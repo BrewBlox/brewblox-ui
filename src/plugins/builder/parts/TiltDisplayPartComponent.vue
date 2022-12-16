@@ -1,6 +1,6 @@
 <script lang="ts">
 import { CENTER } from '@/plugins/builder/const';
-import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import { liquidOnCoord } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
 import { userUnits } from '@/user-settings';
@@ -61,7 +61,6 @@ export default defineComponent({
     return {
       prettyQty,
       preciseNumber,
-      textTransformation,
       fixedNumber,
       width,
       height,

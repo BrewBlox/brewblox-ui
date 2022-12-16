@@ -30,7 +30,7 @@ export default defineComponent({
       () => config.value.currentLayoutId,
     );
 
-    useMetrics.setup(layoutId);
+    useMetrics.setupProvider(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 

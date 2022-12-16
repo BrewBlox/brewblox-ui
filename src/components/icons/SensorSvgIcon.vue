@@ -4,6 +4,12 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'SensorSvgIcon',
+  props: {
+    color: {
+      type: String,
+      default: 'white',
+    },
+  },
   setup() {
     return { mdiThermometer };
   },
@@ -12,13 +18,13 @@ export default defineComponent({
 
 <template>
   <svg
+    :fill="color"
     width="40"
     height="40"
     x="5"
     y="5"
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
-    fill="white"
     stroke="none"
   >
     <path :d="mdiThermometer" />

@@ -187,7 +187,7 @@ export default defineComponent({
     <LiquidStroke
       :paths="['M 17 29 A 8 8 0 1 1 17 31 Z']"
       :colors="liquids"
-      class="pump-ball-liquid"
+      stroke-width="15"
     />
     <!-- ball outline-->
     <circle
@@ -220,7 +220,6 @@ export default defineComponent({
           x2="-7"
           y2="-12.1"
         />
-        <!-- eslint-disable vue/attribute-hyphenation -->
         <animateTransform
           v-if="enabled"
           attributeName="transform"
@@ -231,7 +230,6 @@ export default defineComponent({
           :dur="`${duration}s`"
           repeatCount="indefinite"
         />
-        <!-- eslint-enable -->
       </g>
     </g>
     <!-- tube liquid top-->
@@ -261,7 +259,8 @@ export default defineComponent({
         y2="29"
       />
       <path
-        d="M50,29H29v3.5c0,2.2-1.8,4-4,4s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25"
+        d="M50,29H29v3.5c0,2.2-1.8,4-4,4
+        s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25"
       />
     </g>
     <rect
@@ -307,9 +306,3 @@ export default defineComponent({
     </foreignObject>
   </svg>
 </template>
-
-<style lang="scss" scoped>
-:deep(.pump-ball-liquid path) {
-  stroke-width: 15px !important;
-}
-</style>

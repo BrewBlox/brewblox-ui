@@ -72,7 +72,7 @@ export default defineComponent({
       />
       <path
         v-for="(border, idx) in paths.borders"
-        :key="idx"
+        :key="`border-${idx}`"
         :d="border"
       />
     </g>
