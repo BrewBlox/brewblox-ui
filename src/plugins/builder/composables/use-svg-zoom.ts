@@ -80,7 +80,13 @@ export const useSvgZoom: UseSvgZoomComposable = {
       const selection = d3
         .select(svgRef.value)
         .call(gridZoom)
-        .on('dblclick.zoom', resetZoom);
+        .on('dblclick.zoom', resetZoom)
+        .on('contextmenu', (evt: MouseEvent) => {
+          // Allow for custom context menu handlers
+          if (!evt.shiftKey) {
+            evt.preventDefault();
+          }
+        });
 
       if (!wheelEnabled.value) {
         selection.on('wheel.zoom', null);

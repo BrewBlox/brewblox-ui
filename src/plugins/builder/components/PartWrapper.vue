@@ -63,9 +63,9 @@ export default defineComponent({
       default: false,
     },
     /**
-     * The part is inaccessible, and should be faded.
+     * Element is darkened and non-interactable.
      */
-    inactive: {
+    deselected: {
       type: Boolean,
       default: false,
     },
@@ -120,17 +120,12 @@ export default defineComponent({
       return '';
     });
 
-    function preselect(): void {
-      emit('preselect');
-    }
-
     return {
       component,
       dimensions,
       positionTransform,
       rotateTransform,
       flipTransform,
-      preselect,
     };
   },
 });
@@ -139,23 +134,34 @@ export default defineComponent({
 <template>
   <g :transform="positionTransform">
     <g :transform="`${rotateTransform} ${flipTransform}`">
-      <g :class="{ interactable, selectable, selected, inactive }">
+      <g
+        :class="[
+          'builder-part-wrapper',
+          {
+            interactable,
+            selectable,
+            selected,
+            preselectable,
+            deselected,
+          },
+        ]"
+      >
         <component
           :is="component"
           v-if="component"
           class="builder-part"
         />
         <rect
-          class="select-background"
+          class="selection-overlay"
           :width="dimensions.width"
           :height="dimensions.height"
         />
         <rect
-          v-if="preselectable"
+          v-if="preselectable && !interactable"
           :width="dimensions.width"
           :height="dimensions.height"
-          class="preselect-foreground"
-          @click.stop="preselect"
+          class="preselection-overlay"
+          @click.stop="$emit('preselect')"
         />
       </g>
     </g>
@@ -163,63 +169,70 @@ export default defineComponent({
 </template>
 
 <style lang="sass">
-/* not scoped */
-.interactable > .builder-part
-  pointer-events: all
+// Unscoped, to apply styles to all part components
+.builder-part-wrapper
+  > .selection-overlay
+    pointer-events: none
+    opacity: 0
+    rx: 4
 
-.selectable > .builder-part
-  pointer-events: none
+  > .preselection-overlay
+    fill: white
+    opacity: 0
 
-.selectable > .select-background
-  cursor: pointer
-  pointer-events: all
+  &.interactable
+    > .builder-part
+      pointer-events: all
 
-.select-background
-  pointer-events: none
-  opacity: 0
-  rx: 4
+  &.selectable
+    > .builder-part
+      pointer-events: none
 
-.selectable:hover > .select-background
-  fill: white
-  opacity: 0.2
+    > .selection-overlay
+      pointer-events: all
+      cursor: pointer
 
-.selected > .select-background
-  fill: dodgerblue
-  opacity: 0.5
+  &.selectable:hover
+    > .selection-overlay
+      fill: white
+      opacity: 0.2
 
-.inactive
-  opacity: 0.25 !important
+  &.selected
+    > .selection-overlay
+      fill: dodgerblue
+      opacity: 0.5
 
-.preselect-foreground
-  fill: white
-  opacity: 0
+  &.deselected
+    > .builder-part
+      pointer-events: none !important
+      opacity: 0.1 !important
+      fill-opacity: 0.1 !important
 
-.builder-text
-  font-size: 12px
-  font-weight: 500
-  text-align: center
-  line-height: 1
-  vertical-align: middle
-  display: inline-block
-
-.interaction
-  cursor: pointer
-
-.interaction > .interaction-background
-  width: 100%
-  height: 100%
-  opacity: 0
-  rx: 4
-
-.interaction:hover > .interaction-background
-  fill: white
-  opacity: 0.2
-
-// Generic styling for all part components
 .builder-part
-  pointer-events: none
   stroke-linecap: round
   fill: none
+
+  .builder-text
+    font-size: 12px
+    font-weight: 500
+    text-align: center
+    line-height: 1
+    vertical-align: middle
+    display: inline-block
+
+  .interaction
+    cursor: pointer
+
+    > .interaction-background
+      width: 100%
+      height: 100%
+      opacity: 0
+      rx: 4
+
+  .interaction:hover
+    > .interaction-background
+      fill: white
+      opacity: 0.2
 
   text
     fill: #fff
@@ -240,4 +253,14 @@ export default defineComponent({
 
   .q-icon
     stroke-width: 0
+
+  .block-status
+    &__Active
+      fill: $positive
+    &__deselected
+      fill: $warning
+    &__Disabled
+      fill: $grey-6
+    &__Invalid
+      fill: $negative
 </style>

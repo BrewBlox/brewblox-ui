@@ -1,7 +1,6 @@
 <script lang="ts">
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { Widget } from '@/store/widgets';
-import { userUISettings } from '@/user-settings';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
@@ -9,13 +8,9 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
+import { usePreselect } from './composables/use-preselect';
 import { useBuilderStore } from './store';
-import {
-  BuilderConfig,
-  BuilderLayout,
-  FlowPart,
-  PersistentPart,
-} from './types';
+import { BuilderConfig, BuilderLayout, PersistentPart } from './types';
 import { coord2grid, coord2translate } from './utils';
 
 export default defineComponent({
@@ -26,8 +21,7 @@ export default defineComponent({
     const { inDialog } = useContext.setup();
     const { dense } = useGlobals.setup();
     const { config, patchConfig } = useWidget.setup<Widget<BuilderConfig>>();
-
-    const pending = ref<FlowPart | null>(null);
+    const { preselectable, preselectedId, preselect } = usePreselect.setup();
     const zoomEnabled = ref<boolean>(inDialog.value);
 
     const storeLayouts = computed<BuilderLayout[]>(() => builderStore.layouts);
@@ -83,11 +77,6 @@ export default defineComponent({
       parts.value = concatById(parts.value, part);
     }
 
-    const delayTouch = computed<boolean>(() => {
-      const delayed = userUISettings.value.builderTouchDelayed;
-      return delayed === 'always' || (delayed === 'dense' && dense.value);
-    });
-
     return {
       coord2grid,
       coord2translate,
@@ -96,6 +85,9 @@ export default defineComponent({
       dense,
       svgRef,
       svgContentRef,
+      preselectable,
+      preselectedId,
+      preselect,
       startEditor,
       gridDimensions,
       parts,
@@ -104,8 +96,6 @@ export default defineComponent({
       selectLayout,
       flowParts,
       flowPartsRevision,
-      pending,
-      delayTouch,
       savePart,
       calculateFlowParts,
       resetZoom,
@@ -144,10 +134,7 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
 
-    <div
-      class="fit"
-      @click="pending = null"
-    >
+    <div class="fit">
       <span
         v-if="parts.length === 0"
         class="absolute-center q-gutter-y-sm"
@@ -188,52 +175,27 @@ export default defineComponent({
       <svg
         ref="svgRef"
         class="fit"
-        @contextmenu="
-          (evt) => {
-            if (!evt.shiftKey) {
-              evt.preventDefault();
-            }
-          }
-        "
+        @click="preselect(null)"
       >
         <g ref="svgContentRef">
           <g
             v-for="part in flowParts"
             :key="`${flowPartsRevision}-${part.id}`"
-            :class="{
-              [part.type]: true,
-              inactive: pending != null,
-            }"
+            :class="['flowpart', part.type]"
           >
             <PartWrapper
+              :id="part.id"
               :part="part"
               :coord-x="part.x"
               :coord-y="part.y"
-              :inactive="pending != null"
-              :interactable="!delayTouch"
-              :preselectable="delayTouch"
+              :interactable="!preselectable || preselectedId === part.id"
+              :preselectable="preselectable"
+              :deselected="preselectedId != null && preselectedId !== part.id"
               @update:part="savePart"
               @reflow="calculateFlowParts"
-              @preselect="pending = part"
+              @preselect="preselect(part.id)"
             />
           </g>
-          <template v-if="pending != null">
-            <rect
-              width="100%"
-              height="100%"
-              fill="black"
-              opacity="0"
-              @click.stop="pending = null"
-            />
-            <PartWrapper
-              :part="pending"
-              :coord-x="pending.x"
-              :coord-y="pending.y"
-              interactable
-              @update:part="savePart"
-              @reflow="calculateFlowParts"
-            />
-          </template>
         </g>
       </svg>
       <q-toggle
@@ -246,10 +208,3 @@ export default defineComponent({
     </div>
   </Card>
 </template>
-
-<style lang="sass" scoped>
-@import './grid.sass'
-
-.inactive
-  opacity: 0.1
-</style>

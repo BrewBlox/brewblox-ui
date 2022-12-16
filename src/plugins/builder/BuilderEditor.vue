@@ -1051,13 +1051,6 @@ export default defineComponent({
         ref="svgRef"
         class="fit"
         :style="{ cursor }"
-        @contextmenu="
-          (evt) => {
-            if (!evt.shiftKey) {
-              evt.preventDefault();
-            }
-          }
-        "
       >
         <g ref="svgContentRef">
           <EditorBackground
@@ -1065,7 +1058,7 @@ export default defineComponent({
             :width="layout.width"
             :height="layout.height"
           />
-          <!-- All parts, hidden if selected or floating -->
+          <!-- All parts, hidden if floating -->
           <g
             v-for="part in flowParts"
             v-show="!isFloating(part)"
