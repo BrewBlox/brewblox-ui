@@ -182,7 +182,7 @@ export default defineComponent({
 
   &.interactable
     > .builder-part
-      pointer-events: all
+      pointer-events: auto
 
   &.selectable
     > .builder-part
