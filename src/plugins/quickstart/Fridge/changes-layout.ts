@@ -9,7 +9,6 @@ import {
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { FridgeConfig } from './types';
@@ -93,7 +92,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.fridgeSetpoint,
-              type: BlockType.SetpointSensorPair,
+              type: null,
             }),
           },
         },
@@ -109,7 +108,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.coolPid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
         },
@@ -125,7 +124,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.heatPid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
         },

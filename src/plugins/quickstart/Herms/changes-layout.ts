@@ -15,7 +15,6 @@ import {
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { HermsConfig } from './types';
@@ -78,7 +77,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [PWM_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.bkPwm,
-              type: BlockType.ActuatorPwm,
+              type: null,
             }),
             [SIZE_X_KEY]: 4,
           },
@@ -94,7 +93,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [PWM_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.hltPwm,
-              type: BlockType.ActuatorPwm,
+              type: null,
             }),
             [SIZE_X_KEY]: 4,
           },
@@ -140,7 +139,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.mtSetpoint,
-              type: BlockType.SetpointSensorPair,
+              type: null,
             }),
           },
           flipped: false,
@@ -156,7 +155,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.bkSetpoint,
-              type: BlockType.SetpointSensorPair,
+              type: null,
             }),
           },
           flipped: false,
@@ -172,7 +171,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.hltSetpoint,
-              type: BlockType.SetpointSensorPair,
+              type: null,
             }),
           },
           flipped: false,
@@ -828,7 +827,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.mtPid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
           flipped: false,
@@ -844,7 +843,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.bkPid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
           flipped: false,
@@ -860,7 +859,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.hltPid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
           flipped: false,
@@ -876,7 +875,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
             [DRIVER_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.hltDriver,
-              type: BlockType.ActuatorOffset,
+              type: null,
             }),
           },
           flipped: false,
