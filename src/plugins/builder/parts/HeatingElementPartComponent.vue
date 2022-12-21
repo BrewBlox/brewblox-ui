@@ -5,7 +5,7 @@ import { usePart } from '../composables';
 export default defineComponent({
   name: 'HeatingElementPartComponent',
   setup() {
-    const { width, height } = usePart.setup();
+    const { bordered, width, height } = usePart.setup();
 
     const path = computed<string>(() => {
       const straight = width.value - 100;
@@ -13,6 +13,7 @@ export default defineComponent({
     });
 
     return {
+      bordered,
       width,
       height,
       path,
@@ -24,7 +25,7 @@ export default defineComponent({
 <template>
   <!-- No viewBox. width is auto-adjusted -->
   <svg v-bind="{ width, height }">
-    <PwmValues />
+    <PwmValues :bordered="bordered" />
     <g class="outline">
       <path :d="path" />
     </g>

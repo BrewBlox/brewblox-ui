@@ -2,7 +2,7 @@ import { MetricsConfig } from '@/plugins/history/types';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { deepCopy } from '@/utils/objects';
 import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
-import { BORDER_KEY, PartKey, ReflowKey } from '../const';
+import { BORDER_KEY, InteractKey, PartKey, ReflowKey } from '../const';
 import { FlowPart } from '../types';
 import { coord2grid } from '../utils';
 
@@ -17,6 +17,7 @@ export interface UsePartComponent {
   flipped: ComputedRef<boolean>;
   bordered: ComputedRef<boolean>;
   patchSettings: (patch: Mapped<any>) => void;
+  interact: (func: () => unknown) => void;
   reflow: () => void;
 }
 
@@ -27,6 +28,7 @@ export interface UsePartComposable {
 export const usePart: UsePartComposable = {
   setup(): UsePartComponent {
     const part = inject(PartKey)!;
+    const interact = inject(InteractKey, () => {});
     const reflow = inject(ReflowKey)!;
 
     const settings = computed<Mapped<any>>({
@@ -70,6 +72,7 @@ export const usePart: UsePartComposable = {
       bordered,
       patchSettings,
       reflow,
+      interact,
     };
   },
 };

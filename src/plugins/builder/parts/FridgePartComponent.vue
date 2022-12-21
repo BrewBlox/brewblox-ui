@@ -25,15 +25,6 @@ export default defineComponent({
 <template>
   <svg v-bind="{ width, height }">
     <g class="outline">
-      <rect
-        :width="width - 4"
-        :height="height - 4"
-        x="2"
-        y="2"
-        rx="8"
-        ry="8"
-        stroke-width="4"
-      />
       <!-- Top divider -->
       <line
         :x1="2"
@@ -56,6 +47,10 @@ export default defineComponent({
         :y2="shelfHeight"
       />
     </g>
+    <BuilderBorder
+      v-bind="{ width, height }"
+      large
+    />
     <BuilderLabelValues
       :width="width"
       :height="50"

@@ -24,23 +24,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <svg
-    v-bind="{ width, height }"
-    viewBox="0 0 100 50"
-  >
-    <SetpointValues />
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="100 - 2"
-        :height="50 - 2"
-        :stroke="color"
-        stroke-width="2px"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-      />
-    </g>
-  </svg>
+  <SetpointValues v-bind="{ width, height, bordered, color }" />
 </template>

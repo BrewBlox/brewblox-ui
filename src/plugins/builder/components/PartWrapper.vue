@@ -4,7 +4,7 @@ import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 import { computed, defineComponent, PropType, provide } from 'vue';
-import { PartKey, ReflowKey } from '../const';
+import { InteractKey, PartKey, ReflowKey } from '../const';
 import parts from '../parts';
 
 export default defineComponent({
@@ -82,6 +82,11 @@ export default defineComponent({
 
     provide(PartKey, providedPart);
     provide(ReflowKey, () => emit('reflow'));
+    provide(InteractKey, (func: () => unknown) => {
+      if (props.interactable) {
+        func();
+      }
+    });
 
     const sizeX = computed<number>(() => props.part.size[0]);
     const sizeY = computed<number>(() => props.part.size[1]);
@@ -146,17 +151,17 @@ export default defineComponent({
           },
         ]"
       >
+        <rect
+          class="selection-overlay"
+          :width="dimensions.width"
+          :height="dimensions.height"
+        />
         <g class="builder-part">
           <component
             :is="component"
             v-if="component"
           />
         </g>
-        <rect
-          class="selection-overlay"
-          :width="dimensions.width"
-          :height="dimensions.height"
-        />
         <rect
           v-if="preselectable && !interactable"
           :width="dimensions.width"
@@ -171,26 +176,20 @@ export default defineComponent({
 
 <style lang="sass" scoped>
 .builder-part-wrapper
+  pointer-events: none
+
   > .selection-overlay
-    pointer-events: none
     opacity: 0
     rx: 4
 
   > .preselection-overlay
+    pointer-events: all
     fill: white
     opacity: 0
 
-  &.interactable
-    > .builder-part
-      pointer-events: auto
-
   &.selectable
-    > .builder-part
-      pointer-events: none
-
     > .selection-overlay
-      pointer-events: all
-      cursor: pointer
+      pointer-events: auto
 
   &.selectable:hover
     > .selection-overlay
@@ -203,14 +202,22 @@ export default defineComponent({
       opacity: 0.5
 
   &.deselected
-    > .builder-part
-      pointer-events: none !important
-      opacity: 0.1 !important
-      fill-opacity: 0.1 !important
+    opacity: 0.1 !important
+
+  &.interactable
+    :deep(.interaction)
+      cursor: pointer
 
 :deep(.builder-part)
+  pointer-events: none
   stroke-linecap: round
   fill: none
+
+  &:hover
+    .interaction
+      opacity: 0.2
+      fill: white
+      background-color: white
 
   text
     fill: white
@@ -224,23 +231,16 @@ export default defineComponent({
     display: inline-block
 
   .interaction
-    cursor: pointer
-
-    > .interaction-background
-      width: 100%
-      height: 100%
-      opacity: 0
-      rx: 4
-
-  .interaction:hover
-    > .interaction-background
-      fill: white
-      opacity: 0.2
+    pointer-events: auto
+    width: 100%
+    height: 100%
+    opacity: 0
+    rx: 4
 
   .fill
     fill: white
 
   .outline
-    stroke-width: 2px
+    stroke-width: 2
     stroke: white
 </style>

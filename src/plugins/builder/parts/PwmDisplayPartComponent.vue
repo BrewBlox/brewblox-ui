@@ -7,7 +7,7 @@ import { liquidOnCoord } from '../utils';
 export default defineComponent({
   name: 'PwmDisplayPartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, bordered, width, height } = usePart.setup();
 
     const color = computed<string>(
       () => liquidOnCoord(part.value, CENTER)[0] ?? '',
@@ -16,6 +16,7 @@ export default defineComponent({
     return {
       width,
       height,
+      bordered,
       color,
     };
   },
@@ -23,8 +24,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <PwmValues
-    v-bind="{ width, height }"
-    :color="color"
-  />
+  <PwmValues v-bind="{ width, height, bordered, color }" />
 </template>

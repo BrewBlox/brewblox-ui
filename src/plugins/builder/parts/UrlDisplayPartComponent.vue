@@ -39,12 +39,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <svg
-    v-bind="{ width, height }"
-    class="interaction"
-    @click="interact"
-  >
-    <rect class="interaction-background" />
+  <svg v-bind="{ width, height }">
+    <BuilderInteraction
+      v-bind="{ width, height }"
+      @interact="interact"
+    />
     <foreignObject v-bind="{ width, height }">
       <div
         class="fit text-bold text-center q-mt-sm grid-label"
@@ -53,17 +52,9 @@ export default defineComponent({
         {{ titleText }}
       </div>
     </foreignObject>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="width - 2"
-        :height="height - 2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke="white"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      v-bind="{ width, height }"
+    />
   </svg>
 </template>

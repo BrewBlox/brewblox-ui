@@ -95,7 +95,9 @@ declare module '@vue/runtime-core' {
     BuilderToolsMenu: typeof import('src/plugins/builder/components/BuilderToolsMenu.vue').default;
     BuilderPartSettingsDialog: typeof import('src/plugins/builder/components/BuilderPartSettingsDialog.vue').default;
     BuilderLabelValues: typeof import('src/plugins/builder/components/BuilderLabelValues.vue').default;
+    BuilderInteraction: typeof import('src/plugins/builder/components/BuilderInteraction.vue').default;
     BuilderCatalogDialog: typeof import('src/plugins/builder/components/BuilderCatalogDialog.vue').default;
+    BuilderBorder: typeof import('src/plugins/builder/components/BuilderBorder.vue').default;
     BuilderActions: typeof import('src/plugins/builder/components/BuilderActions.vue').default;
     BorderCard: typeof import('src/plugins/builder/components/BorderCard.vue').default;
     BlockStatusSvg: typeof import('src/plugins/builder/components/BlockStatusSvg.vue').default;

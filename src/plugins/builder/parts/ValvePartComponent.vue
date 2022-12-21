@@ -31,8 +31,15 @@ export default defineComponent({
     const { part, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
-    const { hasAddress, block, blockStatus, isBroken, patchBlock } =
-      useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
+    const {
+      hasAddress,
+      block,
+      blockStatus,
+      isBroken,
+      patchBlock,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
 
     const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
 
@@ -78,7 +85,7 @@ export default defineComponent({
       },
     );
 
-    function interact(): void {
+    function toggle(): void {
       if (hasAddress.value) {
         if (block.value) {
           const storedState =
@@ -100,13 +107,16 @@ export default defineComponent({
       blockStatus,
       paths,
       hasAddress,
+      block,
       isBroken,
       flowSpeed,
       liquids,
       closed,
       pending,
       valveRotation,
-      interact,
+      toggle,
+      showBlockDialog,
+      showBlockSelectDialog,
     };
   },
 });
@@ -116,10 +126,7 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="interact"
   >
-    <rect class="interaction-background" />
     <BrokenSvgIcon
       v-if="isBroken"
       x="0"
@@ -176,5 +183,29 @@ export default defineComponent({
       :speed="flowSpeed"
       :path="paths.arrows"
     />
+    <BuilderInteraction @interact="toggle">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

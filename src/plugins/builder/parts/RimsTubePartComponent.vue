@@ -7,7 +7,7 @@ import { usePart } from '../composables';
 export default defineComponent({
   name: 'RimsTubePartComponent',
   setup() {
-    const { part, width, height, sizeX } = usePart.setup();
+    const { part, bordered, width, height, sizeX } = usePart.setup();
 
     const paths = computed<Mapped<string>>(() => {
       const startLast = width.value - 50;
@@ -48,6 +48,7 @@ export default defineComponent({
     return {
       width,
       height,
+      bordered,
       paths,
       sizeX,
       flowSpeed,
@@ -62,6 +63,7 @@ export default defineComponent({
     <PwmValues
       :width="50"
       :height="50"
+      :bordered="bordered"
     />
     <LiquidStroke
       :paths="[paths.content]"

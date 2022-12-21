@@ -40,17 +40,10 @@ export default defineComponent({
       rx="2"
       ry="2"
     />
-    <g class="outline">
-      <rect
-        :width="width - 4"
-        :height="height - 4"
-        x="2"
-        y="2"
-        rx="8"
-        ry="8"
-        stroke-width="4px"
-      />
-    </g>
+    <BuilderBorder
+      v-bind="{ width, height }"
+      large
+    />
     <BuilderLabelValues
       :width="width"
       :height="50"

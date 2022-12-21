@@ -33,6 +33,14 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
+    bordered: {
+      type: Boolean,
+      default: false,
+    },
+    color: {
+      type: String,
+      default: 'white',
+    },
     hideUnset: {
       type: Boolean,
       default: false,
@@ -96,10 +104,7 @@ export default defineComponent({
     v-if="block || !hideUnset"
     v-bind="{ x, y, width, height }"
     viewBox="0 0 100 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <BrokenSvgIcon
       v-if="isBroken"
       x="30"
@@ -145,25 +150,37 @@ export default defineComponent({
         </div>
       </foreignObject>
     </template>
-
-    <foreignObject v-bind="{ width, height }">
+    <BuilderBorder
+      v-if="bordered"
+      :width="100"
+      :color="color"
+    />
+    <BuilderInteraction
+      :width="100"
+      @interact="showBlockDialog"
+    >
       <q-menu
         touch-position
         context-menu
       >
-        <q-list
-          dense
-          style="min-width: 100px"
-        >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
           <q-item
             v-close-popup
             clickable
             @click="showBlockSelectDialog"
           >
-            <q-item-section>Select block</q-item-section>
+            <q-item-section>Assign block</q-item-section>
           </q-item>
         </q-list>
       </q-menu>
-    </foreignObject>
+    </BuilderInteraction>
   </svg>
 </template>

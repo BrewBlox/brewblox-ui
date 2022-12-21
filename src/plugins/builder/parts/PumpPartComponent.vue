@@ -112,7 +112,7 @@ export default defineComponent({
       }
     });
 
-    function interact(): void {
+    function clickHandler(): void {
       if (isClaimed.value) {
         showBlockDialog();
         return;
@@ -141,12 +141,12 @@ export default defineComponent({
       }
     }
 
-    function toggleInteract(): void {
+    function toggleHandler(): void {
       if (!isClaimed.value && isPwm(block.value)) {
         const storedSetting = block.value.data.storedSetting > 0 ? 0 : 100;
         patchBlock({ storedSetting }, true);
       } else {
-        interact();
+        clickHandler();
       }
     }
 
@@ -161,8 +161,8 @@ export default defineComponent({
       enabled,
       liquids,
       duration,
-      interact,
-      toggleInteract,
+      clickHandler,
+      toggleHandler,
       showBlockDialog,
       showBlockSelectDialog,
     };
@@ -174,10 +174,7 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="interact"
   >
-    <rect class="interaction-background" />
     <!-- tube liquid bottom-->
     <LiquidStroke
       :paths="['M50,25H0']"
@@ -263,32 +260,24 @@ export default defineComponent({
         s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25"
       />
     </g>
-    <rect
-      fill="green"
-      fill-opacity="0"
-      x="0"
-      y="0"
-      width="50"
-      height="50"
-    />
     <BlockStatusSvg :status="blockStatus" />
-    <foreignObject v-bind="{ width, height }">
+    <BuilderInteraction @interact="clickHandler">
       <q-menu
         touch-position
         context-menu
       >
-        <q-list style="min-width: 100px">
+        <q-list>
           <q-item
             v-close-popup
             :disable="isBroken || isClaimed"
             clickable
-            @click="toggleInteract"
+            @click="toggleHandler"
           >
             <q-item-section>Toggle pump</q-item-section>
           </q-item>
           <q-item
             v-close-popup
-            :disable="block == null"
+            :disable="!block"
             clickable
             @click="showBlockDialog"
           >
@@ -303,6 +292,6 @@ export default defineComponent({
           </q-item>
         </q-list>
       </q-menu>
-    </foreignObject>
+    </BuilderInteraction>
   </svg>
 </template>

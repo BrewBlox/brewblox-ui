@@ -122,18 +122,10 @@ export default defineComponent({
         </div>
       </foreignObject>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="100 - 2"
-        :height="50 - 2"
-        :stroke="color"
-        stroke-width="2px"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :width="100"
+      :color="color"
+    />
   </svg>
 </template>

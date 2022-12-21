@@ -38,7 +38,7 @@ export default defineComponent({
         : 'Not linked',
     );
 
-    function interact(): void {
+    function showWidget(): void {
       showLinkedWidgetDialog(part.value, WIDGET_KEY);
     }
 
@@ -50,19 +50,14 @@ export default defineComponent({
       isLinked,
       isBroken,
       displayText,
-      interact,
+      showWidget,
     };
   },
 });
 </script>
 
 <template>
-  <svg
-    v-bind="{ width, height }"
-    class="interaction"
-    @click="interact"
-  >
-    <rect class="interaction-background" />
+  <svg v-bind="{ width, height }">
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"
@@ -90,18 +85,13 @@ export default defineComponent({
         <SessionSvgIcon v-else />
       </template>
     </g>
-
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="width - 2"
-        :height="height - 2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke-width="2px"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      v-bind="{ width, height }"
+    />
+    <BuilderInteraction
+      v-bind="{ width, height }"
+      @interact="showWidget"
+    />
   </svg>
 </template>

@@ -56,10 +56,7 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <g
       :transform="contentTransform"
       class="content"
@@ -87,18 +84,10 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :stroke="color"
-        stroke-width="2"
-        x="1"
-        y="1"
-        width="48"
-        height="48"
-        rx="6"
-        ry="6"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :color="color"
+    />
+    <BuilderInteraction @interact="showBlockDialog" />
   </svg>
 </template>

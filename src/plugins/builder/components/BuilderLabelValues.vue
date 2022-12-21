@@ -52,7 +52,7 @@ export default defineComponent({
       textTransformation(part.value, [sizeX.value, sizeY.value], false),
     );
 
-    function interact(): void {
+    function edit(): void {
       createDialog({
         component: 'InputDialog',
         componentProps: {
@@ -67,19 +67,14 @@ export default defineComponent({
       text,
       fontSize,
       labelTransform,
-      interact,
+      edit,
     };
   },
 });
 </script>
 
 <template>
-  <svg
-    v-bind="{ width, height }"
-    class="interaction"
-    @click="interact"
-  >
-    <rect class="interaction-background" />
+  <svg v-bind="{ width, height }">
     <foreignObject
       :transform="labelTransform"
       class="fit"
@@ -91,5 +86,9 @@ export default defineComponent({
         {{ text }}
       </div>
     </foreignObject>
+    <BuilderInteraction
+      v-bind="{ width, height }"
+      @interact="edit"
+    />
   </svg>
 </template>

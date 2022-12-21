@@ -47,7 +47,7 @@ export default defineComponent({
 
     const liquidColor = computed<string[]>(() => liquidOnCoord(part.value, UP));
 
-    function interact(): void {
+    function toggle(): void {
       if (block.value) {
         patchBlock({
           storedState:
@@ -86,7 +86,7 @@ export default defineComponent({
       liquidPath,
       liquidSpeed,
       liquidColor,
-      interact,
+      toggle,
     };
   },
 });
@@ -96,10 +96,7 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="interact"
   >
-    <rect class="interaction-background" />
     <BrokenSvgIcon
       v-if="isBroken"
       x="0"
@@ -136,5 +133,6 @@ export default defineComponent({
       y="25"
       color="black"
     />
+    <BuilderInteraction @interact="toggle" />
   </svg>
 </template>

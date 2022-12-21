@@ -90,18 +90,6 @@ export default defineComponent({
         </div>
       </div>
     </foreignObject>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="width - 2"
-        :height="height - 2"
-        :stroke="color"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke-width="2px"
-      />
-    </g>
+    <BuilderBorder v-bind="{ width, height, color }" />
   </svg>
 </template>
