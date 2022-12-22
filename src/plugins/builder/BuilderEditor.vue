@@ -1119,7 +1119,7 @@ export default defineComponent({
         v-if="!hasFocus && focusWarningEnabled"
         class="unfocus-overlay"
         @click.stop="setFocus"
-        @contextmenu="evt => !evt.shiftKey && evt.preventDefault()"
+        @contextmenu="(evt) => !evt.shiftKey && evt.preventDefault()"
       >
         <transition
           appear

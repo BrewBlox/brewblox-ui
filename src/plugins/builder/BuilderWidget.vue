@@ -190,7 +190,7 @@ export default defineComponent({
               :coord-y="part.y"
               :interactable="!preselectable || preselectedId === part.id"
               :preselectable="preselectable"
-              :deselected="preselectedId != null && preselectedId !== part.id"
+              :dimmed="preselectedId != null && preselectedId !== part.id"
               @update:part="savePart"
               @reflow="calculateFlowParts"
               @preselect="preselect(part.id)"

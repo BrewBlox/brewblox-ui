@@ -65,7 +65,7 @@ export default defineComponent({
     /**
      * Element is darkened and non-interactable.
      */
-    deselected: {
+    dimmed: {
       type: Boolean,
       default: false,
     },
@@ -147,7 +147,7 @@ export default defineComponent({
             selectable,
             selected,
             preselectable,
-            deselected,
+            dimmed,
           },
         ]"
       >
@@ -162,6 +162,11 @@ export default defineComponent({
             v-if="component"
           />
         </g>
+        <rect
+          class="selection-highlight"
+          :width="dimensions.width"
+          :height="dimensions.height"
+        />
         <rect
           v-if="preselectable && !interactable"
           :width="dimensions.width"
@@ -180,6 +185,9 @@ export default defineComponent({
 
   > .selection-overlay
     opacity: 0
+
+  > .selection-highlight
+    opacity: 0
     rx: 4
 
   > .preselection-overlay
@@ -192,16 +200,21 @@ export default defineComponent({
       pointer-events: auto
 
   &.selectable:hover
-    > .selection-overlay
+    > .selection-highlight
       fill: white
       opacity: 0.2
 
   &.selected
-    > .selection-overlay
+    > .selection-highlight
       fill: dodgerblue
       opacity: 0.5
 
-  &.deselected
+  &.selected.selectable:hover
+    > .selection-highlight
+      fill: shade(dodgerblue, 4)
+      opacity: 0.5
+
+  &.dimmed
     opacity: 0.1 !important
 
   &.interactable
@@ -236,6 +249,7 @@ export default defineComponent({
     height: 100%
     opacity: 0
     rx: 4
+    border-radius: 4px
 
   .fill
     fill: white

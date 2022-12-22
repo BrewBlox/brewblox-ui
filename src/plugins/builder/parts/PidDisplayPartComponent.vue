@@ -23,8 +23,13 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const { part, width, height, bordered } = usePart.setup();
 
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
@@ -81,6 +86,7 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       outputValue,
       outputSetting,
       kp,
@@ -138,6 +144,29 @@ export default defineComponent({
       v-if="bordered"
       :color="color"
     />
-    <BuilderInteraction @interact="showBlockDialog" />
+    <BuilderInteraction @interact="showBlockDialog">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>
