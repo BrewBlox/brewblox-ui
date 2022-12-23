@@ -1,6 +1,5 @@
 <script lang="ts">
-import { CENTER } from '@/plugins/builder/const';
-import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import { liquidBorderColor } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
 import { userUnits } from '@/user-settings';
@@ -19,6 +18,8 @@ export default defineComponent({
   setup() {
     const { part, settings, width, height, bordered } = usePart.setup();
     const tiltStore = useTiltStore();
+
+    const color = computed<string>(() => liquidBorderColor(part.value));
 
     const tiltId = computed<string | null>(
       () => settings.value[TILT_ID_KEY] ?? null,
@@ -50,10 +51,6 @@ export default defineComponent({
       prettyUnit(userUnits.value.gravity),
     );
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
-
     const unitlessGravity = computed<boolean>(
       () => userUnits.value.gravity === 'G',
     );
@@ -61,7 +58,6 @@ export default defineComponent({
     return {
       prettyQty,
       preciseNumber,
-      textTransformation,
       fixedNumber,
       width,
       height,
@@ -123,18 +119,10 @@ export default defineComponent({
         </div>
       </foreignObject>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="100 - 2"
-        :height="50 - 2"
-        :stroke="color"
-        stroke-width="2px"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :width="100"
+      :color="color"
+    />
   </svg>
 </template>

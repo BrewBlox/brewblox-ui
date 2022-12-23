@@ -1,4 +1,5 @@
 import isFinite from 'lodash/isFinite';
+import round from 'lodash/round';
 import { clampRotation } from './quantity';
 
 export type CoordinatesParam =
@@ -78,6 +79,10 @@ export class Coordinates {
     if ([this.x, this.y, this.z].some((v) => !isFinite(v))) {
       throw new Error(`${param} could not be parsed as a coordinate`);
     }
+
+    this.x = round(this.x, 3);
+    this.y = round(this.y, 3);
+    this.z = round(this.z, 3);
   }
 
   private isException(): boolean {

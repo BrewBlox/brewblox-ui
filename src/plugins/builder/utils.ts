@@ -1,18 +1,12 @@
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
-import { isBlockCompatible, isCompatible } from '@/plugins/spark/utils/info';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
-import { durationMs } from '@/utils/quantity';
-import {
-  Block,
-  BlockType,
-  DigitalActuatorBlock,
-  FastPwmBlock,
-} from 'brewblox-proto/ts';
+import { Block } from 'brewblox-proto/ts';
 import defaults from 'lodash/defaults';
 import isObject from 'lodash/isObject';
 import range from 'lodash/range';
@@ -354,22 +348,8 @@ export function showLinkedWidgetDialog(
   }
 }
 
-export function scheduleSoftStartRefresh(block: Block): void {
-  if (
-    isBlockCompatible<FastPwmBlock | DigitalActuatorBlock>(block, [
-      BlockType.FastPwm,
-      BlockType.DigitalActuator,
-    ])
-  ) {
-    const softStartDuration = durationMs(block.data.transitionDurationValue);
-    if (softStartDuration > 0) {
-      setTimeout(() => useSparkStore().fetchBlock(block), softStartDuration);
-    }
-  }
-}
-
 export function universalTransitions(
-  size: [number, number],
+  size: [x: number, y: number],
   enabled: boolean,
 ): Transitions {
   if (!enabled) {
@@ -450,6 +430,18 @@ export function rotatedCoord(part: StatePart, coord: CoordinatesParam): string {
 export function liquidOnCoord(part: FlowPart, coord: string): string[] {
   const flows = part.flows[rotatedCoord(part, coord)];
   return flows ? Object.keys(flows) : [];
+}
+
+export function liquidBorderColor(part: FlowPart): string {
+  for (const coord in part.flows) {
+    const flow = part.flows[coord];
+    for (const color in flow) {
+      if (flow[color] != 0) {
+        return color;
+      }
+    }
+  }
+  return '';
 }
 
 export function flowOnCoord(part: FlowPart, coord: string): number {

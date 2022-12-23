@@ -6,11 +6,10 @@ import {
   VALVE_KEY,
   VALVE_TYPES,
 } from '@/plugins/builder/const';
-import { useSparkStore } from '@/plugins/spark/store';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { flowOnCoord, liquidOnCoord, scheduleSoftStartRefresh } from '../utils';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   outerValve: [
@@ -29,13 +28,18 @@ const paths = {
 export default defineComponent({
   name: 'ValvePartComponent',
   setup() {
-    const sparkStore = useSparkStore();
-
     const { part, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
-    const { hasAddress, block, blockStatus, isBroken } =
-      useSettingsBlock.setup<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES);
+    const {
+      hasAddress,
+      block,
+      blockStatus,
+      isBroken,
+      patchBlock,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
 
     const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
 
@@ -54,6 +58,9 @@ export default defineComponent({
     );
 
     const valveRotation = computed<number>(() => {
+      if (isBroken.value) {
+        return 45;
+      }
       if (!hasAddress.value) {
         return closed.value ? 90 : 0;
       }
@@ -78,16 +85,14 @@ export default defineComponent({
       },
     );
 
-    function interact(): void {
+    function toggle(): void {
       if (hasAddress.value) {
         if (block.value) {
           const storedState =
             block.value.data.state === DigitalState.STATE_INACTIVE
               ? DigitalState.STATE_ACTIVE
               : DigitalState.STATE_INACTIVE;
-          sparkStore.patchBlock(block.value, { storedState });
-
-          scheduleSoftStartRefresh(block.value);
+          patchBlock({ storedState }, true);
         }
       } else {
         patchSettings({
@@ -102,13 +107,16 @@ export default defineComponent({
       blockStatus,
       paths,
       hasAddress,
+      block,
       isBroken,
       flowSpeed,
       liquids,
       closed,
       pending,
       valveRotation,
-      interact,
+      toggle,
+      showBlockDialog,
+      showBlockSelectDialog,
     };
   },
 });
@@ -118,35 +126,23 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="interact"
   >
-    <rect class="interaction-background" />
-    <BlockStatusSvg :status="blockStatus" />
-    <UnlinkedSvgIcon
+    <BrokenSvgIcon
       v-if="isBroken"
       x="0"
       y="0"
       height="15"
       width="15"
     />
-    <foreignObject
+    <BlockStatusSvg
+      v-else
+      :status="blockStatus"
+    />
+    <SpinnerSvgIcon
       v-if="pending"
-      x="3"
-      y="3"
-      height="44"
-      width="44"
-    >
-      <q-spinner
-        size="44px"
-        class="col"
-        color="blue-grey-5"
-      />
-    </foreignObject>
-    <g
-      key="valve-outer"
-      class="outline"
-    >
+      r="18"
+    />
+    <g class="outline">
       <path :d="paths.outerValve[0]" />
       <path :d="paths.outerValve[1]" />
     </g>
@@ -161,15 +157,16 @@ export default defineComponent({
       :colors="liquids"
     />
     <g
-      key="valve-inner"
       :transform="`rotate(${valveRotation}, 25, 25)`"
-      class="fill outline inner"
+      class="outline fill"
     >
       <path :d="paths.innerValve[0]" />
       <path :d="paths.innerValve[1]" />
-      <PowerIcon
+      <PowerSvgIcon
         v-if="hasAddress"
         color="black"
+        x="20"
+        y="10.5"
       />
     </g>
     <AnimatedArrows
@@ -177,5 +174,29 @@ export default defineComponent({
       :speed="flowSpeed"
       :path="paths.arrows"
     />
+    <BuilderInteraction @interact="toggle">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

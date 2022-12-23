@@ -1,11 +1,10 @@
 <script lang="ts">
 import {
-  CENTER,
   SensorBlockT,
   SENSOR_KEY,
   SENSOR_TYPES,
 } from '@/plugins/builder/const';
-import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
@@ -15,8 +14,15 @@ export default defineComponent({
   setup() {
     const { part, width, height, bordered } = usePart.setup();
 
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SensorBlockT>(part, SENSOR_KEY, SENSOR_TYPES);
+    const color = computed<string>(() => liquidBorderColor(part.value));
+
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<SensorBlockT>(SENSOR_KEY, SENSOR_TYPES);
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
@@ -30,10 +36,6 @@ export default defineComponent({
       prettyUnit(block.value?.data.value),
     );
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
-
     return {
       fixedNumber,
       width,
@@ -42,6 +44,7 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       contentTransform,
       tempValue,
       tempUnit,
@@ -56,10 +59,7 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <g
       :transform="contentTransform"
       class="content"
@@ -87,18 +87,36 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :stroke="color"
-        stroke-width="2"
-        x="1"
-        y="1"
-        width="48"
-        height="48"
-        rx="6"
-        ry="6"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :color="color"
+    />
+    <BuilderInteraction
+      :width="100"
+      @interact="showBlockDialog"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

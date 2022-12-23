@@ -3,18 +3,24 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'HeatingSvgIcon',
+  props: {
+    color: {
+      type: String,
+      default: 'white',
+    },
+  },
 });
 </script>
 
 <template>
   <svg
+    :fill="color"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="-50 -50 1150 1150"
     width="40"
     height="40"
     x="5"
     y="5"
-    fill="white"
     stroke="none"
   >
     <g transform="translate(0.000000,511.000000) scale(0.100000,-0.100000)">

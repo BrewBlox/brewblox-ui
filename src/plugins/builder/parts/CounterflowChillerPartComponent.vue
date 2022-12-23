@@ -25,13 +25,13 @@ const paths = {
        C30.6,75,25,69.4,25,62.5 l0,0C25,55.6,30.6,50,37.5,50z`,
   ],
   topTubeLiquid: [
-    'M 0,25 h 4.1 c 2.2,0,5.7,2.2,7.6,4.8 l 2.7,3.6 c 2,2.6,5.1,4.8,7,4.8 h 4.5',
-    'M 150,25 H 146 c -2.2,0-5.7,2.2-7.6,4.8 l -2.7,3.6 c -2,2.6-5.1,4.8-7,4.8 h -4.5',
+    'M 0,25 h 4.1 c 2.2,0,5.7,2.2,7.6,4.8 l 2.7,3.6 c 2,2.6,5.1,4.8,7,4.8 h 6',
+    'M 150,25 H 146 c -2.2,0-5.7,2.2-7.6,4.8 l -2.7,3.6 c -2,2.6-5.1,4.8-7,4.8 h -6',
   ],
   topBulbLiquid: ['M 36.8,37.5 L 113.3,37.5'],
   bottomTubeLiquid: [
-    'M 25.9,61.8 h-5.1 c -2.2,0-5.7,2.2-7.6,4.8 l -2.7,3.6 c -2,2.6-5.1,4.8-7,4.8 H 0',
-    'M 124.2,61.8 h 5.1 c 2.2,0,5.7,2.2,7.6,4.8 l 2.7,3.6 c 2,2.6,5.1,4.8,7,4.8 h 3.5',
+    'M 26.9,61.8 h-6.1 c -2.2,0-5.7,2.2-7.6,4.8 l -2.7,3.6 c -2,2.6-5.1,4.8-7,4.8 H 0',
+    'M 123.2,61.8 h 6.1 c 2.2,0,5.7,2.2,7.6,4.8 l 2.7,3.6 c 2,2.6,5.1,4.8,7,4.8 h 3.5',
   ],
   bottomBulbLiquid: ['M 36.8,62.5 L 113.3,62.5'],
   topArrows: `
@@ -88,12 +88,16 @@ export default defineComponent({
     <LiquidStroke
       :paths="paths.topBulbLiquid"
       :colors="topLiquids"
-      class="bulb-liquid"
+      stroke-width="24"
+      stroke-linecap="round"
+      fill="none"
     />
     <LiquidStroke
       :paths="paths.bottomBulbLiquid"
       :colors="bottomLiquids"
-      class="bulb-liquid"
+      stroke-width="24"
+      stroke-linecap="round"
+      fill="none"
     />
     <g class="outline">
       <path
@@ -122,11 +126,3 @@ export default defineComponent({
     />
   </svg>
 </template>
-
-<style lang="scss" scoped>
-:deep(.bulb-liquid path) {
-  stroke-width: 18pt !important;
-  stroke-linecap: round;
-  fill: none;
-}
-</style>

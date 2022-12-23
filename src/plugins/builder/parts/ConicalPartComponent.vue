@@ -39,10 +39,7 @@ export default defineComponent({
       <polygon points="1,250 149,250 82,363 67.5,363 " />
       <path d="M25,50c0,0,8.7-17,50-17s50,17,50,17H25z" />
       <!-- Setpoint -->
-      <SetpointValues
-        :y="50"
-        hide-unset
-      />
+      <SetpointValues :y="50" />
     </g>
     <g class="outline legs">
       <!-- Legs -->
@@ -169,8 +166,7 @@ export default defineComponent({
   </svg>
 </template>
 
-<style scoped>
-.legs {
-  fill: #24333d;
-}
+<style scoped lang="sass">
+.legs
+  fill: #24333d
 </style>

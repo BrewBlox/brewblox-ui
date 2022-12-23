@@ -8,8 +8,7 @@ import { fixedNumber, shortDateString } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
-import { CENTER } from '../const';
-import { liquidOnCoord } from '../utils';
+import { liquidBorderColor } from '../utils';
 
 interface MetricDisplay {
   field: string;
@@ -23,7 +22,9 @@ export default defineComponent({
   name: 'MetricsDisplayPartComponent',
   setup() {
     const { part, metrics, width, height, bordered } = usePart.setup();
-    const { source } = useMetrics.setup(null);
+    const { source } = useMetrics.setupConsumer();
+
+    const color = computed<string>(() => liquidBorderColor(part.value));
 
     function fieldFreshDuration(field: string): number {
       return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
@@ -49,10 +50,6 @@ export default defineComponent({
             ((now - v.time) as number) > fieldFreshDuration(v.field),
         }));
     });
-
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
 
     return {
       width,
@@ -90,18 +87,6 @@ export default defineComponent({
         </div>
       </div>
     </foreignObject>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="width - 2"
-        :height="height - 2"
-        :stroke="color"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke-width="2px"
-      />
-    </g>
+    <BuilderBorder v-bind="{ width, height, color }" />
   </svg>
 </template>

@@ -119,7 +119,7 @@ export default defineComponent({
 
     const layoutId = computed<string | null>(() => props.routeId || null);
 
-    useMetrics.setup(layoutId);
+    useMetrics.setupProvider(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 
@@ -1054,10 +1054,11 @@ export default defineComponent({
       >
         <g ref="svgContentRef">
           <EditorBackground
+            v-if="activeToolId !== 'interact' || floater"
             :width="layout.width"
             :height="layout.height"
           />
-          <!-- All parts, hidden if selected or floating -->
+          <!-- All parts, hidden if floating -->
           <g
             v-for="part in flowParts"
             v-show="!isFloating(part)"
@@ -1116,16 +1117,15 @@ export default defineComponent({
       />
       <div
         v-if="!hasFocus && focusWarningEnabled"
-        class="unfocus-overlay row items-center justify-center"
+        class="unfocus-overlay"
         @click.stop="setFocus"
+        @contextmenu="(evt) => !evt.shiftKey && evt.preventDefault()"
       >
         <transition
           appear
           name="fade"
         >
-          <div class="text-h5 text-white q-pa-lg unfocus-message col-auto">
-            Click to resume editing
-          </div>
+          <div class="unfocus-message">Click to resume editing</div>
         </transition>
       </div>
     </div>
@@ -1147,8 +1147,16 @@ export default defineComponent({
   transition: 1s
 
 .unfocus-message
-  border-radius: 40px
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  padding: 20px
   border: 2px solid silver
+  border-radius: 40px
+  color: white
+  background-color: rgba(0, 0, 0, 0.7)
+  font-size: 1.8rem
 
 .fade-enter-active
   transition: opacity 4s ease

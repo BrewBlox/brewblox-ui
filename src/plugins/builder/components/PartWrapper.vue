@@ -4,7 +4,7 @@ import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 import { computed, defineComponent, PropType, provide } from 'vue';
-import { PartKey, ReflowKey } from '../const';
+import { InteractKey, PartKey, ReflowKey } from '../const';
 import parts from '../parts';
 
 export default defineComponent({
@@ -63,9 +63,9 @@ export default defineComponent({
       default: false,
     },
     /**
-     * The part is inaccessible, and should be faded.
+     * Element is darkened and non-interactable.
      */
-    inactive: {
+    dimmed: {
       type: Boolean,
       default: false,
     },
@@ -82,6 +82,11 @@ export default defineComponent({
 
     provide(PartKey, providedPart);
     provide(ReflowKey, () => emit('reflow'));
+    provide(InteractKey, (func: () => unknown) => {
+      if (props.interactable) {
+        func();
+      }
+    });
 
     const sizeX = computed<number>(() => props.part.size[0]);
     const sizeY = computed<number>(() => props.part.size[1]);
@@ -120,17 +125,12 @@ export default defineComponent({
       return '';
     });
 
-    function preselect(): void {
-      emit('preselect');
-    }
-
     return {
       component,
       dimensions,
       positionTransform,
       rotateTransform,
       flipTransform,
-      preselect,
     };
   },
 });
@@ -139,108 +139,122 @@ export default defineComponent({
 <template>
   <g :transform="positionTransform">
     <g :transform="`${rotateTransform} ${flipTransform}`">
-      <g :class="{ interactable, selectable, selected, inactive }">
+      <g
+        :class="[
+          'builder-part-wrapper',
+          {
+            interactable,
+            selectable,
+            selected,
+            preselectable,
+            dimmed,
+          },
+        ]"
+      >
         <rect
-          class="select-background"
+          class="selection-overlay"
           :width="dimensions.width"
           :height="dimensions.height"
         />
-        <component
-          :is="component"
-          v-if="component"
-          class="builder-part"
-        />
+        <g class="builder-part">
+          <component
+            :is="component"
+            v-if="component"
+          />
+        </g>
         <rect
-          v-if="preselectable"
+          class="selection-highlight"
           :width="dimensions.width"
           :height="dimensions.height"
-          class="preselect-foreground"
-          @click.stop="preselect"
+        />
+        <rect
+          v-if="preselectable && !interactable"
+          :width="dimensions.width"
+          :height="dimensions.height"
+          class="preselection-overlay"
+          @click.stop="$emit('preselect')"
         />
       </g>
     </g>
   </g>
 </template>
 
-<style lang="sass">
-/* not scoped */
-.interactable > .builder-part
-  pointer-events: all
-
-.selectable > .builder-part
+<style lang="sass" scoped>
+.builder-part-wrapper
   pointer-events: none
 
-.selectable > .select-background
-  cursor: pointer
-  pointer-events: all
+  > .selection-overlay
+    opacity: 0
 
-.select-background
-  pointer-events: none
-  opacity: 0
-  rx: 4
+  > .selection-highlight
+    opacity: 0
+    rx: 4
 
-.selectable:hover > .select-background
-  fill: silver
-  fill-opacity: 0.5
-  opacity: 0.5
+  > .preselection-overlay
+    pointer-events: all
+    fill: white
+    opacity: 0
 
-.selected > .select-background
-  fill: dodgerblue
-  fill-opacity: 0.5
-  opacity: 0.5
+  &.selectable
+    > .selection-overlay
+      pointer-events: auto
 
-.inactive
-  opacity: 0.25 !important
+  &.selectable:hover
+    > .selection-highlight
+      fill: white
+      opacity: 0.2
 
-.preselect-foreground
-  fill: white
-  opacity: 0
+  &.selected
+    > .selection-highlight
+      fill: dodgerblue
+      opacity: 0.5
 
-.builder-text
-  font-size: 12px
-  font-weight: 500
-  text-align: center
-  line-height: 1
-  vertical-align: middle
-  display: inline-block
+  &.selected.selectable:hover
+    > .selection-highlight
+      fill: shade(dodgerblue, 4)
+      opacity: 0.5
 
-.interaction
-  cursor: pointer
+  &.dimmed
+    opacity: 0.1 !important
 
-.interaction > .interaction-background
-  width: 100%
-  height: 100%
-  opacity: 0
-  rx: 4
+  &.interactable
+    :deep(.interaction)
+      cursor: pointer
 
-.interaction:hover > .interaction-background
-  fill: silver
-  fill-opacity: 0.5
-  opacity: 0.5
-
-// Generic styling for all part components
-.builder-part
+:deep(.builder-part)
   pointer-events: none
   stroke-linecap: round
   fill: none
 
+  &:hover
+    .interaction
+      opacity: 0.2
+      fill: white
+      background-color: white
+
   text
-    fill: #fff
+    fill: white
+
+  .builder-text
+    font-size: 12px
+    font-weight: 500
+    text-align: center
+    line-height: 1
+    vertical-align: middle
+    display: inline-block
+
+  .interaction
+    pointer-events: auto
+    width: 100%
+    height: 100%
+    opacity: 0
+    rx: 4
+    border-radius: 4px
 
   .fill
-    fill: #fff
+    fill: white
 
   .outline
-    stroke-width: 2px
-    stroke: #fff
-
-  .text
-    stroke-width: 1px
-    stroke: #fff
-
-  .liquid
-    stroke-width: 7px
-
-  .q-icon
-    stroke-width: 0
+    stroke-width: 2
+    stroke: white
 </style>

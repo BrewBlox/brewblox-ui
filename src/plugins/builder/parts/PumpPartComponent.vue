@@ -13,12 +13,7 @@ import {
   PwmBlockT,
   PWM_TYPES,
 } from '@/plugins/builder/const';
-import {
-  liquidOnCoord,
-  scheduleSoftStartRefresh,
-  showAbsentBlock,
-} from '@/plugins/builder/utils';
-import { useSparkStore } from '@/plugins/spark/store';
+import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, onBeforeMount, watch } from 'vue';
@@ -27,33 +22,44 @@ import { usePart, useSettingsBlock } from '../composables';
 export default defineComponent({
   name: 'PumpPartComponent',
   setup() {
-    const sparkStore = useSparkStore();
     const { part, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
-    const { block, blockStatus, hasAddress, showBlockDialog } =
-      useSettingsBlock.setup<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
+    const {
+      block,
+      blockStatus,
+      hasAddress,
+      isBroken,
+      isClaimed,
+      showBlockDialog,
+      showBlockSelectDialog,
+      patchBlock,
+    } = useSettingsBlock.setup<PumpBlockT>(PUMP_KEY, PUMP_TYPES);
+
+    function isDigital(v: Maybe<PumpBlockT>): v is DigitalBlockT {
+      return isBlockCompatible<DigitalBlockT>(v, DIGITAL_TYPES);
+    }
+
+    function isPwm(v: Maybe<PumpBlockT>): v is PwmBlockT {
+      return isBlockCompatible<PwmBlockT>(v, PWM_TYPES);
+    }
 
     const enabled = computed<boolean>(() => {
-      if (block.value === null) {
-        return hasAddress.value
-          ? false
-          : Boolean(settings.value[IO_ENABLED_KEY]);
-      } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
+      if (isDigital(block.value)) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
-      } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
-        return block.value.data.enabled && Boolean(block.value.data.setting);
-      } else {
-        return false;
       }
+
+      if (isPwm(block.value)) {
+        return block.value.data.enabled && Boolean(block.value.data.setting);
+      }
+
+      return hasAddress.value ? false : Boolean(settings.value[IO_ENABLED_KEY]);
     });
 
     const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
 
     const pwmSetting = computed<number>(() =>
-      isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)
-        ? Number(block.value.data.setting)
-        : 100,
+      isPwm(block.value) ? Number(block.value.data.setting) : 100,
     );
 
     const duration = computed<number>(() => {
@@ -75,16 +81,10 @@ export default defineComponent({
       if (newV.type !== oldV.type) {
         return true;
       }
-      if (
-        isBlockCompatible<DigitalBlockT>(newV, DIGITAL_TYPES) &&
-        isBlockCompatible<DigitalBlockT>(oldV, DIGITAL_TYPES)
-      ) {
+      if (isDigital(newV) && isDigital(oldV)) {
         return newV.data.state !== oldV.data.state;
       }
-      if (
-        isBlockCompatible<PwmBlockT>(newV, PWM_TYPES) &&
-        isBlockCompatible<PwmBlockT>(oldV, PWM_TYPES)
-      ) {
+      if (isPwm(newV) && isPwm(oldV)) {
         return (
           newV.data.setting !== oldV.data.setting ||
           newV.data.enabled !== oldV.data.enabled
@@ -112,20 +112,41 @@ export default defineComponent({
       }
     });
 
-    function interact(): void {
-      if (!hasAddress.value) {
-        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
-      } else if (block.value == null) {
-        showAbsentBlock(part.value, PUMP_KEY);
-      } else if (isBlockCompatible<DigitalBlockT>(block.value, DIGITAL_TYPES)) {
+    function clickHandler(): void {
+      if (isClaimed.value) {
+        showBlockDialog();
+        return;
+      }
+
+      if (isDigital(block.value)) {
         const storedState =
           block.value.data.state === DigitalState.STATE_INACTIVE
             ? DigitalState.STATE_ACTIVE
             : DigitalState.STATE_INACTIVE;
-        sparkStore.patchBlock(block.value, { storedState });
-        scheduleSoftStartRefresh(block.value);
-      } else if (isBlockCompatible<PwmBlockT>(block.value, PWM_TYPES)) {
+        patchBlock({ storedState }, true);
+        return;
+      }
+
+      if (isPwm(block.value)) {
         showBlockDialog();
+        return;
+      }
+
+      // There's no block
+      // That's an error state only if a block address has been set
+      if (hasAddress.value) {
+        showAbsentBlock(part.value, PUMP_KEY);
+      } else {
+        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
+      }
+    }
+
+    function toggleHandler(): void {
+      if (!isClaimed.value && isPwm(block.value)) {
+        const storedSetting = block.value.data.storedSetting > 0 ? 0 : 100;
+        patchBlock({ storedSetting }, true);
+      } else {
+        clickHandler();
       }
     }
 
@@ -135,10 +156,15 @@ export default defineComponent({
       block,
       hasAddress,
       blockStatus,
+      isBroken,
+      isClaimed,
       enabled,
       liquids,
       duration,
-      interact,
+      clickHandler,
+      toggleHandler,
+      showBlockDialog,
+      showBlockSelectDialog,
     };
   },
 });
@@ -148,10 +174,7 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="interact"
   >
-    <rect class="interaction-background" />
     <!-- tube liquid bottom-->
     <LiquidStroke
       :paths="['M50,25H0']"
@@ -161,7 +184,7 @@ export default defineComponent({
     <LiquidStroke
       :paths="['M 17 29 A 8 8 0 1 1 17 31 Z']"
       :colors="liquids"
-      class="ballLiquid"
+      stroke-width="15"
     />
     <!-- ball outline-->
     <circle
@@ -194,7 +217,6 @@ export default defineComponent({
           x2="-7"
           y2="-12.1"
         />
-        <!-- eslint-disable vue/attribute-hyphenation -->
         <animateTransform
           v-if="enabled"
           attributeName="transform"
@@ -205,7 +227,6 @@ export default defineComponent({
           :dur="`${duration}s`"
           repeatCount="indefinite"
         />
-        <!-- eslint-enable -->
       </g>
     </g>
     <!-- tube liquid top-->
@@ -235,23 +256,42 @@ export default defineComponent({
         y2="29"
       />
       <path
-        d="M50,29H29v3.5c0,2.2-1.8,4-4,4s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25"
+        d="M50,29H29v3.5c0,2.2-1.8,4-4,4
+        s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25"
       />
     </g>
-    <rect
-      fill="green"
-      fill-opacity="0"
-      x="0"
-      y="0"
-      width="50"
-      height="50"
-    />
     <BlockStatusSvg :status="blockStatus" />
+    <BuilderInteraction @interact="clickHandler">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="isBroken || isClaimed"
+            clickable
+            @click="toggleHandler"
+          >
+            <q-item-section>Toggle pump</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>
-
-<style lang="scss" scoped>
-:deep(.ballLiquid path) {
-  stroke-width: 15px !important;
-}
-</style>

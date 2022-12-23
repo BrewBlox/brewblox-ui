@@ -3,11 +3,18 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'CoolingSvgIcon',
+  props: {
+    color: {
+      type: String,
+      default: 'white',
+    },
+  },
 });
 </script>
 
 <template>
   <svg
+    :stroke="color"
     xmlns="http://www.w3.org/2000/svg"
     x="5"
     y="5"
@@ -15,7 +22,6 @@ export default defineComponent({
     height="40"
     viewBox="8 8 35 35"
     fill="none"
-    stroke="white"
     stroke-width="1.5px"
   >
     <line

@@ -1,13 +1,12 @@
 <script lang="ts">
 import {
-  CENTER,
   COLD_WATER,
   HOT_WATER,
   PidBlockT,
   PID_KEY,
   PID_TYPES,
 } from '@/plugins/builder/const';
-import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { userUnits } from '@/user-settings';
@@ -23,8 +22,15 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const { part, width, height, bordered } = usePart.setup();
 
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<PidBlockT>(part, PID_KEY, PID_TYPES);
+    const color = computed<string>(() => liquidBorderColor(part.value));
+
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
@@ -64,10 +70,6 @@ export default defineComponent({
       return '%';
     });
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
-
     return {
       HOT_WATER,
       COLD_WATER,
@@ -81,6 +83,7 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       outputValue,
       outputSetting,
       kp,
@@ -97,10 +100,7 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <g
       :transform="contentTransform"
       class="content"
@@ -111,7 +111,7 @@ export default defineComponent({
         <BlockStatusSvg :status="blockStatus" />
         <HeatingSvgIcon
           v-if="kp && kp > 0"
-          :fill="outputValue ? HOT_WATER : 'white'"
+          :color="outputValue ? HOT_WATER : 'white'"
           x="12.5"
           y="5"
           width="25"
@@ -119,7 +119,7 @@ export default defineComponent({
         />
         <CoolingSvgIcon
           v-else
-          :stroke="outputValue ? COLD_WATER : 'white'"
+          :color="outputValue ? COLD_WATER : 'white'"
           x="12.5"
           y="5"
           width="25"
@@ -137,17 +137,33 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        width="46"
-        height="46"
-        stroke-width="2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :color="color"
+    />
+    <BuilderInteraction @interact="showBlockDialog">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

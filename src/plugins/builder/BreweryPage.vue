@@ -1,12 +1,13 @@
 <script lang="ts">
 import { useGlobals } from '@/composables';
-import { startupDone, userUISettings } from '@/user-settings';
+import { startupDone } from '@/user-settings';
 import { concatById } from '@/utils/collections';
 import { useQuasar } from 'quasar';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
-import { FlowPart, PersistentPart } from './types';
+import { usePreselect } from './composables/use-preselect';
+import { PersistentPart } from './types';
 import { coord2grid, coord2translate, startChangeLayoutTitle } from './utils';
 
 export default defineComponent({
@@ -20,20 +21,11 @@ export default defineComponent({
   setup(props) {
     const { dense } = useGlobals.setup();
     const { localStorage } = useQuasar();
-
-    const pending = ref<FlowPart | null>(null);
-
-    const delayTouch = computed<boolean>(() => {
-      const { builderTouchDelayed } = userUISettings.value;
-      return (
-        builderTouchDelayed === 'always' ||
-        (builderTouchDelayed === 'dense' && dense.value)
-      );
-    });
+    const { preselectable, preselectedId, preselect } = usePreselect.setup();
 
     const layoutId = computed<string | null>(() => props.routeId);
 
-    useMetrics.setup(layoutId);
+    useMetrics.setupProvider(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 
@@ -79,8 +71,6 @@ export default defineComponent({
 
     return {
       coord2grid,
-      coord2translate,
-      delayTouch,
       dense,
       layoutId,
       layout,
@@ -89,11 +79,14 @@ export default defineComponent({
       svgRef,
       svgContentRef,
       resetZoom,
+      coord2translate,
+      preselectable,
+      preselectedId,
+      preselect,
       startupDone,
       parts,
       flowParts,
       flowPartsRevision,
-      pending,
       savePart,
       calculateFlowParts,
     };
@@ -147,65 +140,39 @@ export default defineComponent({
         </ActionMenu>
       </ButtonsTeleport>
 
-      <div
-        class="fit"
-        @click="pending = null"
-      >
+      <div class="fit">
         <span
           v-if="parts.length === 0"
           class="absolute-center"
         >
-          {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
+          {{ layout == null ? 'No layout selected' : 'Layout is empty' }}
         </span>
         <svg
           ref="svgRef"
           class="fit"
+          @click="preselect(null)"
         >
           <g ref="svgContentRef">
             <g
               v-for="part in flowParts"
               :key="`${flowPartsRevision}-${part.id}`"
-              :class="[part.type]"
+              :class="['flowpart', part.type]"
             >
               <PartWrapper
                 :part="part"
                 :coord-x="part.x"
                 :coord-y="part.y"
-                :inactive="pending != null"
-                :interactable="!delayTouch"
-                :preselectable="delayTouch"
+                :interactable="!preselectable || preselectedId === part.id"
+                :preselectable="preselectable"
+                :dimmed="preselectedId != null && preselectedId !== part.id"
                 @update:part="savePart"
                 @reflow="calculateFlowParts"
-                @preselect="pending = part"
+                @preselect="preselect(part.id)"
               />
             </g>
-            <template v-if="pending != null">
-              <rect
-                width="100%"
-                height="100%"
-                fill="black"
-                opacity="0"
-                @click.stop="pending = null"
-              />
-              <PartWrapper
-                :part="pending"
-                :coord-x="pending.x"
-                :coord-y="pending.y"
-                interactable
-                @update:part="savePart"
-                @reflow="calculateFlowParts"
-              />
-            </template>
           </g>
         </svg>
       </div>
     </template>
   </q-page>
 </template>
-
-<style lang="sass" scoped>
-@import './grid.sass'
-
-.inactive
-  opacity: 0.1
-</style>

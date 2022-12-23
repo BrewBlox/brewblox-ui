@@ -4,12 +4,6 @@ import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
-const paths = {
-  top: 'M25,25 V0',
-  left: 'M25,25 H0',
-  right: 'M25,25 H50',
-};
-
 export default defineComponent({
   name: 'TeeTubePartComponent',
   setup() {
@@ -34,7 +28,6 @@ export default defineComponent({
     return {
       width,
       height,
-      paths,
       topSpeed,
       leftSpeed,
       rightSpeed,
@@ -70,19 +63,19 @@ export default defineComponent({
     />
     <g class="outline">
       <AnimatedArrows
-        :path="paths.top"
         :num-arrows="1"
         :speed="topSpeed"
+        path="M25,25 V0"
       />
       <AnimatedArrows
-        :path="paths.left"
         :num-arrows="1"
         :speed="leftSpeed"
+        path="M25,25 H0"
       />
       <AnimatedArrows
-        :path="paths.right"
         :num-arrows="1"
         :speed="rightSpeed"
+        path="M25,25 H50"
       />
     </g>
   </svg>

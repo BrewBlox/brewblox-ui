@@ -106,6 +106,8 @@ export const PUMP_TYPES = [...PWM_TYPES, ...DIGITAL_TYPES] as const;
 
 export const PartKey: InjectionKey<WritableComputedRef<FlowPart>> =
   Symbol('$part');
+export const InteractKey: InjectionKey<(func: () => unknown) => void> =
+  Symbol('$interact');
 export const ReflowKey: InjectionKey<() => void> = Symbol('$reflow');
 export const PartRemoveKey: InjectionKey<() => void> = Symbol('$remove');
 

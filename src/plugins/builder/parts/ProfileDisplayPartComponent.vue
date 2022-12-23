@@ -6,14 +6,22 @@ import { Setpoint } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
+import { liquidBorderColor } from '../utils';
 
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
   setup() {
     const { part, width, height, bordered } = usePart.setup();
 
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<ProfileBlockT>(part, PROFILE_KEY, PROFILE_TYPES);
+    const color = computed<string>(() => liquidBorderColor(part.value));
+
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<ProfileBlockT>(PROFILE_KEY, PROFILE_TYPES);
 
     const points = computed<Setpoint[]>(() => {
       if (!block.value) {
@@ -81,9 +89,11 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       currentValue,
       nextValue,
       tempUnit,
+      color,
     };
   },
 });
@@ -93,10 +103,7 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 100 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"
@@ -138,17 +145,37 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="100 - 2"
-        :height="50 - 2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke-width="2px"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :width="100"
+      :color="color"
+    />
+    <BuilderInteraction
+      :width="100"
+      @interact="showBlockDialog"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="block == null"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

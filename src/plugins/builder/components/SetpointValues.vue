@@ -5,7 +5,7 @@ import { makeTypeFilter } from '@/utils/functional';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { BlockType, PidBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { usePart, useSettingsBlock } from '../composables';
+import { useSettingsBlock } from '../composables';
 import { SetpointBlockT, SETPOINT_KEY, SETPOINT_TYPES } from '../const';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
@@ -33,20 +33,32 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    hideUnset: {
+    bordered: {
+      type: Boolean,
+      default: false,
+    },
+    borderColor: {
+      type: String,
+      default: 'white',
+    },
+    always: {
       type: Boolean,
       default: false,
     },
   },
   setup(props) {
     const sparkStore = useSparkStore();
-    const { part } = usePart.setup();
-    const { address, block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SetpointBlockT>(
-        part,
-        props.settingsKey,
-        SETPOINT_TYPES,
-      );
+    const {
+      address,
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<SetpointBlockT>(
+      props.settingsKey,
+      SETPOINT_TYPES,
+    );
 
     const isUsed = computed<boolean>(
       () =>
@@ -78,6 +90,7 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       setpointSetting,
       setpointValue,
       tempUnit,
@@ -88,13 +101,10 @@ export default defineComponent({
 
 <template>
   <svg
-    v-if="block || !hideUnset"
+    v-if="block || always"
     v-bind="{ x, y, width, height }"
     viewBox="0 0 100 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <BrokenSvgIcon
       v-if="isBroken"
       x="30"
@@ -140,5 +150,37 @@ export default defineComponent({
         </div>
       </foreignObject>
     </template>
+    <BuilderBorder
+      v-if="bordered"
+      :width="100"
+      :color="borderColor"
+    />
+    <BuilderInteraction
+      :width="100"
+      @interact="showBlockDialog"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

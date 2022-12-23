@@ -30,15 +30,12 @@ const paths = {
     `M4.9,43.9c-2.1,0-3.8-1.6-4-3.6c-0.2-2.2,1.4-4.2,3.6-4.4l90.1-9.3
      c0.1,0,0.3,0,0.4,0c2.1,0,3.8,1.6,4,3.6 c0.2,2.2-1.4,4.2-3.6,4.4L4.9,43.9z`,
   ],
-  liquid: [
-    'M 95,50 L 4.8,39.8',
-    'M 95,69.4 L 4.8,59.3',
-    'M 4.9,39.8 L 95.4,30.6',
-    'M42.3,75c14.6,0,29.4-2.6,29.4-2.6l23.4-3',
+  transitionLiquid: [
     'M75,0v16.8c0,4.3,1.5,6.3,5.8,8.2l14.6,5.6',
-    'M 4.8,59.3 L 95,50',
-    'M25,0v70c0,2.8,2.2,5,5,5h12.3',
+    'M42.3,75c14.6,0,29.4-2.6,29.4-2.6l23.4-3 M25,0v70c0,2.8,2.2,5,5,5h12.3',
   ],
+  backLiquid: ['M 95,50 L 4.8,39.8', 'M 95,69.4 L 4.8,59.3'],
+  frontLiquid: ['M 4.9,39.8 L 95.4,30.6', 'M 4.8,59.3 L 95,50'],
 };
 
 export default defineComponent({
@@ -71,9 +68,49 @@ export default defineComponent({
     viewBox="0 0 100 100"
   >
     <LiquidStroke
-      :paths="paths.liquid"
+      :paths="paths.backLiquid"
       :colors="liquids"
-      class="coil-liquid"
+      stroke-linecap="round"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      :path="paths.backLiquid[0]"
+      :num-arrows="2"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      :path="paths.backLiquid[1]"
+      :num-arrows="2"
+    />
+    <LiquidStroke
+      :paths="paths.transitionLiquid"
+      :colors="liquids"
+      stroke-linecap="round"
+    />
+    <AnimatedArrows
+      :speed="-flowSpeed"
+      :path="paths.transitionLiquid[0]"
+      :num-arrows="2"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      :path="paths.transitionLiquid[1]"
+      :num-arrows="6"
+    />
+    <LiquidStroke
+      :paths="paths.frontLiquid"
+      :colors="liquids"
+      stroke-linecap="round"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      :path="paths.frontLiquid[0]"
+      :num-arrows="3"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      :path="paths.frontLiquid[1]"
+      :num-arrows="3"
     />
     <g class="outline">
       <path
@@ -84,9 +121,3 @@ export default defineComponent({
     </g>
   </svg>
 </template>
-
-<style lang="scss" scoped>
-:deep(.coil-liquid path) {
-  stroke-linecap: round;
-}
-</style>

@@ -4,11 +4,6 @@ import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
-const paths = {
-  borders: ['M 0,21 H 50', 'M 0,29 H 50'],
-  liquid: 'M 0,25 H 50',
-};
-
 export default defineComponent({
   name: 'GravityTubePartComponent',
   setup() {
@@ -21,7 +16,6 @@ export default defineComponent({
     return {
       width,
       height,
-      paths,
       flowSpeed,
       liquids,
     };
@@ -35,8 +29,8 @@ export default defineComponent({
     viewBox="0 0 50 50"
   >
     <g class="outline">
-      <path :d="paths.borders[0]" />
-      <path :d="paths.borders[1]" />
+      <path d="M 0,21 H 50" />
+      <path d="M 0,29 H 50" />
       <!-- Arrow -->
       <polyline points="20.5,10 16.5,6 20.5,2 " />
       <line
@@ -59,7 +53,7 @@ export default defineComponent({
       />
     </g>
     <LiquidStroke
-      :paths="[paths.liquid]"
+      :paths="['M 0,25 H 50']"
       :colors="liquids"
     />
     <AnimatedArrows
