@@ -8,8 +8,7 @@ import { fixedNumber, shortDateString } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
-import { CENTER } from '../const';
-import { liquidOnCoord } from '../utils';
+import { liquidBorderColor } from '../utils';
 
 interface MetricDisplay {
   field: string;
@@ -24,6 +23,8 @@ export default defineComponent({
   setup() {
     const { part, metrics, width, height, bordered } = usePart.setup();
     const { source } = useMetrics.setupConsumer();
+
+    const color = computed<string>(() => liquidBorderColor(part.value));
 
     function fieldFreshDuration(field: string): number {
       return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
@@ -49,10 +50,6 @@ export default defineComponent({
             ((now - v.time) as number) > fieldFreshDuration(v.field),
         }));
     });
-
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
 
     return {
       width,

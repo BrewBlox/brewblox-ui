@@ -5,14 +5,16 @@ import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
 import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { CENTER, DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
-import { liquidOnCoord } from '../utils';
+import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
+import { liquidBorderColor } from '../utils';
 
 export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
     const { part, width, height, bordered } = usePart.setup();
+
+    const color = computed<string>(() => liquidBorderColor(part.value));
 
     const {
       block,
@@ -58,10 +60,6 @@ export default defineComponent({
 
     const tempUnit = computed<string>(() =>
       prettyUnit(userUnits.value.temperature),
-    );
-
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
     );
 
     return {

@@ -4,11 +4,6 @@ import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
-const paths = {
-  borders: ['M 0,21 L 25,21', 'M 0,29 L 25,29'],
-  liquid: 'M0,25 H25',
-};
-
 export default defineComponent({
   name: 'StraightInletTubePartComponent',
   setup() {
@@ -21,7 +16,6 @@ export default defineComponent({
     return {
       width,
       height,
-      paths,
       flowSpeed,
       liquids,
     };
@@ -34,33 +28,30 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
   >
-    <g class="outline">
-      <rect
-        fill="white"
-        y="12.5"
-        width="8"
-        height="8"
-      />
-      <rect
-        fill="white"
-        y="30"
-        width="8"
-        height="8"
-      />
-      <path
-        v-for="border in paths.borders"
-        :key="border"
-        :d="border"
-      />
-    </g>
     <LiquidStroke
-      :paths="[paths.liquid]"
+      :paths="['M0,25 H25']"
       :colors="liquids"
     />
     <AnimatedArrows
       :num-arrows="1"
       :speed="flowSpeed"
-      :path="paths.liquid"
+      path="M0,25 H25"
     />
+    <g class="outline fill">
+      <rect
+        y="12.5"
+        width="8"
+        height="8"
+      />
+      <rect
+        y="30"
+        width="8"
+        height="8"
+      />
+    </g>
+    <g class="outline">
+      <path d="M 0,21 L 25,21" />
+      <path d="M 0,29 L 25,29" />
+    </g>
   </svg>
 </template>

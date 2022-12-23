@@ -1,11 +1,10 @@
 <script lang="ts">
 import {
-  CENTER,
   SensorBlockT,
   SENSOR_KEY,
   SENSOR_TYPES,
 } from '@/plugins/builder/const';
-import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
@@ -15,8 +14,15 @@ export default defineComponent({
   setup() {
     const { part, width, height, bordered } = usePart.setup();
 
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SensorBlockT>(SENSOR_KEY, SENSOR_TYPES);
+    const color = computed<string>(() => liquidBorderColor(part.value));
+
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<SensorBlockT>(SENSOR_KEY, SENSOR_TYPES);
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
@@ -30,10 +36,6 @@ export default defineComponent({
       prettyUnit(block.value?.data.value),
     );
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
-
     return {
       fixedNumber,
       width,
@@ -42,6 +44,7 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       contentTransform,
       tempValue,
       tempUnit,
@@ -88,6 +91,32 @@ export default defineComponent({
       v-if="bordered"
       :color="color"
     />
-    <BuilderInteraction @interact="showBlockDialog" />
+    <BuilderInteraction
+      :width="100"
+      @interact="showBlockDialog"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <q-item
+            v-close-popup
+            :disable="!block"
+            clickable
+            @click="showBlockDialog"
+          >
+            <q-item-section>Show block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showBlockSelectDialog"
+          >
+            <q-item-section>Assign block</q-item-section>
+          </q-item>
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

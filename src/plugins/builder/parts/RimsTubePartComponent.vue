@@ -60,11 +60,7 @@ export default defineComponent({
 
 <template>
   <svg v-bind="{ width, height }">
-    <PwmValues
-      :width="50"
-      :height="50"
-      :bordered="bordered"
-    />
+    <PwmValues :bordered="bordered" />
     <LiquidStroke
       :paths="[paths.content]"
       :colors="liquids"

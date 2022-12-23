@@ -25,9 +25,9 @@ export default defineComponent({
 <template>
   <!-- No viewBox. width is auto-adjusted -->
   <svg v-bind="{ width, height }">
-    <PwmValues :bordered="bordered" />
     <g class="outline">
       <path :d="path" />
     </g>
+    <PwmValues :bordered="bordered" />
   </svg>
 </template>

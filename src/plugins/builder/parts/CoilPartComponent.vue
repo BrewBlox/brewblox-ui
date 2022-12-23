@@ -108,35 +108,33 @@ export default defineComponent({
       :path="paths.frontLiquid[1]"
       :num-arrows="4"
     />
-    <g class="outline">
+    <g class="outline fill">
       <rect
-        fill="white"
         x="1"
         y="12.5"
         width="8"
         height="8"
       />
       <rect
-        fill="white"
         x="1"
         y="30"
         width="8"
         height="8"
       />
       <rect
-        fill="white"
         x="1"
         y="62.5"
         width="8"
         height="8"
       />
       <rect
-        fill="white"
         x="1"
         y="80"
         width="8"
         height="8"
       />
+    </g>
+    <g class="outline">
       <path
         v-for="border in paths.borders"
         :key="border"

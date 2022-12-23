@@ -56,13 +56,6 @@ export default defineComponent({
     viewBox="0 0 50 50"
   >
     <!-- low -->
-    <g class="outline">
-      <path
-        v-for="border in lowPaths.borders"
-        :key="border"
-        :d="border"
-      />
-    </g>
     <LiquidStroke
       :paths="[lowPaths.liquid]"
       :colors="lowLiquid"
@@ -71,14 +64,14 @@ export default defineComponent({
       :speed="lowFlowSpeed"
       :path="lowPaths.liquid"
     />
-    <!-- high -->
     <g class="outline">
       <path
-        v-for="border in highPaths.borders"
+        v-for="border in lowPaths.borders"
         :key="border"
         :d="border"
       />
     </g>
+    <!-- high -->
     <LiquidStroke
       :paths="[highPaths.liquid]"
       :colors="highLiquid"
@@ -87,5 +80,12 @@ export default defineComponent({
       :speed="highFlowSpeed"
       :path="highPaths.liquid"
     />
+    <g class="outline">
+      <path
+        v-for="border in highPaths.borders"
+        :key="border"
+        :d="border"
+      />
+    </g>
   </svg>
 </template>

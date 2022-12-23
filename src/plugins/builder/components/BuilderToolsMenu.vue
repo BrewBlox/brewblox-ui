@@ -50,25 +50,6 @@ export default defineComponent({
       class="column no-wrap"
       @click.stop
     >
-      <!-- <div
-        class="no-select q-py-sm q-pl-md text-italic text-grey-5"
-        style="font-size: 120%"
-      >
-        Modes
-      </div>
-
-      <ActionItem
-        v-for="opt in builderModes"
-        :key="'mode-' + opt.value"
-        :active="mode === opt.value"
-        :icon="opt.icon"
-        :label="expanded ? opt.label : ''"
-        :inset-level="0.2"
-        :class="[expanded ? 'q-pr-md' : 'q-pr-none']"
-        style="min-height: 0px"
-        @click="$emit('update:mode', opt.value)"
-      /> -->
-
       <div
         class="no-select q-py-sm q-pl-md text-italic text-grey-5"
         style="font-size: 120%"

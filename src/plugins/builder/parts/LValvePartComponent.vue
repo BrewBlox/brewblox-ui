@@ -112,12 +112,10 @@ export default defineComponent({
       :paths="[liquidPath]"
       :colors="liquidColor"
     />
-    <g class="outline">
-      <AnimatedArrows
-        :path="liquidPath"
-        :speed="liquidSpeed"
-      />
-    </g>
+    <AnimatedArrows
+      :path="liquidPath"
+      :speed="liquidSpeed"
+    />
     <g
       class="outline fill"
       :transform="closed ? 'translate(50, 0) scale(-1, 1)' : ''"

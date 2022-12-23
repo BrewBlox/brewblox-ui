@@ -1,6 +1,5 @@
 <script lang="ts">
-import { CENTER } from '@/plugins/builder/const';
-import { liquidOnCoord } from '@/plugins/builder/utils';
+import { liquidBorderColor } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
 import { userUnits } from '@/user-settings';
@@ -19,6 +18,8 @@ export default defineComponent({
   setup() {
     const { part, settings, width, height, bordered } = usePart.setup();
     const tiltStore = useTiltStore();
+
+    const color = computed<string>(() => liquidBorderColor(part.value));
 
     const tiltId = computed<string | null>(
       () => settings.value[TILT_ID_KEY] ?? null,
@@ -48,10 +49,6 @@ export default defineComponent({
 
     const gravityUnit = computed<string>(() =>
       prettyUnit(userUnits.value.gravity),
-    );
-
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
     );
 
     const unitlessGravity = computed<boolean>(

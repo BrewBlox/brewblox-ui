@@ -349,7 +349,7 @@ export function showLinkedWidgetDialog(
 }
 
 export function universalTransitions(
-  size: [number, number],
+  size: [x: number, y: number],
   enabled: boolean,
 ): Transitions {
   if (!enabled) {
@@ -430,6 +430,18 @@ export function rotatedCoord(part: StatePart, coord: CoordinatesParam): string {
 export function liquidOnCoord(part: FlowPart, coord: string): string[] {
   const flows = part.flows[rotatedCoord(part, coord)];
   return flows ? Object.keys(flows) : [];
+}
+
+export function liquidBorderColor(part: FlowPart): string {
+  for (const coord in part.flows) {
+    const flow = part.flows[coord];
+    for (const color in flow) {
+      if (flow[color] != 0) {
+        return color;
+      }
+    }
+  }
+  return '';
 }
 
 export function flowOnCoord(part: FlowPart, coord: string): number {

@@ -20,10 +20,6 @@ export default defineComponent({
       type: String,
       default: PWM_KEY,
     },
-    bordered: {
-      type: Boolean,
-      default: false,
-    },
     x: {
       type: Number,
       default: 0,
@@ -32,7 +28,11 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    color: {
+    bordered: {
+      type: Boolean,
+      default: false,
+    },
+    borderColor: {
       type: String,
       default: '',
     },
@@ -103,7 +103,7 @@ export default defineComponent({
     </g>
     <BuilderBorder
       v-if="bordered"
-      :color="color"
+      :color="borderColor"
     />
     <BuilderInteraction @interact="showBlockDialog">
       <q-menu

@@ -9,7 +9,7 @@ const paths = {
     `M21,0 v17 ${elbow(12, 12, false)} H50`,
     `M29,0 v17 ${elbow(4, 4, false)} H50`,
   ],
-  liquid: `M25,0 v17 ${elbow(8, 8, false)} H50`,
+  liquid: [`M25,0 v17 ${elbow(8, 8, false)} H50`],
 };
 
 export default defineComponent({
@@ -38,12 +38,12 @@ export default defineComponent({
     viewBox="0 0 50 50"
   >
     <LiquidStroke
-      :paths="[paths.liquid]"
+      :paths="paths.liquid"
       :colors="liquids"
     />
     <AnimatedArrows
       :speed="flowSpeed"
-      :path="paths.liquid"
+      :path="paths.liquid[0]"
     />
     <g class="outline">
       <path :d="paths.borders[0]" />

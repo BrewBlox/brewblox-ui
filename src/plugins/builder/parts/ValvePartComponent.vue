@@ -138,19 +138,10 @@ export default defineComponent({
       v-else
       :status="blockStatus"
     />
-    <foreignObject
+    <SpinnerSvgIcon
       v-if="pending"
-      x="3"
-      y="3"
-      height="44"
-      width="44"
-    >
-      <q-spinner
-        size="44px"
-        class="col"
-        color="blue-grey-5"
-      />
-    </foreignObject>
+      r="18"
+    />
     <g class="outline">
       <path :d="paths.outerValve[0]" />
       <path :d="paths.outerValve[1]" />

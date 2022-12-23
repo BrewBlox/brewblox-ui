@@ -9,14 +9,14 @@ export default defineComponent({
   setup() {
     const { settings, width, height } = usePart.setup();
 
-    const color = computed<string>(() =>
+    const fillColor = computed<string>(() =>
       colorString(settings.value[COLOR_KEY]),
     );
 
     return {
       width,
       height,
-      color,
+      fillColor,
     };
   },
 });
@@ -28,7 +28,7 @@ export default defineComponent({
     viewBox="0 0 100 250"
   >
     <rect
-      :fill="color"
+      :fill="fillColor"
       x="10"
       y="60"
       width="80"
@@ -62,10 +62,6 @@ export default defineComponent({
         height="23.8"
       />
     </g>
-    <SetpointValues
-      :y="100"
-      :background-color="color"
-      hide-unset
-    />
+    <SetpointValues :y="100" />
   </svg>
 </template>

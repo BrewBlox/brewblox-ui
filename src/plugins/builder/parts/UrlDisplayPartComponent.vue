@@ -40,10 +40,6 @@ export default defineComponent({
 
 <template>
   <svg v-bind="{ width, height }">
-    <BuilderInteraction
-      v-bind="{ width, height }"
-      @interact="interact"
-    />
     <foreignObject v-bind="{ width, height }">
       <div
         class="fit text-bold text-center q-mt-sm grid-label"
@@ -55,6 +51,10 @@ export default defineComponent({
     <BuilderBorder
       v-if="bordered"
       v-bind="{ width, height }"
+    />
+    <BuilderInteraction
+      v-bind="{ width, height }"
+      @interact="interact"
     />
   </svg>
 </template>

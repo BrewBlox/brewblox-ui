@@ -129,7 +129,7 @@ declare module '@vue/runtime-core' {
     ActionItem: typeof import('src/components/menu/ActionItem.vue').default;
     UnlinkedSvgIcon: typeof import('src/components/icons/UnlinkedSvgIcon.vue').default;
     TiltSvgIcon: typeof import('src/components/icons/TiltSvgIcon.vue').default;
-    SleepingSvgIcon: typeof import('src/components/icons/SleepingSvgIcon.vue').default;
+    SpinnerSvgIcon: typeof import('src/components/icons/SpinnerSvgIcon.vue').default;
     SetpointSvgIcon: typeof import('src/components/icons/SetpointSvgIcon.vue').default;
     SessionSvgIcon: typeof import('src/components/icons/SessionSvgIcon.vue').default;
     SensorSvgIcon: typeof import('src/components/icons/SensorSvgIcon.vue').default;

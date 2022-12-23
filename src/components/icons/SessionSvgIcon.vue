@@ -3,7 +3,13 @@ import { mdiTextSubject } from '@quasar/extras/mdi-v5';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'SleepingSvgIcon',
+  name: 'SessionSvgIcon',
+  props: {
+    color: {
+      type: String,
+      default: 'white',
+    },
+  },
   setup() {
     return {
       mdiTextSubject,
@@ -23,13 +29,8 @@ export default defineComponent({
   >
     <path
       :d="mdiTextSubject"
-      class="icon"
+      :fill="color"
+      stroke="none"
     />
   </svg>
 </template>
-
-<style lang="sass" scoped>
-.icon
-  fill: white
-  stroke: none
-</style>

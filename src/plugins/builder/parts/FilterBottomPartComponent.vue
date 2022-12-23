@@ -32,34 +32,6 @@ export default defineComponent({
 <template>
   <!-- No viewBox. path auto-adjusts to width -->
   <svg v-bind="{ width, height }">
-    <g class="outline">
-      <line
-        :x2="width - 4"
-        x1="2"
-        y1="11"
-        m
-        y2="11"
-        fill="none"
-        stroke-width="4px"
-        stroke-dasharray="10,6"
-      />
-      <rect
-        x="1"
-        y="12"
-        width="8"
-        height="8"
-        fill="white"
-      />
-      <rect
-        x="1"
-        y="30"
-        width="8"
-        height="8"
-        fill="white"
-      />
-      <path :d="paths.borders[0]" />
-      <path :d="paths.borders[1]" />
-    </g>
     <LiquidStroke
       :paths="paths.liquid"
       :colors="liquids"
@@ -68,5 +40,32 @@ export default defineComponent({
       :speed="flowSpeed"
       :path="paths.liquid[0]"
     />
+    <g class="outline fill">
+      <rect
+        x="1"
+        y="12"
+        width="8"
+        height="8"
+      />
+      <rect
+        x="1"
+        y="30"
+        width="8"
+        height="8"
+      />
+    </g>
+    <g class="outline">
+      <line
+        :x2="width - 4"
+        x1="2"
+        y1="11"
+        m
+        y2="11"
+        stroke-width="4px"
+        stroke-dasharray="10,6"
+      />
+      <path :d="paths.borders[0]" />
+      <path :d="paths.borders[1]" />
+    </g>
   </svg>
 </template>

@@ -1,13 +1,12 @@
 <script lang="ts">
 import {
-  CENTER,
   COLD_WATER,
   HOT_WATER,
   PidBlockT,
   PID_KEY,
   PID_TYPES,
 } from '@/plugins/builder/const';
-import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { userUnits } from '@/user-settings';
@@ -22,6 +21,8 @@ export default defineComponent({
   setup() {
     const sparkStore = useSparkStore();
     const { part, width, height, bordered } = usePart.setup();
+
+    const color = computed<string>(() => liquidBorderColor(part.value));
 
     const {
       block,
@@ -68,10 +69,6 @@ export default defineComponent({
       }
       return '%';
     });
-
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
 
     return {
       HOT_WATER,

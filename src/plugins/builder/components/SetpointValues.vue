@@ -37,11 +37,11 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    color: {
+    borderColor: {
       type: String,
       default: 'white',
     },
-    hideUnset: {
+    always: {
       type: Boolean,
       default: false,
     },
@@ -101,7 +101,7 @@ export default defineComponent({
 
 <template>
   <svg
-    v-if="block || !hideUnset"
+    v-if="block || always"
     v-bind="{ x, y, width, height }"
     viewBox="0 0 100 50"
   >
@@ -153,7 +153,7 @@ export default defineComponent({
     <BuilderBorder
       v-if="bordered"
       :width="100"
-      :color="color"
+      :color="borderColor"
     />
     <BuilderInteraction
       :width="100"

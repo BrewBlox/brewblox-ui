@@ -55,3 +55,13 @@ export default defineComponent({
     </text>
   </g>
 </template>
+
+<style lang="sass" scoped>
+.grid-square-text
+  font-size: x-small
+  z-index: 2
+  -webkit-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+</style>
