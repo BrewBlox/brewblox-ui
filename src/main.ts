@@ -1,5 +1,4 @@
 import '@/css/app.sass';
-import automation from '@/plugins/automation';
 import builder from '@/plugins/builder';
 import history from '@/plugins/history';
 import misc from '@/plugins/misc';
@@ -77,7 +76,6 @@ app.use(tilt);
 app.use(builder);
 app.use(quickstart);
 app.use(misc);
-app.use(automation);
 
 // Local components
 globRegister(app, import.meta.glob('./components/**/*.vue', { eager: true }));
