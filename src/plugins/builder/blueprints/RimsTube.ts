@@ -4,7 +4,7 @@ import {
   Transitions,
 } from '@/plugins/builder/types';
 import { Coordinates } from '@/utils/coordinates';
-import { PWM_KEY, PWM_TYPES, SIZE_X_KEY } from '../const';
+import { PWM_KEY, PWM_TYPES, WIDTH_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
 export const DEFAULT_SIZE_X = 4;
@@ -20,7 +20,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_X_KEY,
+        settingsKey: WIDTH_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 3,
@@ -42,11 +42,11 @@ const blueprint: BuilderBlueprint = {
   ],
   size,
   transitions: (part: PersistentPart): Transitions => {
-    const [sizeX] = size(part);
-    const rightOut = new Coordinates([sizeX - 0.5, 0, 0]).toString();
+    const [width] = size(part);
+    const rightOut = new Coordinates([width - 0.5, 0, 0]).toString();
     return {
-      [ENTRY]: [{ outCoords: rightOut, friction: sizeX - 1 }],
-      [rightOut]: [{ outCoords: ENTRY, friction: sizeX - 1 }],
+      [ENTRY]: [{ outCoords: rightOut, friction: width - 1 }],
+      [rightOut]: [{ outCoords: ENTRY, friction: width - 1 }],
     };
   },
 };

@@ -1,4 +1,4 @@
-import { COLOR_KEY, SIZE_X_KEY, SIZE_Y_KEY } from '@/plugins/builder/const';
+import { COLOR_KEY, HEIGHT_KEY, WIDTH_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { variableSizeFunc } from '../utils';
 
@@ -18,7 +18,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_X_KEY,
+        settingsKey: WIDTH_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 1,
@@ -28,7 +28,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_Y_KEY,
+        settingsKey: HEIGHT_KEY,
         defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
         min: 1,

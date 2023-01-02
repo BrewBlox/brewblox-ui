@@ -54,8 +54,8 @@ export const BORDER_KEY = 'bordered';
 export const FLOW_TOGGLE_KEY = 'flowEnabled';
 export const URL_KEY = 'url';
 export const LABEL_KEY = 'text';
-export const SIZE_X_KEY = 'sizeX';
-export const SIZE_Y_KEY = 'sizeY';
+export const WIDTH_KEY = 'sizeX';
+export const HEIGHT_KEY = 'sizeY';
 export const VALVE_CLOSED_KEY = 'closed';
 
 // Deprecated setting keys

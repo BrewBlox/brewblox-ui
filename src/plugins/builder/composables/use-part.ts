@@ -10,8 +10,8 @@ export interface UsePartComponent {
   part: WritableComputedRef<FlowPart>;
   settings: WritableComputedRef<Mapped<any>>;
   metrics: ComputedRef<MetricsConfig>;
-  sizeX: ComputedRef<number>;
-  sizeY: ComputedRef<number>;
+  partWidth: ComputedRef<number>;
+  partHeight: ComputedRef<number>;
   width: ComputedRef<number>;
   height: ComputedRef<number>;
   flipped: ComputedRef<boolean>;
@@ -42,13 +42,13 @@ export const usePart: UsePartComposable = {
       () => part.value.metrics ?? emptyMetricsConfig(),
     );
 
-    const sizeX = computed<number>(() => part.value.size[0]);
+    const partWidth = computed<number>(() => part.value.size[0]);
 
-    const sizeY = computed<number>(() => part.value.size[1]);
+    const partHeight = computed<number>(() => part.value.size[1]);
 
-    const width = computed<number>(() => coord2grid(sizeX.value));
+    const width = computed<number>(() => coord2grid(partWidth.value));
 
-    const height = computed<number>(() => coord2grid(sizeY.value));
+    const height = computed<number>(() => coord2grid(partHeight.value));
 
     const flipped = computed<boolean>(() => part.value.flipped === true);
 
@@ -64,8 +64,8 @@ export const usePart: UsePartComposable = {
       part,
       settings,
       metrics,
-      sizeX,
-      sizeY,
+      partWidth,
+      partHeight,
       width,
       height,
       flipped,

@@ -7,7 +7,7 @@ import { usePart } from '../composables';
 export default defineComponent({
   name: 'RimsTubePartComponent',
   setup() {
-    const { part, bordered, width, height, sizeX } = usePart.setup();
+    const { part, bordered, width, height, partWidth } = usePart.setup();
 
     const paths = computed<Mapped<string>>(() => {
       const startLast = width.value - 50;
@@ -34,7 +34,7 @@ export default defineComponent({
     });
 
     const outCoord = computed<string>(() =>
-      new Coordinates([sizeX.value - 0.5, 0, 0]).toString(),
+      new Coordinates([partWidth.value - 0.5, 0, 0]).toString(),
     );
 
     const flowSpeed = computed<number>(() =>
@@ -50,7 +50,7 @@ export default defineComponent({
       height,
       bordered,
       paths,
-      sizeX,
+      partWidth,
       flowSpeed,
       liquids,
     };
@@ -73,7 +73,7 @@ export default defineComponent({
       :colors="liquids"
     />
     <AnimatedArrows
-      :num-arrows="(sizeX - 1) * 2"
+      :num-arrows="(partWidth - 1) * 2"
       :speed="flowSpeed"
       :path="paths.flowPath"
     />

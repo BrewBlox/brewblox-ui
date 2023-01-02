@@ -1,4 +1,4 @@
-import { CENTER, LEFT, SIZE_X_KEY } from '@/plugins/builder/const';
+import { CENTER, LEFT, WIDTH_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { variableSizeFunc } from '../utils';
 
@@ -12,7 +12,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_X_KEY,
+        settingsKey: WIDTH_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 1,

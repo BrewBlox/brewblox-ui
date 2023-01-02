@@ -88,12 +88,9 @@ export default defineComponent({
       }
     });
 
-    const sizeX = computed<number>(() => props.part.size[0]);
-    const sizeY = computed<number>(() => props.part.size[1]);
-
     const dimensions = computed(() => ({
-      width: coord2grid(sizeX.value),
-      height: coord2grid(sizeY.value),
+      width: coord2grid(props.part.size[0]),
+      height: coord2grid(props.part.size[1]),
     }));
 
     const positionTransform = computed<string>(() =>
@@ -101,26 +98,26 @@ export default defineComponent({
     );
 
     const rotateTransform = computed<string>(() => {
-      const [partSizeX, partSizeY] = props.part.size;
-      const [renderSizeX, renderSizeY] = rotatedSize(
+      const [partWidth, partHeight] = props.part.size;
+      const [renderWidth, renderHeight] = rotatedSize(
         props.part.rotate,
         props.part.size,
       );
 
-      const farEdge = new Coordinates([partSizeX, partSizeY, 0]).rotate(
+      const farEdge = new Coordinates([partWidth, partHeight, 0]).rotate(
         props.part.rotate,
         [0, 0, 0],
       );
 
-      const trX = farEdge.x < 0 ? coord2grid(renderSizeX) : 0;
-      const trY = farEdge.y < 0 ? coord2grid(renderSizeY) : 0;
+      const trX = farEdge.x < 0 ? coord2grid(renderWidth) : 0;
+      const trY = farEdge.y < 0 ? coord2grid(renderHeight) : 0;
 
       return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
     });
 
     const flipTransform = computed<string>(() => {
       if (props.part.flipped) {
-        return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
+        return `translate(${coord2grid(props.part.size[0])}, 0) scale(-1, 1)`;
       }
       return '';
     });

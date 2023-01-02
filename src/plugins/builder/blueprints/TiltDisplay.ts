@@ -4,7 +4,7 @@ import {
   variableSizeFunc,
 } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
-import { FLOW_TOGGLE_KEY, SIZE_X_KEY, SIZE_Y_KEY } from '../const';
+import { FLOW_TOGGLE_KEY, HEIGHT_KEY, WIDTH_KEY } from '../const';
 
 export const DEFAULT_SIZE_X = 2;
 export const DEFAULT_SIZE_Y = 1;
@@ -29,7 +29,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_X_KEY,
+        settingsKey: WIDTH_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 1,
@@ -39,7 +39,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_Y_KEY,
+        settingsKey: HEIGHT_KEY,
         defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
         min: 1,

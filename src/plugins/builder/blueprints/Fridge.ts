@@ -1,5 +1,5 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { LABEL_KEY, SIZE_X_KEY, SIZE_Y_KEY } from '../const';
+import { HEIGHT_KEY, LABEL_KEY, WIDTH_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
 export const SHELF_Y_KEY = 'shelfY';
@@ -31,7 +31,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_X_KEY,
+        settingsKey: WIDTH_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 2,
@@ -41,7 +41,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_Y_KEY,
+        settingsKey: HEIGHT_KEY,
         defaultSize: DEFAULT_SIZE_Y,
         label: 'Height',
         min: 4,

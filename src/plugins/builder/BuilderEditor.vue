@@ -265,12 +265,12 @@ export default defineComponent({
       if (coords) {
         for (let idx = flowParts.value.length - 1; idx >= 0; idx--) {
           const part = flowParts.value[idx];
-          const [sizeX, sizeY] = rotatedSize(part.rotate, part.size);
+          const [width, height] = rotatedSize(part.rotate, part.size);
           if (
             coords.x >= part.x &&
-            coords.x < part.x + sizeX &&
+            coords.x < part.x + width &&
             coords.y >= part.y &&
-            coords.y < part.y + sizeY
+            coords.y < part.y + height
           ) {
             return deepCopy(part);
           }

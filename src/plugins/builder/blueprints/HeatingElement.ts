@@ -1,5 +1,5 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { PWM_KEY, PWM_TYPES, SIZE_X_KEY } from '../const';
+import { PWM_KEY, PWM_TYPES, WIDTH_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
 const DEFAULT_SIZE_X = 5;
@@ -20,7 +20,7 @@ const blueprint: BuilderBlueprint = {
     {
       component: 'SizeCard',
       props: {
-        settingsKey: SIZE_X_KEY,
+        settingsKey: WIDTH_KEY,
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
         min: 3,
