@@ -14,6 +14,11 @@ export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';
 export type ServiceHook = (service: Service) => Awaitable<unknown>;
 
+export interface GridSize {
+  cols: number;
+  rows: number;
+}
+
 export interface WidgetContext {
   mode: WidgetMode;
   container: WidgetContainer;

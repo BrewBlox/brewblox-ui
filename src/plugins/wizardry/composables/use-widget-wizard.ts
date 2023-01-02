@@ -1,4 +1,4 @@
-import { useFeatureStore } from '@/store/features';
+import { GridSize, useFeatureStore } from '@/store/features';
 import { nanoid } from 'nanoid';
 import { PropType } from 'vue';
 import {

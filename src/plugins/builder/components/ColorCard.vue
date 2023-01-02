@@ -45,6 +45,7 @@ export default defineComponent({
   <div class="row q-gutter-x-md q-pl-sm">
     <ColorField
       v-model="color"
+      :presets="presetColors"
       clearable
       title="Liquid color"
       label="Custom"

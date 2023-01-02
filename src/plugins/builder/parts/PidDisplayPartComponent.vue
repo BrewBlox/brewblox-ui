@@ -1,15 +1,18 @@
 <script lang="ts">
 import {
   COLD_WATER,
+  HEIGHT_KEY,
   HOT_WATER,
   PidBlockT,
   PID_KEY,
   PID_TYPES,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { userUnits } from '@/user-settings';
+import { createDialog } from '@/utils/dialog';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { Block, BlockType } from 'brewblox-proto/ts';
@@ -20,7 +23,15 @@ export default defineComponent({
   name: 'PidDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered } = usePart.setup();
+    const {
+      part,
+      patchSettings,
+      partWidth,
+      partHeight,
+      width,
+      height,
+      bordered,
+    } = usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -70,6 +81,27 @@ export default defineComponent({
       return '%';
     });
 
+    function showSizeDialog(): void {
+      createDialog({
+        component: 'AreaSizeDialog',
+        componentProps: {
+          title: 'Part size',
+          message: 'The part is scaled to fit the new dimensions.',
+          modelValue: {
+            width: partWidth.value,
+            height: partHeight.value,
+          },
+          min: { width: 1, height: 1 },
+          max: { width: 5, height: 5 },
+        },
+      }).onOk(({ width, height }: AreaSize) => {
+        patchSettings({
+          [WIDTH_KEY]: width,
+          [HEIGHT_KEY]: height,
+        });
+      });
+    }
+
     return {
       HOT_WATER,
       COLD_WATER,
@@ -91,6 +123,7 @@ export default defineComponent({
       suffix,
       color,
       bordered,
+      showSizeDialog,
     };
   },
 });
@@ -161,6 +194,13 @@ export default defineComponent({
             @click="showBlockSelectDialog"
           >
             <q-item-section>Assign block</q-item-section>
+          </q-item>
+          <q-item
+            v-close-popup
+            clickable
+            @click="showSizeDialog"
+          >
+            <q-item-section>Edit size</q-item-section>
           </q-item>
         </q-list>
       </q-menu>
