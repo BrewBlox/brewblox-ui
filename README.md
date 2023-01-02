@@ -72,6 +72,10 @@ yarn build
 
 # Generate import types for global components
 yarn components
+
+# Pull shared types for a specific firmware build
+# Develop is used by default, but a branch name argument can be used
+yarn firmware
 ```
 
 ## Common issues
