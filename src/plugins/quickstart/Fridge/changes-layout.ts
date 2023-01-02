@@ -1,10 +1,10 @@
 import { SHELF_Y_KEY } from '@/plugins/builder/blueprints/Fridge';
 import {
   BORDER_KEY,
+  HEIGHT_KEY,
   LABEL_KEY,
   PID_KEY,
   SETPOINT_KEY,
-  SIZE_Y_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -30,7 +30,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            [SIZE_Y_KEY]: 7,
+            [HEIGHT_KEY]: 7,
             [SHELF_Y_KEY]: 4,
             [LABEL_KEY]: 'Fridge',
           },

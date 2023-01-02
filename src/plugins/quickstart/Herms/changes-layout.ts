@@ -9,8 +9,8 @@ import {
   PID_KEY,
   PWM_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
   VALVE_CLOSED_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -79,7 +79,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
               id: names.bkPwm,
               type: null,
             }),
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
           },
           flipped: true,
           type: 'HeatingElement',
@@ -95,7 +95,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
               id: names.hltPwm,
               type: null,
             }),
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
           },
           flipped: false,
           type: 'HeatingElement',
@@ -124,7 +124,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
           },
           flipped: true,
           type: 'FilterBottom',

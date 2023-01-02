@@ -4,7 +4,7 @@ import {
   PID_KEY,
   PWM_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -38,7 +38,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
             [PWM_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.kettlePwm,
