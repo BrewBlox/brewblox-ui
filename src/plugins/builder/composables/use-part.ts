@@ -2,7 +2,14 @@ import { MetricsConfig } from '@/plugins/history/types';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { deepCopy } from '@/utils/objects';
 import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
-import { BORDER_KEY, InteractKey, PartKey, ReflowKey } from '../const';
+import {
+  BORDER_KEY,
+  DEPRECATED_IO_PRESSURE_KEY,
+  InteractKey,
+  IO_ENABLED_KEY,
+  PartKey,
+  ReflowKey,
+} from '../const';
 import { FlowPart } from '../types';
 import { coord2grid } from '../utils';
 
@@ -15,7 +22,8 @@ export interface UsePartComponent {
   width: ComputedRef<number>;
   height: ComputedRef<number>;
   flipped: ComputedRef<boolean>;
-  bordered: ComputedRef<boolean>;
+  bordered: WritableComputedRef<boolean>;
+  pressured: WritableComputedRef<boolean>;
   patchSettings: (patch: Mapped<any>) => void;
   interact: (func: () => unknown) => void;
   reflow: () => void;
@@ -52,9 +60,23 @@ export const usePart: UsePartComposable = {
 
     const flipped = computed<boolean>(() => part.value.flipped === true);
 
-    const bordered = computed<boolean>(() =>
-      Boolean(part.value.settings[BORDER_KEY] ?? true),
-    );
+    const bordered = computed<boolean>({
+      get: () => Boolean(part.value.settings[BORDER_KEY] ?? true),
+      set: (v) => patchSettings({ [BORDER_KEY]: Boolean(v) }),
+    });
+
+    const pressured = computed<boolean>({
+      get: () =>
+        Boolean(
+          settings.value[IO_ENABLED_KEY] ??
+            settings.value[DEPRECATED_IO_PRESSURE_KEY],
+        ),
+      set: (enabled) =>
+        patchSettings({
+          [IO_ENABLED_KEY]: enabled,
+          [DEPRECATED_IO_PRESSURE_KEY]: undefined,
+        }),
+    });
 
     function patchSettings(patch: Mapped<any>): void {
       settings.value = { ...part.value.settings, ...patch };
@@ -70,6 +92,7 @@ export const usePart: UsePartComposable = {
       height,
       flipped,
       bordered,
+      pressured,
       patchSettings,
       reflow,
       interact,

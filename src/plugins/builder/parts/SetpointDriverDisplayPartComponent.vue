@@ -174,21 +174,11 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <q-item
-            v-close-popup
-            :disable="block == null"
-            clickable
-            @click="showBlockDialog"
-          >
-            <q-item-section>Show block</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
-            clickable
-            @click="showBlockSelectDialog"
-          >
-            <q-item-section>Assign block</q-item-section>
-          </q-item>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

@@ -74,6 +74,10 @@ declare module '@vue/runtime-core' {
     GraphDisplayDialog: typeof import('src/plugins/history/components/GraphDisplayDialog.vue').default;
     GraphDialog: typeof import('src/plugins/history/components/GraphDialog.vue').default;
     ExportGraphAction: typeof import('src/plugins/history/components/ExportGraphAction.vue').default;
+    SizeMenuContent: typeof import('src/plugins/builder/components/menu/SizeMenuContent.vue').default;
+    LiquidSourceMenuContent: typeof import('src/plugins/builder/components/menu/LiquidSourceMenuContent.vue').default;
+    BorderMenuContent: typeof import('src/plugins/builder/components/menu/BorderMenuContent.vue').default;
+    BlockMenuContent: typeof import('src/plugins/builder/components/menu/BlockMenuContent.vue').default;
     ToggleCard: typeof import('src/plugins/builder/components/ToggleCard.vue').default;
     TextCard: typeof import('src/plugins/builder/components/TextCard.vue').default;
     SizeCard: typeof import('src/plugins/builder/components/SizeCard.vue').default;
@@ -185,6 +189,7 @@ declare module '@vue/runtime-core' {
     BlockFieldAddressDialog: typeof import('src/components/form/BlockFieldAddressDialog.vue').default;
     BlockAddressField: typeof import('src/components/form/BlockAddressField.vue').default;
     BlockAddressDialog: typeof import('src/components/form/BlockAddressDialog.vue').default;
+    AreaSizeDialog: typeof import('src/components/form/AreaSizeDialog.vue').default;
     PreviewCard: typeof import('src/components/card/PreviewCard.vue').default;
     Card: typeof import('src/components/card/Card.vue').default;
   }

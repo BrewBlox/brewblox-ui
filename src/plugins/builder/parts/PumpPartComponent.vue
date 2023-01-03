@@ -7,6 +7,8 @@ import {
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
   LEFT,
+  MAX_PUMP_PRESSURE,
+  MIN_PUMP_PRESSURE,
   PumpBlockT,
   PUMP_KEY,
   PUMP_TYPES,
@@ -151,6 +153,10 @@ export default defineComponent({
     }
 
     return {
+      IO_PRESSURE_KEY,
+      MIN_PUMP_PRESSURE,
+      MAX_PUMP_PRESSURE,
+      DEFAULT_PUMP_PRESSURE,
       width,
       height,
       block,
@@ -275,21 +281,17 @@ export default defineComponent({
           >
             <q-item-section>Toggle pump</q-item-section>
           </q-item>
-          <q-item
-            v-close-popup
-            :disable="!block"
-            clickable
-            @click="showBlockDialog"
-          >
-            <q-item-section>Show block</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
-            clickable
-            @click="showBlockSelectDialog"
-          >
-            <q-item-section>Assign block</q-item-section>
-          </q-item>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <PressureMenuContent
+            :settings-key="IO_PRESSURE_KEY"
+            :min="MIN_PUMP_PRESSURE"
+            :max="MAX_PUMP_PRESSURE"
+            :default="DEFAULT_PUMP_PRESSURE"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

@@ -19,10 +19,6 @@ const blueprint: BuilderBlueprint = {
         max: 15,
       },
     },
-    {
-      component: 'LiquidSourceCard',
-      props: {},
-    },
   ],
   size: variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y),
   transitions: () => ({

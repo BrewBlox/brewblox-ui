@@ -76,22 +76,42 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{ title, message, html }">
-      <div class="column no-scroll q-pt-xl">
-        <q-slider
-          v-model="local.width"
-          :min="min.width"
-          :max="max.width"
-          label-always
-          class="q-ml-lg q-mb-sm"
-        />
-        <q-slider
-          v-model="local.height"
-          :min="min.height"
-          :max="max.height"
-          label-always
-          vertical
-        />
-      </div>
+      <q-list class="q-py-lg">
+        <q-item>
+          <q-item-section
+            label
+            side
+            style="min-width: 70px"
+          >
+            Width
+          </q-item-section>
+          <q-item-section>
+            <q-slider
+              v-model="local.width"
+              :min="min.width"
+              :max="max.width"
+              label-always
+            />
+          </q-item-section>
+        </q-item>
+        <q-item class="q-mt-md">
+          <q-item-section
+            label
+            side
+            style="min-width: 70px"
+          >
+            Height
+          </q-item-section>
+          <q-item-section>
+            <q-slider
+              v-model="local.height"
+              :min="min.height"
+              :max="max.height"
+              label-always
+            />
+          </q-item-section>
+        </q-item>
+      </q-list>
       <template #actions>
         <q-btn
           flat

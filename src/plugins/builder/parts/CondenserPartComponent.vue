@@ -1,7 +1,13 @@
 <script lang="ts">
 import { elbow } from '@/plugins/builder/utils';
 import { defineComponent } from 'vue';
+import {
+  DEFAULT_OUTLET_PRESSURE,
+  MAX_OUTLET_PRESSURE,
+  MIN_OUTLET_PRESSURE,
+} from '../blueprints/Condenser';
 import { usePart } from '../composables';
+import { IO_PRESSURE_KEY } from '../const';
 
 export default defineComponent({
   name: 'CondenserPartComponent',
@@ -23,8 +29,11 @@ export default defineComponent({
 
     const casing = outlinePath(false);
     const smokeArea = outlinePath(true);
-
     return {
+      IO_PRESSURE_KEY,
+      MIN_OUTLET_PRESSURE,
+      MAX_OUTLET_PRESSURE,
+      DEFAULT_OUTLET_PRESSURE,
       width,
       height,
       casing,
@@ -52,5 +61,20 @@ export default defineComponent({
         :speed="1"
       />
     </g>
+    <BuilderInteraction :height="100">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <PressureMenuContent
+            :settings-key="IO_PRESSURE_KEY"
+            :min="MIN_OUTLET_PRESSURE"
+            :max="MAX_OUTLET_PRESSURE"
+            :default="DEFAULT_OUTLET_PRESSURE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

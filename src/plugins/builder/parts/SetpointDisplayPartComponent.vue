@@ -24,5 +24,20 @@ export default defineComponent({
   <SetpointValues
     v-bind="{ width, height, bordered, borderColor }"
     always
-  />
+  >
+    <template #menu-content>
+      <q-item
+        v-ripple
+        v-close-popup
+        tag="label"
+      >
+        <q-item-section>
+          <q-item-label>Border</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-toggle v-model="bordered" />
+        </q-item-section>
+      </q-item>
+    </template>
+  </SetpointValues>
 </template>

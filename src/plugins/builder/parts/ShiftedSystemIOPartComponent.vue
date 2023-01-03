@@ -13,7 +13,7 @@ const chevrons = verticalChevrons(50, 86.4);
 export default defineComponent({
   name: 'ShiftedSystemIOPartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, width, height, pressured } = usePart.setup();
 
     const flowSpeed = computed<number>(() => -flowOnCoord(part.value, UP));
 
@@ -22,6 +22,7 @@ export default defineComponent({
     return {
       width,
       height,
+      pressured,
       chevrons,
       flowSpeed,
       liquids,
@@ -59,5 +60,15 @@ export default defineComponent({
         :d="chevrons.straight"
       />
     </g>
+    <BuilderInteraction @interact="pressured = !pressured">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <LiquidSourceMenuContent />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

@@ -13,7 +13,7 @@ const chevrons = horizontalChevrons(15, 25);
 export default defineComponent({
   name: 'SystemIOPartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, width, height, pressured } = usePart.setup();
 
     const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
 
@@ -23,6 +23,7 @@ export default defineComponent({
       width,
       height,
       chevrons,
+      pressured,
       flowSpeed,
       liquids,
     };
@@ -60,5 +61,15 @@ export default defineComponent({
       <path d="M30,21 H50" />
       <path d="M30,29 H50" />
     </g>
+    <BuilderInteraction @interact="pressured = !pressured">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <LiquidSourceMenuContent />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

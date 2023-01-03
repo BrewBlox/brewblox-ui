@@ -12,6 +12,8 @@ import {
 
 export const SIZE_X = 1;
 export const SIZE_Y = 2;
+export const MIN_OUTLET_PRESSURE = MIN_IO_PRESSURE;
+export const MAX_OUTLET_PRESSURE = MAX_IO_PRESSURE;
 export const DEFAULT_OUTLET_PRESSURE = DEFAULT_IO_PRESSURE / 2;
 
 const blueprint: BuilderBlueprint = {
