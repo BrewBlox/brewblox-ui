@@ -2,10 +2,11 @@
 import {
   BEER,
   COLD_WATER,
+  COLOR_KEY,
+  DEPRECATED_IO_LIQUIDS_KEY,
   DEPRECATED_IO_PRESSURE_KEY,
   HOT_WATER,
   IO_ENABLED_KEY,
-  IO_LIQUIDS_KEY,
   WORT,
 } from '@/plugins/builder/const';
 import { colorString } from '@/plugins/builder/utils';
@@ -32,16 +33,20 @@ export default defineComponent({
         }),
     });
 
-    const color = computed<string | null>({
-      get: () => settings.value[IO_LIQUIDS_KEY]?.[0] ?? null,
-      set: (v) => {
-        const liquids = v ? [colorString(v)] : [];
-        patchSettings({ [IO_LIQUIDS_KEY]: liquids });
-      },
+    const color = computed<string>({
+      get: () =>
+        settings.value[COLOR_KEY] ??
+        settings.value[DEPRECATED_IO_LIQUIDS_KEY]?.[0] ??
+        '',
+      set: (v) =>
+        patchSettings({
+          [COLOR_KEY]: colorString(v),
+          [DEPRECATED_IO_LIQUIDS_KEY]: undefined,
+        }),
     });
 
     function toggle(c: string): void {
-      color.value = c !== color.value ? c : null;
+      color.value = c !== color.value ? c : '';
     }
 
     return {

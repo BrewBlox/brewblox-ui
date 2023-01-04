@@ -6,6 +6,7 @@ import {
 import { defaultLabel } from '@/plugins/history/nodes';
 import { fixedNumber, shortDateString } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/MetricsDisplay';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
 import { liquidBorderColor } from '../utils';
@@ -21,7 +22,8 @@ interface MetricDisplay {
 export default defineComponent({
   name: 'MetricsDisplayPartComponent',
   setup() {
-    const { part, metrics, width, height, bordered } = usePart.setup();
+    const { part, metrics, width, height, bordered, universalFlow } =
+      usePart.setup();
     const { source } = useMetrics.setupConsumer();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
@@ -52,9 +54,12 @@ export default defineComponent({
     });
 
     return {
+      DEFAULT_SIZE_X,
+      DEFAULT_SIZE_Y,
       width,
       height,
       bordered,
+      universalFlow,
       color,
       values,
     };
@@ -88,5 +93,28 @@ export default defineComponent({
       </div>
     </foreignObject>
     <BuilderBorder v-bind="{ width, height, color }" />
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <!-- TODO(Bob) metrics menu content -->
+          <SizeMenuContent
+            :min="{ width: 1, height: 2 }"
+            :max="{ width: 8, height: 20 }"
+            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="universalFlow"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

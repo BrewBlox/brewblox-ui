@@ -1,5 +1,11 @@
 <script lang="ts">
-import { UP } from '@/plugins/builder/const';
+import {
+  DEFAULT_IO_PRESSURE,
+  IO_PRESSURE_KEY,
+  MAX_IO_PRESSURE,
+  MIN_IO_PRESSURE,
+  UP,
+} from '@/plugins/builder/const';
 import {
   flowOnCoord,
   liquidOnCoord,
@@ -20,6 +26,10 @@ export default defineComponent({
     const liquids = computed<string[]>(() => liquidOnCoord(part.value, UP));
 
     return {
+      IO_PRESSURE_KEY,
+      MIN_IO_PRESSURE,
+      MAX_IO_PRESSURE,
+      DEFAULT_IO_PRESSURE,
       width,
       height,
       pressured,
@@ -66,7 +76,17 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <LiquidSourceMenuContent />
+          <ToggleMenuContent
+            v-model="pressured"
+            label="Active"
+          />
+          <ColorMenuContent />
+          <PressureMenuContent
+            :settings-key="IO_PRESSURE_KEY"
+            :min="MIN_IO_PRESSURE"
+            :max="MAX_IO_PRESSURE"
+            :default="DEFAULT_IO_PRESSURE"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

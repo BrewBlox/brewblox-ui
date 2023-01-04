@@ -224,7 +224,7 @@ export default defineComponent({
   fill: none
 
   &:hover
-    .interaction
+    .interaction:hover
       opacity: 0.2
       fill: white
       background-color: white

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/HeatingElement';
 import { usePart } from '../composables';
 
 export default defineComponent({
@@ -13,6 +14,8 @@ export default defineComponent({
     });
 
     return {
+      DEFAULT_SIZE_X,
+      DEFAULT_SIZE_Y,
       bordered,
       width,
       height,
@@ -28,6 +31,26 @@ export default defineComponent({
     <g class="outline">
       <path :d="path" />
     </g>
-    <PwmValues :bordered="bordered" />
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <SizeMenuContent
+            :min="{ width: 3, height: 1 }"
+            :max="{ width: 10, height: 1 }"
+            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
+    <PwmValues>
+      <BuilderBorder v-if="bordered" />
+    </PwmValues>
   </svg>
 </template>

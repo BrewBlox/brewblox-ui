@@ -16,7 +16,8 @@ import { usePart } from '../composables';
 export default defineComponent({
   name: 'TiltDisplayPartComponent',
   setup() {
-    const { part, settings, width, height, bordered } = usePart.setup();
+    const { part, settings, width, height, bordered, universalFlow } =
+      usePart.setup();
     const tiltStore = useTiltStore();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
@@ -68,6 +69,7 @@ export default defineComponent({
       unitlessGravity,
       color,
       bordered,
+      universalFlow,
     };
   },
 });
@@ -78,51 +80,72 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 100 50"
   >
-    <g class="content">
-      <SensorSvgIcon
-        x="15"
-        y="3"
-        width="20"
-        height="20"
-      />
-      <foreignObject
-        x="40"
-        y="5"
-        width="50"
-        height="18"
-      >
-        <div class="fit builder-text">
-          {{ preciseNumber(temperature) }}
-          <small>{{ tempUnit }}</small>
-        </div>
-      </foreignObject>
-      <TiltSvgIcon
-        x="15"
-        y="25"
-        width="20"
-        height="20"
-      />
-      <foreignObject
-        x="40"
-        y="27"
-        width="50"
-        height="18"
-      >
-        <div class="fit builder-text">
-          <template v-if="unitlessGravity">
-            {{ fixedNumber(gravity, 4) }}
-          </template>
-          <template v-else>
-            {{ preciseNumber(gravity) }}
-            <small>{{ gravityUnit }}</small>
-          </template>
-        </div>
-      </foreignObject>
-    </g>
+    <SensorSvgIcon
+      x="15"
+      y="3"
+      width="20"
+      height="20"
+    />
+    <foreignObject
+      x="40"
+      y="5"
+      width="50"
+      height="18"
+    >
+      <div class="fit builder-text">
+        {{ preciseNumber(temperature) }}
+        <small>{{ tempUnit }}</small>
+      </div>
+    </foreignObject>
+    <TiltSvgIcon
+      x="15"
+      y="25"
+      width="20"
+      height="20"
+    />
+    <foreignObject
+      x="40"
+      y="27"
+      width="50"
+      height="18"
+    >
+      <div class="fit builder-text">
+        <template v-if="unitlessGravity">
+          {{ fixedNumber(gravity, 4) }}
+        </template>
+        <template v-else>
+          {{ preciseNumber(gravity) }}
+          <small>{{ gravityUnit }}</small>
+        </template>
+      </div>
+    </foreignObject>
     <BuilderBorder
       v-if="bordered"
       :width="100"
       :color="color"
     />
+    <BuilderInteraction :width="100">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <!-- TODO(Bob) select tilt -->
+          <SizeMenuContent
+            :min="{ width: 2, height: 1 }"
+            :max="{ width: 10, height: 5 }"
+            :default="{ width: 2, height: 1 }"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="universalFlow"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

@@ -11,7 +11,7 @@ import { liquidBorderColor } from '../utils';
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, universalFlow } = usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -85,6 +85,7 @@ export default defineComponent({
       width,
       height,
       bordered,
+      universalFlow,
       block,
       blockStatus,
       isBroken,
@@ -163,6 +164,19 @@ export default defineComponent({
             :available="!!block"
             @show="showBlockDialog"
             @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="{ width: 2, height: 1 }"
+            :max="{ width: 10, height: 5 }"
+            :default="{ width: 2, height: 1 }"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="universalFlow"
+            label="Flow through part"
           />
         </q-list>
       </q-menu>

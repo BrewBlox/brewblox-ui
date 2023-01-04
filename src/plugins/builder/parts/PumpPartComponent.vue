@@ -1,7 +1,6 @@
 <script lang="ts">
 import {
   DEFAULT_PUMP_PRESSURE,
-  DEPRECATED_PUMP_KEY,
   DigitalBlockT,
   DIGITAL_TYPES,
   IO_ENABLED_KEY,
@@ -18,7 +17,7 @@ import {
 import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, defineComponent, onBeforeMount, watch } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
@@ -103,16 +102,6 @@ export default defineComponent({
         }
       },
     );
-
-    onBeforeMount(() => {
-      const oldBlockAddr = settings.value[DEPRECATED_PUMP_KEY];
-      if (oldBlockAddr !== undefined) {
-        patchSettings({
-          [PUMP_KEY]: oldBlockAddr,
-          [DEPRECATED_PUMP_KEY]: undefined,
-        });
-      }
-    });
 
     function clickHandler(): void {
       if (isClaimed.value) {
@@ -273,6 +262,7 @@ export default defineComponent({
         context-menu
       >
         <q-list>
+          <!-- TODO(Bob) PWM toggle behavior -->
           <q-item
             v-close-popup
             :disable="isBroken || isClaimed"

@@ -74,9 +74,12 @@ declare module '@vue/runtime-core' {
     GraphDisplayDialog: typeof import('src/plugins/history/components/GraphDisplayDialog.vue').default;
     GraphDialog: typeof import('src/plugins/history/components/GraphDialog.vue').default;
     ExportGraphAction: typeof import('src/plugins/history/components/ExportGraphAction.vue').default;
+    ToggleMenuContent: typeof import('src/plugins/builder/components/menu/ToggleMenuContent.vue').default;
+    TextMenuContent: typeof import('src/plugins/builder/components/menu/TextMenuContent.vue').default;
+    SliderMenuContent: typeof import('src/plugins/builder/components/menu/SliderMenuContent.vue').default;
     SizeMenuContent: typeof import('src/plugins/builder/components/menu/SizeMenuContent.vue').default;
-    LiquidSourceMenuContent: typeof import('src/plugins/builder/components/menu/LiquidSourceMenuContent.vue').default;
-    BorderMenuContent: typeof import('src/plugins/builder/components/menu/BorderMenuContent.vue').default;
+    PressureMenuContent: typeof import('src/plugins/builder/components/menu/PressureMenuContent.vue').default;
+    ColorMenuContent: typeof import('src/plugins/builder/components/menu/ColorMenuContent.vue').default;
     BlockMenuContent: typeof import('src/plugins/builder/components/menu/BlockMenuContent.vue').default;
     ToggleCard: typeof import('src/plugins/builder/components/ToggleCard.vue').default;
     TextCard: typeof import('src/plugins/builder/components/TextCard.vue').default;

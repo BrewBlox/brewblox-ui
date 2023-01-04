@@ -5,8 +5,8 @@ import { variableSizeFunc } from '../utils';
 export const WIDGET_KEY = 'widgetId';
 export const WIDGET_TYPES = ['SessionLog'] as const;
 
-const DEFAULT_SIZE_X = 1;
-const SIZE_Y = 1;
+export const DEFAULT_SIZE_X = 1;
+export const DEFAULT_SIZE_Y = 1;
 
 const blueprint: BuilderBlueprint = {
   type: 'SessionLogDisplay',
@@ -34,7 +34,7 @@ const blueprint: BuilderBlueprint = {
       props: {},
     },
   ],
-  size: variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y),
+  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
   transitions: () => ({}),
 };
 

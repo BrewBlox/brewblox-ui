@@ -1,6 +1,7 @@
 <script lang="ts">
 import { LEFT } from '@/plugins/builder/const';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/FilterBottom';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
@@ -19,6 +20,8 @@ export default defineComponent({
     const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
 
     return {
+      DEFAULT_SIZE_X,
+      DEFAULT_SIZE_Y,
       width,
       height,
       paths,
@@ -67,5 +70,19 @@ export default defineComponent({
       <path :d="paths.borders[0]" />
       <path :d="paths.borders[1]" />
     </g>
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <SizeMenuContent
+            :min="{ width: 1, height: 1 }"
+            :max="{ width: 15, height: 1 }"
+            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

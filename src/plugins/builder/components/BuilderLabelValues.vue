@@ -1,5 +1,4 @@
 <script lang="ts">
-import { createDialog } from '@/utils/dialog';
 import { computed, defineComponent } from 'vue';
 import {
   LABEL_FONT_SIZE_DEFAULT,
@@ -38,8 +37,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { part, settings, partWidth, partHeight, patchSettings } =
-      usePart.setup();
+    const { part, settings, partWidth, partHeight } = usePart.setup();
 
     const text = computed<string>(
       () => settings.value[props.settingsKey] || props.unsetLabel,
@@ -57,43 +55,25 @@ export default defineComponent({
       ),
     );
 
-    function edit(): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: settings.value[props.settingsKey] ?? '',
-          title: 'Edit label',
-          label: 'text',
-        },
-      }).onOk((text) => patchSettings({ [props.settingsKey]: text }));
-    }
-
     return {
       text,
       fontSize,
       labelTransform,
-      edit,
     };
   },
 });
 </script>
 
 <template>
-  <svg v-bind="{ width, height }">
-    <foreignObject
-      :transform="labelTransform"
-      class="fit"
+  <foreignObject
+    v-bind="{ width, height }"
+    :transform="labelTransform"
+  >
+    <div
+      class="fit builder-text"
+      :style="`font-size: ${fontSize}pt; padding-top: 15px`"
     >
-      <div
-        class="fit builder-text"
-        :style="`font-size: ${fontSize}pt; padding-top: 15px`"
-      >
-        {{ text }}
-      </div>
-    </foreignObject>
-    <BuilderInteraction
-      v-bind="{ width, height }"
-      @interact="edit"
-    />
-  </svg>
+      {{ text }}
+    </div>
+  </foreignObject>
 </template>

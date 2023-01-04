@@ -4,7 +4,6 @@ import {
   COLOR_KEY,
   DRIVER_KEY,
   IO_ENABLED_KEY,
-  IO_LIQUIDS_KEY,
   IO_PRESSURE_KEY,
   PID_KEY,
   PWM_KEY,
@@ -920,7 +919,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           settings: {
             [IO_ENABLED_KEY]: true,
             [IO_PRESSURE_KEY]: 10,
-            [IO_LIQUIDS_KEY]: [COLD_WATER],
+            [COLOR_KEY]: COLD_WATER,
           },
           flipped: false,
           type: 'SystemIO',

@@ -1,9 +1,10 @@
 import {
   CENTER,
+  COLOR_KEY,
   DEFAULT_IO_PRESSURE,
+  DEPRECATED_IO_LIQUIDS_KEY,
   DEPRECATED_IO_PRESSURE_KEY,
   IO_ENABLED_KEY,
-  IO_LIQUIDS_KEY,
   IO_PRESSURE_KEY,
   MAX_IO_PRESSURE,
   MIN_IO_PRESSURE,
@@ -38,12 +39,15 @@ const blueprint: BuilderBlueprint = {
     const pressure = enabled
       ? part.settings[IO_PRESSURE_KEY] ?? DEFAULT_IO_PRESSURE
       : 0;
+    const color =
+      part.settings[COLOR_KEY] ?? part.settings[DEPRECATED_IO_LIQUIDS_KEY]?.[0];
+    const liquids = enabled && color ? [color] : [];
     return {
       [CENTER]: [
         {
-          outCoords: RIGHT,
           pressure,
-          liquids: enabled ? part.settings[IO_LIQUIDS_KEY] || [] : [],
+          liquids,
+          outCoords: RIGHT,
           source: true,
         },
       ],

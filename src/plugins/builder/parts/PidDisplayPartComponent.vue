@@ -20,7 +20,7 @@ export default defineComponent({
   name: 'PidDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, universalFlow } = usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -91,6 +91,7 @@ export default defineComponent({
       suffix,
       color,
       bordered,
+      universalFlow,
     };
   },
 });
@@ -157,7 +158,14 @@ export default defineComponent({
             :max="{ width: 5, height: 5 }"
             :default="{ width: 1, height: 1 }"
           />
-          <BorderMenuContent />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="universalFlow"
+            label="Flow through part"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

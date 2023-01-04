@@ -2,8 +2,8 @@ import { CENTER, LEFT, WIDTH_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { variableSizeFunc } from '../utils';
 
-const DEFAULT_SIZE_X = 4;
-const SIZE_Y = 1;
+export const DEFAULT_SIZE_X = 4;
+export const DEFAULT_SIZE_Y = 1;
 
 const blueprint: BuilderBlueprint = {
   type: 'FilterBottom',
@@ -20,7 +20,7 @@ const blueprint: BuilderBlueprint = {
       },
     },
   ],
-  size: variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y),
+  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
   transitions: () => ({
     [LEFT]: [{ outCoords: CENTER }],
     [CENTER]: [{ outCoords: LEFT }],

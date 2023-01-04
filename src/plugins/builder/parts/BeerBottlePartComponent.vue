@@ -1,6 +1,7 @@
 <script lang="ts">
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/BeerBottle';
 import { usePart } from '../composables';
 import { COLOR_KEY } from '../const';
 
@@ -14,6 +15,8 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE_X,
+      DEFAULT_SIZE_Y,
       width,
       height,
       color,
@@ -61,5 +64,20 @@ export default defineComponent({
         />
       </g>
     </g>
+    <BuilderInteraction :height="100">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <ColorMenuContent />
+          <SizeMenuContent
+            :min="{ width: 1, height: 1 }"
+            :max="{ width: 5, height: 10 }"
+            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

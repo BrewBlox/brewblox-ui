@@ -2,8 +2,8 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 import { HEIGHT_KEY, SETPOINT_KEY, SETPOINT_TYPES, WIDTH_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
-const DEFAULT_SIZE_X = 3;
-const DEFAULT_SIZE_Y = 9;
+export const DEFAULT_SIZE_X = 3;
+export const DEFAULT_SIZE_Y = 9;
 
 const blueprint: BuilderBlueprint = {
   type: 'Conical',

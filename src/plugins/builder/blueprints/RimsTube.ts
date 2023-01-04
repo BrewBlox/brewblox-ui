@@ -8,10 +8,10 @@ import { PWM_KEY, PWM_TYPES, WIDTH_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
 export const DEFAULT_SIZE_X = 4;
-export const SIZE_Y = 1;
+export const DEFAULT_SIZE_Y = 1;
 export const ENTRY = '1.5,0,0';
 
-const size = variableSizeFunc(DEFAULT_SIZE_X, SIZE_Y);
+const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
 
 const blueprint: BuilderBlueprint = {
   type: 'RimsTube',

@@ -12,7 +12,7 @@ import { usePart, useSettingsBlock } from '../composables';
 export default defineComponent({
   name: 'SensorDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, universalFlow } = usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -50,6 +50,7 @@ export default defineComponent({
       tempUnit,
       color,
       bordered,
+      universalFlow,
     };
   },
 });
@@ -91,10 +92,7 @@ export default defineComponent({
       v-if="bordered"
       :color="color"
     />
-    <BuilderInteraction
-      :width="100"
-      @interact="showBlockDialog"
-    >
+    <BuilderInteraction @interact="showBlockDialog">
       <q-menu
         touch-position
         context-menu
@@ -104,6 +102,19 @@ export default defineComponent({
             :available="!!block"
             @show="showBlockDialog"
             @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="{ width: 1, height: 1 }"
+            :max="{ width: 5, height: 5 }"
+            :default="{ width: 1, height: 1 }"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="universalFlow"
+            label="Flow through part"
           />
         </q-list>
       </q-menu>

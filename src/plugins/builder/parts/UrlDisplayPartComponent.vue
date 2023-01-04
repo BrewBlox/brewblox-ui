@@ -2,6 +2,7 @@
 import { isAbsoluteUrl } from '@/utils/url';
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/UrlDisplay';
 import { usePart } from '../composables';
 import { LABEL_KEY, URL_KEY } from '../const';
 
@@ -27,6 +28,8 @@ export default defineComponent({
     }
 
     return {
+      DEFAULT_SIZE_X,
+      DEFAULT_SIZE_Y,
       width,
       height,
       bordered,
@@ -55,6 +58,21 @@ export default defineComponent({
     <BuilderInteraction
       v-bind="{ width, height }"
       @interact="interact"
-    />
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <!-- TODO(Bob) edit URL -->
+          <TextMenuContent />
+          <SizeMenuContent
+            :min="{ width: 2, height: 1 }"
+            :max="{ width: 10, height: 10 }"
+            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

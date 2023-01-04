@@ -33,14 +33,6 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    bordered: {
-      type: Boolean,
-      default: false,
-    },
-    borderColor: {
-      type: String,
-      default: 'white',
-    },
     always: {
       type: Boolean,
       default: false,
@@ -150,11 +142,9 @@ export default defineComponent({
         </div>
       </foreignObject>
     </template>
-    <BuilderBorder
-      v-if="bordered"
-      :width="100"
-      :color="borderColor"
-    />
+
+    <slot />
+
     <BuilderInteraction
       :width="100"
       @interact="showBlockDialog"

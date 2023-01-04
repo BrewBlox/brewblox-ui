@@ -1,7 +1,12 @@
 <script lang="ts">
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
-import { DEFAULT_FILL_PCT, KETTLE_FILL_PCT_KEY } from '../blueprints/Kettle';
+import {
+  DEFAULT_FILL_PCT,
+  DEFAULT_SIZE_X,
+  DEFAULT_SIZE_Y,
+  KETTLE_FILL_PCT_KEY,
+} from '../blueprints/Kettle';
 import { usePart } from '../composables';
 import { COLOR_KEY } from '../const';
 
@@ -20,6 +25,10 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE_X,
+      DEFAULT_SIZE_Y,
+      KETTLE_FILL_PCT_KEY,
+      DEFAULT_FILL_PCT,
       width,
       height,
       filledHeight,
@@ -48,5 +57,28 @@ export default defineComponent({
       :width="width"
       :height="50"
     />
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <TextMenuContent />
+          <ColorMenuContent />
+          <SizeMenuContent
+            :min="{ width: 2, height: 2 }"
+            :max="{ width: 10, height: 10 }"
+            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+          />
+          <SliderMenuContent
+            :min="0"
+            :max="100"
+            :default="DEFAULT_FILL_PCT"
+            :settings-key="KETTLE_FILL_PCT_KEY"
+            label="Liquid level (%)"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

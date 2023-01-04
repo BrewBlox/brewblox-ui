@@ -4,14 +4,16 @@ import { deepCopy } from '@/utils/objects';
 import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
 import {
   BORDER_KEY,
+  COLOR_KEY,
   DEPRECATED_IO_PRESSURE_KEY,
+  FLOW_TOGGLE_KEY,
   InteractKey,
   IO_ENABLED_KEY,
   PartKey,
   ReflowKey,
 } from '../const';
 import { FlowPart } from '../types';
-import { coord2grid } from '../utils';
+import { colorString, coord2grid } from '../utils';
 
 export interface UsePartComponent {
   part: WritableComputedRef<FlowPart>;
@@ -22,8 +24,10 @@ export interface UsePartComponent {
   width: ComputedRef<number>;
   height: ComputedRef<number>;
   flipped: ComputedRef<boolean>;
+  color: WritableComputedRef<string>;
   bordered: WritableComputedRef<boolean>;
   pressured: WritableComputedRef<boolean>;
+  universalFlow: WritableComputedRef<boolean>;
   patchSettings: (patch: Mapped<any>) => void;
   interact: (func: () => unknown) => void;
   reflow: () => void;
@@ -60,8 +64,13 @@ export const usePart: UsePartComposable = {
 
     const flipped = computed<boolean>(() => part.value.flipped === true);
 
+    const color = computed<string>({
+      get: () => settings.value[COLOR_KEY] ?? '',
+      set: (v) => patchSettings({ [COLOR_KEY]: colorString(v) }),
+    });
+
     const bordered = computed<boolean>({
-      get: () => Boolean(part.value.settings[BORDER_KEY] ?? true),
+      get: () => Boolean(settings.value[BORDER_KEY] ?? true),
       set: (v) => patchSettings({ [BORDER_KEY]: Boolean(v) }),
     });
 
@@ -78,6 +87,11 @@ export const usePart: UsePartComposable = {
         }),
     });
 
+    const universalFlow = computed<boolean>({
+      get: () => Boolean(settings.value[FLOW_TOGGLE_KEY] ?? false),
+      set: (v) => patchSettings({ [FLOW_TOGGLE_KEY]: Boolean(v) }),
+    });
+
     function patchSettings(patch: Mapped<any>): void {
       settings.value = { ...part.value.settings, ...patch };
     }
@@ -91,8 +105,10 @@ export const usePart: UsePartComposable = {
       width,
       height,
       flipped,
+      color,
       bordered,
       pressured,
+      universalFlow,
       patchSettings,
       reflow,
       interact,

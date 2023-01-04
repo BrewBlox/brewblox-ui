@@ -2,6 +2,12 @@ import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
 import { upgradeMetricsConfig } from '@/plugins/history/utils';
 import { concatById, filterById, findById } from '@/utils/collections';
 import { defineStore } from 'pinia';
+import {
+  COLOR_KEY,
+  DEPRECATED_IO_LIQUIDS_KEY,
+  DEPRECATED_PUMP_KEY,
+  PUMP_KEY,
+} from '../const';
 import api from './api';
 
 const fallbackBlueprint = (): BuilderBlueprint => ({
@@ -74,6 +80,27 @@ export const useBuilderStore = defineStore('builderStore', {
             if (upgraded) {
               dirty = true;
               part.metrics = upgraded;
+            }
+          }
+
+          // Migrate from settings.liquids to settings.color
+          // This removes an unnecessary array, and standardizes all color settings
+          if (part.type === 'SystemIo' || part.type === 'ShiftedSystemIo') {
+            const liquids = part.settings[DEPRECATED_IO_LIQUIDS_KEY]?.[0];
+            if (liquids) {
+              dirty = true;
+              part.settings[COLOR_KEY] = liquids;
+              part.settings[DEPRECATED_IO_LIQUIDS_KEY] = undefined;
+            }
+          }
+
+          // Pumps were standardized to use either PWM or Digital Actuator blocks
+          if (part.type === 'Pump') {
+            const addr = part.settings[DEPRECATED_PUMP_KEY];
+            if (addr !== undefined) {
+              dirty = true;
+              part.settings[PUMP_KEY] = addr;
+              part.settings[DEPRECATED_PUMP_KEY] = undefined;
             }
           }
         });

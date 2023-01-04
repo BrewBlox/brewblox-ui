@@ -28,14 +28,6 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    bordered: {
-      type: Boolean,
-      default: false,
-    },
-    borderColor: {
-      type: String,
-      default: '',
-    },
   },
   setup(props) {
     const { part } = usePart.setup();
@@ -101,10 +93,9 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <BuilderBorder
-      v-if="bordered"
-      :color="borderColor"
-    />
+
+    <slot />
+
     <BuilderInteraction @interact="showBlockDialog">
       <q-menu
         touch-position
@@ -116,6 +107,7 @@ export default defineComponent({
             @show="showBlockDialog"
             @assign="showBlockSelectDialog"
           />
+          <slot name="menu-content" />
         </q-list>
       </q-menu>
     </BuilderInteraction>

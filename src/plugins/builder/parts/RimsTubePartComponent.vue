@@ -2,6 +2,7 @@
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/RimsTube';
 import { usePart } from '../composables';
 
 export default defineComponent({
@@ -46,6 +47,8 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE_X,
+      DEFAULT_SIZE_Y,
       width,
       height,
       bordered,
@@ -60,7 +63,6 @@ export default defineComponent({
 
 <template>
   <svg v-bind="{ width, height }">
-    <PwmValues :bordered="bordered" />
     <LiquidStroke
       :paths="[paths.content]"
       :colors="liquids"
@@ -83,5 +85,26 @@ export default defineComponent({
       <path :d="paths.casing" />
       <path :d="paths.element" />
     </g>
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <SizeMenuContent
+            :min="{ width: 3, height: 1 }"
+            :max="{ width: 10, height: 1 }"
+            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
+    <PwmValues>
+      <BuilderBorder v-if="bordered" />
+    </PwmValues>
   </svg>
 </template>

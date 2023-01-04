@@ -2,8 +2,8 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 import { HEIGHT_KEY, LABEL_KEY, WIDTH_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
-const DEFAULT_SIZE_X = 4;
-const DEFAULT_SIZE_Y = 1;
+export const DEFAULT_SIZE_X = 4;
+export const DEFAULT_SIZE_Y = 1;
 
 export const LABEL_FONT_SIZE_KEY = 'fontSize';
 export const LABEL_FONT_SIZE_DEFAULT = 16;

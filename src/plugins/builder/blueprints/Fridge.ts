@@ -2,11 +2,10 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 import { HEIGHT_KEY, LABEL_KEY, WIDTH_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
+export const DEFAULT_SIZE_X = 4;
+export const DEFAULT_SIZE_Y = 12;
 export const SHELF_Y_KEY = 'shelfY';
 export const DEFAULT_SHELF_Y = 1;
-
-const DEFAULT_SIZE_X = 4;
-const DEFAULT_SIZE_Y = 12;
 
 const blueprint: BuilderBlueprint = {
   type: 'Fridge',

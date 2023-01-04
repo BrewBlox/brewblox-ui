@@ -48,7 +48,6 @@ export const LIQUID_CORNER = 8;
 // Generic setting keys
 export const IO_ENABLED_KEY = 'enabled';
 export const IO_PRESSURE_KEY = 'onPressure';
-export const IO_LIQUIDS_KEY = 'liquids';
 export const COLOR_KEY = 'color';
 export const BORDER_KEY = 'bordered';
 export const FLOW_TOGGLE_KEY = 'flowEnabled';
@@ -60,6 +59,7 @@ export const VALVE_CLOSED_KEY = 'closed';
 
 // Deprecated setting keys
 // Typically used as fallback
+export const DEPRECATED_IO_LIQUIDS_KEY = 'liquids';
 export const DEPRECATED_IO_PRESSURE_KEY = 'pressure';
 export const DEPRECATED_SCALE_KEY = 'scale';
 export const DEPRECATED_PUMP_KEY = 'pwm';
