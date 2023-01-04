@@ -96,15 +96,17 @@ export default defineComponent({
             :max="{ width: 10, height: 1 }"
             :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
           />
-          <ToggleMenuContent
-            v-model="bordered"
-            label="Border"
-          />
         </q-list>
       </q-menu>
     </BuilderInteraction>
     <PwmValues>
       <BuilderBorder v-if="bordered" />
+      <template #menu-content>
+        <ToggleMenuContent
+          v-model="bordered"
+          label="Border"
+        />
+      </template>
     </PwmValues>
   </svg>
 </template>

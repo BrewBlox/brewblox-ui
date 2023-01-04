@@ -269,7 +269,7 @@ export default defineComponent({
             clickable
             @click="toggleHandler"
           >
-            <q-item-section>Toggle pump</q-item-section>
+            <q-item-section>Toggle</q-item-section>
           </q-item>
           <BlockMenuContent
             :available="!!block"

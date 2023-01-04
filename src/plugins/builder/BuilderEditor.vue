@@ -486,18 +486,6 @@ export default defineComponent({
       }
     }
 
-    function useEdit(): void {
-      activeToolId.value = 'edit';
-      if (floater.value) {
-        cancelFloater();
-      } else {
-        const part = findHoveredPart();
-        if (part) {
-          configuredPart.value = part;
-        }
-      }
-    }
-
     function useInteract(): void {
       activeToolId.value = 'interact';
       if (floater.value) {
@@ -563,7 +551,6 @@ export default defineComponent({
       copy: useCopy,
       rotate: useRotate,
       flip: useFlip,
-      edit: useEdit,
       interact: useInteract,
       delete: useDelete,
       undo: useUndo,
@@ -581,12 +568,12 @@ export default defineComponent({
     const disabledTools = computed<BuilderToolName[]>(() => {
       const tools: BuilderToolName[] = [];
       if (floater.value) {
-        tools.push('add', 'edit', 'interact');
+        tools.push('add', 'interact');
         if (floater.value.parts.length > 1) {
           tools.push('rotate', 'flip');
         }
       } else if (selectedIds.value.length > 1) {
-        tools.push('interact', 'edit', 'rotate', 'flip');
+        tools.push('interact', 'rotate', 'flip');
       }
       if (!history.value.length) {
         tools.push('undo');

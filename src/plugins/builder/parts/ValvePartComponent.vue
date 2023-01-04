@@ -36,6 +36,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      isClaimed,
       patchBlock,
       showBlockDialog,
       showBlockSelectDialog,
@@ -109,6 +110,7 @@ export default defineComponent({
       hasAddress,
       block,
       isBroken,
+      isClaimed,
       flowSpeed,
       liquids,
       closed,
@@ -180,6 +182,14 @@ export default defineComponent({
         context-menu
       >
         <q-list>
+          <q-item
+            v-close-popup
+            :disable="isBroken || isClaimed"
+            clickable
+            @click="toggle"
+          >
+            <q-item-section>Toggle</q-item-section>
+          </q-item>
           <BlockMenuContent
             :available="!!block"
             @show="showBlockDialog"

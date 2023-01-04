@@ -96,7 +96,6 @@ export type BuilderToolName =
   | 'copy'
   | 'rotate'
   | 'flip'
-  | 'edit'
   | 'interact'
   | 'delete'
   | 'undo'

@@ -177,13 +177,6 @@ export const builderTools: BuilderTool[] = [
     cursor: 'auto',
   },
   {
-    value: 'edit',
-    label: 'Edit settings',
-    icon: 'settings',
-    shortcut: 'e',
-    cursor: 'auto',
-  },
-  {
     label: 'Interact',
     value: 'interact',
     icon: 'mdi-cursor-default',
