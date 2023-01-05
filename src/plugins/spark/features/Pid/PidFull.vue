@@ -282,6 +282,9 @@ export default defineComponent({
       <div class="span-s big">=</div>
       <div class="span-l">
         <LabeledField label="Error">
+          <q-tooltip>
+            Error = setting - measured
+          </q-tooltip>
           {{ prettyQty(block.data.error) }}
         </LabeledField>
       </div>
@@ -296,7 +299,7 @@ export default defineComponent({
           label="Kp"
           message="
               <p>
-                Kp is the proportional gain, which is directly mutiplied by the filtered error.
+                Kp is the proportional gain, which is directly mutiplied by the error.
                 The output of the PID is Kp * input error.
                 Set it to what you think the output should be for a 1 degree error.
               </p>
@@ -320,7 +323,10 @@ export default defineComponent({
       <div class="span-l">
         <LabeledField label="Integral of P">
           {{ fixedNumber(block.data.integral) }}
-        </LabeledField>
+          <q-tooltip>
+            Increases with P every second
+          </q-tooltip>
+          </LabeledField>
       </div>
 
       <div class="span-s big">&#247;</div>
@@ -345,9 +351,9 @@ export default defineComponent({
                 <p>
                   When the proportional action (P) brings the input close
                   to the target value but a small error remains,
-                  the integrator corrects it.
-                  The integrator action (I) will increase by (P)
-                  every period of duration Ti.
+                  the integrator will correct it over time.
+                  The integratal increases by P every second.
+                  I, which is integral/Ti, will increase by P in Ti seconds.
                 </p>
                 <p>
                   The integrator should be slow enough
@@ -387,6 +393,9 @@ export default defineComponent({
           label="Derivative of P"
         >
           {{ fixedNumber(block.data.derivative, 4) }}
+          <q-tooltip>
+            Filtered change of P per second
+          </q-tooltip>
         </LabeledField>
       </div>
 
@@ -473,6 +482,7 @@ export default defineComponent({
         <span>when the setpoint is higher than</span>
         <InlineQuantityField
           v-model="boilPoint"
+          :class="{ 'text-green': boiling }"
           title="Boiling point"
           message="
         When the Setpoint is set to this temperature or higher,
