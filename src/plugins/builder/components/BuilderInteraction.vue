@@ -21,12 +21,15 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
+    /**
+     * Handled as a property instead of an emitted event
+     * to allow for automated presence checks.
+     */
     onInteract: {
       type: Function,
       default: null,
     },
   },
-  emits: ['interact'],
   setup() {
     const { interact } = usePart.setup();
 
