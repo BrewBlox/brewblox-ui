@@ -1,7 +1,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/BuilderLabel';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/BuilderLabel';
 import { usePart } from '../composables';
+import { LABEL_KEY } from '../const';
 
 export default defineComponent({
   name: 'BuilderLabelPartComponent',
@@ -9,8 +10,10 @@ export default defineComponent({
     const { width, height } = usePart.setup();
 
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      MIN_SIZE,
+      MAX_SIZE,
+      DEFAULT_SIZE,
+      LABEL_KEY,
       width,
       height,
     };
@@ -30,11 +33,14 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <TextMenuContent />
+          <TextMenuContent
+            :settings-key="LABEL_KEY"
+            label="Edit text"
+          />
           <SizeMenuContent
-            :min="{ width: 2, height: 1 }"
-            :max="{ width: 10, height: 10 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
         </q-list>
       </q-menu>

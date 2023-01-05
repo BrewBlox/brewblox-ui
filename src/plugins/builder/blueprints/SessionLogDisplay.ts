@@ -3,10 +3,14 @@ import { WIDTH_KEY } from '../const';
 import { variableSizeFunc } from '../utils';
 
 export const WIDGET_KEY = 'widgetId';
-export const WIDGET_TYPES = ['SessionLog'] as const;
+export const WIDGET_TYPE = 'SessionLog';
 
 export const DEFAULT_SIZE_X = 1;
 export const DEFAULT_SIZE_Y = 1;
+
+export const MIN_SIZE: AreaSize = { width: 1, height: 1 };
+export const MAX_SIZE: AreaSize = { width: 10, height: 1 };
+export const DEFAULT_SIZE: AreaSize = { width: 1, height: 1 };
 
 const blueprint: BuilderBlueprint = {
   type: 'SessionLogDisplay',
@@ -26,7 +30,7 @@ const blueprint: BuilderBlueprint = {
       component: 'LinkedWidgetCard',
       props: {
         settingsKey: WIDGET_KEY,
-        types: WIDGET_TYPES,
+        types: [WIDGET_TYPE],
       },
     },
     {
@@ -34,7 +38,7 @@ const blueprint: BuilderBlueprint = {
       props: {},
     },
   ],
-  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
+  size: variableSizeFunc(DEFAULT_SIZE),
   transitions: () => ({}),
 };
 

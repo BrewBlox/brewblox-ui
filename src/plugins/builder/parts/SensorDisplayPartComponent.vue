@@ -7,12 +7,13 @@ import {
 import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'SensorDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered, universalFlow } = usePart.setup();
+    const { part, width, height, bordered, passthrough } = usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -37,6 +38,9 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       fixedNumber,
       width,
       height,
@@ -50,7 +54,7 @@ export default defineComponent({
       tempUnit,
       color,
       bordered,
-      universalFlow,
+      passthrough,
     };
   },
 });
@@ -104,16 +108,16 @@ export default defineComponent({
             @assign="showBlockSelectDialog"
           />
           <SizeMenuContent
-            :min="{ width: 1, height: 1 }"
-            :max="{ width: 5, height: 5 }"
-            :default="{ width: 1, height: 1 }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
           <ToggleMenuContent
             v-model="bordered"
             label="Border"
           />
           <ToggleMenuContent
-            v-model="universalFlow"
+            v-model="passthrough"
             label="Flow through part"
           />
         </q-list>

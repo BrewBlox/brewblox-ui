@@ -14,7 +14,11 @@ import {
 export const DEFAULT_SIZE_X = 2;
 export const DEFAULT_SIZE_Y = 1;
 
-const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+export const MIN_SIZE: AreaSize = { width: 1, height: 1 };
+export const MAX_SIZE: AreaSize = { width: 10, height: 5 };
+export const DEFAULT_SIZE: AreaSize = { width: 2, height: 1 };
+
+const size = variableSizeFunc(DEFAULT_SIZE);
 
 const blueprint: BuilderBlueprint = {
   type: 'SetpointDriverDisplay',

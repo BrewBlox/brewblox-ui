@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/Conical';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/Conical';
 import { usePart } from '../composables';
 
 export default defineComponent({
@@ -9,8 +9,9 @@ export default defineComponent({
     const { width, height } = usePart.setup();
 
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       width,
       height,
     };
@@ -174,9 +175,9 @@ export default defineComponent({
       >
         <q-list>
           <SizeMenuContent
-            :min="{ width: 2, height: 2 }"
-            :max="{ width: 8, height: 20 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
         </q-list>
       </q-menu>

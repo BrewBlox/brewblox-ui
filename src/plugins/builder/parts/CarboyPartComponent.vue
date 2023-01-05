@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/Carboy';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/Carboy';
 import { usePart } from '../composables';
 
 export default defineComponent({
@@ -9,8 +9,9 @@ export default defineComponent({
     const { width, height, color } = usePart.setup();
 
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      MIN_SIZE,
+      MAX_SIZE,
+      DEFAULT_SIZE,
       width,
       height,
       color,
@@ -61,9 +62,9 @@ export default defineComponent({
         <q-list>
           <ColorMenuContent />
           <SizeMenuContent
-            :min="{ width: 1, height: 1 }"
-            :max="{ width: 5, height: 10 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
         </q-list>
       </q-menu>

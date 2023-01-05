@@ -11,6 +11,10 @@ import { variableSizeFunc } from '../utils';
 export const DEFAULT_SIZE_X = 2;
 export const DEFAULT_SIZE_Y = 5;
 
+export const MIN_SIZE: AreaSize = { width: 1, height: 2 };
+export const MAX_SIZE: AreaSize = { width: 8, height: 20 };
+export const DEFAULT_SIZE: AreaSize = { width: 2, height: 5 };
+
 const blueprint: BuilderBlueprint = {
   type: 'Keg',
   title: 'Keg',
@@ -51,7 +55,7 @@ const blueprint: BuilderBlueprint = {
       },
     },
   ],
-  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
+  size: variableSizeFunc(DEFAULT_SIZE),
 };
 
 export default blueprint;

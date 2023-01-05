@@ -11,7 +11,11 @@ import { variableSizeFunc } from '../utils';
 export const DEFAULT_SIZE_X = 2;
 export const DEFAULT_SIZE_Y = 4;
 
-const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+export const MIN_SIZE: AreaSize = { width: 2, height: 2 };
+export const MAX_SIZE: AreaSize = { width: 8, height: 10 };
+export const DEFAULT_SIZE: AreaSize = { width: 2, height: 4 };
+
+const size = variableSizeFunc(DEFAULT_SIZE);
 
 const blueprint: BuilderBlueprint = {
   type: 'Carboy',

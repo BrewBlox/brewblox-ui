@@ -215,7 +215,7 @@ export default defineComponent({
     opacity: 0.1 !important
 
   &.interactable
-    :deep(.interaction)
+    :deep(.interaction.pointer)
       cursor: pointer
 
 :deep(.builder-part)

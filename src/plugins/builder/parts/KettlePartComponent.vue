@@ -3,12 +3,13 @@ import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
 import {
   DEFAULT_FILL_PCT,
-  DEFAULT_SIZE_X,
-  DEFAULT_SIZE_Y,
+  DEFAULT_SIZE,
   KETTLE_FILL_PCT_KEY,
+  MAX_SIZE,
+  MIN_SIZE,
 } from '../blueprints/Kettle';
 import { usePart } from '../composables';
-import { COLOR_KEY } from '../const';
+import { COLOR_KEY, LABEL_KEY } from '../const';
 
 export default defineComponent({
   name: 'KettlePartComponent',
@@ -23,12 +24,13 @@ export default defineComponent({
     const color = computed<string>(() =>
       colorString(settings.value[COLOR_KEY]),
     );
-
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       KETTLE_FILL_PCT_KEY,
       DEFAULT_FILL_PCT,
+      LABEL_KEY,
       width,
       height,
       filledHeight,
@@ -63,19 +65,23 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <TextMenuContent />
           <ColorMenuContent />
           <SizeMenuContent
-            :min="{ width: 2, height: 2 }"
-            :max="{ width: 10, height: 10 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
           <SliderMenuContent
             :min="0"
             :max="100"
             :default="DEFAULT_FILL_PCT"
             :settings-key="KETTLE_FILL_PCT_KEY"
-            label="Liquid level (%)"
+            label="Liquid level"
+            postfix="%"
+          />
+          <TextMenuContent
+            :settings-key="LABEL_KEY"
+            label="Edit label"
           />
         </q-list>
       </q-menu>

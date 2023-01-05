@@ -26,6 +26,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    postfix: {
+      type: String,
+      default: '',
+    },
   },
   setup(props) {
     const { settings, patchSettings } = usePart.setup();
@@ -61,6 +65,6 @@ export default defineComponent({
     @click="edit"
   >
     <q-item-section>{{ label }}</q-item-section>
-    <q-item-section side> {{ settingValue }} </q-item-section>
+    <q-item-section side> {{ settingValue }} {{ postfix }} </q-item-section>
   </q-item>
 </template>

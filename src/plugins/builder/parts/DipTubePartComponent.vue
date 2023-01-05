@@ -34,6 +34,14 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
   >
+    <LiquidStroke
+      :paths="paths.liquid"
+      :colors="liquids"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      :path="paths.liquid[0]"
+    />
     <g class="outline fill">
       <rect
         y="12.5"
@@ -53,13 +61,5 @@ export default defineComponent({
         :d="border"
       />
     </g>
-    <LiquidStroke
-      :paths="paths.liquid"
-      :colors="liquids"
-    />
-    <AnimatedArrows
-      :speed="flowSpeed"
-      :path="paths.liquid[0]"
-    />
   </svg>
 </template>

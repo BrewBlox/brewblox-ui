@@ -19,6 +19,10 @@ import { settingsBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { DigitalState } from 'brewblox-proto/ts';
 
+export type OnInteractBehavior = 'toggle' | 'dialog';
+
+export const ON_INTERACT_KEY = 'onInteract';
+
 const calcPressure = (part: PersistentPart): number => {
   const block = settingsBlock<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
   if (block == null) {

@@ -18,6 +18,7 @@ import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
+import { OnInteractBehavior, ON_INTERACT_KEY } from '../blueprints/Pump';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
@@ -45,16 +46,31 @@ export default defineComponent({
       return isBlockCompatible<PwmBlockT>(v, PWM_TYPES);
     }
 
+    const onInteract = computed<OnInteractBehavior>(
+      () => settings.value[ON_INTERACT_KEY] ?? 'toggle',
+    );
+
     const enabled = computed<boolean>(() => {
+      if (!hasAddress.value) {
+        return Boolean(settings.value[IO_ENABLED_KEY]);
+      }
+
       if (isDigital(block.value)) {
         return block.value.data.state === DigitalState.STATE_ACTIVE;
       }
 
       if (isPwm(block.value)) {
-        return block.value.data.enabled && Boolean(block.value.data.setting);
+        return block.value.data.enabled;
       }
 
-      return hasAddress.value ? false : Boolean(settings.value[IO_ENABLED_KEY]);
+      return false;
+    });
+
+    const active = computed<boolean>(() => {
+      if (isPwm(block.value)) {
+        return enabled.value && Boolean(block.value.data.setting);
+      }
+      return enabled.value;
     });
 
     const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
@@ -103,7 +119,22 @@ export default defineComponent({
       },
     );
 
-    function clickHandler(): void {
+    function toggleHandler(): void {
+      // No block has been linked - change the part setting
+      if (!hasAddress.value) {
+        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
+        return;
+      }
+
+      // A block has been linked, but is not available
+      // We can't change the block setting
+      if (!block.value) {
+        showAbsentBlock(part.value, PUMP_KEY);
+        return;
+      }
+
+      // We can't toggle the block setting if it's claimed
+      // Show the dialog as fallback behavior
       if (isClaimed.value) {
         showBlockDialog();
         return;
@@ -119,25 +150,32 @@ export default defineComponent({
       }
 
       if (isPwm(block.value)) {
-        showBlockDialog();
+        const enabled = !block.value.data.enabled;
+        patchBlock({ enabled }, true);
         return;
-      }
-
-      // There's no block
-      // That's an error state only if a block address has been set
-      if (hasAddress.value) {
-        showAbsentBlock(part.value, PUMP_KEY);
-      } else {
-        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
       }
     }
 
-    function toggleHandler(): void {
-      if (!isClaimed.value && isPwm(block.value)) {
-        const storedSetting = block.value.data.storedSetting > 0 ? 0 : 100;
-        patchBlock({ storedSetting }, true);
+    function interactHandler(): void {
+      // No block has been linked - we always toggle
+      if (!hasAddress.value) {
+        toggleHandler();
+        return;
+      }
+
+      // A block has been linked, but is not available
+      // We can't toggle or show a dialog - we show an error message instead
+      if (!block.value) {
+        showAbsentBlock(part.value, PUMP_KEY);
+        return;
+      }
+
+      // We can now either toggle or show a dialog
+      // This comes down to the onInteract setting
+      if (onInteract.value === 'dialog') {
+        showBlockDialog();
       } else {
-        clickHandler();
+        toggleHandler();
       }
     }
 
@@ -146,6 +184,7 @@ export default defineComponent({
       MIN_PUMP_PRESSURE,
       MAX_PUMP_PRESSURE,
       DEFAULT_PUMP_PRESSURE,
+      ON_INTERACT_KEY,
       width,
       height,
       block,
@@ -154,9 +193,10 @@ export default defineComponent({
       isBroken,
       isClaimed,
       enabled,
+      active,
       liquids,
       duration,
-      clickHandler,
+      interactHandler,
       toggleHandler,
       showBlockDialog,
       showBlockSelectDialog,
@@ -213,7 +253,7 @@ export default defineComponent({
           y2="-12.1"
         />
         <animateTransform
-          v-if="enabled"
+          v-if="active"
           attributeName="transform"
           attributeType="XML"
           type="rotate"
@@ -256,21 +296,32 @@ export default defineComponent({
       />
     </g>
     <BlockStatusSvg :status="blockStatus" />
-    <BuilderInteraction @interact="clickHandler">
+    <BuilderInteraction @interact="interactHandler">
       <q-menu
         touch-position
         context-menu
       >
         <q-list>
-          <!-- TODO(Bob) PWM toggle behavior -->
-          <q-item
-            v-close-popup
-            :disable="isBroken || isClaimed"
-            clickable
-            @click="toggleHandler"
-          >
-            <q-item-section>Toggle</q-item-section>
-          </q-item>
+          <ToggleMenuContent
+            :model-value="enabled"
+            label="Toggle"
+            @update:model-value="toggleHandler()"
+          />
+          <SelectMenuContent
+            :settings-key="ON_INTERACT_KEY"
+            title="Click behavior"
+            label="On click"
+            message="
+            Select the default behavior when the pump is clicked.
+            When the pump is linked to a PWM block, toggle enables or 
+            disables the block. The speed is not changed.
+            "
+            default="toggle"
+            :opts="[
+              { label: 'Toggle', value: 'toggle' },
+              { label: 'Show block', value: 'dialog' },
+            ]"
+          />
           <BlockMenuContent
             :available="!!block"
             @show="showBlockDialog"

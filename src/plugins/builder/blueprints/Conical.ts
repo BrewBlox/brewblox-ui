@@ -5,6 +5,10 @@ import { variableSizeFunc } from '../utils';
 export const DEFAULT_SIZE_X = 3;
 export const DEFAULT_SIZE_Y = 9;
 
+export const MIN_SIZE: AreaSize = { width: 2, height: 2 };
+export const MAX_SIZE: AreaSize = { width: 8, height: 20 };
+export const DEFAULT_SIZE: AreaSize = { width: 3, height: 9 };
+
 const blueprint: BuilderBlueprint = {
   type: 'Conical',
   title: 'Conical',
@@ -39,7 +43,7 @@ const blueprint: BuilderBlueprint = {
       },
     },
   ],
-  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
+  size: variableSizeFunc(DEFAULT_SIZE),
 };
 
 export default blueprint;

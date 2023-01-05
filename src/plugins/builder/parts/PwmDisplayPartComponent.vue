@@ -1,20 +1,24 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PwmDisplay';
 import { usePart } from '../composables';
 import { liquidBorderColor } from '../utils';
 
 export default defineComponent({
   name: 'PwmDisplayPartComponent',
   setup() {
-    const { part, bordered, width, height, universalFlow } = usePart.setup();
+    const { part, bordered, width, height, passthrough } = usePart.setup();
 
     const borderColor = computed<string>(() => liquidBorderColor(part.value));
 
     return {
+      MIN_SIZE,
+      MAX_SIZE,
+      DEFAULT_SIZE,
       width,
       height,
       bordered,
-      universalFlow,
+      passthrough,
       borderColor,
     };
   },
@@ -30,16 +34,16 @@ export default defineComponent({
 
     <template #menu-content>
       <SizeMenuContent
-        :min="{ width: 1, height: 1 }"
-        :max="{ width: 5, height: 5 }"
-        :default="{ width: 1, height: 1 }"
+        :min="MIN_SIZE"
+        :max="MAX_SIZE"
+        :default="DEFAULT_SIZE"
       />
       <ToggleMenuContent
         v-model="bordered"
         label="Border"
       />
       <ToggleMenuContent
-        v-model="universalFlow"
+        v-model="passthrough"
         label="Flow through part"
       />
     </template>

@@ -21,6 +21,10 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
+    onInteract: {
+      type: Function,
+      default: null,
+    },
   },
   emits: ['interact'],
   setup() {
@@ -36,8 +40,11 @@ export default defineComponent({
 <template>
   <foreignObject v-bind="{ x, y, width, height }">
     <div
-      class="interaction"
-      @click="interact(() => $emit('interact'))"
+      :class="{
+        interaction: true,
+        pointer: onInteract != null,
+      }"
+      @click="interact(() => onInteract && onInteract())"
     >
       <slot />
     </div>

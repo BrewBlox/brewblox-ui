@@ -85,7 +85,7 @@ export const useBuilderStore = defineStore('builderStore', {
 
           // Migrate from settings.liquids to settings.color
           // This removes an unnecessary array, and standardizes all color settings
-          if (part.type === 'SystemIo' || part.type === 'ShiftedSystemIo') {
+          if (part.type === 'SystemIO' || part.type === 'ShiftedSystemIO') {
             const liquids = part.settings[DEPRECATED_IO_LIQUIDS_KEY]?.[0];
             if (liquids) {
               dirty = true;

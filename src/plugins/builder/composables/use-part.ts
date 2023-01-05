@@ -27,7 +27,7 @@ export interface UsePartComponent {
   color: WritableComputedRef<string>;
   bordered: WritableComputedRef<boolean>;
   pressured: WritableComputedRef<boolean>;
-  universalFlow: WritableComputedRef<boolean>;
+  passthrough: WritableComputedRef<boolean>;
   patchSettings: (patch: Mapped<any>) => void;
   interact: (func: () => unknown) => void;
   reflow: () => void;
@@ -87,7 +87,7 @@ export const usePart: UsePartComposable = {
         }),
     });
 
-    const universalFlow = computed<boolean>({
+    const passthrough = computed<boolean>({
       get: () => Boolean(settings.value[FLOW_TOGGLE_KEY] ?? false),
       set: (v) => patchSettings({ [FLOW_TOGGLE_KEY]: Boolean(v) }),
     });
@@ -108,7 +108,7 @@ export const usePart: UsePartComposable = {
       color,
       bordered,
       pressured,
-      universalFlow,
+      passthrough,
       patchSettings,
       reflow,
       interact,

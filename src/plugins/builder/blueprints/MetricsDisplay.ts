@@ -8,7 +8,11 @@ import { FLOW_TOGGLE_KEY, HEIGHT_KEY, WIDTH_KEY } from '../const';
 export const DEFAULT_SIZE_X = 4;
 export const DEFAULT_SIZE_Y = 2;
 
-const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+export const MIN_SIZE: AreaSize = { width: 2, height: 1 };
+export const MAX_SIZE: AreaSize = { width: 10, height: 10 };
+export const DEFAULT_SIZE: AreaSize = { width: 4, height: 2 };
+
+const size = variableSizeFunc(DEFAULT_SIZE);
 
 const blueprint: BuilderBlueprint = {
   type: 'MetricsDisplay',

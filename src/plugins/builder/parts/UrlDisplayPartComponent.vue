@@ -2,7 +2,7 @@
 import { isAbsoluteUrl } from '@/utils/url';
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/UrlDisplay';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/UrlDisplay';
 import { usePart } from '../composables';
 import { LABEL_KEY, URL_KEY } from '../const';
 
@@ -28,8 +28,11 @@ export default defineComponent({
     }
 
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
+      LABEL_KEY,
+      URL_KEY,
       width,
       height,
       bordered,
@@ -64,12 +67,18 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <!-- TODO(Bob) edit URL -->
-          <TextMenuContent />
           <SizeMenuContent
-            :min="{ width: 2, height: 1 }"
-            :max="{ width: 10, height: 10 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <TextMenuContent
+            :settings-key="LABEL_KEY"
+            label="Edit label"
+          />
+          <TextMenuContent
+            :settings-key="URL_KEY"
+            label="Edit link"
           />
         </q-list>
       </q-menu>

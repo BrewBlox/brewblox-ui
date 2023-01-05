@@ -4,6 +4,11 @@ import { userUnits } from '@/user-settings';
 import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
 import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+} from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
 import { liquidBorderColor } from '../utils';
@@ -12,7 +17,7 @@ export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered, universalFlow } = usePart.setup();
+    const { part, width, height, bordered, passthrough } = usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -63,13 +68,16 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       ReferenceKind,
       prettyQty,
       fixedNumber,
       width,
       height,
       bordered,
-      universalFlow,
+      passthrough,
       block,
       blockStatus,
       isBroken,
@@ -181,16 +189,16 @@ export default defineComponent({
             @assign="showBlockSelectDialog"
           />
           <SizeMenuContent
-            :min="{ width: 2, height: 1 }"
-            :max="{ width: 10, height: 5 }"
-            :default="{ width: 2, height: 1 }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
           <ToggleMenuContent
             v-model="bordered"
             label="Border"
           />
           <ToggleMenuContent
-            v-model="universalFlow"
+            v-model="passthrough"
             label="Flow through part"
           />
         </q-list>

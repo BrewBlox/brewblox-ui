@@ -2,22 +2,31 @@
 import { createDialog } from '@/utils/dialog';
 import { defineComponent } from 'vue';
 import { usePart } from '../../composables';
-import { LABEL_KEY } from '../../const';
 
 export default defineComponent({
   name: 'TextMenuContent',
-  setup() {
+  props: {
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
     const { settings, patchSettings } = usePart.setup();
 
     function edit(): void {
       createDialog({
-        component: 'InputDialog',
+        component: 'TextAreaDialog',
         componentProps: {
-          modelValue: settings.value[LABEL_KEY] ?? '',
-          title: 'Edit label',
-          label: 'text',
+          modelValue: settings.value[props.settingsKey] ?? '',
+          title: props.label,
+          label: '',
         },
-      }).onOk((text) => patchSettings({ [LABEL_KEY]: text }));
+      }).onOk((text) => patchSettings({ [props.settingsKey]: text }));
     }
 
     return {
@@ -33,6 +42,6 @@ export default defineComponent({
     clickable
     @click="edit"
   >
-    <q-item-section>Edit text</q-item-section>
+    <q-item-section>{{ label }}</q-item-section>
   </q-item>
 </template>

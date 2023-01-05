@@ -369,22 +369,19 @@ export function universalTransitions(
   );
 }
 
-export function variableSizeFunc(
-  defaultWidth: number,
-  defaultHeight: number,
-): BuilderBlueprint['size'] {
+export function variableSizeFunc(defaults: AreaSize): BuilderBlueprint['size'] {
   return ({ settings }) => {
     const width = settingsProp<number>(settings, WIDTH_KEY, 'number');
     const height = settingsProp<number>(settings, HEIGHT_KEY, 'number');
     if (width || height) {
-      return [width || defaultWidth, height || defaultHeight];
+      return [width || defaults.width, height || defaults.height];
     }
     // backwards compatibility with deprecated setting
     if (settings[DEPRECATED_SCALE_KEY] != null) {
       const scale = Number(settings[DEPRECATED_SCALE_KEY]);
-      return [defaultWidth * scale, defaultHeight * scale];
+      return [defaults.width * scale, defaults.height * scale];
     }
-    return [defaultWidth, defaultHeight];
+    return [defaults.width, defaults.height];
   };
 }
 

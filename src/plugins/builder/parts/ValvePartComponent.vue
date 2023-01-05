@@ -144,10 +144,6 @@ export default defineComponent({
       v-if="pending"
       r="18"
     />
-    <g class="outline">
-      <path :d="paths.outerValve[0]" />
-      <path :d="paths.outerValve[1]" />
-    </g>
     <LiquidStroke
       v-if="closed"
       :paths="paths.closedLiquid"
@@ -158,6 +154,10 @@ export default defineComponent({
       :paths="paths.openLiquid"
       :colors="liquids"
     />
+    <g class="outline">
+      <path :d="paths.outerValve[0]" />
+      <path :d="paths.outerValve[1]" />
+    </g>
     <g
       :transform="`rotate(${valveRotation}, 25, 25)`"
       class="outline fill"

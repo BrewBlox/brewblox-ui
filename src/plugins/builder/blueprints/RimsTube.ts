@@ -11,7 +11,11 @@ export const DEFAULT_SIZE_X = 4;
 export const DEFAULT_SIZE_Y = 1;
 export const ENTRY = '1.5,0,0';
 
-const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+export const MIN_SIZE: AreaSize = { width: 3, height: 1 };
+export const MAX_SIZE: AreaSize = { width: 10, height: 1 };
+export const DEFAULT_SIZE: AreaSize = { width: 4, height: 1 };
+
+const size = variableSizeFunc(DEFAULT_SIZE);
 
 const blueprint: BuilderBlueprint = {
   type: 'RimsTube',

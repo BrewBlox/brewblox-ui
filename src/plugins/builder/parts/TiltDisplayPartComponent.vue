@@ -10,13 +10,18 @@ import {
   prettyUnit,
 } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
-import { TILT_ID_KEY } from '../blueprints/TiltDisplay';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+  TILT_ID_KEY,
+} from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'TiltDisplayPartComponent',
   setup() {
-    const { part, settings, width, height, bordered, universalFlow } =
+    const { part, settings, width, height, bordered, passthrough } =
       usePart.setup();
     const tiltStore = useTiltStore();
 
@@ -56,7 +61,15 @@ export default defineComponent({
       () => userUnits.value.gravity === 'G',
     );
 
+    function findTilts(): SelectOption[] {
+      return useTiltStore().values.map((v) => ({ label: v.name, value: v.id }));
+    }
+
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
+      TILT_ID_KEY,
       prettyQty,
       preciseNumber,
       fixedNumber,
@@ -69,7 +82,8 @@ export default defineComponent({
       unitlessGravity,
       color,
       bordered,
-      universalFlow,
+      passthrough,
+      findTilts,
     };
   },
 });
@@ -130,18 +144,23 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <!-- TODO(Bob) select tilt -->
+          <SelectMenuContent
+            :settings-key="TILT_ID_KEY"
+            title="Tilt device"
+            label="Assign tilt"
+            :opts="findTilts"
+          />
           <SizeMenuContent
-            :min="{ width: 2, height: 1 }"
-            :max="{ width: 10, height: 5 }"
-            :default="{ width: 2, height: 1 }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
           <ToggleMenuContent
             v-model="bordered"
             label="Border"
           />
           <ToggleMenuContent
-            v-model="universalFlow"
+            v-model="passthrough"
             label="Flow through part"
           />
         </q-list>

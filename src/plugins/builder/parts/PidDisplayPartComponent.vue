@@ -14,13 +14,14 @@ import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { Block, BlockType } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'PidDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered, universalFlow } = usePart.setup();
+    const { part, width, height, bordered, passthrough } = usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -71,6 +72,9 @@ export default defineComponent({
     });
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       HOT_WATER,
       COLD_WATER,
       preciseNumber,
@@ -91,7 +95,7 @@ export default defineComponent({
       suffix,
       color,
       bordered,
-      universalFlow,
+      passthrough,
     };
   },
 });
@@ -154,16 +158,16 @@ export default defineComponent({
             @assign="showBlockSelectDialog"
           />
           <SizeMenuContent
-            :min="{ width: 1, height: 1 }"
-            :max="{ width: 5, height: 5 }"
-            :default="{ width: 1, height: 1 }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
           <ToggleMenuContent
             v-model="bordered"
             label="Border"
           />
           <ToggleMenuContent
-            v-model="universalFlow"
+            v-model="passthrough"
             label="Flow through part"
           />
         </q-list>

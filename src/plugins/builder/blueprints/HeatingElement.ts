@@ -5,6 +5,10 @@ import { variableSizeFunc } from '../utils';
 export const DEFAULT_SIZE_X = 5;
 export const DEFAULT_SIZE_Y = 1;
 
+export const MIN_SIZE: AreaSize = { width: 3, height: 1 };
+export const MAX_SIZE: AreaSize = { width: 10, height: 1 };
+export const DEFAULT_SIZE: AreaSize = { width: 5, height: 1 };
+
 const blueprint: BuilderBlueprint = {
   type: 'HeatingElement',
   title: 'Heating element',
@@ -32,7 +36,7 @@ const blueprint: BuilderBlueprint = {
       props: {},
     },
   ],
-  size: variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y),
+  size: variableSizeFunc(DEFAULT_SIZE),
   transitions: () => ({}),
 };
 

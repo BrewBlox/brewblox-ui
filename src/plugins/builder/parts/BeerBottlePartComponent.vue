@@ -1,7 +1,7 @@
 <script lang="ts">
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/BeerBottle';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/BeerBottle';
 import { usePart } from '../composables';
 import { COLOR_KEY } from '../const';
 
@@ -15,8 +15,9 @@ export default defineComponent({
     );
 
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      MIN_SIZE,
+      MAX_SIZE,
+      DEFAULT_SIZE,
       width,
       height,
       color,
@@ -72,9 +73,9 @@ export default defineComponent({
         <q-list>
           <ColorMenuContent />
           <SizeMenuContent
-            :min="{ width: 1, height: 1 }"
-            :max="{ width: 5, height: 10 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
         </q-list>
       </q-menu>

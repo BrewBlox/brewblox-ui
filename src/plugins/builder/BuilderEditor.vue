@@ -93,7 +93,6 @@ export default defineComponent({
     const partDragStart = ref<XYPosition | null>(null);
 
     const selectedIds = ref<string[]>([]);
-    const configuredPart = ref<FlowPart | null>(null);
     const floater = ref<UnwrapRef<Floater> | null>(null);
 
     const focusRef = ref<HTMLElement>();
@@ -309,11 +308,6 @@ export default defineComponent({
           selectedIds.value.length &&
           !selectedIds.value.some((v) => v === hovered.id),
       );
-    }
-
-    function closeMenu(): void {
-      configuredPart.value = null;
-      nextTick(setFocus);
     }
 
     function toggleSelect(id: string | null): void {
@@ -866,11 +860,6 @@ export default defineComponent({
         if (el) {
           selectPartHandlers(el, tool);
         }
-        if (configuredPart.value) {
-          const id = configuredPart.value.id;
-          configuredPart.value =
-            flowParts.value.find((v) => v.id === id) ?? null;
-        }
       },
       { immediate: true },
     );
@@ -910,9 +899,6 @@ export default defineComponent({
       savePart,
       removePart,
 
-      configuredPart,
-      closeMenu,
-
       activeToolId,
       disabledTools,
       toolsMenuExpanded,
@@ -930,16 +916,6 @@ export default defineComponent({
     class="page-height"
     @keydown="keyHandler"
   >
-    <BuilderPartSettingsDialog
-      v-if="configuredPart"
-      :part="configuredPart"
-      :rev="flowPartsRevision"
-      @update:part="savePart"
-      @remove:part="removePart"
-      @reflow="calculateFlowParts"
-      @hide="closeMenu"
-    />
-
     <TitleTeleport v-if="layout">
       <span
         class="cursor-pointer"

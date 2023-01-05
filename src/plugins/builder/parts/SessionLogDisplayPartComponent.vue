@@ -2,33 +2,31 @@
 // import type { SessionLogWidget } from '@/plugins/history/SessionLog/types';
 import { useHistoryStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
-import { useWidgetStore, Widget } from '@/store/widgets';
 import { mdiTextSubject } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent } from 'vue';
 import {
-  DEFAULT_SIZE_X,
-  DEFAULT_SIZE_Y,
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
   WIDGET_KEY,
+  WIDGET_TYPE,
 } from '../blueprints/SessionLogDisplay';
-import { usePart } from '../composables';
-import { showLinkedWidgetDialog } from '../utils';
+import { usePart, useSettingsWidget } from '../composables';
 
 export default defineComponent({
   name: 'SessionLogDisplayPartComponent',
   setup() {
-    const widgetStore = useWidgetStore();
     const historyStore = useHistoryStore();
-    const { part, settings, width, height, bordered } = usePart.setup();
+    const { width, height, bordered } = usePart.setup();
+    const {
+      widgetId,
+      widget,
+      isBroken,
+      showWidgetDialog,
+      showWidgetSelectDialog,
+    } = useSettingsWidget.setup(WIDGET_KEY, WIDGET_TYPE);
 
-    const isLinked = computed<boolean>(() =>
-      Boolean(settings.value[WIDGET_KEY]),
-    );
-
-    const widget = computed<Widget | null>(() =>
-      widgetStore.widgetById(settings.value[WIDGET_KEY]),
-    );
-
-    const isBroken = computed<boolean>(() => isLinked.value && !widget.value);
+    const available = computed<boolean>(() => widget.value != null);
 
     const session = computed<LoggedSession | null>(() =>
       widget.value?.config.currentSession
@@ -37,26 +35,26 @@ export default defineComponent({
     );
 
     const displayText = computed<string>(() =>
-      isLinked.value
+      widgetId.value
         ? session.value?.title ?? 'no active session'
         : 'Not linked',
     );
 
-    function showWidget(): void {
-      showLinkedWidgetDialog(part.value, WIDGET_KEY);
-    }
-
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      WIDGET_KEY,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       mdiTextSubject,
       width,
       height,
       bordered,
-      isLinked,
+      widgetId,
       isBroken,
+      available,
       displayText,
-      showWidget,
+      showWidgetDialog,
+      showWidgetSelectDialog,
     };
   },
 });
@@ -69,7 +67,7 @@ export default defineComponent({
       :x="width / 2 - 20"
     />
     <UnlinkedSvgIcon
-      v-else-if="!isLinked"
+      v-else-if="widgetId == null"
       :x="width / 2 - 20"
     />
     <template v-else>
@@ -95,18 +93,22 @@ export default defineComponent({
     />
     <BuilderInteraction
       v-bind="{ width, height }"
-      @interact="showWidget"
+      @interact="showWidgetDialog"
     >
       <q-menu
         touch-position
         context-menu
       >
         <q-list>
-          <!-- TODO(Bob) select widget -->
+          <WidgetMenuContent
+            :available="available"
+            @show="showWidgetDialog"
+            @assign="showWidgetSelectDialog"
+          />
           <SizeMenuContent
-            :min="{ width: 1, height: 1 }"
-            :max="{ width: 10, height: 1 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
           <ToggleMenuContent
             v-model="bordered"

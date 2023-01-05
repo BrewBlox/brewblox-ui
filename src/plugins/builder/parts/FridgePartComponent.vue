@@ -2,11 +2,13 @@
 import { computed, defineComponent } from 'vue';
 import {
   DEFAULT_SHELF_Y,
-  DEFAULT_SIZE_X,
-  DEFAULT_SIZE_Y,
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
   SHELF_Y_KEY,
 } from '../blueprints/Fridge';
 import { usePart } from '../composables';
+import { LABEL_KEY } from '../const';
 import { coord2grid } from '../utils';
 
 export default defineComponent({
@@ -17,12 +19,13 @@ export default defineComponent({
     const shelfHeight = computed<number>(() =>
       coord2grid(settings.value[SHELF_Y_KEY] || DEFAULT_SHELF_Y),
     );
-
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       SHELF_Y_KEY,
       DEFAULT_SHELF_Y,
+      LABEL_KEY,
       width,
       height,
       shelfHeight,
@@ -70,11 +73,10 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <TextMenuContent />
           <SizeMenuContent
-            :min="{ width: 2, height: 1 }"
-            :max="{ width: 10, height: 10 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
           <SliderMenuContent
             :settings-key="SHELF_Y_KEY"
@@ -82,6 +84,10 @@ export default defineComponent({
             :max="14"
             :default="DEFAULT_SHELF_Y"
             label="Shelf position (from top)"
+          />
+          <TextMenuContent
+            :settings-key="LABEL_KEY"
+            label="Edit label"
           />
         </q-list>
       </q-menu>

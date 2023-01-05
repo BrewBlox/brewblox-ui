@@ -10,7 +10,11 @@ export const DEFAULT_FILL_PCT = 85;
 export const DEFAULT_SIZE_X = 4;
 export const DEFAULT_SIZE_Y = 6;
 
-const size = variableSizeFunc(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+export const MIN_SIZE: AreaSize = { width: 2, height: 2 };
+export const MAX_SIZE: AreaSize = { width: 10, height: 10 };
+export const DEFAULT_SIZE: AreaSize = { width: 4, height: 6 };
+
+const size = variableSizeFunc(DEFAULT_SIZE);
 
 const blueprint: BuilderBlueprint = {
   type: 'Kettle',

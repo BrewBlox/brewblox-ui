@@ -2,7 +2,7 @@
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
 import { computed, defineComponent } from 'vue';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/RimsTube';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/RimsTube';
 import { usePart } from '../composables';
 
 export default defineComponent({
@@ -47,8 +47,9 @@ export default defineComponent({
     );
 
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       width,
       height,
       bordered,
@@ -92,9 +93,9 @@ export default defineComponent({
       >
         <q-list>
           <SizeMenuContent
-            :min="{ width: 3, height: 1 }"
-            :max="{ width: 10, height: 1 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
         </q-list>
       </q-menu>

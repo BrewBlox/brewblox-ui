@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/HeatingElement';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/HeatingElement';
 import { usePart } from '../composables';
 
 export default defineComponent({
@@ -14,8 +14,9 @@ export default defineComponent({
     });
 
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       bordered,
       width,
       height,
@@ -29,7 +30,10 @@ export default defineComponent({
   <!-- No viewBox. width is auto-adjusted -->
   <svg v-bind="{ width, height }">
     <g class="outline">
-      <path :d="path" />
+      <path
+        :d="path"
+        stroke-width="3"
+      />
     </g>
     <BuilderInteraction v-bind="{ width, height }">
       <q-menu
@@ -38,9 +42,9 @@ export default defineComponent({
       >
         <q-list>
           <SizeMenuContent
-            :min="{ width: 3, height: 1 }"
-            :max="{ width: 10, height: 1 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
         </q-list>
       </q-menu>

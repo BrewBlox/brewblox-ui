@@ -6,7 +6,7 @@ import {
 import { defaultLabel } from '@/plugins/history/nodes';
 import { fixedNumber, shortDateString } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
-import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../blueprints/MetricsDisplay';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/MetricsDisplay';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
 import { liquidBorderColor } from '../utils';
@@ -22,7 +22,7 @@ interface MetricDisplay {
 export default defineComponent({
   name: 'MetricsDisplayPartComponent',
   setup() {
-    const { part, metrics, width, height, bordered, universalFlow } =
+    const { part, metrics, width, height, bordered, passthrough } =
       usePart.setup();
     const { source } = useMetrics.setupConsumer();
 
@@ -54,12 +54,13 @@ export default defineComponent({
     });
 
     return {
-      DEFAULT_SIZE_X,
-      DEFAULT_SIZE_Y,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       width,
       height,
       bordered,
-      universalFlow,
+      passthrough,
       color,
       values,
     };
@@ -99,18 +100,18 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <!-- TODO(Bob) metrics menu content -->
+          <MetricsMenuContent />
           <SizeMenuContent
-            :min="{ width: 1, height: 2 }"
-            :max="{ width: 8, height: 20 }"
-            :default="{ width: DEFAULT_SIZE_X, height: DEFAULT_SIZE_Y }"
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
           />
           <ToggleMenuContent
             v-model="bordered"
             label="Border"
           />
           <ToggleMenuContent
-            v-model="universalFlow"
+            v-model="passthrough"
             label="Flow through part"
           />
         </q-list>
