@@ -19,6 +19,10 @@ export default defineComponent({
       type: String,
       default: '<not set>',
     },
+    presets: {
+      type: Array as PropType<string[]>,
+      default: () => [],
+    },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -60,6 +64,7 @@ export default defineComponent({
           message: props.message,
           html: props.html,
           clearable: props.clearable,
+          presets: props.presets,
         },
       }).onOk(change);
     }

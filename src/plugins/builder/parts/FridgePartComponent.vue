@@ -1,7 +1,14 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { DEFAULT_SHELF_Y, SHELF_Y_KEY } from '../blueprints/Fridge';
+import {
+  DEFAULT_SHELF_Y,
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+  SHELF_Y_KEY,
+} from '../blueprints/Fridge';
 import { usePart } from '../composables';
+import { LABEL_KEY } from '../const';
 import { coord2grid } from '../utils';
 
 export default defineComponent({
@@ -12,8 +19,13 @@ export default defineComponent({
     const shelfHeight = computed<number>(() =>
       coord2grid(settings.value[SHELF_Y_KEY] || DEFAULT_SHELF_Y),
     );
-
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
+      SHELF_Y_KEY,
+      DEFAULT_SHELF_Y,
+      LABEL_KEY,
       width,
       height,
       shelfHeight,
@@ -55,5 +67,30 @@ export default defineComponent({
       :width="width"
       :height="50"
     />
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <SliderMenuContent
+            :settings-key="SHELF_Y_KEY"
+            :min="1"
+            :max="14"
+            :default="DEFAULT_SHELF_Y"
+            label="Shelf position (from top)"
+          />
+          <TextMenuContent
+            :settings-key="LABEL_KEY"
+            label="Edit label"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

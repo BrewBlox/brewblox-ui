@@ -1,22 +1,20 @@
 <script lang="ts">
-import { colorString } from '@/plugins/builder/utils';
-import { computed, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/Carboy';
 import { usePart } from '../composables';
-import { COLOR_KEY } from '../const';
 
 export default defineComponent({
   name: 'CarboyPartComponent',
   setup() {
-    const { settings, width, height } = usePart.setup();
-
-    const fillColor = computed<string>(() =>
-      colorString(settings.value[COLOR_KEY]),
-    );
+    const { width, height, color } = usePart.setup();
 
     return {
+      MIN_SIZE,
+      MAX_SIZE,
+      DEFAULT_SIZE,
       width,
       height,
-      fillColor,
+      color,
     };
   },
 });
@@ -28,7 +26,7 @@ export default defineComponent({
     viewBox="0 0 100 200"
   >
     <rect
-      :fill="fillColor"
+      :fill="color"
       y="50"
       width="100"
       height="148"
@@ -53,6 +51,24 @@ export default defineComponent({
           z"
       />
     </g>
+    <BuilderInteraction
+      :width="100"
+      :height="200"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <ColorMenuContent />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
     <SetpointValues :y="50" />
   </svg>
 </template>

@@ -1,5 +1,12 @@
 <script lang="ts">
-import { RIGHT } from '@/plugins/builder/const';
+import {
+  DEFAULT_IO_PRESSURE,
+  IO_ENABLED_KEY,
+  IO_PRESSURE_KEY,
+  MAX_IO_PRESSURE,
+  MIN_IO_PRESSURE,
+  RIGHT,
+} from '@/plugins/builder/const';
 import {
   flowOnCoord,
   horizontalChevrons,
@@ -13,16 +20,26 @@ const chevrons = horizontalChevrons(15, 25);
 export default defineComponent({
   name: 'SystemIOPartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, settings, patchSettings, width, height } = usePart.setup();
+
+    const pressured = computed<boolean>({
+      get: () => Boolean(settings.value[IO_ENABLED_KEY]),
+      set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
+    });
 
     const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
 
     const liquids = computed<string[]>(() => liquidOnCoord(part.value, RIGHT));
 
     return {
+      IO_PRESSURE_KEY,
+      MIN_IO_PRESSURE,
+      MAX_IO_PRESSURE,
+      DEFAULT_IO_PRESSURE,
       width,
       height,
       chevrons,
+      pressured,
       flowSpeed,
       liquids,
     };
@@ -60,5 +77,25 @@ export default defineComponent({
       <path d="M30,21 H50" />
       <path d="M30,29 H50" />
     </g>
+    <BuilderInteraction @interact="pressured = !pressured">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <ToggleMenuContent
+            v-model="pressured"
+            label="Active"
+          />
+          <ColorMenuContent />
+          <PressureMenuContent
+            :settings-key="IO_PRESSURE_KEY"
+            :min="MIN_IO_PRESSURE"
+            :max="MAX_IO_PRESSURE"
+            :default="DEFAULT_IO_PRESSURE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

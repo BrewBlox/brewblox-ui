@@ -1,6 +1,7 @@
 <script lang="ts">
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/Keg';
 import { usePart } from '../composables';
 import { COLOR_KEY } from '../const';
 
@@ -14,6 +15,9 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       width,
       height,
       fillColor,
@@ -62,6 +66,24 @@ export default defineComponent({
         height="23.8"
       />
     </g>
+    <BuilderInteraction
+      :width="100"
+      :height="250"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <ColorMenuContent />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
     <SetpointValues :y="100" />
   </svg>
 </template>

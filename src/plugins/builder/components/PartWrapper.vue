@@ -4,7 +4,7 @@ import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 import { computed, defineComponent, PropType, provide } from 'vue';
-import { InteractKey, PartKey, ReflowKey } from '../const';
+import { InteractableKey, PartKey, ReflowKey } from '../const';
 import parts from '../parts';
 
 export default defineComponent({
@@ -75,25 +75,22 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const component = builderStore.componentByType(props.part.type);
 
-    const providedPart = computed<FlowPart>({
-      get: () => props.part,
-      set: (v) => emit('update:part', v),
-    });
-
-    provide(PartKey, providedPart);
     provide(ReflowKey, () => emit('reflow'));
-    provide(InteractKey, (func: () => unknown) => {
-      if (props.interactable) {
-        func();
-      }
-    });
-
-    const sizeX = computed<number>(() => props.part.size[0]);
-    const sizeY = computed<number>(() => props.part.size[1]);
+    provide(
+      PartKey,
+      computed<FlowPart>({
+        get: () => props.part,
+        set: (v) => emit('update:part', v),
+      }),
+    );
+    provide(
+      InteractableKey,
+      computed(() => props.interactable),
+    );
 
     const dimensions = computed(() => ({
-      width: coord2grid(sizeX.value),
-      height: coord2grid(sizeY.value),
+      width: coord2grid(props.part.size[0]),
+      height: coord2grid(props.part.size[1]),
     }));
 
     const positionTransform = computed<string>(() =>
@@ -101,26 +98,26 @@ export default defineComponent({
     );
 
     const rotateTransform = computed<string>(() => {
-      const [partSizeX, partSizeY] = props.part.size;
-      const [renderSizeX, renderSizeY] = rotatedSize(
+      const [partWidth, partHeight] = props.part.size;
+      const [renderWidth, renderHeight] = rotatedSize(
         props.part.rotate,
         props.part.size,
       );
 
-      const farEdge = new Coordinates([partSizeX, partSizeY, 0]).rotate(
+      const farEdge = new Coordinates([partWidth, partHeight, 0]).rotate(
         props.part.rotate,
         [0, 0, 0],
       );
 
-      const trX = farEdge.x < 0 ? coord2grid(renderSizeX) : 0;
-      const trY = farEdge.y < 0 ? coord2grid(renderSizeY) : 0;
+      const trX = farEdge.x < 0 ? coord2grid(renderWidth) : 0;
+      const trY = farEdge.y < 0 ? coord2grid(renderHeight) : 0;
 
       return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
     });
 
     const flipTransform = computed<string>(() => {
       if (props.part.flipped) {
-        return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
+        return `translate(${coord2grid(props.part.size[0])}, 0) scale(-1, 1)`;
       }
       return '';
     });
@@ -217,17 +214,13 @@ export default defineComponent({
   &.dimmed
     opacity: 0.1 !important
 
-  &.interactable
-    :deep(.interaction)
-      cursor: pointer
-
 :deep(.builder-part)
   pointer-events: none
   stroke-linecap: round
   fill: none
 
   &:hover
-    .interaction
+    .interaction:hover
       opacity: 0.2
       fill: white
       background-color: white

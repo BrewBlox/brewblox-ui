@@ -145,7 +145,7 @@ export default defineComponent({
             '{esc}': '⊗',
           },
           buttonTheme: [{ buttons: '-', class: 'text-h5' }],
-          ...findLayout(),
+          layout: findLayout(),
         });
         keyboard.value.setInput(local.value);
         onWatcherDone();
@@ -181,37 +181,41 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{ message, html }">
-      <q-input
-        :model-value="local"
-        :suffix="suffix"
-        :type="password && pwdActive ? 'password' : 'textarea'"
-        autogrow
-        label=""
-        item-aligned
-        readonly
-        :rules="localRules"
-        class="q-mb-md"
-      >
-        <template #append>
-          <q-icon
-            v-if="password"
-            :name="pwdActive ? 'visibility_off' : 'visibility'"
-            class="cursor-pointer"
-            @click="pwdActive = !pwdActive"
+      <template #body>
+        <q-card-section>
+          <q-input
+            :model-value="local"
+            :suffix="suffix"
+            :type="password && pwdActive ? 'password' : 'textarea'"
+            autogrow
+            label=""
+            item-aligned
+            readonly
+            :rules="localRules"
+            class="q-mb-md"
+          >
+            <template #append>
+              <q-icon
+                v-if="password"
+                :name="pwdActive ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="pwdActive = !pwdActive"
+              />
+              <q-icon
+                v-if="local"
+                class="pointer self-end q-mb-sm fade-3"
+                name="mdi-close-circle"
+                size="sm"
+                @click="clearInput"
+              />
+            </template>
+          </q-input>
+          <div
+            ref="keyboardElementRef"
+            class="simple-keyboard"
           />
-          <q-icon
-            v-if="local"
-            class="pointer self-end q-mb-sm fade-3"
-            name="mdi-close-circle"
-            size="sm"
-            @click="clearInput"
-          />
-        </template>
-      </q-input>
-      <div
-        ref="keyboardElementRef"
-        class="simple-keyboard"
-      />
+        </q-card-section>
+      </template>
       <template #actions>
         <q-btn
           flat

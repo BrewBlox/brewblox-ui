@@ -30,8 +30,14 @@ export default defineComponent({
     const { part, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
-    const { block, patchBlock, blockStatus, isBroken } =
-      useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
+    const {
+      block,
+      patchBlock,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
 
     const closed = computed<boolean>(() =>
       block.value !== null
@@ -87,6 +93,8 @@ export default defineComponent({
       liquidSpeed,
       liquidColor,
       toggle,
+      showBlockDialog,
+      showBlockSelectDialog,
     };
   },
 });
@@ -131,6 +139,19 @@ export default defineComponent({
       y="25"
       color="black"
     />
-    <BuilderInteraction @interact="toggle" />
+    <BuilderInteraction @interact="toggle">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

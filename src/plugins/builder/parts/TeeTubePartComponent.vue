@@ -44,24 +44,25 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
   >
-    <g class="outline">
-      <path d="M0,21H21V0" />
-      <path d="M50,21H29V0" />
-      <path d="M0,29H50" />
-    </g>
     <LiquidStroke
-      :paths="['M25,22V0']"
+      :paths="['M25,25V0']"
       :colors="topLiquids"
+      stroke-linecap="round"
     />
     <LiquidStroke
       :paths="['M0,25H25']"
       :colors="leftLiquids"
+      stroke-linecap="round"
     />
     <LiquidStroke
       :paths="['M25,25H50']"
       :colors="rightLiquids"
+      stroke-linecap="round"
     />
     <g class="outline">
+      <path d="M0,21H21V0" />
+      <path d="M50,21H29V0" />
+      <path d="M0,29H50" />
       <AnimatedArrows
         :num-arrows="1"
         :speed="topSpeed"

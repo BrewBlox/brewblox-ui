@@ -6,6 +6,7 @@ import {
 import { defaultLabel } from '@/plugins/history/nodes';
 import { fixedNumber, shortDateString } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/MetricsDisplay';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
 import { liquidBorderColor } from '../utils';
@@ -21,7 +22,8 @@ interface MetricDisplay {
 export default defineComponent({
   name: 'MetricsDisplayPartComponent',
   setup() {
-    const { part, metrics, width, height, bordered } = usePart.setup();
+    const { part, metrics, width, height, bordered, passthrough } =
+      usePart.setup();
     const { source } = useMetrics.setupConsumer();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
@@ -52,9 +54,13 @@ export default defineComponent({
     });
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       width,
       height,
       bordered,
+      passthrough,
       color,
       values,
     };
@@ -88,5 +94,28 @@ export default defineComponent({
       </div>
     </foreignObject>
     <BuilderBorder v-bind="{ width, height, color }" />
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <MetricsMenuContent />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

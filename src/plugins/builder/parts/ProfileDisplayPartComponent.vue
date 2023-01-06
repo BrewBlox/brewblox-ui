@@ -4,6 +4,7 @@ import { makeObjectSorter } from '@/utils/functional';
 import { durationMs, preciseNumber, prettyUnit } from '@/utils/quantity';
 import { Setpoint } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/ProfileDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
 import { liquidBorderColor } from '../utils';
@@ -11,7 +12,8 @@ import { liquidBorderColor } from '../utils';
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -32,6 +34,9 @@ export default defineComponent({
     });
 
     const currentValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 19;
+      }
       if (
         !block.value ||
         !block.value.data.enabled ||
@@ -62,6 +67,9 @@ export default defineComponent({
     });
 
     const nextValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 21;
+      }
       if (!block.value || !block.value.data.start) {
         return null;
       }
@@ -81,10 +89,15 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       preciseNumber,
       width,
       height,
       bordered,
+      passthrough,
+      placeholder,
       block,
       blockStatus,
       isBroken,
@@ -110,7 +123,7 @@ export default defineComponent({
         x="30"
       />
       <UnlinkedSvgIcon
-        v-else-if="!block"
+        v-else-if="!block && !placeholder"
         x="30"
       />
       <template v-else>
@@ -159,21 +172,24 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <q-item
-            v-close-popup
-            :disable="block == null"
-            clickable
-            @click="showBlockDialog"
-          >
-            <q-item-section>Show block</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
-            clickable
-            @click="showBlockSelectDialog"
-          >
-            <q-item-section>Assign block</q-item-section>
-          </q-item>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

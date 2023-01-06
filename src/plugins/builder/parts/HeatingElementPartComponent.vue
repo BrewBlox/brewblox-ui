@@ -1,5 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/HeatingElement';
 import { usePart } from '../composables';
 
 export default defineComponent({
@@ -13,6 +14,9 @@ export default defineComponent({
     });
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       bordered,
       width,
       height,
@@ -26,8 +30,33 @@ export default defineComponent({
   <!-- No viewBox. width is auto-adjusted -->
   <svg v-bind="{ width, height }">
     <g class="outline">
-      <path :d="path" />
+      <path
+        :d="path"
+        stroke-width="3"
+      />
     </g>
-    <PwmValues :bordered="bordered" />
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
+    <PwmValues>
+      <BuilderBorder v-if="bordered" />
+      <template #menu-content>
+        <ToggleMenuContent
+          v-model="bordered"
+          label="Border"
+        />
+      </template>
+    </PwmValues>
   </svg>
 </template>

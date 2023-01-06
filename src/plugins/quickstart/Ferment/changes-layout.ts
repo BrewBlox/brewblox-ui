@@ -1,13 +1,13 @@
 import {
   BORDER_KEY,
   COLOR_KEY,
+  HEIGHT_KEY,
   LABEL_KEY,
   PID_KEY,
   PROFILE_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
-  SIZE_Y_KEY,
   URL_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -33,7 +33,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            [SIZE_Y_KEY]: 7,
+            [HEIGHT_KEY]: 7,
             [LABEL_KEY]: withPrefix(config.prefix, 'fridge'),
           },
         },
@@ -128,8 +128,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             [BORDER_KEY]: false,
             [LABEL_KEY]: 'User manual',
             [URL_KEY]: 'https://www.brewblox.com/user/ferment_guide.html',
-            [SIZE_X_KEY]: 4,
-            [SIZE_Y_KEY]: 1,
+            [WIDTH_KEY]: 4,
+            [HEIGHT_KEY]: 1,
           },
         },
       ],

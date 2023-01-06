@@ -5,7 +5,7 @@ import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const lowPaths = {
-  borders: ['M 21,50 L 21,21 M 21,10 L 21,0', 'M 29,50 L 29,21 M 29,10 L 29,0'],
+  borders: ['M 21,50 L 21,21 M 21,11 L 21,0', 'M 29,50 L 29,21 M 29,11 L 29,0'],
   liquid: 'M 25,50 L 25,21 M 25,11 L 25,0',
 };
 const highPaths = {
@@ -75,6 +75,7 @@ export default defineComponent({
     <LiquidStroke
       :paths="[highPaths.liquid]"
       :colors="highLiquid"
+      stroke-width="8"
     />
     <AnimatedArrows
       :speed="highFlowSpeed"

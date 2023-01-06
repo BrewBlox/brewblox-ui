@@ -4,6 +4,11 @@ import { userUnits } from '@/user-settings';
 import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
 import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+} from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
 import { liquidBorderColor } from '../utils';
@@ -12,7 +17,8 @@ export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -47,11 +53,17 @@ export default defineComponent({
         : refBlock.value.data.value.value;
     });
 
-    const setting = computed<number | null>(
-      () => block.value?.data.setting.value ?? null,
-    );
+    const setting = computed<number | null>(() => {
+      if (placeholder) {
+        return 8;
+      }
+      return block.value?.data.setting.value ?? null;
+    });
 
     const appliedSetting = computed<number | null>(() => {
+      if (placeholder) {
+        return 26;
+      }
       if (refAmount.value == null || setting.value == null) {
         return null;
       }
@@ -63,15 +75,20 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       ReferenceKind,
       prettyQty,
       fixedNumber,
       width,
       height,
       bordered,
+      passthrough,
       block,
       blockStatus,
       isBroken,
+      placeholder,
       showBlockDialog,
       showBlockSelectDialog,
       refKind,
@@ -95,7 +112,7 @@ export default defineComponent({
         x="30"
       />
       <UnlinkedSvgIcon
-        v-else-if="!block"
+        v-else-if="!block && !placeholder"
         x="30"
       />
       <template v-else>
@@ -174,21 +191,24 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <q-item
-            v-close-popup
-            :disable="block == null"
-            clickable
-            @click="showBlockDialog"
-          >
-            <q-item-section>Show block</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
-            clickable
-            @click="showBlockSelectDialog"
-          >
-            <q-item-section>Assign block</q-item-section>
-          </q-item>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

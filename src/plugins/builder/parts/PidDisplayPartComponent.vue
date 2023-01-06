@@ -14,13 +14,15 @@ import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { Block, BlockType } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'PidDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -36,13 +38,25 @@ export default defineComponent({
       textTransformation(part.value, [1, 1]),
     );
 
-    const outputValue = computed<number | null>(() =>
-      block.value?.data.enabled ? block.value.data.outputValue : null,
-    );
+    const outputValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 83;
+      }
+      if (block.value?.data.enabled) {
+        return block.value.data.outputValue;
+      }
+      return null;
+    });
 
-    const outputSetting = computed<number | null>(() =>
-      block.value?.data.enabled ? block.value.data.outputSetting : null,
-    );
+    const outputSetting = computed<number | null>(() => {
+      if (placeholder) {
+        return 83;
+      }
+      if (block.value?.data.enabled) {
+        return block.value.data.outputSetting;
+      }
+      return null;
+    });
 
     const kp = computed<number | null>(
       () => block.value?.data.kp.value ?? null,
@@ -60,8 +74,7 @@ export default defineComponent({
     );
 
     const suffix = computed<string>(() => {
-      const setting = outputSetting.value;
-      if (setting == null) {
+      if (outputSetting.value == null) {
         return '';
       }
       if (targetingOffset.value) {
@@ -71,6 +84,9 @@ export default defineComponent({
     });
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       HOT_WATER,
       COLD_WATER,
       preciseNumber,
@@ -91,6 +107,8 @@ export default defineComponent({
       suffix,
       color,
       bordered,
+      passthrough,
+      placeholder,
     };
   },
 });
@@ -106,7 +124,7 @@ export default defineComponent({
       class="content"
     >
       <BrokenSvgIcon v-if="isBroken" />
-      <UnlinkedSvgIcon v-else-if="!block" />
+      <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <HeatingSvgIcon
@@ -147,21 +165,24 @@ export default defineComponent({
         context-menu
       >
         <q-list>
-          <q-item
-            v-close-popup
-            :disable="!block"
-            clickable
-            @click="showBlockDialog"
-          >
-            <q-item-section>Show block</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
-            clickable
-            @click="showBlockSelectDialog"
-          >
-            <q-item-section>Assign block</q-item-section>
-          </q-item>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

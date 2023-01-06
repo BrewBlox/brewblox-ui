@@ -36,6 +36,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      isClaimed,
       patchBlock,
       showBlockDialog,
       showBlockSelectDialog,
@@ -109,6 +110,7 @@ export default defineComponent({
       hasAddress,
       block,
       isBroken,
+      isClaimed,
       flowSpeed,
       liquids,
       closed,
@@ -142,10 +144,6 @@ export default defineComponent({
       v-if="pending"
       r="18"
     />
-    <g class="outline">
-      <path :d="paths.outerValve[0]" />
-      <path :d="paths.outerValve[1]" />
-    </g>
     <LiquidStroke
       v-if="closed"
       :paths="paths.closedLiquid"
@@ -156,6 +154,10 @@ export default defineComponent({
       :paths="paths.openLiquid"
       :colors="liquids"
     />
+    <g class="outline">
+      <path :d="paths.outerValve[0]" />
+      <path :d="paths.outerValve[1]" />
+    </g>
     <g
       :transform="`rotate(${valveRotation}, 25, 25)`"
       class="outline fill"
@@ -182,19 +184,17 @@ export default defineComponent({
         <q-list>
           <q-item
             v-close-popup
-            :disable="!block"
+            :disable="isBroken || isClaimed"
             clickable
-            @click="showBlockDialog"
+            @click="toggle"
           >
-            <q-item-section>Show block</q-item-section>
+            <q-item-section>Toggle</q-item-section>
           </q-item>
-          <q-item
-            v-close-popup
-            clickable
-            @click="showBlockSelectDialog"
-          >
-            <q-item-section>Assign block</q-item-section>
-          </q-item>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

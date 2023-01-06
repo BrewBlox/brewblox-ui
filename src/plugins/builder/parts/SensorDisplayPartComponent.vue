@@ -7,12 +7,14 @@ import {
 import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'SensorDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -28,15 +30,21 @@ export default defineComponent({
       textTransformation(part.value, [1, 1]),
     );
 
-    const tempValue = computed<number | null>(
-      () => block.value?.data.value?.value ?? null,
-    );
+    const tempValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 21;
+      }
+      return block.value?.data.value?.value ?? null;
+    });
 
     const tempUnit = computed<string>(() =>
       prettyUnit(block.value?.data.value),
     );
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       fixedNumber,
       width,
       height,
@@ -50,6 +58,8 @@ export default defineComponent({
       tempUnit,
       color,
       bordered,
+      passthrough,
+      placeholder,
     };
   },
 });
@@ -65,7 +75,7 @@ export default defineComponent({
       class="content"
     >
       <BrokenSvgIcon v-if="isBroken" />
-      <UnlinkedSvgIcon v-else-if="!block" />
+      <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <SensorSvgIcon
@@ -91,30 +101,30 @@ export default defineComponent({
       v-if="bordered"
       :color="color"
     />
-    <BuilderInteraction
-      :width="100"
-      @interact="showBlockDialog"
-    >
+    <BuilderInteraction @interact="showBlockDialog">
       <q-menu
         touch-position
         context-menu
       >
         <q-list>
-          <q-item
-            v-close-popup
-            :disable="!block"
-            clickable
-            @click="showBlockDialog"
-          >
-            <q-item-section>Show block</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
-            clickable
-            @click="showBlockSelectDialog"
-          >
-            <q-item-section>Assign block</q-item-section>
-          </q-item>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
         </q-list>
       </q-menu>
     </BuilderInteraction>

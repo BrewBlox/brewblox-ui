@@ -28,17 +28,9 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    bordered: {
-      type: Boolean,
-      default: false,
-    },
-    borderColor: {
-      type: String,
-      default: '',
-    },
   },
   setup(props) {
-    const { part } = usePart.setup();
+    const { part, placeholder } = usePart.setup();
     const {
       block,
       blockStatus,
@@ -47,9 +39,15 @@ export default defineComponent({
       showBlockSelectDialog,
     } = useSettingsBlock.setup<PwmBlockT>(props.settingsKey, PWM_TYPES);
 
-    const pwmValue = computed<number | null>(() =>
-      block.value?.data.enabled ? block.value.data.value : null,
-    );
+    const pwmValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 64;
+      }
+      if (block.value?.data.enabled) {
+        return block.value.data.value;
+      }
+      return null;
+    });
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
@@ -62,6 +60,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      placeholder,
       pwmValue,
       showBlockDialog,
       showBlockSelectDialog,
@@ -80,7 +79,7 @@ export default defineComponent({
       class="content"
     >
       <BrokenSvgIcon v-if="isBroken" />
-      <UnlinkedSvgIcon v-else-if="!block" />
+      <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <AnalogSvgIcon
@@ -101,31 +100,21 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <BuilderBorder
-      v-if="bordered"
-      :color="borderColor"
-    />
+
+    <slot />
+
     <BuilderInteraction @interact="showBlockDialog">
       <q-menu
         touch-position
         context-menu
       >
         <q-list>
-          <q-item
-            v-close-popup
-            :disable="!block"
-            clickable
-            @click="showBlockDialog"
-          >
-            <q-item-section>Show block</q-item-section>
-          </q-item>
-          <q-item
-            v-close-popup
-            clickable
-            @click="showBlockSelectDialog"
-          >
-            <q-item-section>Assign block</q-item-section>
-          </q-item>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <slot name="menu-content" />
         </q-list>
       </q-menu>
     </BuilderInteraction>

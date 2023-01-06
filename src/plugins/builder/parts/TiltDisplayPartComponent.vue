@@ -10,13 +10,19 @@ import {
   prettyUnit,
 } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
-import { TILT_ID_KEY } from '../blueprints/TiltDisplay';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+  TILT_ID_KEY,
+} from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'TiltDisplayPartComponent',
   setup() {
-    const { part, settings, width, height, bordered } = usePart.setup();
+    const { part, settings, width, height, bordered, passthrough } =
+      usePart.setup();
     const tiltStore = useTiltStore();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
@@ -55,7 +61,15 @@ export default defineComponent({
       () => userUnits.value.gravity === 'G',
     );
 
+    function findTilts(): SelectOption[] {
+      return useTiltStore().values.map((v) => ({ label: v.name, value: v.id }));
+    }
+
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
+      TILT_ID_KEY,
       prettyQty,
       preciseNumber,
       fixedNumber,
@@ -68,6 +82,8 @@ export default defineComponent({
       unitlessGravity,
       color,
       bordered,
+      passthrough,
+      findTilts,
     };
   },
 });
@@ -78,51 +94,77 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 100 50"
   >
-    <g class="content">
-      <SensorSvgIcon
-        x="15"
-        y="3"
-        width="20"
-        height="20"
-      />
-      <foreignObject
-        x="40"
-        y="5"
-        width="50"
-        height="18"
-      >
-        <div class="fit builder-text">
-          {{ preciseNumber(temperature) }}
-          <small>{{ tempUnit }}</small>
-        </div>
-      </foreignObject>
-      <TiltSvgIcon
-        x="15"
-        y="25"
-        width="20"
-        height="20"
-      />
-      <foreignObject
-        x="40"
-        y="27"
-        width="50"
-        height="18"
-      >
-        <div class="fit builder-text">
-          <template v-if="unitlessGravity">
-            {{ fixedNumber(gravity, 4) }}
-          </template>
-          <template v-else>
-            {{ preciseNumber(gravity) }}
-            <small>{{ gravityUnit }}</small>
-          </template>
-        </div>
-      </foreignObject>
-    </g>
+    <SensorSvgIcon
+      x="15"
+      y="3"
+      width="20"
+      height="20"
+    />
+    <foreignObject
+      x="40"
+      y="5"
+      width="50"
+      height="18"
+    >
+      <div class="fit builder-text">
+        {{ preciseNumber(temperature) }}
+        <small>{{ tempUnit }}</small>
+      </div>
+    </foreignObject>
+    <TiltSvgIcon
+      x="15"
+      y="25"
+      width="20"
+      height="20"
+    />
+    <foreignObject
+      x="40"
+      y="27"
+      width="50"
+      height="18"
+    >
+      <div class="fit builder-text">
+        <template v-if="unitlessGravity">
+          {{ fixedNumber(gravity, 4) }}
+        </template>
+        <template v-else>
+          {{ preciseNumber(gravity) }}
+          <small>{{ gravityUnit }}</small>
+        </template>
+      </div>
+    </foreignObject>
     <BuilderBorder
       v-if="bordered"
       :width="100"
       :color="color"
     />
+    <BuilderInteraction :width="100">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <SelectMenuContent
+            :settings-key="TILT_ID_KEY"
+            title="Tilt device"
+            label="Assign tilt"
+            :opts="findTilts"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

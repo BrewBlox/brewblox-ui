@@ -1,5 +1,11 @@
 <script lang="ts">
-import { RIGHT } from '@/plugins/builder/const';
+import {
+  DEFAULT_PUMP_PRESSURE,
+  IO_PRESSURE_KEY,
+  MAX_PUMP_PRESSURE,
+  MIN_PUMP_PRESSURE,
+  RIGHT,
+} from '@/plugins/builder/const';
 import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
@@ -14,6 +20,10 @@ export default defineComponent({
     const liquids = computed<string[]>(() => liquidOnCoord(part.value, RIGHT));
 
     return {
+      IO_PRESSURE_KEY,
+      MAX_PUMP_PRESSURE,
+      MIN_PUMP_PRESSURE,
+      DEFAULT_PUMP_PRESSURE,
       width,
       height,
       flowSpeed,
@@ -60,5 +70,20 @@ export default defineComponent({
       :speed="flowSpeed"
       path="M0,25H50"
     />
+    <BuilderInteraction>
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <PressureMenuContent
+            :settings-key="IO_PRESSURE_KEY"
+            :min="MIN_PUMP_PRESSURE"
+            :max="MAX_PUMP_PRESSURE"
+            :default="DEFAULT_PUMP_PRESSURE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/Conical';
 import { usePart } from '../composables';
 
 export default defineComponent({
@@ -8,6 +9,9 @@ export default defineComponent({
     const { width, height } = usePart.setup();
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       width,
       height,
     };
@@ -38,8 +42,6 @@ export default defineComponent({
       />
       <polygon points="1,250 149,250 82,363 67.5,363 " />
       <path d="M25,50c0,0,8.7-17,50-17s50,17,50,17H25z" />
-      <!-- Setpoint -->
-      <SetpointValues :y="50" />
     </g>
     <g class="outline legs">
       <!-- Legs -->
@@ -163,6 +165,24 @@ export default defineComponent({
         d="M72.3,334l-6.3-4H48c0,0-2.8,0.2-2.8,3.2s3.1,2.8,3.1,2.8h16l6.3,4H80v-6H72.3z"
       />
     </g>
+    <BuilderInteraction
+      :width="150"
+      :height="450"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
+    <SetpointValues :y="50" />
   </svg>
 </template>
 
