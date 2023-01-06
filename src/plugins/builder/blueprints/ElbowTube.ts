@@ -4,7 +4,6 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 const blueprint: BuilderBlueprint = {
   type: 'ElbowTube',
   title: 'Tube: elbow',
-  cards: [],
   size: () => [1, 1],
   transitions: () => ({
     [UP]: [{ outCoords: RIGHT }],

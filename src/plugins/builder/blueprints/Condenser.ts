@@ -19,17 +19,6 @@ export const DEFAULT_OUTLET_PRESSURE = DEFAULT_IO_PRESSURE / 2;
 const blueprint: BuilderBlueprint = {
   type: 'Condenser',
   title: 'Steam condenser',
-  cards: [
-    {
-      component: 'PressureCard',
-      props: {
-        settingsKey: IO_PRESSURE_KEY,
-        min: MIN_IO_PRESSURE,
-        max: MAX_IO_PRESSURE,
-        defaultValue: DEFAULT_OUTLET_PRESSURE,
-      },
-    },
-  ],
   size: () => [SIZE_X, SIZE_Y],
   transitions: (part: PersistentPart) => {
     const bottomOut = new Coordinates([0.5, SIZE_Y, 0]).toString();

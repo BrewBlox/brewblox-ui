@@ -50,16 +50,10 @@ export interface FlowPart extends StatePart {
   flows: CalculatedFlows;
 }
 
-export interface PartSettingsCard {
-  component: string;
-  props: Mapped<any>;
-}
-
 export interface BuilderBlueprint {
   type: string;
   title: string;
   component?: string; // defaults to `${type}PartComponent`
-  cards: PartSettingsCard[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => PartSize;
 }

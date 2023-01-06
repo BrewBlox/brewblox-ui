@@ -7,7 +7,6 @@ const SIZE_Y = 1;
 const blueprint: BuilderBlueprint = {
   type: 'Lauterhexe',
   title: 'Filter: lauterhexe',
-  cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({
     [LEFT]: [{ outCoords: CENTER }],

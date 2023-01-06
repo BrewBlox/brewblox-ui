@@ -5,8 +5,6 @@ import {
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
   LEFT,
-  MAX_PUMP_PRESSURE,
-  MIN_PUMP_PRESSURE,
   PumpBlockT,
   PUMP_KEY,
   PUMP_TYPES,
@@ -48,25 +46,6 @@ const blueprint: BuilderBlueprint = {
   type: 'Pump',
   title: 'Pump',
   size: () => [1, 1],
-  cards: [
-    {
-      component: 'BlockAddressCard',
-      props: {
-        settingsKey: PUMP_KEY,
-        compatible: PUMP_TYPES,
-        label: 'Actuator',
-      },
-    },
-    {
-      component: 'PressureCard',
-      props: {
-        settingsKey: IO_PRESSURE_KEY,
-        min: MIN_PUMP_PRESSURE,
-        max: MAX_PUMP_PRESSURE,
-        defaultValue: DEFAULT_PUMP_PRESSURE,
-      },
-    },
-  ],
   transitions: (part: PersistentPart) => {
     const pressure = calcPressure(part);
     return {

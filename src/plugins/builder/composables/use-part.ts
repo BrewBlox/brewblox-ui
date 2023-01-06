@@ -5,7 +5,6 @@ import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
 import {
   BORDER_KEY,
   COLOR_KEY,
-  DEPRECATED_IO_PRESSURE_KEY,
   FLOW_TOGGLE_KEY,
   InteractKey,
   IO_ENABLED_KEY,
@@ -75,20 +74,12 @@ export const usePart: UsePartComposable = {
     });
 
     const pressured = computed<boolean>({
-      get: () =>
-        Boolean(
-          settings.value[IO_ENABLED_KEY] ??
-            settings.value[DEPRECATED_IO_PRESSURE_KEY],
-        ),
-      set: (enabled) =>
-        patchSettings({
-          [IO_ENABLED_KEY]: enabled,
-          [DEPRECATED_IO_PRESSURE_KEY]: undefined,
-        }),
+      get: () => Boolean(settings.value[IO_ENABLED_KEY]),
+      set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
     });
 
     const passthrough = computed<boolean>({
-      get: () => Boolean(settings.value[FLOW_TOGGLE_KEY] ?? false),
+      get: () => Boolean(settings.value[FLOW_TOGGLE_KEY]),
       set: (v) => patchSettings({ [FLOW_TOGGLE_KEY]: Boolean(v) }),
     });
 

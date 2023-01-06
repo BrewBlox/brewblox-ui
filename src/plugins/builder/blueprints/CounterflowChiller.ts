@@ -11,7 +11,6 @@ const SIZE_Y = 2;
 const blueprint: BuilderBlueprint = {
   type: 'CounterflowChiller',
   title: 'Counterflow chiller',
-  cards: [],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({
     [CFC_TOP_LEFT]: [{ outCoords: CFC_TOP_RIGHT }],

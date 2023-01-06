@@ -2,7 +2,7 @@
 import { colorString } from '@/plugins/builder/utils';
 import { computed, defineComponent } from 'vue';
 import {
-  DEFAULT_FILL_PCT,
+  DEFAULT_KETTLE_FILL_PCT,
   DEFAULT_SIZE,
   KETTLE_FILL_PCT_KEY,
   MAX_SIZE,
@@ -17,7 +17,8 @@ export default defineComponent({
     const { settings, width, height } = usePart.setup();
 
     const filledHeight = computed<number>(() => {
-      const pct = settings.value[KETTLE_FILL_PCT_KEY] ?? DEFAULT_FILL_PCT;
+      const pct =
+        settings.value[KETTLE_FILL_PCT_KEY] ?? DEFAULT_KETTLE_FILL_PCT;
       return pct * (height.value / 100);
     });
 
@@ -29,7 +30,7 @@ export default defineComponent({
       MAX_SIZE,
       MIN_SIZE,
       KETTLE_FILL_PCT_KEY,
-      DEFAULT_FILL_PCT,
+      DEFAULT_KETTLE_FILL_PCT,
       LABEL_KEY,
       width,
       height,
@@ -74,7 +75,7 @@ export default defineComponent({
           <SliderMenuContent
             :min="0"
             :max="100"
-            :default="DEFAULT_FILL_PCT"
+            :default="DEFAULT_KETTLE_FILL_PCT"
             :settings-key="KETTLE_FILL_PCT_KEY"
             label="Liquid level"
             postfix="%"

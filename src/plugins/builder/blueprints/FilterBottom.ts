@@ -1,4 +1,4 @@
-import { CENTER, LEFT, WIDTH_KEY } from '@/plugins/builder/const';
+import { CENTER, LEFT } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { variableSizeFunc } from '../utils';
 
@@ -12,18 +12,6 @@ export const DEFAULT_SIZE: AreaSize = { width: 4, height: 1 };
 const blueprint: BuilderBlueprint = {
   type: 'FilterBottom',
   title: 'Filter: bottom',
-  cards: [
-    {
-      component: 'SizeCard',
-      props: {
-        settingsKey: WIDTH_KEY,
-        defaultSize: DEFAULT_SIZE_X,
-        label: 'Width',
-        min: 1,
-        max: 15,
-      },
-    },
-  ],
   size: variableSizeFunc(DEFAULT_SIZE),
   transitions: () => ({
     [LEFT]: [{ outCoords: CENTER }],
