@@ -282,9 +282,7 @@ export default defineComponent({
       <div class="span-s big">=</div>
       <div class="span-l">
         <LabeledField label="Error">
-          <q-tooltip>
-            Error = setting - measured
-          </q-tooltip>
+          <q-tooltip> Error = setting - measured </q-tooltip>
           {{ prettyQty(block.data.error) }}
         </LabeledField>
       </div>
@@ -323,10 +321,8 @@ export default defineComponent({
       <div class="span-l">
         <LabeledField label="Integral of P">
           {{ fixedNumber(block.data.integral) }}
-          <q-tooltip>
-            Increases with P every second
-          </q-tooltip>
-          </LabeledField>
+          <q-tooltip> Increases with P every second </q-tooltip>
+        </LabeledField>
       </div>
 
       <div class="span-s big">&#247;</div>
@@ -393,9 +389,7 @@ export default defineComponent({
           label="Derivative of P"
         >
           {{ fixedNumber(block.data.derivative, 4) }}
-          <q-tooltip>
-            Filtered change of P per second
-          </q-tooltip>
+          <q-tooltip> Filtered change of P per second </q-tooltip>
         </LabeledField>
       </div>
 
