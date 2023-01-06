@@ -62,7 +62,6 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
       balanced: {
         balancerId: bloxLink(names.balancer),
         granted: 0,
-        id: 0,
       },
       limiting: false,
     });

@@ -70,9 +70,6 @@ export default defineComponent({
       if (moduleStatus & GpioModuleStatus.POWER_ON_RESET) {
         values.push('GPIO Driver not yet initialized (POR)');
       }
-      if (moduleStatus & GpioModuleStatus.SPI_ERROR) {
-        values.push('GPIO Driver SPI error');
-      }
       return values;
     });
 
