@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'ColorDialog',
@@ -13,6 +13,10 @@ export default defineComponent({
     clearable: {
       type: Boolean,
       default: false,
+    },
+    presets: {
+      type: Array as PropType<string[]>,
+      default: () => [],
     },
   },
   emits: [...useDialog.emits],
@@ -50,6 +54,21 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{ title, message, html }">
+      <div
+        v-if="presets.length"
+        class="row q-gutter-x-md q-pb-sm"
+      >
+        <q-btn
+          v-for="(preset, idx) in presets"
+          :key="'preset-color-' + idx"
+          :style="`background-color: ${preset}`"
+          :color="preset"
+          round
+          icon="format_color_fill"
+          class="self-center"
+          @click="local = preset"
+        />
+      </div>
       <q-color
         v-model="local"
         format-model="hex"

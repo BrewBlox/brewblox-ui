@@ -1,5 +1,12 @@
 <script lang="ts">
-import { UP } from '@/plugins/builder/const';
+import {
+  DEFAULT_IO_PRESSURE,
+  IO_ENABLED_KEY,
+  IO_PRESSURE_KEY,
+  MAX_IO_PRESSURE,
+  MIN_IO_PRESSURE,
+  UP,
+} from '@/plugins/builder/const';
 import {
   flowOnCoord,
   liquidOnCoord,
@@ -9,29 +16,30 @@ import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 
 const chevrons = verticalChevrons(50, 86.4);
-const paths = {
-  borders: [
-    'M21,0v20c0,5,4,9,9,9 h13 c1.7,0 1.3,3 3,3 V75 ',
-    'M29,0v18c0,1.7,1.3,3,3,3 h13 c5,0 9,4 9,9 V75',
-  ],
-  liquid: 'M25,0V20a5,5,0,0,0,5,5 h14.5 a5,5,0,0,1,5,6 V75',
-  arrows: 'M25,0V20a5,5,0,0,0,5,5 h14.5 a5,5,0,0,1,5,6 V80',
-};
 
 export default defineComponent({
   name: 'ShiftedSystemIOPartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, settings, patchSettings, width, height } = usePart.setup();
+
+    const pressured = computed<boolean>({
+      get: () => Boolean(settings.value[IO_ENABLED_KEY]),
+      set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
+    });
 
     const flowSpeed = computed<number>(() => -flowOnCoord(part.value, UP));
 
     const liquids = computed<string[]>(() => liquidOnCoord(part.value, UP));
 
     return {
+      IO_PRESSURE_KEY,
+      MIN_IO_PRESSURE,
+      MAX_IO_PRESSURE,
+      DEFAULT_IO_PRESSURE,
       width,
       height,
+      pressured,
       chevrons,
-      paths,
       flowSpeed,
       liquids,
     };
@@ -44,9 +52,17 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 100 100"
   >
+    <LiquidStroke
+      :paths="['M25,0V20a5,5,0,0,0,5,5 h14.5 a5,5,0,0,1,5,6 V75']"
+      :colors="liquids"
+    />
+    <AnimatedArrows
+      :speed="flowSpeed"
+      path="M25,0V20a5,5,0,0,0,5,5 h14.5 a5,5,0,0,1,5,6 V80"
+    />
     <g class="outline">
-      <path :d="paths.borders[0]" />
-      <path :d="paths.borders[1]" />
+      <path d="M21,0v20c0,5,4,9,9,9 h13 c1.7,0 1.3,3 3,3 V75" />
+      <path d="M29,0v18c0,1.7,1.3,3,3,3 h13 c5,0 9,4 9,9 V75" />
       <path
         v-if="flowSpeed > 0"
         :d="chevrons.down"
@@ -60,13 +76,25 @@ export default defineComponent({
         :d="chevrons.straight"
       />
     </g>
-    <LiquidStroke
-      :paths="[paths.liquid]"
-      :colors="liquids"
-    />
-    <AnimatedArrows
-      :speed="flowSpeed"
-      :path="paths.arrows"
-    />
+    <BuilderInteraction @interact="pressured = !pressured">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <ToggleMenuContent
+            v-model="pressured"
+            label="Active"
+          />
+          <ColorMenuContent />
+          <PressureMenuContent
+            :settings-key="IO_PRESSURE_KEY"
+            :min="MIN_IO_PRESSURE"
+            :max="MAX_IO_PRESSURE"
+            :default="DEFAULT_IO_PRESSURE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

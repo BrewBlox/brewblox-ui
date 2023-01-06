@@ -24,10 +24,24 @@ export default defineComponent({
 
 <template>
   <g>
-    <foreignObject
-      class="grid-background"
-      :width="coord2grid(width)"
-      :height="coord2grid(height)"
+    <!-- Grid lines -->
+    <line
+      v-for="x in width - 1"
+      :key="`grid-x-${x}`"
+      :x1="coord2grid(x)"
+      :x2="coord2grid(x)"
+      :y1="0"
+      :y2="coord2grid(height)"
+      class="grid-line"
+    />
+    <line
+      v-for="y in height - 1"
+      :key="`grid-y-${y}`"
+      :x1="0"
+      :x2="coord2grid(width)"
+      :y1="coord2grid(y)"
+      :y2="coord2grid(y)"
+      class="grid-line"
     />
     <!-- Coordinate numbers -->
     <text
@@ -53,23 +67,17 @@ export default defineComponent({
   </g>
 </template>
 
-<style lang="scss" scoped>
-$grid-line: rgba(255, 255, 255, 0.15);
+<style lang="sass" scoped>
+.grid-line
+  stroke: white
+  stroke-width: 0.2
+  opacity: 0.6
 
-.grid-background {
-  background-image: linear-gradient($grid-line 1px, transparent 1px),
-    linear-gradient(90deg, $grid-line 1px, transparent 1px);
-  background-size: 50px 50px, 50px 50px;
-  background-position: 0 -1px, -1px 0;
-  pointer-events: none;
-}
-
-.grid-square-text {
-  font-size: x-small;
-  z-index: 2;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
+.grid-square-text
+  font-size: x-small
+  z-index: 2
+  -webkit-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
 </style>

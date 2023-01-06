@@ -26,12 +26,10 @@ const paths = {
       c 2.1,0,3.8,1.5,4,3.6 c 0.2,2.1-1.4,4.1-3.6,4.3 l-50,4.6
       c -0.1,0-0.1,0-0.2,0 c -22.4,1-49.9,1-50.2,1 H 1`,
   ],
-  liquid: [
+  frontLiquid: ['M 45.4,60.3 L 145.4,50', 'M 45.4,40.9 L 145.4,30.6'],
+  backLiquid: ['M 145.4,50 L 45.4,40.9', 'M 145.4,69.4 L 45.4,60.3'],
+  ioLiquid: [
     'M 145.4,30.6 l -50-4.6 c -22.5-1-50-1-50-1 H 0',
-    'M 145.4,50 L 45.4,40.9',
-    'M 145.4,69.4 L 45.4,60.3',
-    'M 45.4,60.3 L 145.4,50',
-    'M 45.4,40.9 L 145.4,30.6',
     'M 0,75 h 45.4 c 0,0,27.5,0,50-1 l 50-4.6',
   ],
 };
@@ -66,58 +64,82 @@ export default defineComponent({
     viewBox="0 0 150 100"
   >
     <LiquidStroke
-      :paths="paths.liquid"
+      :paths="paths.backLiquid"
       :colors="liquids"
-      class="coil-liquid"
+      stroke-linecap="round"
     />
-    <g class="outline">
+    <AnimatedArrows
+      :speed="-flowSpeed"
+      :path="paths.backLiquid[0]"
+      :num-arrows="3"
+    />
+    <AnimatedArrows
+      :speed="-flowSpeed"
+      :path="paths.backLiquid[1]"
+      :num-arrows="3"
+    />
+    <LiquidStroke
+      :paths="paths.ioLiquid"
+      :colors="liquids"
+      stroke-linecap="round"
+    />
+    <AnimatedArrows
+      :speed="-flowSpeed"
+      :path="paths.ioLiquid[0]"
+      :num-arrows="5"
+    />
+    <AnimatedArrows
+      :speed="-flowSpeed"
+      :path="paths.ioLiquid[1]"
+      :num-arrows="5"
+    />
+    <LiquidStroke
+      :paths="paths.frontLiquid"
+      :colors="liquids"
+      stroke-linecap="round"
+    />
+    <AnimatedArrows
+      :speed="-flowSpeed"
+      :path="paths.frontLiquid[0]"
+      :num-arrows="4"
+    />
+    <AnimatedArrows
+      :speed="-flowSpeed"
+      :path="paths.frontLiquid[1]"
+      :num-arrows="4"
+    />
+    <g class="outline fill">
       <rect
-        fill="white"
         x="1"
         y="12.5"
         width="8"
         height="8"
       />
       <rect
-        fill="white"
         x="1"
         y="30"
         width="8"
         height="8"
       />
       <rect
-        fill="white"
         x="1"
         y="62.5"
         width="8"
         height="8"
       />
       <rect
-        fill="white"
         x="1"
         y="80"
         width="8"
         height="8"
       />
+    </g>
+    <g class="outline">
       <path
         v-for="border in paths.borders"
         :key="border"
         :d="border"
       />
     </g>
-    <AnimatedArrows
-      :speed="flowSpeed"
-      path="M0,25H50"
-    />
-    <AnimatedArrows
-      :speed="flowSpeed"
-      path="M50,75H0"
-    />
   </svg>
 </template>
-
-<style lang="scss" scoped>
-:deep(.coil-liquid path) {
-  stroke-linecap: round;
-}
-</style>

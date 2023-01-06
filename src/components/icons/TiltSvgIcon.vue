@@ -4,6 +4,12 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'SensorSvgIcon',
+  props: {
+    color: {
+      type: String,
+      default: 'white',
+    },
+  },
   setup() {
     return { mdiTestTube };
   },
@@ -21,14 +27,9 @@ export default defineComponent({
   >
     <path
       :d="mdiTestTube"
-      class="icon"
+      :fill="color"
+      stroke="none"
       transform="rotate(25, 12, 12)"
     />
   </svg>
 </template>
-
-<style lang="sass" scoped>
-.icon
-  fill: white
-  stroke: none
-</style>

@@ -19,16 +19,6 @@ const blueprint: BuilderBlueprint = {
   type: 'LValve',
   title: 'Valve: L',
   size: () => [1, 1],
-  cards: [
-    {
-      component: 'BlockAddressCard',
-      props: {
-        settingsKey: VALVE_KEY,
-        compatible: VALVE_TYPES,
-        label: 'Valve or Actuator',
-      },
-    },
-  ],
   transitions: (part: PersistentPart): Transitions => {
     const block = settingsBlock<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES);
     const closed =

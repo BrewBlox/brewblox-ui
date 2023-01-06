@@ -4,13 +4,12 @@ import {
   COLOR_KEY,
   DRIVER_KEY,
   IO_ENABLED_KEY,
-  IO_LIQUIDS_KEY,
   IO_PRESSURE_KEY,
   PID_KEY,
   PWM_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
   VALVE_CLOSED_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -79,7 +78,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
               id: names.bkPwm,
               type: null,
             }),
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
           },
           flipped: true,
           type: 'HeatingElement',
@@ -95,7 +94,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
               id: names.hltPwm,
               type: null,
             }),
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
           },
           flipped: false,
           type: 'HeatingElement',
@@ -124,7 +123,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
           },
           flipped: true,
           type: 'FilterBottom',
@@ -920,7 +919,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           settings: {
             [IO_ENABLED_KEY]: true,
             [IO_PRESSURE_KEY]: 10,
-            [IO_LIQUIDS_KEY]: [COLD_WATER],
+            [COLOR_KEY]: COLD_WATER,
           },
           flipped: false,
           type: 'SystemIO',

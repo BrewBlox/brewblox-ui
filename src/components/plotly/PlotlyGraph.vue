@@ -176,12 +176,25 @@ export default defineComponent({
       modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
       modeBarButtonsToAdd: [
         {
-          name: 'toImageLarge',
+          name: 'toImageLargeJpeg',
           title: 'Download plot as a jpeg',
           icon: Plotly['Icons'].camera,
           click: (el) =>
             Plotly.downloadImage(el, {
               format: 'jpeg',
+              width: 3000,
+              height: 1500,
+              filename:
+                get(props.layout, 'title.text', props.layout.title) || 'graph',
+            }),
+        },
+        {
+          name: 'toImageLargePng',
+          title: 'Download plot as a png',
+          icon: Plotly['Icons'].camera,
+          click: (el) =>
+            Plotly.downloadImage(el, {
+              format: 'png',
               width: 3000,
               height: 1500,
               filename:

@@ -62,6 +62,7 @@ declare module '@vue/runtime-core' {
     QuickstartChannelField: typeof import('src/plugins/quickstart/components/QuickstartChannelField.vue').default;
     SelectBlockGraphDialog: typeof import('src/plugins/history/components/SelectBlockGraphDialog.vue').default;
     QueryEditor: typeof import('src/plugins/history/components/QueryEditor.vue').default;
+    MetricsEditorDialog: typeof import('src/plugins/history/components/MetricsEditorDialog.vue').default;
     MetricsEditor: typeof import('src/plugins/history/components/MetricsEditor.vue').default;
     MetricsDisplayDialog: typeof import('src/plugins/history/components/MetricsDisplayDialog.vue').default;
     HistoryGraph: typeof import('src/plugins/history/components/HistoryGraph.vue').default;
@@ -74,6 +75,16 @@ declare module '@vue/runtime-core' {
     GraphDisplayDialog: typeof import('src/plugins/history/components/GraphDisplayDialog.vue').default;
     GraphDialog: typeof import('src/plugins/history/components/GraphDialog.vue').default;
     ExportGraphAction: typeof import('src/plugins/history/components/ExportGraphAction.vue').default;
+    WidgetMenuContent: typeof import('src/plugins/builder/components/menu/WidgetMenuContent.vue').default;
+    ToggleMenuContent: typeof import('src/plugins/builder/components/menu/ToggleMenuContent.vue').default;
+    TextMenuContent: typeof import('src/plugins/builder/components/menu/TextMenuContent.vue').default;
+    SliderMenuContent: typeof import('src/plugins/builder/components/menu/SliderMenuContent.vue').default;
+    SizeMenuContent: typeof import('src/plugins/builder/components/menu/SizeMenuContent.vue').default;
+    SelectMenuContent: typeof import('src/plugins/builder/components/menu/SelectMenuContent.vue').default;
+    PressureMenuContent: typeof import('src/plugins/builder/components/menu/PressureMenuContent.vue').default;
+    MetricsMenuContent: typeof import('src/plugins/builder/components/menu/MetricsMenuContent.vue').default;
+    ColorMenuContent: typeof import('src/plugins/builder/components/menu/ColorMenuContent.vue').default;
+    BlockMenuContent: typeof import('src/plugins/builder/components/menu/BlockMenuContent.vue').default;
     ToggleCard: typeof import('src/plugins/builder/components/ToggleCard.vue').default;
     TextCard: typeof import('src/plugins/builder/components/TextCard.vue').default;
     SizeCard: typeof import('src/plugins/builder/components/SizeCard.vue').default;
@@ -82,7 +93,6 @@ declare module '@vue/runtime-core' {
     SelectCard: typeof import('src/plugins/builder/components/SelectCard.vue').default;
     PwmValues: typeof import('src/plugins/builder/components/PwmValues.vue').default;
     PressureCard: typeof import('src/plugins/builder/components/PressureCard.vue').default;
-    PowerIcon: typeof import('src/plugins/builder/components/PowerIcon.vue').default;
     PlacementCard: typeof import('src/plugins/builder/components/PlacementCard.vue').default;
     PartWrapper: typeof import('src/plugins/builder/components/PartWrapper.vue').default;
     OverlapIndicators: typeof import('src/plugins/builder/components/OverlapIndicators.vue').default;
@@ -96,7 +106,9 @@ declare module '@vue/runtime-core' {
     BuilderToolsMenu: typeof import('src/plugins/builder/components/BuilderToolsMenu.vue').default;
     BuilderPartSettingsDialog: typeof import('src/plugins/builder/components/BuilderPartSettingsDialog.vue').default;
     BuilderLabelValues: typeof import('src/plugins/builder/components/BuilderLabelValues.vue').default;
+    BuilderInteraction: typeof import('src/plugins/builder/components/BuilderInteraction.vue').default;
     BuilderCatalogDialog: typeof import('src/plugins/builder/components/BuilderCatalogDialog.vue').default;
+    BuilderBorder: typeof import('src/plugins/builder/components/BuilderBorder.vue').default;
     BuilderActions: typeof import('src/plugins/builder/components/BuilderActions.vue').default;
     BorderCard: typeof import('src/plugins/builder/components/BorderCard.vue').default;
     BlockStatusSvg: typeof import('src/plugins/builder/components/BlockStatusSvg.vue').default;
@@ -127,21 +139,15 @@ declare module '@vue/runtime-core' {
     DashboardActions: typeof import('src/components/menu/DashboardActions.vue').default;
     ActionItem: typeof import('src/components/menu/ActionItem.vue').default;
     UnlinkedSvgIcon: typeof import('src/components/icons/UnlinkedSvgIcon.vue').default;
-    UnlinkedIcon: typeof import('src/components/icons/UnlinkedIcon.vue').default;
     TiltSvgIcon: typeof import('src/components/icons/TiltSvgIcon.vue').default;
-    SleepingSvgIcon: typeof import('src/components/icons/SleepingSvgIcon.vue').default;
-    SleepingIcon: typeof import('src/components/icons/SleepingIcon.vue').default;
+    SpinnerSvgIcon: typeof import('src/components/icons/SpinnerSvgIcon.vue').default;
     SetpointSvgIcon: typeof import('src/components/icons/SetpointSvgIcon.vue').default;
     SessionSvgIcon: typeof import('src/components/icons/SessionSvgIcon.vue').default;
     SensorSvgIcon: typeof import('src/components/icons/SensorSvgIcon.vue').default;
-    PwmSvgIcon: typeof import('src/components/icons/PwmSvgIcon.vue').default;
-    PwmIcon: typeof import('src/components/icons/PwmIcon.vue').default;
+    PowerSvgIcon: typeof import('src/components/icons/PowerSvgIcon.vue').default;
     HeatingSvgIcon: typeof import('src/components/icons/HeatingSvgIcon.vue').default;
-    HeatingIcon: typeof import('src/components/icons/HeatingIcon.vue').default;
     CoolingSvgIcon: typeof import('src/components/icons/CoolingSvgIcon.vue').default;
-    CoolingIcon: typeof import('src/components/icons/CoolingIcon.vue').default;
     BrokenSvgIcon: typeof import('src/components/icons/BrokenSvgIcon.vue').default;
-    BrokenIcon: typeof import('src/components/icons/BrokenIcon.vue').default;
     AnalogSvgIcon: typeof import('src/components/icons/AnalogSvgIcon.vue').default;
     GridItem: typeof import('src/components/grid/GridItem.vue').default;
     GridContainer: typeof import('src/components/grid/GridContainer.vue').default;
@@ -190,6 +196,7 @@ declare module '@vue/runtime-core' {
     BlockFieldAddressDialog: typeof import('src/components/form/BlockFieldAddressDialog.vue').default;
     BlockAddressField: typeof import('src/components/form/BlockAddressField.vue').default;
     BlockAddressDialog: typeof import('src/components/form/BlockAddressDialog.vue').default;
+    AreaSizeDialog: typeof import('src/components/form/AreaSizeDialog.vue').default;
     PreviewCard: typeof import('src/components/card/PreviewCard.vue').default;
     Card: typeof import('src/components/card/Card.vue').default;
   }

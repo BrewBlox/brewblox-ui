@@ -6,10 +6,10 @@ import {
 import { defaultLabel } from '@/plugins/history/nodes';
 import { fixedNumber, shortDateString } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/MetricsDisplay';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
-import { CENTER } from '../const';
-import { liquidOnCoord } from '../utils';
+import { liquidBorderColor } from '../utils';
 
 interface MetricDisplay {
   field: string;
@@ -22,8 +22,11 @@ interface MetricDisplay {
 export default defineComponent({
   name: 'MetricsDisplayPartComponent',
   setup() {
-    const { part, metrics, width, height, bordered } = usePart.setup();
-    const { source } = useMetrics.setup(null);
+    const { part, metrics, width, height, bordered, passthrough } =
+      usePart.setup();
+    const { source } = useMetrics.setupConsumer();
+
+    const color = computed<string>(() => liquidBorderColor(part.value));
 
     function fieldFreshDuration(field: string): number {
       return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
@@ -50,14 +53,14 @@ export default defineComponent({
         }));
     });
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
-
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       width,
       height,
       bordered,
+      passthrough,
       color,
       values,
     };
@@ -90,18 +93,29 @@ export default defineComponent({
         </div>
       </div>
     </foreignObject>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="width - 2"
-        :height="height - 2"
-        :stroke="color"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke-width="2px"
-      />
-    </g>
+    <BuilderBorder v-bind="{ width, height, color }" />
+    <BuilderInteraction v-bind="{ width, height }">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <MetricsMenuContent />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

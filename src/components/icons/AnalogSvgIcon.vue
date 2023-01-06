@@ -3,18 +3,24 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'AnalogSvgIcon',
+  props: {
+    color: {
+      type: String,
+      default: 'white',
+    },
+  },
 });
 </script>
 
 <template>
   <svg
+    :fill="color"
     xmlns="http://www.w3.org/2000/svg"
     x="5"
     y="5"
     width="40"
     height="40"
     viewBox="0 -5 100 100"
-    fill="white"
     stroke="none"
   >
     <path

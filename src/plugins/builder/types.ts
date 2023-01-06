@@ -1,6 +1,8 @@
 import { MetricsConfig } from '@/plugins/history/types';
 import { StoreObject } from 'brewblox-proto/ts';
 
+export type PartSize = [width: number, height: number];
+
 export interface FlowRoute {
   outCoords: string;
   friction?: number;
@@ -41,25 +43,19 @@ export interface PersistentPart {
 
 export interface StatePart extends PersistentPart {
   transitions: Transitions;
-  size: [number, number];
+  size: PartSize;
 }
 
 export interface FlowPart extends StatePart {
   flows: CalculatedFlows;
 }
 
-export interface PartSettingsCard {
-  component: string;
-  props: Mapped<any>;
-}
-
 export interface BuilderBlueprint {
   type: string;
   title: string;
   component?: string; // defaults to `${type}PartComponent`
-  cards: PartSettingsCard[];
   transitions: (part: PersistentPart) => Transitions;
-  size: (part: PersistentPart) => [number, number];
+  size: (part: PersistentPart) => PartSize;
 }
 
 export interface BuilderLayout extends StoreObject {
@@ -94,7 +90,6 @@ export type BuilderToolName =
   | 'copy'
   | 'rotate'
   | 'flip'
-  | 'edit'
   | 'interact'
   | 'delete'
   | 'undo'

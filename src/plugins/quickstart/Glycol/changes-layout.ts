@@ -2,13 +2,13 @@ import { KETTLE_FILL_PCT_KEY } from '@/plugins/builder/blueprints/Kettle';
 import {
   BORDER_KEY,
   COLOR_KEY,
+  HEIGHT_KEY,
   PID_KEY,
   PUMP_KEY,
   PWM_KEY,
   SENSOR_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
-  SIZE_Y_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout, PersistentPart } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -149,8 +149,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [SIZE_X_KEY]: 2,
-            [SIZE_Y_KEY]: 3,
+            [WIDTH_KEY]: 2,
+            [HEIGHT_KEY]: 3,
             [COLOR_KEY]: '#69bcff',
             [KETTLE_FILL_PCT_KEY]: 100,
           },

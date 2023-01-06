@@ -10,7 +10,6 @@ import {
   COLOR_KEY,
   HOT_WATER,
   IO_ENABLED_KEY,
-  IO_LIQUIDS_KEY,
   IO_PRESSURE_KEY,
 } from '@/plugins/builder/const';
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
@@ -103,7 +102,7 @@ describe('Data describing an input tube', () => {
     settings: {
       [IO_PRESSURE_KEY]: 11,
       [IO_ENABLED_KEY]: true,
-      [IO_LIQUIDS_KEY]: [COLD_WATER],
+      [COLOR_KEY]: COLD_WATER,
     },
   };
 
@@ -131,7 +130,7 @@ describe('asFlowParts', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {
-        [IO_LIQUIDS_KEY]: [COLD_WATER],
+        [COLOR_KEY]: COLD_WATER,
       },
     },
     {
@@ -170,7 +169,7 @@ describe('A single path without splits', () => {
       settings: {
         [IO_PRESSURE_KEY]: 6,
         [IO_ENABLED_KEY]: true,
-        [IO_LIQUIDS_KEY]: [HOT_WATER],
+        [COLOR_KEY]: HOT_WATER,
       },
     },
     {
@@ -222,7 +221,7 @@ describe('A single path without splits', () => {
         settings: {
           [IO_PRESSURE_KEY]: 6,
           [IO_ENABLED_KEY]: true,
-          [IO_LIQUIDS_KEY]: [HOT_WATER],
+          [COLOR_KEY]: HOT_WATER,
         },
       },
       {
@@ -279,7 +278,7 @@ describe('A path with a split, but no joins', () => {
       settings: {
         [IO_PRESSURE_KEY]: 13,
         [IO_ENABLED_KEY]: true,
-        [IO_LIQUIDS_KEY]: [COLD_WATER],
+        [COLOR_KEY]: COLD_WATER,
       },
     },
     {
@@ -428,7 +427,7 @@ describe('A path that forks and rejoins', () => {
       settings: {
         [IO_ENABLED_KEY]: true,
         [IO_PRESSURE_KEY]: 11.5,
-        [IO_LIQUIDS_KEY]: [COLD_WATER],
+        [COLOR_KEY]: COLD_WATER,
       },
     },
     {
@@ -632,7 +631,7 @@ describe('A single path with a pump', () => {
       settings: {
         [IO_ENABLED_KEY]: true,
         [IO_PRESSURE_KEY]: 9,
-        [IO_LIQUIDS_KEY]: [COLD_WATER],
+        [COLOR_KEY]: COLD_WATER,
       },
     },
     {
@@ -672,7 +671,7 @@ describe('A single path with a pump', () => {
         settings: {
           [IO_ENABLED_KEY]: true,
           [IO_PRESSURE_KEY]: 9,
-          [IO_LIQUIDS_KEY]: [COLD_WATER],
+          [COLOR_KEY]: COLD_WATER,
         },
       },
       {
@@ -765,7 +764,7 @@ describe('Two sources joining', () => {
       settings: {
         [IO_ENABLED_KEY]: true,
         [IO_PRESSURE_KEY]: 15,
-        [IO_LIQUIDS_KEY]: [COLD_WATER],
+        [COLOR_KEY]: COLD_WATER,
       },
     },
     {
@@ -777,7 +776,7 @@ describe('Two sources joining', () => {
       settings: {
         [IO_ENABLED_KEY]: true,
         [IO_PRESSURE_KEY]: 15,
-        [IO_LIQUIDS_KEY]: [HOT_WATER],
+        [COLOR_KEY]: HOT_WATER,
       },
     },
     {
@@ -999,7 +998,7 @@ describe('A path with a bridge', () => {
       type: 'SystemIO',
       rotate: 0,
       settings: {
-        [IO_LIQUIDS_KEY]: [COLD_WATER],
+        [COLOR_KEY]: COLD_WATER,
         [IO_ENABLED_KEY]: true,
         [IO_PRESSURE_KEY]: 8,
       },
@@ -1063,7 +1062,7 @@ describe('A path with a bridge', () => {
         type: 'SystemIO',
         rotate: 0,
         settings: {
-          [IO_LIQUIDS_KEY]: [COLD_WATER],
+          [COLOR_KEY]: COLD_WATER,
           [IO_ENABLED_KEY]: true,
           [IO_PRESSURE_KEY]: 8,
         },
@@ -1456,7 +1455,7 @@ describe('A forking and joining path with a pump in each fork', () => {
       id: '1a',
       rotate: 180,
       settings: {
-        [IO_LIQUIDS_KEY]: ['#DB0023'],
+        [COLOR_KEY]: '#DB0023',
         [IO_ENABLED_KEY]: true,
         [IO_PRESSURE_KEY]: 0,
       },

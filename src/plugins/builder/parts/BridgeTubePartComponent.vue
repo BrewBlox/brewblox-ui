@@ -5,7 +5,7 @@ import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const lowPaths = {
-  borders: ['M 21,50 L 21,21 M 21,10 L 21,0', 'M 29,50 L 29,21 M 29,10 L 29,0'],
+  borders: ['M 21,50 L 21,21 M 21,11 L 21,0', 'M 29,50 L 29,21 M 29,11 L 29,0'],
   liquid: 'M 25,50 L 25,21 M 25,11 L 25,0',
 };
 const highPaths = {
@@ -56,13 +56,6 @@ export default defineComponent({
     viewBox="0 0 50 50"
   >
     <!-- low -->
-    <g class="outline">
-      <path
-        v-for="border in lowPaths.borders"
-        :key="border"
-        :d="border"
-      />
-    </g>
     <LiquidStroke
       :paths="[lowPaths.liquid]"
       :colors="lowLiquid"
@@ -71,7 +64,23 @@ export default defineComponent({
       :speed="lowFlowSpeed"
       :path="lowPaths.liquid"
     />
+    <g class="outline">
+      <path
+        v-for="border in lowPaths.borders"
+        :key="border"
+        :d="border"
+      />
+    </g>
     <!-- high -->
+    <LiquidStroke
+      :paths="[highPaths.liquid]"
+      :colors="highLiquid"
+      stroke-width="8"
+    />
+    <AnimatedArrows
+      :speed="highFlowSpeed"
+      :path="highPaths.liquid"
+    />
     <g class="outline">
       <path
         v-for="border in highPaths.borders"
@@ -79,13 +88,5 @@ export default defineComponent({
         :d="border"
       />
     </g>
-    <LiquidStroke
-      :paths="[highPaths.liquid]"
-      :colors="highLiquid"
-    />
-    <AnimatedArrows
-      :speed="highFlowSpeed"
-      :path="highPaths.liquid"
-    />
   </svg>
 </template>

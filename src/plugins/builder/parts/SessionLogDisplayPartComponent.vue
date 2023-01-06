@@ -2,29 +2,31 @@
 // import type { SessionLogWidget } from '@/plugins/history/SessionLog/types';
 import { useHistoryStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
-import { useWidgetStore, Widget } from '@/store/widgets';
 import { mdiTextSubject } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent } from 'vue';
-import { WIDGET_KEY } from '../blueprints/SessionLogDisplay';
-import { usePart } from '../composables';
-import { showLinkedWidgetDialog } from '../utils';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+  WIDGET_KEY,
+  WIDGET_TYPE,
+} from '../blueprints/SessionLogDisplay';
+import { usePart, useSettingsWidget } from '../composables';
 
 export default defineComponent({
   name: 'SessionLogDisplayPartComponent',
   setup() {
-    const widgetStore = useWidgetStore();
     const historyStore = useHistoryStore();
-    const { part, settings, width, height, bordered } = usePart.setup();
+    const { width, height, bordered, placeholder } = usePart.setup();
+    const {
+      widgetId,
+      widget,
+      isBroken,
+      showWidgetDialog,
+      showWidgetSelectDialog,
+    } = useSettingsWidget.setup(WIDGET_KEY, WIDGET_TYPE);
 
-    const isLinked = computed<boolean>(() =>
-      Boolean(settings.value[WIDGET_KEY]),
-    );
-
-    const widget = computed<Widget | null>(() =>
-      widgetStore.widgetById(settings.value[WIDGET_KEY]),
-    );
-
-    const isBroken = computed<boolean>(() => isLinked.value && !widget.value);
+    const available = computed<boolean>(() => widget.value != null);
 
     const session = computed<LoggedSession | null>(() =>
       widget.value?.config.currentSession
@@ -33,75 +35,88 @@ export default defineComponent({
     );
 
     const displayText = computed<string>(() =>
-      isLinked.value
+      widgetId.value
         ? session.value?.title ?? 'no active session'
         : 'Not linked',
     );
 
-    function interact(): void {
-      showLinkedWidgetDialog(part.value, WIDGET_KEY);
-    }
-
     return {
+      WIDGET_KEY,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       mdiTextSubject,
       width,
       height,
       bordered,
-      isLinked,
+      placeholder,
+      widgetId,
       isBroken,
+      available,
       displayText,
-      interact,
+      showWidgetDialog,
+      showWidgetSelectDialog,
     };
   },
 });
 </script>
 
 <template>
-  <svg
-    v-bind="{ width, height }"
-    class="interaction"
-    @click="interact"
-  >
-    <rect class="interaction-background" />
-    <g class="content">
-      <BrokenSvgIcon
-        v-if="isBroken"
-        :x="width / 2 - 20"
-      />
-      <UnlinkedSvgIcon
-        v-else-if="!isLinked"
-        :x="width / 2 - 20"
-      />
-      <template v-else>
-        <foreignObject
-          v-if="width > 50"
-          x="0"
-          y="5"
-          :width="width"
-          :height="height - 5"
+  <svg v-bind="{ width, height }">
+    <BrokenSvgIcon
+      v-if="isBroken"
+      :x="width / 2 - 20"
+    />
+    <UnlinkedSvgIcon
+      v-else-if="!available && !placeholder"
+      :x="width / 2 - 20"
+    />
+    <template v-else>
+      <foreignObject
+        v-if="width > 50"
+        x="0"
+        y="5"
+        :width="width"
+        :height="height - 5"
+      >
+        <div
+          class="fit builder-text"
+          style="font-size: 130%"
         >
-          <div
-            class="fit builder-text"
-            style="font-size: 130%"
-          >
-            {{ displayText }}
-          </div>
-        </foreignObject>
-        <SessionSvgIcon v-else />
-      </template>
-    </g>
-
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="width - 2"
-        :height="height - 2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke-width="2px"
-      />
-    </g>
+          {{ displayText }}
+        </div>
+      </foreignObject>
+      <SessionSvgIcon v-else />
+    </template>
+    <BuilderBorder
+      v-if="bordered"
+      v-bind="{ width, height }"
+    />
+    <BuilderInteraction
+      v-bind="{ width, height }"
+      @interact="showWidgetDialog"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <WidgetMenuContent
+            :available="available"
+            @show="showWidgetDialog"
+            @assign="showWidgetSelectDialog"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

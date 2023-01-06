@@ -1,40 +1,50 @@
 <script lang="ts">
 import {
-  CENTER,
   SensorBlockT,
   SENSOR_KEY,
   SENSOR_TYPES,
 } from '@/plugins/builder/const';
-import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'SensorDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SensorBlockT>(part, SENSOR_KEY, SENSOR_TYPES);
+    const color = computed<string>(() => liquidBorderColor(part.value));
+
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<SensorBlockT>(SENSOR_KEY, SENSOR_TYPES);
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
     );
 
-    const tempValue = computed<number | null>(
-      () => block.value?.data.value?.value ?? null,
-    );
+    const tempValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 21;
+      }
+      return block.value?.data.value?.value ?? null;
+    });
 
     const tempUnit = computed<string>(() =>
       prettyUnit(block.value?.data.value),
     );
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
-
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       fixedNumber,
       width,
       height,
@@ -42,11 +52,14 @@ export default defineComponent({
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       contentTransform,
       tempValue,
       tempUnit,
       color,
       bordered,
+      passthrough,
+      placeholder,
     };
   },
 });
@@ -56,16 +69,13 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <g
       :transform="contentTransform"
       class="content"
     >
       <BrokenSvgIcon v-if="isBroken" />
-      <UnlinkedSvgIcon v-else-if="!block" />
+      <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <SensorSvgIcon
@@ -87,18 +97,36 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :stroke="color"
-        stroke-width="2"
-        x="1"
-        y="1"
-        width="48"
-        height="48"
-        rx="6"
-        ry="6"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :color="color"
+    />
+    <BuilderInteraction @interact="showBlockDialog">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

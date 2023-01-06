@@ -2,13 +2,20 @@ import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
 import { upgradeMetricsConfig } from '@/plugins/history/utils';
 import { concatById, filterById, findById } from '@/utils/collections';
 import { defineStore } from 'pinia';
+import {
+  COLOR_KEY,
+  DEPRECATED_IO_LIQUIDS_KEY,
+  DEPRECATED_IO_PRESSURE_KEY,
+  DEPRECATED_PUMP_KEY,
+  IO_ENABLED_KEY,
+  PUMP_KEY,
+} from '../const';
 import api from './api';
 
 const fallbackBlueprint = (): BuilderBlueprint => ({
   type: '',
   title: 'Unknown Part',
   component: 'UnknownPartComponent',
-  cards: [],
   size: () => [1, 1],
   transitions: () => ({}),
 });
@@ -66,23 +73,57 @@ export const useBuilderStore = defineStore('builderStore', {
       this.layouts = await api.fetch();
 
       // check if any layouts must be upgraded
-      [...this.layouts].forEach((layout) => {
+      for (const layout of [...this.layouts]) {
         let dirty = false;
-        layout.parts.forEach((part) => {
-          if (part.metrics) {
+        for (const part of layout.parts) {
+          // Metrics configuration may have been independently upgraded
+          if (part.metrics !== undefined) {
             const upgraded = upgradeMetricsConfig(part.metrics);
             if (upgraded) {
               dirty = true;
               part.metrics = upgraded;
             }
           }
-        });
-        if (dirty) {
-          // Immediately set upgraded layout, to prevent rendering with invalid data
-          concatById(this.layouts, layout);
-          this.saveLayout(layout);
+
+          if (part.type === 'SystemIO' || part.type === 'ShiftedSystemIO') {
+            // Migrate from settings.liquids to settings.color
+            // This removes an unnecessary array, and standardizes all color settings
+            const liquid = part.settings[DEPRECATED_IO_LIQUIDS_KEY]?.[0];
+            if (liquid !== undefined) {
+              dirty = true;
+              const color = part.settings[COLOR_KEY];
+              part.settings[COLOR_KEY] = color ?? liquid;
+              part.settings[DEPRECATED_IO_LIQUIDS_KEY] = undefined;
+            }
+
+            // IO pressure was split in "enabled" and "pressure when enabled"
+            // This provides a toggle between off and custom pressure values
+            const pressure = part.settings[DEPRECATED_IO_PRESSURE_KEY];
+            if (pressure !== undefined) {
+              dirty = true;
+              const enabled = part.settings[IO_ENABLED_KEY];
+              part.settings[IO_ENABLED_KEY] = Boolean(enabled ?? pressure);
+              part.settings[DEPRECATED_IO_PRESSURE_KEY] = undefined;
+            }
+          }
+
+          // Pumps were standardized to use either PWM or Digital Actuator blocks
+          if (part.type === 'Pump') {
+            const addr = part.settings[DEPRECATED_PUMP_KEY];
+            if (addr !== undefined) {
+              dirty = true;
+              part.settings[PUMP_KEY] = addr;
+              part.settings[DEPRECATED_PUMP_KEY] = undefined;
+            }
+          }
+
+          if (dirty) {
+            // Immediately set upgraded layout, to prevent rendering with invalid data
+            concatById(this.layouts, layout);
+            this.saveLayout(layout);
+          }
         }
-      });
+      }
 
       api.subscribe(
         (layout: BuilderLayout) => {

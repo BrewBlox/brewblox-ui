@@ -1,5 +1,4 @@
 <script lang="ts">
-/* eslint-disable vue/attribute-hyphenation */
 import { svgPathProperties } from 'svg-path-properties';
 import { computed, defineComponent } from 'vue';
 

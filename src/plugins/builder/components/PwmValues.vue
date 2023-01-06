@@ -20,10 +20,6 @@ export default defineComponent({
       type: String,
       default: PWM_KEY,
     },
-    noBorder: {
-      type: Boolean,
-      default: false,
-    },
     x: {
       type: Number,
       default: 0,
@@ -32,19 +28,26 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    color: {
-      type: String,
-      default: '',
-    },
   },
   setup(props) {
-    const { part, bordered } = usePart.setup();
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<PwmBlockT>(part, props.settingsKey, PWM_TYPES);
+    const { part, placeholder } = usePart.setup();
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<PwmBlockT>(props.settingsKey, PWM_TYPES);
 
-    const pwmValue = computed<number | null>(() =>
-      block.value?.data.enabled ? block.value.data.value : null,
-    );
+    const pwmValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 64;
+      }
+      if (block.value?.data.enabled) {
+        return block.value.data.value;
+      }
+      return null;
+    });
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
@@ -57,9 +60,10 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      placeholder,
       pwmValue,
-      bordered,
       showBlockDialog,
+      showBlockSelectDialog,
     };
   },
 });
@@ -69,16 +73,13 @@ export default defineComponent({
   <svg
     v-bind="{ x, y, width, height }"
     viewBox="0 0 50 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <g
       :transform="contentTransform"
       class="content"
     >
       <BrokenSvgIcon v-if="isBroken" />
-      <UnlinkedSvgIcon v-else-if="!block" />
+      <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <AnalogSvgIcon
@@ -99,18 +100,23 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :stroke="color"
-        stroke-width="2"
-        x="1"
-        y="1"
-        width="48"
-        height="48"
-        rx="6"
-        ry="6"
-      />
-    </g>
+
+    <slot />
+
+    <BuilderInteraction @interact="showBlockDialog">
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <slot name="menu-content" />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>
