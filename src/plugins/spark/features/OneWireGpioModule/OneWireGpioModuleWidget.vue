@@ -71,7 +71,7 @@ export default defineComponent({
         values.push('ERROR: Not yet initialized (power on reset)');
       }
       if (moduleStatus & GpioModuleStatus.SPI_ERROR) {
-        values.push('Error: SPI error');
+        values.push('ERROR: SPI error');
       }
       return values;
     });
