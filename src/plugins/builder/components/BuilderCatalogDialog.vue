@@ -4,7 +4,8 @@ import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, defineComponent, PropType, provide, ref } from 'vue';
+import { PlaceholderKey } from '../const';
 import { BuilderBlueprint, FlowPart, PersistentPart } from '../types';
 import { asStatePart, coord2grid } from '../utils';
 
@@ -32,6 +33,9 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
+
+    // Rendered parts should display dummy values instead of errors
+    provide(PlaceholderKey, true);
 
     const partFilter = ref<string | null>(null);
 

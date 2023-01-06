@@ -14,7 +14,7 @@ import {
   TempSensorMockBlock,
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
-import { InjectionKey, WritableComputedRef } from 'vue';
+import { ComputedRef, InjectionKey, WritableComputedRef } from 'vue';
 import { BuilderTool, FlowPart } from './types';
 
 export const DEFAULT_LAYOUT_WIDTH = 20;
@@ -106,10 +106,10 @@ export const PUMP_TYPES = [...PWM_TYPES, ...DIGITAL_TYPES] as const;
 
 export const PartKey: InjectionKey<WritableComputedRef<FlowPart>> =
   Symbol('$part');
-export const InteractKey: InjectionKey<(func: () => unknown) => void> =
-  Symbol('$interact');
+export const InteractableKey: InjectionKey<ComputedRef<boolean>> =
+  Symbol('$interactable');
 export const ReflowKey: InjectionKey<() => void> = Symbol('$reflow');
-export const PartRemoveKey: InjectionKey<() => void> = Symbol('$remove');
+export const PlaceholderKey: InjectionKey<boolean> = Symbol('$placeholder');
 
 export const deprecatedTypes = {
   SmallKettle: 'Kettle',

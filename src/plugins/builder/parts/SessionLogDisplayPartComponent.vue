@@ -17,7 +17,7 @@ export default defineComponent({
   name: 'SessionLogDisplayPartComponent',
   setup() {
     const historyStore = useHistoryStore();
-    const { width, height, bordered } = usePart.setup();
+    const { width, height, bordered, placeholder } = usePart.setup();
     const {
       widgetId,
       widget,
@@ -49,6 +49,7 @@ export default defineComponent({
       width,
       height,
       bordered,
+      placeholder,
       widgetId,
       isBroken,
       available,
@@ -67,7 +68,7 @@ export default defineComponent({
       :x="width / 2 - 20"
     />
     <UnlinkedSvgIcon
-      v-else-if="widgetId == null"
+      v-else-if="!available && !placeholder"
       :x="width / 2 - 20"
     />
     <template v-else>

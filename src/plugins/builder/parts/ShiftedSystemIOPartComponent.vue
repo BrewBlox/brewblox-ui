@@ -1,6 +1,7 @@
 <script lang="ts">
 import {
   DEFAULT_IO_PRESSURE,
+  IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
   MAX_IO_PRESSURE,
   MIN_IO_PRESSURE,
@@ -19,7 +20,12 @@ const chevrons = verticalChevrons(50, 86.4);
 export default defineComponent({
   name: 'ShiftedSystemIOPartComponent',
   setup() {
-    const { part, width, height, pressured } = usePart.setup();
+    const { part, settings, patchSettings, width, height } = usePart.setup();
+
+    const pressured = computed<boolean>({
+      get: () => Boolean(settings.value[IO_ENABLED_KEY]),
+      set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
+    });
 
     const flowSpeed = computed<number>(() => -flowOnCoord(part.value, UP));
 

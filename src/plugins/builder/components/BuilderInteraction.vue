@@ -1,6 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { usePart } from '../composables';
+import { computed, defineComponent, inject } from 'vue';
+import { InteractableKey } from '../const';
 
 export default defineComponent({
   name: 'BuilderInteraction',
@@ -23,17 +23,33 @@ export default defineComponent({
     },
     /**
      * Handled as a property instead of an emitted event
-     * to allow for automated presence checks.
+     * to allow for presence checks.
      */
     onInteract: {
       type: Function,
       default: null,
     },
   },
-  setup() {
-    const { interact } = usePart.setup();
+  setup(props) {
+    const interactionAllowed = inject(
+      InteractableKey,
+      computed(() => false),
+    );
+
+    const style = computed(() =>
+      interactionAllowed.value && props.onInteract != null
+        ? { cursor: 'pointer' }
+        : {},
+    );
+
+    function interact(): void {
+      if (interactionAllowed.value) {
+        props.onInteract?.();
+      }
+    }
 
     return {
+      style,
       interact,
     };
   },
@@ -43,11 +59,9 @@ export default defineComponent({
 <template>
   <foreignObject v-bind="{ x, y, width, height }">
     <div
-      :class="{
-        interaction: true,
-        pointer: onInteract != null,
-      }"
-      @click="interact(() => onInteract && onInteract())"
+      class="interaction"
+      :style="style"
+      @click="interact"
     >
       <slot />
     </div>

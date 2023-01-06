@@ -6,29 +6,103 @@ import {
   BORDER_KEY,
   COLOR_KEY,
   FLOW_TOGGLE_KEY,
-  InteractKey,
-  IO_ENABLED_KEY,
   PartKey,
+  PlaceholderKey,
   ReflowKey,
 } from '../const';
 import { FlowPart } from '../types';
 import { colorString, coord2grid } from '../utils';
 
 export interface UsePartComponent {
+  /**
+   * The builder part itself.
+   * Updating its value will cause it to be updated in the store,
+   * and active flows to be recalculated.
+   */
   part: WritableComputedRef<FlowPart>;
+
+  /**
+   * `part.settings`, extracted for convenience.
+   * Updating its value will cause `part` to be updated.
+   */
   settings: WritableComputedRef<Mapped<any>>;
+
+  /**
+   * Part metrics will be merged per layout,
+   * and the data is accessible through the useMetrics composable.
+   */
   metrics: ComputedRef<MetricsConfig>;
+
+  /**
+   * The calculated part width, in grid squares.
+   */
   partWidth: ComputedRef<number>;
+
+  /**
+   * The calculated part height, in grid squares.
+   */
   partHeight: ComputedRef<number>;
+
+  /**
+   * The calculated part width, in SVG units.
+   */
   width: ComputedRef<number>;
+
+  /**
+   * The calculated part height, in SVG units.
+   */
   height: ComputedRef<number>;
+
+  /**
+   * The part should be rendered horizontally mirrored.
+   * The order of operation is to flip before rotate.
+   */
   flipped: ComputedRef<boolean>;
+
+  /**
+   * The part is rendered for demonstration purposed.
+   * Link errors should be suppressed, and dummy values shown.
+   */
+  placeholder: boolean;
+
+  /**
+   * Optional: the liquid color property.
+   * This is used by parts that are a container or a liquid source.
+   * The value is a HTML color (# + 1-6 hexadecimal characters)
+   *
+   * If no color is set, the value is an empty string.
+   */
   color: WritableComputedRef<string>;
+
+  /**
+   * Optional: whether to render the border for this part.
+   * This is used by various display parts.
+   */
   bordered: WritableComputedRef<boolean>;
-  pressured: WritableComputedRef<boolean>;
+
+  /**
+   * Optional: parts with no explicit tubes may declare
+   * universal flow passthrough.
+   * Any edge will be connected to all other edges.
+   * This is used to support inline display components.
+   */
   passthrough: WritableComputedRef<boolean>;
+
+  /**
+   * Update one or more setting values.
+   * All other settings will be unchanged.
+   * To remove a setting, change its value to `undefined`.
+   *
+   * @param patch The changed subset of the part settings.
+   */
   patchSettings: (patch: Mapped<any>) => void;
-  interact: (func: () => unknown) => void;
+
+  /**
+   * Causes the active layout to recalculate flows.
+   * Flows are always recalculated if settings are changed,
+   * but external changes (such as block values) may also
+   * justify flows to be re-rendered.
+   */
   reflow: () => void;
 }
 
@@ -39,8 +113,8 @@ export interface UsePartComposable {
 export const usePart: UsePartComposable = {
   setup(): UsePartComponent {
     const part = inject(PartKey)!;
-    const interact = inject(InteractKey, () => {});
     const reflow = inject(ReflowKey)!;
+    const placeholder = inject(PlaceholderKey, false);
 
     const settings = computed<Mapped<any>>({
       get: () => part.value.settings,
@@ -73,11 +147,6 @@ export const usePart: UsePartComposable = {
       set: (v) => patchSettings({ [BORDER_KEY]: Boolean(v) }),
     });
 
-    const pressured = computed<boolean>({
-      get: () => Boolean(settings.value[IO_ENABLED_KEY]),
-      set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
-    });
-
     const passthrough = computed<boolean>({
       get: () => Boolean(settings.value[FLOW_TOGGLE_KEY]),
       set: (v) => patchSettings({ [FLOW_TOGGLE_KEY]: Boolean(v) }),
@@ -98,11 +167,10 @@ export const usePart: UsePartComposable = {
       flipped,
       color,
       bordered,
-      pressured,
       passthrough,
+      placeholder,
       patchSettings,
       reflow,
-      interact,
     };
   },
 };

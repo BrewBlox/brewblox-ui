@@ -30,7 +30,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { part } = usePart.setup();
+    const { part, placeholder } = usePart.setup();
     const {
       block,
       blockStatus,
@@ -39,9 +39,15 @@ export default defineComponent({
       showBlockSelectDialog,
     } = useSettingsBlock.setup<PwmBlockT>(props.settingsKey, PWM_TYPES);
 
-    const pwmValue = computed<number | null>(() =>
-      block.value?.data.enabled ? block.value.data.value : null,
-    );
+    const pwmValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 64;
+      }
+      if (block.value?.data.enabled) {
+        return block.value.data.value;
+      }
+      return null;
+    });
 
     const contentTransform = computed<string>(() =>
       textTransformation(part.value, [1, 1]),
@@ -54,6 +60,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      placeholder,
       pwmValue,
       showBlockDialog,
       showBlockSelectDialog,
@@ -72,7 +79,7 @@ export default defineComponent({
       class="content"
     >
       <BrokenSvgIcon v-if="isBroken" />
-      <UnlinkedSvgIcon v-else-if="!block" />
+      <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <AnalogSvgIcon

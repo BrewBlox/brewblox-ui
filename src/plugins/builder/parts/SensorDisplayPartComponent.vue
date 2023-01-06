@@ -13,7 +13,8 @@ import { usePart, useSettingsBlock } from '../composables';
 export default defineComponent({
   name: 'SensorDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered, passthrough } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -29,9 +30,12 @@ export default defineComponent({
       textTransformation(part.value, [1, 1]),
     );
 
-    const tempValue = computed<number | null>(
-      () => block.value?.data.value?.value ?? null,
-    );
+    const tempValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 21;
+      }
+      return block.value?.data.value?.value ?? null;
+    });
 
     const tempUnit = computed<string>(() =>
       prettyUnit(block.value?.data.value),
@@ -55,6 +59,7 @@ export default defineComponent({
       color,
       bordered,
       passthrough,
+      placeholder,
     };
   },
 });
@@ -70,7 +75,7 @@ export default defineComponent({
       class="content"
     >
       <BrokenSvgIcon v-if="isBroken" />
-      <UnlinkedSvgIcon v-else-if="!block" />
+      <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <SensorSvgIcon

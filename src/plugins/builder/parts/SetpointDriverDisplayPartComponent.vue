@@ -17,7 +17,8 @@ export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered, passthrough } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -52,11 +53,17 @@ export default defineComponent({
         : refBlock.value.data.value.value;
     });
 
-    const setting = computed<number | null>(
-      () => block.value?.data.setting.value ?? null,
-    );
+    const setting = computed<number | null>(() => {
+      if (placeholder) {
+        return 8;
+      }
+      return block.value?.data.setting.value ?? null;
+    });
 
     const appliedSetting = computed<number | null>(() => {
+      if (placeholder) {
+        return 26;
+      }
       if (refAmount.value == null || setting.value == null) {
         return null;
       }
@@ -81,6 +88,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      placeholder,
       showBlockDialog,
       showBlockSelectDialog,
       refKind,
@@ -104,7 +112,7 @@ export default defineComponent({
         x="30"
       />
       <UnlinkedSvgIcon
-        v-else-if="!block"
+        v-else-if="!block && !placeholder"
         x="30"
       />
       <template v-else>

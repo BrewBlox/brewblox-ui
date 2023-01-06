@@ -5,7 +5,7 @@ import { makeTypeFilter } from '@/utils/functional';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { BlockType, PidBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { useSettingsBlock } from '../composables';
+import { usePart, useSettingsBlock } from '../composables';
 import { SetpointBlockT, SETPOINT_KEY, SETPOINT_TYPES } from '../const';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
@@ -40,6 +40,7 @@ export default defineComponent({
   },
   setup(props) {
     const sparkStore = useSparkStore();
+    const { placeholder } = usePart.setup();
     const {
       address,
       block,
@@ -62,15 +63,22 @@ export default defineComponent({
           .some((blk) => blk.data.inputId.id === address.value.id),
     );
 
-    const setpointSetting = computed<number | null>(() =>
-      block.value && isUsed.value
-        ? block.value.data.desiredSetting.value
-        : null,
-    );
+    const setpointSetting = computed<number | null>(() => {
+      if (placeholder) {
+        return 26;
+      }
+      if (block.value && isUsed.value) {
+        return block.value.data.desiredSetting.value;
+      }
+      return null;
+    });
 
-    const setpointValue = computed<number | null>(
-      () => block.value?.data.value.value ?? null,
-    );
+    const setpointValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 21;
+      }
+      return block.value?.data.value.value ?? null;
+    });
 
     const tempUnit = computed<string>(() =>
       prettyUnit(userUnits.value.temperature),
@@ -81,6 +89,7 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      placeholder,
       showBlockDialog,
       showBlockSelectDialog,
       setpointSetting,
@@ -102,7 +111,7 @@ export default defineComponent({
       x="30"
     />
     <UnlinkedSvgIcon
-      v-else-if="!block"
+      v-else-if="!block && !placeholder"
       x="30"
     />
     <template v-else>

@@ -4,7 +4,7 @@ import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 import { computed, defineComponent, PropType, provide } from 'vue';
-import { InteractKey, PartKey, ReflowKey } from '../const';
+import { InteractableKey, PartKey, ReflowKey } from '../const';
 import parts from '../parts';
 
 export default defineComponent({
@@ -75,18 +75,18 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const component = builderStore.componentByType(props.part.type);
 
-    const providedPart = computed<FlowPart>({
-      get: () => props.part,
-      set: (v) => emit('update:part', v),
-    });
-
-    provide(PartKey, providedPart);
     provide(ReflowKey, () => emit('reflow'));
-    provide(InteractKey, (func: () => unknown) => {
-      if (props.interactable) {
-        func();
-      }
-    });
+    provide(
+      PartKey,
+      computed<FlowPart>({
+        get: () => props.part,
+        set: (v) => emit('update:part', v),
+      }),
+    );
+    provide(
+      InteractableKey,
+      computed(() => props.interactable),
+    );
 
     const dimensions = computed(() => ({
       width: coord2grid(props.part.size[0]),
@@ -213,10 +213,6 @@ export default defineComponent({
 
   &.dimmed
     opacity: 0.1 !important
-
-  &.interactable
-    :deep(.interaction.pointer)
-      cursor: pointer
 
 :deep(.builder-part)
   pointer-events: none

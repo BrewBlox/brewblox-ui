@@ -12,7 +12,8 @@ import { liquidBorderColor } from '../utils';
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered, passthrough } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
     const color = computed<string>(() => liquidBorderColor(part.value));
 
@@ -33,6 +34,9 @@ export default defineComponent({
     });
 
     const currentValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 19;
+      }
       if (
         !block.value ||
         !block.value.data.enabled ||
@@ -63,6 +67,9 @@ export default defineComponent({
     });
 
     const nextValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 21;
+      }
       if (!block.value || !block.value.data.start) {
         return null;
       }
@@ -90,6 +97,7 @@ export default defineComponent({
       height,
       bordered,
       passthrough,
+      placeholder,
       block,
       blockStatus,
       isBroken,
@@ -115,7 +123,7 @@ export default defineComponent({
         x="30"
       />
       <UnlinkedSvgIcon
-        v-else-if="!block"
+        v-else-if="!block && !placeholder"
         x="30"
       />
       <template v-else>
