@@ -18,7 +18,7 @@ import { computed, ComputedRef, inject } from 'vue';
 import { PartKey } from '../const';
 import { settingsAddress, showAbsentBlock } from '../utils';
 
-export interface useSettingsBlockComponent<BlockT extends Block> {
+export interface UseSettingsBlockComponent<BlockT extends Block> {
   hasAddress: ComputedRef<boolean>;
   address: ComputedRef<BlockAddress>;
   block: ComputedRef<BlockT | null>;
@@ -33,18 +33,18 @@ export interface useSettingsBlockComponent<BlockT extends Block> {
   ): Promise<void>;
 }
 
-export interface useSettingsBlockComposable {
+export interface UseSettingsBlockComposable {
   setup<BlockT extends Block>(
     settingsKey: string,
     intf: ComparedBlockType,
-  ): useSettingsBlockComponent<BlockT>;
+  ): UseSettingsBlockComponent<BlockT>;
 }
 
-export const useSettingsBlock: useSettingsBlockComposable = {
+export const useSettingsBlock: UseSettingsBlockComposable = {
   setup<BlockT extends Block>(
     settingsKey: string,
     intf: ComparedBlockType,
-  ): useSettingsBlockComponent<BlockT> {
+  ): UseSettingsBlockComponent<BlockT> {
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const part = inject(PartKey)!;

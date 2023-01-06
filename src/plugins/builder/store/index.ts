@@ -73,10 +73,10 @@ export const useBuilderStore = defineStore('builderStore', {
       this.layouts = await api.fetch();
 
       // check if any layouts must be upgraded
-      for (const layout of this.layouts) {
+      for (const layout of [...this.layouts]) {
         let dirty = false;
         for (const part of layout.parts) {
-          // Metrics configuration may have been indepently upgraded
+          // Metrics configuration may have been independently upgraded
           if (part.metrics !== undefined) {
             const upgraded = upgradeMetricsConfig(part.metrics);
             if (upgraded) {

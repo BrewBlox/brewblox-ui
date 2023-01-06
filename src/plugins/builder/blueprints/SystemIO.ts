@@ -22,10 +22,10 @@ const blueprint: BuilderBlueprint = {
     return {
       [CENTER]: [
         {
-          pressure,
-          liquids,
           outCoords: RIGHT,
           source: true,
+          pressure,
+          liquids,
         },
       ],
       [RIGHT]: [{ outCoords: CENTER, sink: true }],

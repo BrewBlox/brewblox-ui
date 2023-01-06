@@ -1,5 +1,4 @@
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
-import { Coordinates } from '@/utils/coordinates';
 import {
   CENTER,
   DEFAULT_IO_PRESSURE,
@@ -10,28 +9,27 @@ import {
   UP,
 } from '../const';
 
-export const SIZE_X = 1;
-export const SIZE_Y = 2;
 export const MIN_OUTLET_PRESSURE = MIN_IO_PRESSURE;
 export const MAX_OUTLET_PRESSURE = MAX_IO_PRESSURE;
 export const DEFAULT_OUTLET_PRESSURE = DEFAULT_IO_PRESSURE / 2;
 
+const BOTTOM_OUT = '0.5,2,0';
+const BOTTOM_CENTER = '0.5,1.5,0';
+
 const blueprint: BuilderBlueprint = {
   type: 'Condenser',
   title: 'Steam condenser',
-  size: () => [SIZE_X, SIZE_Y],
+  size: () => [1, 2],
   transitions: (part: PersistentPart) => {
-    const bottomOut = new Coordinates([0.5, SIZE_Y, 0]).toString();
-    const bottomCenter = new Coordinates([0.5, SIZE_Y - 0.5, 0]).toString();
     const pressure = Number(
       part.settings[IO_PRESSURE_KEY] ?? DEFAULT_OUTLET_PRESSURE,
     );
     return {
       [UP]: [{ outCoords: CENTER, sink: true }],
-      [bottomOut]: [{ outCoords: bottomCenter, sink: true }],
-      [bottomCenter]: [
+      [BOTTOM_OUT]: [{ outCoords: BOTTOM_CENTER, sink: true }],
+      [BOTTOM_CENTER]: [
         {
-          outCoords: bottomOut,
+          outCoords: BOTTOM_OUT,
           source: true,
           pressure,
           liquids: [HOT_WATER],

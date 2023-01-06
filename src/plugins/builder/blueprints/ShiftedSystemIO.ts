@@ -8,13 +8,10 @@ import {
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
 
-const SIZE_X = 2;
-const SIZE_Y = 2;
-
 const blueprint: BuilderBlueprint = {
   type: 'ShiftedSystemIO',
   title: 'Global inlet: shifted',
-  size: () => [SIZE_X, SIZE_Y],
+  size: () => [2, 2],
   transitions: (part: PersistentPart) => {
     const enabled = Boolean(part.settings[IO_ENABLED_KEY]);
     const pressure = enabled
@@ -25,10 +22,10 @@ const blueprint: BuilderBlueprint = {
     return {
       [CENTER]: [
         {
-          pressure,
-          liquids,
           outCoords: UP,
           source: true,
+          pressure,
+          liquids,
         },
       ],
       [UP]: [{ outCoords: CENTER, sink: true }],

@@ -6,7 +6,7 @@ import { computed, ComputedRef, inject } from 'vue';
 import { PartKey } from '../const';
 import { settingsProp } from '../utils';
 
-export interface useSettingsWidgetComponent {
+export interface UseSettingsWidgetComponent {
   widgetId: ComputedRef<string | undefined>;
   widget: ComputedRef<Widget | null>;
   isBroken: ComputedRef<boolean>;
@@ -14,12 +14,12 @@ export interface useSettingsWidgetComponent {
   showWidgetSelectDialog: () => void;
 }
 
-export interface useSettingsWidgetComposable {
-  setup(settingsKey: string, type: string): useSettingsWidgetComponent;
+export interface UseSettingsWidgetComposable {
+  setup(settingsKey: string, type: string): UseSettingsWidgetComponent;
 }
 
-export const useSettingsWidget: useSettingsWidgetComposable = {
-  setup(settingsKey: string, type: string): useSettingsWidgetComponent {
+export const useSettingsWidget: UseSettingsWidgetComposable = {
+  setup(settingsKey: string, type: string): UseSettingsWidgetComponent {
     const widgetStore = useWidgetStore();
     const dashboardStore = useDashboardStore();
     const part = inject(PartKey)!;

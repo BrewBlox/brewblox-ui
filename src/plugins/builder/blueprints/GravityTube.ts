@@ -11,16 +11,12 @@ const blueprint: BuilderBlueprint = {
   title: 'Tube: gravity',
   size: () => [1, 1],
   transitions: (part: PersistentPart) => {
+    const pressure = Number(
+      part.settings[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE,
+    );
     return {
       [LEFT]: [{ outCoords: RIGHT }],
-      [RIGHT]: [
-        {
-          outCoords: LEFT,
-          pressure: Number(
-            part.settings[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE,
-          ),
-        },
-      ],
+      [RIGHT]: [{ outCoords: LEFT, pressure }],
     };
   },
 };
