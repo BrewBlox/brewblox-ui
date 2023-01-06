@@ -67,6 +67,9 @@ export default defineComponent({
       } else if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_WARNING) {
         values.push('WARNING: Overtemperature');
       }
+      if (moduleStatus & GpioModuleStatus.POWER_ON_RESET) {
+        values.push('GPIO Driver not yet initialized (POR)');
+      }
       return values;
     });
 
@@ -120,6 +123,8 @@ export default defineComponent({
         v-model:channels="channels"
         :error-pins="block.data.overCurrent"
       />
+
+      <span>{{ block.data.moduleStatus }}</span>
 
       <template v-if="context.mode === 'Full'">
         <q-separator inset />

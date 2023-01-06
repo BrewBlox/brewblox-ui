@@ -4,8 +4,16 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockClaimed } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { matchesType } from '@/utils/objects';
-import { bloxQty, fixedNumber, prettyQty, tempQty } from '@/utils/quantity';
+import {
+  bloxQty,
+  durationMs,
+  durationString,
+  fixedNumber,
+  prettyQty,
+  tempQty,
+} from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
   Block,
@@ -15,11 +23,6 @@ import {
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-
-interface GridOpts {
-  start?: number;
-  span?: number;
-}
 
 export default defineComponent({
   name: 'PidFull',
@@ -62,10 +65,6 @@ export default defineComponent({
 
     const boiling = computed<boolean>(() => block.value.data.boilModeActive);
 
-    const boilAdjustment = computed<number>(() =>
-      boiling.value ? block.value.data.boilMinOutput - baseOutput.value : 0,
-    );
-
     const waterBoilTemp = computed<Quantity>(() => tempQty(100));
 
     const boilPoint = computed<Quantity>({
@@ -105,17 +104,34 @@ export default defineComponent({
       createBlockDialog(outputBlock.value);
     }
 
-    function grid(opts: GridOpts): Mapped<string> {
-      return {
-        gridColumnStart: `${opts.start || 'auto'}`,
-        gridColumnEnd: `span ${opts.span || 1}`,
-      };
+    function startEditIValue(): void {
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          modelValue: block.value.data.i ?? 0,
+          type: 'number',
+          title: 'Override I part of PID',
+          message: `
+                <p>
+                  The integrator slowly builds up when the error is not zero.
+                  If you don't want to wait for that,
+                  you can manually set the integral part of the output here.
+                </p>
+                <p>
+                  It will continue to adjust automatically afterwards.
+                </p>
+                `,
+          html: true,
+        },
+      }).onOk((v: number) => patchBlock({ integralReset: v || 0.001 }));
     }
 
     return {
       prettyBlock,
       prettyQty,
       fixedNumber,
+      durationString,
+      durationMs,
       serviceId,
       block,
       patchBlock,
@@ -125,12 +141,11 @@ export default defineComponent({
       outputBlock,
       baseOutput,
       boiling,
-      boilAdjustment,
       boilMinOutputQty,
       boilPoint,
       showInput,
       showOutput,
-      grid,
+      startEditIValue,
     };
   },
 });
@@ -260,17 +275,21 @@ export default defineComponent({
 
     <q-separator inset />
 
-    <!-- Calculation grid -->
-    <div class="widget-body items-center grid-container">
-      <div class="span-2">
+    <!-- Calculation -->
+
+    <div class="flex-center calculation grid-container q-pa-lg">
+      <div class="span-s big p-parts">P</div>
+      <div class="span-s big">=</div>
+      <div class="span-l">
         <LabeledField label="Error">
+          <q-tooltip> Error = setting - measured </q-tooltip>
           {{ prettyQty(block.data.error) }}
         </LabeledField>
       </div>
 
-      <div class="span-1 self-center text-center">*</div>
+      <div class="span-s big">&#xd7;</div>
 
-      <div class="span-2">
+      <div class="span-l">
         <QuantityField
           :model-value="block.data.kp"
           :html="true"
@@ -278,7 +297,7 @@ export default defineComponent({
           label="Kp"
           message="
               <p>
-                Kp is the proportional gain, which is directly mutiplied by the filtered error.
+                Kp is the proportional gain, which is directly mutiplied by the error.
                 The output of the PID is Kp * input error.
                 Set it to what you think the output should be for a 1 degree error.
               </p>
@@ -289,41 +308,26 @@ export default defineComponent({
         />
       </div>
 
-      <div
-        :style="grid({ start: 9 })"
-        class="self-center text-center"
-      >
-        =
-      </div>
+      <div class="span-s text-center big">=</div>
 
-      <div class="span-2">
-        <LabeledField label="P">
+      <div class="span-m">
+        <div class="big p-parts">
           {{ fixedNumber(block.data.p) }}
+        </div>
+      </div>
+
+      <div class="span-s big i-parts">I</div>
+      <div class="span-s big">=</div>
+      <div class="span-l">
+        <LabeledField label="Integral of P">
+          {{ fixedNumber(block.data.integral) }}
+          <q-tooltip> Increases with P every second </q-tooltip>
         </LabeledField>
       </div>
 
-      <!-- Break -->
+      <div class="span-s big">&#247;</div>
 
-      <div class="span-2">
-        <LabeledField label="Integral">
-          {{ prettyQty(block.data.integral) }}
-        </LabeledField>
-      </div>
-
-      <div class="span-1 self-center text-center">*</div>
-
-      <div class="span-2">
-        <QuantityField
-          :model-value="block.data.kp"
-          label="Kp"
-          tag-class="darkish"
-          readonly
-        />
-      </div>
-
-      <div class="span-1 self-center text-center">/</div>
-
-      <div class="span-2">
+      <div class="span-l">
         <DurationField
           :model-value="block.data.ti"
           :rules="[
@@ -336,78 +340,62 @@ export default defineComponent({
           title="Integral time constant Ti"
           label="Ti"
           message="
-              <p>
-                The purpose of the integrator is to remove steady state errors.
-                The integrator slowly builds up when the error is not zero.
-              </p>
-              <p>
-                When the proportional action (P) brings the input close
-                to the target value but a small error remains,
-                the integrator corrects it.
-                The integrator action (I) will increase by (P)
-                every period of duration Ti.
-              </p>
-              <p>
-                The integrator should be slow enough
-                to give the process time to respond to proportional action (P).
-                Overshoot due to too much integrator action is usually a sign of Kp being too low.
-              </p>
-              <p>Setting Ti to zero will disable the integrator.</p>
-              "
+                <p>
+                  The purpose of the integrator is to remove steady state errors.
+                  The integrator slowly builds up when the error is not zero.
+                </p>
+                <p>
+                  When the proportional action (P) brings the input close
+                  to the target value but a small error remains,
+                  the integrator will correct it over time.
+                  The integratal increases by P every second.
+                  I, which is integral/Ti, will increase by P in Ti seconds.
+                </p>
+                <p>
+                  The integrator should be slow enough
+                  to give the process time to respond to proportional action (P).
+                  Overshoot due to too much integrator action is usually a sign of Kp being too low.
+                </p>
+                <p>Setting Ti to zero will disable the integrator.</p>
+                "
           borderless
           @update:model-value="(ti) => patchBlock({ ti })"
-        />
+        >
+          <template #value>
+            <span>{{ durationMs(block.data.ti) / 1000 }} </span>
+            <span class="darkish q-ml-sm"
+              >({{ durationString(block.data.ti) }})</span
+            >
+          </template>
+        </DurationField>
       </div>
 
-      <div class="span-1 self-center text-center">=</div>
+      <div class="span-s text-center big">=</div>
 
-      <div class="span-2">
-        <InputField
-          :model-value="block.data.i"
-          :html="true"
-          type="number"
-          title="Manually set integral"
-          label="I"
-          message="
-              <p>
-                The integrator slowly builds up when the error is not zero.
-                If you don't want to wait for that,
-                you can manually set the integral part of the output here.
-              </p>
-              <p>
-                It will continue to adjust automatically afterwards.
-              </p>
-              "
-          borderless
-          @update:model-value="(v) => patchBlock({ integralReset: v || 0.001 })"
-        />
+      <div
+        class="span-m clickable row items-center full-height q-my-md"
+        @click="startEditIValue"
+      >
+        <div class="col big i-parts">
+          {{ fixedNumber(block.data.i) }}
+        </div>
       </div>
 
-      <!-- Break -->
-
-      <div class="span-2">
+      <div class="span-s big d-parts">D</div>
+      <div class="span-s big">=</div>
+      <div class="span-l">
         <LabeledField
           :tag-class="{ darkish: block.data.td.value === 0 }"
-          label="Derivative"
+          label="Derivative of P"
         >
-          {{ prettyQty(block.data.derivative) }}
+          {{ fixedNumber(block.data.derivative, 4) }}
+          <q-tooltip> Filtered change of P per second </q-tooltip>
         </LabeledField>
       </div>
 
-      <div class="span-1 self-center text-center">*</div>
+      <div class="span-s big">&#xd7;</div>
 
-      <div class="span-2">
-        <QuantityField
-          :model-value="block.data.kp"
-          label="Kp"
-          tag-class="darkish"
-          readonly
-        />
-      </div>
-
-      <div class="span-1 self-center text-center">*</div>
-
-      <div class="span-2">
+      <div class="span-l">
         <DurationField
           :model-value="block.data.td"
           :rules="[
@@ -436,64 +424,66 @@ export default defineComponent({
               "
           borderless
           @update:model-value="(td) => patchBlock({ td })"
-        />
+        >
+          <template #value>
+            <span>{{ durationMs(block.data.td) / 1000 }} </span>
+            <span class="darkish q-ml-sm"
+              >({{ durationString(block.data.td) }})</span
+            >
+          </template>
+        </DurationField>
       </div>
+      <div class="span-s text-center big">=</div>
 
-      <div class="span-1 q-pt-sm self-center text-center">=</div>
+      <div class="span-m big d-parts">
+        {{ fixedNumber(block.data.d) }}
+      </div>
+    </div>
 
-      <div class="span-2 calc-line">
-        <LabeledField label="D">
+    <div class="items-center result">
+      <div class="row q-mb-md q-gutter-x-md">
+        <div class="col-auto big p-parts">
+          {{ fixedNumber(block.data.p) }}
+        </div>
+        <div class="col-auto text-center big">&#x2b;</div>
+        <div class="col-auto big i-parts">
+          {{ fixedNumber(block.data.i) }}
+        </div>
+        <div class="col-auto text-center big">&#x2b;</div>
+        <div class="col-auto big d-parts">
           {{ fixedNumber(block.data.d) }}
-          <template #after>
-            <sub class="self-end">+</sub>
-          </template>
-        </LabeledField>
-      </div>
-
-      <!-- Break -->
-
-      <div
-        v-if="boiling"
-        class="calc-line"
-        :style="grid({ start: 10, span: 2 })"
-      >
-        <LabeledField label="Boil mode">
-          {{ fixedNumber(boilAdjustment) }}
-          <template #after>
-            <sub class="self-end">+</sub>
-          </template>
-        </LabeledField>
-      </div>
-
-      <!-- Break -->
-
-      <div :style="grid({ start: 10, span: 2 })">
-        <LabeledField label="Output">
-          {{ fixedNumber(baseOutput + boilAdjustment) }}
-        </LabeledField>
+        </div>
+        <div class="col-auto text-center big">=</div>
+        <div class="col-auto big">
+          {{ fixedNumber(block.data.p + block.data.i + block.data.d) }}
+        </div>
       </div>
     </div>
 
     <q-separator inset />
 
-    <div class="widget-body row">
-      <QuantityField
-        v-model="boilMinOutputQty"
-        title="Minimum output"
-        label="Minimum output when boiling"
-        class="col-grow"
-      />
-      <QuantityField
-        v-model="boilPoint"
-        title="Boil temperature"
-        label="Boiling point"
-        message="
-              When the Setpoint setting is at or above this temperature,
-              the <i>Minimum output when boiling</i> setting will apply.
-            "
-        :html="true"
-        class="col-grow"
-      />
+    <div class="row items-center justify-center boil q-pa-md q-gutter-y-sm">
+      <div class="col-auto">
+        <span>Keep output above </span>
+        <InlineQuantityField
+          v-model="boilMinOutputQty"
+          :class="{ 'text-green': boiling }"
+          title="Minimum output when boiling"
+        />
+      </div>
+
+      <div class="col-auto">
+        <span>when the setpoint is higher than</span>
+        <InlineQuantityField
+          v-model="boilPoint"
+          :class="{ 'text-green': boiling }"
+          title="Boiling point"
+          message="
+        When the Setpoint is set to this temperature or higher,
+      the output of the PID will stay above the configured miniumum for boiling.
+      "
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -501,17 +491,40 @@ export default defineComponent({
 <style lang="sass" scoped>
 .grid-container
   display: grid
-  grid-template-columns: repeat(11, 1fr)
+  grid-template-columns: repeat(14, 1fr)
   grid-row-gap: 10px
 
-.span-1
+.span-s
   grid-column: span 1
 
-.span-2
+.span-l
+  grid-column: span 4
+
+.span-m
   grid-column: span 2
-  padding-left: 5px
-  padding-right: 5px
+  padding-left: 7px
+  border-radius: 4px
 
 .calc-line
   border-bottom: 2px solid white
+
+.calculation > .row
+  justify-content: center
+
+.result > .row
+  justify-content: center
+
+.p-parts
+  color: $light-blue-7
+
+.i-parts
+  color: $deep-orange-5
+
+.d-parts
+  color: $pink-5
+.big
+  font-size: 1.5em
+
+.result .big
+  font-size: 2em
 </style>
