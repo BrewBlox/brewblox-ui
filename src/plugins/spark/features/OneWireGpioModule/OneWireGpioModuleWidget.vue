@@ -68,7 +68,10 @@ export default defineComponent({
         values.push('WARNING: Overtemperature');
       }
       if (moduleStatus & GpioModuleStatus.POWER_ON_RESET) {
-        values.push('GPIO Driver not yet initialized (POR)');
+        values.push('ERROR: Not yet initialized (power on reset)');
+      }
+      if (moduleStatus & GpioModuleStatus.SPI_ERROR) {
+        values.push('Error: SPI error');
       }
       return values;
     });
