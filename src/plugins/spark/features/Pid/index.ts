@@ -136,15 +136,6 @@ const plugin: Plugin = {
       },
       {
         type,
-        key: 'error',
-        title: 'Error',
-        component: 'QuantityValEdit',
-        generate: () => deltaTempQty(0),
-        readonly: true,
-        graphed: true,
-      },
-      {
-        type,
         key: 'p',
         title: 'P',
         component: 'NumberValEdit',
