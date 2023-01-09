@@ -47,7 +47,7 @@ function fieldLabel(
   const label = source.renames[key] || defaultLabel(key);
   const precision = source.precision[key] ?? DEFAULT_GRAPH_DECIMALS;
   const prop = source.axes[key] === 'y2' ? 'style="color: #aef"' : '';
-  return `<span ${prop}>${label}</span><br>${fixedNumber(value, precision)}`;
+  return `<span ${prop}>${label}<br>${fixedNumber(value, precision)}</span>`;
 }
 
 function transformer(
