@@ -1,5 +1,6 @@
 <script lang="ts">
 import { useGlobals } from '@/composables';
+import { Y2_COLOR } from '@/plugins/history/const';
 import { GraphAnnotation } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
@@ -46,10 +47,10 @@ const layoutDefaults = (): Partial<Layout> => ({
     side: 'right',
     position: 0.95,
     gridcolor: '#467',
-    zerolinecolor: '#aef',
+    zerolinecolor: Y2_COLOR,
     autorange: true,
     tickfont: {
-      color: '#aef',
+      color: Y2_COLOR,
     },
   },
   paper_bgcolor: 'transparent',

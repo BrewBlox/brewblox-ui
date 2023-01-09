@@ -1,6 +1,7 @@
 import {
   DEFAULT_GRAPH_DECIMALS,
   MAX_GRAPH_POINTS,
+  Y2_COLOR,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { useHistoryStore } from '@/plugins/history/store';
@@ -46,7 +47,7 @@ function fieldLabel(
 ): string {
   const label = source.renames[key] || defaultLabel(key);
   const precision = source.precision[key] ?? DEFAULT_GRAPH_DECIMALS;
-  const prop = source.axes[key] === 'y2' ? 'style="color: #aef"' : '';
+  const prop = source.axes[key] === 'y2' ? `style="color: ${Y2_COLOR}"` : '';
   return `<span ${prop}>${label}<br>${fixedNumber(value, precision)}</span>`;
 }
 
