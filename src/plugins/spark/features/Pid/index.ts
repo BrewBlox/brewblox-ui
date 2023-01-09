@@ -6,8 +6,6 @@ import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import {
   bloxQty,
-  deltaTempMultHourQty,
-  deltaTempPerMinuteQty,
   deltaTempQty,
   durationString,
   inverseTempQty,
@@ -148,18 +146,18 @@ const plugin: Plugin = {
       {
         type,
         key: 'integral',
-        title: 'Integral of error',
-        component: 'QuantityValEdit',
-        generate: () => deltaTempMultHourQty(1),
+        title: 'Integral of P',
+        component: 'NumberValEdit',
+        generate: () => 1,
         readonly: true,
         graphed: true,
       },
       {
         type,
         key: 'derivative',
-        title: 'Derivative of input',
-        component: 'QuantityValEdit',
-        generate: () => deltaTempPerMinuteQty(1),
+        title: 'Derivative of P',
+        component: 'NumberValEdit',
+        generate: () => 1,
         readonly: true,
         graphed: true,
       },
