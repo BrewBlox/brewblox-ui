@@ -7,7 +7,7 @@ import { URL_KEY } from '../const';
 export default defineComponent({
   name: 'ImageDisplayPartComponent',
   setup() {
-    const { settings, width, height, bordered, passthrough } = usePart.setup();
+    const { settings, width, height, passthrough } = usePart.setup();
 
     const href = computed<string>(
       () => settings.value[URL_KEY] || '/image-placeholder.png',
@@ -20,7 +20,6 @@ export default defineComponent({
       DEFAULT_SIZE,
       width,
       height,
-      bordered,
       passthrough,
       href,
     };
@@ -31,10 +30,6 @@ export default defineComponent({
 <template>
   <svg v-bind="{ width, height }">
     <image v-bind="{ width, height, href }" />
-    <BuilderBorder
-      v-if="bordered"
-      v-bind="{ width, height }"
-    />
     <BuilderInteraction v-bind="{ width, height }">
       <q-menu
         touch-position
@@ -49,10 +44,6 @@ export default defineComponent({
             :min="MIN_SIZE"
             :max="MAX_SIZE"
             :default="DEFAULT_SIZE"
-          />
-          <ToggleMenuContent
-            v-model="bordered"
-            label="Border"
           />
           <ToggleMenuContent
             v-model="passthrough"
