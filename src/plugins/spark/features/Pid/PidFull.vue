@@ -244,7 +244,7 @@ export default defineComponent({
       <LabeledField
         :model-value="block.data.outputSetting"
         number
-        label="Target value"
+        label="Desired value"
         tag="b"
         class="col-grow"
       />
@@ -321,7 +321,9 @@ export default defineComponent({
       <div class="span-l">
         <LabeledField label="Integral of P">
           {{ fixedNumber(block.data.integral) }}
-          <q-tooltip> Increases with P every second </q-tooltip>
+          <q-tooltip>
+            Increases with P every second when desired output is achieved
+          </q-tooltip>
         </LabeledField>
       </div>
 
@@ -346,7 +348,7 @@ export default defineComponent({
                 </p>
                 <p>
                   When the proportional action (P) brings the input close
-                  to the target value but a small error remains,
+                  to the desired value but a small error remains,
                   the integrator will correct it over time.
                   The integratal increases by P every second.
                   I, which is integral/Ti, will increase by P in Ti seconds.
