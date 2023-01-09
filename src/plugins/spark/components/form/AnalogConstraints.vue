@@ -28,7 +28,6 @@ const defaultValues: Record<AnalogConstraintKey, AnalogConstraint> = {
     balanced: {
       balancerId: bloxLink(null, BlockType.Balancer),
       granted: 0,
-      id: 0,
     },
   },
 };

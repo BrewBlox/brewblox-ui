@@ -1,39 +1,20 @@
 <script lang="ts">
-import { colorString } from '@/plugins/builder/utils';
-import { computed, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/Carboy';
 import { usePart } from '../composables';
-import { COLOR_KEY } from '../const';
-
-const path = `
-    M89.2,199
-    H10.8
-    c-5.4,0-9.8-4.4-9.8-9.9
-    V43.9
-    c0-4.4,2.9-8.3,7-9.5
-    l32.6-8.8
-    V2
-    h18.6
-    v24.6
-    L92,34.4
-    c4.2,1.2,7,5.1,7,9.5
-    v145.2
-    C99,194.6,94.6,199,89.2,199
-    z`;
 
 export default defineComponent({
   name: 'CarboyPartComponent',
   setup() {
-    const { settings, width, height } = usePart.setup();
-
-    const color = computed<string>(() =>
-      colorString(settings.value[COLOR_KEY]),
-    );
+    const { width, height, color } = usePart.setup();
 
     return {
+      MIN_SIZE,
+      MAX_SIZE,
+      DEFAULT_SIZE,
       width,
       height,
       color,
-      path,
     };
   },
 });
@@ -53,12 +34,41 @@ export default defineComponent({
       ry="8"
     />
     <g class="outline">
-      <path :d="path" />
+      <path
+        d="M89.2,199
+          H10.8
+          c-5.4,0-9.8-4.4-9.8-9.9
+          V43.9
+          c0-4.4,2.9-8.3,7-9.5
+          l32.6-8.8
+          V2
+          h18.6
+          v24.6
+          L92,34.4
+          c4.2,1.2,7,5.1,7,9.5
+          v145.2
+          C99,194.6,94.6,199,89.2,199
+          z"
+      />
     </g>
-    <SetpointValues
-      :y="50"
-      :background-color="color"
-      hide-unset
-    />
+    <BuilderInteraction
+      :width="100"
+      :height="200"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <ColorMenuContent />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
+    <SetpointValues :y="50" />
   </svg>
 </template>

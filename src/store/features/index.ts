@@ -4,6 +4,7 @@ import isString from 'lodash/isString';
 import { defineStore } from 'pinia';
 import type {
   ComponentResult,
+  GridSize,
   QuickstartFeature,
   ServiceFeature,
   WatcherFeature,

@@ -4,7 +4,6 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 const blueprint: BuilderBlueprint = {
   type: 'BridgeTube',
   title: 'Tube: bridge',
-  cards: [],
   size: () => [1, 1],
   transitions: () => ({
     // bridge (high)

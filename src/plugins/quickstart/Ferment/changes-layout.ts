@@ -1,18 +1,17 @@
 import {
   BORDER_KEY,
   COLOR_KEY,
+  HEIGHT_KEY,
   LABEL_KEY,
   PID_KEY,
   PROFILE_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
-  SIZE_Y_KEY,
   URL_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { BlockIntfType, BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { FermentConfig } from './types';
@@ -34,7 +33,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            [SIZE_Y_KEY]: 7,
+            [HEIGHT_KEY]: 7,
             [LABEL_KEY]: withPrefix(config.prefix, 'fridge'),
           },
         },
@@ -50,7 +49,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: config.names.beerSetpoint,
-              type: BlockIntfType.SetpointSensorPairInterface,
+              type: null,
             }),
           },
         },
@@ -66,7 +65,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             [PROFILE_KEY]: typed<BlockAddress>({
               serviceId,
               id: config.names.tempProfile,
-              type: BlockType.SetpointProfile,
+              type: null,
             }),
           },
         },
@@ -82,7 +81,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: config.names.fridgeSetpoint,
-              type: BlockIntfType.SetpointSensorPairInterface,
+              type: null,
             }),
           },
         },
@@ -98,7 +97,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: config.names.coolPid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
         },
@@ -114,7 +113,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: config.names.heatPid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
         },
@@ -129,8 +128,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             [BORDER_KEY]: false,
             [LABEL_KEY]: 'User manual',
             [URL_KEY]: 'https://www.brewblox.com/user/ferment_guide.html',
-            [SIZE_X_KEY]: 4,
-            [SIZE_Y_KEY]: 1,
+            [WIDTH_KEY]: 4,
+            [HEIGHT_KEY]: 1,
           },
         },
       ],

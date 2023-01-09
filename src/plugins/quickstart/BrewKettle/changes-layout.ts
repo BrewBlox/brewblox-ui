@@ -4,12 +4,11 @@ import {
   PID_KEY,
   PWM_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { BlockIntfType, BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { BrewKettleConfig } from './types';
@@ -39,11 +38,11 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
             [PWM_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.kettlePwm,
-              type: BlockIntfType.ActuatorAnalogInterface,
+              type: null,
             }),
           },
           flipped: false,
@@ -59,7 +58,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.kettleSetpoint,
-              type: BlockIntfType.SetpointSensorPairInterface,
+              type: null,
             }),
           },
           flipped: false,
@@ -75,7 +74,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.kettlePid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
           flipped: false,

@@ -97,7 +97,7 @@ export default defineComponent({
     <component
       :is="unitTag"
       v-if="modelValue.value !== null"
-      class="self-end darkish"
+      class="self-end darkish q-ml-xs"
     >
       {{ displayUnit }}
     </component>

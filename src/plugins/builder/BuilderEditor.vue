@@ -93,7 +93,6 @@ export default defineComponent({
     const partDragStart = ref<XYPosition | null>(null);
 
     const selectedIds = ref<string[]>([]);
-    const configuredPart = ref<FlowPart | null>(null);
     const floater = ref<UnwrapRef<Floater> | null>(null);
 
     const focusRef = ref<HTMLElement>();
@@ -119,7 +118,7 @@ export default defineComponent({
 
     const layoutId = computed<string | null>(() => props.routeId || null);
 
-    useMetrics.setup(layoutId);
+    useMetrics.setupProvider(layoutId);
     const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
       useFlowParts.setup(layoutId);
 
@@ -265,12 +264,12 @@ export default defineComponent({
       if (coords) {
         for (let idx = flowParts.value.length - 1; idx >= 0; idx--) {
           const part = flowParts.value[idx];
-          const [sizeX, sizeY] = rotatedSize(part.rotate, part.size);
+          const [width, height] = rotatedSize(part.rotate, part.size);
           if (
             coords.x >= part.x &&
-            coords.x < part.x + sizeX &&
+            coords.x < part.x + width &&
             coords.y >= part.y &&
-            coords.y < part.y + sizeY
+            coords.y < part.y + height
           ) {
             return deepCopy(part);
           }
@@ -309,11 +308,6 @@ export default defineComponent({
           selectedIds.value.length &&
           !selectedIds.value.some((v) => v === hovered.id),
       );
-    }
-
-    function closeMenu(): void {
-      configuredPart.value = null;
-      nextTick(setFocus);
     }
 
     function toggleSelect(id: string | null): void {
@@ -486,18 +480,6 @@ export default defineComponent({
       }
     }
 
-    function useEdit(): void {
-      activeToolId.value = 'edit';
-      if (floater.value) {
-        cancelFloater();
-      } else {
-        const part = findHoveredPart();
-        if (part) {
-          configuredPart.value = part;
-        }
-      }
-    }
-
     function useInteract(): void {
       activeToolId.value = 'interact';
       if (floater.value) {
@@ -563,7 +545,6 @@ export default defineComponent({
       copy: useCopy,
       rotate: useRotate,
       flip: useFlip,
-      edit: useEdit,
       interact: useInteract,
       delete: useDelete,
       undo: useUndo,
@@ -581,12 +562,12 @@ export default defineComponent({
     const disabledTools = computed<BuilderToolName[]>(() => {
       const tools: BuilderToolName[] = [];
       if (floater.value) {
-        tools.push('add', 'edit', 'interact');
+        tools.push('add', 'interact');
         if (floater.value.parts.length > 1) {
           tools.push('rotate', 'flip');
         }
       } else if (selectedIds.value.length > 1) {
-        tools.push('interact', 'edit', 'rotate', 'flip');
+        tools.push('interact', 'rotate', 'flip');
       }
       if (!history.value.length) {
         tools.push('undo');
@@ -879,11 +860,6 @@ export default defineComponent({
         if (el) {
           selectPartHandlers(el, tool);
         }
-        if (configuredPart.value) {
-          const id = configuredPart.value.id;
-          configuredPart.value =
-            flowParts.value.find((v) => v.id === id) ?? null;
-        }
       },
       { immediate: true },
     );
@@ -923,9 +899,6 @@ export default defineComponent({
       savePart,
       removePart,
 
-      configuredPart,
-      closeMenu,
-
       activeToolId,
       disabledTools,
       toolsMenuExpanded,
@@ -943,16 +916,6 @@ export default defineComponent({
     class="page-height"
     @keydown="keyHandler"
   >
-    <BuilderPartSettingsDialog
-      v-if="configuredPart"
-      :part="configuredPart"
-      :rev="flowPartsRevision"
-      @update:part="savePart"
-      @remove:part="removePart"
-      @reflow="calculateFlowParts"
-      @hide="closeMenu"
-    />
-
     <TitleTeleport v-if="layout">
       <span
         class="cursor-pointer"
@@ -1054,10 +1017,11 @@ export default defineComponent({
       >
         <g ref="svgContentRef">
           <EditorBackground
+            v-if="activeToolId !== 'interact' || floater"
             :width="layout.width"
             :height="layout.height"
           />
-          <!-- All parts, hidden if selected or floating -->
+          <!-- All parts, hidden if floating -->
           <g
             v-for="part in flowParts"
             v-show="!isFloating(part)"
@@ -1116,16 +1080,15 @@ export default defineComponent({
       />
       <div
         v-if="!hasFocus && focusWarningEnabled"
-        class="unfocus-overlay row items-center justify-center"
+        class="unfocus-overlay"
         @click.stop="setFocus"
+        @contextmenu="(evt) => !evt.shiftKey && evt.preventDefault()"
       >
         <transition
           appear
           name="fade"
         >
-          <div class="text-h5 text-white q-pa-lg unfocus-message col-auto">
-            Click to resume editing
-          </div>
+          <div class="unfocus-message">Click to resume editing</div>
         </transition>
       </div>
     </div>
@@ -1147,8 +1110,16 @@ export default defineComponent({
   transition: 1s
 
 .unfocus-message
-  border-radius: 40px
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  padding: 20px
   border: 2px solid silver
+  border-radius: 40px
+  color: white
+  background-color: rgba(0, 0, 0, 0.7)
+  font-size: 1.8rem
 
 .fade-enter-active
   transition: opacity 4s ease

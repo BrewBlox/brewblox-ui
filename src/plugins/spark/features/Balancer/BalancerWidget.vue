@@ -1,39 +1,18 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { fixedNumber } from '@/utils/quantity';
-import { BalancerBlock, Block } from 'brewblox-proto/ts';
-import get from 'lodash/get';
-import { computed, defineComponent } from 'vue';
+import { fixedNumber, prettyLink } from '@/utils/quantity';
+import { BalancerBlock } from 'brewblox-proto/ts';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'BalancerWidget',
   setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, block } = useBlockWidget.setup<BalancerBlock>();
-
-    const clientNames = computed<Mapped<string>>(() => {
-      const result = {};
-      sparkStore.blocksByService(serviceId).forEach((v: Block) => {
-        const constraint = get(v, 'data.constrainedBy.constraints', []).find(
-          (constraint) =>
-            get(constraint, 'balanced.balancerId.id') === block.value.id,
-        );
-        if (constraint) {
-          result[constraint.balanced.id] = v.id;
-        }
-      });
-      return result;
-    });
-
-    function clientName(id: number): string {
-      return clientNames.value[id] || `${id}` || 'unknown';
-    }
+    const { block } = useBlockWidget.setup<BalancerBlock>();
 
     return {
+      prettyLink,
       fixedNumber,
       block,
-      clientName,
     };
   },
 });
@@ -58,7 +37,7 @@ export default defineComponent({
         class="col-auto row q-gutter-x-sm"
       >
         <div class="col text-italic">
-          {{ clientName(client.id) }}
+          {{ prettyLink(client.id) }}
         </div>
         <div class="col">
           {{ fixedNumber(client.granted) }}

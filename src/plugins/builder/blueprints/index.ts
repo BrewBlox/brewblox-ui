@@ -15,6 +15,7 @@ import FilterBottom from './FilterBottom';
 import Fridge from './Fridge';
 import GravityTube from './GravityTube';
 import HeatingElement from './HeatingElement';
+import ImageDisplay from './ImageDisplay';
 import ImmersionCoil from './ImmersionCoil';
 import Keg from './Keg';
 import Kettle from './Kettle';
@@ -56,6 +57,7 @@ const blueprints: { [key: string]: BuilderBlueprint } = {
   FilterBottom,
   GravityTube,
   HeatingElement,
+  ImageDisplay,
   ImmersionCoil,
   Keg,
   Kettle,

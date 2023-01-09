@@ -67,6 +67,12 @@ export default defineComponent({
       } else if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_WARNING) {
         values.push('WARNING: Overtemperature');
       }
+      if (moduleStatus & GpioModuleStatus.POWER_ON_RESET) {
+        values.push('ERROR: Not yet initialized (power on reset)');
+      }
+      if (moduleStatus & GpioModuleStatus.SPI_ERROR) {
+        values.push('ERROR: SPI error');
+      }
       return values;
     });
 
@@ -120,6 +126,8 @@ export default defineComponent({
         v-model:channels="channels"
         :error-pins="block.data.overCurrent"
       />
+
+      <span>{{ block.data.moduleStatus }}</span>
 
       <template v-if="context.mode === 'Full'">
         <q-separator inset />

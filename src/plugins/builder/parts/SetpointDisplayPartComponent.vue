@@ -1,46 +1,59 @@
 <script lang="ts">
-import { CENTER } from '@/plugins/builder/const';
 import { computed, defineComponent } from 'vue';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+} from '../blueprints/SetpointDisplay';
 import { usePart } from '../composables';
-import { liquidOnCoord } from '../utils';
+import { liquidBorderColor } from '../utils';
 
 export default defineComponent({
   name: 'SetpointDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, passthrough } = usePart.setup();
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
+    const borderColor = computed<string>(() => liquidBorderColor(part.value));
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       width,
       height,
       bordered,
-      color,
+      borderColor,
+      passthrough,
     };
   },
 });
 </script>
 
 <template>
-  <svg
-    v-bind="{ width, height }"
-    viewBox="0 0 100 50"
+  <SetpointValues
+    v-bind="{ width, height, bordered, borderColor }"
+    always
   >
-    <SetpointValues />
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="100 - 2"
-        :height="50 - 2"
-        :stroke="color"
-        stroke-width="2px"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
+    <BuilderBorder
+      v-if="bordered"
+      :color="borderColor"
+      :width="100"
+    />
+
+    <template #menu-content>
+      <SizeMenuContent
+        :min="MIN_SIZE"
+        :max="MAX_SIZE"
+        :default="DEFAULT_SIZE"
       />
-    </g>
-  </svg>
+      <ToggleMenuContent
+        v-model="bordered"
+        label="Border"
+      />
+      <ToggleMenuContent
+        v-model="passthrough"
+        label="Flow through part"
+      />
+    </template>
+  </SetpointValues>
 </template>

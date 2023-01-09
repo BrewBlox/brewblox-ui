@@ -48,7 +48,8 @@ export default defineComponent({
       :d="path"
       :stroke="colors[0]"
       stroke-linecap="butt"
-      class="liquid"
+      stroke-width="7"
+      v-bind="$attrs"
     />
   </g>
   <g v-else-if="colors.length > 1">
@@ -61,7 +62,8 @@ export default defineComponent({
         :stroke-dashoffset="cidx * dashArrays[pidx][0]"
         :stroke-dasharray="dashArrays[pidx].join(',')"
         stroke-linecap="butt"
-        class="liquid"
+        stroke-width="7"
+        v-bind="$attrs"
       />
     </template>
   </g>

@@ -1,16 +1,13 @@
-import { CENTER, LEFT } from '@/plugins/builder/const';
+import { LEFT } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { Coordinates } from '@/utils/coordinates';
 
-const SIZE_X = 1;
-const SIZE_Y = 4;
-const OUT = new Coordinates(CENTER).translate([0, SIZE_Y - 1, 0]).toString();
+// Center of height - 1
+const OUT = '0.5,3.5,0';
 
 const blueprint: BuilderBlueprint = {
   type: 'WhirlpoolInlet',
   title: 'Kettle inlet: whirlpool',
-  cards: [],
-  size: () => [SIZE_X, SIZE_Y],
+  size: () => [1, 4],
   transitions: () => ({
     [LEFT]: [{ outCoords: OUT }],
     [OUT]: [{ outCoords: LEFT }],

@@ -4,6 +4,12 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'UnlinkedSvgIcon',
+  props: {
+    color: {
+      type: String,
+      default: 'firebrick',
+    },
+  },
   setup() {
     return {
       mdiLinkVariantOff,
@@ -23,13 +29,8 @@ export default defineComponent({
   >
     <path
       :d="mdiLinkVariantOff"
-      class="icon"
+      :fill="color"
+      stroke="none"
     />
   </svg>
 </template>
-
-<style lang="sass" scoped>
-.icon
-  fill: $negative
-  stroke: none
-</style>

@@ -4,17 +4,31 @@ import { userUnits } from '@/user-settings';
 import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
 import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+} from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
+import { liquidBorderColor } from '../utils';
 
 export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<DriverBlockT>(part, DRIVER_KEY, DRIVER_TYPES);
+    const color = computed<string>(() => liquidBorderColor(part.value));
+
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<DriverBlockT>(DRIVER_KEY, DRIVER_TYPES);
 
     const refBlock = computed<SetpointSensorPairBlock | null>(() =>
       block.value !== null
@@ -39,11 +53,17 @@ export default defineComponent({
         : refBlock.value.data.value.value;
     });
 
-    const setting = computed<number | null>(
-      () => block.value?.data.setting.value ?? null,
-    );
+    const setting = computed<number | null>(() => {
+      if (placeholder) {
+        return 8;
+      }
+      return block.value?.data.setting.value ?? null;
+    });
 
     const appliedSetting = computed<number | null>(() => {
+      if (placeholder) {
+        return 26;
+      }
       if (refAmount.value == null || setting.value == null) {
         return null;
       }
@@ -55,20 +75,27 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       ReferenceKind,
       prettyQty,
       fixedNumber,
       width,
       height,
       bordered,
+      passthrough,
       block,
       blockStatus,
       isBroken,
+      placeholder,
       showBlockDialog,
+      showBlockSelectDialog,
       refKind,
       setting,
       appliedSetting,
       tempUnit,
+      color,
     };
   },
 });
@@ -78,17 +105,14 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 100 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"
         x="30"
       />
       <UnlinkedSvgIcon
-        v-else-if="!block"
+        v-else-if="!block && !placeholder"
         x="30"
       />
       <template v-else>
@@ -153,17 +177,40 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="100 - 2"
-        :height="50 - 2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke-width="2px"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :width="100"
+      :color="color"
+    />
+    <BuilderInteraction
+      :width="100"
+      @interact="showBlockDialog"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

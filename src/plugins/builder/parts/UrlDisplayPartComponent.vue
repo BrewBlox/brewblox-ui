@@ -2,9 +2,9 @@
 import { isAbsoluteUrl } from '@/utils/url';
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/UrlDisplay';
 import { usePart } from '../composables';
 import { LABEL_KEY, URL_KEY } from '../const';
-import { textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'UrlDisplayPartComponent',
@@ -28,7 +28,11 @@ export default defineComponent({
     }
 
     return {
-      textTransformation,
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
+      LABEL_KEY,
+      URL_KEY,
       width,
       height,
       bordered,
@@ -41,12 +45,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <svg
-    v-bind="{ width, height }"
-    class="interaction"
-    @click="interact"
-  >
-    <rect class="interaction-background" />
+  <svg v-bind="{ width, height }">
     <foreignObject v-bind="{ width, height }">
       <div
         class="fit text-bold text-center q-mt-sm grid-label"
@@ -55,17 +54,34 @@ export default defineComponent({
         {{ titleText }}
       </div>
     </foreignObject>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="width - 2"
-        :height="height - 2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke="white"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      v-bind="{ width, height }"
+    />
+    <BuilderInteraction
+      v-bind="{ width, height }"
+      @interact="interact"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <TextMenuContent
+            :settings-key="LABEL_KEY"
+            label="Edit label"
+          />
+          <TextMenuContent
+            :settings-key="URL_KEY"
+            label="Edit link"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

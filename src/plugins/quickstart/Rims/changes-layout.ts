@@ -5,12 +5,11 @@ import {
   PUMP_KEY,
   PWM_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { RimsConfig } from './types';
@@ -48,11 +47,11 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [SIZE_X_KEY]: 4,
+            [WIDTH_KEY]: 4,
             [PWM_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.tubePwm,
-              type: BlockType.ActuatorPwm,
+              type: null,
             }),
           },
           flipped: false,
@@ -77,7 +76,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.kettleSetpoint,
-              type: BlockType.SetpointSensorPair,
+              type: null,
             }),
           },
           flipped: false,
@@ -92,7 +91,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.tubeSetpoint,
-              type: BlockType.SetpointSensorPair,
+              type: null,
             }),
           },
           flipped: false,
@@ -222,7 +221,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.tubePid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
           flipped: false,
@@ -274,7 +273,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.kettlePid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
           flipped: false,

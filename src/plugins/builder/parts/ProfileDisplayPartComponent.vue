@@ -4,16 +4,26 @@ import { makeObjectSorter } from '@/utils/functional';
 import { durationMs, preciseNumber, prettyUnit } from '@/utils/quantity';
 import { Setpoint } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/ProfileDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
+import { liquidBorderColor } from '../utils';
 
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered } = usePart.setup();
+    const { part, width, height, bordered, passthrough, placeholder } =
+      usePart.setup();
 
-    const { block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<ProfileBlockT>(part, PROFILE_KEY, PROFILE_TYPES);
+    const color = computed<string>(() => liquidBorderColor(part.value));
+
+    const {
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<ProfileBlockT>(PROFILE_KEY, PROFILE_TYPES);
 
     const points = computed<Setpoint[]>(() => {
       if (!block.value) {
@@ -24,6 +34,9 @@ export default defineComponent({
     });
 
     const currentValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 19;
+      }
       if (
         !block.value ||
         !block.value.data.enabled ||
@@ -54,6 +67,9 @@ export default defineComponent({
     });
 
     const nextValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 21;
+      }
       if (!block.value || !block.value.data.start) {
         return null;
       }
@@ -73,17 +89,24 @@ export default defineComponent({
     );
 
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
       preciseNumber,
       width,
       height,
       bordered,
+      passthrough,
+      placeholder,
       block,
       blockStatus,
       isBroken,
       showBlockDialog,
+      showBlockSelectDialog,
       currentValue,
       nextValue,
       tempUnit,
+      color,
     };
   },
 });
@@ -93,17 +116,14 @@ export default defineComponent({
   <svg
     v-bind="{ width, height }"
     viewBox="0 0 100 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <g class="content">
       <BrokenSvgIcon
         v-if="isBroken"
         x="30"
       />
       <UnlinkedSvgIcon
-        v-else-if="!block"
+        v-else-if="!block && !placeholder"
         x="30"
       />
       <template v-else>
@@ -138,17 +158,40 @@ export default defineComponent({
         </foreignObject>
       </template>
     </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="100 - 2"
-        :height="50 - 2"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-        stroke-width="2px"
-      />
-    </g>
+    <BuilderBorder
+      v-if="bordered"
+      :width="100"
+      :color="color"
+    />
+    <BuilderInteraction
+      :width="100"
+      @interact="showBlockDialog"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

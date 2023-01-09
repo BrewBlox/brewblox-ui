@@ -91,14 +91,14 @@ export const useDragSelect: UseDragSelectComposable = {
         // Part X/Y position is always in the top left corner,
         // but rotation will impact the end coordinates for non-square parts
         // We can ignore flipping, as all parts are rectangular
-        const [sizeX, sizeY] = rotatedSize(part.rotate, part.size);
+        const [width, height] = rotatedSize(part.rotate, part.size);
 
         // The selection must touch all squares occupied by the part
         return (
           startX <= part.x + 1 &&
           startY <= part.y + 1 &&
-          endX >= part.x + sizeX - 1 &&
-          endY >= part.y + sizeY - 1
+          endX >= part.x + width - 1 &&
+          endY >= part.y + height - 1
         );
       };
     }

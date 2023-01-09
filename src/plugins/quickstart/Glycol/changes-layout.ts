@@ -2,18 +2,17 @@ import { KETTLE_FILL_PCT_KEY } from '@/plugins/builder/blueprints/Kettle';
 import {
   BORDER_KEY,
   COLOR_KEY,
+  HEIGHT_KEY,
   PID_KEY,
   PUMP_KEY,
   PWM_KEY,
   SENSOR_KEY,
   SETPOINT_KEY,
-  SIZE_X_KEY,
-  SIZE_Y_KEY,
+  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout, PersistentPart } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { BlockIntfType, BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { GlycolConfig } from './types';
@@ -33,7 +32,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           [PID_KEY]: typed<BlockAddress>({
             serviceId,
             id: names.heatPid,
-            type: BlockType.Pid,
+            type: null,
           }),
         },
         flipped: false,
@@ -49,7 +48,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           [PWM_KEY]: typed<BlockAddress>({
             serviceId,
             id: names.heatPwm,
-            type: BlockType.ActuatorPwm,
+            type: null,
           }),
         },
         flipped: false,
@@ -70,7 +69,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           [SETPOINT_KEY]: typed<BlockAddress>({
             serviceId,
             id: names.glycolSetpoint,
-            type: BlockType.SetpointSensorPair,
+            type: null,
           }),
         },
         flipped: false,
@@ -86,7 +85,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           [PID_KEY]: typed<BlockAddress>({
             serviceId,
             id: names.glycolPid,
-            type: BlockType.Pid,
+            type: null,
           }),
         },
         flipped: false,
@@ -103,7 +102,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         [SENSOR_KEY]: typed<BlockAddress>({
           serviceId,
           id: names.glycolSensor,
-          type: BlockIntfType.TempSensorInterface,
+          type: null,
         }),
       },
       flipped: false,
@@ -129,7 +128,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
             [SETPOINT_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.beerSetpoint,
-              type: BlockType.SetpointSensorPair,
+              type: null,
             }),
           },
           flipped: false,
@@ -150,8 +149,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [SIZE_X_KEY]: 2,
-            [SIZE_Y_KEY]: 3,
+            [WIDTH_KEY]: 2,
+            [HEIGHT_KEY]: 3,
             [COLOR_KEY]: '#69bcff',
             [KETTLE_FILL_PCT_KEY]: 100,
           },
@@ -294,7 +293,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
             [PID_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.coolPid,
-              type: BlockType.Pid,
+              type: null,
             }),
           },
           flipped: false,
@@ -309,7 +308,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
             [PUMP_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.coolPwm,
-              type: BlockType.ActuatorPwm,
+              type: null,
             }),
           },
           flipped: false,

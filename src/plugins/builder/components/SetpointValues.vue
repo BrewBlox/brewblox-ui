@@ -33,20 +33,25 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    hideUnset: {
+    always: {
       type: Boolean,
       default: false,
     },
   },
   setup(props) {
     const sparkStore = useSparkStore();
-    const { part } = usePart.setup();
-    const { address, block, blockStatus, isBroken, showBlockDialog } =
-      useSettingsBlock.setup<SetpointBlockT>(
-        part,
-        props.settingsKey,
-        SETPOINT_TYPES,
-      );
+    const { placeholder } = usePart.setup();
+    const {
+      address,
+      block,
+      blockStatus,
+      isBroken,
+      showBlockDialog,
+      showBlockSelectDialog,
+    } = useSettingsBlock.setup<SetpointBlockT>(
+      props.settingsKey,
+      SETPOINT_TYPES,
+    );
 
     const isUsed = computed<boolean>(
       () =>
@@ -58,15 +63,22 @@ export default defineComponent({
           .some((blk) => blk.data.inputId.id === address.value.id),
     );
 
-    const setpointSetting = computed<number | null>(() =>
-      block.value && isUsed.value
-        ? block.value.data.desiredSetting.value
-        : null,
-    );
+    const setpointSetting = computed<number | null>(() => {
+      if (placeholder) {
+        return 26;
+      }
+      if (block.value && isUsed.value) {
+        return block.value.data.desiredSetting.value;
+      }
+      return null;
+    });
 
-    const setpointValue = computed<number | null>(
-      () => block.value?.data.value.value ?? null,
-    );
+    const setpointValue = computed<number | null>(() => {
+      if (placeholder) {
+        return 21;
+      }
+      return block.value?.data.value.value ?? null;
+    });
 
     const tempUnit = computed<string>(() =>
       prettyUnit(userUnits.value.temperature),
@@ -77,7 +89,9 @@ export default defineComponent({
       block,
       blockStatus,
       isBroken,
+      placeholder,
       showBlockDialog,
+      showBlockSelectDialog,
       setpointSetting,
       setpointValue,
       tempUnit,
@@ -88,19 +102,16 @@ export default defineComponent({
 
 <template>
   <svg
-    v-if="block || !hideUnset"
+    v-if="block || always"
     v-bind="{ x, y, width, height }"
     viewBox="0 0 100 50"
-    class="interaction"
-    @click="showBlockDialog"
   >
-    <rect class="interaction-background" />
     <BrokenSvgIcon
       v-if="isBroken"
       x="30"
     />
     <UnlinkedSvgIcon
-      v-else-if="!block"
+      v-else-if="!block && !placeholder"
       x="30"
     />
     <template v-else>
@@ -140,5 +151,26 @@ export default defineComponent({
         </div>
       </foreignObject>
     </template>
+
+    <slot />
+
+    <BuilderInteraction
+      :width="100"
+      @interact="showBlockDialog"
+    >
+      <q-menu
+        touch-position
+        context-menu
+      >
+        <q-list>
+          <BlockMenuContent
+            :available="!!block"
+            @show="showBlockDialog"
+            @assign="showBlockSelectDialog"
+          />
+          <slot name="menu-content" />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

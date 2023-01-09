@@ -37,9 +37,9 @@ interface XYPosition {
   y: number;
 }
 
-interface GridSize {
-  cols: number;
-  rows: number;
+interface AreaSize {
+  width: number;
+  height: number;
 }
 
 type InputRule = (val: any) => boolean | string;

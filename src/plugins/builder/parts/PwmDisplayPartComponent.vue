@@ -1,30 +1,51 @@
 <script lang="ts">
-import { CENTER } from '@/plugins/builder/const';
 import { computed, defineComponent } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PwmDisplay';
 import { usePart } from '../composables';
-import { liquidOnCoord } from '../utils';
+import { liquidBorderColor } from '../utils';
 
 export default defineComponent({
   name: 'PwmDisplayPartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, bordered, width, height, passthrough } = usePart.setup();
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
+    const borderColor = computed<string>(() => liquidBorderColor(part.value));
 
     return {
+      MIN_SIZE,
+      MAX_SIZE,
+      DEFAULT_SIZE,
       width,
       height,
-      color,
+      bordered,
+      passthrough,
+      borderColor,
     };
   },
 });
 </script>
 
 <template>
-  <PwmValues
-    v-bind="{ width, height }"
-    :color="color"
-  />
+  <PwmValues v-bind="{ width, height }">
+    <BuilderBorder
+      v-if="bordered"
+      :color="borderColor"
+    />
+
+    <template #menu-content>
+      <SizeMenuContent
+        :min="MIN_SIZE"
+        :max="MAX_SIZE"
+        :default="DEFAULT_SIZE"
+      />
+      <ToggleMenuContent
+        v-model="bordered"
+        label="Border"
+      />
+      <ToggleMenuContent
+        v-model="passthrough"
+        label="Flow through part"
+      />
+    </template>
+  </PwmValues>
 </template>

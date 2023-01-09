@@ -1,18 +1,12 @@
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
-import { isBlockCompatible, isCompatible } from '@/plugins/spark/utils/info';
+import { isCompatible } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
-import { durationMs } from '@/utils/quantity';
-import {
-  Block,
-  BlockType,
-  DigitalActuatorBlock,
-  FastPwmBlock,
-} from 'brewblox-proto/ts';
+import { Block } from 'brewblox-proto/ts';
 import defaults from 'lodash/defaults';
 import isObject from 'lodash/isObject';
 import range from 'lodash/range';
@@ -25,15 +19,16 @@ import {
   DEFAULT_LAYOUT_WIDTH,
   deprecatedTypes,
   DEPRECATED_SCALE_KEY,
-  SIZE_X_KEY,
-  SIZE_Y_KEY,
+  HEIGHT_KEY,
   SQUARE_SIZE,
+  WIDTH_KEY,
 } from './const';
 import { useBuilderStore } from './store';
 import {
   BuilderBlueprint,
   BuilderLayout,
   FlowPart,
+  PartSize,
   PersistentPart,
   StatePart,
   Transitions,
@@ -204,20 +199,20 @@ export function colorString(val: Maybe<string>): string {
 }
 
 export function containerTransitions(
-  [sizeX, sizeY]: [number, number],
+  [width, height]: PartSize,
   color?: string,
 ): Transitions {
-  const coords = Array(sizeX * sizeY)
+  const coords = Array(width * height)
     .fill(0)
     .map((_, n) => {
       const outFlow = new Coordinates({
-        x: (n % sizeX) + 0.5,
-        y: Math.floor(n / sizeX) + 0.5,
+        x: (n % width) + 0.5,
+        y: Math.floor(n / width) + 0.5,
         z: 0,
       });
       const inFlow = new Coordinates({
-        x: (n % sizeX) + 0.1,
-        y: Math.floor(n / sizeX) + 0.1,
+        x: (n % width) + 0.1,
+        y: Math.floor(n / width) + 0.1,
         z: 0,
       });
       return { in: inFlow.toString(), out: outFlow.toString() };
@@ -261,16 +256,16 @@ export function coord2translate(x: number, y: number): string {
 
 export function textTransformation(
   part: PersistentPart,
-  textSize: [number, number],
+  [textWidth, textHeight]: PartSize,
   counterRotate = true,
 ): string {
   const transforms: string[] = [];
   if (part.flipped) {
-    transforms.push(`translate(${coord2grid(textSize[0])}, 0) scale(-1,1)`);
+    transforms.push(`translate(${coord2grid(textWidth)}, 0) scale(-1,1)`);
   }
   if (part.rotate && counterRotate) {
-    const originX = coord2grid(0.5 * textSize[0]);
-    const originY = coord2grid(0.5 * textSize[1]);
+    const originX = coord2grid(0.5 * textWidth);
+    const originY = coord2grid(0.5 * textHeight);
     transforms.push(`rotate(${-part.rotate},${originX},${originY})`);
   }
   return transforms.join(' ');
@@ -354,31 +349,16 @@ export function showLinkedWidgetDialog(
   }
 }
 
-export function scheduleSoftStartRefresh(block: Block): void {
-  if (
-    isBlockCompatible<FastPwmBlock | DigitalActuatorBlock>(block, [
-      BlockType.FastPwm,
-      BlockType.DigitalActuator,
-    ])
-  ) {
-    const softStartDuration = durationMs(block.data.transitionDurationValue);
-    if (softStartDuration > 0) {
-      setTimeout(() => useSparkStore().fetchBlock(block), softStartDuration);
-    }
-  }
-}
-
 export function universalTransitions(
-  size: [number, number],
+  [width, height]: PartSize,
   enabled: boolean,
 ): Transitions {
   if (!enabled) {
     return {};
   }
-  const [sizeX, sizeY] = size;
   const coords: string[] = [
-    range(sizeX).map((x) => [`${x + 0.5},0,0`, `${x + 0.5},${sizeY},0`]),
-    range(sizeY).map((y) => [`0,${y + 0.5},0`, `${sizeX},${y + 0.5},0`]),
+    range(width).map((x) => [`${x + 0.5},0,0`, `${x + 0.5},${height},0`]),
+    range(height).map((y) => [`0,${y + 0.5},0`, `${width},${y + 0.5},0`]),
   ].flat(2);
   return coords.reduce(
     (acc, coord) => {
@@ -389,22 +369,19 @@ export function universalTransitions(
   );
 }
 
-export function variableSizeFunc(
-  defaultSizeX: number,
-  defaultSizeY: number,
-): BuilderBlueprint['size'] {
+export function variableSizeFunc(defaults: AreaSize): BuilderBlueprint['size'] {
   return ({ settings }) => {
-    const sizeX = settingsProp<number>(settings, SIZE_X_KEY, 'number');
-    const sizeY = settingsProp<number>(settings, SIZE_Y_KEY, 'number');
-    if (sizeX || sizeY) {
-      return [sizeX || defaultSizeX, sizeY || defaultSizeY];
+    const width = settingsProp<number>(settings, WIDTH_KEY, 'number');
+    const height = settingsProp<number>(settings, HEIGHT_KEY, 'number');
+    if (width || height) {
+      return [width || defaults.width, height || defaults.height];
     }
     // backwards compatibility with deprecated setting
     if (settings[DEPRECATED_SCALE_KEY] != null) {
       const scale = Number(settings[DEPRECATED_SCALE_KEY]);
-      return [defaultSizeX * scale, defaultSizeY * scale];
+      return [defaults.width * scale, defaults.height * scale];
     }
-    return [defaultSizeX, defaultSizeY];
+    return [defaults.width, defaults.height];
   };
 }
 
@@ -415,7 +392,7 @@ export function vivifyParts(
     return [];
   }
   const builderStore = useBuilderStore();
-  const sizes: Mapped<number> = {};
+  const surfaceArea: Mapped<number> = {};
   return (
     parts
       .map((storePart) => {
@@ -428,15 +405,15 @@ export function vivifyParts(
         part.id = part.id ?? nanoid();
         part.type = deprecatedTypes[part.type] ?? part.type;
 
-        const [sizeX, sizeY] = builderStore
+        const [width, height] = builderStore
           .blueprintByType(part.type)
           .size(part);
-        sizes[part.id] = sizeX * sizeY;
+        surfaceArea[part.id] = width * height;
         return part;
       })
       // Sort parts to render largest first
       // This improves clickability of overlapping parts
-      .sort((a, b) => sizes[b.id] - sizes[a.id])
+      .sort((a, b) => surfaceArea[b.id] - surfaceArea[a.id])
   );
 }
 
@@ -452,13 +429,25 @@ export function liquidOnCoord(part: FlowPart, coord: string): string[] {
   return flows ? Object.keys(flows) : [];
 }
 
+export function liquidBorderColor(part: FlowPart): string {
+  for (const coord in part.flows) {
+    const flow = part.flows[coord];
+    for (const color in flow) {
+      if (flow[color] != 0) {
+        return color;
+      }
+    }
+  }
+  return '';
+}
+
 export function flowOnCoord(part: FlowPart, coord: string): number {
   const flows = part.flows[rotatedCoord(part, coord)];
   return flows ? reduce(flows, (sum, v) => sum + v, 0) : 0;
 }
 
 export async function startAddLayout(
-  source: BuilderLayout | null = null,
+  source?: Maybe<BuilderLayout>,
 ): Promise<string | null> {
   const title = await createDialogPromise({
     component: 'InputDialog',

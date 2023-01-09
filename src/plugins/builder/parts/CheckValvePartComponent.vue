@@ -4,8 +4,6 @@ import { computed, defineComponent } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
-const liquidPaths = ['M 0,25 h 50', 'M 20,15 L 30,25 L 20,35'];
-
 export default defineComponent({
   name: 'CheckValvePartComponent',
   setup() {
@@ -18,7 +16,6 @@ export default defineComponent({
     return {
       width,
       height,
-      liquidPaths,
       flowSpeed,
       liquids,
     };
@@ -43,7 +40,7 @@ export default defineComponent({
       />
     </g>
     <LiquidStroke
-      :paths="liquidPaths"
+      :paths="['M 0,25 h 50', 'M 20,15 L 30,25 L 20,35']"
       :colors="liquids"
     />
     <g class="fill">

@@ -1,6 +1,5 @@
 <script lang="ts">
-import { CENTER } from '@/plugins/builder/const';
-import { liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
+import { liquidBorderColor } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
 import { userUnits } from '@/user-settings';
@@ -11,14 +10,22 @@ import {
   prettyUnit,
 } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
-import { TILT_ID_KEY } from '../blueprints/TiltDisplay';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  MIN_SIZE,
+  TILT_ID_KEY,
+} from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';
 
 export default defineComponent({
   name: 'TiltDisplayPartComponent',
   setup() {
-    const { part, settings, width, height, bordered } = usePart.setup();
+    const { part, settings, width, height, bordered, passthrough } =
+      usePart.setup();
     const tiltStore = useTiltStore();
+
+    const color = computed<string>(() => liquidBorderColor(part.value));
 
     const tiltId = computed<string | null>(
       () => settings.value[TILT_ID_KEY] ?? null,
@@ -50,18 +57,21 @@ export default defineComponent({
       prettyUnit(userUnits.value.gravity),
     );
 
-    const color = computed<string>(
-      () => liquidOnCoord(part.value, CENTER)[0] ?? '',
-    );
-
     const unitlessGravity = computed<boolean>(
       () => userUnits.value.gravity === 'G',
     );
 
+    function findTilts(): SelectOption[] {
+      return useTiltStore().values.map((v) => ({ label: v.name, value: v.id }));
+    }
+
     return {
+      DEFAULT_SIZE,
+      MAX_SIZE,
+      MIN_SIZE,
+      TILT_ID_KEY,
       prettyQty,
       preciseNumber,
-      textTransformation,
       fixedNumber,
       width,
       height,
@@ -72,6 +82,8 @@ export default defineComponent({
       unitlessGravity,
       color,
       bordered,
+      passthrough,
+      findTilts,
     };
   },
 });
@@ -82,59 +94,77 @@ export default defineComponent({
     v-bind="{ width, height }"
     viewBox="0 0 100 50"
   >
-    <g class="content">
-      <SensorSvgIcon
-        x="15"
-        y="3"
-        width="20"
-        height="20"
-      />
-      <foreignObject
-        x="40"
-        y="5"
-        width="50"
-        height="18"
+    <SensorSvgIcon
+      x="15"
+      y="3"
+      width="20"
+      height="20"
+    />
+    <foreignObject
+      x="40"
+      y="5"
+      width="50"
+      height="18"
+    >
+      <div class="fit builder-text">
+        {{ preciseNumber(temperature) }}
+        <small>{{ tempUnit }}</small>
+      </div>
+    </foreignObject>
+    <TiltSvgIcon
+      x="15"
+      y="25"
+      width="20"
+      height="20"
+    />
+    <foreignObject
+      x="40"
+      y="27"
+      width="50"
+      height="18"
+    >
+      <div class="fit builder-text">
+        <template v-if="unitlessGravity">
+          {{ fixedNumber(gravity, 4) }}
+        </template>
+        <template v-else>
+          {{ preciseNumber(gravity) }}
+          <small>{{ gravityUnit }}</small>
+        </template>
+      </div>
+    </foreignObject>
+    <BuilderBorder
+      v-if="bordered"
+      :width="100"
+      :color="color"
+    />
+    <BuilderInteraction :width="100">
+      <q-menu
+        touch-position
+        context-menu
       >
-        <div class="fit builder-text">
-          {{ preciseNumber(temperature) }}
-          <small>{{ tempUnit }}</small>
-        </div>
-      </foreignObject>
-      <TiltSvgIcon
-        x="15"
-        y="25"
-        width="20"
-        height="20"
-      />
-      <foreignObject
-        x="40"
-        y="27"
-        width="50"
-        height="18"
-      >
-        <div class="fit builder-text">
-          <template v-if="unitlessGravity">
-            {{ fixedNumber(gravity, 4) }}
-          </template>
-          <template v-else>
-            {{ preciseNumber(gravity) }}
-            <small>{{ gravityUnit }}</small>
-          </template>
-        </div>
-      </foreignObject>
-    </g>
-    <g class="outline">
-      <rect
-        v-show="bordered"
-        :width="100 - 2"
-        :height="50 - 2"
-        :stroke="color"
-        stroke-width="2px"
-        x="1"
-        y="1"
-        rx="6"
-        ry="6"
-      />
-    </g>
+        <q-list>
+          <SelectMenuContent
+            :settings-key="TILT_ID_KEY"
+            title="Tilt device"
+            label="Assign tilt"
+            :opts="findTilts"
+          />
+          <SizeMenuContent
+            :min="MIN_SIZE"
+            :max="MAX_SIZE"
+            :default="DEFAULT_SIZE"
+          />
+          <ToggleMenuContent
+            v-model="bordered"
+            label="Border"
+          />
+          <ToggleMenuContent
+            v-model="passthrough"
+            label="Flow through part"
+          />
+        </q-list>
+      </q-menu>
+    </BuilderInteraction>
   </svg>
 </template>

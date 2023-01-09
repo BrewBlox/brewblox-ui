@@ -33,6 +33,6 @@ module.exports = {
   history: `${host}/history/history`,
   datastore: `${host}/history/datastore`,
   fileDir: path.resolve(__dirname, 'presets'),
-  databases: ['brewblox-global', 'brewblox-automation', 'brewblox-ui-store'],
+  databases: ['brewblox-global', 'brewblox-ui-store'],
   sparks: ['sparkey', 'spock'],
 };

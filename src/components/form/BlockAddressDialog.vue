@@ -59,11 +59,12 @@ export default defineComponent({
       useDialog.setup();
     const sparkStore = useSparkStore();
     const featureStore = useFeatureStore();
-    const local = ref<BlockAddress | null>(null);
 
     const modelValueAddr = computed<BlockAddress>(
       () => props.modelValue ?? asAddr(null),
     );
+
+    const local = ref<BlockAddress | null>(modelValueAddr.value);
 
     const serviceIds = computed<string[]>(() => sparkStore.serviceIds);
 
