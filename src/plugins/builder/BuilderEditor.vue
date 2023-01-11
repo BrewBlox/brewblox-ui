@@ -6,12 +6,14 @@ import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
 import { uniqueFilter } from '@/utils/functional';
 import { loadFile } from '@/utils/import-export';
+import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { clampRotation } from '@/utils/quantity';
 import * as d3 from 'd3';
 import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
+import pluralize from 'pluralize';
 import {
   computed,
   defineComponent,
@@ -582,6 +584,53 @@ export default defineComponent({
     // Event handlers
     ////////////////////////////////////////////////////////////////
 
+    function onClipboardCopy(evt: ClipboardEvent): void {
+      evt.preventDefault();
+      const activeParts = findActiveParts(true);
+      if (!activeParts.length) {
+        return;
+      }
+      const content = JSON.stringify({ parts: activeParts });
+      evt.clipboardData?.setData('BuilderClipboardContent', content);
+      notify.info(`Copied ${pluralize('part', activeParts.length, true)}`);
+    }
+
+    function onClipboardCut(evt: ClipboardEvent): void {
+      evt.preventDefault();
+      const activeParts = findActiveParts(true);
+      if (!activeParts.length) {
+        return;
+      }
+      const content = JSON.stringify({ parts: activeParts });
+      evt.clipboardData?.setData('BuilderClipboardContent', content);
+      notify.info(`Cut ${pluralize('part', activeParts.length, true)}`);
+
+      // Now remove cut parts from layout
+      const ids = activeParts.map((p) => p.id);
+      saveParts(parts.value.filter((p) => !ids.includes(p.id)));
+    }
+
+    function onClipboardPaste(evt: ClipboardEvent): void {
+      evt.preventDefault();
+      const content = evt.clipboardData?.getData('BuilderClipboardContent');
+      if (!content) {
+        return;
+      }
+
+      const { parts }: { parts: FlowPart[] } = JSON.parse(content);
+      if (parts?.length) {
+        const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
+        const minX = Math.min(...parts.map((part) => part.x));
+        const minY = Math.min(...parts.map((part) => part.y));
+        parts.forEach((part) => {
+          part.id = nanoid();
+          part.x -= minX;
+          part.y -= minY;
+        });
+        makeFloater({ x, y, parts });
+      }
+    }
+
     function deltaMove(delta: XYPosition): void {
       const activeParts = findActiveParts(true);
       activeParts.forEach((part) => {
@@ -771,7 +820,7 @@ export default defineComponent({
         dropFloater(toCoords(d3EventPos(evt)));
       });
 
-    function selectGridHandlers(
+    function defineGridEventHandlers(
       el: SVGElement,
       tool: BuilderToolName | null,
     ): void {
@@ -794,7 +843,7 @@ export default defineComponent({
       }
     }
 
-    function selectPartHandlers(
+    function definePartEventHandlers(
       el: SVGElement,
       tool: BuilderToolName | null,
     ): void {
@@ -849,7 +898,7 @@ export default defineComponent({
 
     watch(
       [svgRef, activeToolId],
-      ([el, tool]) => el && selectGridHandlers(el, tool),
+      ([el, tool]) => el && defineGridEventHandlers(el, tool),
       { immediate: true },
     );
 
@@ -858,7 +907,7 @@ export default defineComponent({
       async ([el, tool]) => {
         await nextTick();
         if (el) {
-          selectPartHandlers(el, tool);
+          definePartEventHandlers(el, tool);
         }
       },
       { immediate: true },
@@ -905,6 +954,9 @@ export default defineComponent({
       useTool,
       cursor,
 
+      onClipboardCopy,
+      onClipboardCut,
+      onClipboardPaste,
       keyHandler,
     };
   },
@@ -915,6 +967,9 @@ export default defineComponent({
   <q-page
     class="page-height"
     @keydown="keyHandler"
+    @copy="onClipboardCopy"
+    @cut="onClipboardCut"
+    @paste="onClipboardPaste"
   >
     <TitleTeleport v-if="layout">
       <span

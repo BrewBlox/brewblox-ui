@@ -687,6 +687,11 @@
   resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.7.tgz#5960126d6cb727e38dc52e9fbc0a9aae9ddbb4da"
   integrity sha512-jMP4lHOJ3Av1GeCGG9DvaiuiU+vTVkX4v+CpLqY8RJ52yp3t/5Nur1JdKq2z9ZhmXrDOsedkmbh1BOhpmaJoQA==
 
+"@types/pluralize@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/pluralize/-/pluralize-0.0.29.tgz#6ffa33ed1fc8813c469b859681d09707eb40d03c"
+  integrity sha512-BYOID+l2Aco2nBik+iYS4SZX0Lf20KPILP5RGmM1IgzdwNdTs0eebiFriOPcej1sX9mLnSoiNte5zcFxssgpGA==
+
 "@types/qs@^6.2.31":
   version "6.9.7"
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.9.7.tgz#63bb7d067db107cc1e457c303bc25d511febf6cb"
@@ -4369,6 +4374,11 @@ plotly.js@^2.4.1:
     topojson-client "^3.1.0"
     webgl-context "^2.2.0"
     world-calendars "^1.0.3"
+
+pluralize@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-8.0.0.tgz#1a6fa16a38d12a1901e0320fa017051c539ce3b1"
+  integrity sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==
 
 point-in-polygon@^1.1.0:
   version "1.1.0"
