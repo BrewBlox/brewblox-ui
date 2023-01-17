@@ -13,6 +13,7 @@ import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
 import FilterBottom from './FilterBottom';
 import Fridge from './Fridge';
+import GraphDisplay from './GraphDisplay';
 import GravityTube from './GravityTube';
 import HeatingElement from './HeatingElement';
 import ImageDisplay from './ImageDisplay';
@@ -55,6 +56,8 @@ const blueprints: { [key: string]: BuilderBlueprint } = {
   DipTube,
   ElbowTube,
   FilterBottom,
+  Fridge,
+  GraphDisplay,
   GravityTube,
   HeatingElement,
   ImageDisplay,
@@ -77,7 +80,6 @@ const blueprints: { [key: string]: BuilderBlueprint } = {
   StraightInletTube,
   StraightTube,
   SystemIO,
-  Fridge,
   TeeTube,
   TiltDisplay,
   UrlDisplay,
