@@ -1,31 +1,34 @@
 import { MetricsConfig } from '@/plugins/history/types';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
-import { deepCopy } from '@/utils/objects';
-import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
 import {
-  BORDER_KEY,
-  COLOR_KEY,
-  FLOW_TOGGLE_KEY,
+  computed,
+  ComputedRef,
+  inject,
+  shallowRef,
+  WritableComputedRef,
+} from 'vue';
+import { BORDER_KEY, COLOR_KEY, FLOW_TOGGLE_KEY } from '../const';
+import {
+  FlowsKey,
   PartKey,
+  PatchPartKey,
+  PatchSettingsKey,
   PlaceholderKey,
   ReflowKey,
-} from '../const';
-import { FlowPart } from '../types';
+} from '../symbols';
+import { BuilderPart, PartFlows } from '../types';
 import { colorString, coord2grid } from '../utils';
 
 export interface UsePartComponent {
   /**
    * The builder part itself.
-   * Updating its value will cause it to be updated in the store,
-   * and active flows to be recalculated.
    */
-  part: WritableComputedRef<FlowPart>;
+  part: ComputedRef<BuilderPart>;
 
   /**
    * `part.settings`, extracted for convenience.
-   * Updating its value will cause `part` to be updated.
    */
-  settings: WritableComputedRef<Mapped<any>>;
+  settings: ComputedRef<Mapped<any>>;
 
   /**
    * Part metrics will be merged per layout,
@@ -34,14 +37,10 @@ export interface UsePartComponent {
   metrics: ComputedRef<MetricsConfig>;
 
   /**
-   * The calculated part width, in grid squares.
+   * Part flows if defined and calculated.
+   * The object will be empty otherwise.
    */
-  partWidth: ComputedRef<number>;
-
-  /**
-   * The calculated part height, in grid squares.
-   */
-  partHeight: ComputedRef<number>;
+  flows: ComputedRef<PartFlows>;
 
   /**
    * The calculated part width, in SVG units.
@@ -89,13 +88,23 @@ export interface UsePartComponent {
   passthrough: WritableComputedRef<boolean>;
 
   /**
+   * Update one or more part values.
+   * All other properties will be unchanged.
+   * To remove a value, change its value to `undefined`.
+   * To update part settings, `patchSettings` is recommended.
+   *
+   * @param patch The changed subset of the part.
+   */
+  patchPart: (patch: Partial<BuilderPart>) => void;
+
+  /**
    * Update one or more setting values.
    * All other settings will be unchanged.
    * To remove a setting, change its value to `undefined`.
    *
    * @param patch The changed subset of the part settings.
    */
-  patchSettings: (patch: Mapped<any>) => void;
+  patchSettings: (patch: Partial<BuilderPart['settings']>) => void;
 
   /**
    * Causes the active layout to recalculate flows.
@@ -113,27 +122,25 @@ export interface UsePartComposable {
 export const usePart: UsePartComposable = {
   setup(): UsePartComponent {
     const part = inject(PartKey)!;
+    const patchPart = inject(PatchPartKey, () => {});
+    const patchSettings = inject(PatchSettingsKey, () => {});
     const reflow = inject(ReflowKey)!;
+    const allFlows = inject(FlowsKey, shallowRef({}));
     const placeholder = inject(PlaceholderKey, false);
 
-    const settings = computed<Mapped<any>>({
-      get: () => part.value.settings,
-      set: (data) => {
-        part.value = { ...part.value, settings: deepCopy(data) };
-      },
-    });
+    const settings = computed<Mapped<any>>(() => part.value.settings);
 
     const metrics = computed<MetricsConfig>(
       () => part.value.metrics ?? emptyMetricsConfig(),
     );
 
-    const partWidth = computed<number>(() => part.value.size[0]);
+    const flows = computed<PartFlows>(
+      () => allFlows.value[part.value.id] ?? {},
+    );
 
-    const partHeight = computed<number>(() => part.value.size[1]);
+    const width = computed<number>(() => coord2grid(part.value.width));
 
-    const width = computed<number>(() => coord2grid(partWidth.value));
-
-    const height = computed<number>(() => coord2grid(partHeight.value));
+    const height = computed<number>(() => coord2grid(part.value.height));
 
     const flipped = computed<boolean>(() => part.value.flipped === true);
 
@@ -152,16 +159,11 @@ export const usePart: UsePartComposable = {
       set: (v) => patchSettings({ [FLOW_TOGGLE_KEY]: Boolean(v) }),
     });
 
-    function patchSettings(patch: Mapped<any>): void {
-      settings.value = { ...part.value.settings, ...patch };
-    }
-
     return {
       part,
       settings,
       metrics,
-      partWidth,
-      partHeight,
+      flows,
       width,
       height,
       flipped,
@@ -169,6 +171,7 @@ export const usePart: UsePartComposable = {
       bordered,
       passthrough,
       placeholder,
+      patchPart,
       patchSettings,
       reflow,
     };

@@ -1,21 +1,43 @@
 import { useBuilderStore } from '@/plugins/builder/store';
-import { deepCopy } from '@/utils/objects';
+import produce from 'immer';
 import debounce from 'lodash/debounce';
-import { nanoid } from 'nanoid';
-import { computed, Ref, ref, watch, WritableComputedRef } from 'vue';
+import isEqual from 'lodash/isEqual';
+import keyBy from 'lodash/keyBy';
+import {
+  computed,
+  ComputedRef,
+  provide,
+  Ref,
+  shallowRef,
+  ShallowRef,
+  watch,
+} from 'vue';
 import { calculateNormalizedFlows } from '../calculateFlows';
-import { BuilderLayout, FlowPart, PersistentPart } from '../types';
-import { asPersistentPart, asStatePart, vivifyParts } from '../utils';
+import { FlowsKey } from '../symbols';
+import {
+  BuilderLayout,
+  BuilderPart,
+  PartFlows,
+  PartTransitions,
+} from '../types';
+
+export type UpdateLayoutFunc = (draft: BuilderLayout) => void | BuilderLayout;
+export type UpdatePartsFunc = (
+  draft: Mapped<BuilderPart>,
+) => void | Mapped<BuilderPart>;
 
 export interface UseFlowPartsComponent {
-  layout: Ref<BuilderLayout | null>;
-  saveLayout(): Awaitable<unknown>;
+  layout: ComputedRef<BuilderLayout | null>;
 
-  parts: WritableComputedRef<PersistentPart[]>;
-  flowParts: Ref<FlowPart[]>;
-  flowPartsRevision: Ref<string>;
+  parts: ShallowRef<Mapped<BuilderPart>>;
+  flows: ShallowRef<Mapped<PartFlows>>;
 
-  calculateFlowParts(): Awaitable<unknown>;
+  orderedParts: ComputedRef<BuilderPart[]>;
+
+  updateLayout: (cb: UpdateLayoutFunc) => void;
+  updateParts: (cb: UpdatePartsFunc) => void;
+
+  reflow: () => void;
 }
 
 export interface UseFlowPartsComposable {
@@ -26,68 +48,87 @@ export const useFlowParts: UseFlowPartsComposable = {
   setup(layoutId: Ref<string | null>): UseFlowPartsComponent {
     const builderStore = useBuilderStore();
 
-    const layout = ref<BuilderLayout | null>(
+    const layout = computed<BuilderLayout | null>(() =>
       builderStore.layoutById(layoutId.value),
     );
 
-    const saveLayout = debounce(
-      () => {
-        if (layout.value) {
-          builderStore.saveLayout(layout.value);
-        }
-      },
-      500,
-      { trailing: true },
+    const parts = shallowRef<Mapped<BuilderPart>>({});
+    const flows = shallowRef<Mapped<PartFlows>>({});
+    provide(FlowsKey, flows);
+
+    const orderedParts = computed<BuilderPart[]>(() =>
+      Object.values(parts.value).sort(
+        (a, b) => b.width * b.height - a.width * a.height,
+      ),
     );
 
-    const parts = computed<PersistentPart[]>({
-      get: () => vivifyParts(layout.value?.parts),
-      set: (values) => {
-        if (layout.value) {
-          layout.value.parts = values.map(asPersistentPart);
-          saveLayout();
+    function assignLocalParts(updated: Mapped<BuilderPart>): void {
+      if (!isEqual(updated, parts.value)) {
+        parts.value = updated;
+        reflow();
+      }
+    }
+
+    function updateLayout(cb: UpdateLayoutFunc): void {
+      if (layout.value) {
+        const updated = produce(layout.value, cb);
+        assignLocalParts(keyBy(updated.parts, 'id'));
+        builderStore.saveLayout(updated);
+      }
+    }
+
+    function updateParts(cb: UpdatePartsFunc): void {
+      if (layout.value) {
+        const updated = produce(parts.value, cb);
+        assignLocalParts(updated);
+        builderStore.saveLayout({
+          ...layout.value,
+          parts: Object.values(updated),
+        });
+      }
+    }
+
+    function makeTransitions(
+      evaluated: BuilderPart[],
+    ): Mapped<PartTransitions> {
+      return evaluated.reduce((acc, part) => {
+        const transitions = builderStore
+          .blueprintByType(part.type)
+          ?.transitions(part);
+        if (transitions) {
+          acc[part.id] = transitions;
         }
-      },
-    });
+        return acc;
+      }, {});
+    }
 
-    const _flowParts = ref<FlowPart[]>([]);
-    const flowPartsRevision = ref<string>('');
-
-    const flowParts = computed<FlowPart[]>({
-      get: () => _flowParts.value,
-      set: (values) => {
-        _flowParts.value = values;
-        flowPartsRevision.value = nanoid(6);
-      },
-    });
-
-    const calculateFlowParts = debounce(
+    const reflow = debounce(
       () => {
-        const source = deepCopy(parts.value);
-        flowParts.value = calculateNormalizedFlows(source.map(asStatePart));
+        const evaluated = Object.values(parts.value);
+        const transitions = makeTransitions(evaluated);
+
+        flows.value = calculateNormalizedFlows(evaluated, transitions);
       },
-      500,
+      100,
       { leading: true },
     );
 
     watch(
-      () => builderStore.layoutById(layoutId.value),
-      (newV) => (layout.value = newV),
-    );
-
-    watch(
-      () => parts.value,
-      () => calculateFlowParts(),
+      () => layout.value?.parts,
+      (newParts: BuilderPart[] | undefined) => {
+        assignLocalParts(keyBy(newParts ?? [], 'id'));
+      },
       { immediate: true },
     );
 
     return {
       layout,
-      saveLayout,
       parts,
-      flowParts,
-      flowPartsRevision,
-      calculateFlowParts,
+      flows,
+      orderedParts,
+      updateLayout,
+      updateParts,
+      reflow,
     };
   },
 };

@@ -17,10 +17,10 @@ export default defineComponent({
   name: 'SetpointDriverDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered, passthrough, placeholder } =
+    const { flows, width, height, bordered, passthrough, placeholder } =
       usePart.setup();
 
-    const color = computed<string>(() => liquidBorderColor(part.value));
+    const color = computed<string>(() => liquidBorderColor(flows.value));
 
     const {
       block,

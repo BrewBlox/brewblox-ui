@@ -9,7 +9,6 @@ import {
   PWM_KEY,
   SETPOINT_KEY,
   VALVE_CLOSED_KEY,
-  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -37,6 +36,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Kettle',
           x: 20,
           y: 1,
+          width: 4,
+          height: 6,
         },
         {
           id: nanoid(),
@@ -48,6 +49,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Kettle',
           x: 12,
           y: 1,
+          width: 4,
+          height: 6,
         },
         {
           id: nanoid(),
@@ -59,6 +62,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Kettle',
           x: 4,
           y: 1,
+          width: 4,
+          height: 6,
         },
         {
           id: nanoid(),
@@ -68,6 +73,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Coil',
           x: 5,
           y: 4,
+          width: 3,
+          height: 2,
         },
         {
           id: nanoid(),
@@ -78,12 +85,13 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
               id: names.bkPwm,
               type: null,
             }),
-            [WIDTH_KEY]: 4,
           },
           flipped: true,
           type: 'HeatingElement',
           x: 21,
           y: 6,
+          width: 4,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -94,12 +102,13 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
               id: names.hltPwm,
               type: null,
             }),
-            [WIDTH_KEY]: 4,
           },
           flipped: false,
           type: 'HeatingElement',
           x: 3,
           y: 6,
+          width: 4,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -109,6 +118,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'WhirlpoolInlet',
           x: 20,
           y: 2,
+          width: 1,
+          height: 4,
         },
         {
           id: nanoid(),
@@ -118,17 +129,19 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'WhirlpoolInlet',
           x: 4,
           y: 2,
+          width: 1,
+          height: 4,
         },
         {
           id: nanoid(),
           rotate: 0,
-          settings: {
-            [WIDTH_KEY]: 4,
-          },
+          settings: {},
           flipped: true,
           type: 'FilterBottom',
           x: 12,
           y: 6,
+          width: 4,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -145,6 +158,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'SetpointDisplay',
           x: 13,
           y: 3,
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -161,6 +176,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'SetpointDisplay',
           x: 21,
           y: 3,
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -177,6 +194,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'SetpointDisplay',
           x: 5,
           y: 3,
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -186,6 +205,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 19,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -195,6 +216,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 18,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -204,6 +227,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 18,
           y: 3,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -213,6 +238,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 18,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -222,6 +249,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 18,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -231,6 +260,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'BridgeTube',
           x: 18,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -240,6 +271,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 11,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -249,6 +282,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 10,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -258,6 +293,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 9,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -267,6 +304,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 11,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -276,6 +315,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 10,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -285,6 +326,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -294,6 +337,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'DipTube',
           x: 12,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -303,6 +348,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'DipTube',
           x: 20,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -312,6 +359,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'TeeTube',
           x: 17,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -323,6 +372,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 16,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -334,6 +385,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 19,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -343,6 +396,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 2,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -352,6 +407,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 2,
           y: 3,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -361,6 +418,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 2,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -370,6 +429,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 2,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -379,6 +440,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'DipTube',
           x: 7,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -388,6 +451,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 8,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -397,6 +462,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'TeeTube',
           x: 17,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -408,6 +475,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 18,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -417,6 +486,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 18,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -426,6 +497,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 17,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -435,6 +508,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 15,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -444,6 +519,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'TeeTube',
           x: 9,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -455,6 +532,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Pump',
           x: 17,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -464,6 +543,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 3,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -473,6 +554,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 4,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -482,6 +565,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 5,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -491,6 +576,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 2,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -500,6 +587,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 3,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -509,6 +598,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'TeeTube',
           x: 13,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -518,6 +609,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'TeeTube',
           x: 11,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -529,6 +622,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 13,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -540,6 +635,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 11,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -551,6 +648,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 9,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -560,6 +659,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -569,6 +670,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 12,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -580,6 +683,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 10,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -591,6 +696,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 12,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -600,6 +707,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 13,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -609,6 +718,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'BridgeTube',
           x: 11,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -618,6 +729,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 10,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -627,6 +740,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 2,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -636,6 +751,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 16,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -647,6 +764,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 14,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -656,6 +775,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'TeeTube',
           x: 18,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -667,6 +788,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 19,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -676,6 +799,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'SystemIO',
           x: 20,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -685,6 +810,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'TeeTube',
           x: 7,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -696,6 +823,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Pump',
           x: 7,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -707,6 +836,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 8,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -718,6 +849,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 6,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -727,6 +860,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 8,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -736,6 +871,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 7,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -745,6 +882,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 11,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -754,6 +893,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 11,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -763,6 +904,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 10,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -772,6 +915,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 10,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -781,6 +926,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'BridgeTube',
           x: 9,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -790,6 +937,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'BridgeTube',
           x: 9,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -799,6 +948,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 8,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -808,6 +959,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 8,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -817,6 +970,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 3,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -833,6 +988,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'PidDisplay',
           x: 11,
           y: 1,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -849,6 +1006,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'PidDisplay',
           x: 19,
           y: 1,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -865,6 +1024,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'PidDisplay',
           x: 3,
           y: 1,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -881,6 +1042,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'SetpointDriverDisplay',
           x: 8,
           y: 1,
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -890,6 +1053,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'TeeTube',
           x: 2,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -901,6 +1066,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 1,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -912,6 +1079,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 2,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -925,6 +1094,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           type: 'SystemIO',
           x: 0,
           y: 9,
+          width: 1,
+          height: 1,
         },
       ],
     },

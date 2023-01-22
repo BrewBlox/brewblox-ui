@@ -6,13 +6,14 @@ import {
   IO_PRESSURE_KEY,
   UP,
 } from '@/plugins/builder/const';
-import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
+import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 
 const blueprint: BuilderBlueprint = {
   type: 'ShiftedSystemIO',
   title: 'Global inlet: shifted',
-  size: () => [2, 2],
-  transitions: (part: PersistentPart) => {
+  component: 'ShiftedSystemIOPartComponent',
+  defaultSize: { width: 2, height: 2 },
+  transitions: (part: BuilderPart) => {
     const enabled = Boolean(part.settings[IO_ENABLED_KEY]);
     const pressure = enabled
       ? Number(part.settings[IO_PRESSURE_KEY] ?? DEFAULT_IO_PRESSURE)

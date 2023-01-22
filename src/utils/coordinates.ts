@@ -10,9 +10,11 @@ export type CoordinatesParam =
 
 export const rotatedSize = (
   rotation: number,
-  size: [width: number, height: number],
-): [width: number, height: number] =>
-  clampRotation(rotation) % 180 > 0 ? [size[1], size[0]] : [size[0], size[1]];
+  { width, height }: AreaSize,
+): AreaSize =>
+  clampRotation(rotation) % 180 > 0
+    ? { width: height, height: width }
+    : { width, height };
 
 export class Coordinates {
   public readonly x: number;
@@ -130,7 +132,7 @@ export class Coordinates {
   public rotateShapeSquare(
     rotate: number,
     shapeRotation: number,
-    shapeSize: [width: number, height: number],
+    shapeSize: AreaSize,
     shapeCoordinates: CoordinatesParam = [0, 0, 0],
   ): Coordinates {
     const rotation = clampRotation(rotate);
@@ -142,7 +144,7 @@ export class Coordinates {
 
     // Step 1 - start
     const shapeAnchor = new Coordinates(shapeCoordinates);
-    const [newWidth, newHeight] = rotatedSize(totalRotation, shapeSize);
+    const newSize = rotatedSize(totalRotation, shapeSize);
 
     // Step 2 - shift from square anchor (this) to center
     const rotatedSquareCenter = this.translate([0.5, 0.5, 0])
@@ -152,8 +154,8 @@ export class Coordinates {
     const rotatedSquareAnchor = rotatedSquareCenter
       // Step 4 - shift until new shape anchor has the same coordinates as the old anchor
       .translate([
-        rotatedSquareCenter.x < shapeAnchor.x ? newWidth : 0,
-        rotatedSquareCenter.y < shapeAnchor.y ? newHeight : 0,
+        rotatedSquareCenter.x < shapeAnchor.x ? newSize.width : 0,
+        rotatedSquareCenter.y < shapeAnchor.y ? newSize.height : 0,
         0,
       ])
       // Step 5 - shift back from square center to square anchor
@@ -165,7 +167,7 @@ export class Coordinates {
   public rotateShapeEdge(
     rotate: number,
     shapeRotation: number,
-    shapeSize: [width: number, height: number],
+    shapeSize: AreaSize,
     shapeCoordinates: CoordinatesParam = [0, 0, 0],
   ): Coordinates {
     const rotation = clampRotation(rotate);
@@ -203,7 +205,7 @@ export class Coordinates {
   public flipShapeEdge(
     flip: boolean, // allows chained syntax with optional flips
     shapeRotation: number,
-    shapeSize: [width: number, height: number],
+    shapeSize: AreaSize,
     shapeCoordinates: CoordinatesParam = [0, 0, 0],
   ): Coordinates {
     if (this.isException() || !flip) {
@@ -214,7 +216,7 @@ export class Coordinates {
     const shape = new Coordinates(shapeCoordinates);
 
     // Step 2 - shift in X past the midpoint
-    const [width] = rotatedSize(shapeRotation, shapeSize);
+    const { width } = rotatedSize(shapeRotation, shapeSize);
     const shiftX = (shape.x + width / 2 - this.x) * 2;
     const flippedEdge = this.translate([shiftX, 0, 0]);
 
@@ -224,7 +226,7 @@ export class Coordinates {
   public subSquares(
     squares: CoordinatesParam[],
     shapeRotation: number,
-    shapeSize: [width: number, height: number],
+    shapeSize: AreaSize,
   ): Coordinates[] {
     return squares.map((square) =>
       new Coordinates(square)

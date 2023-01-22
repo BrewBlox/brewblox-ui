@@ -1,4 +1,4 @@
-import { BuilderBlueprint } from '@/plugins/builder/types';
+import { BuilderBlueprint, BuilderType } from '@/plugins/builder/types';
 import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
 import BuilderLabel from './BuilderLabel';
@@ -42,7 +42,7 @@ import UrlDisplay from './UrlDisplay';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
 
-const blueprints: { [key: string]: BuilderBlueprint } = {
+const blueprints: Record<BuilderType, BuilderBlueprint> = {
   BeerBottle,
   BridgeTube,
   BuilderLabel,

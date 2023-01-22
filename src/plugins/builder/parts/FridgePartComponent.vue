@@ -19,6 +19,7 @@ export default defineComponent({
     const shelfHeight = computed<number>(() =>
       coord2grid(settings.value[SHELF_Y_KEY] || DEFAULT_SHELF_Y),
     );
+
     return {
       DEFAULT_SIZE,
       MAX_SIZE,

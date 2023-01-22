@@ -24,17 +24,23 @@ const highPaths = {
 export default defineComponent({
   name: 'BridgeTubePartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, flows, width, height } = usePart.setup();
 
-    const lowLiquid = computed<string[]>(() => liquidOnCoord(part.value, UP));
-
-    const highLiquid = computed<string[]>(() =>
-      liquidOnCoord(part.value, LEFT),
+    const lowLiquid = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, UP),
     );
 
-    const lowFlowSpeed = computed<number>(() => flowOnCoord(part.value, UP));
+    const highLiquid = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, LEFT),
+    );
 
-    const highFlowSpeed = computed<number>(() => flowOnCoord(part.value, LEFT));
+    const lowFlowSpeed = computed<number>(() =>
+      flowOnCoord(part.value, flows.value, UP),
+    );
+
+    const highFlowSpeed = computed<number>(() =>
+      flowOnCoord(part.value, flows.value, LEFT),
+    );
 
     return {
       width,

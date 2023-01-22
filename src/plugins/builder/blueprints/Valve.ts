@@ -6,19 +6,16 @@ import {
   VALVE_KEY,
   VALVE_TYPES,
 } from '@/plugins/builder/const';
-import {
-  BuilderBlueprint,
-  PersistentPart,
-  Transitions,
-} from '@/plugins/builder/types';
+import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 import { DigitalState } from 'brewblox-proto/ts';
 import { settingsAddress, settingsBlock } from '../utils';
 
 const blueprint: BuilderBlueprint = {
   type: 'Valve',
   title: 'Valve',
-  size: () => [1, 1],
-  transitions: (part: PersistentPart): Transitions => {
+  component: 'ValvePartComponent',
+  defaultSize: { width: 1, height: 1 },
+  transitions: (part: BuilderPart) => {
     const hasAddress = settingsAddress(part, VALVE_KEY).id !== null;
     const block = hasAddress
       ? settingsBlock<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES)
@@ -28,7 +25,7 @@ const blueprint: BuilderBlueprint = {
       : Boolean(part.settings[VALVE_CLOSED_KEY]);
 
     return closed
-      ? {}
+      ? null
       : {
           [LEFT]: [{ outCoords: RIGHT }],
           [RIGHT]: [{ outCoords: LEFT }],

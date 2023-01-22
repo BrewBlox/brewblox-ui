@@ -37,14 +37,14 @@ const paths = {
 export default defineComponent({
   name: 'CoilPartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, flows, width, height } = usePart.setup();
 
     const flowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, COIL_BOTTOM),
+      flowOnCoord(part.value, flows.value, COIL_BOTTOM),
     );
 
     const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, COIL_BOTTOM),
+      liquidOnCoord(part.value, flows.value, COIL_BOTTOM),
     );
 
     return {

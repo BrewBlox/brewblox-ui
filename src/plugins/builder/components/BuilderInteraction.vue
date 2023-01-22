@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent, inject } from 'vue';
-import { InteractableKey } from '../const';
+import { InteractableKey } from '../symbols';
 
 export default defineComponent({
   name: 'BuilderInteraction',

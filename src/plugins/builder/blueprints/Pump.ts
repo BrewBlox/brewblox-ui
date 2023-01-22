@@ -12,7 +12,7 @@ import {
   PWM_TYPES,
   RIGHT,
 } from '@/plugins/builder/const';
-import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
+import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { DigitalState } from 'brewblox-proto/ts';
@@ -21,7 +21,7 @@ export type OnInteractBehavior = 'toggle' | 'dialog';
 
 export const ON_INTERACT_KEY = 'onInteract';
 
-const calcPressure = (part: PersistentPart): number => {
+const calcPressure = (part: BuilderPart): number => {
   const block = settingsBlock<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
   if (block == null) {
     return part.settings[IO_ENABLED_KEY]
@@ -45,8 +45,9 @@ const calcPressure = (part: PersistentPart): number => {
 const blueprint: BuilderBlueprint = {
   type: 'Pump',
   title: 'Pump',
-  size: () => [1, 1],
-  transitions: (part: PersistentPart) => {
+  component: 'PumpPartComponent',
+  defaultSize: { width: 1, height: 1 },
+  transitions: (part: BuilderPart) => {
     const pressure = calcPressure(part);
     return {
       [LEFT]: [{ outCoords: RIGHT }],

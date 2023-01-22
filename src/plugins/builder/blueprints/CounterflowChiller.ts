@@ -8,7 +8,8 @@ export const CFC_BOTTOM_RIGHT = '3,1.5,0';
 const blueprint: BuilderBlueprint = {
   type: 'CounterflowChiller',
   title: 'Counterflow chiller',
-  size: () => [3, 2],
+  component: 'CounterflowChillerPartComponent',
+  defaultSize: { width: 3, height: 2 },
   transitions: () => ({
     [CFC_TOP_LEFT]: [{ outCoords: CFC_TOP_RIGHT }],
     [CFC_TOP_RIGHT]: [{ outCoords: CFC_TOP_LEFT }],

@@ -5,17 +5,13 @@ import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, provide, ref } from 'vue';
-import { PlaceholderKey } from '../const';
-import { BuilderBlueprint, FlowPart, PersistentPart } from '../types';
-import { asStatePart, coord2grid } from '../utils';
+import { PlaceholderKey } from '../symbols';
+import { BuilderBlueprint, BuilderPart } from '../types';
+import { coord2grid } from '../utils';
 
 interface PartDisplay {
-  part: FlowPart;
+  part: BuilderPart;
   blueprint: BuilderBlueprint;
-}
-
-function asFlowPart(part: PersistentPart): FlowPart {
-  return { ...asStatePart(part), flows: {} };
 }
 
 export default defineComponent({
@@ -23,7 +19,7 @@ export default defineComponent({
   props: {
     ...useDialog.props,
     partial: {
-      type: Object as PropType<Partial<PersistentPart>>,
+      type: Object as PropType<Partial<BuilderPart>>,
       default: () => ({}),
     },
   },
@@ -48,20 +44,23 @@ export default defineComponent({
         .sort(makeObjectSorter('title'))
         .map((blueprint) => ({
           blueprint,
-          part: asFlowPart({
+          part: {
             type: blueprint.type,
             id: nanoid(),
             x: 0,
             y: 0,
+            width: blueprint.defaultSize.width,
+            height: blueprint.defaultSize.height,
             rotate: 0,
             settings: {},
             flipped: false,
-          }),
+          },
         }));
     });
 
     function partViewBox(display: PartDisplay): string {
-      return display.part.size.map(coord2grid).join(' ');
+      const { width, height } = display.part;
+      return `${coord2grid(width)} ${coord2grid(height)}`;
     }
 
     function selectPart(display: PartDisplay): void {

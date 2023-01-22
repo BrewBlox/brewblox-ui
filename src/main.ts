@@ -35,6 +35,7 @@ import { computed, createApp, ref } from 'vue';
 import vuedraggable from 'vuedraggable';
 // Assumes your root component is App.vue
 // and placed in same folder as main.js
+import { setAutoFreeze } from 'immer';
 import App from './App.vue';
 
 const quasarOpts: Partial<QuasarPluginOptions> = {
@@ -56,6 +57,9 @@ const quasarOpts: Partial<QuasarPluginOptions> = {
     },
   },
 };
+
+// When frozen, objects can't be serialized properly
+setAutoFreeze(false);
 
 const app = createApp(App);
 

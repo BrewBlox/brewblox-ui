@@ -13,10 +13,10 @@ import { usePart, useSettingsBlock } from '../composables';
 export default defineComponent({
   name: 'SensorDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered, passthrough, placeholder } =
+    const { part, flows, width, height, bordered, passthrough, placeholder } =
       usePart.setup();
 
-    const color = computed<string>(() => liquidBorderColor(part.value));
+    const color = computed<string>(() => liquidBorderColor(flows.value));
 
     const {
       block,
@@ -27,7 +27,7 @@ export default defineComponent({
     } = useSettingsBlock.setup<SensorBlockT>(SENSOR_KEY, SENSOR_TYPES);
 
     const contentTransform = computed<string>(() =>
-      textTransformation(part.value, [1, 1]),
+      textTransformation(part.value, { width: 1, height: 1 }),
     );
 
     const tempValue = computed<number | null>(() => {

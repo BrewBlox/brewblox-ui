@@ -4,21 +4,17 @@ import { concatById, filterById, findById } from '@/utils/collections';
 import { defineStore } from 'pinia';
 import {
   COLOR_KEY,
+  deprecatedTypes,
   DEPRECATED_IO_LIQUIDS_KEY,
   DEPRECATED_IO_PRESSURE_KEY,
   DEPRECATED_PUMP_KEY,
+  DEPRECATED_SCALE_KEY,
+  HEIGHT_KEY,
   IO_ENABLED_KEY,
   PUMP_KEY,
+  WIDTH_KEY,
 } from '../const';
 import api from './api';
-
-const fallbackBlueprint = (): BuilderBlueprint => ({
-  type: '',
-  title: 'Unknown Part',
-  component: 'UnknownPartComponent',
-  size: () => [1, 1],
-  transitions: () => ({}),
-});
 
 interface BuilderStoreState {
   blueprints: BuilderBlueprint[];
@@ -43,14 +39,15 @@ export const useBuilderStore = defineStore('builderStore', {
       return findById(this.layouts, id);
     },
 
-    blueprintByType(type: string): BuilderBlueprint {
-      return (
-        this.blueprints.find((v) => v.type === type) ?? fallbackBlueprint()
-      );
+    blueprintByType(type: string): BuilderBlueprint | null {
+      return this.blueprints.find((v) => v.type === type) ?? null;
     },
 
     componentByType(type: string): string {
       const blueprint = this.blueprintByType(type);
+      if (!blueprint) {
+        return 'UnknownPartComponent';
+      }
       return blueprint.component ?? `${blueprint.type}PartComponent`;
     },
 
@@ -76,6 +73,38 @@ export const useBuilderStore = defineStore('builderStore', {
       for (const layout of [...this.layouts]) {
         let dirty = false;
         for (const part of layout.parts) {
+          // Replace deprecated types
+          if (part.type in deprecatedTypes) {
+            dirty = true;
+            part.type = deprecatedTypes[part.type];
+          }
+
+          // Part size was moved to top-level variables
+          if (!part.width || !part.height) {
+            dirty = true;
+            const defaultSize = this.blueprintByType(part.type)
+              ?.defaultSize ?? { width: 1, height: 1 };
+
+            const settingsWidth = part.settings[WIDTH_KEY];
+            const settingsHeight = part.settings[HEIGHT_KEY];
+            const scale = part.settings[DEPRECATED_SCALE_KEY];
+
+            if (settingsWidth || settingsHeight) {
+              part.width = settingsWidth || defaultSize.width;
+              part.height = settingsHeight || defaultSize.height;
+            } else if (scale) {
+              part.width = defaultSize.width * scale;
+              part.height = defaultSize.height * scale;
+            } else {
+              part.width = defaultSize.width;
+              part.height = defaultSize.height;
+            }
+
+            part.settings[WIDTH_KEY] = undefined;
+            part.settings[HEIGHT_KEY] = undefined;
+            part.settings[DEPRECATED_SCALE_KEY] = undefined;
+          }
+
           // Metrics configuration may have been independently upgraded
           if (part.metrics !== undefined) {
             const upgraded = upgradeMetricsConfig(part.metrics);

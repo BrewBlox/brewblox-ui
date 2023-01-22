@@ -15,7 +15,7 @@ import {
   FastPwmBlock,
 } from 'brewblox-proto/ts';
 import { computed, ComputedRef, inject } from 'vue';
-import { PartKey } from '../const';
+import { PartKey, PatchSettingsKey } from '../symbols';
 import { settingsAddress, showAbsentBlock } from '../utils';
 
 export interface UseSettingsBlockComponent<BlockT extends Block> {
@@ -48,6 +48,7 @@ export const useSettingsBlock: UseSettingsBlockComposable = {
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const part = inject(PartKey)!;
+    const patchSettings = inject(PatchSettingsKey, () => {});
 
     const address = computed<BlockAddress>(() =>
       settingsAddress(part.value, settingsKey),
@@ -117,13 +118,7 @@ export const useSettingsBlock: UseSettingsBlockComposable = {
           compatible: intf,
         },
       }).onOk((addr: BlockAddress) => {
-        part.value = {
-          ...part.value,
-          settings: {
-            ...part.value.settings,
-            [settingsKey]: addr,
-          },
-        };
+        patchSettings({ [settingsKey]: addr });
       });
     }
 

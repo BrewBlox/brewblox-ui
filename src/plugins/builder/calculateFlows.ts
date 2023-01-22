@@ -5,14 +5,13 @@ import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
 import set from 'lodash/set';
-import { FlowSegment, mergeOverlappingSplits } from './FlowSegment';
+import { FlowPart, FlowSegment, mergeOverlappingSplits } from './FlowSegment';
 import {
-  CalculatedFlows,
-  FlowPart,
+  BuilderPart,
   FlowRoute,
   LiquidFlow,
-  StatePart,
-  Transitions,
+  PartFlows,
+  PartTransitions,
 } from './types';
 
 const adjacentPart = (
@@ -26,57 +25,66 @@ const adjacentPart = (
       has(part, ['transitions', outCoords]),
   ) || null;
 
-const normalizeFlows = (part: FlowPart): FlowPart => {
-  if (!part.flows) {
-    return { ...part, flows: {} };
+const normalizeFlows = (
+  acc: Mapped<PartFlows>,
+  part: FlowPart,
+): Mapped<PartFlows> => {
+  if (part.flows) {
+    acc[part.id] = mapKeys(part.flows, (flow, inCoord) =>
+      new Coordinates(inCoord).translate([-part.x, -part.y, 0]).toString(),
+    );
   }
-
-  const newFlows = mapKeys(part.flows, (flow, inCoord) =>
-    new Coordinates(inCoord).translate([-part.x, -part.y, 0]).toString(),
-  );
-
-  return { ...part, flows: newFlows };
+  return acc;
 };
 
-const translations = (part: StatePart): Transitions => {
-  const result: Transitions = {};
-  Object.entries(part.transitions).forEach(
-    ([inCoordStr, transition]: [string, any]) => {
-      // inCoords are relative from part anchor === [0, 0, 0]
+const translatedTransitions = (
+  part: BuilderPart,
+  transitions: Maybe<PartTransitions>,
+): PartTransitions => {
+  if (!transitions) {
+    return {};
+  }
 
-      const updatedKey = new Coordinates(inCoordStr)
-        .flipShapeEdge(!!part.flipped, 0, part.size)
+  const result: PartTransitions = {};
+  for (const inCoordStr in transitions) {
+    const routes = transitions[inCoordStr];
+    // inCoords are relative from part anchor === [0, 0, 0]
+
+    const updatedInCoordStr = new Coordinates(inCoordStr)
+      .flipShapeEdge(!!part.flipped, 0, part)
+      .translate([part.x, part.y, 0])
+      .rotateShapeEdge(part.rotate, 0, part, [part.x, part.y, 0])
+      .toString();
+
+    const updatedRoutes = routes.map((route: FlowRoute) => ({
+      ...route,
+      outCoords: new Coordinates(route.outCoords)
+        .flipShapeEdge(!!part.flipped, 0, part)
         .translate([part.x, part.y, 0])
-        .rotateShapeEdge(part.rotate, 0, part.size, [part.x, part.y, 0])
-        .toString();
+        .rotateShapeEdge(part.rotate, 0, part, [part.x, part.y, 0])
+        .toString(),
+    }));
 
-      const updatedTransition = transition.map((route: FlowRoute) => ({
-        ...route,
-        outCoords: new Coordinates(route.outCoords)
-          .flipShapeEdge(!!part.flipped, 0, part.size)
-          .translate([part.x, part.y, 0])
-          .rotateShapeEdge(part.rotate, 0, part.size, [part.x, part.y, 0])
-          .toString(),
-      }));
-
-      result[updatedKey] = updatedTransition;
-    },
-  );
+    result[updatedInCoordStr] = updatedRoutes;
+  }
   return result;
 };
 
-export const asFlowParts = (parts: StatePart[]): FlowPart[] =>
+export const asFlowParts = (
+  parts: BuilderPart[],
+  allTransitions: Mapped<PartTransitions>,
+): FlowPart[] =>
   parts.map((part) => ({
     ...part,
-    transitions: translations(part),
+    transitions: translatedTransitions(part, allTransitions[part.id]),
     flows: {},
   }));
 
 const combineFlows = (
-  left: CalculatedFlows = {},
-  right: CalculatedFlows = {},
-): CalculatedFlows => {
-  const combined: CalculatedFlows = left;
+  left: PartFlows = {},
+  right: PartFlows = {},
+): PartFlows => {
+  const combined: PartFlows = left;
   for (const coord in right) {
     for (const liquid in right[coord]) {
       set(
@@ -89,8 +97,8 @@ const combineFlows = (
   return combined;
 };
 
-const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
-  const mergedFlows: CalculatedFlows = {};
+const mergeFlows = (flows: PartFlows): PartFlows => {
+  const mergedFlows: PartFlows = {};
   Object.entries(flows).forEach(([coord, coordFlows]: [string, LiquidFlow]) => {
     const splitPosNeg = (
       toSplit: LiquidFlow,
@@ -145,7 +153,7 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
 const additionalFlow = (
   part: FlowPart,
   allParts: FlowPart[],
-  flowToAdd: CalculatedFlows,
+  flowToAdd: PartFlows,
 ): FlowPart[] =>
   allParts.map((item) =>
     part.id === item.id
@@ -263,9 +271,9 @@ export const addFlowForPath = (
   path: FlowSegment,
   flows: LiquidFlow,
 ): FlowPart[] => {
-  const inFlow: CalculatedFlows = {};
-  const outFlow: CalculatedFlows = {};
-  const splitFlow: CalculatedFlows = {};
+  const inFlow: PartFlows = {};
+  const outFlow: PartFlows = {};
+  const splitFlow: PartFlows = {};
 
   // add flow for incoming transition
   inFlow[path.inRoute.outCoords] = mapValues(flows, (v) => -v);
@@ -346,14 +354,8 @@ export const calculateFlows = (parts: FlowPart[]): FlowPart[] =>
     .reduce(addFlowFromPart, parts)
     .map((part) => ({ ...part, flows: mergeFlows(part.flows) }));
 
-// can be used to check whether a part has equal in and out flow
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-const unbalancedFlow = (part: FlowPart): number =>
-  Object.values(part.flows).reduce(
-    (sum: number, v: LiquidFlow) =>
-      Object.values(v).reduce((sum2: number, w: number) => sum2 + w, sum),
-    0,
-  );
-
-export const calculateNormalizedFlows = (parts: StatePart[]): FlowPart[] =>
-  calculateFlows(asFlowParts(parts)).map(normalizeFlows);
+export const calculateNormalizedFlows = (
+  parts: BuilderPart[],
+  allTransitions: Mapped<PartTransitions>,
+): Mapped<PartFlows> =>
+  calculateFlows(asFlowParts(parts, allTransitions)).reduce(normalizeFlows, {});

@@ -1,6 +1,17 @@
 import { Notify } from 'quasar';
 import { DEFAULT_FRICTION } from './const';
-import { FlowPart, FlowRoute, PathFriction } from './types';
+import {
+  BuilderPart,
+  FlowRoute,
+  PartFlows,
+  PartTransitions,
+  PathFriction,
+} from './types';
+
+export interface FlowPart extends BuilderPart {
+  transitions: PartTransitions;
+  flows: PartFlows;
+}
 
 export class FlowSegment {
   public constructor(part: FlowPart, route: FlowRoute) {

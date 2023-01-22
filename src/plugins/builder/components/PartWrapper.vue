@@ -1,11 +1,17 @@
 <script lang="ts">
 import { useBuilderStore } from '@/plugins/builder/store';
-import { FlowPart } from '@/plugins/builder/types';
+import { BuilderPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 import { computed, defineComponent, PropType, provide } from 'vue';
-import { InteractableKey, PartKey, ReflowKey } from '../const';
 import parts from '../parts';
+import {
+  InteractableKey,
+  PartKey,
+  PatchPartKey,
+  PatchSettingsKey,
+  ReflowKey,
+} from '../symbols';
 
 export default defineComponent({
   name: 'PartWrapper',
@@ -14,24 +20,8 @@ export default defineComponent({
   },
   props: {
     part: {
-      type: Object as PropType<FlowPart>,
+      type: Object as PropType<BuilderPart>,
       required: true,
-    },
-    /**
-     * Rendered X position (in coordinates).
-     * This is not required to be equal to `part.x`.
-     */
-    coordX: {
-      type: Number,
-      default: 0,
-    },
-    /**
-     * Rendered Y position (in coordinates).
-     * This is not required to be equal to `part.y`.
-     */
-    coordY: {
-      type: Number,
-      default: 0,
     },
     /**
      * Mouse events for the wrapped part are enabled.
@@ -70,7 +60,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['update:part', 'preselect', 'reflow'],
+  emits: ['patch:part', 'patch:settings', 'preselect', 'reflow'],
   setup(props, { emit }) {
     const builderStore = useBuilderStore();
     const component = builderStore.componentByType(props.part.type);
@@ -78,46 +68,43 @@ export default defineComponent({
     provide(ReflowKey, () => emit('reflow'));
     provide(
       PartKey,
-      computed<FlowPart>({
-        get: () => props.part,
-        set: (v) => emit('update:part', v),
-      }),
+      computed<BuilderPart>(() => props.part),
     );
     provide(
       InteractableKey,
       computed(() => props.interactable),
     );
 
+    provide(PatchPartKey, (patch) => emit('patch:part', patch));
+    provide(PatchSettingsKey, (patch) => emit('patch:settings', patch));
+
     const dimensions = computed(() => ({
-      width: coord2grid(props.part.size[0]),
-      height: coord2grid(props.part.size[1]),
+      width: coord2grid(props.part.width),
+      height: coord2grid(props.part.height),
     }));
 
     const positionTransform = computed<string>(() =>
-      coord2translate(props.coordX, props.coordY),
+      coord2translate(props.part.x, props.part.y),
     );
 
     const rotateTransform = computed<string>(() => {
-      const [partWidth, partHeight] = props.part.size;
-      const [renderWidth, renderHeight] = rotatedSize(
-        props.part.rotate,
-        props.part.size,
-      );
+      const { width, height } = props.part;
+      const renderSize = rotatedSize(props.part.rotate, props.part);
 
-      const farEdge = new Coordinates([partWidth, partHeight, 0]).rotate(
+      const farEdge = new Coordinates([width, height, 0]).rotate(
         props.part.rotate,
         [0, 0, 0],
       );
 
-      const trX = farEdge.x < 0 ? coord2grid(renderWidth) : 0;
-      const trY = farEdge.y < 0 ? coord2grid(renderHeight) : 0;
+      const trX = farEdge.x < 0 ? coord2grid(renderSize.width) : 0;
+      const trY = farEdge.y < 0 ? coord2grid(renderSize.height) : 0;
 
       return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
     });
 
     const flipTransform = computed<string>(() => {
       if (props.part.flipped) {
-        return `translate(${coord2grid(props.part.size[0])}, 0) scale(-1, 1)`;
+        return `translate(${coord2grid(props.part.width)}, 0) scale(-1, 1)`;
       }
       return '';
     });

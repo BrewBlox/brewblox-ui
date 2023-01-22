@@ -22,11 +22,11 @@ interface MetricDisplay {
 export default defineComponent({
   name: 'MetricsDisplayPartComponent',
   setup() {
-    const { part, metrics, width, height, bordered, passthrough } =
+    const { flows, metrics, width, height, bordered, passthrough } =
       usePart.setup();
     const { source } = useMetrics.setupConsumer();
 
-    const color = computed<string>(() => liquidBorderColor(part.value));
+    const color = computed<string>(() => liquidBorderColor(flows.value));
 
     function fieldFreshDuration(field: string): number {
       return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;

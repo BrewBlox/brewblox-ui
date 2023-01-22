@@ -14,16 +14,16 @@ import {
 } from '@/plugins/builder/const';
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import {
+  BuilderPart,
   FlowPart,
   FlowRoute,
-  PersistentPart,
   StatePart,
 } from '@/plugins/builder/types';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { describe, expect, it } from 'vitest';
 
-function asStatePart(part: PersistentPart): StatePart {
+function asStatePart(part: BuilderPart): StatePart {
   const blueprint = blueprints[part.type];
   return {
     ...part,
@@ -93,7 +93,7 @@ const findPaths = (parts: FlowPart[], start: FlowPart): FlowSegment[] => {
 };
 
 describe('Data describing an input tube', () => {
-  const part: PersistentPart = {
+  const part: BuilderPart = {
     id: '',
     x: 1,
     y: 2,
@@ -122,7 +122,7 @@ describe('Data describing an input tube', () => {
 });
 
 describe('asFlowParts', () => {
-  const path: PersistentPart[] = [
+  const path: BuilderPart[] = [
     {
       id: 'one',
       x: 1,
@@ -159,7 +159,7 @@ describe('asFlowParts', () => {
 });
 
 describe('A single path without splits', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 1,
@@ -268,7 +268,7 @@ describe('A single path without splits', () => {
 });
 
 describe('A path with a split, but no joins', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 1,
@@ -417,7 +417,7 @@ describe('A path with a split, but no joins', () => {
 });
 
 describe('A path that forks and rejoins', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 1,
@@ -621,7 +621,7 @@ describe('A path that forks and rejoins', () => {
 });
 
 describe('A single path with a pump', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 3,
@@ -754,7 +754,7 @@ describe('A single path with a pump', () => {
 });
 
 describe('Two sources joining', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 1,
@@ -990,7 +990,7 @@ describe('Two sources joining', () => {
 
 describe('A path with a bridge', () => {
   // 7 transitions long, passes the bridge twice
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 11,
@@ -1170,7 +1170,7 @@ describe('A path with a bridge', () => {
 });
 
 describe('A kettle with 2 outflows', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       rotate: 0,
@@ -1287,7 +1287,7 @@ describe('A kettle with 2 outflows', () => {
 });
 
 describe('A kettle with flow back to itself', () => {
-  let parts: PersistentPart[] = [
+  let parts: BuilderPart[] = [
     {
       id: '1',
       rotate: 0,
@@ -1450,7 +1450,7 @@ describe('A kettle with flow back to itself', () => {
 });
 
 describe('A forking and joining path with a pump in each fork', () => {
-  const partsBase: PersistentPart[] = [
+  const partsBase: BuilderPart[] = [
     {
       id: '1a',
       rotate: 180,

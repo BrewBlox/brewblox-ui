@@ -7,22 +7,30 @@ import { flowOnCoord, liquidOnCoord } from '../utils';
 export default defineComponent({
   name: 'TeeTubePartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, flows, width, height } = usePart.setup();
 
-    const topSpeed = computed<number>(() => flowOnCoord(part.value, UP));
+    const topSpeed = computed<number>(() =>
+      flowOnCoord(part.value, flows.value, UP),
+    );
 
-    const leftSpeed = computed<number>(() => flowOnCoord(part.value, LEFT));
+    const leftSpeed = computed<number>(() =>
+      flowOnCoord(part.value, flows.value, LEFT),
+    );
 
-    const rightSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
+    const rightSpeed = computed<number>(() =>
+      flowOnCoord(part.value, flows.value, RIGHT),
+    );
 
-    const topLiquids = computed<string[]>(() => liquidOnCoord(part.value, UP));
+    const topLiquids = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, UP),
+    );
 
     const leftLiquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, LEFT),
+      liquidOnCoord(part.value, flows.value, LEFT),
     );
 
     const rightLiquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, RIGHT),
+      liquidOnCoord(part.value, flows.value, RIGHT),
     );
 
     return {
