@@ -107,7 +107,10 @@ export default defineComponent({
         }"
       />
     </foreignObject>
-    <BuilderInteraction v-bind="{ width, height }">
+    <BuilderInteraction
+      v-bind="{ width, height }"
+      @interact="maximized"
+    >
       <q-menu
         touch-position
         context-menu
