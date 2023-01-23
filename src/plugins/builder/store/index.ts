@@ -1,18 +1,22 @@
 import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
-import { upgradeMetricsConfig } from '@/plugins/history/utils';
+import {
+  upgradeGraphConfig,
+  upgradeMetricsConfig,
+} from '@/plugins/history/utils';
 import { concatById, filterById, findById } from '@/utils/collections';
 import { defineStore } from 'pinia';
 import {
   COLOR_KEY,
   deprecatedTypes,
+  DEPRECATED_HEIGHT_KEY,
   DEPRECATED_IO_LIQUIDS_KEY,
   DEPRECATED_IO_PRESSURE_KEY,
   DEPRECATED_PUMP_KEY,
   DEPRECATED_SCALE_KEY,
-  HEIGHT_KEY,
+  DEPRECATED_WIDTH_KEY,
+  GRAPH_CONFIG_KEY,
   IO_ENABLED_KEY,
   PUMP_KEY,
-  WIDTH_KEY,
 } from '../const';
 import api from './api';
 
@@ -85,8 +89,8 @@ export const useBuilderStore = defineStore('builderStore', {
             const defaultSize = this.blueprintByType(part.type)
               ?.defaultSize ?? { width: 1, height: 1 };
 
-            const settingsWidth = part.settings[WIDTH_KEY];
-            const settingsHeight = part.settings[HEIGHT_KEY];
+            const settingsWidth = part.settings[DEPRECATED_WIDTH_KEY];
+            const settingsHeight = part.settings[DEPRECATED_HEIGHT_KEY];
             const scale = part.settings[DEPRECATED_SCALE_KEY];
 
             if (settingsWidth || settingsHeight) {
@@ -100,8 +104,8 @@ export const useBuilderStore = defineStore('builderStore', {
               part.height = defaultSize.height;
             }
 
-            part.settings[WIDTH_KEY] = undefined;
-            part.settings[HEIGHT_KEY] = undefined;
+            part.settings[DEPRECATED_WIDTH_KEY] = undefined;
+            part.settings[DEPRECATED_HEIGHT_KEY] = undefined;
             part.settings[DEPRECATED_SCALE_KEY] = undefined;
           }
 
@@ -111,6 +115,17 @@ export const useBuilderStore = defineStore('builderStore', {
             if (upgraded) {
               dirty = true;
               part.metrics = upgraded;
+            }
+          }
+
+          // Graph configuration may have been independently upgraded
+          if (part.type === 'GraphDisplay') {
+            const upgraded = upgradeGraphConfig(
+              part.settings[GRAPH_CONFIG_KEY],
+            );
+            if (upgraded) {
+              dirty = true;
+              part.settings[GRAPH_CONFIG_KEY] = upgraded;
             }
           }
 

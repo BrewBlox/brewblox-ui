@@ -231,6 +231,9 @@ export default defineComponent({
     rx: 4
     border-radius: 4px
 
+  :not(.interactable) .native-interaction
+    pointer-events: none !important
+
   .fill
     fill: white
 

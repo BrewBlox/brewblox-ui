@@ -14,6 +14,7 @@ import {
   CENTER,
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
+  PASSTHROUGH_KEY,
   SQUARE_SIZE,
 } from './const';
 import { useBuilderStore } from './store';
@@ -212,11 +213,12 @@ export function containerTransitions(
   return result;
 }
 
-export function passthroughTransitions(
-  { width, height }: AreaSize,
-  enabled: boolean,
-): PartTransitions {
-  if (!enabled) {
+export function passthroughTransitions({
+  width,
+  height,
+  settings,
+}: BuilderPart): PartTransitions {
+  if (!settings[PASSTHROUGH_KEY]) {
     return {};
   }
   const coords: string[] = [

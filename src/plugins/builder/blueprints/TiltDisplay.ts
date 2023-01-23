@@ -1,6 +1,5 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { passthroughTransitions } from '@/plugins/builder/utils';
-import { FLOW_TOGGLE_KEY } from '../const';
 
 export const DEFAULT_SIZE_X = 2;
 export const DEFAULT_SIZE_Y = 1;
@@ -15,8 +14,7 @@ const blueprint: BuilderBlueprint = {
   title: 'Display: Tilt',
   component: 'TiltDisplayPartComponent',
   defaultSize: DEFAULT_SIZE,
-  transitions: (part) =>
-    passthroughTransitions(part, part.settings[FLOW_TOGGLE_KEY]),
+  transitions: (part) => passthroughTransitions(part),
 };
 
 export default blueprint;

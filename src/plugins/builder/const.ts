@@ -49,15 +49,16 @@ export const IO_ENABLED_KEY = 'enabled';
 export const IO_PRESSURE_KEY = 'onPressure';
 export const COLOR_KEY = 'color';
 export const BORDER_KEY = 'bordered';
-export const FLOW_TOGGLE_KEY = 'flowEnabled';
+export const PASSTHROUGH_KEY = 'flowEnabled';
 export const URL_KEY = 'url';
 export const LABEL_KEY = 'text';
-export const WIDTH_KEY = 'sizeX';
-export const HEIGHT_KEY = 'sizeY';
 export const VALVE_CLOSED_KEY = 'closed';
+export const GRAPH_CONFIG_KEY = 'graphConfig';
 
 // Deprecated setting keys
 // Typically used as fallback
+export const DEPRECATED_WIDTH_KEY = 'sizeX';
+export const DEPRECATED_HEIGHT_KEY = 'sizeY';
 export const DEPRECATED_IO_LIQUIDS_KEY = 'liquids';
 export const DEPRECATED_IO_PRESSURE_KEY = 'pressure';
 export const DEPRECATED_SCALE_KEY = 'scale';

@@ -6,7 +6,7 @@ import { usePart } from '../../composables';
 export default defineComponent({
   name: 'MetricsMenuContent',
   setup() {
-    const { part } = usePart.setup();
+    const { part, patchPart } = usePart.setup();
 
     function edit(): void {
       createDialog({
@@ -15,7 +15,7 @@ export default defineComponent({
           modelValue: part.value.metrics ?? {},
         },
       }).onOk((metrics) => {
-        part.value = { ...part.value, metrics };
+        patchPart({ metrics });
       });
     }
 

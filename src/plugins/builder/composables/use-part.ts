@@ -7,9 +7,10 @@ import {
   shallowRef,
   WritableComputedRef,
 } from 'vue';
-import { BORDER_KEY, COLOR_KEY, FLOW_TOGGLE_KEY } from '../const';
+import { BORDER_KEY, COLOR_KEY, PASSTHROUGH_KEY } from '../const';
 import {
   FlowsKey,
+  InteractableKey,
   PartKey,
   PatchPartKey,
   PatchSettingsKey,
@@ -63,6 +64,12 @@ export interface UsePartComponent {
    * Link errors should be suppressed, and dummy values shown.
    */
   placeholder: boolean;
+
+  /**
+   * Part can allow custom click and hover handlers.
+   * This is also handled by the BuilderInteraction component.
+   */
+  interactable: ComputedRef<boolean>;
 
   /**
    * Optional: the liquid color property.
@@ -127,6 +134,10 @@ export const usePart: UsePartComposable = {
     const reflow = inject(ReflowKey)!;
     const allFlows = inject(FlowsKey, shallowRef({}));
     const placeholder = inject(PlaceholderKey, false);
+    const interactable = inject(
+      InteractableKey,
+      computed(() => false),
+    );
 
     const settings = computed<Mapped<any>>(() => part.value.settings);
 
@@ -155,8 +166,8 @@ export const usePart: UsePartComposable = {
     });
 
     const passthrough = computed<boolean>({
-      get: () => Boolean(settings.value[FLOW_TOGGLE_KEY]),
-      set: (v) => patchSettings({ [FLOW_TOGGLE_KEY]: Boolean(v) }),
+      get: () => Boolean(settings.value[PASSTHROUGH_KEY]),
+      set: (v) => patchSettings({ [PASSTHROUGH_KEY]: Boolean(v) }),
     });
 
     return {
@@ -171,6 +182,7 @@ export const usePart: UsePartComposable = {
       bordered,
       passthrough,
       placeholder,
+      interactable,
       patchPart,
       patchSettings,
       reflow,

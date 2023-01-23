@@ -1,4 +1,3 @@
-import { FLOW_TOGGLE_KEY } from '@/plugins/builder/const';
 import { BuilderBlueprint } from '@/plugins/builder/types';
 import { passthroughTransitions } from '@/plugins/builder/utils';
 
@@ -11,8 +10,7 @@ const blueprint: BuilderBlueprint = {
   title: 'Display: Setpoint Profile',
   component: 'ProfileDisplayPartComponent',
   defaultSize: DEFAULT_SIZE,
-  transitions: (part) =>
-    passthroughTransitions(part, part.settings[FLOW_TOGGLE_KEY]),
+  transitions: (part) => passthroughTransitions(part),
 };
 
 export default blueprint;

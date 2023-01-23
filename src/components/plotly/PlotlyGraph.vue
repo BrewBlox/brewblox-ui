@@ -2,6 +2,7 @@
 import capitalize from 'lodash/capitalize';
 import get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
+import merge from 'lodash/merge';
 import Plotly, {
   Config,
   Frame,
@@ -75,6 +76,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    interactable: {
+      type: Boolean,
+      default: true,
+    },
     autoResize: {
       type: Boolean,
       default: false,
@@ -134,14 +139,19 @@ export default defineComponent({
       };
     }
 
-    function resizedLayout(): Partial<Layout> {
-      return props.autoFit
-        ? Object.assign({}, props.layout, getSize())
-        : props.layout;
+    function adjustedLayout(): Partial<Layout> {
+      const layout = merge({}, props.layout);
+      if (props.autoFit) {
+        merge(layout, getSize());
+      }
+      if (!props.interactable) {
+        merge(layout, { dragmode: false, hovermode: false });
+      }
+      return layout;
     }
 
     async function relayoutPlot(): Promise<void> {
-      await Plotly.relayout(plotlyElement.value!, resizedLayout());
+      await Plotly.relayout(plotlyElement.value!, adjustedLayout());
     }
 
     async function resizePlot(): Promise<void> {
@@ -152,7 +162,7 @@ export default defineComponent({
       await Plotly.react(
         plotlyElement.value!,
         props.data,
-        resizedLayout(),
+        adjustedLayout(),
         extendedConfig.value,
       );
     }
@@ -213,7 +223,7 @@ export default defineComponent({
         await Plotly.newPlot(
           plotlyElement.value,
           props.data,
-          resizedLayout(),
+          adjustedLayout(),
           extendedConfig.value,
         );
         attachListeners();
