@@ -91,7 +91,7 @@ declare module '@vue/runtime-core' {
     PartWrapper: typeof import('src/plugins/builder/components/PartWrapper.vue').default;
     OverlapIndicators: typeof import('src/plugins/builder/components/OverlapIndicators.vue').default;
     LiquidStroke: typeof import('src/plugins/builder/components/LiquidStroke.vue').default;
-    LayoutActions: typeof import('src/plugins/builder/components/LayoutActions.vue').default;
+    LayoutActionsMenu: typeof import('src/plugins/builder/components/LayoutActionsMenu.vue').default;
     EditorBackground: typeof import('src/plugins/builder/components/EditorBackground.vue').default;
     BuilderToolsMenu: typeof import('src/plugins/builder/components/BuilderToolsMenu.vue').default;
     BuilderLabelValues: typeof import('src/plugins/builder/components/BuilderLabelValues.vue').default;

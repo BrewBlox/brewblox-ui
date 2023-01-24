@@ -5,7 +5,6 @@ import { rotatedSize } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
 import { uniqueFilter } from '@/utils/functional';
-import { loadFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { clampRotation } from '@/utils/quantity';
@@ -45,6 +44,7 @@ import {
   grid2coord,
   startAddLayout,
   startChangeLayoutTitle,
+  startImportLayout,
 } from './utils';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>;
@@ -174,11 +174,8 @@ export default defineComponent({
     }
 
     async function importLayout(): Promise<void> {
-      loadFile<BuilderLayout>(async (layout) => {
-        const id = nanoid();
-        await builderStore.createLayout({ ...layout, id });
-        selectLayout(id);
-      });
+      await startImportLayout((id) => selectLayout(id));
+      setFocus();
     }
 
     function pushHistory(): void {
@@ -1012,7 +1009,7 @@ export default defineComponent({
         label="Builder actions"
       >
         <template #menus>
-          <LayoutActions :layout="layout" />
+          <LayoutActionsMenu :layout="layout" />
         </template>
         <template #actions>
           <ActionItem
@@ -1101,8 +1098,6 @@ export default defineComponent({
           >
             <PartWrapper
               :part="part"
-              :coord-x="part.x"
-              :coord-y="part.y"
               :selected="selectedIds.includes(part.id)"
               :selectable="!['interact', 'pan', null].includes(activeToolId)"
               :interactable="activeToolId === 'interact'"

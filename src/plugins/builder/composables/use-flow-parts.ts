@@ -10,6 +10,7 @@ import {
   Ref,
   shallowRef,
   ShallowRef,
+  toRaw,
   watch,
 } from 'vue';
 import { calculateNormalizedFlows } from '../calculateFlows';
@@ -71,7 +72,7 @@ export const useFlowParts: UseFlowPartsComposable = {
 
     function updateLayout(cb: UpdateLayoutFunc): void {
       if (layout.value) {
-        const updated = produce(layout.value, cb);
+        const updated = produce(toRaw(layout.value), cb);
         assignLocalParts(keyBy(updated.parts, 'id'));
         builderStore.saveLayout(updated);
       }

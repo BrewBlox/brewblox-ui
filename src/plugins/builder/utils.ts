@@ -3,6 +3,7 @@ import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
+import { loadFile } from '@/utils/import-export';
 import { deepCopy } from '@/utils/objects';
 import { Block } from 'brewblox-proto/ts';
 import isObject from 'lodash/isObject';
@@ -10,11 +11,23 @@ import range from 'lodash/range';
 import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
 import { Router } from 'vue-router';
+import { upgradeGraphConfig, upgradeMetricsConfig } from '../history/utils';
 import {
   CENTER,
+  COLOR_KEY,
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
+  deprecatedTypes,
+  DEPRECATED_HEIGHT_KEY,
+  DEPRECATED_IO_LIQUIDS_KEY,
+  DEPRECATED_IO_PRESSURE_KEY,
+  DEPRECATED_PUMP_KEY,
+  DEPRECATED_SCALE_KEY,
+  DEPRECATED_WIDTH_KEY,
+  GRAPH_CONFIG_KEY,
+  IO_ENABLED_KEY,
   PASSTHROUGH_KEY,
+  PUMP_KEY,
   SQUARE_SIZE,
 } from './const';
 import { useBuilderStore } from './store';
@@ -325,6 +338,24 @@ export function flowOnCoord(
   return flow ? reduce(flow, (sum, v) => sum + v, 0) : 0;
 }
 
+export async function startImportLayout(
+  onLoad: (id: string) => unknown,
+): Promise<void> {
+  loadFile<BuilderLayout>(async (layout) => {
+    const base: BuilderLayout = {
+      id: '',
+      height: DEFAULT_LAYOUT_HEIGHT,
+      width: DEFAULT_LAYOUT_WIDTH,
+      parts: [],
+      title: 'Layout',
+    };
+    layout = { ...base, ...layout, id: nanoid() };
+    layout = upgradeLayout(layout) ?? layout;
+    await useBuilderStore().createLayout(layout);
+    onLoad(layout.id);
+  });
+}
+
 export async function startAddLayout(
   source?: Maybe<BuilderLayout>,
 ): Promise<string | null> {
@@ -396,4 +427,99 @@ export function startRemoveLayout(
       router.replace('/builder');
     }
   });
+}
+
+export function upgradeLayout(layout: any): BuilderLayout | null {
+  const builderStore = useBuilderStore();
+
+  let dirty = false;
+  for (const part of layout.parts) {
+    // Replace deprecated types
+    if (part.type in deprecatedTypes) {
+      dirty = true;
+      part.type = deprecatedTypes[part.type];
+    }
+
+    // Part size was moved to top-level variables
+    if (!part.width || !part.height) {
+      dirty = true;
+      const defaultSize = builderStore.blueprintByType(part.type)
+        ?.defaultSize ?? { width: 1, height: 1 };
+
+      const settingsWidth = part.settings[DEPRECATED_WIDTH_KEY];
+      const settingsHeight = part.settings[DEPRECATED_HEIGHT_KEY];
+      const scale = part.settings[DEPRECATED_SCALE_KEY];
+
+      if (settingsWidth || settingsHeight) {
+        part.width = settingsWidth || defaultSize.width;
+        part.height = settingsHeight || defaultSize.height;
+      } else if (scale) {
+        part.width = defaultSize.width * scale;
+        part.height = defaultSize.height * scale;
+      } else {
+        part.width = defaultSize.width;
+        part.height = defaultSize.height;
+      }
+
+      part.settings[DEPRECATED_WIDTH_KEY] = undefined;
+      part.settings[DEPRECATED_HEIGHT_KEY] = undefined;
+      part.settings[DEPRECATED_SCALE_KEY] = undefined;
+    }
+
+    // Metrics configuration may have been independently upgraded
+    if (part.metrics !== undefined) {
+      const upgraded = upgradeMetricsConfig(part.metrics);
+      if (upgraded) {
+        dirty = true;
+        part.metrics = upgraded;
+      }
+    }
+
+    // Graph configuration may have been independently upgraded
+    if (part.type === 'GraphDisplay') {
+      const upgraded = upgradeGraphConfig(part.settings[GRAPH_CONFIG_KEY]);
+      if (upgraded) {
+        dirty = true;
+        part.settings[GRAPH_CONFIG_KEY] = upgraded;
+      }
+    }
+
+    if (part.type === 'SystemIO' || part.type === 'ShiftedSystemIO') {
+      // Migrate from settings.liquids to settings.color
+      // This removes an unnecessary array, and standardizes all color settings
+      const liquid = part.settings[DEPRECATED_IO_LIQUIDS_KEY]?.[0];
+      if (liquid !== undefined) {
+        dirty = true;
+        const color = part.settings[COLOR_KEY];
+        part.settings[COLOR_KEY] = color ?? liquid;
+        part.settings[DEPRECATED_IO_LIQUIDS_KEY] = undefined;
+      }
+
+      // IO pressure was split in "enabled" and "pressure when enabled"
+      // This provides a toggle between off and custom pressure values
+      const pressure = part.settings[DEPRECATED_IO_PRESSURE_KEY];
+      if (pressure !== undefined) {
+        dirty = true;
+        const enabled = part.settings[IO_ENABLED_KEY];
+        part.settings[IO_ENABLED_KEY] = Boolean(enabled ?? pressure);
+        part.settings[DEPRECATED_IO_PRESSURE_KEY] = undefined;
+      }
+    }
+
+    // Pumps were standardized to use either PWM or Digital Actuator blocks
+    if (part.type === 'Pump') {
+      const addr = part.settings[DEPRECATED_PUMP_KEY];
+      if (addr !== undefined) {
+        dirty = true;
+        part.settings[PUMP_KEY] = addr;
+        part.settings[DEPRECATED_PUMP_KEY] = undefined;
+      }
+    }
+  }
+
+  if (dirty) {
+    return layout;
+  }
+
+  return null;
 }

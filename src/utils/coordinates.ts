@@ -81,10 +81,6 @@ export class Coordinates {
     if ([this.x, this.y, this.z].some((v) => !isFinite(v))) {
       throw new Error(`${param} could not be parsed as a coordinate`);
     }
-
-    this.x = round(this.x, 3);
-    this.y = round(this.y, 3);
-    this.z = round(this.z, 3);
   }
 
   private isException(): boolean {
@@ -112,7 +108,7 @@ export class Coordinates {
     const x = shiftX * c - shiftY * s + pivotCoord.x;
     const y = shiftX * s + shiftY * c + pivotCoord.y;
 
-    return new Coordinates([+x.toFixed(1), +y.toFixed(1), this.z]);
+    return new Coordinates([round(x, 1), round(y, 1), this.z]);
   }
 
   public translate(offset: CoordinatesParam): Coordinates {
@@ -235,16 +231,12 @@ export class Coordinates {
     );
   }
 
-  public toString(): string {
-    return `${this.x},${this.y},${this.z}`;
-  }
-
   public values(): [number, number, number] {
-    return [this.x, this.y, this.z];
+    return [round(this.x, 2), round(this.y, 2), round(this.z, 2)];
   }
 
-  public raw(): { x: number; y: number; z: number } {
-    return { x: this.x, y: this.y, z: this.z };
+  public toString(): string {
+    return `${round(this.x, 2)},${round(this.y, 2)},${round(this.z, 2)}`;
   }
 
   public equals(other: Coordinates): boolean {

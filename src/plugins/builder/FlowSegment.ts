@@ -130,6 +130,7 @@ export class FlowSegment {
       return this.next.trimAtRoute(route);
     }
     for (const [i, v] of this.splits.entries()) {
+      // Check if route is same object
       if (v.inRoute === route) {
         const end = this.splits.splice(i, 1)[0];
         return end;

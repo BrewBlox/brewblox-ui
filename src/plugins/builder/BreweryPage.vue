@@ -3,11 +3,18 @@ import { useGlobals } from '@/composables';
 import { startupDone } from '@/user-settings';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { usePreselect } from './composables/use-preselect';
 import { BuilderPart } from './types';
-import { coord2grid, coord2translate, startChangeLayoutTitle } from './utils';
+import {
+  coord2grid,
+  coord2translate,
+  startAddLayout,
+  startChangeLayoutTitle,
+  startImportLayout,
+} from './utils';
 
 export default defineComponent({
   name: 'BreweryPage',
@@ -19,6 +26,7 @@ export default defineComponent({
   },
   setup(props) {
     const { dense } = useGlobals.setup();
+    const router = useRouter();
     const { localStorage } = useQuasar();
     const { preselectable, preselectedId, preselect } = usePreselect.setup();
 
@@ -40,6 +48,10 @@ export default defineComponent({
       () => layout.value?.title ?? 'Builder layout',
     );
 
+    function selectLayout(id: string): void {
+      router.push(`/brewery/${id}`).catch(() => {});
+    }
+
     function patchPart(id: string, patch: Partial<BuilderPart>): void {
       updateParts((draft) => {
         const part = draft[id];
@@ -59,6 +71,17 @@ export default defineComponent({
 
     function editTitle(): void {
       startChangeLayoutTitle(layout.value);
+    }
+
+    async function createLayout(): Promise<void> {
+      const id = await startAddLayout();
+      if (id) {
+        selectLayout(id);
+      }
+    }
+
+    async function importLayout(): Promise<void> {
+      startImportLayout((id) => selectLayout(id));
     }
 
     watch(
@@ -85,6 +108,8 @@ export default defineComponent({
       layout,
       layoutTitle,
       editTitle,
+      createLayout,
+      importLayout,
       svgRef,
       svgContentRef,
       resetZoom,
@@ -136,9 +161,19 @@ export default defineComponent({
           label="Layout actions"
         >
           <template #menus>
-            <LayoutActions :layout="layout" />
+            <LayoutActionsMenu :layout="layout" />
           </template>
           <template #actions>
+            <ActionItem
+              label="New layout"
+              icon="add"
+              @click="createLayout"
+            />
+            <ActionItem
+              icon="mdi-file-import"
+              label="Import Layout"
+              @click="importLayout"
+            />
             <ActionItem
               label="Reset zoom"
               icon="mdi-stretch-to-page-outline"

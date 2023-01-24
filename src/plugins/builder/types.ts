@@ -103,7 +103,6 @@ export interface BuilderLayout extends StoreObject {
   width: number;
   height: number;
   parts: BuilderPart[];
-  revision?: string;
   parentFolder?: string | null;
 }
 

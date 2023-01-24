@@ -1,11 +1,8 @@
 <script lang="ts">
-import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { loadFile } from '@/utils/import-export';
-import { nanoid } from 'nanoid';
 import { defineComponent, PropType } from 'vue';
 import { useRouter } from 'vue-router';
-import { startAddLayout } from '../utils';
+import { startAddLayout, startImportLayout } from '../utils';
 
 export default defineComponent({
   name: 'BuilderActions',
@@ -16,7 +13,6 @@ export default defineComponent({
     },
   },
   setup() {
-    const builderStore = useBuilderStore();
     const router = useRouter();
 
     function selectLayout(id: string): void {
@@ -31,11 +27,7 @@ export default defineComponent({
     }
 
     async function importLayout(): Promise<void> {
-      loadFile<BuilderLayout>(async (layout) => {
-        const id = nanoid();
-        await builderStore.createLayout({ ...layout, id });
-        selectLayout(id);
-      });
+      startImportLayout((id) => selectLayout(id));
     }
 
     return {
@@ -63,7 +55,7 @@ export default defineComponent({
       />
     </template>
     <template #menus>
-      <LayoutActions
+      <LayoutActionsMenu
         :layout="layout"
         @selected="selectLayout"
       />
