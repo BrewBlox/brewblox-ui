@@ -422,7 +422,7 @@ export function startRemoveLayout(
     }
     const path = router.currentRoute.value.path;
     if (path === `/brewery/${layout.id}`) {
-      router.replace('/brewery');
+      router.replace('/');
     } else if (path === `/builder/${layout.id}`) {
       router.replace('/builder');
     }
