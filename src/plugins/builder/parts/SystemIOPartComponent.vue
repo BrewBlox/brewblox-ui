@@ -20,16 +20,21 @@ const chevrons = horizontalChevrons(15, 25);
 export default defineComponent({
   name: 'SystemIOPartComponent',
   setup() {
-    const { part, settings, patchSettings, width, height } = usePart.setup();
+    const { part, flows, settings, patchSettings, width, height } =
+      usePart.setup();
 
     const pressured = computed<boolean>({
       get: () => Boolean(settings.value[IO_ENABLED_KEY]),
       set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
     });
 
-    const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
+    const flowSpeed = computed<number>(() =>
+      flowOnCoord(part.value, flows.value, RIGHT),
+    );
 
-    const liquids = computed<string[]>(() => liquidOnCoord(part.value, RIGHT));
+    const liquids = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, RIGHT),
+    );
 
     return {
       IO_PRESSURE_KEY,

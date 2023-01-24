@@ -1,13 +1,11 @@
 import {
   BORDER_KEY,
   COLOR_KEY,
-  HEIGHT_KEY,
   LABEL_KEY,
   PID_KEY,
   PROFILE_KEY,
   SETPOINT_KEY,
   URL_KEY,
-  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -33,9 +31,10 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            [HEIGHT_KEY]: 7,
             [LABEL_KEY]: withPrefix(config.prefix, 'fridge'),
           },
+          width: 4,
+          height: 7,
         },
         {
           id: nanoid(),
@@ -52,6 +51,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
               type: null,
             }),
           },
+          width: 2,
+          height: 4,
         },
         {
           id: nanoid(),
@@ -68,6 +69,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
               type: null,
             }),
           },
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -84,6 +87,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
               type: null,
             }),
           },
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -100,6 +105,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
               type: null,
             }),
           },
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -116,6 +123,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
               type: null,
             }),
           },
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -128,9 +137,9 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
             [BORDER_KEY]: false,
             [LABEL_KEY]: 'User manual',
             [URL_KEY]: 'https://www.brewblox.com/user/ferment_guide.html',
-            [WIDTH_KEY]: 4,
-            [HEIGHT_KEY]: 1,
           },
+          width: 4,
+          height: 1,
         },
       ],
     },

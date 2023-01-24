@@ -6,13 +6,14 @@ import {
   IO_PRESSURE_KEY,
   RIGHT,
 } from '@/plugins/builder/const';
-import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
+import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 
 const blueprint: BuilderBlueprint = {
   type: 'SystemIO',
   title: 'Global inlet',
-  size: () => [1, 1],
-  transitions: (part: PersistentPart) => {
+  component: 'SystemIOPartComponent',
+  defaultSize: { width: 1, height: 1 },
+  transitions: (part: BuilderPart) => {
     const enabled = Boolean(part.settings[IO_ENABLED_KEY]);
     const pressure = enabled
       ? Number(part.settings[IO_PRESSURE_KEY] ?? DEFAULT_IO_PRESSURE)

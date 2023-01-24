@@ -1,4 +1,4 @@
-import { BuilderBlueprint } from '@/plugins/builder/types';
+import { BuilderBlueprint, BuilderType } from '@/plugins/builder/types';
 import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
 import BuilderLabel from './BuilderLabel';
@@ -13,6 +13,7 @@ import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
 import FilterBottom from './FilterBottom';
 import Fridge from './Fridge';
+import GraphDisplay from './GraphDisplay';
 import GravityTube from './GravityTube';
 import HeatingElement from './HeatingElement';
 import ImageDisplay from './ImageDisplay';
@@ -41,7 +42,7 @@ import UrlDisplay from './UrlDisplay';
 import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
 
-const blueprints: { [key: string]: BuilderBlueprint } = {
+const blueprints: Record<BuilderType, BuilderBlueprint> = {
   BeerBottle,
   BridgeTube,
   BuilderLabel,
@@ -55,6 +56,8 @@ const blueprints: { [key: string]: BuilderBlueprint } = {
   DipTube,
   ElbowTube,
   FilterBottom,
+  Fridge,
+  GraphDisplay,
   GravityTube,
   HeatingElement,
   ImageDisplay,
@@ -77,7 +80,6 @@ const blueprints: { [key: string]: BuilderBlueprint } = {
   StraightInletTube,
   StraightTube,
   SystemIO,
-  Fridge,
   TeeTube,
   TiltDisplay,
   UrlDisplay,

@@ -2,15 +2,13 @@ import { KETTLE_FILL_PCT_KEY } from '@/plugins/builder/blueprints/Kettle';
 import {
   BORDER_KEY,
   COLOR_KEY,
-  HEIGHT_KEY,
   PID_KEY,
   PUMP_KEY,
   PWM_KEY,
   SENSOR_KEY,
   SETPOINT_KEY,
-  WIDTH_KEY,
 } from '@/plugins/builder/const';
-import { BuilderLayout, PersistentPart } from '@/plugins/builder/types';
+import { BuilderLayout, BuilderPart } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
 import { nanoid } from 'nanoid';
@@ -19,8 +17,8 @@ import { GlycolConfig } from './types';
 
 export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
   const { serviceId, names } = config;
-  const heatingParts: PersistentPart[] = [];
-  const glycolParts: PersistentPart[] = [];
+  const heatingParts: BuilderPart[] = [];
+  const glycolParts: BuilderPart[] = [];
 
   if (config.heated) {
     heatingParts.push(
@@ -39,6 +37,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         type: 'PidDisplay',
         x: 2,
         y: 5,
+        width: 1,
+        height: 1,
       },
       {
         id: nanoid(),
@@ -55,6 +55,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         type: 'PwmDisplay',
         x: 2,
         y: 6,
+        width: 1,
+        height: 1,
       },
     );
   }
@@ -76,6 +78,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         type: 'SetpointDisplay',
         x: 6,
         y: 8,
+        width: 2,
+        height: 1,
       },
       {
         id: nanoid(),
@@ -92,6 +96,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         type: 'PidDisplay',
         x: 7,
         y: 6,
+        width: 1,
+        height: 1,
       },
     );
   } else if (config.glycolControl === 'Measure') {
@@ -109,6 +115,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
       type: 'SensorDisplay',
       x: 7,
       y: 7,
+      width: 1,
+      height: 1,
     });
   }
 
@@ -135,6 +143,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'Conical',
           x: 1,
           y: 1,
+          width: 3,
+          height: 9,
         },
         {
           id: nanoid(),
@@ -144,13 +154,13 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'Coil',
           x: 1,
           y: 3,
+          width: 3,
+          height: 2,
         },
         {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [WIDTH_KEY]: 2,
-            [HEIGHT_KEY]: 3,
             [COLOR_KEY]: '#69bcff',
             [KETTLE_FILL_PCT_KEY]: 100,
           },
@@ -158,6 +168,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'Kettle',
           x: 6,
           y: 7,
+          width: 2,
+          height: 3,
         },
         {
           id: nanoid(),
@@ -167,6 +179,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightInletTube',
           x: 6,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -176,6 +190,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightInletTube',
           x: 6,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -185,6 +201,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 4,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -194,6 +212,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 4,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -203,6 +223,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 5,
           y: 3,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -212,6 +234,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 5,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -221,6 +245,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 4,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -230,6 +256,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 4,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -239,6 +267,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 4,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -248,6 +278,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 4,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -257,6 +289,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 4,
           y: 3,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -266,6 +300,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 5,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -275,6 +311,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 5,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -284,6 +322,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 5,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -300,6 +340,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'PidDisplay',
           x: 6,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -315,6 +357,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           type: 'Pump',
           x: 5,
           y: 4,
+          width: 1,
+          height: 1,
         },
       ],
     },

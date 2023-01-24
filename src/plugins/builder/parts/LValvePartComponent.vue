@@ -27,7 +27,7 @@ const paths = {
 export default defineComponent({
   name: 'LValvePartComponent',
   setup() {
-    const { part, settings, width, height, patchSettings, reflow } =
+    const { part, flows, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
     const {
@@ -49,9 +49,13 @@ export default defineComponent({
       closed.value ? paths.liquidLeft : paths.liquidRight,
     );
 
-    const liquidSpeed = computed<number>(() => -flowOnCoord(part.value, UP));
+    const liquidSpeed = computed<number>(
+      () => -flowOnCoord(part.value, flows.value, UP),
+    );
 
-    const liquidColor = computed<string[]>(() => liquidOnCoord(part.value, UP));
+    const liquidColor = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, UP),
+    );
 
     function toggle(): void {
       if (block.value) {

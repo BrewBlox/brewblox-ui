@@ -5,7 +5,6 @@ import {
   PUMP_KEY,
   PWM_KEY,
   SETPOINT_KEY,
-  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -33,6 +32,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'Kettle',
           x: 4,
           y: 1,
+          width: 4,
+          height: 6,
         },
         {
           id: nanoid(),
@@ -42,12 +43,13 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'FilterBottom',
           x: 4,
           y: 6,
+          width: 4,
+          height: 1,
         },
         {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [WIDTH_KEY]: 4,
             [PWM_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.tubePwm,
@@ -58,6 +60,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'RimsTube',
           x: 3,
           y: 9,
+          width: 4,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -67,6 +71,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'WhirlpoolInlet',
           x: 7,
           y: 1,
+          width: 1,
+          height: 4,
         },
         {
           id: nanoid(),
@@ -83,6 +89,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'SetpointDisplay',
           x: 5,
           y: 2,
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -98,6 +106,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'SetpointDisplay',
           x: 7,
           y: 8,
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -107,6 +117,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -116,6 +128,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 5,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -125,6 +139,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 8,
           y: 1,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -134,6 +150,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 9,
           y: 1,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -143,6 +161,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 4,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -152,6 +172,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 3,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -161,6 +183,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 2,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -170,6 +194,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 2,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -179,6 +205,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'Valve',
           x: 3,
           y: 6,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -188,6 +216,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 2,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -203,6 +233,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'Pump',
           x: 3,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -212,6 +244,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 4,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -228,6 +262,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'PidDisplay',
           x: 2,
           y: 9,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -237,6 +273,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 9,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -246,6 +284,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'StraightTube',
           x: 2,
           y: 7,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -255,6 +295,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 6,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -264,6 +306,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'ElbowTube',
           x: 9,
           y: 8,
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -280,6 +324,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           type: 'PidDisplay',
           x: 1,
           y: 9,
+          width: 1,
+          height: 1,
         },
       ],
     },

@@ -15,20 +15,20 @@ const paths = {
 export default defineComponent({
   name: 'CrossTubePartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, flows, width, height } = usePart.setup();
 
     const speed = computed<Record<Direction, number>>(() => ({
-      up: flowOnCoord(part.value, UP),
-      down: flowOnCoord(part.value, DOWN),
-      left: flowOnCoord(part.value, LEFT),
-      right: flowOnCoord(part.value, RIGHT),
+      up: flowOnCoord(part.value, flows.value, UP),
+      down: flowOnCoord(part.value, flows.value, DOWN),
+      left: flowOnCoord(part.value, flows.value, LEFT),
+      right: flowOnCoord(part.value, flows.value, RIGHT),
     }));
 
     const liquids = computed<Record<Direction, string[]>>(() => ({
-      up: liquidOnCoord(part.value, UP),
-      down: liquidOnCoord(part.value, DOWN),
-      left: liquidOnCoord(part.value, LEFT),
-      right: liquidOnCoord(part.value, RIGHT),
+      up: liquidOnCoord(part.value, flows.value, UP),
+      down: liquidOnCoord(part.value, flows.value, DOWN),
+      left: liquidOnCoord(part.value, flows.value, LEFT),
+      right: liquidOnCoord(part.value, flows.value, RIGHT),
     }));
 
     return {

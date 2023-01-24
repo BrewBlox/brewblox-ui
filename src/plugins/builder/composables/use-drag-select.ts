@@ -1,7 +1,7 @@
 import { rotatedSize } from '@/utils/coordinates';
 import { Ref, ref } from 'vue';
 import { SQUARE_SIZE } from '../const';
-import { FlowPart } from '../types';
+import { BuilderPart } from '../types';
 
 interface DragSelectArea {
   startX: number;
@@ -28,7 +28,7 @@ export interface UseDragSelectComponent {
   startDragSelect(area: DragSelectArea): void;
   updateDragSelect(x: number, y: number): void;
   stopDragSelect(): void;
-  makeSelectAreaFilter(): (part: FlowPart) => boolean;
+  makeSelectAreaFilter(): (part: BuilderPart) => boolean;
   getDragDistance(): number;
 }
 
@@ -76,7 +76,7 @@ export const useDragSelect: UseDragSelectComposable = {
       applyAttributes();
     }
 
-    function makeSelectAreaFilter(): (part: FlowPart) => boolean {
+    function makeSelectAreaFilter(): (part: BuilderPart) => boolean {
       if (!activeSelectArea.value) {
         return () => false;
       }
@@ -91,7 +91,7 @@ export const useDragSelect: UseDragSelectComposable = {
         // Part X/Y position is always in the top left corner,
         // but rotation will impact the end coordinates for non-square parts
         // We can ignore flipping, as all parts are rectangular
-        const [width, height] = rotatedSize(part.rotate, part.size);
+        const { width, height } = rotatedSize(part.rotate, part);
 
         // The selection must touch all squares occupied by the part
         return (

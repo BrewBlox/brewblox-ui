@@ -1,6 +1,17 @@
 import { Notify } from 'quasar';
 import { DEFAULT_FRICTION } from './const';
-import { FlowPart, FlowRoute, PathFriction } from './types';
+import {
+  BuilderPart,
+  FlowRoute,
+  PartFlows,
+  PartTransitions,
+  PathFriction,
+} from './types';
+
+export interface FlowPart extends BuilderPart {
+  transitions: PartTransitions;
+  flows: PartFlows;
+}
 
 export class FlowSegment {
   public constructor(part: FlowPart, route: FlowRoute) {
@@ -119,6 +130,7 @@ export class FlowSegment {
       return this.next.trimAtRoute(route);
     }
     for (const [i, v] of this.splits.entries()) {
+      // Check if route is same object
       if (v.inRoute === route) {
         const end = this.splits.splice(i, 1)[0];
         return end;

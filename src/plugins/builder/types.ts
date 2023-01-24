@@ -1,7 +1,53 @@
 import { MetricsConfig } from '@/plugins/history/types';
 import { StoreObject } from 'brewblox-proto/ts';
+import { Enum } from 'typescript-string-enums';
 
-export type PartSize = [width: number, height: number];
+export const BuilderType = Enum(
+  'BeerBottle',
+  'BridgeTube',
+  'BuilderLabel',
+  'Carboy',
+  'CheckValve',
+  'Coil',
+  'Condenser',
+  'Conical',
+  'CounterflowChiller',
+  'CrossTube',
+  'DipTube',
+  'ElbowTube',
+  'FilterBottom',
+  'Fridge',
+  'GraphDisplay',
+  'GravityTube',
+  'HeatingElement',
+  'ImageDisplay',
+  'ImmersionCoil',
+  'Keg',
+  'Kettle',
+  'Lauterhexe',
+  'LValve',
+  'MetricsDisplay',
+  'PidDisplay',
+  'ProfileDisplay',
+  'Pump',
+  'PwmDisplay',
+  'RimsTube',
+  'SensorDisplay',
+  'SessionLogDisplay',
+  'SetpointDisplay',
+  'SetpointDriverDisplay',
+  'ShiftedSystemIO',
+  'StraightInletTube',
+  'StraightTube',
+  'SystemIO',
+  'TeeTube',
+  'TiltDisplay',
+  'UrlDisplay',
+  'Valve',
+  'WhirlpoolInlet',
+);
+
+export type BuilderType = Enum<typeof BuilderType>;
 
 export interface FlowRoute {
   outCoords: string;
@@ -13,7 +59,7 @@ export interface FlowRoute {
   source?: boolean;
 }
 
-export interface Transitions {
+export interface PartTransitions {
   [inCoords: string]: FlowRoute[];
 }
 
@@ -21,7 +67,7 @@ export interface LiquidFlow {
   [liquid: string]: number;
 }
 
-export interface CalculatedFlows {
+export interface PartFlows {
   [inCoords: string]: LiquidFlow;
 }
 
@@ -30,32 +76,25 @@ export interface PathFriction {
   pressureDiff: number;
 }
 
-export interface PersistentPart {
+export interface BuilderPart {
   id: string;
-  type: string;
+  type: BuilderType;
   x: number;
   y: number;
+  width: number;
+  height: number;
   rotate: number;
-  flipped?: boolean;
   settings: Mapped<any>;
+  flipped?: boolean;
   metrics?: MetricsConfig;
 }
 
-export interface StatePart extends PersistentPart {
-  transitions: Transitions;
-  size: PartSize;
-}
-
-export interface FlowPart extends StatePart {
-  flows: CalculatedFlows;
-}
-
 export interface BuilderBlueprint {
-  type: string;
+  type: BuilderType;
   title: string;
-  component?: string; // defaults to `${type}PartComponent`
-  transitions: (part: PersistentPart) => Transitions;
-  size: (part: PersistentPart) => PartSize;
+  component: string;
+  defaultSize: AreaSize;
+  transitions: (part: BuilderPart) => Maybe<PartTransitions>;
 }
 
 export interface BuilderLayout extends StoreObject {
@@ -63,7 +102,7 @@ export interface BuilderLayout extends StoreObject {
   title: string;
   width: number;
   height: number;
-  parts: PersistentPart[];
+  parts: BuilderPart[];
   parentFolder?: string | null;
 }
 

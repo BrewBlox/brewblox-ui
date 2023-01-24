@@ -12,25 +12,27 @@ import {
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
 } from '@/plugins/builder/const';
-import { FlowSegment } from '@/plugins/builder/FlowSegment';
+import { FlowPart, FlowSegment } from '@/plugins/builder/FlowSegment';
 import {
-  FlowPart,
+  BuilderPart,
   FlowRoute,
-  PersistentPart,
-  StatePart,
+  PartTransitions,
 } from '@/plugins/builder/types';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { describe, expect, it } from 'vitest';
 
-function asStatePart(part: PersistentPart): StatePart {
-  const blueprint = blueprints[part.type];
-  return {
-    ...part,
-    transitions: blueprint.transitions(part),
-    size: blueprint.size(part),
-  };
-}
+const makeTransitions = (part: BuilderPart): Maybe<PartTransitions> =>
+  blueprints[part.type].transitions(part);
+
+const makeAllTransitions = (parts: BuilderPart[]): Mapped<PartTransitions> =>
+  parts.reduce((acc, part) => {
+    const transitions = makeTransitions(part);
+    if (transitions) {
+      acc[part.id] = transitions;
+    }
+    return acc;
+  }, {});
 
 const propertyWalker = (
   acc: any[],
@@ -93,7 +95,7 @@ const findPaths = (parts: FlowPart[], start: FlowPart): FlowSegment[] => {
 };
 
 describe('Data describing an input tube', () => {
-  const part: PersistentPart = {
+  const part: BuilderPart = {
     id: '',
     x: 1,
     y: 2,
@@ -104,10 +106,12 @@ describe('Data describing an input tube', () => {
       [IO_ENABLED_KEY]: true,
       [COLOR_KEY]: COLD_WATER,
     },
+    width: 1,
+    height: 1,
   };
 
   it('can resolve to transitions', () => {
-    expect(asStatePart(part).transitions).toEqual({
+    expect(makeTransitions(part)).toEqual({
       [CENTER]: [
         {
           outCoords: '1,0.5,0',
@@ -122,7 +126,7 @@ describe('Data describing an input tube', () => {
 });
 
 describe('asFlowParts', () => {
-  const path: PersistentPart[] = [
+  const path: BuilderPart[] = [
     {
       id: 'one',
       x: 1,
@@ -132,6 +136,8 @@ describe('asFlowParts', () => {
       settings: {
         [COLOR_KEY]: COLD_WATER,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: 'two',
@@ -140,6 +146,8 @@ describe('asFlowParts', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: 'three',
@@ -148,18 +156,20 @@ describe('asFlowParts', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {},
+      width: 1,
+      height: 1,
     },
   ];
 
   it('it adds transitions', () => {
-    asFlowParts(path.map(asStatePart)).forEach((part) => {
+    asFlowParts(path, makeAllTransitions(path)).forEach((part) => {
       expect(part).toHaveProperty('transitions');
     });
   });
 });
 
 describe('A single path without splits', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 1,
@@ -171,6 +181,8 @@ describe('A single path without splits', () => {
         [IO_ENABLED_KEY]: true,
         [COLOR_KEY]: HOT_WATER,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: '2',
@@ -179,6 +191,8 @@ describe('A single path without splits', () => {
       rotate: 180,
       type: 'SystemIO',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -187,10 +201,12 @@ describe('A single path without splits', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
   ];
 
-  const flowParts = asFlowParts(parts.map(asStatePart));
+  const flowParts = asFlowParts(parts, makeAllTransitions(parts));
   const start = flowParts[0];
 
   const path = findPath(flowParts, start);
@@ -268,7 +284,7 @@ describe('A single path without splits', () => {
 });
 
 describe('A path with a split, but no joins', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 1,
@@ -280,6 +296,8 @@ describe('A path with a split, but no joins', () => {
         [IO_ENABLED_KEY]: true,
         [COLOR_KEY]: COLD_WATER,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: '2',
@@ -288,6 +306,8 @@ describe('A path with a split, but no joins', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -296,6 +316,8 @@ describe('A path with a split, but no joins', () => {
       rotate: 270,
       type: 'TeeTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '4',
@@ -304,6 +326,8 @@ describe('A path with a split, but no joins', () => {
       rotate: 90,
       type: 'SystemIO',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '5',
@@ -312,10 +336,12 @@ describe('A path with a split, but no joins', () => {
       rotate: 270,
       type: 'SystemIO',
       settings: {},
+      width: 1,
+      height: 1,
     },
   ];
 
-  const flowParts = asFlowParts(parts.map(asStatePart));
+  const flowParts = asFlowParts(parts, makeAllTransitions(parts));
   const start = flowParts[0];
 
   const path = findPath(flowParts, start);
@@ -417,7 +443,7 @@ describe('A path with a split, but no joins', () => {
 });
 
 describe('A path that forks and rejoins', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 1,
@@ -429,6 +455,8 @@ describe('A path that forks and rejoins', () => {
         [IO_PRESSURE_KEY]: 11.5,
         [COLOR_KEY]: COLD_WATER,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: '2',
@@ -437,6 +465,8 @@ describe('A path that forks and rejoins', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -445,6 +475,8 @@ describe('A path that forks and rejoins', () => {
       rotate: 270,
       type: 'TeeTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '4',
@@ -453,6 +485,8 @@ describe('A path that forks and rejoins', () => {
       rotate: 90,
       type: 'ElbowTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '5',
@@ -461,6 +495,8 @@ describe('A path that forks and rejoins', () => {
       rotate: 0,
       type: 'ElbowTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '6',
@@ -469,6 +505,8 @@ describe('A path that forks and rejoins', () => {
       rotate: 180,
       type: 'ElbowTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '7',
@@ -477,6 +515,8 @@ describe('A path that forks and rejoins', () => {
       rotate: 270,
       type: 'ElbowTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '8',
@@ -485,6 +525,8 @@ describe('A path that forks and rejoins', () => {
       rotate: 90,
       type: 'TeeTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '9',
@@ -493,10 +535,12 @@ describe('A path that forks and rejoins', () => {
       rotate: 180,
       type: 'SystemIO',
       settings: {},
+      width: 1,
+      height: 1,
     },
   ];
 
-  const flowParts = asFlowParts(parts.map(asStatePart));
+  const flowParts = asFlowParts(parts, makeAllTransitions(parts));
   const start = flowParts[0];
 
   const path = findPath(flowParts, start);
@@ -621,7 +665,7 @@ describe('A path that forks and rejoins', () => {
 });
 
 describe('A single path with a pump', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 3,
@@ -633,6 +677,8 @@ describe('A single path with a pump', () => {
         [IO_PRESSURE_KEY]: 9,
         [COLOR_KEY]: COLD_WATER,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: '2',
@@ -644,6 +690,8 @@ describe('A single path with a pump', () => {
         [IO_ENABLED_KEY]: false,
         [IO_PRESSURE_KEY]: 12,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -652,11 +700,13 @@ describe('A single path with a pump', () => {
       rotate: 0,
       type: 'SystemIO',
       settings: {},
+      width: 1,
+      height: 1,
     },
   ];
 
   it('Should have a flow of value of 3 for all parts with the pump disabled', () => {
-    const flowParts = asFlowParts(parts.map(asStatePart));
+    const flowParts = asFlowParts(parts, makeAllTransitions(parts));
     const partsWithFlow = calculateFlows(flowParts);
     expect(partsWithFlow).toMatchObject([
       {
@@ -706,7 +756,7 @@ describe('A single path with a pump', () => {
     it('Should have a flow of value of 9 when the pump is enabled', () => {
       // (input pressure 9 + pump pressure 12) / friction 3 = 7
       set(parts[1], ['settings', IO_ENABLED_KEY], true);
-      const flowParts = asFlowParts(parts.map(asStatePart));
+      const flowParts = asFlowParts(parts, makeAllTransitions(parts));
       const partsWithFlow = calculateFlows(flowParts);
       expect(partsWithFlow).toMatchObject([
         {
@@ -754,7 +804,7 @@ describe('A single path with a pump', () => {
 });
 
 describe('Two sources joining', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 1,
@@ -766,6 +816,8 @@ describe('Two sources joining', () => {
         [IO_PRESSURE_KEY]: 15,
         [COLOR_KEY]: COLD_WATER,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: '2',
@@ -778,6 +830,8 @@ describe('Two sources joining', () => {
         [IO_PRESSURE_KEY]: 15,
         [COLOR_KEY]: HOT_WATER,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -786,6 +840,8 @@ describe('Two sources joining', () => {
       rotate: 180,
       type: 'ElbowTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '4',
@@ -794,6 +850,8 @@ describe('Two sources joining', () => {
       rotate: 270,
       type: 'ElbowTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '5',
@@ -802,6 +860,8 @@ describe('Two sources joining', () => {
       rotate: 90,
       type: 'TeeTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '6',
@@ -810,6 +870,8 @@ describe('Two sources joining', () => {
       rotate: 0,
       type: 'StraightTube',
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '7',
@@ -818,10 +880,12 @@ describe('Two sources joining', () => {
       rotate: 180,
       type: 'SystemIO',
       settings: {},
+      width: 1,
+      height: 1,
     },
   ];
 
-  const flowParts = asFlowParts(parts.map(asStatePart));
+  const flowParts = asFlowParts(parts, makeAllTransitions(parts));
   const start = flowParts[0];
   const path = findPath(flowParts, start);
   it('Should return the correct path from a source', () => {
@@ -893,7 +957,9 @@ describe('Two sources joining', () => {
   });
 
   it('Should have the correct flow and liquids in all paths', () => {
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const partsWithFlow = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
     expect(partsWithFlow).toMatchObject([
       {
         flows: {
@@ -990,7 +1056,7 @@ describe('Two sources joining', () => {
 
 describe('A path with a bridge', () => {
   // 7 transitions long, passes the bridge twice
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       x: 11,
@@ -1002,6 +1068,8 @@ describe('A path with a bridge', () => {
         [IO_ENABLED_KEY]: true,
         [IO_PRESSURE_KEY]: 8,
       },
+      width: 1,
+      height: 1,
     },
     {
       id: '2',
@@ -1010,6 +1078,8 @@ describe('A path with a bridge', () => {
       type: 'StraightTube',
       rotate: 0,
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -1018,6 +1088,8 @@ describe('A path with a bridge', () => {
       y: 2,
       rotate: 0,
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '4',
@@ -1026,6 +1098,8 @@ describe('A path with a bridge', () => {
       y: 1,
       rotate: 90,
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '5',
@@ -1034,6 +1108,8 @@ describe('A path with a bridge', () => {
       type: 'ElbowTube',
       rotate: 180,
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '6',
@@ -1042,6 +1118,8 @@ describe('A path with a bridge', () => {
       y: 3,
       rotate: 270,
       settings: {},
+      width: 1,
+      height: 1,
     },
     {
       id: '7',
@@ -1050,11 +1128,15 @@ describe('A path with a bridge', () => {
       type: 'ElbowTube',
       rotate: 0,
       settings: {},
+      width: 1,
+      height: 1,
     },
   ];
 
   it('Should have the correct flow and liquids in all paths', () => {
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const partsWithFlow = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
     expect(partsWithFlow).toMatchObject([
       {
         x: 11,
@@ -1170,7 +1252,7 @@ describe('A path with a bridge', () => {
 });
 
 describe('A kettle with 2 outflows', () => {
-  const parts: PersistentPart[] = [
+  const parts: BuilderPart[] = [
     {
       id: '1',
       rotate: 0,
@@ -1181,6 +1263,8 @@ describe('A kettle with 2 outflows', () => {
       type: 'Kettle',
       x: 1,
       y: 1,
+      width: 4,
+      height: 6,
     },
     {
       id: '2',
@@ -1190,6 +1274,8 @@ describe('A kettle with 2 outflows', () => {
       type: 'DipTube',
       x: 4,
       y: 6,
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -1202,6 +1288,8 @@ describe('A kettle with 2 outflows', () => {
       type: 'Pump',
       x: 5,
       y: 6,
+      width: 1,
+      height: 1,
     },
     {
       id: '4',
@@ -1211,6 +1299,8 @@ describe('A kettle with 2 outflows', () => {
       type: 'SystemIO',
       x: 6,
       y: 6,
+      width: 1,
+      height: 1,
     },
     {
       id: '5',
@@ -1220,6 +1310,8 @@ describe('A kettle with 2 outflows', () => {
       type: 'DipTube',
       x: 4,
       y: 5,
+      width: 1,
+      height: 1,
     },
     {
       id: '6',
@@ -1232,6 +1324,8 @@ describe('A kettle with 2 outflows', () => {
       flipped: true,
       x: 5,
       y: 5,
+      width: 1,
+      height: 1,
     },
     {
       id: '7',
@@ -1241,10 +1335,12 @@ describe('A kettle with 2 outflows', () => {
       type: 'SystemIO',
       x: 6,
       y: 5,
+      width: 1,
+      height: 1,
     },
   ];
 
-  const flowParts = asFlowParts(parts.map(asStatePart));
+  const flowParts = asFlowParts(parts, makeAllTransitions(parts));
   it('Should have 2 outflow paths', () => {
     const start = flowParts[0];
 
@@ -1257,7 +1353,9 @@ describe('A kettle with 2 outflows', () => {
     expect(visitedTypes).toEqual(['Kettle', 'DipTube', 'Pump', 'SystemIO']);
   });
   it('Each branch should have flow 10/3', () => {
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const partsWithFlow = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
     const straight1 = partsWithFlow.find((part) => part.id === '3');
     expect(straight1).toMatchObject({
       id: '3',
@@ -1287,7 +1385,7 @@ describe('A kettle with 2 outflows', () => {
 });
 
 describe('A kettle with flow back to itself', () => {
-  let parts: PersistentPart[] = [
+  let parts: BuilderPart[] = [
     {
       id: '1',
       rotate: 0,
@@ -1297,6 +1395,8 @@ describe('A kettle with flow back to itself', () => {
       type: 'Kettle',
       x: 1,
       y: 1,
+      width: 4,
+      height: 6,
     },
     {
       id: '2',
@@ -1306,6 +1406,8 @@ describe('A kettle with flow back to itself', () => {
       type: 'DipTube',
       x: 4,
       y: 4,
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -1314,6 +1416,8 @@ describe('A kettle with flow back to itself', () => {
       type: 'ElbowTube',
       x: 5,
       y: 4,
+      width: 1,
+      height: 1,
     },
     {
       id: '5',
@@ -1322,6 +1426,8 @@ describe('A kettle with flow back to itself', () => {
       type: 'ElbowTube',
       x: 5,
       y: 6,
+      width: 1,
+      height: 1,
     },
     {
       id: '6',
@@ -1331,6 +1437,8 @@ describe('A kettle with flow back to itself', () => {
       type: 'DipTube',
       x: 4,
       y: 6,
+      width: 1,
+      height: 1,
     },
   ];
 
@@ -1347,10 +1455,12 @@ describe('A kettle with flow back to itself', () => {
         type: 'Pump',
         x: 5,
         y: 5,
+        width: 1,
+        height: 1,
       },
     ];
 
-    const flowParts = asFlowParts(parts.map(asStatePart));
+    const flowParts = asFlowParts(parts, makeAllTransitions(parts));
     it('Should return the right path starting at the kettle', () => {
       const start = flowParts[0];
 
@@ -1405,9 +1515,11 @@ describe('A kettle with flow back to itself', () => {
         type: 'Pump',
         x: 5,
         y: 5,
+        width: 1,
+        height: 1,
       },
     ];
-    const flowParts = asFlowParts(parts.map(asStatePart));
+    const flowParts = asFlowParts(parts, makeAllTransitions(parts));
     it('Should return the right path starting at the kettle', () => {
       const start = flowParts[0];
       const path = findPaths(flowParts, start)[0];
@@ -1432,7 +1544,9 @@ describe('A kettle with flow back to itself', () => {
     });
 
     it('Should have flow 2', () => {
-      const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+      const partsWithFlow = calculateFlows(
+        asFlowParts(parts, makeAllTransitions(parts)),
+      );
       const part = partsWithFlow.find((part) => part.id === '3');
       expect(part).toMatchObject({
         id: '3',
@@ -1450,7 +1564,7 @@ describe('A kettle with flow back to itself', () => {
 });
 
 describe('A forking and joining path with a pump in each fork', () => {
-  const partsBase: PersistentPart[] = [
+  const partsBase: BuilderPart[] = [
     {
       id: '1a',
       rotate: 180,
@@ -1463,6 +1577,8 @@ describe('A forking and joining path with a pump in each fork', () => {
       type: 'SystemIO',
       x: 2,
       y: 2,
+      width: 1,
+      height: 1,
     },
     {
       id: '1b',
@@ -1472,6 +1588,8 @@ describe('A forking and joining path with a pump in each fork', () => {
       type: 'SystemIO',
       x: 2,
       y: 0,
+      width: 1,
+      height: 1,
     },
     {
       id: '2',
@@ -1481,6 +1599,8 @@ describe('A forking and joining path with a pump in each fork', () => {
       type: 'ElbowTube',
       x: 0,
       y: 2,
+      width: 1,
+      height: 1,
     },
     {
       id: '3',
@@ -1490,6 +1610,8 @@ describe('A forking and joining path with a pump in each fork', () => {
       type: 'ElbowTube',
       x: 0,
       y: 0,
+      width: 1,
+      height: 1,
     },
     {
       id: '4',
@@ -1499,6 +1621,8 @@ describe('A forking and joining path with a pump in each fork', () => {
       type: 'TeeTube',
       x: 1,
       y: 2,
+      width: 1,
+      height: 1,
     },
     {
       id: '5',
@@ -1508,11 +1632,13 @@ describe('A forking and joining path with a pump in each fork', () => {
       type: 'TeeTube',
       x: 1,
       y: 0,
+      width: 1,
+      height: 1,
     },
   ];
 
   it('has no flow with both pumps disabled', () => {
-    const parts = [
+    const parts: BuilderPart[] = [
       ...partsBase,
       {
         id: '8',
@@ -1524,6 +1650,8 @@ describe('A forking and joining path with a pump in each fork', () => {
         type: 'Pump',
         x: 1,
         y: 1,
+        width: 1,
+        height: 1,
       },
       {
         id: '9',
@@ -1535,10 +1663,12 @@ describe('A forking and joining path with a pump in each fork', () => {
         type: 'Pump',
         x: 0,
         y: 1,
+        width: 1,
+        height: 1,
       },
     ];
 
-    const flowParts = asFlowParts(parts.map(asStatePart));
+    const flowParts = asFlowParts(parts, makeAllTransitions(parts));
 
     const start = flowParts[0];
 
@@ -1562,12 +1692,14 @@ describe('A forking and joining path with a pump in each fork', () => {
       1 + 0.5 + 0.5 + (1.5 * 3.5) / (1.5 + 3.5) + 0.5 + 1,
     );
 
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const partsWithFlow = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
     expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(0, 2);
   });
 
   it('has flow with one pump enabled', () => {
-    const parts = [
+    const parts: BuilderPart[] = [
       ...partsBase,
       {
         id: '10',
@@ -1580,6 +1712,8 @@ describe('A forking and joining path with a pump in each fork', () => {
         type: 'Pump',
         x: 1,
         y: 1,
+        width: 1,
+        height: 1,
       },
       {
         id: '11',
@@ -1592,10 +1726,12 @@ describe('A forking and joining path with a pump in each fork', () => {
         type: 'Pump',
         x: 0,
         y: 1,
+        width: 1,
+        height: 1,
       },
     ];
 
-    const flowParts = asFlowParts(parts.map(asStatePart));
+    const flowParts = asFlowParts(parts, makeAllTransitions(parts));
 
     const start = flowParts[0];
 
@@ -1614,12 +1750,14 @@ describe('A forking and joining path with a pump in each fork', () => {
       'SystemIO',
     ]);
 
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const partsWithFlow = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
     expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(1.54, 2);
   });
 
   it('has flow with the other pump enabled', () => {
-    const parts = [
+    const parts: BuilderPart[] = [
       ...partsBase,
       {
         id: '10',
@@ -1632,6 +1770,8 @@ describe('A forking and joining path with a pump in each fork', () => {
         type: 'Pump',
         x: 1,
         y: 1,
+        width: 1,
+        height: 1,
       },
       {
         id: '11',
@@ -1644,10 +1784,12 @@ describe('A forking and joining path with a pump in each fork', () => {
         type: 'Pump',
         x: 0,
         y: 1,
+        width: 1,
+        height: 1,
       },
     ];
 
-    const flowParts = asFlowParts(parts.map(asStatePart));
+    const flowParts = asFlowParts(parts, makeAllTransitions(parts));
 
     const start = flowParts[0];
 
@@ -1666,12 +1808,14 @@ describe('A forking and joining path with a pump in each fork', () => {
       'SystemIO',
     ]);
 
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const partsWithFlow = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
     expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(0.66, 2);
   });
 
   it('has more flow with both pumps', () => {
-    const parts = [
+    const parts: BuilderPart[] = [
       ...partsBase,
       {
         id: '10',
@@ -1684,6 +1828,8 @@ describe('A forking and joining path with a pump in each fork', () => {
         type: 'Pump',
         x: 1,
         y: 1,
+        width: 1,
+        height: 1,
       },
       {
         id: '11',
@@ -1696,10 +1842,12 @@ describe('A forking and joining path with a pump in each fork', () => {
         type: 'Pump',
         x: 0,
         y: 1,
+        width: 1,
+        height: 1,
       },
     ];
 
-    const flowParts = asFlowParts(parts.map(asStatePart));
+    const flowParts = asFlowParts(parts, makeAllTransitions(parts));
 
     const start = flowParts[0];
 
@@ -1718,7 +1866,9 @@ describe('A forking and joining path with a pump in each fork', () => {
       'SystemIO',
     ]);
 
-    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    const partsWithFlow = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
     expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(2.2, 2);
   });
 });

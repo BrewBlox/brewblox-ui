@@ -1,7 +1,6 @@
 <script lang="ts">
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { Widget } from '@/store/widgets';
-import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
 import { computed, defineComponent, ref } from 'vue';
@@ -10,7 +9,7 @@ import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { usePreselect } from './composables/use-preselect';
 import { useBuilderStore } from './store';
-import { BuilderConfig, BuilderLayout, PersistentPart } from './types';
+import { BuilderConfig, BuilderLayout, BuilderPart } from './types';
 import { coord2grid, coord2translate } from './utils';
 
 export default defineComponent({
@@ -31,7 +30,7 @@ export default defineComponent({
     );
 
     useMetrics.setupProvider(layoutId);
-    const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
+    const { layout, orderedParts, updateParts, reflow } =
       useFlowParts.setup(layoutId);
 
     const gridDimensions = computed<UseSvgZoomDimensions>(() => ({
@@ -72,9 +71,21 @@ export default defineComponent({
         router.push(`/builder/${layout.value?.id ?? ''}`);
       }
     }
+    function patchPart(id: string, patch: Partial<BuilderPart>): void {
+      updateParts((draft) => {
+        const part = draft[id];
+        draft[id] = { ...part, ...patch, id };
+      });
+    }
 
-    function savePart(part: PersistentPart): void {
-      parts.value = concatById(parts.value, part);
+    function patchPartSettings(
+      id: string,
+      patch: Partial<BuilderPart['settings']>,
+    ): void {
+      updateParts((draft) => {
+        const part = draft[id];
+        part.settings = { ...part.settings, ...patch };
+      });
     }
 
     return {
@@ -90,14 +101,13 @@ export default defineComponent({
       preselect,
       startEditor,
       gridDimensions,
-      parts,
       layout,
       storeLayouts,
       selectLayout,
-      flowParts,
-      flowPartsRevision,
-      savePart,
-      calculateFlowParts,
+      orderedParts,
+      patchPart,
+      patchPartSettings,
+      reflow,
       resetZoom,
       zoomEnabled,
     };
@@ -136,7 +146,7 @@ export default defineComponent({
 
     <div class="fit">
       <span
-        v-if="parts.length === 0"
+        v-if="orderedParts.length === 0"
         class="absolute-center q-gutter-y-sm"
       >
         <div class="text-center">
@@ -179,20 +189,18 @@ export default defineComponent({
       >
         <g ref="svgContentRef">
           <g
-            v-for="part in flowParts"
-            :key="`${flowPartsRevision}-${part.id}`"
+            v-for="part in orderedParts"
+            :key="part.id"
             :class="['flowpart', part.type]"
           >
             <PartWrapper
-              :id="part.id"
               :part="part"
-              :coord-x="part.x"
-              :coord-y="part.y"
               :interactable="!preselectable || preselectedId === part.id"
               :preselectable="preselectable"
               :dimmed="preselectedId != null && preselectedId !== part.id"
-              @update:part="savePart"
-              @reflow="calculateFlowParts"
+              @patch:part="(patch) => patchPart(part.id, patch)"
+              @patch:settings="(patch) => patchPartSettings(part.id, patch)"
+              @reflow="reflow"
               @preselect="preselect(part.id)"
             />
           </g>

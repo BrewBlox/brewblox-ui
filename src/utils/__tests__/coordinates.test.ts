@@ -61,42 +61,50 @@ describe('coordinates', () => {
 
   it('Should rotate squares in a shape CW', () => {
     expect(
-      new Coordinates([2, 0, 0]).rotateShapeSquare(90, 0, [3, 2]).values(),
+      new Coordinates([2, 0, 0])
+        .rotateShapeSquare(90, 0, { width: 3, height: 2 })
+        .values(),
     ).toEqual([1, 2, 0]);
   });
 
   it('Should rotate squares in a shape CCW', () => {
     expect(
-      new Coordinates([2, 0, 0]).rotateShapeSquare(-90, 0, [3, 2]).values(),
+      new Coordinates([2, 0, 0])
+        .rotateShapeSquare(-90, 0, { width: 3, height: 2 })
+        .values(),
     ).toEqual([0, 0, 0]);
   });
 
   it('Should rotate squares in a shape CW from intermediate rotations', () => {
     expect(
-      new Coordinates([1, 2, 0]).rotateShapeSquare(90, 90, [3, 2]).values(),
+      new Coordinates([1, 2, 0])
+        .rotateShapeSquare(90, 90, { width: 3, height: 2 })
+        .values(),
     ).toEqual([0, 1, 0]);
 
     expect(
-      new Coordinates([1, 2, 0]).rotateShapeSquare(180, 90, [3, 2]).values(),
+      new Coordinates([1, 2, 0])
+        .rotateShapeSquare(180, 90, { width: 3, height: 2 })
+        .values(),
     ).toEqual([0, 0, 0]);
   });
 
   it('Should end up at the original coordinates after a full rotation', () => {
     expect(
       new Coordinates([1, 1, 0])
-        .rotateShapeSquare(90, 0, [3, 2])
-        .rotateShapeSquare(90, 90, [3, 2])
-        .rotateShapeSquare(90, 180, [3, 2])
-        .rotateShapeSquare(90, 270, [3, 2])
+        .rotateShapeSquare(90, 0, { width: 3, height: 2 })
+        .rotateShapeSquare(90, 90, { width: 3, height: 2 })
+        .rotateShapeSquare(90, 180, { width: 3, height: 2 })
+        .rotateShapeSquare(90, 270, { width: 3, height: 2 })
         .values(),
     ).toEqual([1, 1, 0]);
 
     expect(
       new Coordinates([1, 1, 0])
-        .rotateShapeSquare(-90, 0, [3, 2])
-        .rotateShapeSquare(-90, -90, [3, 2])
-        .rotateShapeSquare(-90, -180, [3, 2])
-        .rotateShapeSquare(-90, -270, [3, 2])
+        .rotateShapeSquare(-90, 0, { width: 3, height: 2 })
+        .rotateShapeSquare(-90, -90, { width: 3, height: 2 })
+        .rotateShapeSquare(-90, -180, { width: 3, height: 2 })
+        .rotateShapeSquare(-90, -270, { width: 3, height: 2 })
         .values(),
     ).toEqual([1, 1, 0]);
   });
@@ -104,66 +112,76 @@ describe('coordinates', () => {
   it('Should correctly rotate non-origin shapes', () => {
     expect(
       new Coordinates([12, 15, 0])
-        .rotateShapeSquare(90, 0, [3, 2], [10, 15, 0])
+        .rotateShapeSquare(90, 0, { width: 3, height: 2 }, [10, 15, 0])
         .values(),
     ).toEqual([11, 17, 0]);
   });
 
   it('Should not rotate exceptions', () => {
     expect(
-      new Coordinates([1, 1, -1]).rotateShapeSquare(90, 0, [3, 2]).values(),
+      new Coordinates([1, 1, -1])
+        .rotateShapeSquare(90, 0, { width: 3, height: 2 })
+        .values(),
     ).toEqual([1, 1, -1]);
   });
 
   it('Should ignore shape anchor exceptions', () => {
     expect(
       new Coordinates([12, 15, 0])
-        .rotateShapeSquare(90, 0, [3, 2], [10, 15, -1])
+        .rotateShapeSquare(90, 0, { width: 3, height: 2 }, [10, 15, -1])
         .values(),
     ).toEqual([11, 17, 0]);
   });
 
   it('Should rotate square edges CW', () => {
     expect(
-      new Coordinates([1.5, 0, 0]).rotateShapeEdge(90, 0, [3, 2]).values(),
+      new Coordinates([1.5, 0, 0])
+        .rotateShapeEdge(90, 0, { width: 3, height: 2 })
+        .values(),
     ).toEqual([2, 1.5, 0]);
   });
 
   it('Should rotate square edges CCW', () => {
     expect(
-      new Coordinates([1.5, 0, 0]).rotateShapeEdge(-90, 0, [3, 2]).values(),
+      new Coordinates([1.5, 0, 0])
+        .rotateShapeEdge(-90, 0, { width: 3, height: 2 })
+        .values(),
     ).toEqual([0, 1.5, 0]);
   });
 
   it('Should rotate square edges from an intermediate rotation', () => {
     expect(
-      new Coordinates([2, 1.5, 0]).rotateShapeEdge(90, 90, [3, 2]).values(),
+      new Coordinates([2, 1.5, 0])
+        .rotateShapeEdge(90, 90, { width: 3, height: 2 })
+        .values(),
     ).toEqual([1.5, 2, 0]);
   });
 
   it('Should end up at original edge coordinates after a full rotation', () => {
     expect(
       new Coordinates([1.5, 0, 0])
-        .rotateShapeEdge(90, 0, [3, 2])
-        .rotateShapeEdge(90, 90, [3, 2])
-        .rotateShapeEdge(90, 180, [3, 2])
-        .rotateShapeEdge(90, 270, [3, 2])
+        .rotateShapeEdge(90, 0, { width: 3, height: 2 })
+        .rotateShapeEdge(90, 90, { width: 3, height: 2 })
+        .rotateShapeEdge(90, 180, { width: 3, height: 2 })
+        .rotateShapeEdge(90, 270, { width: 3, height: 2 })
         .values(),
     ).toEqual([1.5, 0, 0]);
 
     expect(
       new Coordinates([1.5, 0, 0])
-        .rotateShapeEdge(-90, 0, [3, 2])
-        .rotateShapeEdge(-90, -90, [3, 2])
-        .rotateShapeEdge(-90, -180, [3, 2])
-        .rotateShapeEdge(-90, -270, [3, 2])
+        .rotateShapeEdge(-90, 0, { width: 3, height: 2 })
+        .rotateShapeEdge(-90, -90, { width: 3, height: 2 })
+        .rotateShapeEdge(-90, -180, { width: 3, height: 2 })
+        .rotateShapeEdge(-90, -270, { width: 3, height: 2 })
         .values(),
     ).toEqual([1.5, 0, 0]);
   });
 
   it('Should not rotate edge exceptions', () => {
     expect(
-      new Coordinates([1.5, 0, -1]).rotateShapeEdge(90, 0, [3, 2]).values(),
+      new Coordinates([1.5, 0, -1])
+        .rotateShapeEdge(90, 0, { width: 3, height: 2 })
+        .values(),
     ).toEqual([1.5, 0, -1]);
   });
 });

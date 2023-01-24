@@ -37,7 +37,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { part, settings, partWidth, partHeight } = usePart.setup();
+    const { part, settings } = usePart.setup();
 
     const text = computed<string>(
       () => settings.value[props.settingsKey] || props.unsetLabel,
@@ -48,11 +48,7 @@ export default defineComponent({
     );
 
     const labelTransform = computed<string>(() =>
-      textTransformation(
-        part.value,
-        [partWidth.value, partHeight.value],
-        false,
-      ),
+      textTransformation(part.value, part.value, false),
     );
 
     return {

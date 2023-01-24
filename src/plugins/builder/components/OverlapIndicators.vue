@@ -1,14 +1,14 @@
 <script lang="ts">
 import { Coordinates } from '@/utils/coordinates';
 import { computed, defineComponent, PropType } from 'vue';
-import { FlowPart } from '../types';
+import { BuilderPart } from '../types';
 import { coord2grid } from '../utils';
 
 export default defineComponent({
   name: 'OverlapIndicators',
   props: {
     parts: {
-      type: Array as PropType<FlowPart[]>,
+      type: Object as PropType<BuilderPart[]>,
       required: true,
     },
   },

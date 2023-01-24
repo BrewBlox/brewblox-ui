@@ -1,37 +1,41 @@
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
-import { useWidgetStore } from '@/store/widgets';
-import { createBlockDialog } from '@/utils/block-dialog';
 import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
+import { loadFile } from '@/utils/import-export';
 import { deepCopy } from '@/utils/objects';
 import { Block } from 'brewblox-proto/ts';
-import defaults from 'lodash/defaults';
 import isObject from 'lodash/isObject';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
 import { Router } from 'vue-router';
+import { upgradeGraphConfig, upgradeMetricsConfig } from '../history/utils';
 import {
   CENTER,
+  COLOR_KEY,
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
   deprecatedTypes,
+  DEPRECATED_HEIGHT_KEY,
+  DEPRECATED_IO_LIQUIDS_KEY,
+  DEPRECATED_IO_PRESSURE_KEY,
+  DEPRECATED_PUMP_KEY,
   DEPRECATED_SCALE_KEY,
-  HEIGHT_KEY,
+  DEPRECATED_WIDTH_KEY,
+  GRAPH_CONFIG_KEY,
+  IO_ENABLED_KEY,
+  PASSTHROUGH_KEY,
+  PUMP_KEY,
   SQUARE_SIZE,
-  WIDTH_KEY,
 } from './const';
 import { useBuilderStore } from './store';
 import {
-  BuilderBlueprint,
   BuilderLayout,
-  FlowPart,
-  PartSize,
-  PersistentPart,
-  StatePart,
-  Transitions,
+  BuilderPart,
+  PartFlows,
+  PartTransitions,
 } from './types';
 
 export function settingsProp<T = any>(
@@ -50,10 +54,7 @@ export function settingsProp<T = any>(
   return undefined;
 }
 
-export function settingsAddress(
-  part: PersistentPart,
-  key: string,
-): BlockAddress {
+export function settingsAddress(part: BuilderPart, key: string): BlockAddress {
   const obj = settingsProp(part.settings, key, isObject) ?? {};
   return {
     // Older objects use 'blockId' as key
@@ -64,30 +65,13 @@ export function settingsAddress(
 }
 
 export function settingsBlock<T extends Block>(
-  part: PersistentPart,
+  part: BuilderPart,
   key: string,
   intf: ComparedBlockType,
 ): T | null {
   const addr = settingsAddress(part, key);
   const block = useSparkStore().blockByAddress<T>(addr);
   return block && isCompatible(block.type, intf) ? block : null;
-}
-
-export function asPersistentPart(
-  part: PersistentPart | FlowPart,
-): PersistentPart {
-  const { transitions, size, flows, ...persistent } = part as FlowPart;
-  void { transitions, size, flows };
-  return persistent;
-}
-
-export function asStatePart(part: PersistentPart): StatePart {
-  const blueprint = useBuilderStore().blueprintByType(part.type);
-  return {
-    ...part,
-    transitions: blueprint.transitions(part),
-    size: blueprint.size(part),
-  };
 }
 
 export function verticalChevrons(
@@ -199,9 +183,9 @@ export function colorString(val: Maybe<string>): string {
 }
 
 export function containerTransitions(
-  [width, height]: PartSize,
+  { width, height }: AreaSize,
   color?: string,
-): Transitions {
+): PartTransitions {
   const coords = Array(width * height)
     .fill(0)
     .map((_, n) => {
@@ -242,118 +226,12 @@ export function containerTransitions(
   return result;
 }
 
-export function coord2grid(val: number): number {
-  return val * SQUARE_SIZE;
-}
-
-export function grid2coord(val: number): number {
-  return Math.round(val / SQUARE_SIZE);
-}
-
-export function coord2translate(x: number, y: number): string {
-  return `translate(${coord2grid(x)}, ${coord2grid(y)})`;
-}
-
-export function textTransformation(
-  part: PersistentPart,
-  [textWidth, textHeight]: PartSize,
-  counterRotate = true,
-): string {
-  const transforms: string[] = [];
-  if (part.flipped) {
-    transforms.push(`translate(${coord2grid(textWidth)}, 0) scale(-1,1)`);
-  }
-  if (part.rotate && counterRotate) {
-    const originX = coord2grid(0.5 * textWidth);
-    const originY = coord2grid(0.5 * textHeight);
-    transforms.push(`rotate(${-part.rotate},${originX},${originY})`);
-  }
-  return transforms.join(' ');
-}
-
-export function elbow(dX: number, dY: number, fromHorizontal: boolean): string {
-  const dx1 = fromHorizontal ? 0.5 * dX : 0;
-  const dy1 = fromHorizontal ? 0 : 0.5 * dY;
-  const dx2 = fromHorizontal ? dX : 0.5 * dX;
-  const dy2 = fromHorizontal ? 0.5 * dY : dY;
-  return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
-}
-
-export function showAbsentBlock(part: PersistentPart, key: string): void {
-  const addr = settingsAddress(part, key);
-  if (!!addr.serviceId && !!addr.id) {
-    createDialog({
-      component: 'ConfirmDialog',
-      componentProps: {
-        title: 'Broken Link',
-        message: `Block '${addr.id}' was not found. Use the editor to change the link.`,
-        cancel: false,
-      },
-    });
-  }
-}
-
-export function showSettingsBlock(
-  part: PersistentPart,
-  settingsKey: string,
-  intf: ComparedBlockType,
-): void {
-  const block = settingsBlock(part, settingsKey, intf);
-  block !== null
-    ? createBlockDialog(block, { mode: 'Basic' })
-    : showAbsentBlock(part, settingsKey);
-}
-
-export function showPartBlockDialog(
-  part: PersistentPart,
-  settingsKey: string,
-  intf: ComparedBlockType,
-): void {
-  // const sparkStore = useSparkStore();
-  const block = settingsBlock(part, settingsKey, intf);
-
-  if (!block) {
-    return showAbsentBlock(part, settingsKey);
-  }
-
-  if (block) {
-    createBlockDialog(block, { mode: 'Basic' });
-  }
-}
-
-export function showLinkedWidgetDialog(
-  part: PersistentPart,
-  key: string,
-): void {
-  const widgetStore = useWidgetStore();
-  const widgetId = settingsProp<string>(part.settings, key, 'string');
-  if (!widgetId) {
-    return;
-  } else if (widgetStore.widgetIds.includes(widgetId)) {
-    createDialog({
-      component: 'WidgetDialog',
-      componentProps: {
-        mode: 'Basic',
-        widgetId,
-      },
-    });
-  } else {
-    createDialog({
-      component: 'ConfirmDialog',
-      componentProps: {
-        title: 'Broken Link',
-        message: 'Widget was not found. Use the editor to change the link.',
-        cancel: false,
-      },
-    });
-  }
-}
-
-export function universalTransitions(
-  [width, height]: PartSize,
-  enabled: boolean,
-): Transitions {
-  if (!enabled) {
+export function passthroughTransitions({
+  width,
+  height,
+  settings,
+}: BuilderPart): PartTransitions {
+  if (!settings[PASSTHROUGH_KEY]) {
     return {};
   }
   const coords: string[] = [
@@ -369,69 +247,79 @@ export function universalTransitions(
   );
 }
 
-export function variableSizeFunc(defaults: AreaSize): BuilderBlueprint['size'] {
-  return ({ settings }) => {
-    const width = settingsProp<number>(settings, WIDTH_KEY, 'number');
-    const height = settingsProp<number>(settings, HEIGHT_KEY, 'number');
-    if (width || height) {
-      return [width || defaults.width, height || defaults.height];
-    }
-    // backwards compatibility with deprecated setting
-    if (settings[DEPRECATED_SCALE_KEY] != null) {
-      const scale = Number(settings[DEPRECATED_SCALE_KEY]);
-      return [defaults.width * scale, defaults.height * scale];
-    }
-    return [defaults.width, defaults.height];
-  };
+export function coord2grid(val: number): number {
+  return val * SQUARE_SIZE;
 }
 
-export function vivifyParts(
-  parts: PersistentPart[] | null | undefined,
-): PersistentPart[] {
-  if (!parts) {
-    return [];
+export function grid2coord(val: number): number {
+  return Math.round(val / SQUARE_SIZE);
+}
+
+export function coord2translate(x: number, y: number): string {
+  return `translate(${coord2grid(x)}, ${coord2grid(y)})`;
+}
+
+export function textTransformation(
+  part: BuilderPart,
+  { width, height }: AreaSize, // text dimensions
+  counterRotate = true,
+): string {
+  const transforms: string[] = [];
+  if (part.flipped) {
+    transforms.push(`translate(${coord2grid(width)}, 0) scale(-1,1)`);
   }
-  const builderStore = useBuilderStore();
-  const surfaceArea: Mapped<number> = {};
-  return (
-    parts
-      .map((storePart) => {
-        const part: PersistentPart = { ...storePart };
-        defaults(part, {
-          rotate: 0,
-          settings: {},
-          flipped: false,
-        });
-        part.id = part.id ?? nanoid();
-        part.type = deprecatedTypes[part.type] ?? part.type;
-
-        const [width, height] = builderStore
-          .blueprintByType(part.type)
-          .size(part);
-        surfaceArea[part.id] = width * height;
-        return part;
-      })
-      // Sort parts to render largest first
-      // This improves clickability of overlapping parts
-      .sort((a, b) => surfaceArea[b.id] - surfaceArea[a.id])
-  );
+  if (part.rotate && counterRotate) {
+    const originX = coord2grid(0.5 * width);
+    const originY = coord2grid(0.5 * height);
+    transforms.push(`rotate(${-part.rotate},${originX},${originY})`);
+  }
+  return transforms.join(' ');
 }
 
-export function rotatedCoord(part: StatePart, coord: CoordinatesParam): string {
+export function elbow(dX: number, dY: number, fromHorizontal: boolean): string {
+  const dx1 = fromHorizontal ? 0.5 * dX : 0;
+  const dy1 = fromHorizontal ? 0 : 0.5 * dY;
+  const dx2 = fromHorizontal ? dX : 0.5 * dX;
+  const dy2 = fromHorizontal ? 0.5 * dY : dY;
+  return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
+}
+
+export function showAbsentBlock(part: BuilderPart, key: string): void {
+  const addr = settingsAddress(part, key);
+  if (!!addr.serviceId && !!addr.id) {
+    createDialog({
+      component: 'ConfirmDialog',
+      componentProps: {
+        title: 'Broken Link',
+        message: `Block '${addr.id}' was not found. Please assign a new block.`,
+        cancel: false,
+      },
+    });
+  }
+}
+
+export function rotatedCoord(
+  part: BuilderPart,
+  coord: CoordinatesParam,
+): string {
   return new Coordinates(coord)
-    .flipShapeEdge(!!part.flipped, 0, part.size)
-    .rotateShapeEdge(part.rotate, 0, part.size)
+    .flipShapeEdge(Boolean(part.flipped), 0, part)
+    .rotateShapeEdge(part.rotate, 0, part)
     .toString();
 }
 
-export function liquidOnCoord(part: FlowPart, coord: string): string[] {
-  const flows = part.flows[rotatedCoord(part, coord)];
-  return flows ? Object.keys(flows) : [];
+export function liquidOnCoord(
+  part: BuilderPart,
+  flows: PartFlows,
+  baseInCoords: string,
+): string[] {
+  const flow = flows[rotatedCoord(part, baseInCoords)];
+  return flow ? Object.keys(flow) : [];
 }
 
-export function liquidBorderColor(part: FlowPart): string {
-  for (const coord in part.flows) {
-    const flow = part.flows[coord];
+export function liquidBorderColor(flows: PartFlows): string {
+  for (const coord in flows) {
+    const flow = flows[coord];
     for (const color in flow) {
       if (flow[color] != 0) {
         return color;
@@ -441,9 +329,31 @@ export function liquidBorderColor(part: FlowPart): string {
   return '';
 }
 
-export function flowOnCoord(part: FlowPart, coord: string): number {
-  const flows = part.flows[rotatedCoord(part, coord)];
-  return flows ? reduce(flows, (sum, v) => sum + v, 0) : 0;
+export function flowOnCoord(
+  part: BuilderPart,
+  flows: PartFlows,
+  baseInCoords: string,
+): number {
+  const flow = flows[rotatedCoord(part, baseInCoords)];
+  return flow ? reduce(flow, (sum, v) => sum + v, 0) : 0;
+}
+
+export async function startImportLayout(
+  onLoad: (id: string) => unknown,
+): Promise<void> {
+  loadFile<BuilderLayout>(async (layout) => {
+    const base: BuilderLayout = {
+      id: '',
+      height: DEFAULT_LAYOUT_HEIGHT,
+      width: DEFAULT_LAYOUT_WIDTH,
+      parts: [],
+      title: 'Layout',
+    };
+    layout = { ...base, ...layout, id: nanoid() };
+    layout = upgradeLayout(layout) ?? layout;
+    await useBuilderStore().createLayout(layout);
+    onLoad(layout.id);
+  });
 }
 
 export async function startAddLayout(
@@ -512,9 +422,104 @@ export function startRemoveLayout(
     }
     const path = router.currentRoute.value.path;
     if (path === `/brewery/${layout.id}`) {
-      router.replace('/brewery');
+      router.replace('/');
     } else if (path === `/builder/${layout.id}`) {
       router.replace('/builder');
     }
   });
+}
+
+export function upgradeLayout(layout: any): BuilderLayout | null {
+  const builderStore = useBuilderStore();
+
+  let dirty = false;
+  for (const part of layout.parts) {
+    // Replace deprecated types
+    if (part.type in deprecatedTypes) {
+      dirty = true;
+      part.type = deprecatedTypes[part.type];
+    }
+
+    // Part size was moved to top-level variables
+    if (!part.width || !part.height) {
+      dirty = true;
+      const defaultSize = builderStore.blueprintByType(part.type)
+        ?.defaultSize ?? { width: 1, height: 1 };
+
+      const settingsWidth = part.settings[DEPRECATED_WIDTH_KEY];
+      const settingsHeight = part.settings[DEPRECATED_HEIGHT_KEY];
+      const scale = part.settings[DEPRECATED_SCALE_KEY];
+
+      if (settingsWidth || settingsHeight) {
+        part.width = settingsWidth || defaultSize.width;
+        part.height = settingsHeight || defaultSize.height;
+      } else if (scale) {
+        part.width = defaultSize.width * scale;
+        part.height = defaultSize.height * scale;
+      } else {
+        part.width = defaultSize.width;
+        part.height = defaultSize.height;
+      }
+
+      part.settings[DEPRECATED_WIDTH_KEY] = undefined;
+      part.settings[DEPRECATED_HEIGHT_KEY] = undefined;
+      part.settings[DEPRECATED_SCALE_KEY] = undefined;
+    }
+
+    // Metrics configuration may have been independently upgraded
+    if (part.metrics !== undefined) {
+      const upgraded = upgradeMetricsConfig(part.metrics);
+      if (upgraded) {
+        dirty = true;
+        part.metrics = upgraded;
+      }
+    }
+
+    // Graph configuration may have been independently upgraded
+    if (part.type === 'GraphDisplay') {
+      const upgraded = upgradeGraphConfig(part.settings[GRAPH_CONFIG_KEY]);
+      if (upgraded) {
+        dirty = true;
+        part.settings[GRAPH_CONFIG_KEY] = upgraded;
+      }
+    }
+
+    if (part.type === 'SystemIO' || part.type === 'ShiftedSystemIO') {
+      // Migrate from settings.liquids to settings.color
+      // This removes an unnecessary array, and standardizes all color settings
+      const liquid = part.settings[DEPRECATED_IO_LIQUIDS_KEY]?.[0];
+      if (liquid !== undefined) {
+        dirty = true;
+        const color = part.settings[COLOR_KEY];
+        part.settings[COLOR_KEY] = color ?? liquid;
+        part.settings[DEPRECATED_IO_LIQUIDS_KEY] = undefined;
+      }
+
+      // IO pressure was split in "enabled" and "pressure when enabled"
+      // This provides a toggle between off and custom pressure values
+      const pressure = part.settings[DEPRECATED_IO_PRESSURE_KEY];
+      if (pressure !== undefined) {
+        dirty = true;
+        const enabled = part.settings[IO_ENABLED_KEY];
+        part.settings[IO_ENABLED_KEY] = Boolean(enabled ?? pressure);
+        part.settings[DEPRECATED_IO_PRESSURE_KEY] = undefined;
+      }
+    }
+
+    // Pumps were standardized to use either PWM or Digital Actuator blocks
+    if (part.type === 'Pump') {
+      const addr = part.settings[DEPRECATED_PUMP_KEY];
+      if (addr !== undefined) {
+        dirty = true;
+        part.settings[PUMP_KEY] = addr;
+        part.settings[DEPRECATED_PUMP_KEY] = undefined;
+      }
+    }
+  }
+
+  if (dirty) {
+    return layout;
+  }
+
+  return null;
 }

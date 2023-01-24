@@ -13,11 +13,15 @@ const paths = {
 export default defineComponent({
   name: 'FilterBottomPartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, flows, width, height } = usePart.setup();
 
-    const flowSpeed = computed<number>(() => -flowOnCoord(part.value, LEFT));
+    const flowSpeed = computed<number>(
+      () => -flowOnCoord(part.value, flows.value, LEFT),
+    );
 
-    const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
+    const liquids = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, LEFT),
+    );
 
     return {
       DEFAULT_SIZE,

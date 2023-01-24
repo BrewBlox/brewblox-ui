@@ -4,13 +4,14 @@ import {
   LEFT,
   RIGHT,
 } from '@/plugins/builder/const';
-import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
+import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 
 const blueprint: BuilderBlueprint = {
   type: 'GravityTube',
   title: 'Tube: gravity',
-  size: () => [1, 1],
-  transitions: (part: PersistentPart) => {
+  component: 'GravityTubePartComponent',
+  defaultSize: { width: 1, height: 1 },
+  transitions: (part: BuilderPart) => {
     const pressure = Number(
       part.settings[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE,
     );

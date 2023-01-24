@@ -50,7 +50,7 @@ export default defineComponent({
     });
 
     const contentTransform = computed<string>(() =>
-      textTransformation(part.value, [1, 1]),
+      textTransformation(part.value, { width: 1, height: 1 }),
     );
 
     return {

@@ -18,7 +18,7 @@ import { computed, defineComponent, PropType } from 'vue';
 import { useRoute } from 'vue-router';
 
 export default defineComponent({
-  name: 'LayoutActions',
+  name: 'LayoutActionsMenu',
   props: {
     layout: {
       type: null as unknown as PropType<BuilderLayout | null>,

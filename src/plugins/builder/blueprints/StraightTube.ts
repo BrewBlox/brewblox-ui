@@ -4,7 +4,8 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 const blueprint: BuilderBlueprint = {
   type: 'StraightTube',
   title: 'Tube: straight',
-  size: () => [1, 1],
+  component: 'StraightTubePartComponent',
+  defaultSize: { width: 1, height: 1 },
   transitions: () => ({
     [LEFT]: [{ outCoords: RIGHT }],
     [RIGHT]: [{ outCoords: LEFT }],

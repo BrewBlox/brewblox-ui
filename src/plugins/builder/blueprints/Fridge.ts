@@ -1,5 +1,4 @@
 import { BuilderBlueprint } from '@/plugins/builder/types';
-import { variableSizeFunc } from '../utils';
 
 export const SHELF_Y_KEY = 'shelfY';
 export const DEFAULT_SHELF_Y = 1;
@@ -11,8 +10,9 @@ export const DEFAULT_SIZE: AreaSize = { width: 4, height: 12 };
 const blueprint: BuilderBlueprint = {
   type: 'Fridge',
   title: 'Fridge',
-  size: variableSizeFunc(DEFAULT_SIZE),
-  transitions: () => ({}),
+  component: 'FridgePartComponent',
+  defaultSize: DEFAULT_SIZE,
+  transitions: () => null,
 };
 
 export default blueprint;

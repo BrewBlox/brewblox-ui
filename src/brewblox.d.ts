@@ -49,7 +49,7 @@ interface SelectOption<T = any> {
   value: T;
 }
 
-type Mapped<T> = Record<string, T>;
+type Mapped<T> = { [index in string]: T };
 
 type AnyDict = { [index in string]: any };
 

@@ -13,11 +13,15 @@ import { flowOnCoord, liquidOnCoord } from '../utils';
 export default defineComponent({
   name: 'GravityTubePartComponent',
   setup() {
-    const { part, width, height } = usePart.setup();
+    const { part, flows, width, height } = usePart.setup();
 
-    const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
+    const flowSpeed = computed<number>(() =>
+      flowOnCoord(part.value, flows.value, RIGHT),
+    );
 
-    const liquids = computed<string[]>(() => liquidOnCoord(part.value, RIGHT));
+    const liquids = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, RIGHT),
+    );
 
     return {
       IO_PRESSURE_KEY,

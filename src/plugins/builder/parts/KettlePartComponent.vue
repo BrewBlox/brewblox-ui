@@ -25,6 +25,7 @@ export default defineComponent({
     const color = computed<string>(() =>
       colorString(settings.value[COLOR_KEY]),
     );
+
     return {
       DEFAULT_SIZE,
       MAX_SIZE,

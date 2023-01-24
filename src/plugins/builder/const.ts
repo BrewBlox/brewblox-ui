@@ -14,8 +14,7 @@ import {
   TempSensorMockBlock,
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
-import { ComputedRef, InjectionKey, WritableComputedRef } from 'vue';
-import { BuilderTool, FlowPart } from './types';
+import { BuilderTool } from './types';
 
 export const DEFAULT_LAYOUT_WIDTH = 20;
 export const DEFAULT_LAYOUT_HEIGHT = 15;
@@ -50,15 +49,16 @@ export const IO_ENABLED_KEY = 'enabled';
 export const IO_PRESSURE_KEY = 'onPressure';
 export const COLOR_KEY = 'color';
 export const BORDER_KEY = 'bordered';
-export const FLOW_TOGGLE_KEY = 'flowEnabled';
+export const PASSTHROUGH_KEY = 'flowEnabled';
 export const URL_KEY = 'url';
 export const LABEL_KEY = 'text';
-export const WIDTH_KEY = 'sizeX';
-export const HEIGHT_KEY = 'sizeY';
 export const VALVE_CLOSED_KEY = 'closed';
+export const GRAPH_CONFIG_KEY = 'graphConfig';
 
 // Deprecated setting keys
 // Typically used as fallback
+export const DEPRECATED_WIDTH_KEY = 'sizeX';
+export const DEPRECATED_HEIGHT_KEY = 'sizeY';
 export const DEPRECATED_IO_LIQUIDS_KEY = 'liquids';
 export const DEPRECATED_IO_PRESSURE_KEY = 'pressure';
 export const DEPRECATED_SCALE_KEY = 'scale';
@@ -103,13 +103,6 @@ export const DIGITAL_TYPES = [BlockType.DigitalActuator] as const;
 export type PumpBlockT = PwmBlockT | DigitalBlockT;
 export const PUMP_KEY = 'actuator';
 export const PUMP_TYPES = [...PWM_TYPES, ...DIGITAL_TYPES] as const;
-
-export const PartKey: InjectionKey<WritableComputedRef<FlowPart>> =
-  Symbol('$part');
-export const InteractableKey: InjectionKey<ComputedRef<boolean>> =
-  Symbol('$interactable');
-export const ReflowKey: InjectionKey<() => void> = Symbol('$reflow');
-export const PlaceholderKey: InjectionKey<boolean> = Symbol('$placeholder');
 
 export const deprecatedTypes = {
   SmallKettle: 'Kettle',

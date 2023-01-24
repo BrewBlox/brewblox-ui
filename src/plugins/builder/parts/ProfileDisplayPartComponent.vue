@@ -12,10 +12,10 @@ import { liquidBorderColor } from '../utils';
 export default defineComponent({
   name: 'ProfileDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered, passthrough, placeholder } =
+    const { flows, width, height, bordered, passthrough, placeholder } =
       usePart.setup();
 
-    const color = computed<string>(() => liquidBorderColor(part.value));
+    const color = computed<string>(() => liquidBorderColor(flows.value));
 
     const {
       block,

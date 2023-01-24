@@ -4,7 +4,8 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 const blueprint: BuilderBlueprint = {
   type: 'DipTube',
   title: 'Kettle inlet: dip',
-  size: () => [1, 1],
+  component: 'DipTubePartComponent',
+  defaultSize: { width: 1, height: 1 },
   transitions: () => ({
     [LEFT]: [{ outCoords: CENTER }],
     [CENTER]: [{ outCoords: LEFT }],
