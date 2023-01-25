@@ -9,6 +9,7 @@ import {
 } from 'vue';
 import { BORDER_KEY, COLOR_KEY, PASSTHROUGH_KEY } from '../const';
 import {
+  EditableKey,
   FlowsKey,
   InteractableKey,
   PartKey,
@@ -64,6 +65,12 @@ export interface UsePartComponent {
    * Link errors should be suppressed, and dummy values shown.
    */
   placeholder: boolean;
+
+  /**
+   * The part is rendered in the editable.
+   * It's up to the part whether to have any custom behavior.
+   */
+  editable: boolean;
 
   /**
    * Part can allow custom click and hover handlers.
@@ -134,6 +141,7 @@ export const usePart: UsePartComposable = {
     const reflow = inject(ReflowKey)!;
     const allFlows = inject(FlowsKey, shallowRef({}));
     const placeholder = inject(PlaceholderKey, false);
+    const editable = inject(EditableKey, false);
     const interactable = inject(
       InteractableKey,
       computed(() => false),
@@ -182,6 +190,7 @@ export const usePart: UsePartComposable = {
       bordered,
       passthrough,
       placeholder,
+      editable,
       interactable,
       patchPart,
       patchSettings,

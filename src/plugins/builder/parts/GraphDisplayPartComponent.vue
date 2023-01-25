@@ -16,8 +16,14 @@ import { GRAPH_CONFIG_KEY } from '../const';
 export default defineComponent({
   name: 'GraphDisplayPartComponent',
   setup() {
-    const { settings, patchSettings, width, height, interactable } =
-      usePart.setup();
+    const {
+      settings,
+      patchSettings,
+      width,
+      height,
+      interactable,
+      placeholder,
+    } = usePart.setup();
 
     const graphId = nanoid();
     const sourceRevision = ref<Date>(new Date());
@@ -81,6 +87,7 @@ export default defineComponent({
       width,
       height,
       interactable,
+      placeholder,
       graphId,
       config,
       presets,
@@ -96,7 +103,16 @@ export default defineComponent({
 
 <template>
   <svg v-bind="{ width, height }">
-    <foreignObject v-bind="{ width, height }">
+    <ChartSvgIcon
+      v-if="placeholder"
+      :width="height"
+      :height="height"
+      :x="width / 2 - height / 2"
+    />
+    <foreignObject
+      v-else
+      v-bind="{ width, height }"
+    >
       <HistoryGraph
         v-bind="{
           graphId,

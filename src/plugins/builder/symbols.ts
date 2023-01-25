@@ -13,3 +13,4 @@ export const InteractableKey: InjectionKey<ComputedRef<boolean>> =
   Symbol('$interactable');
 export const ReflowKey: InjectionKey<() => void> = Symbol('$reflow');
 export const PlaceholderKey: InjectionKey<boolean> = Symbol('$placeholder');
+export const EditableKey: InjectionKey<boolean> = Symbol('$editable');

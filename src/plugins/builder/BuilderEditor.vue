@@ -17,6 +17,7 @@ import {
   computed,
   defineComponent,
   nextTick,
+  provide,
   ref,
   UnwrapRef,
   watch,
@@ -32,6 +33,7 @@ import {
 import { useMetrics } from './composables/use-metrics';
 import { builderTools, SQUARE_SIZE } from './const';
 import { useBuilderStore } from './store';
+import { EditableKey } from './symbols';
 import {
   BuilderLayout,
   BuilderPart,
@@ -82,6 +84,7 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const router = useRouter();
+    provide(EditableKey, true);
 
     const history = ref<string[]>([]);
     const undoneHistory = ref<string[]>([]);
