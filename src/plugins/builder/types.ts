@@ -44,6 +44,7 @@ export const BuilderType = Enum(
   'TiltDisplay',
   'UrlDisplay',
   'Valve',
+  'WebframeDisplay',
   'WhirlpoolInlet',
 );
 

@@ -40,6 +40,7 @@ import TeeTube from './TeeTube';
 import TiltDisplay from './TiltDisplay';
 import UrlDisplay from './UrlDisplay';
 import Valve from './Valve';
+import WebframeDisplay from './WebframeDisplay';
 import WhirlpoolInlet from './WhirlpoolInlet';
 
 const blueprints: Record<BuilderType, BuilderBlueprint> = {
@@ -84,6 +85,7 @@ const blueprints: Record<BuilderType, BuilderBlueprint> = {
   TiltDisplay,
   UrlDisplay,
   Valve,
+  WebframeDisplay,
   WhirlpoolInlet,
 };
 

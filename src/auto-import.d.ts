@@ -134,6 +134,7 @@ declare module '@vue/runtime-core' {
     PowerSvgIcon: typeof import('src/components/icons/PowerSvgIcon.vue').default;
     HeatingSvgIcon: typeof import('src/components/icons/HeatingSvgIcon.vue').default;
     CoolingSvgIcon: typeof import('src/components/icons/CoolingSvgIcon.vue').default;
+    ChartSvgIcon: typeof import('src/components/icons/ChartSvgIcon.vue').default;
     BrokenSvgIcon: typeof import('src/components/icons/BrokenSvgIcon.vue').default;
     AnalogSvgIcon: typeof import('src/components/icons/AnalogSvgIcon.vue').default;
     GridItem: typeof import('src/components/grid/GridItem.vue').default;
