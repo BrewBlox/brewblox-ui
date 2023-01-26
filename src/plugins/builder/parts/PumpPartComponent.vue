@@ -24,7 +24,7 @@ import { usePart, useSettingsBlock } from '../composables';
 export default defineComponent({
   name: 'PumpPartComponent',
   setup() {
-    const { part, settings, width, height, patchSettings, reflow } =
+    const { part, flows, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
     const {
@@ -73,7 +73,9 @@ export default defineComponent({
       return enabled.value;
     });
 
-    const liquids = computed<string[]>(() => liquidOnCoord(part.value, LEFT));
+    const liquids = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, LEFT),
+    );
 
     const pwmSetting = computed<number>(() =>
       isPwm(block.value) ? Number(block.value.data.setting) : 100,
@@ -313,7 +315,7 @@ export default defineComponent({
             label="On click"
             message="
             Select the default behavior when the pump is clicked.
-            When the pump is linked to a PWM block, toggle enables or 
+            When the pump is linked to a PWM block, toggle enables or
             disables the block. The speed is not changed.
             "
             default="toggle"

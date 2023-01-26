@@ -11,9 +11,9 @@ import { liquidBorderColor } from '../utils';
 export default defineComponent({
   name: 'SetpointDisplayPartComponent',
   setup() {
-    const { part, width, height, bordered, passthrough } = usePart.setup();
+    const { flows, width, height, bordered, passthrough } = usePart.setup();
 
-    const borderColor = computed<string>(() => liquidBorderColor(part.value));
+    const borderColor = computed<string>(() => liquidBorderColor(flows.value));
 
     return {
       DEFAULT_SIZE,

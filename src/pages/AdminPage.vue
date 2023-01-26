@@ -251,7 +251,7 @@ export default defineComponent({
         expand-icon-class="fade-4"
         switch-toggle-side
       >
-        <LayoutActions
+        <LayoutActionsMenu
           class="q-ml-md"
           :layout="layout"
           no-label
@@ -261,7 +261,7 @@ export default defineComponent({
             icon="mdi-tools"
             label="Edit layout"
           />
-        </LayoutActions>
+        </LayoutActionsMenu>
       </q-expansion-item>
     </div>
   </q-page>

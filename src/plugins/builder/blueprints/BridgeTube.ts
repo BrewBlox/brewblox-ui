@@ -4,7 +4,8 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 const blueprint: BuilderBlueprint = {
   type: 'BridgeTube',
   title: 'Tube: bridge',
-  size: () => [1, 1],
+  component: 'BridgeTubePartComponent',
+  defaultSize: { width: 1, height: 1 },
   transitions: () => ({
     // bridge (high)
     [LEFT]: [{ outCoords: RIGHT }],

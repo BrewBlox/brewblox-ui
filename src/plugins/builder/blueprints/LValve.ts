@@ -9,8 +9,8 @@ import {
 } from '@/plugins/builder/const';
 import {
   BuilderBlueprint,
-  PersistentPart,
-  Transitions,
+  BuilderPart,
+  PartTransitions,
 } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
 import { DigitalState } from 'brewblox-proto/ts';
@@ -18,8 +18,9 @@ import { DigitalState } from 'brewblox-proto/ts';
 const blueprint: BuilderBlueprint = {
   type: 'LValve',
   title: 'Valve: L',
-  size: () => [1, 1],
-  transitions: (part: PersistentPart): Transitions => {
+  component: 'LValvePartComponent',
+  defaultSize: { width: 1, height: 1 },
+  transitions: (part: BuilderPart): PartTransitions => {
     const block = settingsBlock<ValveBlockT>(part, VALVE_KEY, VALVE_TYPES);
     const closed =
       block != null

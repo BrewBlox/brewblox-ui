@@ -17,16 +17,16 @@
 export function keyEventString(evt: KeyboardEvent): string {
   const modifiers: string[] = [];
 
-  if (evt.metaKey) {
+  if (evt.metaKey && evt.key !== 'Meta') {
     modifiers.push('cmd');
   }
-  if (evt.ctrlKey) {
+  if (evt.ctrlKey && evt.key !== 'Control') {
     modifiers.push('ctrl');
   }
-  if (evt.altKey) {
+  if (evt.altKey && evt.key !== 'Alt') {
     modifiers.push('alt');
   }
-  if (evt.shiftKey) {
+  if (evt.shiftKey && evt.key !== 'Shift') {
     modifiers.push('shift');
   }
 

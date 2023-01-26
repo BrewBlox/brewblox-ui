@@ -21,10 +21,10 @@ export default defineComponent({
   name: 'PidDisplayPartComponent',
   setup() {
     const sparkStore = useSparkStore();
-    const { part, width, height, bordered, passthrough, placeholder } =
+    const { part, flows, width, height, bordered, passthrough, placeholder } =
       usePart.setup();
 
-    const color = computed<string>(() => liquidBorderColor(part.value));
+    const color = computed<string>(() => liquidBorderColor(flows.value));
 
     const {
       block,
@@ -35,7 +35,7 @@ export default defineComponent({
     } = useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
 
     const contentTransform = computed<string>(() =>
-      textTransformation(part.value, [1, 1]),
+      textTransformation(part.value, { width: 1, height: 1 }),
     );
 
     const outputValue = computed<number | null>(() => {

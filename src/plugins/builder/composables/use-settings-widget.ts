@@ -3,7 +3,7 @@ import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { computed, ComputedRef, inject } from 'vue';
-import { PartKey } from '../const';
+import { PartKey, PatchSettingsKey } from '../symbols';
 import { settingsProp } from '../utils';
 
 export interface UseSettingsWidgetComponent {
@@ -23,6 +23,7 @@ export const useSettingsWidget: UseSettingsWidgetComposable = {
     const widgetStore = useWidgetStore();
     const dashboardStore = useDashboardStore();
     const part = inject(PartKey)!;
+    const patchSettings = inject(PatchSettingsKey, () => {});
 
     const widgetId = computed<string | undefined>(() =>
       settingsProp<string>(part.value.settings, settingsKey, 'string'),
@@ -83,13 +84,7 @@ export const useSettingsWidget: UseSettingsWidgetComposable = {
           },
         },
       }).onOk((id: string) => {
-        part.value = {
-          ...part.value,
-          settings: {
-            ...part.value.settings,
-            [settingsKey]: id,
-          },
-        };
+        patchSettings({ [settingsKey]: id });
       });
     }
 

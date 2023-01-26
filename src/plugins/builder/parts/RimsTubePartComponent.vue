@@ -8,7 +8,7 @@ import { usePart } from '../composables';
 export default defineComponent({
   name: 'RimsTubePartComponent',
   setup() {
-    const { part, bordered, width, height, partWidth } = usePart.setup();
+    const { part, flows, bordered, width, height } = usePart.setup();
 
     const paths = computed<Mapped<string>>(() => {
       const startLast = width.value - 50;
@@ -35,26 +35,26 @@ export default defineComponent({
     });
 
     const outCoord = computed<string>(() =>
-      new Coordinates([partWidth.value - 0.5, 0, 0]).toString(),
+      new Coordinates([part.value.width - 0.5, 0, 0]).toString(),
     );
 
     const flowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, outCoord.value),
+      flowOnCoord(part.value, flows.value, outCoord.value),
     );
 
     const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, outCoord.value),
+      liquidOnCoord(part.value, flows.value, outCoord.value),
     );
 
     return {
       DEFAULT_SIZE,
       MAX_SIZE,
       MIN_SIZE,
+      part,
       width,
       height,
       bordered,
       paths,
-      partWidth,
       flowSpeed,
       liquids,
     };
@@ -76,7 +76,7 @@ export default defineComponent({
       :colors="liquids"
     />
     <AnimatedArrows
-      :num-arrows="(partWidth - 1) * 2"
+      :num-arrows="(part.width - 1) * 2"
       :speed="flowSpeed"
       :path="paths.flowPath"
     />

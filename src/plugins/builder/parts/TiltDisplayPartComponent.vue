@@ -21,11 +21,11 @@ import { usePart } from '../composables';
 export default defineComponent({
   name: 'TiltDisplayPartComponent',
   setup() {
-    const { part, settings, width, height, bordered, passthrough } =
+    const { flows, settings, width, height, bordered, passthrough } =
       usePart.setup();
     const tiltStore = useTiltStore();
 
-    const color = computed<string>(() => liquidBorderColor(part.value));
+    const color = computed<string>(() => liquidBorderColor(flows.value));
 
     const tiltId = computed<string | null>(
       () => settings.value[TILT_ID_KEY] ?? null,

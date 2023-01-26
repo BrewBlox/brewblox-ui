@@ -1,4 +1,4 @@
-import { BuilderBlueprint, PersistentPart } from '@/plugins/builder/types';
+import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 import {
   CENTER,
   DEFAULT_IO_PRESSURE,
@@ -19,8 +19,9 @@ const BOTTOM_CENTER = '0.5,1.5,0';
 const blueprint: BuilderBlueprint = {
   type: 'Condenser',
   title: 'Steam condenser',
-  size: () => [1, 2],
-  transitions: (part: PersistentPart) => {
+  component: 'CondenserPartComponent',
+  defaultSize: { width: 1, height: 2 },
+  transitions: (part: BuilderPart) => {
     const pressure = Number(
       part.settings[IO_PRESSURE_KEY] ?? DEFAULT_OUTLET_PRESSURE,
     );

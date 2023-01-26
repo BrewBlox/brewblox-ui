@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent, inject } from 'vue';
-import { InteractableKey } from '../const';
+import { InteractableKey, PlaceholderKey } from '../symbols';
 
 export default defineComponent({
   name: 'BuilderInteraction',
@@ -31,6 +31,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const placeholder = inject(PlaceholderKey, false);
     const interactionAllowed = inject(
       InteractableKey,
       computed(() => false),
@@ -50,6 +51,7 @@ export default defineComponent({
 
     return {
       style,
+      placeholder,
       interact,
     };
   },
@@ -57,7 +59,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <foreignObject v-bind="{ x, y, width, height }">
+  <foreignObject
+    v-if="!placeholder"
+    v-bind="{ x, y, width, height }"
+  >
     <div
       class="interaction"
       :style="style"

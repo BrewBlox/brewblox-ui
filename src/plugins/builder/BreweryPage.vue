@@ -1,14 +1,20 @@
 <script lang="ts">
 import { useGlobals } from '@/composables';
 import { startupDone } from '@/user-settings';
-import { concatById } from '@/utils/collections';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { usePreselect } from './composables/use-preselect';
-import { PersistentPart } from './types';
-import { coord2grid, coord2translate, startChangeLayoutTitle } from './utils';
+import { BuilderPart } from './types';
+import {
+  coord2grid,
+  coord2translate,
+  startAddLayout,
+  startChangeLayoutTitle,
+  startImportLayout,
+} from './utils';
 
 export default defineComponent({
   name: 'BreweryPage',
@@ -20,13 +26,14 @@ export default defineComponent({
   },
   setup(props) {
     const { dense } = useGlobals.setup();
+    const router = useRouter();
     const { localStorage } = useQuasar();
     const { preselectable, preselectedId, preselect } = usePreselect.setup();
 
     const layoutId = computed<string | null>(() => props.routeId);
 
     useMetrics.setupProvider(layoutId);
-    const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
+    const { layout, orderedParts, updateParts, reflow } =
       useFlowParts.setup(layoutId);
 
     const gridDimensions = computed<UseSvgZoomDimensions>(() => ({
@@ -41,12 +48,40 @@ export default defineComponent({
       () => layout.value?.title ?? 'Builder layout',
     );
 
-    function savePart(part: PersistentPart): void {
-      parts.value = concatById(parts.value, part);
+    function selectLayout(id: string): void {
+      router.push(`/brewery/${id}`).catch(() => {});
+    }
+
+    function patchPart(id: string, patch: Partial<BuilderPart>): void {
+      updateParts((draft) => {
+        const part = draft[id];
+        draft[id] = { ...part, ...patch, id };
+      });
+    }
+
+    function patchPartSettings(
+      id: string,
+      patch: Partial<BuilderPart['settings']>,
+    ): void {
+      updateParts((draft) => {
+        const part = draft[id];
+        part.settings = { ...part.settings, ...patch };
+      });
     }
 
     function editTitle(): void {
       startChangeLayoutTitle(layout.value);
+    }
+
+    async function createLayout(): Promise<void> {
+      const id = await startAddLayout();
+      if (id) {
+        selectLayout(id);
+      }
+    }
+
+    async function importLayout(): Promise<void> {
+      startImportLayout((id) => selectLayout(id));
     }
 
     watch(
@@ -57,10 +92,7 @@ export default defineComponent({
 
     watch(
       () => layoutId.value,
-      (newV, oldV) => {
-        if (newV !== oldV) {
-          flowParts.value = [];
-        }
+      () => {
         try {
           localStorage.set('brewery-page', layoutId.value);
         } catch (e) {
@@ -76,6 +108,8 @@ export default defineComponent({
       layout,
       layoutTitle,
       editTitle,
+      createLayout,
+      importLayout,
       svgRef,
       svgContentRef,
       resetZoom,
@@ -84,11 +118,10 @@ export default defineComponent({
       preselectedId,
       preselect,
       startupDone,
-      parts,
-      flowParts,
-      flowPartsRevision,
-      savePart,
-      calculateFlowParts,
+      orderedParts,
+      patchPart,
+      patchPartSettings,
+      reflow,
     };
   },
 });
@@ -128,9 +161,19 @@ export default defineComponent({
           label="Layout actions"
         >
           <template #menus>
-            <LayoutActions :layout="layout" />
+            <LayoutActionsMenu :layout="layout" />
           </template>
           <template #actions>
+            <ActionItem
+              label="New layout"
+              icon="add"
+              @click="createLayout"
+            />
+            <ActionItem
+              icon="mdi-file-import"
+              label="Import Layout"
+              @click="importLayout"
+            />
             <ActionItem
               label="Reset zoom"
               icon="mdi-stretch-to-page-outline"
@@ -142,7 +185,7 @@ export default defineComponent({
 
       <div class="fit">
         <span
-          v-if="parts.length === 0"
+          v-if="orderedParts.length === 0"
           class="absolute-center"
         >
           {{ layout == null ? 'No layout selected' : 'Layout is empty' }}
@@ -154,19 +197,18 @@ export default defineComponent({
         >
           <g ref="svgContentRef">
             <g
-              v-for="part in flowParts"
-              :key="`${flowPartsRevision}-${part.id}`"
+              v-for="part in orderedParts"
+              :key="part.id"
               :class="['flowpart', part.type]"
             >
               <PartWrapper
                 :part="part"
-                :coord-x="part.x"
-                :coord-y="part.y"
                 :interactable="!preselectable || preselectedId === part.id"
                 :preselectable="preselectable"
                 :dimmed="preselectedId != null && preselectedId !== part.id"
-                @update:part="savePart"
-                @reflow="calculateFlowParts"
+                @patch:part="(patch) => patchPart(part.id, patch)"
+                @patch:settings="(patch) => patchPartSettings(part.id, patch)"
+                @reflow="reflow"
                 @preselect="preselect(part.id)"
               />
             </g>

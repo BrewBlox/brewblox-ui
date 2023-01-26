@@ -14,6 +14,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    message: {
+      type: String,
+      default: '',
+    },
   },
   setup(props) {
     const { settings, patchSettings } = usePart.setup();
@@ -24,6 +28,7 @@ export default defineComponent({
         componentProps: {
           modelValue: settings.value[props.settingsKey] ?? '',
           title: props.label,
+          message: props.message,
           label: '',
         },
       }).onOk((text) => patchSettings({ [props.settingsKey]: text }));

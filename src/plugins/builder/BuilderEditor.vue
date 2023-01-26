@@ -5,17 +5,21 @@ import { rotatedSize } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
 import { uniqueFilter } from '@/utils/functional';
-import { loadFile } from '@/utils/import-export';
+import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { clampRotation } from '@/utils/quantity';
 import * as d3 from 'd3';
 import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
+import pluralize from 'pluralize';
 import {
   computed,
   defineComponent,
   nextTick,
+  onBeforeMount,
+  onBeforeUnmount,
+  provide,
   ref,
   UnwrapRef,
   watch,
@@ -31,20 +35,20 @@ import {
 import { useMetrics } from './composables/use-metrics';
 import { builderTools, SQUARE_SIZE } from './const';
 import { useBuilderStore } from './store';
+import { EditableKey } from './symbols';
 import {
   BuilderLayout,
+  BuilderPart,
   BuilderTool,
   BuilderToolName,
-  FlowPart,
-  PersistentPart,
 } from './types';
 import {
-  asStatePart,
   coord2grid,
   coord2translate,
   grid2coord,
   startAddLayout,
   startChangeLayoutTitle,
+  startImportLayout,
 } from './utils';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>;
@@ -59,8 +63,8 @@ type ToolSource = 'shortcut' | 'menu' | 'click';
  * All parts in the floater will be rendered at `floater.x + part.x` / `floater.y + part.y`.
  * This way, only floater.x/y have to be updated to move all contained parts.
  */
-interface Floater extends XYPosition {
-  parts: FlowPart[];
+interface Floater extends XYPosition, AreaSize {
+  parts: BuilderPart[];
 }
 
 const moveKeys: Record<string, XYPosition> = {
@@ -82,6 +86,7 @@ export default defineComponent({
     const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const router = useRouter();
+    provide(EditableKey, true);
 
     const history = ref<string[]>([]);
     const undoneHistory = ref<string[]>([]);
@@ -95,18 +100,8 @@ export default defineComponent({
     const selectedIds = ref<string[]>([]);
     const floater = ref<UnwrapRef<Floater> | null>(null);
 
-    const focusRef = ref<HTMLElement>();
-    const hasFocus = ref<boolean>(true);
-
-    function checkFocus(): void {
-      nextTick(() => {
-        hasFocus.value = focusRef.value?.matches(':focus-within') === true;
-      });
-    }
-
     function setFocus(): void {
-      focusRef.value?.focus();
-      checkFocus();
+      svgRef.value?.focus();
     }
 
     const focusWarningEnabled = computed<boolean>({
@@ -119,7 +114,7 @@ export default defineComponent({
     const layoutId = computed<string | null>(() => props.routeId || null);
 
     useMetrics.setupProvider(layoutId);
-    const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
+    const { layout, parts, orderedParts, updateLayout, updateParts, reflow } =
       useFlowParts.setup(layoutId);
 
     const layoutTitle = computed<string>(
@@ -160,7 +155,6 @@ export default defineComponent({
 
     function selectLayout(id: string | null): void {
       if (id !== layoutId.value) {
-        flowParts.value = [];
         const route = id ? `/builder/${id}` : '/builder';
         router.push(route);
       }
@@ -175,34 +169,39 @@ export default defineComponent({
     }
 
     async function importLayout(): Promise<void> {
-      loadFile<BuilderLayout>(async (layout) => {
-        const id = nanoid();
-        await builderStore.createLayout({ ...layout, id });
-        selectLayout(id);
+      await startImportLayout((id) => selectLayout(id));
+      setFocus();
+    }
+
+    function pushHistory(): void {
+      history.value.push(JSON.stringify(parts.value));
+      undoneHistory.value = [];
+    }
+
+    function patchPart(id: string, patch: Partial<BuilderPart>): void {
+      pushHistory();
+      updateParts((draft) => {
+        const part = draft[id];
+        draft[id] = { ...part, ...patch, id };
       });
     }
 
-    function saveParts(updated: PersistentPart[], saveHistory = true): void {
-      if (saveHistory) {
-        history.value.push(JSON.stringify(parts.value));
-        undoneHistory.value = [];
-      }
-      parts.value = updated;
-    }
-
-    function savePart(part: PersistentPart): void {
-      saveParts(parts.value.map((v) => (v.id === part.id ? part : v)));
-    }
-
-    function removePart(part: PersistentPart): void {
-      saveParts(parts.value.filter((v) => v.id !== part.id));
+    function patchPartSettings(
+      id: string,
+      patch: Partial<BuilderPart['settings']>,
+    ): void {
+      pushHistory();
+      updateParts((draft) => {
+        const part = draft[id];
+        part.settings = { ...part.settings, ...patch };
+      });
     }
 
     // Return the grid coordinates of the current event
     function toCoords(pos: XYPosition): XYPosition;
     function toCoords(pos: XYPosition | null): XYPosition | null;
     function toCoords(pos: XYPosition | null): XYPosition | null {
-      return pos !== null
+      return pos != null
         ? {
             x: Math.floor(pos.x / SQUARE_SIZE),
             y: Math.floor(pos.y / SQUARE_SIZE),
@@ -210,17 +209,33 @@ export default defineComponent({
         : null;
     }
 
-    function isFloating(part: FlowPart): boolean {
-      return floater.value?.parts.some((p) => p.id === part.id) === true;
+    function toFractionCoords(pos: XYPosition): XYPosition;
+    function toFractionCoords(pos: XYPosition | null): XYPosition | null;
+    function toFractionCoords(pos: XYPosition | null): XYPosition | null {
+      return pos != null
+        ? {
+            x: pos.x / SQUARE_SIZE,
+            y: pos.y / SQUARE_SIZE,
+          }
+        : null;
+    }
+
+    function isFloating(id: string): boolean {
+      return floater.value?.parts.some((p) => p.id === id) === true;
     }
 
     function makeFloater(source: Floater): void {
       floater.value = deepCopy(source);
+      moveFloater(source);
     }
 
     const moveFloater = throttle(({ x, y }: XYPosition): void => {
       if (floater.value) {
-        floater.value = { ...floater.value, x, y };
+        floater.value = {
+          ...floater.value,
+          x: Math.round(x - floater.value.width / 2),
+          y: Math.round(y - floater.value.height / 2),
+        };
       }
     }, 50);
 
@@ -228,21 +243,23 @@ export default defineComponent({
       if (!floater.value) {
         return;
       }
-      const source = floater.value;
 
       if (coords) {
-        const ids: string[] = [];
+        const sourceParts = floater.value.parts;
+        const offset: AreaSize = {
+          width: floater.value.width / 2,
+          height: floater.value.height / 2,
+        };
 
-        floater.value.parts.forEach((part) => {
-          ids.push(part.id);
-          part.x += coords.x;
-          part.y += coords.y;
+        pushHistory();
+        updateParts((draft) => {
+          for (const part of sourceParts) {
+            // Translate coordinate origin from floater to layout
+            part.x += Math.round(coords.x - offset.width);
+            part.y += Math.round(coords.y - offset.height);
+            draft[part.id] = part;
+          }
         });
-
-        saveParts([
-          ...parts.value.filter((p) => !ids.includes(p.id)),
-          ...source.parts,
-        ]);
       }
 
       cancelSelection();
@@ -250,21 +267,34 @@ export default defineComponent({
     }
 
     function cancelFloater(): void {
-      if (floater.value) {
-        selectedIds.value = [...floater.value.parts]
-          .map((v) => v.id)
-          .filter((id) => flowParts.value.some((v) => v.id === id));
-        floater.value = null;
-      }
+      floater.value = null;
     }
 
-    function findPartAtCoords(coords: XYPosition | null): FlowPart | null {
+    function combinedPartSize(parts: BuilderPart[]): AreaSize {
+      return parts
+        .map((part) => {
+          const partSize = rotatedSize(part.rotate, part);
+          return {
+            width: part.x + partSize.width,
+            height: part.y + partSize.height,
+          };
+        })
+        .reduce(
+          (size, partSize) => ({
+            width: Math.max(size.width, partSize.width),
+            height: Math.max(size.height, partSize.height),
+          }),
+          { width: 0, height: 0 },
+        );
+    }
+
+    function findPartAtCoords(coords: XYPosition | null): BuilderPart | null {
       // iterate right to left to match rendering order
       // when items overlap, the later item is rendered on top
       if (coords) {
-        for (let idx = flowParts.value.length - 1; idx >= 0; idx--) {
-          const part = flowParts.value[idx];
-          const [width, height] = rotatedSize(part.rotate, part.size);
+        for (let idx = orderedParts.value.length - 1; idx >= 0; idx--) {
+          const part = orderedParts.value[idx];
+          const { width, height } = rotatedSize(part.rotate, part);
           if (
             coords.x >= part.x &&
             coords.x < part.x + width &&
@@ -278,24 +308,23 @@ export default defineComponent({
       return null;
     }
 
-    function findHoveredPart(): FlowPart | null {
+    function findHoveredPart(): BuilderPart | null {
       return findPartAtCoords(toCoords(gridHoverPos.value));
     }
 
-    function findActiveParts(alwaysIncludeSelected = false): FlowPart[] {
+    function findActiveParts(alwaysIncludeSelected = false): BuilderPart[] {
       const hovered = findHoveredPart();
+      const selected = selectedIds.value
+        .map((id) => deepCopy(parts.value[id]))
+        .filter((part) => part != null);
 
       if (hovered) {
         return selectedIds.value.length &&
           (alwaysIncludeSelected || selectedIds.value.includes(hovered.id))
-          ? deepCopy(
-              flowParts.value.filter((v) => selectedIds.value.includes(v.id)),
-            )
+          ? selected
           : [hovered];
       } else if (alwaysIncludeSelected) {
-        return deepCopy(
-          flowParts.value.filter((v) => selectedIds.value.includes(v.id)),
-        );
+        return selected;
       } else {
         return [];
       }
@@ -364,11 +393,13 @@ export default defineComponent({
         createDialog({
           component: 'BuilderCatalogDialog',
         })
-          .onOk((part: PersistentPart) => {
+          .onOk((part: BuilderPart) => {
             makeFloater({
               x: 0,
               y: 0,
-              parts: [{ ...asStatePart(part), flows: {} }],
+              width: part.width,
+              height: part.height,
+              parts: [part],
             });
             nextTick(setFocus);
           })
@@ -388,7 +419,7 @@ export default defineComponent({
       }
 
       if (floater.value) {
-        dropFloater(toCoords(gridHoverPos.value));
+        dropFloater(toFractionCoords(gridHoverPos.value));
         return;
       }
 
@@ -403,13 +434,14 @@ export default defineComponent({
         const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         const minX = Math.min(...activeParts.map((part) => part.x));
         const minY = Math.min(...activeParts.map((part) => part.y));
-        const parts = activeParts.map((part) => ({
+        const floatingParts = activeParts.map((part) => ({
           ...part,
           x: part.x - minX,
           y: part.y - minY,
         }));
+        const { width, height } = combinedPartSize(floatingParts);
 
-        makeFloater({ x, y, parts });
+        makeFloater({ x, y, width, height, parts: floatingParts });
       }
     }
 
@@ -425,12 +457,12 @@ export default defineComponent({
       }
 
       if (floater.value) {
-        dropFloater(toCoords(gridHoverPos.value));
+        dropFloater(floater.value);
         return;
       }
 
       if (isHoveringUnselectedPart()) {
-        cancelSelection();
+        // cancelSelection();
         return;
       }
 
@@ -440,13 +472,14 @@ export default defineComponent({
         const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         const minX = Math.min(...activeParts.map((part) => part.x));
         const minY = Math.min(...activeParts.map((part) => part.y));
-        const parts = activeParts.map((part) => ({
+        const floatingParts = activeParts.map((part) => ({
           ...part,
           id: nanoid(),
           x: part.x - minX,
           y: part.y - minY,
         }));
-        makeFloater({ x, y, parts });
+        const { width, height } = combinedPartSize(floatingParts);
+        makeFloater({ x, y, width, height, parts: floatingParts });
       }
     }
 
@@ -460,7 +493,10 @@ export default defineComponent({
         activeToolId.value = 'rotate';
         const part = findHoveredPart();
         if (part) {
-          savePart({ ...part, rotate: clampRotation(part.rotate + 90) });
+          pushHistory();
+          updateParts((draft) => {
+            draft[part.id].rotate = clampRotation(part.rotate + 90);
+          });
         }
       }
     }
@@ -475,7 +511,10 @@ export default defineComponent({
         activeToolId.value = 'flip';
         const part = findHoveredPart();
         if (part) {
-          savePart({ ...part, flipped: !part.flipped });
+          pushHistory();
+          updateParts((draft) => {
+            draft[part.id].flipped = !part.flipped;
+          });
         }
       }
     }
@@ -500,8 +539,12 @@ export default defineComponent({
 
       const activeParts = findActiveParts(true);
       if (activeParts.length) {
-        const ids = activeParts.map((p) => p.id);
-        saveParts(parts.value.filter((p) => !ids.includes(p.id)));
+        pushHistory();
+        updateParts((draft) => {
+          for (const part of activeParts) {
+            delete draft[part.id];
+          }
+        });
         cancelFloater();
         cancelSelection();
       }
@@ -516,7 +559,7 @@ export default defineComponent({
       const state = history.value.pop();
       if (state) {
         undoneHistory.value.push(JSON.stringify(parts.value));
-        parts.value = JSON.parse(state);
+        updateParts(() => JSON.parse(state));
       }
     }
 
@@ -529,7 +572,7 @@ export default defineComponent({
       const state = undoneHistory.value.pop();
       if (state) {
         history.value.push(JSON.stringify(parts.value));
-        parts.value = JSON.parse(state);
+        updateParts(() => JSON.parse(state));
       }
     }
 
@@ -582,17 +625,67 @@ export default defineComponent({
     // Event handlers
     ////////////////////////////////////////////////////////////////
 
+    function onClipboardCopy(evt: ClipboardEvent): void {
+      const activeParts = findActiveParts(true);
+      if (!activeParts.length) {
+        return;
+      }
+      const content = JSON.stringify({ parts: activeParts });
+      evt.clipboardData?.setData('BuilderClipboardContent', content);
+      notify.info(`Copied ${pluralize('part', activeParts.length, true)}`);
+      evt.preventDefault();
+    }
+
+    function onClipboardCut(evt: ClipboardEvent): void {
+      const activeParts = findActiveParts(true);
+      if (!activeParts.length) {
+        return;
+      }
+      const content = JSON.stringify({ parts: activeParts });
+      evt.clipboardData?.setData('BuilderClipboardContent', content);
+      notify.info(`Cut ${pluralize('part', activeParts.length, true)}`);
+      evt.preventDefault();
+
+      // Now remove cut parts from layout
+      pushHistory();
+      updateParts((draft) => {
+        for (const part of activeParts) {
+          delete draft[part.id];
+        }
+      });
+    }
+
+    function onClipboardPaste(evt: ClipboardEvent): void {
+      evt.preventDefault();
+      const content = evt.clipboardData?.getData('BuilderClipboardContent');
+      if (!content) {
+        return;
+      }
+
+      const { parts }: { parts: BuilderPart[] } = JSON.parse(content);
+      if (parts?.length) {
+        const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
+        const minX = Math.min(...parts.map((part) => part.x));
+        const minY = Math.min(...parts.map((part) => part.y));
+        parts.forEach((part) => {
+          part.id = nanoid();
+          part.x -= minX;
+          part.y -= minY;
+        });
+        const { width, height } = combinedPartSize(parts);
+        makeFloater({ x, y, width, height, parts });
+      }
+    }
+
     function deltaMove(delta: XYPosition): void {
       const activeParts = findActiveParts(true);
-      activeParts.forEach((part) => {
-        part.x += delta.x;
-        part.y += delta.y;
+      pushHistory();
+      updateParts((draft) => {
+        for (const part of activeParts) {
+          draft[part.id].x += delta.x;
+          draft[part.id].y += delta.y;
+        }
       });
-      const ids = activeParts.map((v) => v.id);
-      saveParts([
-        ...parts.value.filter((p) => !ids.includes(p.id)),
-        ...activeParts,
-      ]);
     }
 
     function keyHandler(evt: KeyboardEvent): void {
@@ -611,6 +704,8 @@ export default defineComponent({
       } else {
         return; // not handled - don't stop propagation
       }
+
+      // If we handled the key, we want to stop propagation
       evt.stopPropagation();
       evt.preventDefault();
     }
@@ -624,11 +719,7 @@ export default defineComponent({
     function gridHoverHandler(selection: SVGSelection): SVGSelection {
       const throttledMove = throttle((gridPos: XYPosition) => {
         gridHoverPos.value = gridPos;
-        const coords = toCoords(gridPos);
-        if (floater.value) {
-          floater.value.x = coords.x;
-          floater.value.y = coords.y;
-        }
+        moveFloater(toFractionCoords(gridPos));
       }, 50);
       return selection
         .on('mouseenter', (evt) => throttledMove(d3EventPos(evt)))
@@ -668,18 +759,18 @@ export default defineComponent({
             return;
           }
 
-          // Saving parts also saves layout
-          layout.value.width = grid2coord(endX - startX);
-          layout.value.height = grid2coord(endY - startY);
+          updateLayout((draft) => {
+            draft.width = grid2coord(endX - startX);
+            draft.height = grid2coord(endY - startY);
 
-          const offsetX = grid2coord(startX);
-          const offsetY = grid2coord(startY);
+            const offsetX = grid2coord(startX);
+            const offsetY = grid2coord(startY);
 
-          parts.value = parts.value.map((part) => ({
-            ...part,
-            x: part.x - offsetX,
-            y: part.y - offsetY,
-          }));
+            for (const part of draft.parts) {
+              part.x -= offsetX;
+              part.y -= offsetY;
+            }
+          });
         }
       });
 
@@ -703,14 +794,14 @@ export default defineComponent({
       })
       .on('end', async (evt) => {
         if (floater.value) {
-          dropFloater(toCoords(d3EventPos(evt)));
+          dropFloater(toFractionCoords(d3EventPos(evt)));
           return;
         }
 
         const { altKey, shiftKey } = evt;
 
         const sourceIds = deepCopy(selectedIds.value);
-        const targetIds = flowParts.value
+        const targetIds = orderedParts.value
           .filter(makeSelectAreaFilter())
           .map((v) => v.id);
 
@@ -740,22 +831,24 @@ export default defineComponent({
         partDragStart.value = toCoords(d3EventPos(evt));
       })
       .on('drag', function (this: Element, evt) {
-        const { x, y } = toCoords(d3EventPos(evt));
+        const pos = d3EventPos(evt);
+        const coords = toCoords(pos);
         const start = partDragStart.value;
 
         // We're already dragging.
         if (floater.value) {
-          moveFloater({ x, y });
+          moveFloater(toFractionCoords(pos));
         }
         // Check if the drag event has left the initial square
         // Create a floater when this happens
-        else if (start && !isEqual(start, { x, y })) {
+        else if (start && !isEqual(start, coords)) {
           const targetId = this.getAttribute('part-id')!;
-          const partIds = selectedIds.value.includes(targetId)
+          const relevantIds = selectedIds.value.includes(targetId)
             ? [...selectedIds.value]
             : [targetId];
-          const parts = flowParts.value
-            .filter((part) => partIds.includes(part.id))
+          const floaterParts = relevantIds
+            .filter((id) => id in parts.value)
+            .map((id) => parts.value[id])
             .map((part) => ({
               ...part,
               id: activeToolId.value === 'copy' ? nanoid() : part.id,
@@ -763,15 +856,20 @@ export default defineComponent({
               y: part.y - start.y,
             }));
 
-          makeFloater({ x, y, parts });
+          makeFloater({
+            ...coords,
+            width: 0,
+            height: 0,
+            parts: floaterParts,
+          });
         }
       })
       .on('end', (evt) => {
         partDragStart.value = null;
-        dropFloater(toCoords(d3EventPos(evt)));
+        dropFloater(toFractionCoords(d3EventPos(evt)));
       });
 
-    function selectGridHandlers(
+    function defineGridEventHandlers(
       el: SVGElement,
       tool: BuilderToolName | null,
     ): void {
@@ -780,7 +878,7 @@ export default defineComponent({
 
       selection.on('click', (evt) => {
         if (floater.value) {
-          dropFloater(toCoords(d3EventPos(evt)));
+          dropFloater(toFractionCoords(d3EventPos(evt)));
         }
       });
 
@@ -794,7 +892,7 @@ export default defineComponent({
       }
     }
 
-    function selectPartHandlers(
+    function definePartEventHandlers(
       el: SVGElement,
       tool: BuilderToolName | null,
     ): void {
@@ -849,20 +947,31 @@ export default defineComponent({
 
     watch(
       [svgRef, activeToolId],
-      ([el, tool]) => el && selectGridHandlers(el, tool),
+      ([el, tool]) => el && defineGridEventHandlers(el, tool),
       { immediate: true },
     );
 
     watch(
-      [svgContentRef, activeToolId, flowPartsRevision],
+      [svgContentRef, activeToolId, orderedParts],
       async ([el, tool]) => {
         await nextTick();
         if (el) {
-          selectPartHandlers(el, tool);
+          definePartEventHandlers(el, tool);
         }
       },
       { immediate: true },
     );
+
+    onBeforeMount(() => {
+      document.body.addEventListener('copy', onClipboardCopy);
+      document.body.addEventListener('cut', onClipboardCut);
+      document.body.addEventListener('paste', onClipboardPaste);
+    });
+    onBeforeUnmount(() => {
+      document.body.removeEventListener('copy', onClipboardCopy);
+      document.body.removeEventListener('cut', onClipboardCut);
+      document.body.removeEventListener('paste', onClipboardPaste);
+    });
 
     return {
       coord2grid,
@@ -872,13 +981,11 @@ export default defineComponent({
       svgRef,
       svgContentRef,
       resetZoom,
-      flowParts,
-      flowPartsRevision,
-      calculateFlowParts,
+      orderedParts,
+      patchPart,
+      patchPartSettings,
+      reflow,
 
-      focusRef,
-      hasFocus,
-      checkFocus,
       setFocus,
       focusWarningEnabled,
 
@@ -896,8 +1003,6 @@ export default defineComponent({
       selectLayout,
       createLayout,
       importLayout,
-      savePart,
-      removePart,
 
       activeToolId,
       disabledTools,
@@ -905,6 +1010,9 @@ export default defineComponent({
       useTool,
       cursor,
 
+      onClipboardCopy,
+      onClipboardCut,
+      onClipboardPaste,
       keyHandler,
     };
   },
@@ -915,6 +1023,8 @@ export default defineComponent({
   <q-page
     class="page-height"
     @keydown="keyHandler"
+    @cut="onClipboardCut"
+    @paste="onClipboardPaste"
   >
     <TitleTeleport v-if="layout">
       <span
@@ -942,7 +1052,7 @@ export default defineComponent({
         label="Builder actions"
       >
         <template #menus>
-          <LayoutActions :layout="layout" />
+          <LayoutActionsMenu :layout="layout" />
         </template>
         <template #actions>
           <ActionItem
@@ -1005,10 +1115,8 @@ export default defineComponent({
     <!-- Grid -->
     <div
       v-else
-      ref="focusRef"
-      class="fit"
+      class="fit focus-area"
       tabindex="-1"
-      @focusout="checkFocus"
     >
       <svg
         ref="svgRef"
@@ -1023,21 +1131,20 @@ export default defineComponent({
           />
           <!-- All parts, hidden if floating -->
           <g
-            v-for="part in flowParts"
-            v-show="!isFloating(part)"
-            :key="`${flowPartsRevision}-${part.id}`"
+            v-for="part in orderedParts"
+            v-show="!isFloating(part.id)"
+            :key="part.id"
             :part-id="part.id"
             :class="['flowpart', part.type]"
           >
             <PartWrapper
               :part="part"
-              :coord-x="part.x"
-              :coord-y="part.y"
               :selected="selectedIds.includes(part.id)"
               :selectable="!['interact', 'pan', null].includes(activeToolId)"
               :interactable="activeToolId === 'interact'"
-              @update:part="savePart"
-              @reflow="calculateFlowParts"
+              @patch:part="(patch) => patchPart(part.id, patch)"
+              @patch:settings="(patch) => patchPartSettings(part.id, patch)"
+              @reflow="reflow"
             />
           </g>
           <!-- Floating parts -->
@@ -1052,14 +1159,12 @@ export default defineComponent({
             >
               <PartWrapper
                 :part="part"
-                :coord-x="part.x"
-                :coord-y="part.y"
                 selected
               />
             </g>
           </g>
           <!-- Indicators for multiple parts sharing the same top/left coordinates-->
-          <OverlapIndicators :parts="flowParts" />
+          <OverlapIndicators :parts="orderedParts" />
           <!-- Selection area -->
           <rect
             ref="selectAreaRef"
@@ -1079,7 +1184,7 @@ export default defineComponent({
         @mousedown.stop
       />
       <div
-        v-if="!hasFocus && focusWarningEnabled"
+        v-if="focusWarningEnabled"
         class="unfocus-overlay"
         @click.stop="setFocus"
         @contextmenu="(evt) => !evt.shiftKey && evt.preventDefault()"
@@ -1099,6 +1204,9 @@ export default defineComponent({
 .q-page-container
   max-height: 100vh
   max-width: 100vw
+
+.focus-area:focus-within .unfocus-overlay
+  display: none
 
 .unfocus-overlay
   position: absolute

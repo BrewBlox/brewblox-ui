@@ -2,7 +2,6 @@
 import { usePart } from '@/plugins/builder/composables';
 import { createDialog } from '@/utils/dialog';
 import { computed, defineComponent, PropType } from 'vue';
-import { HEIGHT_KEY, WIDTH_KEY } from '../../const';
 
 export default defineComponent({
   name: 'SizeMenuContent',
@@ -21,11 +20,11 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { settings, patchSettings } = usePart.setup();
+    const { part, patchPart } = usePart.setup();
 
     const size = computed<AreaSize>(() => ({
-      width: settings.value[WIDTH_KEY] ?? props.default.width,
-      height: settings.value[HEIGHT_KEY] ?? props.default.height,
+      width: part.value.width ?? props.default.width,
+      height: part.value.height ?? props.default.height,
     }));
 
     function showSizeDialog(): void {
@@ -39,10 +38,7 @@ export default defineComponent({
           max: props.max,
         },
       }).onOk(({ width, height }: AreaSize) => {
-        patchSettings({
-          [WIDTH_KEY]: width,
-          [HEIGHT_KEY]: height,
-        });
+        patchPart({ width, height });
       });
     }
 

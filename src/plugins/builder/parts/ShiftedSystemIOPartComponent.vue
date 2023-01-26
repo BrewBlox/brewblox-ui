@@ -20,16 +20,21 @@ const chevrons = verticalChevrons(50, 86.4);
 export default defineComponent({
   name: 'ShiftedSystemIOPartComponent',
   setup() {
-    const { part, settings, patchSettings, width, height } = usePart.setup();
+    const { part, flows, settings, patchSettings, width, height } =
+      usePart.setup();
 
     const pressured = computed<boolean>({
       get: () => Boolean(settings.value[IO_ENABLED_KEY]),
       set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
     });
 
-    const flowSpeed = computed<number>(() => -flowOnCoord(part.value, UP));
+    const flowSpeed = computed<number>(
+      () => -flowOnCoord(part.value, flows.value, UP),
+    );
 
-    const liquids = computed<string[]>(() => liquidOnCoord(part.value, UP));
+    const liquids = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, UP),
+    );
 
     return {
       IO_PRESSURE_KEY,

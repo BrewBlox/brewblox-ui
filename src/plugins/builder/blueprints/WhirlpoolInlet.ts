@@ -7,7 +7,8 @@ const OUT = '0.5,3.5,0';
 const blueprint: BuilderBlueprint = {
   type: 'WhirlpoolInlet',
   title: 'Kettle inlet: whirlpool',
-  size: () => [1, 4],
+  component: 'WhirlpoolInletPartComponent',
+  defaultSize: { width: 1, height: 4 },
   transitions: () => ({
     [LEFT]: [{ outCoords: OUT }],
     [OUT]: [{ outCoords: LEFT }],

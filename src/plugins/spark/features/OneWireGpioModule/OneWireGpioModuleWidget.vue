@@ -127,8 +127,6 @@ export default defineComponent({
         :error-pins="block.data.overCurrent"
       />
 
-      <span>{{ block.data.moduleStatus }}</span>
-
       <template v-if="context.mode === 'Full'">
         <q-separator inset />
 

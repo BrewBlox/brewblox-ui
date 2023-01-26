@@ -28,7 +28,7 @@ const paths = {
 export default defineComponent({
   name: 'ValvePartComponent',
   setup() {
-    const { part, settings, width, height, patchSettings, reflow } =
+    const { part, flows, settings, width, height, patchSettings, reflow } =
       usePart.setup();
 
     const {
@@ -42,9 +42,13 @@ export default defineComponent({
       showBlockSelectDialog,
     } = useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
 
-    const flowSpeed = computed<number>(() => flowOnCoord(part.value, RIGHT));
+    const flowSpeed = computed<number>(() =>
+      flowOnCoord(part.value, flows.value, RIGHT),
+    );
 
-    const liquids = computed<string[]>(() => liquidOnCoord(part.value, RIGHT));
+    const liquids = computed<string[]>(() =>
+      liquidOnCoord(part.value, flows.value, RIGHT),
+    );
 
     const closed = computed<boolean>(() =>
       hasAddress.value

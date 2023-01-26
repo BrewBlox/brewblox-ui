@@ -4,7 +4,8 @@ import { BuilderBlueprint } from '@/plugins/builder/types';
 const blueprint: BuilderBlueprint = {
   type: 'CrossTube',
   title: 'Tube: cross',
-  size: () => [1, 1],
+  component: 'CrossTubePartComponent',
+  defaultSize: { width: 1, height: 1 },
   transitions: () => ({
     [UP]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
     [RIGHT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],

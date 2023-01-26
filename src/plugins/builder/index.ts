@@ -28,6 +28,7 @@ const plugin: Plugin = {
         currentLayoutId: null,
         layoutIds: [],
       }),
+      // Layouts and parts are upgraded on store start
       upgrade: (widget) => {
         const config = widget.config as any;
 

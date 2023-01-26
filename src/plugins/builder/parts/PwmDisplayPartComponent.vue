@@ -7,9 +7,9 @@ import { liquidBorderColor } from '../utils';
 export default defineComponent({
   name: 'PwmDisplayPartComponent',
   setup() {
-    const { part, bordered, width, height, passthrough } = usePart.setup();
+    const { flows, bordered, width, height, passthrough } = usePart.setup();
 
-    const borderColor = computed<string>(() => liquidBorderColor(part.value));
+    const borderColor = computed<string>(() => liquidBorderColor(flows.value));
 
     return {
       MIN_SIZE,

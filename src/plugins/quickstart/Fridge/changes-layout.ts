@@ -1,7 +1,6 @@
 import { SHELF_Y_KEY } from '@/plugins/builder/blueprints/Fridge';
 import {
   BORDER_KEY,
-  HEIGHT_KEY,
   LABEL_KEY,
   PID_KEY,
   SETPOINT_KEY,
@@ -30,10 +29,11 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
-            [HEIGHT_KEY]: 7,
             [SHELF_Y_KEY]: 4,
             [LABEL_KEY]: 'Fridge',
           },
+          width: 4,
+          height: 7,
         },
         {
           id: nanoid(),
@@ -43,6 +43,8 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {},
+          width: 1,
+          height: 2,
         },
         {
           id: nanoid(),
@@ -52,6 +54,8 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {},
+          width: 1,
+          height: 2,
         },
         {
           id: nanoid(),
@@ -61,6 +65,8 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {},
+          width: 1,
+          height: 2,
         },
         {
           id: nanoid(),
@@ -70,6 +76,8 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {},
+          width: 1,
+          height: 2,
         },
         {
           id: nanoid(),
@@ -79,6 +87,8 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {},
+          width: 1,
+          height: 2,
         },
         {
           id: nanoid(),
@@ -95,6 +105,8 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
               type: null,
             }),
           },
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -111,6 +123,8 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
               type: null,
             }),
           },
+          width: 1,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -127,6 +141,8 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
               type: null,
             }),
           },
+          width: 1,
+          height: 1,
         },
       ],
     },

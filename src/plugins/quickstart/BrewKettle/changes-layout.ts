@@ -4,7 +4,6 @@ import {
   PID_KEY,
   PWM_KEY,
   SETPOINT_KEY,
-  WIDTH_KEY,
 } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -33,12 +32,13 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           type: 'Kettle',
           x: 2,
           y: 1,
+          width: 4,
+          height: 6,
         },
         {
           id: nanoid(),
           rotate: 0,
           settings: {
-            [WIDTH_KEY]: 4,
             [PWM_KEY]: typed<BlockAddress>({
               serviceId,
               id: names.kettlePwm,
@@ -49,6 +49,8 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           type: 'HeatingElement',
           x: 1,
           y: 6,
+          width: 4,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -65,6 +67,8 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           type: 'SetpointDisplay',
           x: 3,
           y: 3,
+          width: 2,
+          height: 1,
         },
         {
           id: nanoid(),
@@ -81,6 +85,8 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           type: 'PidDisplay',
           x: 1,
           y: 1,
+          width: 1,
+          height: 1,
         },
       ],
     },
