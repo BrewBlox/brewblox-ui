@@ -17,6 +17,8 @@ import {
   computed,
   defineComponent,
   nextTick,
+  onBeforeMount,
+  onBeforeUnmount,
   provide,
   ref,
   UnwrapRef,
@@ -61,7 +63,7 @@ type ToolSource = 'shortcut' | 'menu' | 'click';
  * All parts in the floater will be rendered at `floater.x + part.x` / `floater.y + part.y`.
  * This way, only floater.x/y have to be updated to move all contained parts.
  */
-interface Floater extends XYPosition {
+interface Floater extends XYPosition, AreaSize {
   parts: BuilderPart[];
 }
 
@@ -98,18 +100,8 @@ export default defineComponent({
     const selectedIds = ref<string[]>([]);
     const floater = ref<UnwrapRef<Floater> | null>(null);
 
-    const focusRef = ref<HTMLElement>();
-    const hasFocus = ref<boolean>(true);
-
-    function checkFocus(): void {
-      nextTick(() => {
-        hasFocus.value = focusRef.value?.matches(':focus-within') === true;
-      });
-    }
-
     function setFocus(): void {
-      focusRef.value?.focus();
-      checkFocus();
+      svgRef.value?.focus();
     }
 
     const focusWarningEnabled = computed<boolean>({
@@ -209,10 +201,21 @@ export default defineComponent({
     function toCoords(pos: XYPosition): XYPosition;
     function toCoords(pos: XYPosition | null): XYPosition | null;
     function toCoords(pos: XYPosition | null): XYPosition | null {
-      return pos !== null
+      return pos != null
         ? {
             x: Math.floor(pos.x / SQUARE_SIZE),
             y: Math.floor(pos.y / SQUARE_SIZE),
+          }
+        : null;
+    }
+
+    function toFractionCoords(pos: XYPosition): XYPosition;
+    function toFractionCoords(pos: XYPosition | null): XYPosition | null;
+    function toFractionCoords(pos: XYPosition | null): XYPosition | null {
+      return pos != null
+        ? {
+            x: pos.x / SQUARE_SIZE,
+            y: pos.y / SQUARE_SIZE,
           }
         : null;
     }
@@ -223,11 +226,16 @@ export default defineComponent({
 
     function makeFloater(source: Floater): void {
       floater.value = deepCopy(source);
+      moveFloater(source);
     }
 
     const moveFloater = throttle(({ x, y }: XYPosition): void => {
       if (floater.value) {
-        floater.value = { ...floater.value, x, y };
+        floater.value = {
+          ...floater.value,
+          x: Math.round(x - floater.value.width / 2),
+          y: Math.round(y - floater.value.height / 2),
+        };
       }
     }, 50);
 
@@ -238,14 +246,17 @@ export default defineComponent({
 
       if (coords) {
         const sourceParts = floater.value.parts;
+        const offset: AreaSize = {
+          width: floater.value.width / 2,
+          height: floater.value.height / 2,
+        };
 
         pushHistory();
         updateParts((draft) => {
           for (const part of sourceParts) {
             // Translate coordinate origin from floater to layout
-            part.x += coords.x;
-            part.y += coords.y;
-
+            part.x += Math.round(coords.x - offset.width);
+            part.y += Math.round(coords.y - offset.height);
             draft[part.id] = part;
           }
         });
@@ -256,12 +267,25 @@ export default defineComponent({
     }
 
     function cancelFloater(): void {
-      if (floater.value) {
-        selectedIds.value = floater.value.parts
-          .map((v) => v.id)
-          .filter((id) => id in parts.value);
-        floater.value = null;
-      }
+      floater.value = null;
+    }
+
+    function combinedPartSize(parts: BuilderPart[]): AreaSize {
+      return parts
+        .map((part) => {
+          const partSize = rotatedSize(part.rotate, part);
+          return {
+            width: part.x + partSize.width,
+            height: part.y + partSize.height,
+          };
+        })
+        .reduce(
+          (size, partSize) => ({
+            width: Math.max(size.width, partSize.width),
+            height: Math.max(size.height, partSize.height),
+          }),
+          { width: 0, height: 0 },
+        );
     }
 
     function findPartAtCoords(coords: XYPosition | null): BuilderPart | null {
@@ -373,6 +397,8 @@ export default defineComponent({
             makeFloater({
               x: 0,
               y: 0,
+              width: part.width,
+              height: part.height,
               parts: [part],
             });
             nextTick(setFocus);
@@ -393,7 +419,7 @@ export default defineComponent({
       }
 
       if (floater.value) {
-        dropFloater(toCoords(gridHoverPos.value));
+        dropFloater(toFractionCoords(gridHoverPos.value));
         return;
       }
 
@@ -408,13 +434,14 @@ export default defineComponent({
         const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         const minX = Math.min(...activeParts.map((part) => part.x));
         const minY = Math.min(...activeParts.map((part) => part.y));
-        const parts = activeParts.map((part) => ({
+        const floatingParts = activeParts.map((part) => ({
           ...part,
           x: part.x - minX,
           y: part.y - minY,
         }));
+        const { width, height } = combinedPartSize(floatingParts);
 
-        makeFloater({ x, y, parts });
+        makeFloater({ x, y, width, height, parts: floatingParts });
       }
     }
 
@@ -430,12 +457,12 @@ export default defineComponent({
       }
 
       if (floater.value) {
-        dropFloater(toCoords(gridHoverPos.value));
+        dropFloater(floater.value);
         return;
       }
 
       if (isHoveringUnselectedPart()) {
-        cancelSelection();
+        // cancelSelection();
         return;
       }
 
@@ -445,13 +472,14 @@ export default defineComponent({
         const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         const minX = Math.min(...activeParts.map((part) => part.x));
         const minY = Math.min(...activeParts.map((part) => part.y));
-        const parts = activeParts.map((part) => ({
+        const floatingParts = activeParts.map((part) => ({
           ...part,
           id: nanoid(),
           x: part.x - minX,
           y: part.y - minY,
         }));
-        makeFloater({ x, y, parts });
+        const { width, height } = combinedPartSize(floatingParts);
+        makeFloater({ x, y, width, height, parts: floatingParts });
       }
     }
 
@@ -598,7 +626,6 @@ export default defineComponent({
     ////////////////////////////////////////////////////////////////
 
     function onClipboardCopy(evt: ClipboardEvent): void {
-      evt.preventDefault();
       const activeParts = findActiveParts(true);
       if (!activeParts.length) {
         return;
@@ -606,10 +633,10 @@ export default defineComponent({
       const content = JSON.stringify({ parts: activeParts });
       evt.clipboardData?.setData('BuilderClipboardContent', content);
       notify.info(`Copied ${pluralize('part', activeParts.length, true)}`);
+      evt.preventDefault();
     }
 
     function onClipboardCut(evt: ClipboardEvent): void {
-      evt.preventDefault();
       const activeParts = findActiveParts(true);
       if (!activeParts.length) {
         return;
@@ -617,6 +644,7 @@ export default defineComponent({
       const content = JSON.stringify({ parts: activeParts });
       evt.clipboardData?.setData('BuilderClipboardContent', content);
       notify.info(`Cut ${pluralize('part', activeParts.length, true)}`);
+      evt.preventDefault();
 
       // Now remove cut parts from layout
       pushHistory();
@@ -644,7 +672,8 @@ export default defineComponent({
           part.x -= minX;
           part.y -= minY;
         });
-        makeFloater({ x, y, parts });
+        const { width, height } = combinedPartSize(parts);
+        makeFloater({ x, y, width, height, parts });
       }
     }
 
@@ -675,6 +704,8 @@ export default defineComponent({
       } else {
         return; // not handled - don't stop propagation
       }
+
+      // If we handled the key, we want to stop propagation
       evt.stopPropagation();
       evt.preventDefault();
     }
@@ -688,11 +719,7 @@ export default defineComponent({
     function gridHoverHandler(selection: SVGSelection): SVGSelection {
       const throttledMove = throttle((gridPos: XYPosition) => {
         gridHoverPos.value = gridPos;
-        const coords = toCoords(gridPos);
-        if (floater.value) {
-          floater.value.x = coords.x;
-          floater.value.y = coords.y;
-        }
+        moveFloater(toFractionCoords(gridPos));
       }, 50);
       return selection
         .on('mouseenter', (evt) => throttledMove(d3EventPos(evt)))
@@ -767,7 +794,7 @@ export default defineComponent({
       })
       .on('end', async (evt) => {
         if (floater.value) {
-          dropFloater(toCoords(d3EventPos(evt)));
+          dropFloater(toFractionCoords(d3EventPos(evt)));
           return;
         }
 
@@ -804,21 +831,22 @@ export default defineComponent({
         partDragStart.value = toCoords(d3EventPos(evt));
       })
       .on('drag', function (this: Element, evt) {
-        const { x, y } = toCoords(d3EventPos(evt));
+        const pos = d3EventPos(evt);
+        const coords = toCoords(pos);
         const start = partDragStart.value;
 
         // We're already dragging.
         if (floater.value) {
-          moveFloater({ x, y });
+          moveFloater(toFractionCoords(pos));
         }
         // Check if the drag event has left the initial square
         // Create a floater when this happens
-        else if (start && !isEqual(start, { x, y })) {
+        else if (start && !isEqual(start, coords)) {
           const targetId = this.getAttribute('part-id')!;
           const relevantIds = selectedIds.value.includes(targetId)
             ? [...selectedIds.value]
             : [targetId];
-          const parts = relevantIds
+          const floaterParts = relevantIds
             .filter((id) => id in parts.value)
             .map((id) => parts.value[id])
             .map((part) => ({
@@ -828,12 +856,17 @@ export default defineComponent({
               y: part.y - start.y,
             }));
 
-          makeFloater({ x, y, parts });
+          makeFloater({
+            ...coords,
+            width: 0,
+            height: 0,
+            parts: floaterParts,
+          });
         }
       })
       .on('end', (evt) => {
         partDragStart.value = null;
-        dropFloater(toCoords(d3EventPos(evt)));
+        dropFloater(toFractionCoords(d3EventPos(evt)));
       });
 
     function defineGridEventHandlers(
@@ -845,7 +878,7 @@ export default defineComponent({
 
       selection.on('click', (evt) => {
         if (floater.value) {
-          dropFloater(toCoords(d3EventPos(evt)));
+          dropFloater(toFractionCoords(d3EventPos(evt)));
         }
       });
 
@@ -929,6 +962,17 @@ export default defineComponent({
       { immediate: true },
     );
 
+    onBeforeMount(() => {
+      document.body.addEventListener('copy', onClipboardCopy);
+      document.body.addEventListener('cut', onClipboardCut);
+      document.body.addEventListener('paste', onClipboardPaste);
+    });
+    onBeforeUnmount(() => {
+      document.body.removeEventListener('copy', onClipboardCopy);
+      document.body.removeEventListener('cut', onClipboardCut);
+      document.body.removeEventListener('paste', onClipboardPaste);
+    });
+
     return {
       coord2grid,
       coord2translate,
@@ -942,9 +986,6 @@ export default defineComponent({
       patchPartSettings,
       reflow,
 
-      focusRef,
-      hasFocus,
-      checkFocus,
       setFocus,
       focusWarningEnabled,
 
@@ -982,7 +1023,6 @@ export default defineComponent({
   <q-page
     class="page-height"
     @keydown="keyHandler"
-    @copy="onClipboardCopy"
     @cut="onClipboardCut"
     @paste="onClipboardPaste"
   >
@@ -1075,10 +1115,8 @@ export default defineComponent({
     <!-- Grid -->
     <div
       v-else
-      ref="focusRef"
-      class="fit"
+      class="fit focus-area"
       tabindex="-1"
-      @focusout="checkFocus"
     >
       <svg
         ref="svgRef"
@@ -1146,7 +1184,7 @@ export default defineComponent({
         @mousedown.stop
       />
       <div
-        v-if="!hasFocus && focusWarningEnabled"
+        v-if="focusWarningEnabled"
         class="unfocus-overlay"
         @click.stop="setFocus"
         @contextmenu="(evt) => !evt.shiftKey && evt.preventDefault()"
@@ -1166,6 +1204,9 @@ export default defineComponent({
 .q-page-container
   max-height: 100vh
   max-width: 100vw
+
+.focus-area:focus-within .unfocus-overlay
+  display: none
 
 .unfocus-overlay
   position: absolute
