@@ -16,7 +16,7 @@
     "spark:load": "node dev/spark_load.js",
     "spark": "yarn spark:load",
     "compose:setup": "yarn redis && yarn spark",
-    "compose:new": "yarn initdev && yarn makecert && docker-compose up -d --force-recreate && yarn compose:setup",
+    "compose:new": "yarn initdev && yarn makecert && docker compose up -d --force-recreate && yarn compose:setup",
     "serve": "vite serve",
     "start": "yarn compose:new && yarn serve",
     "build": "vite build",

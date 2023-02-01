@@ -7,7 +7,7 @@
 * Node.js
 * Yarn
 * Docker
-* Docker-compose
+* Docker Compose
 
 Due to limitations in the way Docker is handled on Windows, Linux or Mac is required for development.
 
@@ -30,9 +30,6 @@ npm install -g yarn
 # Install Docker
 curl -sL https://get.docker.com | bash
 
-# Install docker-compose
-pip3 install --user -U docker-compose
-
 # Allow running docker without sudo
 sudo usermod -aG docker $USER
 
@@ -44,7 +41,7 @@ After the reboot, run the following commands in the `brewblox-ui` directory:
 
 ``` bash
 yarn ci
-docker-compose pull
+docker compose pull
 ```
 
 ## Run
