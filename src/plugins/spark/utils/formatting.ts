@@ -1,15 +1,10 @@
-import { ENUM_LABELS_ANY_CONSTRAINT } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockLimitation } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
 import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 import { durationString, prettyLink } from '@/utils/quantity';
 import {
-  AnalogConstraint,
-  AnalogConstraintKey,
-  AnyConstraint,
-  AnyConstraintKey,
-  AnyConstraintsObj,
+  AnalogConstraints,
   Block,
   BlockType,
   CHANNEL_NAMES_DS2408,
@@ -17,55 +12,14 @@ import {
   CHANNEL_NAMES_MOCK_PINS,
   CHANNEL_NAMES_SPARK_2,
   CHANNEL_NAMES_SPARK_3,
-  DigitalConstraint,
-  DigitalConstraintKey,
+  DigitalConstraints,
   DS2408Block,
   OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
-import get from 'lodash/get';
 import { Enum } from 'typescript-string-enums';
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>
   v?.id || '<not set>';
-
-export const prettifyConstraints = (
-  obj: AnyConstraintsObj | undefined,
-): string =>
-  obj === undefined || obj.constraints.length === 0
-    ? '<no constraints>'
-    : obj.constraints
-        .map((c: AnyConstraint) => {
-          // Analog
-          if ('min' in c) {
-            return `Minimum = ${c.min}`;
-          }
-          if ('max' in c) {
-            return `Maximum = ${c.max}`;
-          }
-          if ('balanced' in c) {
-            return `Balanced by ${prettyLink(c.balanced.balancerId)}`;
-          }
-          // Digital
-          if ('minOff' in c) {
-            return `Minimum OFF = ${durationString(c.minOff)}`;
-          }
-          if ('minOn' in c) {
-            return `Minimum ON = ${durationString(c.minOn)}`;
-          }
-          if ('mutexed' in c) {
-            return `Mutexed by ${prettyLink(c.mutexed.mutexId)}`;
-          }
-          if ('delayedOn' in c) {
-            return `Delayed ON = ${durationString(c.delayedOn)}`;
-          }
-          if ('delayedOff' in c) {
-            return `Delayed OFF = ${durationString(c.delayedOff)}`;
-          }
-          // Fallback
-          return 'Unknown constraint';
-        })
-        .sort()
-        .join(', ');
 
 export async function cleanUnusedNames(
   serviceId: string | null,
@@ -118,66 +72,99 @@ export function channelName(
   return undefined;
 }
 
-export function isDigitalConstraint(
-  constraint: AnyConstraint,
-): constraint is DigitalConstraint {
-  return (constraint as DigitalConstraint).remaining !== undefined;
+export function prettyConstraints(
+  constraints: Maybe<AnalogConstraints | DigitalConstraints>,
+): string {
+  if (constraints == null) {
+    return '';
+  }
+
+  const output: string[] = [];
+  const { min, max, balanced } = constraints as AnalogConstraints;
+  const { minOff, minOn, delayedOff, delayedOn, mutexed } =
+    constraints as DigitalConstraints;
+
+  if (min?.enabled) {
+    output.push(`Minimum = ${min.value}`);
+  }
+
+  if (max?.enabled) {
+    output.push(`Maximum = ${max.value}`);
+  }
+
+  if (balanced?.enabled) {
+    output.push(`Balanced by ${prettyLink(balanced.balancerId)}`);
+  }
+
+  if (minOff?.enabled) {
+    output.push(`Minimum OFF = ${durationString(minOff.duration)}`);
+  }
+
+  if (minOn?.enabled) {
+    output.push(`Minimum ON = ${durationString(minOn.duration)}`);
+  }
+
+  if (delayedOff?.enabled) {
+    output.push(`Delay OFF = ${durationString(delayedOff.duration)}`);
+  }
+
+  if (delayedOn?.enabled) {
+    output.push(`Delay ON = ${durationString(delayedOn.duration)}`);
+  }
+
+  if (mutexed?.enabled) {
+    output.push(
+      `Mutually exclusive = ${durationString(mutexed.extraHoldTime)}` +
+        ` by ${prettyLink(mutexed.mutexId)}`,
+    );
+  }
+
+  return output.join(', ');
 }
 
-export function isAnalogConstraint(
-  constraint: AnyConstraint,
-): constraint is AnalogConstraint {
-  return (constraint as AnalogConstraint).limiting !== undefined;
-}
+export function prettyLimitations(
+  constraints: Maybe<AnalogConstraints | DigitalConstraints>,
+): string {
+  if (constraints == null) {
+    return '';
+  }
 
-export function constraintKey(
-  constraint: DigitalConstraint,
-): DigitalConstraintKey;
-export function constraintKey(
-  constraint: AnalogConstraint,
-): AnalogConstraintKey;
-export function constraintKey(constraint: AnyConstraint): AnyConstraintKey {
-  return Object.keys(constraint).find(
-    (k): k is AnyConstraintKey => k !== 'remaining' && k !== 'limiting',
-  )!;
-}
+  const output: string[] = [];
+  const { min, max, balanced } = constraints as AnalogConstraints;
+  const { minOff, minOn, delayedOff, delayedOn, mutexed } =
+    constraints as DigitalConstraints;
 
-export function findLimitations(block: Block): BlockLimitation[] {
-  const constraints: AnyConstraint[] = get(
-    block,
-    'data.constrainedBy.constraints',
-    [],
-  );
-  const output: BlockLimitation[] = [];
-  constraints.forEach((c: AnyConstraint) => {
-    if (isDigitalConstraint(c) && c.remaining.value) {
-      output.push({
-        target: block.id,
-        constraint: constraintKey(c),
-        remaining: c.remaining,
-      });
-    } else if (isAnalogConstraint(c) && c.limiting) {
-      output.push({
-        target: block.id,
-        constraint: constraintKey(c),
-        remaining: null,
-      });
-    }
-  });
-  return output;
-}
+  if (min?.enabled && min?.limiting) {
+    output.push(`Minimum (${min.value})`);
+  }
 
-export function limitationString(
-  limitations: BlockLimitation[],
-): string | null {
-  return (
-    limitations
-      .map(({ constraint, remaining }) => {
-        const label = ENUM_LABELS_ANY_CONSTRAINT[constraint];
-        return remaining != null
-          ? `${label} (${durationString(remaining)})`
-          : `${label}`;
-      })
-      .join(', ') ?? null
-  );
+  if (max?.enabled && max?.limiting) {
+    output.push(`Maximum (${max.value})`);
+  }
+
+  if (balanced?.enabled && balanced?.limiting) {
+    output.push(`Balanced (${balanced.granted})`);
+  }
+
+  if (minOn?.enabled && minOn?.limiting) {
+    output.push(`Minimum ON (${durationString(minOn.remaining)})`);
+  }
+
+  if (minOff?.enabled && minOff?.limiting) {
+    output.push(`Minimum OFF (${durationString(minOff.remaining)})`);
+  }
+
+  if (delayedOn?.enabled && delayedOn?.limiting) {
+    output.push(`Delay ON (${durationString(delayedOn.remaining)})`);
+  }
+
+  if (delayedOff?.enabled && delayedOff?.limiting) {
+    output.push(`Delay OFF (${durationString(delayedOff.remaining)})`);
+  }
+
+  if (mutexed?.enabled && mutexed?.limiting) {
+    output.push(`Mutually exclusive (${durationString(mutexed.remaining)})`);
+  }
+
+  return output.join(', ');
 }

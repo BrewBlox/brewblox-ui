@@ -2,15 +2,11 @@ import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import {
-  enumHint,
-  prettifyConstraints,
-} from '@/plugins/spark/utils/formatting';
+import { enumHint, prettyConstraints } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import { bloxQty } from '@/utils/quantity';
 import {
-  AnalogConstraintsObj,
   BlockIntfType,
   BlockType,
   FastPwmBlock,
@@ -19,6 +15,7 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { emptyAnalogConstraints } from '../../utils/configuration';
 import widget from './FastPwmWidget.vue';
 
 const type = BlockType.FastPwm;
@@ -40,7 +37,7 @@ const plugin: Plugin = {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constraints: emptyAnalogConstraints(),
         transitionDurationPreset: TransitionDurationPreset.ST_OFF,
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
@@ -89,11 +86,11 @@ const plugin: Plugin = {
       },
       {
         type,
-        key: 'constrainedBy',
+        key: 'constraints',
         title: 'Constraints',
         component: 'AnalogConstraintsValEdit',
-        generate: (): AnalogConstraintsObj => ({ constraints: [] }),
-        pretty: prettifyConstraints,
+        generate: emptyAnalogConstraints,
+        pretty: prettyConstraints,
       },
       {
         type,

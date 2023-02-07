@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useValEdit } from '@/plugins/spark/composables';
-import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
-import { DigitalConstraintsObj } from 'brewblox-proto/ts';
+import { prettyConstraints } from '@/plugins/spark/utils/formatting';
+import { DigitalConstraints } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
@@ -11,10 +11,10 @@ export default defineComponent({
   },
   emits: [...useValEdit.emits],
   setup() {
-    const { field, startEdit } = useValEdit.setup<DigitalConstraintsObj>();
+    const { field, startEdit } = useValEdit.setup<DigitalConstraints>();
 
     const displayString = computed<string>(() =>
-      prettifyConstraints(field.value),
+      prettyConstraints(field.value),
     );
 
     return {
@@ -35,10 +35,7 @@ export default defineComponent({
       Values will replace all existing constraints on
       <i> {{ blockId }} </i>.
     </div>
-    <DigitalConstraints
-      v-model="field"
-      :service-id="serviceId"
-    />
+    <!-- TODO -->
   </div>
   <div
     v-else

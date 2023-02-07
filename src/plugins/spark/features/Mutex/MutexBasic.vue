@@ -2,14 +2,11 @@
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { durationString } from '@/utils/quantity';
-import { MutexBlock, MutexedConstraint, Quantity } from 'brewblox-proto/ts';
+import { MutexBlock, MutexedConstraint } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
-interface MutexClient {
+interface MutexClient extends MutexedConstraint {
   id: string;
-  remaining: Quantity;
-  limited: boolean;
-  hasLock: boolean;
 }
 
 export default defineComponent({
@@ -21,26 +18,15 @@ export default defineComponent({
     const mutexClients = computed<MutexClient[]>(() =>
       sparkStore
         .blocksByService(serviceId)
-        // Does the block have -any- digital constraint?
-        .filter((b) => b.data.constrainedBy?.constraints[0]?.remaining)
-        .flatMap((b) => {
-          // Cast to MutexedConstraint for typing reasons
-          // We haven't yet checked whether this is actually true
-          const constraints: MutexedConstraint[] =
-            b.data.constrainedBy.constraints;
-          return (
-            constraints
-              // Is this a mutexed constraint?
-              // Is this mutexed constraint using this Mutex block?
-              .filter((c) => c.mutexed?.mutexId.id === block.value.id)
-              .map((c) => ({
-                id: b.id,
-                remaining: c.remaining,
-                limited: !!c.remaining.value,
-                hasLock: c.mutexed.hasLock,
-              }))
-          );
-        }),
+        .filter((b) => {
+          const mutexed: MutexedConstraint | undefined =
+            b.data.constraints?.mutexed;
+          return mutexed?.enabled && mutexed?.mutexId.id === block.value.id;
+        })
+        .map((b) => ({
+          ...b.data.constraints?.mutexed,
+          id: b.id,
+        })),
     );
 
     return {
@@ -62,11 +48,11 @@ export default defineComponent({
         class="col-grow"
       >
         <div
-          v-for="{ id, limited, hasLock } in mutexClients"
+          v-for="{ id, limiting, hasLock } in mutexClients"
           :key="id"
           :class="[
             'q-px-sm q-py-xs',
-            limited && 'text-orange',
+            limiting && 'text-orange',
             hasLock && 'text-green',
           ]"
         >

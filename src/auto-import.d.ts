@@ -38,10 +38,9 @@ declare module '@vue/runtime-core' {
     EnumValEdit: typeof import('src/plugins/spark/components/form/EnumValEdit.vue').default;
     DurationValEdit: typeof import('src/plugins/spark/components/form/DurationValEdit.vue').default;
     DigitalConstraintsValEdit: typeof import('src/plugins/spark/components/form/DigitalConstraintsValEdit.vue').default;
-    DigitalConstraints: typeof import('src/plugins/spark/components/form/DigitalConstraints.vue').default;
+    DigitalConstraintsField: typeof import('src/plugins/spark/components/form/DigitalConstraintsField.vue').default;
+    DigitalConstraintsDialog: typeof import('src/plugins/spark/components/form/DigitalConstraintsDialog.vue').default;
     DateValEdit: typeof import('src/plugins/spark/components/form/DateValEdit.vue').default;
-    ConstraintsField: typeof import('src/plugins/spark/components/form/ConstraintsField.vue').default;
-    ConstraintsDialog: typeof import('src/plugins/spark/components/form/ConstraintsDialog.vue').default;
     ClaimIndicator: typeof import('src/plugins/spark/components/form/ClaimIndicator.vue').default;
     ChannelSelectField: typeof import('src/plugins/spark/components/form/ChannelSelectField.vue').default;
     BoolValEdit: typeof import('src/plugins/spark/components/form/BoolValEdit.vue').default;
@@ -50,6 +49,7 @@ declare module '@vue/runtime-core' {
     BlockEnableToggle: typeof import('src/plugins/spark/components/form/BlockEnableToggle.vue').default;
     BlockDialogButton: typeof import('src/plugins/spark/components/form/BlockDialogButton.vue').default;
     AnalogConstraintsValEdit: typeof import('src/plugins/spark/components/form/AnalogConstraintsValEdit.vue').default;
+    AnalogConstraintsField: typeof import('src/plugins/spark/components/form/AnalogConstraintsField.vue').default;
     AnalogConstraints: typeof import('src/plugins/spark/components/form/AnalogConstraints.vue').default;
     QuickstartTaskMaster: typeof import('src/plugins/quickstart/components/QuickstartTaskMaster.vue').default;
     QuickstartServiceTask: typeof import('src/plugins/quickstart/components/QuickstartServiceTask.vue').default;

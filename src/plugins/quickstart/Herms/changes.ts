@@ -13,12 +13,12 @@ import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
-  AnalogConstraint,
+  AnalogConstraints,
   BalancerBlock,
   Block,
   BlockType,
   DigitalActuatorBlock,
-  DigitalConstraint,
+  DigitalConstraints,
   DigitalState,
   FilterChoice,
   MutexBlock,
@@ -54,25 +54,24 @@ export function defineChangedBlocks(
 export function defineCreatedBlocks(config: HermsConfig): Block[] {
   const { serviceId, names, hermsOpts } = config;
 
-  const pwmConstraints: AnalogConstraint[] = [];
-  const actuatorConstraints: DigitalConstraint[] = [];
+  const pwmConstraints: AnalogConstraints = {};
+  const actuatorConstraints: DigitalConstraints = {};
 
   if (config.mutex) {
-    pwmConstraints.push({
-      balanced: {
-        balancerId: bloxLink(names.balancer),
-        granted: 0,
-      },
+    pwmConstraints.balanced = {
+      enabled: true,
       limiting: false,
-    });
-    actuatorConstraints.push({
-      mutexed: {
-        mutexId: bloxLink(names.mutex),
-        extraHoldTime: bloxQty('0s'),
-        hasLock: false,
-      },
+      balancerId: bloxLink(names.balancer),
+      granted: 0,
+    };
+    actuatorConstraints.mutexed = {
+      enabled: true,
+      limiting: false,
+      hasLock: false,
       remaining: bloxQty('0s'),
-    });
+      mutexId: bloxLink(names.mutex),
+      extraHoldTime: bloxQty('0s'),
+    };
   }
 
   const balancerBlocks: Block[] = [
@@ -165,13 +164,12 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         desiredSetting: deltaTempQty(null),
         setting: tempQty(null),
         value: deltaTempQty(null),
-        constrainedBy: {
-          constraints: [
-            {
-              max: hermsOpts.driverMax.value!,
-              limiting: false,
-            },
-          ],
+        constraints: {
+          max: {
+            enabled: true,
+            limiting: false,
+            value: hermsOpts.driverMax.value!,
+          },
         },
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
@@ -194,9 +192,7 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
         invert: false,
-        constrainedBy: {
-          constraints: actuatorConstraints,
-        },
+        constraints: actuatorConstraints,
       },
     }),
     typed<DigitalActuatorBlock>({
@@ -215,9 +211,7 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
         invert: false,
-        constrainedBy: {
-          constraints: actuatorConstraints,
-        },
+        constraints: actuatorConstraints,
       },
     }),
     // PWM
@@ -233,9 +227,7 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: {
-          constraints: pwmConstraints,
-        },
+        constraints: pwmConstraints,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },
@@ -252,9 +244,7 @@ export function defineCreatedBlocks(config: HermsConfig): Block[] {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: {
-          constraints: pwmConstraints,
-        },
+        constraints: pwmConstraints,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },

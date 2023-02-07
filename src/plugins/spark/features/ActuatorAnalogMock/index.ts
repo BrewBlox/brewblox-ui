@@ -2,16 +2,16 @@ import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
+import { prettyConstraints } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import {
   ActuatorAnalogMockBlock,
-  AnalogConstraintsObj,
   BlockType,
   SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { emptyAnalogConstraints } from '../../utils/configuration';
 import widget from './ActuatorAnalogMockWidget.vue';
 
 const type = BlockType.ActuatorAnalogMock;
@@ -33,7 +33,7 @@ const plugin: Plugin = {
         value: 0,
         minValue: 0,
         maxValue: 100,
-        constrainedBy: { constraints: [] },
+        constraints: emptyAnalogConstraints(),
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
@@ -100,11 +100,11 @@ const plugin: Plugin = {
       },
       {
         type,
-        key: 'constrainedBy',
+        key: 'constraints',
         title: 'Constraints',
         component: 'AnalogConstraintsValEdit',
-        generate: (): AnalogConstraintsObj => ({ constraints: [] }),
-        pretty: prettifyConstraints,
+        generate: () => emptyAnalogConstraints(),
+        pretty: prettyConstraints,
       },
       {
         type,

@@ -1,5 +1,9 @@
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import {
+  emptyAnalogConstraints,
+  emptyDigitalConstraints,
+} from '@/plugins/spark/utils/configuration';
 import { useFeatureStore } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { userUnits } from '@/user-settings';
@@ -77,9 +81,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
-        constrainedBy: {
-          constraints: [],
-        },
+        constraints: emptyDigitalConstraints(),
         transitionDurationPreset: TransitionDurationPreset.ST_OFF,
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
@@ -99,9 +101,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         setting: 0,
         desiredSetting: 0,
         value: 0,
-        constrainedBy: {
-          constraints: [],
-        },
+        constraints: emptyAnalogConstraints(),
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },

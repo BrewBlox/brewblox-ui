@@ -145,21 +145,21 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
-        constrainedBy: {
-          constraints: [
-            {
-              mutexed: {
-                mutexId: bloxLink(names.mutex),
-                extraHoldTime: bloxQty('15m'),
-                hasLock: false,
-              },
-              remaining: bloxQty('0s'),
-            },
-            {
-              minOn: bloxQty('5s'),
-              remaining: bloxQty('0s'),
-            },
-          ],
+        constraints: {
+          minOn: {
+            enabled: true,
+            limiting: false,
+            remaining: bloxQty('0s'),
+            duration: bloxQty('5s'),
+          },
+          mutexed: {
+            enabled: true,
+            limiting: false,
+            hasLock: false,
+            remaining: bloxQty('0s'),
+            mutexId: bloxLink(names.mutex),
+            extraHoldTime: bloxQty('15m'),
+          },
         },
       },
     }),
@@ -179,17 +179,15 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
-        constrainedBy: {
-          constraints: [
-            {
-              mutexed: {
-                mutexId: bloxLink(names.mutex),
-                extraHoldTime: bloxQty('15m'),
-                hasLock: false,
-              },
-              remaining: bloxQty('0s'),
-            },
-          ],
+        constraints: {
+          mutexed: {
+            enabled: true,
+            limiting: false,
+            hasLock: false,
+            remaining: bloxQty('0s'),
+            mutexId: bloxLink(names.mutex),
+            extraHoldTime: bloxQty('15m'),
+          },
         },
       },
     }),
@@ -206,7 +204,7 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constraints: {},
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },
@@ -223,7 +221,7 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constraints: {},
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },
@@ -293,11 +291,19 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           transitionDurationValue: bloxQty('0s'),
           claimedBy: bloxLink(null),
           settingMode: SettingMode.STORED,
-          constrainedBy: {
-            constraints: [
-              { minOff: bloxQty('5m'), remaining: bloxQty('0s') },
-              { minOn: bloxQty('3m'), remaining: bloxQty('0s') },
-            ],
+          constraints: {
+            minOff: {
+              enabled: true,
+              limiting: false,
+              remaining: bloxQty('0s'),
+              duration: bloxQty('5m'),
+            },
+            minOn: {
+              enabled: true,
+              limiting: false,
+              remaining: bloxQty('0s'),
+              duration: bloxQty('3m'),
+            },
           },
         },
       }),
@@ -314,7 +320,7 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           desiredSetting: 0,
           setting: 0,
           value: 0,
-          constrainedBy: { constraints: [] },
+          constraints: {},
           claimedBy: bloxLink(null),
           settingMode: SettingMode.STORED,
         },

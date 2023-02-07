@@ -5,7 +5,7 @@ import { createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyLink } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
-  AnalogConstraintsObj,
+  AnalogConstraints,
   Link,
   Quantity,
   ReferenceKind,
@@ -50,9 +50,9 @@ export default defineComponent({
       set: (v) => patchBlock({ storedSetting: v }),
     });
 
-    const constrainedBy = computed<AnalogConstraintsObj>({
-      get: () => block.value.data.constrainedBy,
-      set: (v) => patchBlock({ constrainedBy: v }),
+    const constraints = computed<AnalogConstraints>({
+      get: () => block.value.data.constraints,
+      set: (v) => patchBlock({ constraints: v }),
     });
 
     const isLimited = computed<boolean>(() => {
@@ -89,7 +89,7 @@ export default defineComponent({
       refKind,
       refKindLabel,
       desiredSetting,
-      constrainedBy,
+      constraints,
       isLimited,
       changeEnabled,
     };
@@ -196,8 +196,8 @@ export default defineComponent({
           :service-id="serviceId"
           class="col-grow"
         />
-        <ConstraintsField
-          v-model="constrainedBy"
+        <AnalogConstraintsField
+          v-model="constraints"
           :service-id="serviceId"
           type="analog"
           class="col-grow"

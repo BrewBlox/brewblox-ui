@@ -10,8 +10,11 @@ import { isQuantity } from '@/utils/identity';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, durationMs, parseDate, prettyUnit } from '@/utils/quantity';
 import {
+  AnalogConstraints,
   Block,
   BlockIntfType,
+  BlockType,
+  DigitalConstraints,
   IoDriverInterfaceBlock,
   Link,
   SetpointProfileBlock,
@@ -184,4 +187,54 @@ export async function setExclusiveChannelActuator(
 
   await unlinkChannelActuators(actuator.serviceId, hwDevice, channel);
   await useSparkStore().patchBlock(actuator, { hwDevice, channel });
+}
+
+export function emptyAnalogConstraints(): AnalogConstraints {
+  return {
+    min: { enabled: false, limiting: false, value: 0 },
+    max: { enabled: false, limiting: false, value: 0 },
+    balanced: {
+      enabled: false,
+      limiting: false,
+      granted: 0,
+      balancerId: bloxLink(null, BlockType.Balancer),
+    },
+  };
+}
+
+export function emptyDigitalConstraints(): DigitalConstraints {
+  return {
+    minOff: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      duration: bloxQty('0s'),
+    },
+    minOn: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      duration: bloxQty('0s'),
+    },
+    delayedOn: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      duration: bloxQty('0s'),
+    },
+    delayedOff: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      duration: bloxQty('0s'),
+    },
+    mutexed: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      hasLock: false,
+      mutexId: bloxLink(null, BlockType.Mutex),
+      extraHoldTime: bloxQty('0s'),
+    },
+  };
 }

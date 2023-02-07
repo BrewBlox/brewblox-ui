@@ -172,12 +172,11 @@ export default defineComponent({
           class="col-grow"
         />
 
-        <ConstraintsField
-          :model-value="block.data.constrainedBy"
+        <AnalogConstraintsField
+          :model-value="block.data.constraints"
           :service-id="serviceId"
-          type="analog"
           class="col-grow"
-          @update:model-value="(v) => patchBlock({ constrainedBy: v })"
+          @update:model-value="(v) => patchBlock({ constraints: v })"
         />
       </div>
 
