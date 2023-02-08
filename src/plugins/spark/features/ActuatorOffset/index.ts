@@ -14,7 +14,6 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import { emptyAnalogConstraints } from '../../utils/configuration';
 import widget from './ActuatorOffsetWidget.vue';
 
 const type = BlockType.ActuatorOffset;
@@ -34,7 +33,7 @@ const plugin: Plugin = {
         desiredSetting: deltaTempQty(null),
         setting: deltaTempQty(null),
         value: deltaTempQty(null),
-        constraints: emptyAnalogConstraints(),
+        constraints: {},
         enabled: true,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
@@ -90,7 +89,7 @@ const plugin: Plugin = {
         key: 'constraints',
         title: 'Constraints',
         component: 'AnalogConstraintsValEdit',
-        generate: () => emptyAnalogConstraints(),
+        generate: () => ({}),
         pretty: prettyConstraints,
       },
       {

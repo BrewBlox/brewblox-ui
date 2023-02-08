@@ -2,7 +2,7 @@
 import { useField } from '@/composables';
 import { prettyLink } from '@/utils/quantity';
 import { AnalogConstraintBase, AnalogConstraints } from 'brewblox-proto/ts';
-import { defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 import { prettyConstraints, prettyLimitations } from '../../utils/formatting';
 
 export default defineComponent({
@@ -22,26 +22,37 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
-    function constraintStyle(constraint?: AnalogConstraintBase): string[] {
-      const style: string[] = ['text-small'];
-      if (!constraint) {
-        style.push('darkish');
-      } else if (constraint.limiting) {
-        style.push('text-pink-4');
+  emits: ['update:modelValue'],
+  setup(props, { emit }) {
+    const constraints = computed<AnalogConstraints>({
+      get: () => props.modelValue,
+      set: (v) => emit('update:modelValue', v),
+    });
+
+    const isConstrained = computed<boolean>(() => {
+      const { min, max, balanced } = constraints.value;
+      return [min, max, balanced].some((v) => v?.enabled);
+    });
+
+    function constraintClass(constraint: AnalogConstraintBase): string[] {
+      const cls: string[] = [];
+      if (constraint.limiting) {
+        cls.push('text-pink-4');
       } else if (constraint.enabled) {
-        style.push('text-indigo-4');
+        cls.push('text-indigo-4');
       } else {
-        style.push('darkish');
+        cls.push('darkish');
       }
-      return style;
+      return cls;
     }
 
     return {
       prettyLink,
       prettyConstraints,
       prettyLimitations,
-      constraintStyle,
+      constraints,
+      isConstrained,
+      constraintClass,
     };
   },
 });
@@ -55,24 +66,30 @@ export default defineComponent({
       size="sm"
     />
     <div class="col-auto">
-      <!-- <small>{{ prettyConstraints(modelValue) }}</small> -->
       <div
-        v-if="modelValue.min"
-        :class="constraintStyle(modelValue.min)"
+        v-if="!isConstrained"
+        class="text-italic darkish"
       >
-        Minimum: {{ modelValue.min?.value }}
+        No constraints set
+      </div>
+
+      <div
+        v-if="constraints.min?.enabled"
+        :class="constraintClass(constraints.min)"
+      >
+        Minimum: {{ constraints.min.value }}
       </div>
       <div
-        v-if="modelValue.max"
-        :class="constraintStyle(modelValue.max)"
+        v-if="constraints.max?.enabled"
+        :class="constraintClass(constraints.max)"
       >
-        Maximum: {{ modelValue.max?.value }}
+        Maximum: {{ constraints.max.value }}
       </div>
       <div
-        v-if="modelValue.balanced"
-        :class="constraintStyle(modelValue.balanced)"
+        v-if="constraints.balanced?.enabled"
+        :class="constraintClass(constraints.balanced)"
       >
-        Balanced: {{ prettyLink(modelValue.balanced?.balancerId) }}
+        Balanced: {{ prettyLink(constraints.balanced.balancerId) }}
       </div>
     </div>
     <!--

@@ -51,7 +51,7 @@ export default defineComponent({
     });
 
     const constraints = computed<AnalogConstraints>({
-      get: () => block.value.data.constraints,
+      get: () => block.value.data.constraints ?? {},
       set: (v) => patchBlock({ constraints: v }),
     });
 

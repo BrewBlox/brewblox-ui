@@ -15,7 +15,6 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import { emptyAnalogConstraints } from '../../utils/configuration';
 import widget from './FastPwmWidget.vue';
 
 const type = BlockType.FastPwm;
@@ -37,7 +36,7 @@ const plugin: Plugin = {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constraints: emptyAnalogConstraints(),
+        constraints: {},
         transitionDurationPreset: TransitionDurationPreset.ST_OFF,
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
@@ -89,7 +88,7 @@ const plugin: Plugin = {
         key: 'constraints',
         title: 'Constraints',
         component: 'AnalogConstraintsValEdit',
-        generate: emptyAnalogConstraints,
+        generate: () => ({}),
         pretty: prettyConstraints,
       },
       {

@@ -11,7 +11,6 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import { emptyAnalogConstraints } from '../../utils/configuration';
 import widget from './ActuatorAnalogMockWidget.vue';
 
 const type = BlockType.ActuatorAnalogMock;
@@ -33,7 +32,7 @@ const plugin: Plugin = {
         value: 0,
         minValue: 0,
         maxValue: 100,
-        constraints: emptyAnalogConstraints(),
+        constraints: {},
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
@@ -103,7 +102,7 @@ const plugin: Plugin = {
         key: 'constraints',
         title: 'Constraints',
         component: 'AnalogConstraintsValEdit',
-        generate: () => emptyAnalogConstraints(),
+        generate: () => ({}),
         pretty: prettyConstraints,
       },
       {

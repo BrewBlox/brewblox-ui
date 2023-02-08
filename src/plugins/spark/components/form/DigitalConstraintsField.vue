@@ -1,8 +1,8 @@
 <script lang="ts">
 import { useField } from '@/composables';
-import { createDialog } from '@/utils/dialog';
+import { prettyLink, prettyQty } from '@/utils/quantity';
 import { DigitalConstraintBase, DigitalConstraints } from 'brewblox-proto/ts';
-import { defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'DigitalConstraintsField',
@@ -23,77 +23,94 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    function change(constraints: DigitalConstraints): void {
-      emit('update:modelValue', constraints);
-    }
+    const constraints = computed<DigitalConstraints>({
+      get: () => props.modelValue,
+      set: (v) => emit('update:modelValue', v),
+    });
 
-    function openDialog(): void {
-      createDialog({
-        component: 'ConstraintsDialog',
-        componentProps: {
-          modelValue: props.modelValue,
-          title: props.title,
-          message: props.message,
-          html: props.html,
-          serviceId: props.serviceId,
-        },
-      }).onOk(change);
-    }
+    const isConstrained = computed<boolean>(() => {
+      const { minOn, minOff, delayedOn, delayedOff, mutexed } =
+        constraints.value;
+      return [minOn, minOff, delayedOn, delayedOff, mutexed].some(
+        (v) => v?.enabled,
+      );
+    });
 
-    function constraintStyle(constraint?: DigitalConstraintBase): string[] {
-      const style: string[] = [];
+    function constraintClass(constraint?: DigitalConstraintBase): string[] {
+      const cls: string[] = [];
       if (!constraint) {
-        style.push('darkish');
+        cls.push('darkish');
       } else if (constraint.limiting) {
-        style.push('text-pink-4');
+        cls.push('text-pink-4');
       } else if (constraint.enabled) {
-        style.push('text-indigo-4');
+        cls.push('text-indigo-4');
       } else {
-        style.push('darkish');
+        cls.push('darkish');
       }
-      return style;
+      return cls;
     }
 
     return {
-      constraintStyle,
-      openDialog,
+      constraints,
+      isConstrained,
+      prettyLink,
+      prettyQty,
+      constraintClass,
     };
   },
 });
 </script>
 
 <template>
-  <div
-    class="q-ma-sm q-pa-sm q-gutter-x-sm row clickable rounded-borders"
-    @click="openDialog"
-  >
+  <div class="q-ma-sm q-pa-sm q-gutter-x-sm row clickable rounded-borders">
     <q-icon
       name="mdi-border-outside"
       class="col-auto"
       size="sm"
     />
-    <div class="col-auto">
-      <small :class="constraintStyle(modelValue.minOff)">minOff</small>
-      <small :class="constraintStyle(modelValue.minOn)">minOn</small>
-      <small :class="constraintStyle(modelValue.delayedOn)">delayedOn</small>
-      <small :class="constraintStyle(modelValue.delayedOff)">delayedOff</small>
-      <small :class="constraintStyle(modelValue.mutexed)">mutexed</small>
-    </div>
-    <!--
-        <small
-        v-if="limiters.length"
+    <div
+      class="col-auto"
+      style="font-size: small"
+    >
+      <div
+        v-if="!isConstrained"
+        class="text-italic darkish"
       >
-        Limited by:
-        <i>{{ limiters.join(', ') }}</i>
-      </small>
-      <small v-else-if="numConstraints > 0">
-        {{ numConstraints }} constraint(s), not limited
-      </small>
-      <small v-else> No constraints configured</small>
+        No constraints set
+      </div>
+
+      <div
+        v-if="constraints.minOff?.enabled"
+        :class="constraintClass(constraints.minOff)"
+      >
+        Minimum OFF time: {{ prettyQty(constraints.minOff.duration) }}
+      </div>
+      <div
+        v-if="constraints.minOn?.enabled"
+        :class="constraintClass(constraints.minOn)"
+      >
+        Minimum ON time: {{ prettyQty(constraints.minOn.duration) }}
+      </div>
+      <div
+        v-if="constraints.delayedOn?.enabled"
+        :class="constraintClass(constraints.delayedOn)"
+      >
+        Delay ON: {{ prettyQty(constraints.delayedOn.duration) }}
+      </div>
+      <div
+        v-if="constraints.delayedOff?.enabled"
+        :class="constraintClass(constraints.delayedOff)"
+      >
+        Delay OFF: {{ prettyQty(constraints.delayedOff.duration) }}
+      </div>
+      <div
+        v-if="constraints.mutexed?.enabled"
+        :class="constraintClass(constraints.mutexed)"
+      >
+        Mutually Exclusive:
+        <i>{{ prettyLink(constraints.mutexed.mutexId) }}</i> <br />
+        Extra hold time: {{ prettyQty(constraints.mutexed.extraHoldTime) }}
+      </div>
     </div>
-    -->
-    <!-- <q-tooltip v-if="numConstraints > 0">
-      {{ displayString }}
-    </q-tooltip> -->
   </div>
 </template>

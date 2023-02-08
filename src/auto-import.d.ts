@@ -29,6 +29,7 @@ declare module '@vue/runtime-core' {
     SparkEspWifiCard: typeof import('src/plugins/spark/components/menu/SparkEspWifiCard.vue').default;
     SparkBackupMenu: typeof import('src/plugins/spark/components/menu/SparkBackupMenu.vue').default;
     FirmwareUpdateDialog: typeof import('src/plugins/spark/components/menu/FirmwareUpdateDialog.vue').default;
+    BlockJsonDialog: typeof import('src/plugins/spark/components/menu/BlockJsonDialog.vue').default;
     StringValEdit: typeof import('src/plugins/spark/components/form/StringValEdit.vue').default;
     StateValEdit: typeof import('src/plugins/spark/components/form/StateValEdit.vue').default;
     SetpointSettingDialog: typeof import('src/plugins/spark/components/form/SetpointSettingDialog.vue').default;
@@ -50,7 +51,6 @@ declare module '@vue/runtime-core' {
     BlockDialogButton: typeof import('src/plugins/spark/components/form/BlockDialogButton.vue').default;
     AnalogConstraintsValEdit: typeof import('src/plugins/spark/components/form/AnalogConstraintsValEdit.vue').default;
     AnalogConstraintsField: typeof import('src/plugins/spark/components/form/AnalogConstraintsField.vue').default;
-    AnalogConstraints: typeof import('src/plugins/spark/components/form/AnalogConstraints.vue').default;
     QuickstartTaskMaster: typeof import('src/plugins/quickstart/components/QuickstartTaskMaster.vue').default;
     QuickstartServiceTask: typeof import('src/plugins/quickstart/components/QuickstartServiceTask.vue').default;
     QuickstartSensorField: typeof import('src/plugins/quickstart/components/QuickstartSensorField.vue').default;

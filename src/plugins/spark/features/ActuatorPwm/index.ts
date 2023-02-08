@@ -13,7 +13,6 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import { emptyAnalogConstraints } from '../../utils/configuration';
 import widget from './ActuatorPwmWidget.vue';
 
 const type = BlockType.ActuatorPwm;
@@ -32,7 +31,7 @@ const plugin: Plugin = {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constraints: emptyAnalogConstraints(),
+        constraints: {},
         enabled: true,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
@@ -88,7 +87,7 @@ const plugin: Plugin = {
         key: 'constraints',
         title: 'Constraints',
         component: 'AnalogConstraintsValEdit',
-        generate: () => emptyAnalogConstraints(),
+        generate: () => ({}),
         pretty: prettyConstraints,
       },
       {
