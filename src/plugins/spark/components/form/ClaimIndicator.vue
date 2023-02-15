@@ -67,7 +67,7 @@ export default defineComponent({
           class="col-auto"
           size="sm"
         />
-        <div class="col-auto darkish text-small">
+        <div class="col-auto darkish">
           <div>
             <i>{{ claim.source }}</i>
           </div>

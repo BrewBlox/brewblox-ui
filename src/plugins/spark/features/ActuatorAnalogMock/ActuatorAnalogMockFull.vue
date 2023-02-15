@@ -52,7 +52,9 @@ export default defineComponent({
         class="col-grow"
         @update:model-value="(v) => patchBlock({ maxSetting: v })"
       />
+
       <div class="col-break" />
+
       <LabeledField
         :model-value="block.data.value"
         type="number"
@@ -78,7 +80,9 @@ export default defineComponent({
         class="col-grow"
         @update:model-value="(v) => patchBlock({ maxValue: v })"
       />
+
       <div class="col-break" />
+
       <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
@@ -88,6 +92,13 @@ export default defineComponent({
         :model-value="block.data.constraints"
         :service-id="serviceId"
         class="col-grow"
+      />
+
+      <div class="col-break" />
+
+      <AnalogConstraintsEditor
+        :service-id="serviceId"
+        :model-value="block.data.constraints"
         @update:model-value="(v) => patchBlock({ constraints: v })"
       />
     </div>

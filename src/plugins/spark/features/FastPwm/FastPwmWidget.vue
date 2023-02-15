@@ -176,7 +176,6 @@ export default defineComponent({
           :model-value="block.data.constraints"
           :service-id="serviceId"
           class="col-grow"
-          @update:model-value="(v) => patchBlock({ constraints: v })"
         />
       </div>
 
@@ -251,6 +250,14 @@ export default defineComponent({
           >
             {{ prettyQty(block.data.transitionDurationValue) }}
           </LabeledField>
+
+          <div class="col-break" />
+
+          <AnalogConstraintsEditor
+            :service-id="serviceId"
+            :model-value="block.data.constraints"
+            @update:model-value="(v) => patchBlock({ constraints: v })"
+          />
         </div>
       </template>
     </div>

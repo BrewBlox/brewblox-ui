@@ -189,7 +189,7 @@ export async function setExclusiveChannelActuator(
   await useSparkStore().patchBlock(actuator, { hwDevice, channel });
 }
 
-export function emptyAnalogConstraints(): AnalogConstraints {
+export function emptyAnalogConstraints(): DeepNonNullable<AnalogConstraints> {
   return {
     min: { enabled: false, limiting: false, value: 0 },
     max: { enabled: false, limiting: false, value: 0 },
@@ -202,7 +202,7 @@ export function emptyAnalogConstraints(): AnalogConstraints {
   };
 }
 
-export function emptyDigitalConstraints(): DigitalConstraints {
+export function emptyDigitalConstraints(): DeepNonNullable<DigitalConstraints> {
   return {
     minOff: {
       enabled: false,

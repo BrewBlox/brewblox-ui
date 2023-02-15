@@ -163,6 +163,19 @@ export default defineComponent({
           tag-class="text-secondary"
         />
 
+        <div class="col-break" />
+
+        <ClaimIndicator
+          :block-id="block.id"
+          :service-id="serviceId"
+          class="col-grow"
+        />
+        <AnalogConstraintsField
+          :model-value="constraints"
+          :service-id="serviceId"
+          class="col-grow"
+        />
+
         <template v-if="context.mode === 'Full'">
           <div class="col-break" />
 
@@ -187,21 +200,15 @@ export default defineComponent({
             label="Reference field"
             class="col-grow"
           />
+
+          <div class="col-break" />
+
+          <div class="col-break" />
+          <AnalogConstraintsEditor
+            v-model="constraints"
+            :service-id="serviceId"
+          />
         </template>
-
-        <div class="col-break" />
-
-        <ClaimIndicator
-          :block-id="block.id"
-          :service-id="serviceId"
-          class="col-grow"
-        />
-        <AnalogConstraintsField
-          v-model="constraints"
-          :service-id="serviceId"
-          type="analog"
-          class="col-grow"
-        />
       </div>
     </div>
   </PreviewCard>

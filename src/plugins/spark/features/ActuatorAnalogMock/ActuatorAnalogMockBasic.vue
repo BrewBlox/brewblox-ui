@@ -43,7 +43,9 @@ export default defineComponent({
         tag="big"
         class="col-grow"
       />
+
       <div class="col-break" />
+
       <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
@@ -53,7 +55,6 @@ export default defineComponent({
         :model-value="block.data.constraints"
         :service-id="serviceId"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ constraints: v })"
       />
     </div>
   </div>

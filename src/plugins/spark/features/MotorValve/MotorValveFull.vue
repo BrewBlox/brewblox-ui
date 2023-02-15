@@ -28,23 +28,6 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row">
-      <ChannelSelectField
-        :model-value="{
-          hwDevice: block.data.hwDevice,
-          channel: block.data.channel,
-        }"
-        :service-id="serviceId"
-        :capabilities="ChannelCapabilities.CHAN_SUPPORTS_BIDIRECTIONAL"
-        clearable
-        title="Target channel"
-        label="Channel"
-        class="col-grow"
-        @update:model-value="
-          ({ hwDevice, channel }) =>
-            setExclusiveChannelActuator(block, hwDevice, channel)
-        "
-      />
-      <div class="col-break" />
       <LabeledField
         label="State"
         class="col-grow"
@@ -62,7 +45,9 @@ export default defineComponent({
         label="Valve State"
         class="col-grow"
       />
+
       <div class="col-break" />
+
       <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
@@ -72,6 +57,32 @@ export default defineComponent({
         :model-value="block.data.constraints"
         :service-id="serviceId"
         class="col-grow"
+      />
+
+      <div class="col-break" />
+
+      <ChannelSelectField
+        :model-value="{
+          hwDevice: block.data.hwDevice,
+          channel: block.data.channel,
+        }"
+        :service-id="serviceId"
+        :capabilities="ChannelCapabilities.CHAN_SUPPORTS_BIDIRECTIONAL"
+        clearable
+        title="Target channel"
+        label="Channel"
+        class="col-grow"
+        @update:model-value="
+          ({ hwDevice, channel }) =>
+            setExclusiveChannelActuator(block, hwDevice, channel)
+        "
+      />
+
+      <div class="col-break" />
+
+      <DigitalConstraintsEditor
+        :model-value="block.data.constraints"
+        :service-id="serviceId"
         @update:model-value="(v) => patchBlock({ constraints: v })"
       />
     </div>

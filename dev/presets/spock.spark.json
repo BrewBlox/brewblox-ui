@@ -1,18 +1,16 @@
 {
+  "name": null,
+  "timestamp": "2023-02-09T14:01:39Z",
+  "firmware": {
+    "firmware_version": "072cc202",
+    "proto_version": "e9b2f8b9",
+    "firmware_date": "2023-02-09",
+    "proto_date": "2023-02-09"
+  },
+  "device": {
+    "device_id": "432109876543210987654321"
+  },
   "blocks": [
-    {
-      "id": "ActiveGroups",
-      "nid": 1,
-      "type": "ErrorObject",
-      "serviceId": "spock",
-      "data": {
-        "error": "KeyError('No transcoder found for identifier (65534, 0)')",
-        "identifier": [
-          65534,
-          0
-        ]
-      }
-    },
     {
       "id": "actuator-1",
       "nid": 208,
@@ -23,9 +21,17 @@
         "maxSetting": 30,
         "minValue": 40,
         "maxValue": 60,
-        "desiredSetting": 10,
+        "enabled": false,
+        "storedSetting": 0,
+        "desiredSetting": 0,
         "setting": 0,
-        "value": 0
+        "value": 0,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -44,36 +50,34 @@
           "unit": "second",
           "value": 4
         },
-        "constrainedBy": {
-          "constraints": [
-            {
-              "max": 50,
-              "limiting": false
+        "settingMode": 1,
+        "constraints": {
+          "max": {
+            "value": 50,
+            "enabled": true,
+            "limiting": false
+          },
+          "balanced": {
+            "balancerId": {
+              "__bloxtype": "Link",
+              "type": "BalancerInterface",
+              "id": "balancer-1"
             },
-            {
-              "balanced": {
-                "balancerId": {
-                  "__bloxtype": "Link",
-                  "type": "BalancerInterface",
-                  "id": "balancer-1"
-                },
-                "id": 1,
-                "granted": 0
-              },
-              "limiting": false
-            }
-          ]
-        },
-        "setting": 0,
-        "value": 0,
-        "drivenActuatorId": {
-          "__bloxtype": "Link",
-          "type": "ActuatorDigitalInterface",
-          "driven": true,
-          "id": null
+            "enabled": true,
+            "granted": 0,
+            "limiting": false
+          }
         },
         "enabled": false,
-        "desiredSetting": 0
+        "storedSetting": 0,
+        "desiredSetting": 0,
+        "setting": 0,
+        "value": 0,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        }
       }
     },
     {
@@ -133,10 +137,16 @@
             }
           }
         ],
-        "name": "test",
-        "timeZone": "CET-1CEST,M3.5.0,M10.5.0/3",
-        "tempUnit": 0,
-        "brightness": 0
+        "name": "test"
+      }
+    },
+    {
+      "id": "Mock Pins",
+      "nid": 231,
+      "type": "MockPins",
+      "serviceId": "spock",
+      "data": {
+        "channels": []
       }
     },
     {
@@ -149,8 +159,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "setting": {
           "__bloxtype": "Quantity",
@@ -170,8 +180,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "setting": {
           "__bloxtype": "Quantity",
@@ -191,8 +201,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "setting": {
           "__bloxtype": "Quantity",
@@ -208,16 +218,11 @@
       "type": "Mutex",
       "serviceId": "spock",
       "data": {
-        "differentActuatorWait": {
-          "__bloxtype": "Quantity",
-          "unit": "second",
-          "value": 0.01
-        },
         "waitRemaining": {
           "__bloxtype": "Quantity",
           "unit": "second",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         }
       }
     },
@@ -264,8 +269,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -289,8 +294,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -314,8 +319,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -339,8 +344,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -364,8 +369,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -389,8 +394,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -412,34 +417,45 @@
       "data": {
         "targetId": {
           "__bloxtype": "Link",
-          "type": "ProcessValueInterface",
+          "type": "SetpointSensorPairInterface",
           "id": "setpoint-sensor-pair-1"
         },
         "referenceId": {
           "__bloxtype": "Link",
-          "type": "ProcessValueInterface",
+          "type": "SetpointSensorPairInterface",
           "id": "setpoint-sensor-pair-1"
         },
+        "enabled": false,
+        "storedSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        },
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0,
+          "readonly": true
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0,
+          "readonly": true
+        },
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0,
+          "readonly": true
+        },
         "referenceSettingOrValue": 0,
-        "setting": 0,
-        "value": 0,
-        "drivenTargetId": {
+        "claimedBy": {
           "__bloxtype": "Link",
-          "type": "ProcessValueInterface",
-          "driven": true,
+          "type": "Any",
           "id": null
         },
-        "enabled": false,
-        "desiredSetting": 0
-      }
-    },
-    {
-      "id": "OneWireBus",
-      "nid": 4,
-      "type": "OneWireBus",
-      "serviceId": "spock",
-      "data": {
-        "address": []
+        "settingMode": 0
       }
     },
     {
@@ -477,14 +493,14 @@
         "inputValue": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "inputSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "outputValue": 0,
         "outputSetting": 0,
@@ -495,27 +511,11 @@
         "error": {
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "integral": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC * hour",
-          "readonly": true,
-          "value": 0
-        },
-        "derivative": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC / minute",
-          "readonly": true,
-          "value": 0
-        },
-        "drivenOutputId": {
-          "__bloxtype": "Link",
-          "type": "ActuatorAnalogInterface",
-          "driven": true,
-          "id": null
-        },
+        "integral": 0,
+        "derivative": 0,
         "integralReset": 0,
         "boilPointAdjust": {
           "__bloxtype": "Quantity",
@@ -536,39 +536,54 @@
         "hwDevice": {
           "__bloxtype": "Link",
           "type": "IoArrayInterface",
-          "driven": true,
-          "id": "SparkPins"
+          "id": "Mock Pins"
         },
-        "channel": 1,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "mutexed": {
-                "mutexId": {
-                  "__bloxtype": "Link",
-                  "type": "MutexInterface",
-                  "id": "mutex-1"
-                },
-                "extraHoldTime": {
-                  "__bloxtype": "Quantity",
-                  "unit": "second",
-                  "value": 0
-                },
-                "hasCustomHoldTime": false,
-                "hasLock": false
-              },
-              "remaining": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "readonly": true,
-                "value": 0
-              }
+        "channel": 2,
+        "storedState": 2,
+        "constraints": {
+          "mutexed": {
+            "mutexId": {
+              "__bloxtype": "Link",
+              "type": "MutexInterface",
+              "id": "mutex-1"
+            },
+            "enabled": true,
+            "extraHoldTime": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0
+            },
+            "hasLock": false,
+            "limiting": false,
+            "remaining": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0,
+              "readonly": true
             }
-          ]
+          }
         },
+        "desiredState": 0,
         "state": 0,
         "invert": false,
-        "desiredState": 0
+        "transitionDurationPreset": 0,
+        "transitionDurationSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0
+        },
+        "transitionDurationValue": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -580,39 +595,54 @@
         "hwDevice": {
           "__bloxtype": "Link",
           "type": "IoArrayInterface",
-          "driven": true,
-          "id": "SparkPins"
+          "id": "Mock Pins"
         },
-        "channel": 2,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "mutexed": {
-                "mutexId": {
-                  "__bloxtype": "Link",
-                  "type": "MutexInterface",
-                  "id": "mutex-1"
-                },
-                "extraHoldTime": {
-                  "__bloxtype": "Quantity",
-                  "unit": "second",
-                  "value": 0
-                },
-                "hasCustomHoldTime": false,
-                "hasLock": false
-              },
-              "remaining": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "readonly": true,
-                "value": 0
-              }
+        "channel": 1,
+        "storedState": 2,
+        "constraints": {
+          "mutexed": {
+            "mutexId": {
+              "__bloxtype": "Link",
+              "type": "MutexInterface",
+              "id": "mutex-1"
+            },
+            "enabled": true,
+            "extraHoldTime": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0
+            },
+            "hasLock": false,
+            "limiting": false,
+            "remaining": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0,
+              "readonly": true
             }
-          ]
+          }
         },
+        "desiredState": 0,
         "state": 0,
         "invert": false,
-        "desiredState": 0
+        "transitionDurationPreset": 0,
+        "transitionDurationSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0
+        },
+        "transitionDurationValue": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -621,16 +651,34 @@
       "type": "DigitalActuator",
       "serviceId": "spock",
       "data": {
+        "storedState": 2,
         "hwDevice": {
           "__bloxtype": "Link",
           "type": "IoArrayInterface",
-          "driven": true,
           "id": null
         },
         "channel": 0,
+        "desiredState": 0,
         "state": 0,
         "invert": false,
-        "desiredState": 0
+        "transitionDurationPreset": 0,
+        "transitionDurationSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0
+        },
+        "transitionDurationValue": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -641,7 +689,11 @@
       "data": {
         "points": [
           {
-            "time": 10,
+            "time": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 10
+            },
             "temperature": {
               "__bloxtype": "Quantity",
               "unit": "degC",
@@ -649,7 +701,11 @@
             }
           },
           {
-            "time": 20,
+            "time": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 20
+            },
             "temperature": {
               "__bloxtype": "Quantity",
               "unit": "degC",
@@ -657,7 +713,11 @@
             }
           },
           {
-            "time": 30000,
+            "time": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 30000
+            },
             "temperature": {
               "__bloxtype": "Quantity",
               "unit": "degC",
@@ -665,17 +725,11 @@
             }
           }
         ],
-        "start": 1540376829,
+        "start": "2018-10-24T10:27:09Z",
         "enabled": false,
         "targetId": {
           "__bloxtype": "Link",
           "type": "SetpointSensorPair",
-          "id": null
-        },
-        "drivenTargetId": {
-          "__bloxtype": "Link",
-          "type": "SetpointSensorPair",
-          "driven": true,
           "id": null
         }
       }
@@ -690,8 +744,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "setting": {
           "__bloxtype": "Quantity",
@@ -710,8 +764,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": null
+          "value": 0,
+          "readonly": true
         },
         "connected": false,
         "setting": {
@@ -737,8 +791,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "oneWireBusId": {
           "__bloxtype": "Link",
@@ -770,25 +824,37 @@
           "unit": "delta_degC",
           "value": 4
         },
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
+        },
         "setting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "resetFilter": false
+        "resetFilter": false,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -813,40 +879,38 @@
           "type": "TempSensorInterface",
           "id": null
         },
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
+        },
         "setting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "filter": 0,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "resetFilter": false
-      }
-    },
-    {
-      "id": "SparkPins",
-      "nid": 19,
-      "type": "Spark3Pins",
-      "serviceId": "spock",
-      "data": {
-        "enableIoSupply5V": true,
-        "enableIoSupply12V": true,
-        "soundAlarm": false,
-        "voltage5": 0,
-        "voltage12": 0,
-        "channels": []
+        "filter": 0,
+        "resetFilter": false,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -861,35 +925,18 @@
         "protocolVersion": "",
         "releaseDate": "",
         "protocolDate": "",
-        "command": 0,
-        "trace": []
-      }
-    },
-    {
-      "id": "TouchSettings",
-      "nid": 6,
-      "type": "TouchSettings",
-      "serviceId": "spock",
-      "data": {
-        "calibrated": 1,
-        "xBitsPerPixelX16": 64,
-        "yBitsPerPixelX16": 64,
-        "xOffset": 0,
-        "yOffset": 0
-      }
-    },
-    {
-      "id": "WiFiSettings",
-      "nid": 5,
-      "type": "WiFiSettings",
-      "serviceId": "spock",
-      "data": {
-        "ssid": "",
-        "password": "",
-        "security": 0,
-        "cipher": 0,
-        "signal": 0,
-        "ip": ""
+        "ip": "0.0.0.0",
+        "uptime": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "updatesPerSecond": 0,
+        "systemTime": null,
+        "timeZone": "",
+        "tempUnit": 0,
+        "displayBrightness": 0
       }
     }
   ],
@@ -898,13 +945,6 @@
       "keys": [
         "SystemInfo",
         2
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "SystemTime",
-        3
       ],
       "data": {}
     },
@@ -940,6 +980,13 @@
       "keys": [
         "SparkPins",
         19
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "SystemTime",
+        3
       ],
       "data": {}
     },
@@ -1129,6 +1176,13 @@
       "keys": [
         "New|DS2408-1",
         230
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Mock Pins",
+        231
       ],
       "data": {}
     }

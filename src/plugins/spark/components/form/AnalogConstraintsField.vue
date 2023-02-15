@@ -22,12 +22,8 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const constraints = computed<AnalogConstraints>({
-      get: () => props.modelValue,
-      set: (v) => emit('update:modelValue', v),
-    });
+  setup(props) {
+    const constraints = computed<AnalogConstraints>(() => props.modelValue);
 
     const isConstrained = computed<boolean>(() => {
       const { min, max, balanced } = constraints.value;
@@ -59,54 +55,31 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="q-ma-sm q-pa-sm q-gutter-x-sm row clickable rounded-borders">
-    <q-icon
-      name="mdi-border-outside"
-      class="col-auto"
-      size="sm"
-    />
-    <div class="col-auto">
-      <div
-        v-if="!isConstrained"
-        class="text-italic darkish"
-      >
-        No constraints set
-      </div>
+  <div class="q-ma-sm q-pa-sm q-gutter-x-sm row">
+    <div
+      v-if="!isConstrained"
+      class="text-italic darkish text-small"
+    >
+      No constraints set
+    </div>
 
-      <div
-        v-if="constraints.min?.enabled"
-        :class="constraintClass(constraints.min)"
-      >
-        Minimum: {{ constraints.min.value }}
-      </div>
-      <div
-        v-if="constraints.max?.enabled"
-        :class="constraintClass(constraints.max)"
-      >
-        Maximum: {{ constraints.max.value }}
-      </div>
-      <div
-        v-if="constraints.balanced?.enabled"
-        :class="constraintClass(constraints.balanced)"
-      >
-        Balanced: {{ prettyLink(constraints.balanced.balancerId) }}
-      </div>
+    <div
+      v-if="constraints.min?.enabled"
+      :class="constraintClass(constraints.min)"
+    >
+      Minimum: {{ constraints.min.value }}
     </div>
-    <!--
-        <small
-        v-if="limiters.length"
-      >
-        Limited by:
-        <i>{{ limiters.join(', ') }}</i>
-      </small>
-      <small v-else-if="numConstraints > 0">
-        {{ numConstraints }} constraint(s), not limited
-      </small>
-      <small v-else> No constraints configured</small>
+    <div
+      v-if="constraints.max?.enabled"
+      :class="constraintClass(constraints.max)"
+    >
+      Maximum: {{ constraints.max.value }}
     </div>
-    -->
-    <!-- <q-tooltip v-if="numConstraints > 0">
-      {{ displayString }}
-    </q-tooltip> -->
+    <div
+      v-if="constraints.balanced?.enabled"
+      :class="constraintClass(constraints.balanced)"
+    >
+      Balanced: {{ prettyLink(constraints.balanced.balancerId) }}
+    </div>
   </div>
 </template>

@@ -1,7 +1,11 @@
 <script lang="ts">
 import { useField } from '@/composables';
 import { prettyLink, prettyQty } from '@/utils/quantity';
-import { DigitalConstraintBase, DigitalConstraints } from 'brewblox-proto/ts';
+import {
+  DigitalConstraintBase,
+  DigitalConstraints,
+  MutexedConstraint,
+} from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -21,12 +25,8 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const constraints = computed<DigitalConstraints>({
-      get: () => props.modelValue,
-      set: (v) => emit('update:modelValue', v),
-    });
+  setup(props) {
+    const constraints = computed<DigitalConstraints>(() => props.modelValue);
 
     const isConstrained = computed<boolean>(() => {
       const { minOn, minOff, delayedOn, delayedOff, mutexed } =
@@ -38,14 +38,14 @@ export default defineComponent({
 
     function constraintClass(constraint?: DigitalConstraintBase): string[] {
       const cls: string[] = [];
-      if (!constraint) {
-        cls.push('darkish');
-      } else if (constraint.limiting) {
-        cls.push('text-pink-4');
-      } else if (constraint.enabled) {
-        cls.push('text-indigo-4');
-      } else {
-        cls.push('darkish');
+      if (constraint) {
+        if ((constraint as MutexedConstraint).hasLock) {
+          cls.push('text-green-4');
+        } else if (constraint.limiting) {
+          cls.push('text-pink-4');
+        } else if (constraint.enabled) {
+          cls.push('text-indigo-4');
+        }
       }
       return cls;
     }
@@ -62,19 +62,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="q-ma-sm q-pa-sm q-gutter-x-sm row clickable rounded-borders">
-    <q-icon
-      name="mdi-border-outside"
-      class="col-auto"
-      size="sm"
-    />
-    <div
-      class="col-auto"
-      style="font-size: small"
-    >
+  <div class="col-auto row q-ma-sm q-pa-sm q-gutter-x-sm">
+    <div class="col-auto column">
       <div
         v-if="!isConstrained"
-        class="text-italic darkish"
+        class="text-italic darkish text-small"
       >
         No constraints set
       </div>
@@ -107,9 +99,9 @@ export default defineComponent({
         v-if="constraints.mutexed?.enabled"
         :class="constraintClass(constraints.mutexed)"
       >
-        Mutually Exclusive:
-        <i>{{ prettyLink(constraints.mutexed.mutexId) }}</i> <br />
-        Extra hold time: {{ prettyQty(constraints.mutexed.extraHoldTime) }}
+        Mutex: <i>{{ prettyLink(constraints.mutexed.mutexId) }}</i> <br />
+        Mutex hold time: {{ prettyQty(constraints.mutexed.extraHoldTime) }}
+        <span v-if="constraints.mutexed.hasLock">(has lock)</span>
       </div>
     </div>
   </div>

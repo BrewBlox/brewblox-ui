@@ -40,6 +40,7 @@ declare module '@vue/runtime-core' {
     DurationValEdit: typeof import('src/plugins/spark/components/form/DurationValEdit.vue').default;
     DigitalConstraintsValEdit: typeof import('src/plugins/spark/components/form/DigitalConstraintsValEdit.vue').default;
     DigitalConstraintsField: typeof import('src/plugins/spark/components/form/DigitalConstraintsField.vue').default;
+    DigitalConstraintsEditor: typeof import('src/plugins/spark/components/form/DigitalConstraintsEditor.vue').default;
     DigitalConstraintsDialog: typeof import('src/plugins/spark/components/form/DigitalConstraintsDialog.vue').default;
     DateValEdit: typeof import('src/plugins/spark/components/form/DateValEdit.vue').default;
     ClaimIndicator: typeof import('src/plugins/spark/components/form/ClaimIndicator.vue').default;
@@ -51,6 +52,7 @@ declare module '@vue/runtime-core' {
     BlockDialogButton: typeof import('src/plugins/spark/components/form/BlockDialogButton.vue').default;
     AnalogConstraintsValEdit: typeof import('src/plugins/spark/components/form/AnalogConstraintsValEdit.vue').default;
     AnalogConstraintsField: typeof import('src/plugins/spark/components/form/AnalogConstraintsField.vue').default;
+    AnalogConstraintsEditor: typeof import('src/plugins/spark/components/form/AnalogConstraintsEditor.vue').default;
     QuickstartTaskMaster: typeof import('src/plugins/quickstart/components/QuickstartTaskMaster.vue').default;
     QuickstartServiceTask: typeof import('src/plugins/quickstart/components/QuickstartServiceTask.vue').default;
     QuickstartSensorField: typeof import('src/plugins/quickstart/components/QuickstartSensorField.vue').default;

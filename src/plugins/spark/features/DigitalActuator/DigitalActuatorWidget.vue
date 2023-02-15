@@ -164,6 +164,19 @@ export default defineComponent({
           />
         </LabeledField>
 
+        <div class="col-break" />
+
+        <ClaimIndicator
+          :block-id="block.id"
+          :service-id="serviceId"
+          class="col-grow"
+        />
+        <DigitalConstraintsField
+          :model-value="block.data.constraints"
+          :service-id="serviceId"
+          class="col-grow"
+        />
+
         <template v-if="context.mode === 'Full'">
           <div class="col-break" />
 
@@ -236,21 +249,16 @@ export default defineComponent({
               Soft start is not supported on target channel
             </LabeledField>
           </template>
+
+          <div class="col-break" />
+
+          <DigitalConstraintsEditor
+            :model-value="block.data.constraints"
+            :service-id="serviceId"
+            class="col-auto"
+            @update:model-value="(v) => patchBlock({ constraints: v })"
+          />
         </template>
-
-        <div class="col-break" />
-
-        <ClaimIndicator
-          :block-id="block.id"
-          :service-id="serviceId"
-          class="col-grow"
-        />
-        <DigitalConstraintsField
-          :model-value="block.data.constraints"
-          :service-id="serviceId"
-          class="col-grow"
-          @update:model-value="(v) => patchBlock({ constraints: v })"
-        />
       </div>
     </div>
   </PreviewCard>

@@ -13,8 +13,8 @@ export default defineComponent({
   setup() {
     const { field, startEdit } = useValEdit.setup<DigitalConstraints>();
 
-    const displayString = computed<string>(() =>
-      prettyConstraints(field.value),
+    const displayString = computed<string>(
+      () => prettyConstraints(field.value) || 'Unconstrained',
     );
 
     return {
@@ -35,7 +35,10 @@ export default defineComponent({
       Values will replace all existing constraints on
       <i> {{ blockId }} </i>.
     </div>
-    <!-- TODO -->
+    <DigitalConstraintsEditor
+      v-model="field"
+      :service-id="serviceId"
+    />
   </div>
   <div
     v-else
