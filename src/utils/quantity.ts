@@ -432,9 +432,13 @@ export function durationMs(duration: Maybe<DurationCompatible>): number {
  * Millisecond values are only included if the total value is < 10s.
  *
  * @param duration value that can be interpreted as a duration
+ * @param msIncluded if false, value is rounded down to the nearest second
  * @returns duration formatted as duration string
  */
-export function durationString(duration: Maybe<DurationCompatible>): string {
+export function durationString(
+  duration: Maybe<DurationCompatible>,
+  msIncluded = true,
+): string {
   const ms = durationMs(duration);
   if (!ms) {
     return '0s';
@@ -447,7 +451,7 @@ export function durationString(duration: Maybe<DurationCompatible>): string {
   const seconds = Math.floor(
     secondsTotal - days * 86400 - hours * 3600 - minutes * 60,
   );
-  const milliseconds = secondsTotal < 10 ? ms % 1000 : 0;
+  const milliseconds = msIncluded && secondsTotal < 10 ? ms % 1000 : 0;
   const values = [
     [days, 'd'],
     [hours, 'h'],

@@ -1,5 +1,4 @@
 <script lang="ts">
-import { useField } from '@/composables';
 import { prettyLink } from '@/utils/quantity';
 import { AnalogConstraintBase, AnalogConstraints } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
@@ -8,14 +7,9 @@ import { prettyConstraints, prettyLimitations } from '../../utils/formatting';
 export default defineComponent({
   name: 'AnalogConstraintsField',
   props: {
-    ...useField.props,
     modelValue: {
       type: Object as PropType<AnalogConstraints>,
       default: () => ({}),
-    },
-    title: {
-      type: String,
-      default: 'Edit constraints',
     },
     serviceId: {
       type: String,
