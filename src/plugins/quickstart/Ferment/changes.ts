@@ -129,25 +129,27 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
-        constrainedBy: {
-          constraints: [
-            {
-              minOff: bloxQty('5m'),
-              remaining: bloxQty('0s'),
-            },
-            {
-              minOn: bloxQty('2m'),
-              remaining: bloxQty('0s'),
-            },
-            {
-              mutexed: {
-                mutexId: bloxLink(names.mutex),
-                extraHoldTime: bloxQty('45m'),
-                hasLock: false,
-              },
-              remaining: bloxQty('0s'),
-            },
-          ],
+        constraints: {
+          minOff: {
+            enabled: true,
+            limiting: false,
+            remaining: bloxQty('0s'),
+            duration: bloxQty('5m'),
+          },
+          minOn: {
+            enabled: true,
+            limiting: false,
+            remaining: bloxQty('0s'),
+            duration: bloxQty('2m'),
+          },
+          mutexed: {
+            enabled: true,
+            limiting: false,
+            hasLock: false,
+            remaining: bloxQty('0s'),
+            mutexId: bloxLink(names.mutex),
+            extraHoldTime: bloxQty('45m'),
+          },
         },
       },
     }),
@@ -167,17 +169,15 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
         transitionDurationValue: bloxQty('0s'),
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
-        constrainedBy: {
-          constraints: [
-            {
-              mutexed: {
-                mutexId: bloxLink(names.mutex),
-                extraHoldTime: bloxQty('20m'),
-                hasLock: false,
-              },
-              remaining: bloxQty('0s'),
-            },
-          ],
+        constraints: {
+          mutexed: {
+            enabled: true,
+            limiting: false,
+            hasLock: false,
+            remaining: bloxQty('0s'),
+            mutexId: bloxLink(names.mutex),
+            extraHoldTime: bloxQty('20m'),
+          },
         },
       },
     }),
@@ -194,7 +194,7 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constraints: {},
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },
@@ -211,7 +211,7 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constraints: {},
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },

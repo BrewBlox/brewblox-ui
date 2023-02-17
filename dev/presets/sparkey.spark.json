@@ -1,4 +1,15 @@
 {
+  "name": null,
+  "timestamp": "2023-02-09T14:01:39Z",
+  "firmware": {
+    "firmware_version": "072cc202",
+    "proto_version": "e9b2f8b9",
+    "firmware_date": "2023-02-09",
+    "proto_date": "2023-02-09"
+  },
+  "device": {
+    "device_id": "123456789012345678901234"
+  },
   "blocks": [
     {
       "id": "DisplaySettings",
@@ -6,11 +17,8 @@
       "type": "DisplaySettings",
       "serviceId": "sparkey",
       "data": {
-        "timeZone": "CET-1CEST,M3.5.0,M10.5.0/3",
         "widgets": [],
-        "name": "",
-        "tempUnit": 0,
-        "brightness": 0
+        "name": ""
       }
     },
     {
@@ -42,8 +50,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         }
       }
     },
@@ -70,25 +78,37 @@
           "unit": "delta_degC",
           "value": 5
         },
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
+        },
         "setting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "resetFilter": false
+        "resetFilter": false,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -100,65 +120,84 @@
         "hwDevice": {
           "__bloxtype": "Link",
           "type": "IoArrayInterface",
-          "driven": true,
-          "id": "SparkPins"
+          "id": "Mock Pins"
         },
-        "channel": 1,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "minOff": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "value": 300
-              },
-              "remaining": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "readonly": true,
-                "value": 0
-              }
+        "channel": 4,
+        "storedState": 2,
+        "settingMode": 1,
+        "constraints": {
+          "minOff": {
+            "duration": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 300
             },
-            {
-              "minOn": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "value": 120
-              },
-              "remaining": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "readonly": true,
-                "value": 0
-              }
-            },
-            {
-              "mutexed": {
-                "mutexId": {
-                  "__bloxtype": "Link",
-                  "type": "MutexInterface",
-                  "id": "Ferment Mutex"
-                },
-                "extraHoldTime": {
-                  "__bloxtype": "Quantity",
-                  "unit": "second",
-                  "value": 2700
-                },
-                "hasCustomHoldTime": true,
-                "hasLock": false
-              },
-              "remaining": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "readonly": true,
-                "value": 0
-              }
+            "enabled": true,
+            "limiting": false,
+            "remaining": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0,
+              "readonly": true
             }
-          ]
+          },
+          "minOn": {
+            "duration": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 120
+            },
+            "enabled": true,
+            "limiting": false,
+            "remaining": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0,
+              "readonly": true
+            }
+          },
+          "mutexed": {
+            "mutexId": {
+              "__bloxtype": "Link",
+              "type": "MutexInterface",
+              "id": "Ferment Mutex"
+            },
+            "extraHoldTime": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 2700
+            },
+            "enabled": true,
+            "hasLock": false,
+            "limiting": false,
+            "remaining": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0,
+              "readonly": true
+            }
+          }
         },
+        "desiredState": 0,
         "state": 0,
         "invert": false,
-        "desiredState": 0
+        "transitionDurationPreset": 0,
+        "transitionDurationSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0
+        },
+        "transitionDurationValue": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        }
       }
     },
     {
@@ -196,14 +235,14 @@
         "inputValue": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "inputSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "outputValue": 0,
         "outputSetting": 0,
@@ -214,27 +253,11 @@
         "error": {
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "integral": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC * hour",
-          "readonly": true,
-          "value": 0
-        },
-        "derivative": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC / minute",
-          "readonly": true,
-          "value": 0
-        },
-        "drivenOutputId": {
-          "__bloxtype": "Link",
-          "type": "ActuatorAnalogInterface",
-          "driven": true,
-          "id": null
-        },
+        "integral": 0,
+        "derivative": 0,
         "integralReset": 0,
         "boilPointAdjust": {
           "__bloxtype": "Quantity",
@@ -263,15 +286,16 @@
           "value": 1800
         },
         "enabled": true,
+        "settingMode": 1,
+        "storedSetting": 0,
+        "desiredSetting": 0,
         "setting": 0,
         "value": 0,
-        "drivenActuatorId": {
+        "claimedBy": {
           "__bloxtype": "Link",
-          "type": "ActuatorDigitalInterface",
-          "driven": true,
+          "type": "Any",
           "id": null
-        },
-        "desiredSetting": 0
+        }
       }
     },
     {
@@ -289,8 +313,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "fluctuations": []
       }
@@ -318,25 +342,37 @@
           "unit": "delta_degC",
           "value": 5
         },
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
+        },
         "setting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "resetFilter": false
+        "resetFilter": false,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -348,39 +384,54 @@
         "hwDevice": {
           "__bloxtype": "Link",
           "type": "IoArrayInterface",
-          "driven": true,
-          "id": "SparkPins"
+          "id": "Mock Pins"
         },
-        "channel": 2,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "mutexed": {
-                "mutexId": {
-                  "__bloxtype": "Link",
-                  "type": "MutexInterface",
-                  "id": "Ferment Mutex"
-                },
-                "extraHoldTime": {
-                  "__bloxtype": "Quantity",
-                  "unit": "second",
-                  "value": 1200
-                },
-                "hasCustomHoldTime": true,
-                "hasLock": false
-              },
-              "remaining": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "readonly": true,
-                "value": 0
-              }
+        "channel": 3,
+        "storedState": 2,
+        "settingMode": 1,
+        "constraints": {
+          "mutexed": {
+            "mutexId": {
+              "__bloxtype": "Link",
+              "type": "MutexInterface",
+              "id": "Ferment Mutex"
+            },
+            "extraHoldTime": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 1200
+            },
+            "enabled": true,
+            "hasLock": false,
+            "limiting": false,
+            "remaining": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0,
+              "readonly": true
             }
-          ]
+          }
         },
+        "desiredState": 0,
         "state": 0,
         "invert": false,
-        "desiredState": 0
+        "transitionDurationPreset": 0,
+        "transitionDurationSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0
+        },
+        "transitionDurationValue": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        }
       }
     },
     {
@@ -418,14 +469,14 @@
         "inputValue": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "inputSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "outputValue": 0,
         "outputSetting": 0,
@@ -436,27 +487,11 @@
         "error": {
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "integral": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC * hour",
-          "readonly": true,
-          "value": 0
-        },
-        "derivative": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC / minute",
-          "readonly": true,
-          "value": 0
-        },
-        "drivenOutputId": {
-          "__bloxtype": "Link",
-          "type": "ActuatorAnalogInterface",
-          "driven": true,
-          "id": null
-        },
+        "integral": 0,
+        "derivative": 0,
         "integralReset": 0,
         "boilPointAdjust": {
           "__bloxtype": "Quantity",
@@ -485,15 +520,16 @@
           "value": 10
         },
         "enabled": true,
+        "settingMode": 1,
+        "storedSetting": 0,
+        "desiredSetting": 0,
         "setting": 0,
         "value": 0,
-        "drivenActuatorId": {
+        "claimedBy": {
           "__bloxtype": "Link",
-          "type": "ActuatorDigitalInterface",
-          "driven": true,
+          "type": "Any",
           "id": null
-        },
-        "desiredSetting": 0
+        }
       }
     },
     {
@@ -502,16 +538,11 @@
       "type": "Mutex",
       "serviceId": "sparkey",
       "data": {
-        "differentActuatorWait": {
-          "__bloxtype": "Quantity",
-          "unit": "second",
-          "value": 0
-        },
         "waitRemaining": {
           "__bloxtype": "Quantity",
           "unit": "second",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         }
       }
     },
@@ -528,10 +559,18 @@
               "unit": "degC",
               "value": 20
             },
-            "time": 0
+            "time": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0
+            }
           },
           {
-            "time": 604800,
+            "time": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 604800
+            },
             "temperature": {
               "__bloxtype": "Quantity",
               "unit": "degC",
@@ -539,7 +578,11 @@
             }
           },
           {
-            "time": 864000,
+            "time": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 864000
+            },
             "temperature": {
               "__bloxtype": "Quantity",
               "unit": "degC",
@@ -552,14 +595,8 @@
           "type": "SetpointSensorPair",
           "id": "Ferment Beer Setting"
         },
-        "start": 1611757593,
-        "enabled": false,
-        "drivenTargetId": {
-          "__bloxtype": "Link",
-          "type": "SetpointSensorPair",
-          "driven": true,
-          "id": null
-        }
+        "start": "2021-01-27T14:26:33Z",
+        "enabled": false
       }
     },
     {
@@ -580,39 +617,54 @@
         "hwDevice": {
           "__bloxtype": "Link",
           "type": "IoArrayInterface",
-          "driven": true,
-          "id": "SparkPins"
+          "id": "Mock Pins"
         },
-        "channel": 5,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "mutexed": {
-                "mutexId": {
-                  "__bloxtype": "Link",
-                  "type": "MutexInterface",
-                  "id": "HERMS Mutex"
-                },
-                "hasCustomHoldTime": true,
-                "extraHoldTime": {
-                  "__bloxtype": "Quantity",
-                  "unit": "second",
-                  "value": 0
-                },
-                "hasLock": false
-              },
-              "remaining": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "readonly": true,
-                "value": 0
-              }
+        "channel": 1,
+        "storedState": 2,
+        "settingMode": 1,
+        "constraints": {
+          "mutexed": {
+            "mutexId": {
+              "__bloxtype": "Link",
+              "type": "MutexInterface",
+              "id": "HERMS Mutex"
+            },
+            "enabled": true,
+            "extraHoldTime": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0
+            },
+            "hasLock": false,
+            "limiting": false,
+            "remaining": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0,
+              "readonly": true
             }
-          ]
+          }
         },
+        "desiredState": 0,
         "state": 0,
         "invert": false,
-        "desiredState": 0
+        "transitionDurationPreset": 0,
+        "transitionDurationSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0
+        },
+        "transitionDurationValue": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        }
       }
     },
     {
@@ -651,14 +703,14 @@
         "inputValue": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "inputSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "outputValue": 0,
         "outputSetting": 0,
@@ -669,27 +721,11 @@
         "error": {
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "integral": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC * hour",
-          "readonly": true,
-          "value": 0
-        },
-        "derivative": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC / minute",
-          "readonly": true,
-          "value": 0
-        },
-        "drivenOutputId": {
-          "__bloxtype": "Link",
-          "type": "ActuatorAnalogInterface",
-          "driven": true,
-          "id": null
-        },
+        "integral": 0,
+        "derivative": 0,
         "integralReset": 0,
         "boilPointAdjust": {
           "__bloxtype": "Quantity",
@@ -716,32 +752,29 @@
           "unit": "second",
           "value": 2
         },
-        "constrainedBy": {
-          "constraints": [
-            {
-              "balanced": {
-                "balancerId": {
-                  "__bloxtype": "Link",
-                  "type": "BalancerInterface",
-                  "id": "HERMS Balancer"
-                },
-                "id": 1,
-                "granted": 0
-              },
-              "limiting": false
-            }
-          ]
-        },
         "enabled": true,
+        "settingMode": 1,
+        "constraints": {
+          "balanced": {
+            "balancerId": {
+              "__bloxtype": "Link",
+              "type": "BalancerInterface",
+              "id": "HERMS Balancer"
+            },
+            "enabled": true,
+            "granted": 0,
+            "limiting": false
+          }
+        },
+        "storedSetting": 0,
+        "desiredSetting": 0,
         "setting": 0,
         "value": 0,
-        "drivenActuatorId": {
+        "claimedBy": {
           "__bloxtype": "Link",
-          "type": "ActuatorDigitalInterface",
-          "driven": true,
+          "type": "Any",
           "id": null
-        },
-        "desiredSetting": 0
+        }
       }
     },
     {
@@ -759,8 +792,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "fluctuations": []
       }
@@ -787,26 +820,38 @@
           "unit": "delta_degC",
           "value": 5
         },
+        "enabled": false,
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
+        },
         "setting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "resetFilter": false
+        "resetFilter": false,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -818,39 +863,54 @@
         "hwDevice": {
           "__bloxtype": "Link",
           "type": "IoArrayInterface",
-          "driven": true,
-          "id": "SparkPins"
+          "id": "Mock Pins"
         },
-        "channel": 4,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "mutexed": {
-                "mutexId": {
-                  "__bloxtype": "Link",
-                  "type": "MutexInterface",
-                  "id": "HERMS Mutex"
-                },
-                "hasCustomHoldTime": true,
-                "extraHoldTime": {
-                  "__bloxtype": "Quantity",
-                  "unit": "second",
-                  "value": 0
-                },
-                "hasLock": false
-              },
-              "remaining": {
-                "__bloxtype": "Quantity",
-                "unit": "second",
-                "readonly": true,
-                "value": 0
-              }
+        "channel": 2,
+        "storedState": 2,
+        "settingMode": 1,
+        "constraints": {
+          "mutexed": {
+            "mutexId": {
+              "__bloxtype": "Link",
+              "type": "MutexInterface",
+              "id": "HERMS Mutex"
+            },
+            "enabled": true,
+            "extraHoldTime": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0
+            },
+            "hasLock": false,
+            "limiting": false,
+            "remaining": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 0,
+              "readonly": true
             }
-          ]
+          }
         },
+        "desiredState": 0,
         "state": 0,
         "invert": false,
-        "desiredState": 0
+        "transitionDurationPreset": 0,
+        "transitionDurationSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0
+        },
+        "transitionDurationValue": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        }
       }
     },
     {
@@ -889,14 +949,14 @@
         "inputValue": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "inputSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "outputValue": 0,
         "outputSetting": 0,
@@ -907,27 +967,11 @@
         "error": {
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "integral": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC * hour",
-          "readonly": true,
-          "value": 0
-        },
-        "derivative": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC / minute",
-          "readonly": true,
-          "value": 0
-        },
-        "drivenOutputId": {
-          "__bloxtype": "Link",
-          "type": "ActuatorAnalogInterface",
-          "driven": true,
-          "id": null
-        },
+        "integral": 0,
+        "derivative": 0,
         "integralReset": 0,
         "boilPointAdjust": {
           "__bloxtype": "Quantity",
@@ -954,32 +998,29 @@
           "unit": "second",
           "value": 2
         },
-        "constrainedBy": {
-          "constraints": [
-            {
-              "balanced": {
-                "balancerId": {
-                  "__bloxtype": "Link",
-                  "type": "BalancerInterface",
-                  "id": "HERMS Balancer"
-                },
-                "id": 2,
-                "granted": 0
-              },
-              "limiting": false
-            }
-          ]
-        },
         "enabled": true,
+        "settingMode": 1,
+        "constraints": {
+          "balanced": {
+            "balancerId": {
+              "__bloxtype": "Link",
+              "type": "BalancerInterface",
+              "id": "HERMS Balancer"
+            },
+            "enabled": true,
+            "granted": 0,
+            "limiting": false
+          }
+        },
+        "storedSetting": 0,
+        "desiredSetting": 0,
         "setting": 0,
         "value": 0,
-        "drivenActuatorId": {
+        "claimedBy": {
           "__bloxtype": "Link",
-          "type": "ActuatorDigitalInterface",
-          "driven": true,
+          "type": "Any",
           "id": null
-        },
-        "desiredSetting": 0
+        }
       }
     },
     {
@@ -997,8 +1038,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "fluctuations": []
       }
@@ -1025,26 +1066,38 @@
           "unit": "delta_degC",
           "value": 5
         },
+        "enabled": false,
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
+        },
         "setting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "resetFilter": false
+        "resetFilter": false,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -1055,33 +1108,52 @@
       "data": {
         "targetId": {
           "__bloxtype": "Link",
-          "type": "ProcessValueInterface",
+          "type": "SetpointSensorPairInterface",
           "id": "HERMS HLT Setpoint"
         },
         "referenceId": {
           "__bloxtype": "Link",
-          "type": "ProcessValueInterface",
+          "type": "SetpointSensorPairInterface",
           "id": "HERMS MT Setpoint"
         },
-        "constrainedBy": {
-          "constraints": [
-            {
-              "max": 10,
-              "limiting": false
-            }
-          ]
-        },
-        "referenceSettingOrValue": 0,
-        "setting": 0,
-        "value": 0,
-        "drivenTargetId": {
-          "__bloxtype": "Link",
-          "type": "ProcessValueInterface",
-          "driven": true,
-          "id": null
+        "settingMode": 1,
+        "constraints": {
+          "max": {
+            "value": 10,
+            "enabled": true,
+            "limiting": false
+          }
         },
         "enabled": false,
-        "desiredSetting": 0
+        "storedSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        },
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0,
+          "readonly": true
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0,
+          "readonly": true
+        },
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0,
+          "readonly": true
+        },
+        "referenceSettingOrValue": 0,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        }
       }
     },
     {
@@ -1119,14 +1191,14 @@
         "inputValue": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "inputSetting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "outputValue": 0,
         "outputSetting": 0,
@@ -1137,27 +1209,11 @@
         "error": {
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "integral": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC * hour",
-          "readonly": true,
-          "value": 0
-        },
-        "derivative": {
-          "__bloxtype": "Quantity",
-          "unit": "delta_degC / minute",
-          "readonly": true,
-          "value": 0
-        },
-        "drivenOutputId": {
-          "__bloxtype": "Link",
-          "type": "ActuatorAnalogInterface",
-          "driven": true,
-          "id": null
-        },
+        "integral": 0,
+        "derivative": 0,
         "integralReset": 0,
         "boilPointAdjust": {
           "__bloxtype": "Quantity",
@@ -1184,8 +1240,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "fluctuations": []
       }
@@ -1212,26 +1268,38 @@
           "unit": "delta_degC",
           "value": 5
         },
+        "enabled": false,
+        "desiredSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
+        },
         "setting": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "enabled": false,
         "valueUnfiltered": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
-        "resetFilter": false
+        "resetFilter": false,
+        "claimedBy": {
+          "__bloxtype": "Link",
+          "type": "Any",
+          "id": null
+        },
+        "settingMode": 0
       }
     },
     {
@@ -1240,17 +1308,21 @@
       "type": "Mutex",
       "serviceId": "sparkey",
       "data": {
-        "differentActuatorWait": {
-          "__bloxtype": "Quantity",
-          "unit": "second",
-          "value": 0
-        },
         "waitRemaining": {
           "__bloxtype": "Quantity",
           "unit": "second",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         }
+      }
+    },
+    {
+      "id": "Mock Pins",
+      "nid": 137,
+      "type": "MockPins",
+      "serviceId": "sparkey",
+      "data": {
+        "channels": []
       }
     },
     {
@@ -1296,8 +1368,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -1321,8 +1393,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -1346,8 +1418,8 @@
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         },
         "offset": {
           "__bloxtype": "Quantity",
@@ -1377,9 +1449,9 @@
           "RESTART"
         ],
         "overrideState": true,
-        "activeInstructionStartedAt": 1653915641,
-        "disabledAt": 1653915641,
-        "activeInstruction": 0,
+        "activeInstruction": 1,
+        "activeInstructionStartedAt": "2023-02-09T14:01:29Z",
+        "disabledAt": null,
         "disabledDuration": {
           "__bloxtype": "Quantity",
           "unit": "second",
@@ -1387,6 +1459,32 @@
         },
         "status": 0,
         "error": 0
+      }
+    },
+    {
+      "id": "SystemInfo",
+      "nid": 2,
+      "type": "SysInfo",
+      "serviceId": "sparkey",
+      "data": {
+        "timeZone": "UTC0",
+        "displayBrightness": 255,
+        "deviceId": "",
+        "version": "",
+        "platform": 0,
+        "protocolVersion": "",
+        "releaseDate": "",
+        "protocolDate": "",
+        "ip": "0.0.0.0",
+        "uptime": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        },
+        "updatesPerSecond": 0,
+        "systemTime": null,
+        "tempUnit": 0
       }
     },
     {
@@ -1406,40 +1504,13 @@
           "unit": "degC",
           "value": 20
         },
-        "lastUpdated": 1657663236,
+        "lastUpdated": "2023-02-09T13:29:21Z",
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
-          "readonly": true,
-          "value": 0
+          "value": 0,
+          "readonly": true
         }
-      }
-    },
-    {
-      "id": "TouchSettings",
-      "nid": 6,
-      "type": "TouchSettings",
-      "serviceId": "sparkey",
-      "data": {
-        "calibrated": 1,
-        "xBitsPerPixelX16": 64,
-        "yBitsPerPixelX16": 64,
-        "xOffset": 0,
-        "yOffset": 0
-      }
-    },
-    {
-      "id": "WiFiSettings",
-      "nid": 5,
-      "type": "WiFiSettings",
-      "serviceId": "sparkey",
-      "data": {
-        "ssid": "",
-        "password": "",
-        "security": 0,
-        "cipher": 0,
-        "signal": 0,
-        "ip": ""
       }
     }
   ],
@@ -1448,13 +1519,6 @@
       "keys": [
         "SystemInfo",
         2
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "SystemTime",
-        3
       ],
       "data": {}
     },
@@ -1490,6 +1554,13 @@
       "keys": [
         "SparkPins",
         19
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "SystemTime",
+        3
       ],
       "data": {}
     },
@@ -1742,6 +1813,13 @@
       "keys": [
         "Temp Sensor (External)",
         136
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Mock Pins",
+        137
       ],
       "data": {}
     }

@@ -3657,7 +3657,7 @@
         "settings": {
           "bordered": false,
           "text": "User manual",
-          "url": "https://brewblox.netlify.app/user/ferment_guide.html",
+          "url": "https://brewblox.com/user/ferment_guide.html",
           "sizeX": 4,
           "sizeY": 1
         }

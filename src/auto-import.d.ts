@@ -29,6 +29,7 @@ declare module '@vue/runtime-core' {
     SparkEspWifiCard: typeof import('src/plugins/spark/components/menu/SparkEspWifiCard.vue').default;
     SparkBackupMenu: typeof import('src/plugins/spark/components/menu/SparkBackupMenu.vue').default;
     FirmwareUpdateDialog: typeof import('src/plugins/spark/components/menu/FirmwareUpdateDialog.vue').default;
+    BlockJsonDialog: typeof import('src/plugins/spark/components/menu/BlockJsonDialog.vue').default;
     StringValEdit: typeof import('src/plugins/spark/components/form/StringValEdit.vue').default;
     StateValEdit: typeof import('src/plugins/spark/components/form/StateValEdit.vue').default;
     SetpointSettingDialog: typeof import('src/plugins/spark/components/form/SetpointSettingDialog.vue').default;
@@ -38,10 +39,10 @@ declare module '@vue/runtime-core' {
     EnumValEdit: typeof import('src/plugins/spark/components/form/EnumValEdit.vue').default;
     DurationValEdit: typeof import('src/plugins/spark/components/form/DurationValEdit.vue').default;
     DigitalConstraintsValEdit: typeof import('src/plugins/spark/components/form/DigitalConstraintsValEdit.vue').default;
-    DigitalConstraints: typeof import('src/plugins/spark/components/form/DigitalConstraints.vue').default;
+    DigitalConstraintsField: typeof import('src/plugins/spark/components/form/DigitalConstraintsField.vue').default;
+    DigitalConstraintsEditor: typeof import('src/plugins/spark/components/form/DigitalConstraintsEditor.vue').default;
+    DigitalConstraintsDialog: typeof import('src/plugins/spark/components/form/DigitalConstraintsDialog.vue').default;
     DateValEdit: typeof import('src/plugins/spark/components/form/DateValEdit.vue').default;
-    ConstraintsField: typeof import('src/plugins/spark/components/form/ConstraintsField.vue').default;
-    ConstraintsDialog: typeof import('src/plugins/spark/components/form/ConstraintsDialog.vue').default;
     ClaimIndicator: typeof import('src/plugins/spark/components/form/ClaimIndicator.vue').default;
     ChannelSelectField: typeof import('src/plugins/spark/components/form/ChannelSelectField.vue').default;
     BoolValEdit: typeof import('src/plugins/spark/components/form/BoolValEdit.vue').default;
@@ -50,7 +51,8 @@ declare module '@vue/runtime-core' {
     BlockEnableToggle: typeof import('src/plugins/spark/components/form/BlockEnableToggle.vue').default;
     BlockDialogButton: typeof import('src/plugins/spark/components/form/BlockDialogButton.vue').default;
     AnalogConstraintsValEdit: typeof import('src/plugins/spark/components/form/AnalogConstraintsValEdit.vue').default;
-    AnalogConstraints: typeof import('src/plugins/spark/components/form/AnalogConstraints.vue').default;
+    AnalogConstraintsField: typeof import('src/plugins/spark/components/form/AnalogConstraintsField.vue').default;
+    AnalogConstraintsEditor: typeof import('src/plugins/spark/components/form/AnalogConstraintsEditor.vue').default;
     QuickstartTaskMaster: typeof import('src/plugins/quickstart/components/QuickstartTaskMaster.vue').default;
     QuickstartServiceTask: typeof import('src/plugins/quickstart/components/QuickstartServiceTask.vue').default;
     QuickstartSensorField: typeof import('src/plugins/quickstart/components/QuickstartSensorField.vue').default;

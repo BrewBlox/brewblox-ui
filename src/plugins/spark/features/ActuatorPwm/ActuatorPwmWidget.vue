@@ -127,12 +127,11 @@ export default defineComponent({
           class="col-grow"
         />
 
-        <ConstraintsField
-          :model-value="block.data.constrainedBy"
+        <AnalogConstraintsField
+          :model-value="block.data.constraints"
           :service-id="serviceId"
-          type="analog"
           class="col-grow"
-          @update:model-value="(v) => patchBlock({ constrainedBy: v })"
+          @update:model-value="(v) => patchBlock({ constraints: v })"
         />
       </div>
 
@@ -155,6 +154,12 @@ export default defineComponent({
             label="Digital Actuator Target"
             class="col-grow"
             @update:model-value="(v) => patchBlock({ actuatorId: v })"
+          />
+          <div class="col-break" />
+          <AnalogConstraintsEditor
+            :service-id="serviceId"
+            :model-value="block.data.constraints"
+            @update:model-value="(v) => patchBlock({ constraints: v })"
           />
         </div>
       </template>

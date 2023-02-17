@@ -2,13 +2,12 @@ import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
-import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
+import { prettyConstraints } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import { deltaTempQty } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
-  AnalogConstraintsObj,
   BlockIntfType,
   BlockType,
   ReferenceKind,
@@ -34,7 +33,7 @@ const plugin: Plugin = {
         desiredSetting: deltaTempQty(null),
         setting: deltaTempQty(null),
         value: deltaTempQty(null),
-        constrainedBy: { constraints: [] },
+        constraints: {},
         enabled: true,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
@@ -87,11 +86,11 @@ const plugin: Plugin = {
       },
       {
         type,
-        key: 'constrainedBy',
+        key: 'constraints',
         title: 'Constraints',
         component: 'AnalogConstraintsValEdit',
-        generate: (): AnalogConstraintsObj => ({ constraints: [] }),
-        pretty: prettifyConstraints,
+        generate: () => ({}),
+        pretty: prettyConstraints,
       },
       {
         type,

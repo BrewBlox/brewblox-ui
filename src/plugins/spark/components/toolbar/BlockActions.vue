@@ -5,6 +5,7 @@ import {
   startAddBlockToGraphWidget,
   startChangeBlockId,
   startRemoveBlock,
+  startShowBlockJson,
 } from '@/plugins/spark/utils/actions';
 import {
   isBlockDisplayReady,
@@ -50,6 +51,7 @@ export default defineComponent({
       canDisplay,
       canRemove,
       exportBlock,
+      startShowBlockJson,
     };
   },
 });
@@ -89,6 +91,11 @@ export default defineComponent({
       icon="mdi-monitor"
       label="Add to Spark display"
       @click="startAddBlockToDisplay(block)"
+    />
+    <ActionItem
+      icon="mdi-bug-outline"
+      label="Show as JSON"
+      @click="startShowBlockJson(block)"
     />
     <ActionItem
       icon="mdi-file-export"

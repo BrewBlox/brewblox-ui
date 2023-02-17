@@ -43,18 +43,18 @@ export default defineComponent({
         tag="big"
         class="col-grow"
       />
+
       <div class="col-break" />
+
       <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"
       />
-      <ConstraintsField
-        :model-value="block.data.constrainedBy"
+      <AnalogConstraintsField
+        :model-value="block.data.constraints"
         :service-id="serviceId"
-        type="analog"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ constrainedBy: v })"
       />
     </div>
   </div>

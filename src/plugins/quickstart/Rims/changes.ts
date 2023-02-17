@@ -109,13 +109,12 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         desiredSetting: deltaTempQty(null),
         setting: tempQty(null),
         value: deltaTempQty(null),
-        constrainedBy: {
-          constraints: [
-            {
-              max: 10,
-              limiting: false,
-            },
-          ],
+        constraints: {
+          max: {
+            enabled: true,
+            limiting: false,
+            value: 10,
+          },
         },
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
@@ -133,7 +132,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
-        constrainedBy: { constraints: [] },
+        constraints: {},
         transitionDurationPreset: TransitionDurationPreset.ST_OFF,
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
@@ -152,7 +151,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         storedState: DigitalState.STATE_INACTIVE,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
-        constrainedBy: { constraints: [] },
+        constraints: {},
         transitionDurationPreset: TransitionDurationPreset.ST_OFF,
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
@@ -173,7 +172,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         desiredSetting: 0,
         setting: 0,
         value: 0,
-        constrainedBy: { constraints: [] },
+        constraints: {},
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },
@@ -289,7 +288,7 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
-      version: '1.2',
+      version: '1.3',
       actions: [
         {
           name: 'Enable pump and heater',
