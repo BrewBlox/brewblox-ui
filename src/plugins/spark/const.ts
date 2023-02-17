@@ -11,6 +11,7 @@ import {
   PwmFrequency,
   SensorCombiFunc,
   TransitionDurationPreset,
+  ValveState,
 } from 'brewblox-proto/ts';
 
 type EnumLabels<T extends keyof any> = Record<T, string>;
@@ -63,6 +64,16 @@ export const ENUM_LABELS_DIGITAL_STATE: EnumLabels<DigitalState> = {
   STATE_INACTIVE: 'OFF',
   STATE_UNKNOWN: 'UNKNOWN',
   STATE_REVERSE: 'REVERSED',
+};
+
+export const ENUM_LABELS_VALVE_STATE: EnumLabels<ValveState> = {
+  VALVE_CLOSED: 'Closed',
+  VALVE_CLOSING: 'Closing',
+  VALVE_HALF_OPEN_IDLE: 'Idle (half open)',
+  VALVE_INIT_IDLE: 'Idle',
+  VALVE_OPEN: 'Open',
+  VALVE_OPENING: 'Opening',
+  VALVE_UNKNOWN: 'Unknown',
 };
 
 export const ENUM_LABELS_DIGITAL_OP: EnumLabels<DigitalCompareOp> = {

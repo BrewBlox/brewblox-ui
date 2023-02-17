@@ -387,7 +387,7 @@ export class JSQuantity implements Quantity {
  * - Duration-formatted string: `bloxQty('10s')`
  * - Another Quantity object: `bloxQty(bloxQty(10, 'degC'))`
  *
- * https://brewblox.netlify.app/dev/decisions/20200723_typed_fields.html
+ * https://brewblox.com/dev/decisions/20200723_typed_fields.html
  *
  */
 export function bloxQty(value: number | null, unit: string): JSQuantity;

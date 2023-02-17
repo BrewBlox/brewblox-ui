@@ -383,7 +383,7 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
     config: {
-      version: '1.2',
+      version: '1.3',
       actions: [
         {
           name: 'Disable all setpoints',

@@ -22,7 +22,7 @@ export interface QuickActionsConfigOld {
 }
 
 export interface QuickActionsConfig {
-  version: '1.2';
+  version: '1.3';
   actions: ChangeAction[];
   lastActionId?: string;
 }

@@ -278,7 +278,7 @@ export default defineComponent({
           cooler, each has its own PID. <br />
           For more information, visit our
           <a
-            href="https://brewblox.netlify.app/user/control_chains.html"
+            href="https://brewblox.com/user/control_chains.html"
             target="_blank"
             style="color: white"
           >

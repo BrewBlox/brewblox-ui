@@ -15,7 +15,6 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import { emptyDigitalConstraints } from '../../utils/configuration';
 import widget from './DigitalActuatorWidget.vue';
 
 const type = BlockType.DigitalActuator;
@@ -34,7 +33,7 @@ const plugin: Plugin = {
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
-        constraints: emptyDigitalConstraints(),
+        constraints: {},
         transitionDurationPreset: TransitionDurationPreset.ST_OFF,
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
@@ -71,7 +70,7 @@ const plugin: Plugin = {
         key: 'constraints',
         title: 'Constraints',
         component: 'DigitalConstraintsValEdit',
-        generate: () => emptyDigitalConstraints(),
+        generate: () => ({}),
         pretty: prettyConstraints,
       },
       {

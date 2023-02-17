@@ -14,7 +14,6 @@ import {
   ValveState,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import { emptyDigitalConstraints } from '../../utils/configuration';
 import widget from './MotorValveWidget.vue';
 
 const type = BlockType.MotorValve;
@@ -33,7 +32,7 @@ const plugin: Plugin = {
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         valveState: ValveState.VALVE_INIT_IDLE,
-        constraints: emptyDigitalConstraints(),
+        constraints: {},
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       }),
@@ -60,7 +59,7 @@ const plugin: Plugin = {
         key: 'constraints',
         title: 'Constraints',
         component: 'DigitalConstraintsValEdit',
-        generate: () => emptyDigitalConstraints(),
+        generate: () => ({}),
         pretty: prettyConstraints,
       },
       {

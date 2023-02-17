@@ -78,7 +78,7 @@ export class JSLink implements Link {
  * - Raw arguments: `bloxLink('temp-sensor-1', BlockType.TempSensorOneWire)`
  * - Another Quantity object: `bloxLink(bloxLink('temp-sensor-1'))`
  *
- * https://brewblox.netlify.app/dev/decisions/20200723_typed_fields.html
+ * https://brewblox.com/dev/decisions/20200723_typed_fields.html
  *
  */
 export function bloxLink(

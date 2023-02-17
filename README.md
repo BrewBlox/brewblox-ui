@@ -13,7 +13,7 @@ Due to limitations in the way Docker is handled on Windows, Linux or Mac is requ
 
 ## Installation
 
-**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at <https://brewblox.netlify.app/>**
+**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at <https://brewblox.com/>**
 
 Note: this is tested on Ubuntu, and may or may not work on other distros. Please let us know if there are any issues.
 

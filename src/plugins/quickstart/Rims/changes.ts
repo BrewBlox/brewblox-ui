@@ -288,7 +288,7 @@ export function defineWidgets(
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
-      version: '1.2',
+      version: '1.3',
       actions: [
         {
           name: 'Enable pump and heater',

@@ -3,10 +3,12 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyLink } from '@/utils/quantity';
 import {
   AnalogConstraints,
   BalancedActuator,
+  BalancedConstraint,
   BalancerBlock,
   Block,
   BlockIntfType,
@@ -61,8 +63,8 @@ const COMPATIBLE_COLUMNS: QTableColumn<AnalogConstrainedBlock>[] = [
     name: 'balancer',
     label: 'Balanced by',
     align: 'left',
-    field: (row) => row.data.constraints?.balanced?.balancerId,
-    format: (v) => prettyLink(v),
+    field: (row) => row.data.constraints?.balanced,
+    format: (v) => (v?.enabled ? prettyLink(v?.balancerId) : ''),
     sortable: true,
   },
 ];
@@ -82,12 +84,60 @@ export default defineComponent({
         );
     });
 
+    const nonClientBlocks = computed<AnalogConstrainedBlock[]>(() =>
+      compatibleBlocks.value.filter((b) => {
+        const balanced: BalancedConstraint | undefined =
+          b.data.constraints?.balanced;
+        return !balanced?.enabled || balanced?.balancerId.id !== block.value.id;
+      }),
+    );
+
     function showBlock(target: Block | null): void {
       createBlockDialog(target);
     }
 
     function showBlockLink(link: Link): void {
       showBlock(sparkStore.blockByLink(serviceId, link));
+    }
+
+    function showHelpDialog(): void {
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Balancer block',
+          html: true,
+          cancel: false,
+          message: `
+          <p>
+            When two actuators need to share a total available amount,
+            the balancer can ensure it is shared fairly.
+          </p>
+          <p>
+            The most common example is using two heating elements
+            with a <i>Mutex</i> constraint.
+            The sum of their settings should be limited to 100%.
+          </p>
+          <p>
+            When a Balanced constraint is set on multiple PWM blocks,
+            they ask their target Balancer how much they can use.
+            The Balancer scales down their setting proportionally
+            so the sum does not exceed 100%.
+            Without the balancer, a heater with PWM at 100%
+            would never release the mutex to give the other heater some time.
+          </p>
+          <p>
+            Usage of the Mutex and Balancer blocks is described in the
+            <a
+              href="https://www.brewblox.com/user/control_chains.html#when-you-only-have-power-for-1-element-sharing-power-over-multiple-elements"
+              target="_blank"
+              style="color: white"
+            >
+              control chains guide
+            </a>.
+          </p>
+          `,
+        },
+      });
     }
 
     return {
@@ -97,9 +147,10 @@ export default defineComponent({
       COMPATIBLE_COLUMNS,
       context,
       block,
-      compatibleBlocks,
+      nonClientBlocks,
       showBlock,
       showBlockLink,
+      showHelpDialog,
     };
   },
 });
@@ -111,7 +162,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div class="column q-ma-md q-gutter-y-sm">
+    <div class="widget-body column">
       <q-table
         :columns="CLIENT_COLUMNS"
         :rows="block.data.clients"
@@ -121,16 +172,27 @@ export default defineComponent({
         flat
         @row-click="(_, row) => showBlockLink(row.id)"
       />
-      <q-table
-        v-if="context.mode === 'Full'"
-        :columns="COMPATIBLE_COLUMNS"
-        :rows="compatibleBlocks"
-        :card-style="{ backgroundColor: 'transparent' }"
-        class="q-mt-xl"
-        hide-pagination
-        flat
-        @row-click="(_, row) => showBlock(row)"
+      <q-btn
+        class="self-end"
+        outline
+        round
+        label="?"
+        @click="showHelpDialog"
       />
     </div>
+
+    <template v-if="context.mode === 'Full'">
+      <div class="widget-body">
+        <q-table
+          title="Compatible blocks"
+          :columns="COMPATIBLE_COLUMNS"
+          :rows="nonClientBlocks"
+          :card-style="{ backgroundColor: 'transparent' }"
+          hide-pagination
+          flat
+          @row-click="(_, row) => showBlock(row)"
+        />
+      </div>
+    </template>
   </Card>
 </template>
