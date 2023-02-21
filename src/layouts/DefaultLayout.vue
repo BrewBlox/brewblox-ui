@@ -1,5 +1,8 @@
 <script lang="ts">
-import { useGlobals } from '@/composables';
+import brewbloxIconSvg from '@/assets/logo-x.svg';
+
+import brewbloxLogoSvg from '@/assets/logo-wordmark-dark.svg';
+import { useGlobals, usePanels } from '@/composables';
 import { startCreateFolder } from '@/store/sidebar/utils';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
@@ -10,6 +13,7 @@ export default defineComponent({
   setup() {
     const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
+    const { panels } = usePanels.setup();
     const router = useRouter();
 
     const devMode = Boolean(import.meta.env.DEV);
@@ -31,6 +35,9 @@ export default defineComponent({
     }
 
     return {
+      brewbloxLogoSvg,
+      brewbloxIconSvg,
+      panels,
       devMode,
       editing,
       drawerOpen,
@@ -46,7 +53,10 @@ export default defineComponent({
     view="hHh Lpr fFf"
     style="overflow: hidden"
   >
-    <LayoutHeader @menu="drawerOpen = !drawerOpen">
+    <LayoutHeader
+      v-if="panels"
+      @menu="drawerOpen = !drawerOpen"
+    >
       <template #title>
         <portal-target name="toolbar-title" />
       </template>
@@ -56,9 +66,35 @@ export default defineComponent({
         </div>
       </template>
     </LayoutHeader>
-    <LayoutFooter />
+    <div
+      v-else
+      class="absolute z-top q-pa-sm"
+    >
+      <img
+        :src="brewbloxLogoSvg"
+        class="clickable bg-transparent"
+        style="height: 24px"
+        @click="panels = true"
+      />
+    </div>
+    <!-- <q-header
+      v-else
+      class="bg-transparent"
+      style="border: none !important"
+    >
+      <q-bar class="bg-transparent">
+        <img
+          :src="brewbloxLogoSvg"
+          class="clickable bg-transparent"
+          style="height: 24px"
+          @click="focusActive = false"
+        />
+      </q-bar>
+    </q-header> -->
+    <LayoutFooter v-if="panels" />
 
     <q-drawer
+      v-if="panels"
       v-model="drawerOpen"
       class="column"
       elevated
@@ -80,7 +116,14 @@ export default defineComponent({
           to="/styles"
           :color="routeActive('/styles') ? 'primary' : ''"
         >
-          <q-tooltip> Theming </q-tooltip>
+          <q-tooltip>Theming</q-tooltip>
+        </q-btn>
+        <q-btn
+          flat
+          icon="mdi-border-none-variant"
+          @click="panels = false"
+        >
+          <q-tooltip>Hide panels</q-tooltip>
         </q-btn>
         <q-space />
         <q-btn
