@@ -15,7 +15,7 @@ const plugin: Plugin = {
       wizard: true,
       widgetSize: {
         cols: 4,
-        rows: 3,
+        rows: 4,
       },
       generateConfig: () => ({
         serviceId: null,
