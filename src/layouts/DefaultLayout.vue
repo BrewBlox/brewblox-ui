@@ -2,7 +2,7 @@
 import brewbloxIconSvg from '@/assets/logo-x.svg';
 
 import brewbloxLogoSvg from '@/assets/logo-wordmark-dark.svg';
-import { useGlobals, usePanels } from '@/composables';
+import { useGlobals, useKiosk } from '@/composables';
 import { startCreateFolder } from '@/store/sidebar/utils';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
@@ -13,7 +13,7 @@ export default defineComponent({
   setup() {
     const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
-    const { panels } = usePanels.setup();
+    const { kiosk } = useKiosk.setup();
     const router = useRouter();
 
     const devMode = Boolean(import.meta.env.DEV);
@@ -37,7 +37,7 @@ export default defineComponent({
     return {
       brewbloxLogoSvg,
       brewbloxIconSvg,
-      panels,
+      kiosk,
       devMode,
       editing,
       drawerOpen,
@@ -54,7 +54,7 @@ export default defineComponent({
     style="overflow: hidden"
   >
     <LayoutHeader
-      v-if="panels"
+      v-if="!kiosk"
       @menu="drawerOpen = !drawerOpen"
     >
       <template #title>
@@ -74,27 +74,13 @@ export default defineComponent({
         :src="brewbloxLogoSvg"
         class="clickable bg-transparent"
         style="height: 24px"
-        @click="panels = true"
+        @click="kiosk = false"
       />
     </div>
-    <!-- <q-header
-      v-else
-      class="bg-transparent"
-      style="border: none !important"
-    >
-      <q-bar class="bg-transparent">
-        <img
-          :src="brewbloxLogoSvg"
-          class="clickable bg-transparent"
-          style="height: 24px"
-          @click="focusActive = false"
-        />
-      </q-bar>
-    </q-header> -->
-    <LayoutFooter v-if="panels" />
+    <LayoutFooter v-if="!kiosk" />
 
     <q-drawer
-      v-if="panels"
+      v-if="!kiosk"
       v-model="drawerOpen"
       class="column"
       elevated
@@ -120,10 +106,10 @@ export default defineComponent({
         </q-btn>
         <q-btn
           flat
-          icon="mdi-border-none-variant"
-          @click="panels = false"
+          icon="mdi-fullscreen"
+          @click="kiosk = true"
         >
-          <q-tooltip>Hide panels</q-tooltip>
+          <q-tooltip>Kiosk mode</q-tooltip>
         </q-btn>
         <q-space />
         <q-btn
