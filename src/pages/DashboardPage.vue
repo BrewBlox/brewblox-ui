@@ -1,6 +1,6 @@
 <script lang="ts">
 import { RenderedItem } from '@/components/grid/types';
-import { useGlobals } from '@/composables';
+import { useGlobals, useKiosk } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore, WidgetContext } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
@@ -26,6 +26,7 @@ export default defineComponent({
     const featureStore = useFeatureStore();
     const widgetEditable = ref(false);
     const { dense } = useGlobals.setup();
+    const { kiosk } = useKiosk.setup();
     const router = useRouter();
 
     const context = computed<WidgetContext>(() => ({
@@ -96,6 +97,7 @@ export default defineComponent({
 
     return {
       dense,
+      kiosk,
       widgetEditable,
       context,
       dashboardId,
@@ -189,7 +191,7 @@ export default defineComponent({
         </div>
         <GridContainer
           v-else
-          class="q-ma-lg"
+          :class="['q-ma-lg', kiosk && 'q-mt-xl']"
           :items="dashboardItems"
           :context="context"
           :editable="widgetEditable"
