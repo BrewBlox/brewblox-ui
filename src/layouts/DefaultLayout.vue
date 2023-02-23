@@ -98,6 +98,7 @@ export default defineComponent({
         <q-btn
           v-if="devMode"
           flat
+          round
           icon="mdi-format-paint"
           to="/styles"
           :color="routeActive('/styles') ? 'primary' : ''"
@@ -106,6 +107,7 @@ export default defineComponent({
         </q-btn>
         <q-btn
           flat
+          round
           icon="mdi-fullscreen"
           @click="kiosk = true"
         >
