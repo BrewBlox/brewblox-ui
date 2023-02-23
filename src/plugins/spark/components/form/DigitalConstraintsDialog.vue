@@ -1,38 +1,20 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
-import { AnalogConstraintsObj, DigitalConstraintsObj } from 'brewblox-proto/ts';
-import isString from 'lodash/isString';
+import { DigitalConstraints } from 'brewblox-proto/ts';
 import { defineComponent, PropType, ref } from 'vue';
-import AnalogConstraints from './AnalogConstraints.vue';
-import DigitalConstraints from './DigitalConstraints.vue';
-
-type ConstraintsObj = AnalogConstraintsObj | DigitalConstraintsObj;
-
-function typeValidator(v: unknown): boolean {
-  return isString(v) && ['analog', 'digital'].includes(v);
-}
 
 export default defineComponent({
   name: 'ConstraintsDialog',
-  components: {
-    analog: AnalogConstraints,
-    digital: DigitalConstraints,
-  },
   props: {
     ...useDialog.props,
     modelValue: {
-      type: Object as PropType<ConstraintsObj>,
-      default: () => ({ constraints: [] }),
+      type: Object as PropType<DigitalConstraints>,
+      required: true,
     },
     serviceId: {
       type: String,
       required: true,
-    },
-    type: {
-      type: String as PropType<'analog' | 'digital'>,
-      required: true,
-      validator: typeValidator,
     },
   },
   emits: [...useDialog.emits],
@@ -40,7 +22,7 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
-    const local = ref<ConstraintsObj>(deepCopy(props.modelValue));
+    const local = ref<DigitalConstraints>(deepCopy(props.modelValue));
 
     function save(): void {
       onDialogOK(local.value);
@@ -66,11 +48,7 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{ title, message, html }">
-      <component
-        :is="type"
-        v-model="local"
-        :service-id="serviceId"
-      />
+      {{ local }}
       <template #actions>
         <q-btn
           flat

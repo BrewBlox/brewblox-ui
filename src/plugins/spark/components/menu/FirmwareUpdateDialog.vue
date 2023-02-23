@@ -18,6 +18,8 @@ import {
   ref,
 } from 'vue';
 
+type UpdateProgress = 'Pending' | 'Busy' | 'Done';
+
 export default defineComponent({
   name: 'FirmwareUpdateDialog',
   props: {
@@ -32,7 +34,7 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
 
-    const busy = ref<boolean>(false);
+    const progress = ref<UpdateProgress>('Pending');
     const error = ref<string>('');
     const listenerId = ref<string>('');
     const messages = reactive<string[]>([]);
@@ -91,10 +93,10 @@ export default defineComponent({
     }
 
     function updateFirmware(): void {
-      if (busy.value || !ready.value) {
+      if (progress.value === 'Busy' || !ready.value) {
         return;
       }
-      busy.value = true;
+      progress.value = 'Busy';
       error.value = '';
       messages.length = 0;
 
@@ -103,9 +105,12 @@ export default defineComponent({
         .catch((e) => {
           error.value = e.message;
         })
-        .finally(() => {
-          busy.value = false;
-        });
+        // There will be some time before the service propagates the restarting state
+        .finally(() =>
+          setTimeout(() => {
+            progress.value = 'Done';
+          }, 5000),
+        );
     }
 
     return {
@@ -113,7 +118,7 @@ export default defineComponent({
       dialogProps,
       onDialogHide,
       status,
-      busy,
+      progress,
       error,
       messages,
       updateAvailableText,
@@ -175,12 +180,21 @@ export default defineComponent({
 
       <template #actions>
         <q-btn
-          :disable="busy || !ready"
-          :loading="busy || !ready"
-          :color="status && status.firmware_error ? 'primary' : ''"
+          v-if="
+            progress !== 'Done' || !ready || !status || status.firmware_error
+          "
+          :disable="progress === 'Busy' || !ready"
+          :loading="progress === 'Busy' || !ready"
+          color="primary"
           unelevated
           label="Flash"
           @click="updateFirmware"
+        />
+        <q-btn
+          v-else
+          unelevated
+          label="Close"
+          @click="onDialogHide"
         />
       </template>
     </Card>

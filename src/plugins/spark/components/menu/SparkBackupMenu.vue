@@ -33,9 +33,9 @@ export default defineComponent({
     }
 
     async function reloadStoredBackups(): Promise<void> {
-      storedBackupNames.value = await sparkStore.allStoredBackup(
-        props.serviceId,
-      );
+      storedBackupNames.value = await sparkStore
+        .allStoredBackup(props.serviceId)
+        .then((arr) => arr.sort().reverse());
     }
 
     async function confirmImport(): Promise<boolean> {

@@ -17,7 +17,7 @@ import {
 } from 'brewblox-proto/ts';
 import isMatch from 'lodash/isMatch';
 import range from 'lodash/range';
-import { makeBlockIdRules } from './configuration';
+import { asBlockAddress, makeBlockIdRules } from './configuration';
 import {
   isBlockCompatible,
   isBlockDisplayed,
@@ -305,4 +305,13 @@ export function startResetBlocks(serviceId: string): void {
       restore: selected.includes(0),
     }),
   );
+}
+
+export function startShowBlockJson(block: Block): void {
+  createDialog({
+    component: 'BlockJsonDialog',
+    componentProps: {
+      address: asBlockAddress(block),
+    },
+  });
 }

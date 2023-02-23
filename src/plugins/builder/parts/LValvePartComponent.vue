@@ -31,6 +31,7 @@ export default defineComponent({
       usePart.setup();
 
     const {
+      hasAddress,
       block,
       patchBlock,
       blockStatus,
@@ -58,13 +59,14 @@ export default defineComponent({
     );
 
     function toggle(): void {
-      if (block.value) {
-        patchBlock({
-          storedState:
-            block.value.data.state === DigitalState.STATE_ACTIVE
-              ? DigitalState.STATE_INACTIVE
-              : DigitalState.STATE_ACTIVE,
-        });
+      if (hasAddress.value) {
+        if (block.value) {
+          const storedState =
+            block.value.data.state === DigitalState.STATE_INACTIVE
+              ? DigitalState.STATE_ACTIVE
+              : DigitalState.STATE_INACTIVE;
+          patchBlock({ storedState }, true);
+        }
       } else {
         patchSettings({
           [VALVE_CLOSED_KEY]: !settings.value[VALVE_CLOSED_KEY],
@@ -75,12 +77,8 @@ export default defineComponent({
     watch(
       () => block.value,
       (newV, oldV) => {
-        if (
-          newV === null ||
-          oldV === null ||
-          newV.data.state !== oldV.data.state
-        ) {
-          reflow;
+        if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
+          reflow();
         }
       },
     );

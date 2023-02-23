@@ -76,9 +76,12 @@ function statusDesc(status: SparkStatusDescription | null): [string, string] {
   return ['Unknown', 'red'];
 }
 
-const iconOpts = {
+const iconOpts: Record<
+  SparkStatusDescription['connection_kind'] & string,
+  string
+> = {
   SIMULATION: 'mdi-console',
-  LAN: 'mdi-access-point',
+  TCP: 'mdi-wifi',
   USB: 'mdi-usb-port',
 };
 

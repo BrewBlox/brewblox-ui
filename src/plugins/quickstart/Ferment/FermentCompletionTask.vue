@@ -74,7 +74,7 @@ export default defineComponent({
             <span>
               Visit our
               <a
-                href="https://brewblox.netlify.app/user/ferment_guide.html"
+                href="https://brewblox.com/user/ferment_guide.html"
                 target="_blank"
                 style="color: white"
               >

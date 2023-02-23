@@ -42,54 +42,70 @@ export default defineComponent({
       }
     }
 
+    function showBlockById(id: string): void {
+      createBlockDialog(
+        { serviceId: props.serviceId, id, type: null },
+        { mode: 'Basic' },
+      );
+    }
+
     return {
       claim,
       claimedBy,
       showClaimingBlock,
+      showBlockById,
     };
   },
 });
 </script>
 
 <template>
-  <q-list
-    :class="[{ clickable: claim != null }]"
-    class="rounded-borders"
+  <div
+    v-if="claim"
+    class="q-pa-sm q-gutter-y-xs text-indigo-4"
   >
-    <template v-if="claim">
+    <div class="row">
       <div
-        class="col-auto q-pa-sm q-gutter-x-sm text-indigo-4 row"
-        @click="showClaimingBlock"
+        class="col-auto rounded-borders clickable q-px-sm q-py-xs"
+        @click="showBlockById(claim!.source)"
       >
-        <q-tooltip>Edit {{ claimedBy }}</q-tooltip>
-        <q-icon
-          name="mdi-fast-forward-outline"
-          class="col-auto"
-          size="sm"
-        />
-        <div class="col-auto darkish text-small">
-          <div>
-            <i>{{ claim.source }}</i>
-          </div>
-          <div
-            v-for="(id, idx) in [...claim.intermediate, blockId]"
-            :key="'intermediate-' + id"
-            :style="`margin-left: ${idx * 5}px`"
-          >
-            <q-icon
-              name="mdi-keyboard-return"
-              style="transform: scale(-1, 1)"
-            />
-            {{ id }}
-          </div>
-        </div>
+        <i>{{ claim.source }}</i>
       </div>
-    </template>
-    <div
-      v-else
-      class="col-auto q-pa-sm darkish text-italic text-small"
-    >
-      Not claimed
     </div>
-  </q-list>
+    <div
+      v-for="(id, idx) in claim.intermediate"
+      :key="'intermediate-' + id"
+      :style="`margin-left: ${idx * 5}px`"
+      class="row"
+    >
+      <q-icon
+        name="mdi-keyboard-return"
+        style="transform: scale(-1, 1)"
+        class="q-pa-sm"
+      />
+      <div
+        class="col-auto rounded-borders clickable q-px-sm q-py-xs"
+        @click="showBlockById(id)"
+      >
+        <i>{{ id }}</i>
+      </div>
+    </div>
+    <div
+      :style="`margin-left: ${claim.intermediate.length * 5}px`"
+      class="row"
+    >
+      <q-icon
+        name="mdi-keyboard-return"
+        style="transform: scale(-1, 1)"
+        class="q-pa-sm"
+      />
+      <div class="col-auto q-py-xs">This block</div>
+    </div>
+  </div>
+  <div
+    v-else
+    class="col-auto q-pa-sm darkish text-italic text-small"
+  >
+    Not claimed
+  </div>
 </template>

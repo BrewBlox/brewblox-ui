@@ -65,7 +65,7 @@ export class BrewbloxEventbus {
             message: `
           Failed to connect to the eventbus.
           <a
-            href="https://brewblox.netlify.app/user/troubleshooting.html#known-issues-workarounds"
+            href="https://brewblox.com/user/troubleshooting.html#known-issues-workarounds"
             target="_blank"
             style="color: white"
           >

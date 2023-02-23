@@ -77,9 +77,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
-        constrainedBy: {
-          constraints: [],
-        },
+        constraints: {},
         transitionDurationPreset: TransitionDurationPreset.ST_OFF,
         transitionDurationSetting: bloxQty('0s'),
         transitionDurationValue: bloxQty('0s'),
@@ -99,9 +97,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         setting: 0,
         desiredSetting: 0,
         value: 0,
-        constrainedBy: {
-          constraints: [],
-        },
+        constraints: {},
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
       },

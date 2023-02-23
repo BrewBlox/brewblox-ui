@@ -5,8 +5,7 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import {
   channelName,
-  findLimitations,
-  limitationString,
+  prettyLimitations,
 } from '@/plugins/spark/utils/formatting';
 import { ifCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
@@ -65,7 +64,7 @@ export default defineComponent({
     );
 
     function actuatorLimitations(block: Block): string | null {
-      return limitationString(findLimitations(block));
+      return prettyLimitations(block.data.constraints) || null;
     }
 
     async function replaceActuator(

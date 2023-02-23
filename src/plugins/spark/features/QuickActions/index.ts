@@ -3,6 +3,12 @@ import { Widget } from '@/store/widgets';
 import { cref } from '@/utils/component-ref';
 import { nanoid } from 'nanoid';
 import { Plugin } from 'vue';
+import {
+  convertDeprecatedAnalogConstraints,
+  convertDeprecatedDigitalConstraints,
+  isDeprecatedAnalogConstraints,
+  isDeprecatedDigitalConstraints,
+} from '../../utils/configuration';
 import widget from './QuickActionsWidget.vue';
 import { QuickActionsConfig, QuickActionsConfigOld } from './types';
 
@@ -20,7 +26,7 @@ const plugin: Plugin = {
         rows: 5,
       },
       generateConfig: () => ({
-        version: '1.2',
+        version: '1.3',
         actions: [
           {
             id: nanoid(),
@@ -35,7 +41,7 @@ const plugin: Plugin = {
         const config = widget.config as QuickActionsConfig &
           QuickActionsConfigOld;
 
-        if (config.version !== '1.2') {
+        if (config.version !== '1.3') {
           dirty = true;
 
           if (config.steps) {
@@ -81,6 +87,23 @@ const plugin: Plugin = {
                 change.data.enabled = change.data.settingEnabled;
                 change.data.settingEnabled = undefined;
               });
+
+            // Constraints were changed from array-based to object-based
+            action.changes
+              .filter((change) => change.data.constrainedBy !== undefined)
+              .forEach((change) => {
+                const { constrainedBy } = change.data;
+                if (isDeprecatedAnalogConstraints(constrainedBy)) {
+                  change.data.constraints =
+                    convertDeprecatedAnalogConstraints(constrainedBy);
+                } else if (isDeprecatedDigitalConstraints(constrainedBy)) {
+                  change.data.constraints =
+                    convertDeprecatedDigitalConstraints(constrainedBy);
+                } else {
+                  change.data.constraints = {};
+                }
+                change.data.constrainedBy = undefined;
+              });
           });
         }
 
@@ -89,7 +112,7 @@ const plugin: Plugin = {
           const upgraded: Widget<QuickActionsConfig> = {
             ...widget,
             config: {
-              version: '1.2',
+              version: '1.3',
               actions: config.actions,
               lastActionId: config.lastActionId,
             },

@@ -5,8 +5,9 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { computed, defineComponent, onBeforeUnmount, ref, watch } from 'vue';
 import { SparkDisplayWidget } from './types';
 
-const WIDTH = 320;
-const HEIGHT = 240;
+// Values are also defined in style section
+const WIDTH = 480;
+const HEIGHT = 320;
 
 export default defineComponent({
   name: 'SparkDisplayWidget',
@@ -68,7 +69,7 @@ export default defineComponent({
       },
     );
 
-    function log(logline): void {
+    function log(logline: any): void {
       if (debug === true) {
         console.log(logline); // eslint-disable-line
       }
@@ -336,8 +337,8 @@ export default defineComponent({
 .view
   display: block
   margin: 0 auto
-  width: 320px
-  height: 240px
+  width: 480px
+  height: 320px
 
 .glass
   background-color: rgba(255, 255, 255, 0.75)

@@ -1,8 +1,9 @@
 <script lang="ts">
 import { useValEdit } from '@/plugins/spark/composables';
-import { prettifyConstraints } from '@/plugins/spark/utils/formatting';
-import { AnalogConstraintsObj } from 'brewblox-proto/ts';
+import { AnalogConstraints } from 'brewblox-proto/ts';
+
 import { computed, defineComponent } from 'vue';
+import { prettyConstraints } from '../../utils/formatting';
 
 export default defineComponent({
   name: 'AnalogConstraintsValEdit',
@@ -11,10 +12,10 @@ export default defineComponent({
   },
   emits: [...useValEdit.emits],
   setup() {
-    const { field, startEdit } = useValEdit.setup<AnalogConstraintsObj>();
+    const { field, startEdit } = useValEdit.setup<AnalogConstraints>();
 
-    const displayString = computed<string>(() =>
-      prettifyConstraints(field.value),
+    const displayString = computed<string>(
+      () => prettyConstraints(field.value) || 'Unconstrained',
     );
 
     return {
@@ -34,9 +35,9 @@ export default defineComponent({
     >
       Values will replace all existing constraints on <i> {{ blockId }} </i>.
     </div>
-    <AnalogConstraints
+    <AnalogConstraintsEditor
       v-model="field"
-      v-bind="{ serviceId }"
+      :service-id="serviceId"
     />
   </div>
   <div

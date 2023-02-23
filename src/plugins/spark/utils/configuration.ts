@@ -10,8 +10,23 @@ import { isQuantity } from '@/utils/identity';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, durationMs, parseDate, prettyUnit } from '@/utils/quantity';
 import {
+  AnalogConstraintKey,
+  AnalogConstraints,
   Block,
   BlockIntfType,
+  BlockType,
+  DeprecatedAnalogConstraintsObj,
+  DeprecatedBalancedConstraint,
+  DeprecatedDelayedOffConstraint,
+  DeprecatedDelayedOnConstraint,
+  DeprecatedDigitalConstraintsObj,
+  DeprecatedMaxConstraint,
+  DeprecatedMinConstraint,
+  DeprecatedMinOffConstraint,
+  DeprecatedMinOnConstraint,
+  DeprecatedMutexedConstraint,
+  DigitalConstraintKey,
+  DigitalConstraints,
   IoDriverInterfaceBlock,
   Link,
   SetpointProfileBlock,
@@ -21,6 +36,8 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import { isBlockCompatible } from './info';
+
+import { Enum } from 'typescript-string-enums';
 
 export const asBlockAddress = (block: Block): BlockAddress =>
   pick(block, ['id', 'serviceId', 'type']);
@@ -184,4 +201,115 @@ export async function setExclusiveChannelActuator(
 
   await unlinkChannelActuators(actuator.serviceId, hwDevice, channel);
   await useSparkStore().patchBlock(actuator, { hwDevice, channel });
+}
+
+export function emptyAnalogConstraints(): DeepNonNullable<AnalogConstraints> {
+  return {
+    min: { enabled: false, limiting: false, value: 0 },
+    max: { enabled: false, limiting: false, value: 0 },
+    balanced: {
+      enabled: false,
+      limiting: false,
+      granted: 0,
+      balancerId: bloxLink(null, BlockType.Balancer),
+    },
+  };
+}
+
+export function emptyDigitalConstraints(): DeepNonNullable<DigitalConstraints> {
+  return {
+    minOff: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      duration: bloxQty('0s'),
+    },
+    minOn: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      duration: bloxQty('0s'),
+    },
+    delayedOn: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      duration: bloxQty('0s'),
+    },
+    delayedOff: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      duration: bloxQty('0s'),
+    },
+    mutexed: {
+      enabled: false,
+      limiting: false,
+      remaining: bloxQty('0s'),
+      hasLock: false,
+      mutexId: bloxLink(null, BlockType.Mutex),
+      extraHoldTime: bloxQty('0s'),
+    },
+  };
+}
+
+export function isDeprecatedAnalogConstraints(
+  obj: any,
+): obj is DeprecatedAnalogConstraintsObj {
+  const c = obj.constraints[0];
+  return c && Enum.values(AnalogConstraintKey).some((k) => c[k] !== undefined);
+}
+
+export function isDeprecatedDigitalConstraints(
+  obj: any,
+): obj is DeprecatedDigitalConstraintsObj {
+  const c = obj.constraints[0];
+  return c && Enum.values(DigitalConstraintKey).some((k) => c[k] !== undefined);
+}
+
+export function convertDeprecatedAnalogConstraints(
+  constrainedBy: DeprecatedAnalogConstraintsObj,
+): AnalogConstraints {
+  const constraints = emptyAnalogConstraints();
+  for (const c of constrainedBy.constraints) {
+    const min = (c as DeprecatedMinConstraint).min;
+    const max = (c as DeprecatedMaxConstraint).max;
+    const balanced = (c as DeprecatedBalancedConstraint).balanced;
+
+    if (min !== undefined) {
+      constraints.min.value = min;
+    } else if (max !== undefined) {
+      constraints.max.value = max;
+    } else if (balanced !== undefined) {
+      constraints.balanced.balancerId = balanced.balancerId;
+    }
+  }
+  return constraints;
+}
+
+export function convertDeprecatedDigitalConstraints(
+  constrainedBy: DeprecatedDigitalConstraintsObj,
+): DigitalConstraints {
+  const constraints = emptyDigitalConstraints();
+  for (const c of constrainedBy.constraints) {
+    const minOn = (c as DeprecatedMinOnConstraint).minOn;
+    const minOff = (c as DeprecatedMinOffConstraint).minOff;
+    const delayedOn = (c as DeprecatedDelayedOnConstraint).delayedOn;
+    const delayedOff = (c as DeprecatedDelayedOffConstraint).delayedOff;
+    const mutexed = (c as DeprecatedMutexedConstraint).mutexed;
+
+    if (minOn !== undefined) {
+      constraints.minOn.duration = minOn;
+    } else if (minOff !== undefined) {
+      constraints.minOff.duration = minOff;
+    } else if (delayedOn !== undefined) {
+      constraints.delayedOn.duration = delayedOn;
+    } else if (delayedOff !== undefined) {
+      constraints.delayedOff.duration = delayedOff;
+    } else if (mutexed !== undefined) {
+      constraints.mutexed.mutexId = mutexed.mutexId;
+      constraints.mutexed.extraHoldTime = mutexed.extraHoldTime;
+    }
+  }
+  return constraints;
 }

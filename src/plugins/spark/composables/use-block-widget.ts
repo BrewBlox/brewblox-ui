@@ -4,10 +4,7 @@ import { emptyGraphConfig } from '@/plugins/history/utils';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockConfig, BlockSpec, BlockWidget } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
-import {
-  findLimitations,
-  limitationString,
-} from '@/plugins/spark/utils/formatting';
+import { prettyLimitations } from '@/plugins/spark/utils/formatting';
 import { isBlockVolatile } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
 import { Block } from 'brewblox-proto/ts';
@@ -104,8 +101,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       await sparkStore.patchBlock(block.value, data);
     }
 
-    const limitations = computed<string | null>(() =>
-      limitationString(findLimitations(block.value)),
+    const limitations = computed<string | null>(
+      () => prettyLimitations(block.value.data.constraints) || null,
     );
 
     const hasGraph: boolean =

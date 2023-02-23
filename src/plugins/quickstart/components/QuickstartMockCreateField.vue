@@ -5,6 +5,7 @@ import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import {
   BlockType,
+  MockPinsBlock,
   SparkStatusDescription,
   TempSensorMockBlock,
 } from 'brewblox-proto/ts';
@@ -40,8 +41,12 @@ export default defineComponent({
         return;
       }
       const validator = makeRuleValidator(makeBlockIdRules(props.serviceId));
-      const spec = specStore.blockSpecByType<TempSensorMockBlock>(
+
+      const sensorSpec = specStore.blockSpecByType<TempSensorMockBlock>(
         BlockType.TempSensorMock,
+      );
+      const pinSpec = specStore.blockSpecByType<MockPinsBlock>(
+        BlockType.MockPins,
       );
 
       for (const name of props.names) {
@@ -49,11 +54,20 @@ export default defineComponent({
           id: suggestId(name, validator),
           serviceId: props.serviceId,
           type: BlockType.TempSensorMock,
-          data: spec.generate(),
+          data: sensorSpec.generate(),
         };
         await sparkStore.createBlock(block);
-        notify.done(`Created sensor <i>${block.id}</i>`);
+        notify.done(`Created <i>${block.id}</i>`);
       }
+
+      const pinsBlock: MockPinsBlock = {
+        id: suggestId('Mock Pins', validator),
+        serviceId: props.serviceId,
+        type: BlockType.MockPins,
+        data: pinSpec.generate(),
+      };
+      await sparkStore.createBlock(pinsBlock);
+      notify.done(`Created <i>${pinsBlock.id}</i>`);
 
       finished.value = true;
     }
@@ -83,7 +97,7 @@ export default defineComponent({
         <div class="col-grow text-italic">
           '{{ serviceId }}' is a simulation service without physical sensors.
           <br />
-          Click here to create Temp Sensor (Mock) blocks.
+          Click here to create simulation sensors and IO pins for your system.
         </div>
       </div>
     </q-item-section>

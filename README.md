@@ -7,13 +7,13 @@
 * Node.js
 * Yarn
 * Docker
-* Docker-compose
+* Docker Compose
 
 Due to limitations in the way Docker is handled on Windows, Linux or Mac is required for development.
 
 ## Installation
 
-**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at <https://brewblox.netlify.app/>**
+**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at <https://brewblox.com/>**
 
 Note: this is tested on Ubuntu, and may or may not work on other distros. Please let us know if there are any issues.
 
@@ -30,9 +30,6 @@ npm install -g yarn
 # Install Docker
 curl -sL https://get.docker.com | bash
 
-# Install docker-compose
-pip3 install --user -U docker-compose
-
 # Allow running docker without sudo
 sudo usermod -aG docker $USER
 
@@ -44,7 +41,7 @@ After the reboot, run the following commands in the `brewblox-ui` directory:
 
 ``` bash
 yarn ci
-docker-compose pull
+docker compose pull
 ```
 
 ## Run
