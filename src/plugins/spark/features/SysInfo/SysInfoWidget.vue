@@ -1,7 +1,12 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { dateString, durationString, shortDateString } from '@/utils/quantity';
+import {
+  dateString,
+  durationString,
+  roundedNumber,
+  shortDateString,
+} from '@/utils/quantity';
 import { SysInfoBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 
@@ -22,6 +27,7 @@ export default defineComponent({
     return {
       dateString,
       durationString,
+      roundedNumber,
       block,
       serviceId,
       ready,
@@ -95,22 +101,22 @@ export default defineComponent({
           label="Voltage (internal)"
           class="col-lg-5 col-11"
         >
-          {{ block.data.voltage5 }}V
+          {{ roundedNumber(block.data.voltage5, 3) }}V
         </LabeledField>
         <LabeledField
           label="Voltage (external)"
           class="col-lg-5 col-11"
         >
-          {{ block.data.voltageExternal }}V
+          {{ roundedNumber(block.data.voltageExternal, 3) }}V
         </LabeledField>
         <LabeledField
           label="Free RAM"
           class="col-lg-5 col-11"
           tag-class="q-gutter-y-xs"
         >
-          <div>Total: {{ block.data.memoryFree }}B</div>
-          <div>Contiguous: {{ block.data.memoryFree }}B</div>
-          <div>Lowest: {{ block.data.memoryFree }}B</div>
+          <div>Total: {{ block.data.memoryFree }}</div>
+          <div>Contiguous: {{ block.data.memoryFree }}</div>
+          <div>Lowest: {{ block.data.memoryFree }}</div>
         </LabeledField>
       </div>
     </div>
