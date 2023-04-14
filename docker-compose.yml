@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   eventbus:
-    image: brewblox/mosquitto:develop
+    image: ghcr.io/brewblox/mosquitto:develop
     labels:
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
@@ -31,7 +31,7 @@ services:
     command: --appendonly yes
 
   history:
-    image: brewblox/brewblox-history:develop
+    image: ghcr.io/brewblox/brewblox-history:develop
 
   node-red:
     image: brewblox/node-red:develop
@@ -41,7 +41,7 @@ services:
         target: /data
 
   sparkey:
-    image: brewblox/brewblox-devcon-spark:develop
+    image: ghcr.io/brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
     volumes:
@@ -51,7 +51,7 @@ services:
     command: --name=sparkey --simulation --device-id=123456789012345678901234
 
   spock:
-    image: brewblox/brewblox-devcon-spark:develop
+    image: ghcr.io/brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
     volumes:
@@ -61,7 +61,7 @@ services:
     command: --name=spock --simulation --device-id=432109876543210987654321
 
   tilt:
-    image: brewblox/brewblox-tilt:develop
+    image: ghcr.io/brewblox/brewblox-tilt:develop
     labels:
       - traefik.enable=false
     volumes:

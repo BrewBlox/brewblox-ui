@@ -91,6 +91,27 @@ export default defineComponent({
         >
           {{ lastBlocks }}
         </LabeledField>
+        <LabeledField
+          label="Voltage (internal)"
+          class="col-lg-5 col-11"
+        >
+          {{ block.data.voltage5 }}V
+        </LabeledField>
+        <LabeledField
+          label="Voltage (external)"
+          class="col-lg-5 col-11"
+        >
+          {{ block.data.voltageExternal }}V
+        </LabeledField>
+        <LabeledField
+          label="Free RAM"
+          class="col-lg-5 col-11"
+          tag-class="q-gutter-y-xs"
+        >
+          <div>Total: {{ block.data.memoryFree }}B</div>
+          <div>Contiguous: {{ block.data.memoryFree }}B</div>
+          <div>Lowest: {{ block.data.memoryFree }}B</div>
+        </LabeledField>
       </div>
     </div>
   </Card>

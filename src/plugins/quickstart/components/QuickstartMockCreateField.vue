@@ -33,7 +33,7 @@ export default defineComponent({
     );
 
     const isSimulation = computed<boolean>(
-      () => status.value?.connection_kind === 'SIMULATION',
+      () => status.value?.connection_kind === 'SIM',
     );
 
     async function createMockSensors(): Promise<void> {

@@ -80,9 +80,11 @@ const iconOpts: Record<
   SparkStatusDescription['connection_kind'] & string,
   string
 > = {
-  SIMULATION: 'mdi-console',
+  SIM: 'mdi-console',
+  MOCK: 'mdi-console',
   TCP: 'mdi-wifi',
   USB: 'mdi-usb-port',
+  MQTT: 'mdi-wifi',
 };
 
 export function asServiceStatus(

@@ -36,6 +36,11 @@ const plugin: Plugin = {
         timeZone: 'etc/UTC',
         tempUnit: DisplayTempUnit.TEMP_CELSIUS,
         displayBrightness: 255,
+        voltage5: 5,
+        voltageExternal: 12,
+        memoryFree: 0,
+        memoryFreeContiguous: 0,
+        memoryFreeLowest: 0,
       }),
       analyze: () => 'Active',
     };
