@@ -93,7 +93,10 @@ export default defineComponent({
         </div>
       </div>
     </foreignObject>
-    <BuilderBorder v-bind="{ width, height, color }" />
+    <BuilderBorder
+      v-if="bordered"
+      v-bind="{ width, height, color }"
+    />
     <BuilderInteraction v-bind="{ width, height }">
       <q-menu
         touch-position
