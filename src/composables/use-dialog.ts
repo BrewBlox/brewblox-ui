@@ -115,7 +115,10 @@ export const useDialog: UseDialogComposable = {
     function setupRouteHash(): void {
       const router = useRouter();
       router
-        .push({ hash: (router.currentRoute.value.hash || '#') + hashId })
+        .push({
+          query: { ...router.currentRoute.value.query },
+          hash: (router.currentRoute.value.hash || '#') + hashId,
+        })
         .then(() => nextTick())
         .then(() => {
           cancelWatcher.value = watch(
@@ -153,7 +156,10 @@ export const useDialog: UseDialogComposable = {
         // For security/privacy reasons we can't inspect the stack
         // before calling `router.back()`.
         cancelWatcher.value();
-        router.replace({ hash: hash.replaceAll(hashId, '') });
+        router.replace({
+          query: { ...router.currentRoute.value.query },
+          hash: hash.replaceAll(hashId, ''),
+        });
       }
     }
 

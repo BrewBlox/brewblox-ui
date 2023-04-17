@@ -46,7 +46,7 @@ export default defineComponent({
       { immediate: true },
     );
 
-    watch(interactable, () => {
+    watch([interactable, width, height], () => {
       renderRevision.value = new Date();
     });
 

@@ -5,7 +5,7 @@ version: '3.7'
 # Some common configurations are added in comments below
 services:
   ui:
-    image: brewblox/brewblox-ui:develop
+    image: ghcr.io/brewblox/brewblox-ui:develop
     volumes:
       - type: bind
         source: ./dist
@@ -24,23 +24,6 @@ services:
   #     - type: bind
   #       source: ../node-red-contrib-brewblox
   #       target: /node-red-contrib-brewblox
-
-  # automation:
-  #   image: brewblox/brewblox-automation:develop
-  #   init: true
-  #   volumes:
-  #     - type: bind
-  #       source: ../brewblox-automation
-  #       target: /app
-  #   entrypoint: 'npm run dev'
-
-  # automation-ui:
-  #   image: brewblox/brewblox-automation-ui:develop
-  # sparksimulator:
-  #   image: brewblox/firmware-simulator:feature-multiplatform
-  #   init: true
-  #   ports:
-  #     - "7376:7376"
 
   # history:
   #   image: brewblox/brewblox-history:develop

@@ -1,5 +1,8 @@
 <script lang="ts">
-import { useGlobals } from '@/composables';
+import brewbloxIconSvg from '@/assets/logo-x.svg';
+
+import brewbloxLogoSvg from '@/assets/logo-wordmark-dark.svg';
+import { useGlobals, useKiosk } from '@/composables';
 import { startCreateFolder } from '@/store/sidebar/utils';
 import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref } from 'vue';
@@ -10,6 +13,7 @@ export default defineComponent({
   setup() {
     const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
+    const { kiosk } = useKiosk.setup();
     const router = useRouter();
 
     const devMode = Boolean(import.meta.env.DEV);
@@ -31,6 +35,9 @@ export default defineComponent({
     }
 
     return {
+      brewbloxLogoSvg,
+      brewbloxIconSvg,
+      kiosk,
       devMode,
       editing,
       drawerOpen,
@@ -46,7 +53,10 @@ export default defineComponent({
     view="hHh Lpr fFf"
     style="overflow: hidden"
   >
-    <LayoutHeader @menu="drawerOpen = !drawerOpen">
+    <LayoutHeader
+      v-if="!kiosk"
+      @menu="drawerOpen = !drawerOpen"
+    >
       <template #title>
         <portal-target name="toolbar-title" />
       </template>
@@ -56,9 +66,21 @@ export default defineComponent({
         </div>
       </template>
     </LayoutHeader>
-    <LayoutFooter />
+    <div
+      v-else
+      class="absolute z-top q-pa-sm"
+    >
+      <img
+        :src="brewbloxLogoSvg"
+        class="clickable bg-transparent"
+        style="height: 24px"
+        @click="kiosk = false"
+      />
+    </div>
+    <LayoutFooter v-if="!kiosk" />
 
     <q-drawer
+      v-if="!kiosk"
       v-model="drawerOpen"
       class="column"
       elevated
@@ -76,11 +98,20 @@ export default defineComponent({
         <q-btn
           v-if="devMode"
           flat
+          round
           icon="mdi-format-paint"
           to="/styles"
           :color="routeActive('/styles') ? 'primary' : ''"
         >
-          <q-tooltip> Theming </q-tooltip>
+          <q-tooltip>Theming</q-tooltip>
+        </q-btn>
+        <q-btn
+          flat
+          round
+          icon="mdi-fullscreen"
+          @click="kiosk = true"
+        >
+          <q-tooltip>Kiosk mode</q-tooltip>
         </q-btn>
         <q-space />
         <q-btn

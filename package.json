@@ -19,7 +19,7 @@
     "compose:new": "yarn initdev && yarn makecert && docker compose up -d --force-recreate && yarn compose:setup",
     "serve": "vite serve",
     "start": "yarn compose:new && yarn serve",
-    "build": "vite build",
+    "build": "vite build && du -h dist/",
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
     "lint:eslint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ./src ./test",
@@ -35,7 +35,7 @@
   "dependencies": {
     "@quasar/extras": "^1.10.11",
     "axios": "^1.1.3",
-    "brewblox-proto": "https://github.com/brewblox/brewblox-proto#e9b2f8b9",
+    "brewblox-proto": "https://github.com/brewblox/brewblox-proto#9177f317",
     "buffer": "^6.0.3",
     "cm6-theme-basic-dark": "^0.2.0",
     "codemirror": "^6.0.0",

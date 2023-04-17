@@ -9,6 +9,7 @@ export default defineComponent({
   emits: ['menu'],
   setup() {
     const { dense } = useGlobals.setup();
+
     return {
       brewbloxLogoSvg,
       brewbloxIconSvg,
