@@ -4,7 +4,7 @@ import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
-import { shortDateString } from '@/utils/quantity';
+import { shortDateString, tempQty } from '@/utils/quantity';
 import {
   BlockIntfType,
   BlockType,
@@ -28,6 +28,7 @@ const plugin: Plugin = {
         points: [],
         enabled: false,
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+        setting: tempQty(null),
       }),
       analyze: (block: SetpointProfileBlock) => {
         const { enabled, targetId } = block.data;

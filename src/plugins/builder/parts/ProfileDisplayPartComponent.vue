@@ -37,33 +37,10 @@ export default defineComponent({
       if (placeholder) {
         return 19;
       }
-      if (
-        !block.value ||
-        !block.value.data.enabled ||
-        !block.value.data.start
-      ) {
+      if (!block.value) {
         return null;
       }
-      const now = new Date().getTime();
-      const start = new Date(block.value.data.start).getTime();
-      const idx = points.value.findIndex(
-        (point) => start + durationMs(point.time) > now,
-      );
-      if (idx < 1) {
-        return null;
-      }
-      const prev = points.value[idx - 1];
-      const next = points.value[idx];
-      const prevVal = prev.temperature.value!;
-      const nextVal = next.temperature.value!;
-      const prevTime = durationMs(prev.time);
-      const nextTime = durationMs(next.time);
-      const durationBetween = nextTime - prevTime || 1;
-      const elapsedBetween = now - prevTime - start;
-      const progress = elapsedBetween / durationBetween; // 0-1
-      const tempDelta = nextVal - prevVal;
-
-      return prevVal + progress * tempDelta;
+      return block.value.data.setting.value;
     });
 
     const nextValue = computed<number | null>(() => {

@@ -232,6 +232,13 @@ export default defineComponent({
         class="col-grow"
         @update:model-value="(v) => patchBlock({ targetId: v })"
       />
+      <QuantityField
+        :model-value="block.data.setting"
+        label="Setting"
+        readonly
+        tag="big"
+        class="col-grow min-width-md"
+      />
 
       <div class="col-break" />
 

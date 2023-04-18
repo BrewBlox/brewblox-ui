@@ -191,6 +191,7 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(names.fridgeSetpoint),
+        setting: tempQty(null),
         points: [
           {
             time: bloxQty('0s'),
