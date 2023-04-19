@@ -209,7 +209,6 @@ export default defineComponent({
   &:hover
     .interaction:hover
       opacity: 0.2
-      fill: white
       background-color: white
 
   text
@@ -222,14 +221,6 @@ export default defineComponent({
     line-height: 1
     vertical-align: middle
     display: inline-block
-
-  .interaction
-    pointer-events: auto
-    width: 100%
-    height: 100%
-    opacity: 0
-    rx: 4
-    border-radius: 4px
 
   :not(.interactable) .native-interaction
     pointer-events: none !important

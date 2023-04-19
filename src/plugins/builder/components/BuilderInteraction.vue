@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, inject } from 'vue';
+import { computed, CSSProperties, defineComponent, inject } from 'vue';
 import { InteractableKey, PlaceholderKey } from '../symbols';
 
 export default defineComponent({
@@ -37,7 +37,7 @@ export default defineComponent({
       computed(() => false),
     );
 
-    const style = computed(() =>
+    const style = computed<CSSProperties>(() =>
       interactionAllowed.value && props.onInteract != null
         ? { cursor: 'pointer' }
         : {},
@@ -72,3 +72,12 @@ export default defineComponent({
     </div>
   </foreignObject>
 </template>
+
+<style lang="sass" scoped>
+.interaction
+  opacity: 0
+  border-radius: 4px
+  width: 100%
+  height: 100%
+  position: fixed
+</style>
