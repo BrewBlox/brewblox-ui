@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, CSSProperties, defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'ColorField',
@@ -37,7 +37,7 @@ export default defineComponent({
       !!props.modelValue ? color.value : props.nullText,
     );
 
-    const colorStyle = computed<Mapped<string | undefined>>(() => ({
+    const colorStyle = computed<CSSProperties>(() => ({
       color: color.value,
       backgroundColor: props.modelValue ? color.value : undefined,
       border: `1px ${props.modelValue ? 'solid' : 'dashed'} ${color.value}`,

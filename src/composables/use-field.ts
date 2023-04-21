@@ -1,4 +1,10 @@
-import { computed, ComputedRef, getCurrentInstance, PropType } from 'vue';
+import {
+  computed,
+  ComputedRef,
+  getCurrentInstance,
+  PropType,
+  StyleValue,
+} from 'vue';
 
 export interface UseFieldProps {
   tag: {
@@ -42,7 +48,7 @@ export interface UseFieldProps {
     default: string;
   };
   tagStyle: {
-    type: PropType<string | string[] | AnyDict>;
+    type: PropType<StyleValue>;
     default: string;
   };
   rules: {

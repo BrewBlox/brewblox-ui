@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, inject } from 'vue';
+import { computed, CSSProperties, defineComponent, inject } from 'vue';
 import { InteractableKey, PlaceholderKey } from '../symbols';
 
 export default defineComponent({
@@ -37,11 +37,16 @@ export default defineComponent({
       computed(() => false),
     );
 
-    const style = computed(() =>
-      interactionAllowed.value && props.onInteract != null
-        ? { cursor: 'pointer' }
-        : {},
-    );
+    const style = computed<CSSProperties>(() => {
+      const styleObj: CSSProperties = {};
+
+      if (interactionAllowed.value && props.onInteract != null) {
+        styleObj.cursor = 'pointer';
+        styleObj.pointerEvents = 'auto';
+      }
+
+      return styleObj;
+    });
 
     function interact(): void {
       if (interactionAllowed.value) {
@@ -59,16 +64,22 @@ export default defineComponent({
 </script>
 
 <template>
-  <foreignObject
+  <g
     v-if="!placeholder"
-    v-bind="{ x, y, width, height }"
+    class="interaction"
   >
-    <div
-      class="interaction"
-      :style="style"
-      @click="interact"
-    >
-      <slot />
-    </div>
-  </foreignObject>
+    <rect
+      v-bind="{ x, y, width, height }"
+      class="interaction-highlight"
+    />
+    <foreignObject v-bind="{ x, y, width, height }">
+      <div
+        class="fit"
+        :style="style"
+        @click="interact"
+      >
+        <slot />
+      </div>
+    </foreignObject>
+  </g>
 </template>
