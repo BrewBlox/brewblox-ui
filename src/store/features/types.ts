@@ -30,11 +30,6 @@ export interface WidgetRemoveAction {
   action: (widget: Widget) => void;
 }
 
-export interface ComponentResult {
-  component: string;
-  error?: string;
-}
-
 /**
  * Widgets are the primary dynamic UI component.
  * They are typically rendered as cards on dashboards.
@@ -69,9 +64,17 @@ export interface WidgetFeature<ConfigT = any> {
 
   /**
    * Rendering component for this widget.
-   * Should be or return the name of a globally registered Vue component.
+   * Should be the name of a globally registered Vue component.
    */
-  component: string | ((widget: Widget) => ComponentResult);
+  component: string;
+
+  /**
+   * Wrapping component for this widget.
+   * Should be the name of a globally registered Vue component.
+   * If set, this will be rendered instead of `component`.
+   * It is then the wrapper's responsibility to render the actual component.
+   */
+  wrapperComponent?: string;
 
   /**
    * Wizard component.

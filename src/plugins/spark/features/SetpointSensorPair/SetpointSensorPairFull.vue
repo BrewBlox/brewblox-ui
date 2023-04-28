@@ -13,19 +13,10 @@ export default defineComponent({
   name: 'SetpointSensorPairFull',
   setup() {
     const sparkStore = useSparkStore();
-    const {
-      serviceId,
-      blockId,
-      block,
-      patchBlock,
-      isVolatileBlock,
-      isClaimed,
-    } = useBlockWidget.setup<SetpointSensorPairBlock>();
+    const { serviceId, blockId, block, patchBlock, isClaimed } =
+      useBlockWidget.setup<SetpointSensorPairBlock>();
 
     const usedBy = computed<Block[]>(() => {
-      if (isVolatileBlock.value) {
-        return [];
-      }
       return sparkStore
         .blocksByService(serviceId)
         .filter((b) => b.data.inputId?.id === blockId);

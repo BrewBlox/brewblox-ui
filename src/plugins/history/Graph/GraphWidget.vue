@@ -22,7 +22,7 @@ export default defineComponent({
 
     const { context, inDialog } = useContext.setup();
 
-    const { widgetId, widget, config, saveWidget } =
+    const { widgetId, widget, config, patchWidget } =
       useWidget.setup<Widget<GraphConfig>>();
 
     function cloned(): GraphConfig {
@@ -58,7 +58,7 @@ export default defineComponent({
 
     async function saveConfig(config: GraphConfig): Promise<void> {
       delete config.layout.title;
-      saveWidget({ ...widget.value, config });
+      patchWidget({ config });
     }
 
     function isActivePreset(preset: QueryParams): boolean {

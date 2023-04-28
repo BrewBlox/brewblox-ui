@@ -20,7 +20,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-header class="bg-dark shadow-1">
+  <q-header class="bg-dark">
     <q-bar class="bg-transparent q-px-none">
       <q-btn
         flat

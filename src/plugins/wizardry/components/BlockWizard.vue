@@ -1,19 +1,16 @@
 <script lang="ts">
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import { BlockConfig, ComparedBlockType } from '@/plugins/spark/types';
+import { ComparedBlockType } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { isCompatible, isSystemBlockType } from '@/plugins/spark/utils/info';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
-import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter, nullFilter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
-import { Block, BlockIntfType, UserBlockType } from 'brewblox-proto/ts';
-import isMatch from 'lodash/isMatch';
+import { BlockIntfType, UserBlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { DialogChainObject } from 'quasar';
-import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { useWizard } from '../composables';
 
 export default defineComponent({
@@ -35,7 +32,6 @@ export default defineComponent({
   },
   emits: [...useWizard.emits],
   setup(props) {
-    const widgetStore = useWidgetStore();
     const featureStore = useFeatureStore();
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
@@ -51,9 +47,6 @@ export default defineComponent({
     const blockId = ref<string | null>(null);
     const searchFilter = ref<string>('');
 
-    const activeBlock = ref<Block | null>(null);
-    const activeWidget = ref<Widget<BlockConfig> | null>(null);
-    const activeDialog = ref<DialogChainObject | null>(null);
     const discoveryActive = ref<boolean>(false);
 
     const serviceOpts = computed<string[]>(() => sparkStore.serviceIds);
@@ -93,7 +86,7 @@ export default defineComponent({
       () =>
         selected.value !== null &&
         sparkStore.has(serviceId.value) &&
-        (activeBlock.value !== null || validator.value(blockId.value)),
+        validator.value(blockId.value),
     );
 
     const discoveredType = computed<boolean>(() =>
@@ -129,58 +122,6 @@ export default defineComponent({
       }).onOk((v) => (blockId.value = v));
     }
 
-    function ensureVolatile(): void {
-      if (
-        activeBlock.value &&
-        !isMatch(activeBlock.value, {
-          id: blockId.value,
-          serviceId: serviceId.value,
-          type: selected.value?.value,
-        })
-      ) {
-        sparkStore.removeVolatileBlock(activeBlock.value);
-        activeBlock.value = null;
-      }
-
-      if (
-        !activeBlock.value &&
-        selected.value &&
-        blockId.value &&
-        serviceId.value &&
-        createReady.value
-      ) {
-        sparkStore.setVolatileBlock({
-          id: blockId.value,
-          serviceId: serviceId.value,
-          type: selected.value.value,
-          data: specStore.blockSpecByType(selected.value.value).generate(),
-        });
-        activeBlock.value = sparkStore.blockById(
-          serviceId.value,
-          blockId.value,
-        );
-      }
-
-      if (activeBlock.value) {
-        const block = activeBlock.value;
-        widgetStore.setVolatileWidget({
-          id: widgetId,
-          title: block.id,
-          feature: block.type,
-          dashboard: dashboardId.value ?? '',
-          order: 0,
-          config: {
-            ...(activeWidget.value?.config ?? {}),
-            serviceId: block.serviceId,
-            blockId: block.id,
-          },
-          ...featureStore.widgetSize(block.type),
-          volatile: true,
-        });
-        activeWidget.value = widgetStore.widgetById(widgetId);
-      }
-    }
-
     function selectOpt(opt: SelectOption<UserBlockType> | null): void {
       selected.value = opt;
       if (opt === null) {
@@ -191,60 +132,49 @@ export default defineComponent({
       }
     }
 
-    function configureBlock(): void {
-      if (!createReady.value || !sparkStore.has(serviceId.value)) {
-        return;
-      }
-      ensureVolatile();
-      if (activeBlock.value && activeWidget.value) {
-        activeDialog.value = createDialog({
-          component: 'WidgetDialog',
-          componentProps: {
-            widgetId,
-            mode: 'Full',
-          },
-        });
-      }
-    }
-
     function reset(): void {
       discoveryActive.value = false;
       setDialogTitle('Block wizard');
     }
 
     async function createBlock(): Promise<void> {
-      if (!createReady.value || !sparkStore.has(serviceId.value)) {
+      if (
+        !createReady.value ||
+        !sparkStore.has(serviceId.value) ||
+        !blockId.value ||
+        !selected.value
+      ) {
         return;
       }
-      ensureVolatile();
 
-      if (!activeBlock.value || !activeWidget.value) {
-        return;
-      }
-
-      const persistentBlock = { ...activeBlock.value, meta: undefined };
-      const createdBlock = await tryCreateBlock(persistentBlock);
+      const createdBlock = await tryCreateBlock({
+        id: blockId.value,
+        serviceId: serviceId.value,
+        type: selected.value.value,
+        data: specStore.blockSpecByType(selected.value.value).generate(),
+      });
 
       if (!createdBlock) {
         return close();
       }
 
-      const persistentWidget = { ...activeWidget.value, volatile: undefined };
       const createdWidget = dashboardId.value
-        ? await tryCreateWidget(persistentWidget)
+        ? await tryCreateWidget({
+            id: widgetId,
+            title: createdBlock.id,
+            feature: createdBlock.type,
+            dashboard: dashboardId.value ?? '',
+            order: 0,
+            config: {
+              serviceId: createdBlock.serviceId,
+              blockId: createdBlock.id,
+            },
+            ...featureStore.widgetSize(createdBlock.type),
+          })
         : null;
 
       onDone({ block: createdBlock, widget: createdWidget });
     }
-
-    onBeforeUnmount(() => {
-      if (activeBlock.value) {
-        sparkStore.removeVolatileBlock(activeBlock.value);
-      }
-      if (activeWidget.value) {
-        widgetStore.removeVolatileWidget(activeWidget.value);
-      }
-    });
 
     return {
       onBack,
@@ -267,7 +197,6 @@ export default defineComponent({
       showSearchKeyboard,
       showNameKeyboard,
       selectOpt,
-      configureBlock,
       reset,
       createBlock,
     };
@@ -375,12 +304,6 @@ export default defineComponent({
         />
       </template>
       <template v-else>
-        <q-btn
-          :disable="!createReady"
-          flat
-          label="Configure"
-          @click="configureBlock"
-        />
         <q-btn
           :disable="!createReady"
           unelevated

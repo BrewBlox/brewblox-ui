@@ -1,8 +1,8 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxQty } from '@/utils/quantity';
 import {
   BlockType,
@@ -50,7 +50,7 @@ const plugin: Plugin = {
       id: type,
       title: 'Sequence',
       role: 'Process',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 4,

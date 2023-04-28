@@ -47,7 +47,7 @@ export async function discoverBlocks(
   return discovered;
 }
 
-export function startChangeBlockId(block: Block | null): void {
+export function startChangeBlockId(block: Maybe<Block>): void {
   if (!block) {
     return;
   }
@@ -67,7 +67,7 @@ export function startChangeBlockId(block: Block | null): void {
   });
 }
 
-export function startRemoveBlock(block: Block | null): void {
+export function startRemoveBlock(block: Maybe<Block>): void {
   if (!block) {
     return;
   }

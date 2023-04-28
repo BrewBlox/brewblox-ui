@@ -3,7 +3,6 @@ import { findById } from '@/utils/collections';
 import isString from 'lodash/isString';
 import { defineStore } from 'pinia';
 import type {
-  ComponentResult,
   GridSize,
   QuickstartFeature,
   ServiceFeature,
@@ -67,17 +66,8 @@ export const useFeatureStore = defineStore('featureStore', {
       }
       return null;
     },
-    widgetComponent(widget: Widget): ComponentResult {
-      const feature = this.widgetById(widget.feature);
-      if (!feature) {
-        return {
-          component: 'InvalidWidget',
-          error: `No feature found for '${widget.feature}'`,
-        };
-      }
-      return isString(feature.component)
-        ? { component: feature.component }
-        : feature.component(widget);
+    widgetComponent(widget: Maybe<Widget>): string | null {
+      return this.widgetById(widget?.feature)?.component ?? null;
     },
     widgetSize(id: string): GridSize {
       return this.widgetById(id)?.widgetSize ?? { cols: 3, rows: 2 };

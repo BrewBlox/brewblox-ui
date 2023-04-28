@@ -1,8 +1,8 @@
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { BlockType, Spark3PinsBlock } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './Spark3PinsWidget.vue';
@@ -72,7 +72,7 @@ const plugin: Plugin = {
       id: type,
       title: 'Spark 3 Pins',
       role: 'Output',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 4,

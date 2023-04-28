@@ -1,20 +1,27 @@
 import { useFeatureStore } from '@/store/features';
-import { useWidgetStore, Widget } from '@/store/widgets';
-import { InvalidateKey, WidgetIdKey } from '@/symbols';
-import { computed, ComputedRef, inject, Ref, ref, UnwrapRef, watch } from 'vue';
+import { Widget } from '@/store/widgets';
+import {
+  ChangeWidgetTitleKey,
+  InvalidateKey,
+  PatchWidgetKey,
+  VolatileKey,
+  WidgetKey,
+} from '@/symbols';
+import { computed, ComputedRef, inject } from 'vue';
 
 export interface UseWidgetComponent<WidgetT extends Widget> {
   widgetId: string;
-  widget: Ref<UnwrapRef<WidgetT>>;
+  widget: ComputedRef<WidgetT>;
   config: ComputedRef<WidgetT['config']>;
-  isVolatileWidget: ComputedRef<boolean>;
+  isVolatileWidget: boolean;
   featureTitle: ComputedRef<string>;
+  widgetComponent: ComputedRef<string>;
 
-  saveWidget(widget?: WidgetT): Promise<void>;
-  saveConfig(config?: WidgetT['config']): Promise<void>;
   patchWidget(patch: Partial<WidgetT>): Promise<void>;
+  saveConfig(config: WidgetT['config']): Promise<void>;
   patchConfig(patch: Partial<WidgetT['config']>): Promise<void>;
-  invalidate(): void;
+  invalidate(reason?: string): void;
+  changeWidgetTitle(): void;
 }
 
 export interface UseWidgetComposable {
@@ -23,67 +30,38 @@ export interface UseWidgetComposable {
 
 export const useWidget: UseWidgetComposable = {
   setup<WidgetT extends Widget>(): UseWidgetComponent<WidgetT> {
-    const widgetStore = useWidgetStore();
     const featureStore = useFeatureStore();
-    const widgetId = inject(WidgetIdKey);
-    const invalidate = inject(InvalidateKey);
-    const widget = ref<WidgetT>(widgetStore.widgetById<WidgetT>(widgetId)!);
+    const widget = inject<ComputedRef<WidgetT>>(WidgetKey)!;
+    const patchWidget = inject(PatchWidgetKey)!;
+    const invalidate = inject(InvalidateKey)!;
+    const isVolatileWidget = inject(VolatileKey)!;
+    const changeWidgetTitle = inject(ChangeWidgetTitleKey)!;
 
-    if (!widgetId) {
-      throw new Error('No widget ID injected');
+    if (!widget) {
+      throw new Error('No widget injected');
     }
 
-    if (!invalidate) {
-      throw new Error('No invalidation function injected');
-    }
-
-    if (!widget.value) {
-      throw new Error(`No widget found for ID ${widgetId}`);
-    }
-
-    watch(
-      () => widgetStore.widgetById<WidgetT>(widgetId),
-      (newV) => {
-        if (newV) {
-          widget.value = newV;
-        } else {
-          invalidate();
-        }
-      },
-    );
+    const widgetId = widget.value.id;
 
     const config = computed<WidgetT['config']>(() => widget.value.config);
-
-    const isVolatileWidget = computed<boolean>(() =>
-      Boolean(widget.value.volatile),
-    );
 
     const featureTitle = computed<string>(
       () =>
         featureStore.widgetTitle(widget.value.feature) ?? widget.value.feature,
     );
 
-    async function saveWidget(w: WidgetT = widget.value): Promise<void> {
-      await widgetStore.saveWidget(w);
-    }
+    const widgetComponent = computed<string>(
+      () => featureStore.widgetComponent(widget.value)!,
+    );
 
-    async function saveConfig(
-      c: WidgetT['config'] = config.value,
-    ): Promise<void> {
-      await widgetStore.saveWidget({ ...widget.value, config: c });
-    }
-
-    async function patchWidget(patch: Partial<WidgetT>): Promise<void> {
-      await widgetStore.saveWidget({ ...widget.value, ...patch });
+    async function saveConfig(config: WidgetT['config']): Promise<void> {
+      await patchWidget({ config });
     }
 
     async function patchConfig(
       patch: Partial<WidgetT['config']>,
     ): Promise<void> {
-      await widgetStore.saveWidget({
-        ...widget.value,
-        config: { ...widget.value.config, ...patch },
-      });
+      await saveConfig({ ...widget.value.config, ...patch });
     }
 
     return {
@@ -92,11 +70,12 @@ export const useWidget: UseWidgetComposable = {
       config,
       isVolatileWidget,
       featureTitle,
-      saveWidget,
+      widgetComponent,
       saveConfig,
       patchWidget,
       patchConfig,
       invalidate,
+      changeWidgetTitle,
     };
   },
 };

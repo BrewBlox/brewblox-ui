@@ -3,6 +3,7 @@ import { ComparedBlockType } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
+import { sleep } from '@/utils/misc';
 import { notify } from '@/utils/notify';
 import { Block } from 'brewblox-proto/ts';
 import { WizardDialogResult } from './types';
@@ -16,6 +17,7 @@ export async function tryCreateWidget<T>(
     await widgetStore.appendWidget(widget);
     const featureTitle = featureStore.widgetTitle(widget.feature);
     notify.done(`Created ${featureTitle} widget <b>${widget.title}</b>`);
+    await sleep(1000); // TODO(Bob) Improve tracking of when widget is actually added
     return widgetStore.widgetById(widget.id);
   } catch (e: any) {
     notify.error(`Failed to create widget: ${e.toString()}`);

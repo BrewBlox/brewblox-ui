@@ -1,3 +1,5 @@
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { getCurrentInstance, PropType } from 'vue';
 import { WizardOutput } from '../types';
 
@@ -37,12 +39,27 @@ export const useWizard: UseWizardComposable = {
     function onBack(): void {
       instance.emit('back');
     }
+
     function onClose(): void {
       instance.emit('close');
     }
+
     function onDone(output: WizardOutput): void {
+      if (output.block) {
+        createBlockDialog(output.block);
+      } else if (output.widget) {
+        createDialog({
+          component: 'WidgetDialog',
+          componentProps: {
+            widgetId: output.widget.id,
+            mode: 'Full',
+          },
+        });
+      }
+
       instance.emit('done', output);
     }
+
     function setDialogTitle(title: string): void {
       instance.emit('title', title);
     }

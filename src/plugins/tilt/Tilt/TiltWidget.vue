@@ -1,7 +1,6 @@
 <script lang="ts">
 import { useContext, useWidget } from '@/composables';
 import { findById } from '@/utils/collections';
-import { debounce } from 'quasar';
 import { computed, defineComponent } from 'vue';
 import { fieldLabels } from '../const';
 import { useTiltStore } from '../store';
@@ -14,9 +13,7 @@ export default defineComponent({
   setup() {
     const tiltStore = useTiltStore();
     const { context } = useContext.setup();
-    const { config, saveConfig } = useWidget.setup<TiltWidget>();
-
-    const debouncedSaveConfig = debounce(saveConfig, 100, false);
+    const { config, patchConfig } = useWidget.setup<TiltWidget>();
 
     const tiltOpts = computed<SelectOption<string>[]>(() =>
       tiltStore.values.map((v) => ({ label: v.name, value: v.id })),
@@ -30,9 +27,9 @@ export default defineComponent({
       set: (id) => {
         if (id) {
           const [serviceId, mac] = splitTiltId(id);
-          saveConfig({ ...config.value, serviceId, mac });
+          patchConfig({ serviceId, mac });
         } else {
-          saveConfig({ ...config.value, serviceId: null, mac: null });
+          patchConfig({ serviceId: null, mac: null });
         }
       },
     });
@@ -42,8 +39,12 @@ export default defineComponent({
     );
 
     function setShown(key: string, value: boolean): void {
-      config.value.hidden[key] = !value || undefined;
-      debouncedSaveConfig();
+      patchConfig({
+        hidden: {
+          ...config.value.hidden,
+          [key]: !value || undefined,
+        },
+      });
     }
 
     return {

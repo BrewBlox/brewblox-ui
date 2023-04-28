@@ -194,8 +194,8 @@ export default defineComponent({
               format: 'jpeg',
               width: 3000,
               height: 1500,
-              filename:
-                get(props.layout, 'title.text', props.layout.title) || 'graph',
+              filename: (get(props.layout, 'title.text', props.layout.title) ||
+                'graph') as string,
             }),
         },
         {
@@ -207,8 +207,8 @@ export default defineComponent({
               format: 'png',
               width: 3000,
               height: 1500,
-              filename:
-                get(props.layout, 'title.text', props.layout.title) || 'graph',
+              filename: (get(props.layout, 'title.text', props.layout.title) ||
+                'graph') as string,
             }),
         },
       ],

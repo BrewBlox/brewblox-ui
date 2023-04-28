@@ -1,16 +1,11 @@
 <script lang="ts">
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import {
-  ComponentResult,
-  useFeatureStore,
-  WidgetContext,
-  WidgetMode,
-} from '@/store/features';
-import { useWidgetStore, Widget } from '@/store/widgets';
+import { BlockWidget } from '@/plugins/spark/types';
+import { useFeatureStore, WidgetContext, WidgetMode } from '@/store/features';
 import type { Block } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, onUnmounted, PropType } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'BlockWidgetDialog',
@@ -39,7 +34,6 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const widgetId = nanoid();
     const sparkStore = useSparkStore();
-    const widgetStore = useWidgetStore();
     const featureStore = useFeatureStore();
 
     const block = computed<Block | null>(() =>
@@ -48,7 +42,7 @@ export default defineComponent({
 
     const blockType = computed<string>(() => block.value?.type ?? '');
 
-    widgetStore.setVolatileWidget({
+    const widget = ref<BlockWidget>({
       id: widgetId,
       title: props.blockId,
       feature: blockType.value,
@@ -58,17 +52,8 @@ export default defineComponent({
         serviceId: props.serviceId,
         blockId: props.blockId,
       },
-      volatile: true,
       ...featureStore.widgetSize(blockType.value),
     });
-
-    onUnmounted(() => {
-      widgetStore.removeVolatileWidget({ id: widgetId });
-    });
-
-    const widget = computed<Widget | null>(() =>
-      widgetStore.widgetById(widgetId),
-    );
 
     const context = computed<WidgetContext>(() => ({
       container: 'Dialog',
@@ -76,7 +61,7 @@ export default defineComponent({
       size: 'Fixed',
     }));
 
-    const widgetComponent = computed<ComponentResult | null>(() =>
+    const widgetComponent = computed<string | null>(() =>
       widget.value ? featureStore.widgetComponent(widget.value) : null,
     );
 
@@ -88,6 +73,7 @@ export default defineComponent({
       onDialogHide,
       dense,
       block,
+      widget,
       widgetId,
       context,
       widgetComponent,
@@ -106,17 +92,13 @@ export default defineComponent({
     v-bind="{ ...dialogProps, ...$attrs }"
     @hide="onDialogHide"
   >
-    <WidgetProvider
-      :widget-id="widgetId"
+    <WidgetWrapper
+      v-if="widget"
+      v-model:widget="widget"
       :context="context"
-    >
-      <component
-        :is="widgetComponent.component"
-        v-if="block && widgetComponent"
-        :error="widgetComponent.error"
-        v-bind="widgetProps"
-        @close="onDialogHide"
-      />
-    </WidgetProvider>
+      v-bind="widgetProps"
+      volatile
+      @close="onDialogHide"
+    />
   </q-dialog>
 </template>

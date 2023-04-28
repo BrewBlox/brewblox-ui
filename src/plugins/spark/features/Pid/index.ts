@@ -1,8 +1,8 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 import {
   bloxQty,
@@ -186,7 +186,7 @@ const plugin: Plugin = {
       id: type,
       title: 'PID',
       role: 'Control',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 3,

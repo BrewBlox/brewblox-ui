@@ -1,8 +1,8 @@
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 import { deltaTempQty, tempQty } from '@/utils/quantity';
 import { BlockType, TempSensorOneWireBlock } from 'brewblox-proto/ts';
@@ -53,7 +53,7 @@ const plugin: Plugin = {
       id: type,
       title: 'OneWire Temp Sensor',
       role: 'Process',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 2,
