@@ -69,14 +69,9 @@ export function isBlockDisplayReady(addr: BlockAddress): boolean {
   ]);
 }
 
-export function isBlockVolatile(block: Maybe<Block>): boolean {
-  return block?.meta?.volatile === true;
-}
-
 export function isBlockRemovable(block: Maybe<Block>): boolean {
   return (
     block != null &&
-    !isBlockVolatile(block) &&
     useFeatureStore().widgetRemoveActions(block.type).length > 0
   );
 }

@@ -95,7 +95,6 @@ export default defineComponent({
     v-if="known"
     v-bind="{ options, disable, ...$attrs }"
     :model-value="state"
-    :class="['shadow-1', $attrs.class]"
     dense
     unelevated
     @click="toggle"

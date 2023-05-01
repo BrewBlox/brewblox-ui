@@ -1,8 +1,8 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { BalancerBlock, BlockType } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './BalancerWidget.vue';
@@ -27,7 +27,7 @@ const plugin: Plugin = {
       id: type,
       title: 'Balancer',
       role: 'Constraint',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 2,

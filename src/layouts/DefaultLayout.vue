@@ -83,7 +83,6 @@ export default defineComponent({
       v-if="!kiosk"
       v-model="drawerOpen"
       class="column"
-      elevated
     >
       <SidebarNavigator />
 

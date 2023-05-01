@@ -94,7 +94,6 @@ export interface DisplayOpts {
 export interface BlockConfig {
   serviceId: string;
   blockId: string;
-  volatile?: true;
   queryParams?: QueryParams;
   graphAxes?: GraphValueAxes;
   graphLayout?: Partial<Layout>;

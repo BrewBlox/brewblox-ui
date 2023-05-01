@@ -1,10 +1,5 @@
 {
   "editor.formatOnSave": true,
-  "volar.autoCompleteRefs": false,
-  "volar.codeLens.scriptSetupTools": false,
-  "volar.codeLens.pugTools": false,
-  "volar.takeOverMode.enabled": "auto",
-  "volar.codeLens.references": false,
   "eslint.run": "onType",
   "html.autoClosingTags": true,
   "[vue]": {
@@ -24,5 +19,10 @@
   },
   "[dockercompose]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "vue.codeActions.enabled": false,
+  "vue.codeLens.enabled": false,
+  "vue.inlayHints.inlineHandlerLeading": false,
+  "vue.inlayHints.missingProps": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

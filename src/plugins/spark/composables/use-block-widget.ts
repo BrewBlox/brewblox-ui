@@ -2,31 +2,21 @@ import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { emptyGraphConfig } from '@/plugins/history/utils';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
+import { BlockKey } from '@/plugins/spark/symbols';
 import { BlockConfig, BlockSpec, BlockWidget } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import { prettyLimitations } from '@/plugins/spark/utils/formatting';
-import { isBlockVolatile } from '@/plugins/spark/utils/info';
 import { useWidgetStore } from '@/store/widgets';
 import { Block } from 'brewblox-proto/ts';
-import debounce from 'lodash/debounce';
-import {
-  computed,
-  ComputedRef,
-  Ref,
-  ref,
-  UnwrapRef,
-  watch,
-  WritableComputedRef,
-} from 'vue';
+import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {
   serviceId: string;
   blockId: string;
-  block: Ref<UnwrapRef<BlockT>>;
+  block: ComputedRef<BlockT>;
   graphConfig: WritableComputedRef<GraphConfig>;
   blockSpec: ComputedRef<BlockSpec<BlockT>>;
-  isVolatileBlock: ComputedRef<boolean>;
 
   patchBlock(data: Partial<BlockT['data']>): Promise<void>;
 
@@ -41,7 +31,7 @@ export interface UseBlockWidgetComposable {
 
 export const useBlockWidget: UseBlockWidgetComposable = {
   setup<BlockT extends Block>(): UseBlockWidgetComponent<BlockT> {
-    const { widget, config, invalidate, ...useWidgetResults } =
+    const { widget, config, invalidate, ...useWidgetComponentSetup } =
       useWidget.setup<BlockWidget>();
 
     const sparkStore = useSparkStore();
@@ -60,41 +50,14 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       );
     }
 
-    const block = ref<BlockT>(
-      sparkStore.blockById(serviceId, config.value.blockId)!,
-    );
+    const block = inject<ComputedRef<BlockT>>(BlockKey)!;
 
-    if (!block.value) {
-      throw new Error(`Block not found: (${serviceId} / ${blockId})`);
+    if (!block) {
+      throw new Error('Block not injected');
     }
-
-    const debouncedCheckValid = debounce(
-      () => {
-        if (!sparkStore.blockById(serviceId, blockId)) {
-          invalidate();
-        }
-      },
-      1000,
-      { leading: false, trailing: true },
-    );
-
-    watch(
-      () => sparkStore.blockById(serviceId, blockId),
-      (newV) => {
-        if (newV) {
-          block.value = newV;
-        } else {
-          debouncedCheckValid();
-        }
-      },
-    );
 
     const blockSpec = computed<BlockSpec<BlockT>>(
       () => specStore.blockSpecByAddress(block.value)!,
-    );
-
-    const isVolatileBlock = computed<boolean>(() =>
-      isBlockVolatile(block.value),
     );
 
     async function patchBlock(data: Partial<BlockT['data']>): Promise<void> {
@@ -105,11 +68,9 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       () => prettyLimitations(block.value.data.constraints) || null,
     );
 
-    const hasGraph: boolean =
-      !isVolatileBlock.value &&
-      specStore.fieldSpecs.some(
-        (f) => f.type === block.value.type && f.graphed,
-      );
+    const hasGraph: boolean = specStore.fieldSpecs.some(
+      (f) => f.type === block.value.type && f.graphed,
+    );
 
     const graphConfig = computed<GraphConfig>({
       get: () =>
@@ -137,12 +98,11 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       widget,
       config,
       invalidate,
-      ...useWidgetResults,
+      ...useWidgetComponentSetup,
       serviceId,
       blockId,
       block,
       blockSpec,
-      isVolatileBlock,
       patchBlock,
       limitations,
       graphConfig,

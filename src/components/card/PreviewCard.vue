@@ -102,7 +102,6 @@ export default defineComponent({
   max-height: 90vh
   width: 90vw
   min-width: 90vw
-  box-shadow: none
 
 .toggle-tab
   background-color: $dialog-toolbar-color

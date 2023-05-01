@@ -4,12 +4,11 @@ import { BlockAddress, BlockConfig } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
-import { useWidgetStore } from '@/store/widgets';
-import { createDialog, createDialogPromise } from '@/utils/dialog';
+import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { Block, BlockType } from 'brewblox-proto/ts';
-import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 type CreateMode = 'new' | 'existing';
 
@@ -33,7 +32,6 @@ export default defineComponent({
   },
   emits: [...useWidgetWizard.emits],
   setup(props) {
-    const widgetStore = useWidgetStore();
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const {
@@ -69,9 +67,6 @@ export default defineComponent({
 
     const newBlockId = ref<string>(
       suggestId(featureTitle, blockIdValidator.value),
-    );
-    const newBlockData = ref(
-      specStore.blockSpecByType(props.featureId)!.generate(),
     );
 
     const newBlockAddress = computed<BlockAddress>(() => ({
@@ -119,24 +114,15 @@ export default defineComponent({
       });
     }
 
-    function generateVolatileObjects(): boolean {
+    async function finish(): Promise<void> {
       if (!serviceId.value || !dashboardId.value || !canCreate.value) {
-        return false;
-      }
-
-      if (createMode.value === 'new') {
-        sparkStore.setVolatileBlock({
-          id: newBlockId.value,
-          serviceId: serviceId.value,
-          type: props.featureId,
-          data: newBlockData.value,
-        });
+        return;
       }
 
       const blockId =
         createMode.value === 'new' ? newBlockId.value : existingBlockId.value!;
 
-      widgetStore.setVolatileWidget({
+      const widget = await tryCreateWidget<BlockConfig>({
         id: widgetId,
         title: blockId,
         feature: props.featureId,
@@ -150,56 +136,17 @@ export default defineComponent({
         ...defaultWidgetSize,
       });
 
-      return true;
-    }
-
-    function teardownVolatileObjects(): void {
-      const block = sparkStore.blockByAddress(newBlockAddress.value);
-      if (block) {
-        newBlockData.value = block.data;
-        sparkStore.removeVolatileBlock(block);
-      }
-
-      const widget = widgetStore.widgetById(widgetId);
-      if (widget) {
-        newWidgetConfig.value = widget.config;
-        widgetStore.removeVolatileWidget(widget);
-      }
-    }
-
-    async function configureBlock(): Promise<void> {
-      if (!generateVolatileObjects()) {
-        return;
-      }
-
-      await createDialogPromise({
-        component: 'WidgetDialog',
-        componentProps: {
-          widgetId,
-          mode: 'Full',
-        },
-      });
-
-      teardownVolatileObjects();
-    }
-
-    async function finish(): Promise<void> {
-      if (!generateVolatileObjects()) {
-        return;
-      }
-
-      const volatileWidget = widgetStore.widgetById(widgetId);
-      const persistentWidget = { ...volatileWidget!, volatile: undefined };
-      const widget = await tryCreateWidget<BlockConfig>(persistentWidget);
-
       if (!widget) {
         return onClose();
       }
 
       if (createMode.value === 'new') {
-        const volatileBlock = sparkStore.blockByAddress(newBlockAddress.value);
-        const persistentBlock = { ...volatileBlock!, meta: undefined };
-        const createdBlock = await tryCreateBlock(persistentBlock);
+        const createdBlock = await tryCreateBlock({
+          id: newBlockId.value,
+          serviceId: serviceId.value,
+          type: props.featureId,
+          data: specStore.blockSpecByType(props.featureId)!.generate(),
+        });
 
         if (!createdBlock) {
           return onClose();
@@ -213,11 +160,6 @@ export default defineComponent({
 
       return onDone({ block, widget });
     }
-
-    onBeforeUnmount(() => {
-      sparkStore.removeVolatileBlock(newBlockAddress.value);
-      widgetStore.removeVolatileWidget({ id: widgetId });
-    });
 
     return {
       featureTitle,
@@ -236,7 +178,6 @@ export default defineComponent({
       existingBlock,
       canCreate,
       showIdKeyboard,
-      configureBlock,
       finish,
     };
   },
@@ -311,12 +252,6 @@ export default defineComponent({
         @click="onBack"
       />
       <q-space />
-      <q-btn
-        :disable="!canCreate"
-        flat
-        label="Configure block"
-        @click="configureBlock"
-      />
       <q-btn
         :disable="!canCreate"
         unelevated

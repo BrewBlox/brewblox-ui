@@ -1,11 +1,6 @@
 <script lang="ts">
 import { useDialog, useGlobals } from '@/composables';
-import {
-  ComponentResult,
-  useFeatureStore,
-  WidgetContext,
-  WidgetMode,
-} from '@/store/features';
+import { WidgetContext, WidgetMode } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { computed, defineComponent, PropType } from 'vue';
 
@@ -29,23 +24,19 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const widgetStore = useWidgetStore();
-    const featureStore = useFeatureStore();
     const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
     const { dense } = useGlobals.setup();
 
-    const widget = computed<Widget | null>(() =>
-      widgetStore.widgetById(props.widgetId),
-    );
+    const widget = computed<Widget | null>({
+      get: () => widgetStore.widgetById(props.widgetId),
+      set: (v) => v && widgetStore.saveWidget(v),
+    });
 
     const context = computed<WidgetContext>(() => ({
       container: 'Dialog',
       mode: props.mode,
       size: 'Fixed',
     }));
-
-    const widgetComponent = computed<ComponentResult | null>(() =>
-      widget.value === null ? null : featureStore.widgetComponent(widget.value),
-    );
 
     const widgetProps = computed<AnyDict>(() => props.getProps() ?? {});
 
@@ -55,7 +46,7 @@ export default defineComponent({
       onDialogHide,
       dense,
       context,
-      widgetComponent,
+      widget,
       widgetProps,
     };
   },
@@ -71,17 +62,10 @@ export default defineComponent({
     transition-show="fade"
     @hide="onDialogHide"
   >
-    <WidgetProvider
-      :widget-id="widgetId"
+    <WidgetWrapper
+      v-if="widget"
+      v-model:widget="widget"
       :context="context"
-    >
-      <component
-        :is="widgetComponent.component"
-        v-if="widgetComponent"
-        :error="widgetComponent.error"
-        v-bind="widgetProps"
-        @close="onDialogHide"
-      />
-    </WidgetProvider>
+    />
   </q-dialog>
 </template>

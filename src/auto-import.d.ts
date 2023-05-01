@@ -21,6 +21,7 @@ declare module '@vue/runtime-core' {
     OneWireGpioEditor: typeof import('src/plugins/spark/components/widget/OneWireGpioEditor.vue').default;
     IoArray: typeof import('src/plugins/spark/components/widget/IoArray.vue').default;
     GpioChannelDialog: typeof import('src/plugins/spark/components/widget/GpioChannelDialog.vue').default;
+    BlockWidgetWrapper: typeof import('src/plugins/spark/components/widget/BlockWidgetWrapper.vue').default;
     BlockGraph: typeof import('src/plugins/spark/components/widget/BlockGraph.vue').default;
     BlockWidgetToolbar: typeof import('src/plugins/spark/components/toolbar/BlockWidgetToolbar.vue').default;
     BlockActions: typeof import('src/plugins/spark/components/toolbar/BlockActions.vue').default;
@@ -103,8 +104,9 @@ declare module '@vue/runtime-core' {
     BuilderActions: typeof import('src/plugins/builder/components/BuilderActions.vue').default;
     BlockStatusSvg: typeof import('src/plugins/builder/components/BlockStatusSvg.vue').default;
     AnimatedArrows: typeof import('src/plugins/builder/components/AnimatedArrows.vue').default;
-    WidgetProvider: typeof import('src/components/widget/WidgetProvider.vue').default;
+    WidgetWrapper: typeof import('src/components/widget/WidgetWrapper.vue').default;
     WidgetDialog: typeof import('src/components/widget/WidgetDialog.vue').default;
+    InlineWidgetDialog: typeof import('src/components/widget/InlineWidgetDialog.vue').default;
     BlockWidgetDialog: typeof import('src/components/widget/BlockWidgetDialog.vue').default;
     WidgetToolbar: typeof import('src/components/toolbar/WidgetToolbar.vue').default;
     WidgetActions: typeof import('src/components/toolbar/WidgetActions.vue').default;

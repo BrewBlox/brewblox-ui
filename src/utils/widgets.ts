@@ -45,7 +45,6 @@ export function startCopyWidget(widget: Widget): void {
         id,
         dashboard,
         pinnedPosition: null,
-        volatile: undefined,
       });
       const dashTitle = dashboardStore.dashboardTitle(dashboard);
       notify.done(`Copied <b>${widget.title}</b> to <b>${dashTitle}</b>`);

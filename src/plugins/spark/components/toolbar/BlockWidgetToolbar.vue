@@ -1,6 +1,5 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { startChangeBlockId } from '@/plugins/spark/utils/actions';
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
@@ -9,24 +8,19 @@ export default defineComponent({
     const { widgetId, block, hasGraph, graphConfig } = useBlockWidget.setup();
     const graphModalOpen = ref(false);
 
-    function changeTitle(): void {
-      startChangeBlockId(block.value);
-    }
-
     return {
       widgetId,
       block,
       hasGraph,
       graphConfig,
       graphModalOpen,
-      changeTitle,
     };
   },
 });
 </script>
 
 <template>
-  <WidgetToolbar :change-title-fn="changeTitle">
+  <WidgetToolbar>
     <BlockGraph
       v-if="graphModalOpen"
       :id="`graph-full--${widgetId}`"

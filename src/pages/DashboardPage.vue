@@ -1,8 +1,7 @@
 <script lang="ts">
-import { RenderedItem } from '@/components/grid/types';
 import { useGlobals, useKiosk } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
-import { useFeatureStore, WidgetContext } from '@/store/features';
+import { WidgetContext } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { startChangeDashboardTitle } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
@@ -23,7 +22,6 @@ export default defineComponent({
   setup(props) {
     const dashboardStore = useDashboardStore();
     const widgetStore = useWidgetStore();
-    const featureStore = useFeatureStore();
     const widgetEditable = ref(false);
     const { dense } = useGlobals.setup();
     const { kiosk } = useKiosk.setup();
@@ -59,12 +57,9 @@ export default defineComponent({
         .sort(widgetSorter),
     );
 
-    const dashboardItems = computed<RenderedItem[]>(() =>
-      widgets.value.map((widget) => ({
-        widget,
-        ...featureStore.widgetComponent(widget),
-      })),
-    );
+    async function saveWidget(widget: Widget): Promise<void> {
+      return widgetStore.saveWidget(widget);
+    }
 
     watch(
       () => dashboardId.value,
@@ -104,7 +99,7 @@ export default defineComponent({
       dashboard,
       showWizard,
       widgets,
-      dashboardItems,
+      saveWidget,
       startChangeDashboardTitle,
     };
   },
@@ -158,7 +153,7 @@ export default defineComponent({
 
       <q-scroll-area class="fit">
         <div
-          v-if="dashboardItems.length === 0"
+          v-if="widgets.length === 0"
           class="absolute-center"
         >
           <q-btn
@@ -175,24 +170,20 @@ export default defineComponent({
           class="column q-gutter-y-sm q-pa-md"
           style="width: 100vw"
         >
-          <WidgetProvider
-            v-for="val in dashboardItems"
-            :key="val.widget.id"
-            :widget-id="val.widget.id"
+          <WidgetWrapper
+            v-for="widget in widgets"
+            :key="widget.id"
+            :widget="widget"
             :context="context"
-          >
-            <component
-              :is="val.component"
-              :error="val.error"
-              class="col"
-              @dblclick.stop
-            />
-          </WidgetProvider>
+            class="col"
+            @update:widget="saveWidget"
+            @dblclick.stop
+          />
         </div>
         <GridContainer
           v-else
           :class="['q-ma-lg', kiosk && 'q-mt-xl']"
-          :items="dashboardItems"
+          :widgets="widgets"
           :context="context"
           :editable="widgetEditable"
         />

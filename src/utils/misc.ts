@@ -1,5 +1,9 @@
 import { colors } from 'quasar';
 
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Immediately returns explicitly typed input value.
  * This is useful for populating lists of interface types

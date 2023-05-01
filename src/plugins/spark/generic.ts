@@ -12,9 +12,13 @@ function removeBlock(widget: Widget<BlockConfig>): void {
   }
 }
 
-type BlockFeatureBase = Pick<WidgetFeature, 'wizard' | 'removeActions'>;
+type BlockFeatureBase = Pick<
+  WidgetFeature,
+  'wizard' | 'removeActions' | 'wrapperComponent'
+>;
 
 export const genericBlockFeature: BlockFeatureBase = {
+  wrapperComponent: 'BlockWidgetWrapper',
   wizard: 'BlockWidgetWizard',
   removeActions: [
     {
@@ -26,8 +30,8 @@ export const genericBlockFeature: BlockFeatureBase = {
 
 export const systemBlockFeature: BlockFeatureBase = {
   ...genericBlockFeature,
-  removeActions: undefined,
   wizard: 'SystemBlockWidgetWizard',
+  removeActions: undefined,
 };
 
 export const discoveredBlockFeature: BlockFeatureBase = {
