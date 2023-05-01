@@ -12,7 +12,6 @@ import * as d3 from 'd3';
 import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
-import pluralize from 'pluralize';
 import {
   computed,
   defineComponent,
@@ -632,7 +631,8 @@ export default defineComponent({
       }
       const content = JSON.stringify({ parts: activeParts });
       evt.clipboardData?.setData('BuilderClipboardContent', content);
-      notify.info(`Copied ${pluralize('part', activeParts.length, true)}`);
+      const noun = activeParts.length === 1 ? 'part' : 'parts';
+      notify.info(`Copied ${activeParts.length} ${noun}`);
       evt.preventDefault();
     }
 
@@ -643,7 +643,8 @@ export default defineComponent({
       }
       const content = JSON.stringify({ parts: activeParts });
       evt.clipboardData?.setData('BuilderClipboardContent', content);
-      notify.info(`Cut ${pluralize('part', activeParts.length, true)}`);
+      const noun = activeParts.length === 1 ? 'part' : 'parts';
+      notify.info(`Cut ${activeParts.length} ${noun}`);
       evt.preventDefault();
 
       // Now remove cut parts from layout

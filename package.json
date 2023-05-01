@@ -54,7 +54,6 @@
     "parse-duration": "^1.0.0",
     "pinia": "^2.0.0-rc.10",
     "plotly.js": "^2.4.1",
-    "pluralize": "^8.0.0",
     "portal-vue": "^3.0.0-beta.0",
     "process": "^0.11.10",
     "quasar": "^2.0.4",
