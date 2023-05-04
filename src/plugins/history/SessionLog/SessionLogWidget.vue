@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useContext, useWidget } from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog, createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
@@ -49,7 +49,7 @@ export default defineComponent({
     const notes = computed<SessionNote[]>(() => session.value?.notes ?? []);
 
     function startAddSession(): void {
-      createDialog({
+      createComponentDialog({
         component: SessionCreateDialog,
         componentProps: {
           title: 'New session',
@@ -64,7 +64,7 @@ export default defineComponent({
     }
 
     function startLoadSession(): void {
-      createDialog({
+      createComponentDialog({
         component: SessionLoadDialog,
         componentProps: {
           title: 'Open existing session',

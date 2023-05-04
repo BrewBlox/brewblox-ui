@@ -8,6 +8,7 @@ import { Plugin } from 'vue';
 import widget from './MockPinsWidget.vue';
 
 const type = BlockType.MockPins;
+const title = 'Mock Pins';
 
 const plugin: Plugin = {
   install(app) {
@@ -16,6 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MockPinsBlock> = {
       type,
+      title,
       generate: (): MockPinsBlock['data'] => ({
         channels: [],
       }),
@@ -25,7 +27,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Mock Pins',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

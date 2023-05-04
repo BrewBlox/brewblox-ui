@@ -13,6 +13,7 @@ import { Plugin } from 'vue';
 import widget from './OneWireGpioModuleWidget.vue';
 
 const type = BlockType.OneWireGpioModule;
+const title = 'OneWire GPIO Module';
 
 const plugin: Plugin = {
   install(app) {
@@ -21,6 +22,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<OneWireGpioModuleBlock> = {
       type,
+      title,
       generate: (): OneWireGpioModuleBlock['data'] => ({
         channels: [],
         modulePosition: 0,
@@ -50,7 +52,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...discoveredBlockFeature,
       id: type,
-      title: 'OneWire GPIO Module',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

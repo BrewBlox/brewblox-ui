@@ -168,6 +168,11 @@ export default defineComponent({
               {{ buildDate }}
             </q-item-section>
           </q-item>
+          <ActionItem
+            icon="mdi-format-paint"
+            label="Theme colors"
+            to="/styles"
+          />
           <ExportErrorsAction />
         </ActionSubmenu>
       </q-expansion-item>

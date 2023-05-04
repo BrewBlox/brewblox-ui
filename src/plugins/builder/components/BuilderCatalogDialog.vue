@@ -71,7 +71,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          modelValue: partFilter.value,
+          modelValue: partFilter.value ?? undefined,
         },
       }).onOk((v: string) => (partFilter.value = v));
     }

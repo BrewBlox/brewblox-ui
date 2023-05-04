@@ -6,7 +6,7 @@ import SparkEspWifiCard from './SparkEspWifiCard.vue';
 import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
 
 export default defineComponent({
-  name: 'SparkWifiMenu',
+  name: 'SparkWifiDialog',
   components: {
     SparkEspWifiCard,
     SparkParticleWifiCard,

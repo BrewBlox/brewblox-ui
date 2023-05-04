@@ -294,12 +294,12 @@ export function startResetBlocks(serviceId: string): void {
       title: 'Reset blocks',
       message: `This will remove all blocks on <b>${serviceId}</b>. Are you sure?`,
       html: true,
-      noBackdropDismiss: true,
       selectOptions: [
         { label: 'Remember names of discovered blocks', value: 0 },
       ],
       modelValue: [0, 1], // pre-check default actions
     },
+    noBackdropDismiss: true,
   }).onOk((selected: number[]) =>
     resetBlocks(serviceId, {
       restore: selected.includes(0),

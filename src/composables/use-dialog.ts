@@ -30,7 +30,12 @@ export interface UseDialogProps {
   };
 }
 
-export type UseDialogEmits = ['ok', 'hide'];
+export type UseDialogEmitsArray = ['ok', 'hide'];
+
+export interface UseDialogEmitsObject {
+  ok: (payload?: any) => void;
+  hide: () => void;
+}
 
 export interface UseDialogComponent {
   dialogRef: Ref<QDialog | null>;
@@ -42,7 +47,8 @@ export interface UseDialogComponent {
 
 export interface UseDialogComposable {
   props: UseDialogProps;
-  emits: UseDialogEmits;
+  emits: UseDialogEmitsArray;
+  emitsObject: UseDialogEmitsObject;
   setup(): UseDialogComponent;
 }
 
@@ -62,6 +68,10 @@ export const useDialog: UseDialogComposable = {
     },
   },
   emits: ['ok', 'hide'],
+  emitsObject: {
+    ok: () => true,
+    hide: () => true,
+  },
   setup(): UseDialogComponent {
     const instance = getCurrentInstance()!;
 

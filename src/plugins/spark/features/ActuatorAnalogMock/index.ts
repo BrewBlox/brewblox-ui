@@ -14,6 +14,7 @@ import { Plugin } from 'vue';
 import widget from './ActuatorAnalogMockWidget.vue';
 
 const type = BlockType.ActuatorAnalogMock;
+const title = 'Analog Actuator (Mock)';
 
 const plugin: Plugin = {
   install(app) {
@@ -22,6 +23,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorAnalogMockBlock> = {
       type,
+      title,
       generate: (): ActuatorAnalogMockBlock['data'] => ({
         enabled: true,
         storedSetting: 0,
@@ -130,7 +132,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Analog Actuator (Mock)',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

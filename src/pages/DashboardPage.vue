@@ -42,13 +42,18 @@ export default defineComponent({
     );
 
     function showWizard(widget: boolean): void {
-      createDialog({
-        component: 'WizardDialog',
-        componentProps: {
-          initialWizard: widget ? 'WidgetWizardPicker' : null,
-          activeDashboardId: dashboardId.value,
-        },
-      });
+      if (widget) {
+        createDialog({
+          component: 'WidgetWizardDialog',
+        });
+      }
+      // createDialog({
+      //   component: 'WizardDialog',
+      //   componentProps: {
+      //     initialWizard: widget ? 'WidgetWizardPicker' : undefined,
+      //     activeDashboardId: dashboardId.value ?? undefined,
+      //   },
+      // });
     }
 
     const widgets = computed<Widget[]>(() =>

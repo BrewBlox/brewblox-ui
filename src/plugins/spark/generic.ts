@@ -13,13 +13,18 @@ function removeBlock(widget: Widget<BlockConfig>): void {
 }
 
 type BlockFeatureBase = Pick<
-  WidgetFeature,
-  'wizard' | 'removeActions' | 'wrapperComponent'
+  WidgetFeature<BlockConfig>,
+  | 'removeActions'
+  | 'wrapperComponent'
+  | 'editor'
+  | 'creatable'
+  | 'generateConfig'
 >;
 
 export const genericBlockFeature: BlockFeatureBase = {
   wrapperComponent: 'BlockWidgetWrapper',
-  wizard: 'BlockWidgetWizard',
+  editor: 'BlockWidgetEditor',
+  generateConfig: () => ({ serviceId: '', blockId: '' }),
   removeActions: [
     {
       description: 'Remove block on controller',
@@ -30,11 +35,9 @@ export const genericBlockFeature: BlockFeatureBase = {
 
 export const systemBlockFeature: BlockFeatureBase = {
   ...genericBlockFeature,
-  wizard: 'SystemBlockWidgetWizard',
   removeActions: undefined,
 };
 
 export const discoveredBlockFeature: BlockFeatureBase = {
   ...genericBlockFeature,
-  wizard: 'BlockDiscoveryWizard',
 };

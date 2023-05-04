@@ -1,4 +1,5 @@
 <script lang="ts">
+import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { createDialog } from '@/utils/dialog';
 import { defineComponent } from 'vue';
 import { usePart } from '../../composables';
@@ -12,7 +13,7 @@ export default defineComponent({
       createDialog({
         component: 'MetricsEditorDialog',
         componentProps: {
-          modelValue: part.value.metrics ?? {},
+          modelValue: part.value.metrics ?? emptyMetricsConfig(),
         },
       }).onOk((metrics) => {
         patchPart({ metrics });

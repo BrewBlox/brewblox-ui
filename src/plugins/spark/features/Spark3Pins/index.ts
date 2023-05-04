@@ -8,6 +8,7 @@ import { Plugin } from 'vue';
 import widget from './Spark3PinsWidget.vue';
 
 const type = BlockType.Spark3Pins;
+const title = 'Spark 3 Pins';
 
 const plugin: Plugin = {
   install(app) {
@@ -16,6 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<Spark3PinsBlock> = {
       type,
+      title,
       generate: (): Spark3PinsBlock['data'] => ({
         channels: [],
         enableIoSupply5V: false,
@@ -70,7 +72,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...systemBlockFeature,
       id: type,
-      title: 'Spark 3 Pins',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

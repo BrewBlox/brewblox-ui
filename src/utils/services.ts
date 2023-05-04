@@ -21,6 +21,7 @@ export async function startCreateService(
     return;
   }
 
+  // TODO(Bob) remove
   if (isString(feature.wizard)) {
     createDialog({
       component: 'WizardDialog',

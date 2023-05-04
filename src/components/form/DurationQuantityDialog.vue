@@ -62,7 +62,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          modelValue: local.value,
+          modelValue: local.value ?? '',
           type: 'duration',
           rules: props.rules.map((f) => (s: string) => f(durationMs(s))),
         },

@@ -20,6 +20,8 @@ export default defineComponent({
     const { onBack, onDone, defaultWidgetSize, widgetId, featureTitle } =
       useWidgetWizard.setup(props.featureId);
 
+    const step = ref('dashboard');
+
     const defaultConfig =
       featureStore.widgetById(props.featureId)?.generateConfig?.() ?? {};
     const dashboardId = ref<string | null>(null);
@@ -34,6 +36,27 @@ export default defineComponent({
           modelValue: widgetTitle.value,
         },
       }).onOk((v) => (widgetTitle.value = v));
+    }
+
+    function nextStep(): void {
+      switch (step.value) {
+        case 'widget':
+          step.value = 'dashboard';
+          break;
+        case 'dashboard':
+          step.value = 'service';
+          break;
+        case 'service':
+          step.value = 'block';
+          break;
+        case 'block':
+          step.value = 'name';
+          break;
+        case 'name':
+          break;
+        default:
+          step.value = 'widget';
+      }
     }
 
     async function createWidget(): Promise<void> {
@@ -55,11 +78,13 @@ export default defineComponent({
     }
 
     return {
+      step,
       onBack,
       dashboardId,
       widgetTitle,
       showKeyboard,
       canCreate,
+      nextStep,
       createWidget,
     };
   },
@@ -69,7 +94,41 @@ export default defineComponent({
 <template>
   <WizardBody>
     <div class="widget-body column">
-      <DashboardSelect
+      <q-stepper
+        v-model="step"
+        header-nav
+        animated
+        flat
+        vertical
+      >
+        <q-step
+          name="widget"
+          title="Widget"
+        >
+        </q-step>
+        <q-step
+          name="dashboard"
+          title="Dashboard"
+        >
+        </q-step>
+        <q-step
+          name="service"
+          title="Service"
+          :disable="true"
+        >
+        </q-step>
+        <q-step
+          name="block"
+          title="Block"
+        >
+        </q-step>
+        <q-step
+          name="name"
+          title="Name"
+        >
+        </q-step>
+      </q-stepper>
+      <!-- <DashboardSelect
         v-model="dashboardId"
         :default-value="activeDashboardId"
       />
@@ -81,7 +140,7 @@ export default defineComponent({
         <template #append>
           <KeyboardButton @click="showKeyboard" />
         </template>
-      </q-input>
+      </q-input> -->
     </div>
 
     <template #actions>
@@ -91,6 +150,12 @@ export default defineComponent({
         @click="onBack"
       />
       <q-space />
+      <q-btn
+        unelevated
+        label="Next"
+        color="primary"
+        @click="nextStep"
+      />
       <q-btn
         :disable="!canCreate"
         unelevated

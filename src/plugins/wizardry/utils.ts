@@ -30,6 +30,7 @@ export async function tryCreateBlock(block: Block): Promise<Block | null> {
     const sparkStore = useSparkStore();
     const featureStore = useFeatureStore();
     await sparkStore.createBlock(block);
+    await sleep(1000); // TODO(Bob) Improve tracking of when block is actually added
     const featureTitle = featureStore.widgetTitle(block.type);
     notify.done(`Created ${featureTitle} block <i>${block.id}</i>`);
     return sparkStore.blockByAddress(block);
@@ -44,31 +45,19 @@ export function createBlockWizard(
   compatible: ComparedBlockType = null,
 ): WizardDialogResult {
   return createDialog({
-    component: 'WizardDialog',
+    component: 'BlockWizardDialog',
     componentProps: {
-      initialWizard: 'BlockWizard',
-      initialProps: {
-        compatible,
-        activeServiceId: serviceId,
-      },
-      // Prevent users from navigating to other wizards
-      // This preserves initialProps
-      showMenu: false,
+      serviceId,
+      compatible,
     },
   });
 }
 
 export function createWidgetWizard(featureId: string): WizardDialogResult {
   return createDialog({
-    component: 'WizardDialog',
+    component: 'WidgetWizardDialog',
     componentProps: {
-      initialWizard: useFeatureStore().widgetWizard(featureId),
-      initialProps: {
-        featureId,
-      },
-      // Prevent users from navigating to other wizards
-      // This preserves initialProps
-      showMenu: false,
+      filter: (v) => v === featureId,
     },
   });
 }

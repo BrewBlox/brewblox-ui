@@ -9,6 +9,7 @@ import { Plugin } from 'vue';
 import widget from './TempSensorExternalWidget.vue';
 
 const type = BlockType.TempSensorExternal;
+const title = 'Temp Sensor (External)';
 
 const plugin: Plugin = {
   install(app) {
@@ -17,6 +18,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<TempSensorExternalBlock> = {
       type,
+      title,
       generate: (): TempSensorExternalBlock['data'] => ({
         enabled: true,
         timeout: bloxQty('5m'),
@@ -74,7 +76,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Temp Sensor (External)',
+      title,
       role: 'Process',
       component: cref(app, widget),
       widgetSize: {

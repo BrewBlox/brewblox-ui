@@ -13,7 +13,7 @@ export default defineComponent({
   props: {
     ...useDialog.props,
     modelValue: {
-      type: [String, Number] as PropType<string | number>,
+      type: null as unknown as PropType<string | number | null>,
       default: null,
     },
     type: {
@@ -58,7 +58,7 @@ export default defineComponent({
     const local = ref<string>(
       props.type === 'number'
         ? fixedNumber(Number(props.modelValue), props.decimals)
-        : `${props.modelValue}`,
+        : `${props.modelValue ?? ''}`,
     );
 
     const isValid = computed<boolean>(() =>

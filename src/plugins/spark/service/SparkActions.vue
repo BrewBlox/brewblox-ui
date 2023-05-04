@@ -10,7 +10,7 @@ import { createBlockWizard } from '@/plugins/wizardry';
 import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
-import { createDialog } from '@/utils/dialog';
+import { createDialog, GlobalDialogName } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 import { computed, defineComponent } from 'vue';
 
@@ -49,7 +49,7 @@ export default defineComponent({
       sparkStore.controllerReboot(props.serviceId);
     }
 
-    function startDialog(component: string): void {
+    function startDialog(component: GlobalDialogName): void {
       if (sparkStore.has(props.serviceId)) {
         createDialog({
           component,
@@ -101,7 +101,7 @@ export default defineComponent({
       <ActionItem
         icon="wifi"
         label="Configure Wifi"
-        @click="startDialog('SparkWifiMenu')"
+        @click="startDialog('SparkWifiDialog')"
       />
       <ActionItem
         icon="mdi-restart"
@@ -116,7 +116,7 @@ export default defineComponent({
       <ActionItem
         icon="mdi-file-export"
         label="Controller backups"
-        @click="startDialog('SparkBackupMenu')"
+        @click="startDialog('SparkBackupDialog')"
       />
       <ActionItem
         icon="mdi-tag-remove"

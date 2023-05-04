@@ -57,6 +57,10 @@ export default defineComponent({
           ? new Date()
           : props.modelValue;
 
+      if (date == null) {
+        return;
+      }
+
       createDialog({
         component: 'DatetimeDialog',
         componentProps: {

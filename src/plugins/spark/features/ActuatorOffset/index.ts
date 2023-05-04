@@ -17,6 +17,7 @@ import { Plugin } from 'vue';
 import widget from './ActuatorOffsetWidget.vue';
 
 const type = BlockType.ActuatorOffset;
+const title = 'Setpoint Driver';
 
 const plugin: Plugin = {
   install(app) {
@@ -25,6 +26,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorOffsetBlock> = {
       type,
+      title,
       generate: (): ActuatorOffsetBlock['data'] => ({
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         referenceId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
@@ -124,7 +126,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Setpoint Driver',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

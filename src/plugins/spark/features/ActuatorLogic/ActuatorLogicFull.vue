@@ -3,7 +3,7 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_LOGIC_RESULT } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { nonNullString, prettyLink } from '@/utils/quantity';
 import {
@@ -158,7 +158,7 @@ export default defineComponent({
     }
 
     function editDigital(key: string, cmp: DigitalCompare): void {
-      createDialog({
+      createComponentDialog({
         component: DigitalCompareEditDialog,
         componentProps: {
           modelValue: cmp,
@@ -173,7 +173,7 @@ export default defineComponent({
     }
 
     function editAnalog(key: string, cmp: AnalogCompare): void {
-      createDialog({
+      createComponentDialog({
         component: AnalogCompareEditDialog,
         componentProps: {
           serviceId,

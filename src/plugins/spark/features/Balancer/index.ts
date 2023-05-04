@@ -8,6 +8,7 @@ import { Plugin } from 'vue';
 import widget from './BalancerWidget.vue';
 
 const type = BlockType.Balancer;
+const title = 'Balancer';
 
 const plugin: Plugin = {
   install(app) {
@@ -16,6 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<BalancerBlock> = {
       type,
+      title,
       generate: (): BalancerBlock['data'] => ({
         clients: [],
       }),
@@ -25,7 +27,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Balancer',
+      title,
       role: 'Constraint',
       component: cref(app, widget),
       widgetSize: {

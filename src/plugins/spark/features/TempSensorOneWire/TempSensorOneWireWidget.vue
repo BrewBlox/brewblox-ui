@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog } from '@/utils/dialog';
 import { TempSensorOneWireBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
 import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
@@ -18,7 +18,7 @@ export default defineComponent({
     );
 
     function startSwap(): void {
-      createDialog({
+      createComponentDialog({
         component: TempSensorSwapDialog,
         componentProps: {
           serviceId,

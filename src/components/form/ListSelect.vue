@@ -1,82 +1,76 @@
-<script lang="ts">
+<script setup lang="ts">
 import isObject from 'lodash/isObject';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, PropType } from 'vue';
 
-export default defineComponent({
-  name: 'ListSelect',
-  props: {
-    modelValue: {
-      type: [Object, String, Number, Symbol] as PropType<any>,
-      default: null,
-    },
-    options: {
-      type: Array as PropType<any[]>,
-      required: true,
-    },
-    optionValue: {
-      type: String,
-      default: 'id',
-    },
-    optionLabel: {
-      type: String,
-      default: 'title',
-    },
-    optionClass: {
-      type: [String, Array, Object],
-      default: '',
-    },
-    emitValue: {
-      type: Boolean,
-      default: false,
-    },
-    dense: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  modelValue: {
+    type: [Object, String, Number, Symbol] as PropType<any>,
+    default: null,
   },
-  emits: ['update:modelValue', 'confirm'],
-  setup(props, { emit }) {
-    const mappedOptions = computed<any[]>(() =>
-      props.options.map((opt) =>
-        isObject(opt)
-          ? opt
-          : {
-              [props.optionValue]: opt,
-              [props.optionLabel]: opt,
-            },
-      ),
-    );
-
-    function matches(opt: any): boolean {
-      const model = props.modelValue;
-      const optValue = opt[props.optionValue];
-      if (model === null) {
-        return false;
-      } else {
-        return props.emitValue
-          ? optValue === model
-          : optValue === model[props.optionValue];
-      }
-    }
-
-    function selectValue(opt: any, save: boolean): void {
-      const value = props.emitValue ? opt[props.optionValue] : opt;
-      if (save) {
-        emit('confirm', value);
-      } else if (matches(opt)) {
-        emit('update:modelValue', null);
-      } else {
-        emit('update:modelValue', value);
-      }
-    }
-
-    return {
-      mappedOptions,
-      matches,
-      selectValue,
-    };
+  options: {
+    type: Array as PropType<any[]>,
+    required: true,
+  },
+  optionValue: {
+    type: String,
+    default: 'id',
+  },
+  optionLabel: {
+    type: String,
+    default: 'title',
+  },
+  optionClass: {
+    type: [String, Array, Object],
+    default: '',
+  },
+  emitValue: {
+    type: Boolean,
+    default: false,
+  },
+  dense: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:model-value', value: any | null): void;
+  (e: 'confirm', value: any): void;
+}>();
+
+const mappedOptions = computed<any[]>(() =>
+  props.options.map((opt) =>
+    isObject(opt)
+      ? opt
+      : {
+          [props.optionValue]: opt,
+          [props.optionLabel]: opt,
+        },
+  ),
+);
+
+function matches(opt: any): boolean {
+  const model = props.modelValue;
+  const optValue = opt[props.optionValue];
+  if (model === null) {
+    return false;
+  } else {
+    return props.emitValue
+      ? optValue === model
+      : optValue === model[props.optionValue];
+  }
+}
+
+function selectValue(opt: any, save: boolean): void {
+  const value = props.emitValue ? opt[props.optionValue] : opt;
+  if (save) {
+    emit('confirm', value);
+  } else if (matches(opt)) {
+    emit('update:model-value', null);
+  } else {
+    emit('update:model-value', value);
+  }
+}
 </script>
 
 <template>

@@ -1,6 +1,11 @@
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { getCurrentInstance, PropType } from 'vue';
+import { getCurrentInstance, inject, PropType, Ref } from 'vue';
+import {
+  ActiveDashboardIdKey,
+  ActiveServiceIdKey,
+  DialogTitleKey,
+} from '../symbols';
 import { WizardOutput } from '../types';
 
 export interface UseWizardProps {
@@ -10,13 +15,15 @@ export interface UseWizardProps {
   };
 }
 
-export type UseWizardEmits = ['back', 'close', 'done', 'title'];
+export type UseWizardEmits = ['back', 'close', 'done'];
 
 export interface UseWizardComponent {
+  dialogTitle: Ref<string>;
+  activeDashboardId: string | null;
+  activeServiceId: string | null;
   onBack(): void;
   onClose(): void;
   onDone(output: WizardOutput): void;
-  setDialogTitle(title: string): void;
 }
 
 export interface UseWizardComposable {
@@ -32,9 +39,12 @@ export const useWizard: UseWizardComposable = {
       default: null,
     },
   },
-  emits: ['back', 'close', 'done', 'title'],
+  emits: ['back', 'close', 'done'],
   setup() {
     const instance = getCurrentInstance()!;
+    const dialogTitle = inject(DialogTitleKey)!;
+    const activeDashboardId = inject(ActiveDashboardIdKey)!;
+    const activeServiceId = inject(ActiveServiceIdKey)!;
 
     function onBack(): void {
       instance.emit('back');
@@ -60,15 +70,13 @@ export const useWizard: UseWizardComposable = {
       instance.emit('done', output);
     }
 
-    function setDialogTitle(title: string): void {
-      instance.emit('title', title);
-    }
-
     return {
+      dialogTitle,
+      activeDashboardId,
+      activeServiceId,
       onBack,
       onClose,
       onDone,
-      setDialogTitle,
     };
   },
 };

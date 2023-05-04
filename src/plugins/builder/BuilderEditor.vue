@@ -45,8 +45,8 @@ import {
   coord2grid,
   coord2translate,
   grid2coord,
-  startAddLayout,
   startChangeLayoutTitle,
+  startCreateLayout,
   startImportLayout,
 } from './utils';
 
@@ -160,11 +160,8 @@ export default defineComponent({
     }
 
     async function createLayout(): Promise<void> {
-      const id = await startAddLayout();
+      await startCreateLayout(router);
       setFocus();
-      if (id) {
-        selectLayout(id);
-      }
     }
 
     async function importLayout(): Promise<void> {

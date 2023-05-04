@@ -113,7 +113,7 @@ export default defineComponent({
 
     const filteredRenderItems = computed<ListRenderAddress[]>(() =>
       allRenderItems.value.filter((item) =>
-        `${item.id} ${item.title}`.match(searchExpression.value),
+        searchExpression.value.test(`${item.id} ${item.title}`),
       ),
     );
 
@@ -166,7 +166,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          modelValue: searchText.value,
+          modelValue: searchText.value ?? '',
         },
       }).onOk((v) => (searchText.value = v));
     }

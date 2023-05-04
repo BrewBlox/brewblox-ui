@@ -16,6 +16,7 @@ import { Plugin } from 'vue';
 import widget from './SetpointSensorPairWidget.vue';
 
 const type = BlockType.SetpointSensorPair;
+const title = 'Setpoint';
 
 const plugin: Plugin = {
   install(app) {
@@ -24,6 +25,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SetpointSensorPairBlock> = {
       type,
+      title,
       generate: (): SetpointSensorPairBlock['data'] => ({
         sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
         storedSetting: tempQty(20),
@@ -123,7 +125,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Setpoint',
+      title,
       role: 'Process',
       component: cref(app, widget),
       widgetSize: {

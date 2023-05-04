@@ -29,14 +29,14 @@ export default defineComponent({
       onBack,
       onClose,
       onDone,
-      setDialogTitle,
+      dialogTitle,
       widgetId,
       featureTitle,
       defaultWidgetSize,
     } = useWidgetWizard.setup(props.featureId);
     const sparkStore = useSparkStore();
 
-    setDialogTitle(`${featureTitle} wizard`);
+    dialogTitle.value = `${featureTitle} wizard`;
 
     const serviceId = ref<string>(
       props.activeServiceId || sparkStore.serviceIds[0],

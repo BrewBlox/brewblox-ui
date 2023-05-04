@@ -1,5 +1,8 @@
 import { Service, ServiceStub } from '@/store/services/types';
 import { Widget } from '@/store/widgets/types';
+import { GlobalComponents } from 'vue';
+
+export type ComponentName = keyof GlobalComponents & string;
 
 export type WidgetRole =
   | 'Process'
@@ -83,11 +86,17 @@ export interface WidgetFeature<ConfigT = any> {
    * - true: the generic widget wizard component will be used.
    * - false: this widget can not be created by users.
    */
-  wizard: boolean | string;
+  wizard?: boolean | string;
+
+  /**
+   * Name of the editor component used during the wizard.
+   * If not set, the generic editor component is used.
+   */
+  editor?: ComponentName;
 
   /**
    * Should return a new object that can be used as `widget.config`.
-   * Required if `WidgetFeature.wizard` === true.
+   * If not set, the widget is not creatable by users.
    */
   generateConfig?: () => ConfigT;
 
@@ -96,6 +105,12 @@ export interface WidgetFeature<ConfigT = any> {
    * Should return null if no changes are required.
    */
   upgrade?: (widget: Widget<unknown>) => Widget<ConfigT> | null;
+
+  /**
+   * Widget is creatable by users.
+   * Defaults to true.
+   */
+  creatable?: boolean;
 
   /**
    * Wizard should only be shown if experimental features are enabled.

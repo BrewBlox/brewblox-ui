@@ -3,7 +3,12 @@ import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { useDashboardStore } from '@/store/dashboards';
 import { userUISettings } from '@/user-settings';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, provide, ref } from 'vue';
+import {
+  ActiveDashboardIdKey,
+  ActiveServiceIdKey,
+  DialogTitleKey,
+} from '../symbols';
 
 export default defineComponent({
   name: 'WizardDialog',
@@ -37,6 +42,10 @@ export default defineComponent({
     const dialogTitle = ref<string>('Wizardry');
     const activeWizard = ref<string | null>(props.initialWizard);
     const activeProps = ref(props.initialProps);
+
+    provide(DialogTitleKey, dialogTitle);
+    provide(ActiveDashboardIdKey, '');
+    provide(ActiveServiceIdKey, '');
 
     const sparkServiceAvailable = computed<boolean>(
       () => sparkStore.serviceIds.length > 0,
@@ -156,31 +165,8 @@ export default defineComponent({
               </p>
             </q-item-section>
             <q-tooltip v-if="!sparkServiceAvailable">
-              An active Spark service is required for Quick start wizards.
+              An active Spark service is required for Quickstart wizards.
             </q-tooltip>
-          </q-item>
-        </q-card-section>
-
-        <q-separator inset />
-
-        <q-card-section>
-          <q-item
-            clickable
-            @click="pickWizard('DashboardWizard')"
-          >
-            <q-item-section
-              side
-              class="col-4"
-            >
-              <q-item-label class="text-h6"> New Dashboard </q-item-label>
-              <q-item-label caption> Add an empty dashboard </q-item-label>
-            </q-item-section>
-            <q-item-section>
-              <p>
-                Add widgets to dashboards to create a custom UI for your
-                brewery.
-              </p>
-            </q-item-section>
           </q-item>
         </q-card-section>
 

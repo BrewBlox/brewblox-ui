@@ -111,7 +111,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          modelValue: driverMax.value.value,
+          modelValue: driverMax.value.value ?? undefined,
           type: 'number',
           suffix: prettyUnit(driverMax.value),
         },

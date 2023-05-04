@@ -24,11 +24,11 @@ export default defineComponent({
     const feature = ref<WidgetFeatureOption | null>(null);
     const wizardActive = ref<boolean>(false);
     const filter = ref<string>('');
-    const { onBack, onClose, onDone, setDialogTitle } = useWizard.setup();
+    const { onBack, onClose, onDone, dialogTitle } = useWizard.setup();
 
     function reset(): void {
       wizardActive.value = false;
-      setDialogTitle('Widget wizard');
+      dialogTitle.value = 'Widget wizard';
       filter.value = '';
     }
 
@@ -77,7 +77,7 @@ export default defineComponent({
         return;
       }
       wizardActive.value = true;
-      setDialogTitle(`${feature.value.label} wizard`);
+      dialogTitle.value = `${feature.value.label} wizard`;
     }
 
     function confirm(opt: WidgetFeatureOption | null): void {
@@ -89,7 +89,6 @@ export default defineComponent({
       onBack,
       onClose,
       onDone,
-      setDialogTitle,
       filter,
       feature,
       wizardActive,
@@ -110,7 +109,6 @@ export default defineComponent({
     v-if="feature && wizardActive"
     :feature-id="feature.value"
     :active-dashboard-id="activeDashboardId"
-    @title="setDialogTitle"
     @back="reset"
     @close="onClose"
     @done="onDone"

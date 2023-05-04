@@ -36,9 +36,9 @@ export default defineComponent({
     const widgetStore = useWidgetStore();
     const dashboardStore = useDashboardStore();
     const featureStore = useFeatureStore();
-    const { onBack, onDone, setDialogTitle } = useWizard.setup();
+    const { onBack, onDone, dialogTitle } = useWizard.setup();
 
-    setDialogTitle('Import wizard');
+    dialogTitle.value = 'Import wizard';
 
     const widget = ref<Widget | null>(null);
 

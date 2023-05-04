@@ -10,7 +10,7 @@ import { makeObjectSorter, nullFilter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { BlockIntfType, UserBlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 import { useWizard } from '../composables';
 
 export default defineComponent({
@@ -35,7 +35,7 @@ export default defineComponent({
     const featureStore = useFeatureStore();
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
-    const { onBack, onClose, onDone, setDialogTitle } = useWizard.setup();
+    const { onBack, onClose, onDone, dialogTitle } = useWizard.setup();
 
     const selected = ref<SelectOption<UserBlockType> | null>(null);
     const lastGeneratedId = ref<string>('');
@@ -116,7 +116,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          modelValue: blockId.value,
+          modelValue: blockId.value ?? '',
           rules: activeBlockIdRules.value,
         },
       }).onOk((v) => (blockId.value = v));
@@ -134,7 +134,7 @@ export default defineComponent({
 
     function reset(): void {
       discoveryActive.value = false;
-      setDialogTitle('Block wizard');
+      dialogTitle.value = 'Block wizard';
     }
 
     async function createBlock(): Promise<void> {
@@ -176,11 +176,12 @@ export default defineComponent({
       onDone({ block: createdBlock, widget: createdWidget });
     }
 
+    onBeforeMount(() => reset());
+
     return {
       onBack,
       onClose,
       onDone,
-      setDialogTitle,
       selected,
       serviceId,
       dashboardId,
@@ -211,7 +212,6 @@ export default defineComponent({
     :active-dashboard-id="dashboardId"
     :active-service-id="serviceId"
     optional-widget
-    @title="setDialogTitle"
     @back="reset"
     @close="onClose"
     @done="onDone"
@@ -273,8 +273,9 @@ export default defineComponent({
           <KeyboardButton @click="showNameKeyboard" />
           <q-icon name="mdi-information">
             <q-tooltip>
-              The name of the Spark Controller block.
-              <br />Multiple widgets can display the same block. <br />Rules:
+              The name of the Spark Controller block. <br />
+              Multiple widgets can display the same block. <br />
+              Rules:
               <ul>
                 <li>The name must not be empty.</li>
                 <li>The name must be unique.</li>

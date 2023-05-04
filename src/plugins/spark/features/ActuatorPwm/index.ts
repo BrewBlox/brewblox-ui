@@ -16,6 +16,7 @@ import { Plugin } from 'vue';
 import widget from './ActuatorPwmWidget.vue';
 
 const type = BlockType.ActuatorPwm;
+const title = 'PWM';
 
 const plugin: Plugin = {
   install(app) {
@@ -24,6 +25,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorPwmBlock> = {
       type,
+      title,
       generate: (): ActuatorPwmBlock['data'] => ({
         actuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
         period: bloxQty('4s'),
@@ -125,7 +127,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'PWM',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

@@ -8,7 +8,7 @@ import formatDate from 'date-fns/format';
 import { defineComponent, onMounted, ref } from 'vue';
 
 export default defineComponent({
-  name: 'SparkBackupMenu',
+  name: 'SparkBackupDialog',
   props: {
     ...useDialog.props,
     serviceId: {
@@ -45,8 +45,8 @@ export default defineComponent({
           title: 'Reset blocks?',
           message:
             'This will remove all blocks, and load new ones from the backup. Are you sure?',
-          noBackdropDismiss: true,
         },
+        noBackdropDismiss: true,
       });
       return retv ?? false;
     }

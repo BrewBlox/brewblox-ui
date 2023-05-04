@@ -11,8 +11,8 @@ import { BuilderPart } from './types';
 import {
   coord2grid,
   coord2translate,
-  startAddLayout,
   startChangeLayoutTitle,
+  startCreateLayout,
   startImportLayout,
 } from './utils';
 
@@ -73,13 +73,6 @@ export default defineComponent({
       startChangeLayoutTitle(layout.value);
     }
 
-    async function createLayout(): Promise<void> {
-      const id = await startAddLayout();
-      if (id) {
-        selectLayout(id);
-      }
-    }
-
     async function importLayout(): Promise<void> {
       startImportLayout((id) => selectLayout(id));
     }
@@ -108,7 +101,7 @@ export default defineComponent({
       layout,
       layoutTitle,
       editTitle,
-      createLayout,
+      startCreateLayout,
       importLayout,
       svgRef,
       svgContentRef,
@@ -167,7 +160,7 @@ export default defineComponent({
             <ActionItem
               label="New layout"
               icon="add"
-              @click="createLayout"
+              @click="startCreateLayout($router)"
             />
             <ActionItem
               icon="mdi-file-import"

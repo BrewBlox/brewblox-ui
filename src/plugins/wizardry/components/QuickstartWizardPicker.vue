@@ -11,14 +11,14 @@ export default defineComponent({
   emits: [...useWizard.emits],
   setup() {
     const featureStore = useFeatureStore();
-    const { onBack, onClose, setDialogTitle } = useWizard.setup();
+    const { onBack, onClose, dialogTitle } = useWizard.setup();
 
     const model = ref<QuickstartFeature | null>(null);
     const wizardActive = ref<boolean>(false);
 
     function reset(): void {
       wizardActive.value = false;
-      setDialogTitle('Quick start wizard');
+      dialogTitle.value = 'Quickstart wizard';
     }
 
     onBeforeMount(() => reset());
@@ -29,7 +29,7 @@ export default defineComponent({
 
     function next(): void {
       if (model.value) {
-        setDialogTitle(`${model.value.title} wizard`);
+        dialogTitle.value = `${model.value.title} wizard`;
         wizardActive.value = true;
       }
     }
@@ -42,7 +42,6 @@ export default defineComponent({
     return {
       onBack,
       onClose,
-      setDialogTitle,
       reset,
       model,
       wizardActive,

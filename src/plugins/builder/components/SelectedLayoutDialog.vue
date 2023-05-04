@@ -2,14 +2,14 @@
 import { useDialog } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'SelectedLayoutDialog',
   props: {
     ...useDialog.props,
     modelValue: {
-      type: String,
+      type: null as unknown as PropType<string | null>,
       default: null,
     },
     title: {

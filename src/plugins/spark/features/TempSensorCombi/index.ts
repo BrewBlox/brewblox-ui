@@ -14,6 +14,7 @@ import { Plugin } from 'vue';
 import widget from './TempSensorCombiWidget.vue';
 
 const type = BlockType.TempSensorCombi;
+const title = 'Temp Sensor (Combined)';
 
 const plugin: Plugin = {
   install(app) {
@@ -22,6 +23,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<TempSensorCombiBlock> = {
       type,
+      title,
       generate: (): TempSensorCombiBlock['data'] => ({
         sensors: [],
         combineFunc: SensorCombiFunc.SENSOR_COMBI_FUNC_AVG,
@@ -63,7 +65,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Temp Sensor (Combined)',
+      title,
       role: 'Process',
       component: cref(app, widget),
       widgetSize: {
