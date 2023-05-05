@@ -7,6 +7,7 @@ import {
   BlockWidget,
   ComparedBlockType,
 } from '@/plugins/spark/types';
+import { discoverBlocks } from '@/plugins/spark/utils/actions';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import {
   isCompatible,
@@ -86,17 +87,20 @@ const allBlockOpts = computed<BlockOption[]>(() =>
   blockSpecStore.blockSpecs
     .filter(
       (spec) =>
-        !isSystemBlockType(spec.type) &&
-        isCompatible(spec.type, props.compatible) &&
-        props.filter(spec.type),
+        isCompatible(spec.type, props.compatible) && props.filter(spec.type),
     )
     .map((spec): BlockOption => {
+      const sysBlock = isSystemBlockType(spec.type);
       const discovered = isDiscoveredBlockType(spec.type);
       return {
         value: spec.type,
         label: spec.title,
-        disable: discovered,
-        tooltip: discovered ? 'This is a discovered block' : undefined,
+        disable: sysBlock || discovered,
+        tooltip: discovered
+          ? 'Discovered block'
+          : sysBlock
+          ? 'System block'
+          : undefined,
         generate: spec.generate,
       };
     })
@@ -166,6 +170,10 @@ function showBlockIdKeyboard(): void {
       rules: activeBlockIdRules.value,
     },
   }).onOk((v: string) => (newBlockId.value = v));
+}
+
+function discoverAll(): void {
+  serviceOpts.value.forEach((opt) => discoverBlocks(opt.value));
 }
 
 async function finish(): Promise<void> {
@@ -425,6 +433,11 @@ onMounted(() => {
           @click="back"
         />
         <q-space />
+        <q-btn
+          label="Discover blocks"
+          unelevated
+          @click="discoverAll"
+        />
         <q-btn
           :disable="!canAdvance"
           :loading="finishBusy"

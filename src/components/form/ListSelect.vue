@@ -82,13 +82,15 @@ function selectValue(opt: any, save: boolean): void {
       v-for="opt in mappedOptions"
       :key="opt[optionValue]"
       :class="[
-        'col q-px-sm rounded-borders text-h6',
+        'col q-px-sm rounded-borders text-h6 depth-1',
         optionClass,
         {
           'q-py-sm': !dense,
           'depth-24': matches(opt),
           clickable: !opt.disable,
           darkened: !!opt.disable,
+          'fade-5': !!opt.disable,
+          'not-allowed': !!opt.disable,
         },
       ]"
       @click="selectValue(opt, false)"
