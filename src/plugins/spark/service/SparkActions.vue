@@ -6,7 +6,6 @@ import {
   startResetBlocks,
 } from '@/plugins/spark/utils/actions';
 import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
-import { createBlockWizard } from '@/plugins/wizardry';
 import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
@@ -63,7 +62,6 @@ export default defineComponent({
     return {
       startResetBlocks,
       discoverBlocks,
-      createBlockWizard,
       cleanUnusedNames,
       startChangeServiceTitle,
       startRemoveService,
@@ -86,7 +84,7 @@ export default defineComponent({
       <ActionItem
         icon="add"
         label="New block"
-        @click="createBlockWizard(serviceId)"
+        @click="startDialog('BlockWizardDialog')"
       />
       <ActionItem
         icon="mdi-magnify-plus-outline"

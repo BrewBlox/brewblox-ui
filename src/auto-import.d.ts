@@ -1,19 +1,12 @@
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    WizardDialog: typeof import('src/plugins/wizardry/components/WizardDialog.vue').default;
     WizardBody: typeof import('src/plugins/wizardry/components/WizardBody.vue').default;
-    WidgetWizardPicker: typeof import('src/plugins/wizardry/components/WidgetWizardPicker.vue').default;
     WidgetWizardDialog: typeof import('src/plugins/wizardry/components/WidgetWizardDialog.vue').default;
-    SystemBlockWidgetWizard: typeof import('src/plugins/wizardry/components/SystemBlockWidgetWizard.vue').default;
     QuickstartWizardPicker: typeof import('src/plugins/wizardry/components/QuickstartWizardPicker.vue').default;
-    ImportWizard: typeof import('src/plugins/wizardry/components/ImportWizard.vue').default;
-    GenericWidgetWizard: typeof import('src/plugins/wizardry/components/GenericWidgetWizard.vue').default;
+    QuickstartWizardDialog: typeof import('src/plugins/wizardry/components/QuickstartWizardDialog.vue').default;
     GenericWidgetEditor: typeof import('src/plugins/wizardry/components/GenericWidgetEditor.vue').default;
     BlockWizardDialog: typeof import('src/plugins/wizardry/components/BlockWizardDialog.vue').default;
-    BlockWizard: typeof import('src/plugins/wizardry/components/BlockWizard.vue').default;
-    BlockWidgetWizard: typeof import('src/plugins/wizardry/components/BlockWidgetWizard.vue').default;
     BlockWidgetEditor: typeof import('src/plugins/wizardry/components/BlockWidgetEditor.vue').default;
-    BlockDiscoveryWizard: typeof import('src/plugins/wizardry/components/BlockDiscoveryWizard.vue').default;
     TiltValues: typeof import('src/plugins/tilt/components/TiltValues.vue').default;
     TiltPage: typeof import('src/plugins/tilt/components/TiltPage.vue').default;
     TiltActions: typeof import('src/plugins/tilt/components/TiltActions.vue').default;

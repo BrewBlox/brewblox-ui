@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+import { useDialog, useGlobals, useRouteId } from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
 import {
   ComponentName,
@@ -12,7 +12,7 @@ import { startCreateDashboard } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
-import { computed, nextTick, PropType, ref } from 'vue';
+import { computed, nextTick, onMounted, PropType, ref } from 'vue';
 import { tryCreateWidget } from '../utils';
 
 interface FeatureOption extends SelectOption<string> {
@@ -26,6 +26,10 @@ type WizardStep = 'widget' | 'editor' | 'dashboard';
 
 const props = defineProps({
   ...useDialog.props,
+  featureId: {
+    type: String,
+    default: null,
+  },
   filter: {
     type: Function as PropType<(feature: string) => boolean>,
     default: () => true,
@@ -40,6 +44,7 @@ defineEmits({ ...useDialog.emitsObject });
 
 const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
 const { dense } = useGlobals.setup();
+const { activeDashboardId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();
 const featureStore = useFeatureStore();
 const labelSorter = makeObjectSorter('label');
@@ -61,6 +66,7 @@ const allFeatureOpts = computed<FeatureOption[]>(() =>
       (feature) =>
         (experimental.value || !feature.experimental) &&
         feature.creatable !== false &&
+        (props.featureId == null || props.featureId === feature.id) &&
         props.filter(feature.id),
     )
     .map(
@@ -200,15 +206,11 @@ function next(): void {
   }
 }
 
-function confirmFeatureOpt(opt: FeatureOption): void {
-  selectedFeatureOpt.value = opt;
-  nextTick(() => next()); // wait for computed
-}
-
-function confirmDashboardOpt(opt: DashboardOption): void {
-  selectedDashboardOpt.value = opt;
-  nextTick(() => next()); // wait for computed
-}
+onMounted(() => {
+  selectedDashboardOpt.value =
+    dashboardOpts.value.find((opt) => opt.value === activeDashboardId.value) ??
+    null;
+});
 </script>
 
 <template>
@@ -252,7 +254,12 @@ function confirmDashboardOpt(opt: DashboardOption): void {
             :options="featureOpts"
             option-value="value"
             option-label="label"
-            @confirm="confirmFeatureOpt"
+            @confirm="
+              (opt) => {
+                selectedFeatureOpt = opt;
+                nextTick(() => next());
+              }
+            "
           />
         </q-step>
 
@@ -278,7 +285,12 @@ function confirmDashboardOpt(opt: DashboardOption): void {
             :options="dashboardOpts"
             option-value="value"
             option-label="label"
-            @confirm="confirmDashboardOpt"
+            @confirm="
+              (opt) => {
+                selectedDashboardOpt = opt;
+                nextTick(() => next());
+              }
+            "
           />
           <div class="column q-pt-md">
             <q-btn

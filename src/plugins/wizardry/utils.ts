@@ -1,12 +1,9 @@
 import { useSparkStore } from '@/plugins/spark/store';
-import { ComparedBlockType } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
 import { sleep } from '@/utils/misc';
 import { notify } from '@/utils/notify';
 import { Block } from 'brewblox-proto/ts';
-import { WizardDialogResult } from './types';
 
 export async function tryCreateWidget<T>(
   widget: Widget<T>,
@@ -38,26 +35,4 @@ export async function tryCreateBlock(block: Block): Promise<Block | null> {
     notify.error(`Failed to create block: ${e.toString()}`);
     return null;
   }
-}
-
-export function createBlockWizard(
-  serviceId: string | null,
-  compatible: ComparedBlockType = null,
-): WizardDialogResult {
-  return createDialog({
-    component: 'BlockWizardDialog',
-    componentProps: {
-      serviceId,
-      compatible,
-    },
-  });
-}
-
-export function createWidgetWizard(featureId: string): WizardDialogResult {
-  return createDialog({
-    component: 'WidgetWizardDialog',
-    componentProps: {
-      filter: (v) => v === featureId,
-    },
-  });
 }

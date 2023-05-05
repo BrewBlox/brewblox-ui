@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+import { useDialog, useGlobals, useRouteId } from '@/composables';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
@@ -20,7 +20,7 @@ import { typed } from '@/utils/misc';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { computed, nextTick, PropType, ref } from 'vue';
+import { computed, nextTick, onMounted, PropType, ref } from 'vue';
 import { tryCreateBlock } from '../utils';
 
 interface BlockOption extends SelectOption<BlockType> {
@@ -60,6 +60,7 @@ defineEmits({ ...useDialog.emitsObject });
 
 const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
 const { dense } = useGlobals.setup();
+const { activeDashboardId, activeServiceId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();
 const widgetStore = useWidgetStore();
 const featureStore = useFeatureStore();
@@ -283,6 +284,16 @@ function confirmDashboardOpt(opt: DashboardOption): void {
   selectedDashboardOpt.value = opt;
   nextTick(() => next()); // wait for computed
 }
+
+onMounted(() => {
+  selectedServiceOpt.value =
+    serviceOpts.value.find((opt) => opt.value === activeServiceId.value) ??
+    null;
+
+  selectedDashboardOpt.value =
+    dashboardOpts.value.find((opt) => opt.value === activeDashboardId.value) ??
+    null;
+});
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
-import { createBlockWizard } from '@/plugins/wizardry';
+import { createDialog } from '@/utils/dialog';
 import {
   computed,
   defineComponent,
@@ -41,7 +41,12 @@ export default defineComponent({
     }
 
     function startBlockWizard(): void {
-      createBlockWizard(props.config.serviceId);
+      createDialog({
+        component: 'BlockWizardDialog',
+        componentProps: {
+          serviceId: props.config.serviceId,
+        },
+      });
     }
 
     function taskDone(): void {

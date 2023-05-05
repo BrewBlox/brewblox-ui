@@ -1,5 +1,8 @@
 import { colors } from 'quasar';
 
+/**
+ * Returns a promise that will resolve at least `ms` milliseconds from now.
+ */
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

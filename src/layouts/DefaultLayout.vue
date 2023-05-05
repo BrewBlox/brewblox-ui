@@ -24,15 +24,6 @@ const drawerOpen = computed<boolean>({
     localStorage.set('drawer', v);
   },
 });
-
-function startWizard(initialWizard: string | null): void {
-  createDialog({
-    component: 'WizardDialog',
-    componentProps: {
-      initialWizard: initialWizard ?? undefined,
-    },
-  });
-}
 </script>
 
 <template>
@@ -108,7 +99,7 @@ function startWizard(initialWizard: string | null): void {
             <ActionItem
               label="Quickstart"
               class="text-secondary text-bold"
-              @click="startWizard('QuickstartWizardPicker')"
+              @click="createDialog({ component: 'QuickstartWizardDialog' })"
             />
             <ActionItem
               label="New block"
