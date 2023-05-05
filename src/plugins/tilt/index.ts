@@ -24,7 +24,7 @@ const plugin: Plugin = {
       title: 'Tilt Service',
       pageComponent: 'TiltPage',
       configComponent: 'TiltActions',
-      wizard: (stub): TiltService => ({
+      generate: (stub): TiltService => ({
         ...stub,
         title: stub.id,
         config: {},

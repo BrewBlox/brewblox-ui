@@ -98,7 +98,6 @@ const drawerOpen = computed<boolean>({
           <q-list>
             <ActionItem
               label="Quickstart"
-              class="text-secondary text-bold"
               @click="createDialog({ component: 'QuickstartWizardDialog' })"
             />
             <ActionItem

@@ -1,6 +1,5 @@
 import { useFeatureStore } from '@/store/features';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
-import isString from 'lodash/isString';
 import { Router } from 'vue-router';
 import { createDialog } from './dialog';
 import { notify } from './notify';
@@ -21,22 +20,11 @@ export async function startCreateService(
     return;
   }
 
-  // TODO(Bob) remove
-  if (isString(feature.wizard)) {
-    createDialog({
-      component: 'WizardDialog',
-      componentProps: {
-        initialWizard: feature.wizard,
-        initialProps: { stub },
-      },
-    });
-  } else {
-    const service = await feature.wizard(stub);
-    await serviceStore.createService(service);
-    notify.done(`Added ${feature.title} <b>${service.id}</b>`);
-    if (router) {
-      router.push(`/service/${service.id}`);
-    }
+  const service = await feature.generate(stub);
+  await serviceStore.createService(service);
+  notify.done(`Added ${feature.title} <b>${service.id}</b>`);
+  if (router) {
+    router.push(`/service/${service.id}`);
   }
 }
 

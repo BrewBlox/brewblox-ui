@@ -63,7 +63,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <WizardBody>
+  <QuickstartCard>
     <q-card-section>
       <q-item class="text-big"> About your new HERMS dashboard </q-item>
       <q-item>
@@ -103,5 +103,5 @@ export default defineComponent({
         <q-tooltip v-if="busy"> Creating everything... </q-tooltip>
       </q-btn>
     </template>
-  </WizardBody>
+  </QuickstartCard>
 </template>

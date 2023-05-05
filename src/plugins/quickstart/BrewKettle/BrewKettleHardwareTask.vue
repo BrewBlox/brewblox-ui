@@ -83,7 +83,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <WizardBody>
+  <QuickstartCard>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -164,5 +164,5 @@ export default defineComponent({
         @click="taskDone"
       />
     </template>
-  </WizardBody>
+  </QuickstartCard>
 </template>

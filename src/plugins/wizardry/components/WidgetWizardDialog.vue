@@ -30,6 +30,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  dashboardId: {
+    type: String,
+    default: null,
+  },
   filter: {
     type: Function as PropType<(feature: string) => boolean>,
     default: () => true,
@@ -66,7 +70,7 @@ const allFeatureOpts = computed<FeatureOption[]>(() =>
       (feature) =>
         (experimental.value || !feature.experimental) &&
         feature.creatable !== false &&
-        (props.featureId == null || props.featureId === feature.id) &&
+        (!props.featureId || props.featureId === feature.id) &&
         props.filter(feature.id),
     )
     .map(
@@ -92,7 +96,9 @@ const feature = computed<WidgetFeature | null>(() =>
 );
 
 const dashboardOpts = computed<DashboardOption[]>(() =>
-  dashboardStore.dashboards.map((v) => ({ value: v.id, label: v.title })),
+  dashboardStore.dashboards
+    .filter((v) => !props.dashboardId || v.id === props.dashboardId)
+    .map((v) => ({ value: v.id, label: v.title })),
 );
 
 const canFinish = computed<boolean>(

@@ -156,13 +156,9 @@ export interface ServiceFeature {
   onRemove?: ServiceHook;
 
   /**
-   * Wizard implementation.
-   * This can either be the name of a Vue component, or a function.
-   *
-   * If it's a Vue component, it will be rendered as child of WizardDialog,
-   * and given the stub as prop.
+   * Create a service from the discovered stub.
    */
-  wizard: string | ((stub: ServiceStub) => Service | PromiseLike<Service>);
+  generate: (stub: ServiceStub) => Service | PromiseLike<Service>;
 }
 
 /**

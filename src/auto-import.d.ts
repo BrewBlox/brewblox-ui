@@ -1,8 +1,6 @@
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    WizardBody: typeof import('src/plugins/wizardry/components/WizardBody.vue').default;
     WidgetWizardDialog: typeof import('src/plugins/wizardry/components/WidgetWizardDialog.vue').default;
-    QuickstartWizardPicker: typeof import('src/plugins/wizardry/components/QuickstartWizardPicker.vue').default;
     QuickstartWizardDialog: typeof import('src/plugins/wizardry/components/QuickstartWizardDialog.vue').default;
     GenericWidgetEditor: typeof import('src/plugins/wizardry/components/GenericWidgetEditor.vue').default;
     BlockWizardDialog: typeof import('src/plugins/wizardry/components/BlockWizardDialog.vue').default;
@@ -50,6 +48,7 @@ declare module '@vue/runtime-core' {
     AnalogConstraintsValEdit: typeof import('src/plugins/spark/components/form/AnalogConstraintsValEdit.vue').default;
     AnalogConstraintsField: typeof import('src/plugins/spark/components/form/AnalogConstraintsField.vue').default;
     AnalogConstraintsEditor: typeof import('src/plugins/spark/components/form/AnalogConstraintsEditor.vue').default;
+    WizardCard: typeof import('src/plugins/quickstart/components/WizardCard.vue').default;
     QuickstartTaskMaster: typeof import('src/plugins/quickstart/components/QuickstartTaskMaster.vue').default;
     QuickstartServiceTask: typeof import('src/plugins/quickstart/components/QuickstartServiceTask.vue').default;
     QuickstartSensorField: typeof import('src/plugins/quickstart/components/QuickstartSensorField.vue').default;

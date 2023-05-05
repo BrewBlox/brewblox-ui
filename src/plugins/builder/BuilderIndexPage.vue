@@ -1,53 +1,39 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBuilderStore } from '@/plugins/builder/store';
 import { startupDone } from '@/user-settings';
-import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { computed, defineComponent, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { BuilderLayout } from './types';
+import { startCreateLayout } from './utils';
 
 const sorter = makeObjectSorter<BuilderLayout>('title');
 
-export default defineComponent({
-  name: 'IndexPage',
-  setup() {
-    const builderStore = useBuilderStore();
-    const router = useRouter();
+const builderStore = useBuilderStore();
+const router = useRouter();
 
-    const builderPage = computed<string | null>(() => {
-      if (!startupDone.value) {
-        return null;
-      }
+const builderPage = computed<string | null>(() => {
+  if (!startupDone.value) {
+    return null;
+  }
 
-      if (builderStore.layouts.length === 0) {
-        return '/builder/none';
-      }
+  if (builderStore.layouts.length === 0) {
+    return '/builder/none';
+  }
 
-      const layout =
-        builderStore.layoutById(builderStore.lastLayoutId) ??
-        [...builderStore.layouts].sort(sorter)[0] ??
-        null;
+  const layout =
+    builderStore.layoutById(builderStore.lastLayoutId) ??
+    [...builderStore.layouts].sort(sorter)[0] ??
+    null;
 
-      return layout ? `/builder/${layout.id}` : null;
-    });
-
-    function showWizard(): void {
-      createDialog({ component: 'WizardDialog' });
-    }
-
-    watch(
-      () => builderPage.value,
-      (v) => v && router.replace(v),
-      { immediate: true },
-    );
-
-    return {
-      builderPage,
-      showWizard,
-    };
-  },
+  return layout ? `/builder/${layout.id}` : null;
 });
+
+watch(
+  () => builderPage.value,
+  (v) => v && router.replace(v),
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -58,8 +44,8 @@ export default defineComponent({
         color="secondary"
         icon="mdi-creation"
         size="lg"
-        label="Get started"
-        @click="showWizard"
+        label="New layout"
+        @click="startCreateLayout($router)"
       />
     </PageError>
   </q-page>
