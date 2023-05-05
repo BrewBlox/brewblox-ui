@@ -8,7 +8,11 @@ import {
   ComparedBlockType,
 } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
-import { isCompatible, isSystemBlockType } from '@/plugins/spark/utils/info';
+import {
+  isCompatible,
+  isDiscoveredBlockType,
+  isSystemBlockType,
+} from '@/plugins/spark/utils/info';
 import { useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
@@ -25,6 +29,8 @@ import { tryCreateBlock } from '../utils';
 
 interface BlockOption extends SelectOption<BlockType> {
   generate: BlockSpec['generate'];
+  disable: boolean;
+  tooltip?: string;
 }
 
 type ServiceOption = SelectOption<string>;
@@ -84,13 +90,16 @@ const allBlockOpts = computed<BlockOption[]>(() =>
         isCompatible(spec.type, props.compatible) &&
         props.filter(spec.type),
     )
-    .map(
-      (spec): BlockOption => ({
+    .map((spec): BlockOption => {
+      const discovered = isDiscoveredBlockType(spec.type);
+      return {
         value: spec.type,
         label: spec.title,
+        disable: discovered,
+        tooltip: discovered ? 'This is a discovered block' : undefined,
         generate: spec.generate,
-      }),
-    )
+      };
+    })
     .sort(labelSorter),
 );
 
@@ -244,12 +253,10 @@ function next(): void {
       break;
 
     case 'service':
-      if (!newBlockId.value) {
-        newBlockId.value = suggestId(
-          selectedBlockOpt.value!.label,
-          blockIdValidator.value,
-        );
-      }
+      newBlockId.value = suggestId(
+        selectedBlockOpt.value!.label,
+        blockIdValidator.value,
+      );
       step.value = 'name';
       break;
 

@@ -278,7 +278,8 @@ onMounted(() => {
             v-if="selectedFeatureOpt && widget"
             v-model:widget="widget"
             v-model:valid="widgetValid"
-            :type="selectedFeatureOpt.value"
+            :feature-type="selectedFeatureOpt.value"
+            :feature-title="selectedFeatureOpt.label"
           />
         </q-step>
 

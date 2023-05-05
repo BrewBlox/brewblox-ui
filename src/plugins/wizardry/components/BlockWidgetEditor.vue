@@ -19,8 +19,12 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  type: {
+  featureType: {
     type: String as PropType<BlockType>,
+    required: true,
+  },
+  featureTitle: {
+    type: String,
     required: true,
   },
 });
@@ -32,17 +36,19 @@ const emit = defineEmits<{
 
 const sparkStore = useSparkStore();
 
-const isSystemBlock = computed<boolean>(() => isSystemBlockType(props.type));
+const isSystemBlock = computed<boolean>(() =>
+  isSystemBlockType(props.featureType),
+);
 
 const isDiscoveredBlock = computed<boolean>(() =>
-  isDiscoveredBlockType(props.type),
+  isDiscoveredBlockType(props.featureType),
 );
 
 const address = computed<BlockAddress>({
   get: () => ({
     id: props.widget.config.blockId || null,
     serviceId: props.widget.config.serviceId || null,
-    type: props.type,
+    type: props.featureType,
   }),
   set: (v) => {
     emit('update:widget', {
@@ -62,7 +68,7 @@ async function createBlock(): Promise<void> {
     component: 'BlockWizardDialog',
     componentProps: {
       addWidget: false,
-      compatible: props.type,
+      compatible: props.featureType,
       showCreated: false,
     },
   });
@@ -81,7 +87,9 @@ onMounted(() => {
 <template>
   <div class="column q-gutter-y-sm">
     <CardWarning v-if="isDiscoveredBlock">
-      <template #message> '{{ type }}' is a discovered block type. </template>
+      <template #message>
+        <i>{{ featureTitle }}</i> is a discovered block type.
+      </template>
       <template #actions>
         <q-btn
           flat
@@ -94,11 +102,13 @@ onMounted(() => {
       </template>
     </CardWarning>
     <CardWarning v-else-if="isSystemBlock">
-      <template #message> '{{ type }}' is a system block type. </template>
+      <template #message>
+        <i>{{ featureTitle }}</i> is a system block type.
+      </template>
     </CardWarning>
     <BlockAddressField
       v-model="address"
-      :compatible="type"
+      :compatible="featureType"
       :creatable="!isSystemBlock && !isDiscoveredBlock"
       any-service
     />

@@ -62,6 +62,9 @@ function matches(opt: any): boolean {
 }
 
 function selectValue(opt: any, save: boolean): void {
+  if (opt.disable) {
+    return;
+  }
   const value = props.emitValue ? opt[props.optionValue] : opt;
   if (save) {
     emit('confirm', value);
@@ -79,9 +82,14 @@ function selectValue(opt: any, save: boolean): void {
       v-for="opt in mappedOptions"
       :key="opt[optionValue]"
       :class="[
-        'col clickable q-px-sm rounded-borders text-h6',
+        'col q-px-sm rounded-borders text-h6',
         optionClass,
-        { 'q-py-sm': !dense, 'depth-24': matches(opt) },
+        {
+          'q-py-sm': !dense,
+          'depth-24': matches(opt),
+          clickable: !opt.disable,
+          darkened: !!opt.disable,
+        },
       ]"
       @click="selectValue(opt, false)"
       @dblclick="selectValue(opt, true)"
@@ -98,6 +106,11 @@ function selectValue(opt: any, save: boolean): void {
           >
             {{ opt.badge }}
           </q-badge>
+        </template>
+        <template v-if="opt.tooltip">
+          <q-tooltip>
+            {{ opt.tooltip }}
+          </q-tooltip>
         </template>
       </slot>
     </div>

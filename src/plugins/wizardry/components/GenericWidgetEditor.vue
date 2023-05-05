@@ -3,16 +3,20 @@ import { Widget } from '@/store/widgets';
 import { computed, onMounted, PropType } from 'vue';
 
 const props = defineProps({
-  type: {
-    type: String,
+  widget: {
+    type: Object as PropType<Widget>,
     required: true,
   },
   valid: {
     type: Boolean,
     required: true,
   },
-  widget: {
-    type: Object as PropType<Widget>,
+  featureType: {
+    type: String,
+    required: true,
+  },
+  featureTitle: {
+    type: String,
     required: true,
   },
 });
