@@ -2,8 +2,8 @@
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import {
-  startAddLayout,
   startChangeLayoutTitle,
+  startCreateLayout,
   startRemoveLayout,
 } from '@/plugins/builder/utils';
 import { useDashboardStore } from '@/store/dashboards';
@@ -15,7 +15,7 @@ import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'LayoutActionsMenu',
@@ -35,7 +35,7 @@ export default defineComponent({
     const dashboardStore = useDashboardStore();
     const widgetStore = useWidgetStore();
     const builderStore = useBuilderStore();
-    const route = useRoute();
+    const router = useRouter();
 
     const title = computed<string>(() => props.layout?.title ?? 'Unknown');
 
@@ -53,17 +53,16 @@ export default defineComponent({
       },
     });
 
-    const inEditor = computed<boolean>(() => route.path.startsWith('/builder'));
+    const inEditor = computed<boolean>(() =>
+      router.currentRoute.value.path.startsWith('/builder'),
+    );
 
     function selectLayout(id: string | null): void {
       emit('selected', id);
     }
 
     async function copyLayout(): Promise<void> {
-      const id = await startAddLayout(props.layout);
-      if (id) {
-        selectLayout(id);
-      }
+      await startCreateLayout(router, props.layout);
     }
 
     function exportLayout(): void {
@@ -81,8 +80,8 @@ export default defineComponent({
         componentProps: {
           title: 'Remove parts',
           message: 'Are you sure you wish to remove all parts?',
-          noBackdropDismiss: true,
         },
+        noBackdropDismiss: true,
       }).onOk(() => {
         if (props.layout) {
           builderStore.saveLayout({ ...props.layout, parts: [] });

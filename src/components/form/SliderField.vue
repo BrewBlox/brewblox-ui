@@ -70,7 +70,6 @@ export default defineComponent({
           label: props.label,
           message: props.message,
           html: props.html,
-          decimals: props.decimals,
           min: props.min,
           max: props.max,
           step: props.step,

@@ -109,7 +109,6 @@ export default defineComponent({
           title: props.title,
           message: props.message,
           html: props.html,
-          label: props.label,
           services: props.services,
           compatible: props.compatible,
           blockFilter: props.blockFilter,

@@ -2,9 +2,8 @@ import { typeName as graphType } from '@/plugins/history/Graph/const';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, DisplayOpts } from '@/plugins/spark/types';
-import { createWidgetWizard } from '@/plugins/wizardry';
 import { useDashboardStore } from '@/store/dashboards';
-import { useWidgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
@@ -154,8 +153,11 @@ export async function startAddBlockToGraphWidget(
         .onCancel(() => resolve(null))
         .onDismiss(() => resolve(null));
     } else {
-      createWidgetWizard(graphType)
-        .onOk((output) => resolve(output.widget?.id ?? null))
+      createDialog({
+        component: 'WidgetWizardDialog',
+        componentProps: { featureId: graphType },
+      })
+        .onOk((widget: Maybe<Widget>) => resolve(widget?.id ?? null))
         .onCancel(() => resolve(null))
         .onDismiss(() => resolve(null));
     }
@@ -294,12 +296,12 @@ export function startResetBlocks(serviceId: string): void {
       title: 'Reset blocks',
       message: `This will remove all blocks on <b>${serviceId}</b>. Are you sure?`,
       html: true,
-      noBackdropDismiss: true,
       selectOptions: [
         { label: 'Remember names of discovered blocks', value: 0 },
       ],
       modelValue: [0, 1], // pre-check default actions
     },
+    noBackdropDismiss: true,
   }).onOk((selected: number[]) =>
     resetBlocks(serviceId, {
       restore: selected.includes(0),

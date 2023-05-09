@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useGlobals, useKiosk } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { WidgetContext } from '@/store/features';
@@ -6,110 +6,81 @@ import { useWidgetStore, Widget } from '@/store/widgets';
 import { startChangeDashboardTitle } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const widgetSorter = makeObjectSorter<Widget>('order');
 
-export default defineComponent({
-  name: 'DashboardPage',
-  props: {
-    routeId: {
-      type: String,
-      default: null,
-    },
-  },
-  setup(props) {
-    const dashboardStore = useDashboardStore();
-    const widgetStore = useWidgetStore();
-    const widgetEditable = ref(false);
-    const { dense } = useGlobals.setup();
-    const { kiosk } = useKiosk.setup();
-    const router = useRouter();
-
-    const context = computed<WidgetContext>(() => ({
-      mode: 'Basic',
-      container: 'Dashboard',
-      size: dense.value ? 'Content' : 'Fixed',
-    }));
-
-    const dashboardId = computed<string | null>(() => props.routeId ?? null);
-
-    const dashboard = computed<Dashboard | null>(() =>
-      dashboardId.value
-        ? dashboardStore.dashboardById(dashboardId.value)
-        : null,
-    );
-
-    function showWizard(widget: boolean): void {
-      createDialog({
-        component: 'WizardDialog',
-        componentProps: {
-          initialWizard: widget ? 'WidgetWizardPicker' : null,
-          activeDashboardId: dashboardId.value,
-        },
-      });
-    }
-
-    const widgets = computed<Widget[]>(() =>
-      widgetStore.widgets
-        .filter((widget) => widget.dashboard === dashboardId.value)
-        .sort(widgetSorter),
-    );
-
-    async function saveWidget(widget: Widget): Promise<void> {
-      return widgetStore.saveWidget(widget);
-    }
-
-    watch(
-      () => dashboardId.value,
-      () => (widgetEditable.value = false),
-    );
-
-    watch(
-      () => dashboard.value,
-      (newV) => {
-        // We want to re-route to home if:
-        // - the dashboard was removed
-        // - the user navigates to a dashboard ID that does not exist (or just /dashboard)
-        // - dashboards are loaded from the datastore
-        if (
-          newV === null &&
-          dashboardId.value !== null &&
-          dashboardStore.dashboards.length > 0
-        ) {
-          router.replace('/');
-        }
-      },
-      { immediate: true },
-    );
-
-    watch(
-      () => dashboard.value?.title,
-      (v) => (document.title = `Brewblox | ${v ?? 'Dashboard'}`),
-      { immediate: true },
-    );
-
-    return {
-      dense,
-      kiosk,
-      widgetEditable,
-      context,
-      dashboardId,
-      dashboard,
-      showWizard,
-      widgets,
-      saveWidget,
-      startChangeDashboardTitle,
-    };
+const props = defineProps({
+  routeId: {
+    type: String,
+    default: null,
   },
 });
+
+const dashboardStore = useDashboardStore();
+const widgetStore = useWidgetStore();
+const widgetEditable = ref(false);
+const { dense } = useGlobals.setup();
+const { kiosk } = useKiosk.setup();
+const router = useRouter();
+
+const context = computed<WidgetContext>(() => ({
+  mode: 'Basic',
+  container: 'Dashboard',
+  size: dense.value ? 'Content' : 'Fixed',
+}));
+
+const dashboardId = computed<string | null>(() => props.routeId ?? null);
+
+const dashboard = computed<Dashboard | null>(() =>
+  dashboardId.value ? dashboardStore.dashboardById(dashboardId.value) : null,
+);
+
+const widgets = computed<Widget[]>(() =>
+  widgetStore.widgets
+    .filter((widget) => widget.dashboard === dashboardId.value)
+    .sort(widgetSorter),
+);
+
+async function saveWidget(widget: Widget): Promise<void> {
+  return widgetStore.saveWidget(widget);
+}
+
+watch(
+  () => dashboardId.value,
+  () => (widgetEditable.value = false),
+);
+
+watch(
+  () => dashboard.value,
+  (newV) => {
+    // We want to re-route to home if:
+    // - the dashboard was removed
+    // - the user navigates to a dashboard ID that does not exist (or just /dashboard)
+    // - dashboards are loaded from the datastore
+    if (
+      newV === null &&
+      dashboardId.value !== null &&
+      dashboardStore.dashboards.length > 0
+    ) {
+      router.replace('/');
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  () => dashboard.value?.title,
+  (v) => (document.title = `Brewblox | ${v ?? 'Dashboard'}`),
+  { immediate: true },
+);
 </script>
 
 <template>
   <q-page
     class="page-height"
-    @dblclick="showWizard(true)"
+    @dblclick="createDialog({ component: 'WidgetWizardDialog' })"
   >
     <PageError v-if="!dashboard">
       <span>
@@ -156,14 +127,33 @@ export default defineComponent({
           v-if="widgets.length === 0"
           class="absolute-center"
         >
-          <q-btn
+          <q-btn-dropdown
             unelevated
-            color="secondary"
-            icon="mdi-creation"
-            size="lg"
             label="Get started"
-            @click="showWizard(false)"
-          />
+            icon="mdi-creation"
+            color="secondary"
+            size="lg"
+          >
+            <q-list>
+              <ActionItem
+                label="Quickstart"
+                @click="createDialog({ component: 'QuickstartWizardDialog' })"
+              />
+              <ActionItem
+                label="New block"
+                @click="
+                  createDialog({
+                    component: 'BlockWizardDialog',
+                    componentProps: { addWidget: true },
+                  })
+                "
+              />
+              <ActionItem
+                label="New widget"
+                @click="createDialog({ component: 'WidgetWizardDialog' })"
+              />
+            </q-list>
+          </q-btn-dropdown>
         </div>
         <div
           v-else-if="dense"

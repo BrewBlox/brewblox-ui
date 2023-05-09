@@ -21,6 +21,7 @@ import { Plugin } from 'vue';
 import widget from './PidWidget.vue';
 
 const type = BlockType.Pid;
+const title = 'PID';
 
 const plugin: Plugin = {
   install(app) {
@@ -29,6 +30,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<PidBlock> = {
       type,
+      title,
       generate: (): PidBlock['data'] => ({
         inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
@@ -184,7 +186,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'PID',
+      title,
       role: 'Control',
       component: cref(app, widget),
       widgetSize: {

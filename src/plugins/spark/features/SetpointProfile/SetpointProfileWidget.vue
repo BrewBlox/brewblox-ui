@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog } from '@/utils/dialog';
 import { deepCopy, isJsonEqual } from '@/utils/objects';
 import { prettyLink } from '@/utils/quantity';
 import { Link, SetpointProfileBlock } from 'brewblox-proto/ts';
@@ -47,7 +47,7 @@ export default defineComponent({
       if (enabled) {
         patchBlock({ enabled });
       } else {
-        createDialog({
+        createComponentDialog({
           component: SetpointProfileDisableDialog,
           componentProps: {
             block: block.value,

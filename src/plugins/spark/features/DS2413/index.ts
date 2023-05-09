@@ -8,6 +8,7 @@ import { Plugin } from 'vue';
 import widget from './DS2413Widget.vue';
 
 const type = BlockType.DS2413;
+const title = 'DS2413 Chip';
 
 const plugin: Plugin = {
   install(app) {
@@ -16,6 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<DS2413Block> = {
       type,
+      title,
       generate: (): DS2413Block['data'] => ({
         oneWireBusId: 0,
         address: '',
@@ -33,7 +35,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...discoveredBlockFeature,
       id: type,
-      title: 'DS2413 Chip',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

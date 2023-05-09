@@ -29,8 +29,8 @@ export function startRemoveFolder(folder: Maybe<SidebarFolder>): void {
     componentProps: {
       title: 'Remove folder',
       message: `Are you sure you wish to remove ${folder.title}?`,
-      noBackdropDismiss: true,
     },
+    noBackdropDismiss: true,
   }).onOk(async () => {
     const sidebarStore = useSidebarStore();
     await sidebarStore.removeFolder(folder).catch(() => {});

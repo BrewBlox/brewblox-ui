@@ -18,6 +18,7 @@ import { Plugin } from 'vue';
 import widget from './DigitalActuatorWidget.vue';
 
 const type = BlockType.DigitalActuator;
+const title = 'Digital Actuator';
 
 const plugin: Plugin = {
   install(app) {
@@ -26,6 +27,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<DigitalActuatorBlock> = {
       type,
+      title,
       generate: (): DigitalActuatorBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,
@@ -98,7 +100,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Digital Actuator',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

@@ -2,7 +2,7 @@
 import { useWidget } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { concatById } from '@/utils/collections';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 import { BlockType, PidBlock, SetpointProfileBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
@@ -29,7 +29,10 @@ export default defineComponent({
     const serviceId = computed<string | null>(() => config.value.serviceId);
 
     function showMode(mode: TempControlMode): void {
-      createDialog({
+      if (!serviceId.value) {
+        return;
+      }
+      createComponentDialog({
         component: TempControlModeDialog,
         componentProps: {
           modelValue: mode,

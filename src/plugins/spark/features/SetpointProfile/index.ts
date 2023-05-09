@@ -15,6 +15,7 @@ import { Plugin } from 'vue';
 import widget from './SetpointProfileWidget.vue';
 
 const type = BlockType.SetpointProfile;
+const title = 'Setpoint Profile';
 
 const plugin: Plugin = {
   install(app) {
@@ -23,6 +24,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SetpointProfileBlock> = {
       type,
+      title,
       generate: (): SetpointProfileBlock['data'] => ({
         start: new Date().toISOString(),
         points: [],
@@ -72,7 +74,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Setpoint Profile',
+      title,
       role: 'Process',
       component: cref(app, widget),
       widgetSize: {

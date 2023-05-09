@@ -69,8 +69,8 @@ export default defineComponent({
           message:
             `Are you sure you want to remove the ${kind} ` +
             `config from the ${tempMode.title} mode?`,
-          noBackdropDismiss: true,
         },
+        noBackdropDismiss: true,
       }).onOk(() => {
         tempMode[kind + 'Config'] = null;
         save();

@@ -1,6 +1,6 @@
 declare module 'url-safe-string';
 declare module 'fromentries';
-declare module 'simple-keyboard-layouts';
+// declare module 'simple-keyboard-layouts';
 declare module '*.svg';
 declare module '*.vue' {
   import { ComponentPublicInstance } from 'vue';

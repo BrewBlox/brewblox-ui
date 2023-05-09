@@ -4,7 +4,7 @@ import { BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import type { Block } from 'brewblox-proto/ts';
+import { Block } from 'brewblox-proto/ts';
 import difference from 'lodash/difference';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
@@ -121,6 +121,7 @@ export default defineComponent({
           address: {
             id: change.value.blockId,
             serviceId: change.value.serviceId,
+            type: null,
           },
           title: `${change.value.blockId} ${field.specField.title}`,
         },

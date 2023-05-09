@@ -114,7 +114,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <WizardBody>
+  <QuickstartCard>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -205,5 +205,5 @@ export default defineComponent({
         @click="$emit('next')"
       />
     </template>
-  </WizardBody>
+  </QuickstartCard>
 </template>

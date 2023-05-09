@@ -14,6 +14,7 @@ import { Plugin } from 'vue';
 import widget from './SequenceWidget.vue';
 
 const type = BlockType.Sequence;
+const title = 'Sequence';
 
 const plugin: Plugin = {
   install(app) {
@@ -22,6 +23,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SequenceBlock> = {
       type,
+      title,
       generate: (): SequenceBlock['data'] => ({
         enabled: false,
         overrideState: false,
@@ -48,7 +50,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Sequence',
+      title,
       role: 'Process',
       component: cref(app, widget),
       widgetSize: {

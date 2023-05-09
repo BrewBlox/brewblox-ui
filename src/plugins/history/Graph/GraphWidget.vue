@@ -102,8 +102,8 @@ export default defineComponent({
             title: 'Import Session Graph',
             message:
               'Are you sure you wish to replace the current graph config?',
-            noBackdropDismiss: true,
           },
+          noBackdropDismiss: true,
         }).onOk(() => saveConfig(noteConfig));
       }
     }

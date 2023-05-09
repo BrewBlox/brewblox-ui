@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog } from '@/utils/dialog';
 import { SetpointProfileBlock } from 'brewblox-proto/ts';
 import { defineComponent } from 'vue';
 import ProfileSnippetDialog from './ProfileSnippetDialog.vue';
@@ -21,7 +21,7 @@ export default defineComponent({
     const { block } = useBlockWidget.setup<SetpointProfileBlock>();
 
     async function showDialog(): Promise<void> {
-      createDialog({
+      createComponentDialog({
         component: ProfileSnippetDialog,
         componentProps: {
           block: block.value,

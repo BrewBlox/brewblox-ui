@@ -17,6 +17,7 @@ import { Plugin } from 'vue';
 import widget from './MotorValveWidget.vue';
 
 const type = BlockType.MotorValve;
+const title = 'Motor Valve';
 
 const plugin: Plugin = {
   install(app) {
@@ -25,6 +26,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MotorValveBlock> = {
       type,
+      title,
       generate: (): MotorValveBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,
@@ -87,7 +89,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Motor Valve',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

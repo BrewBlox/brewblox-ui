@@ -10,6 +10,7 @@ import { Plugin } from 'vue';
 import widget from './TempSensorOneWireWidget.vue';
 
 const type = BlockType.TempSensorOneWire;
+const title = 'OneWire Temp Sensor';
 
 const plugin: Plugin = {
   install(app) {
@@ -18,6 +19,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<TempSensorOneWireBlock> = {
       type,
+      title,
       generate: (): TempSensorOneWireBlock['data'] => ({
         value: tempQty(20),
         offset: deltaTempQty(0),
@@ -51,7 +53,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...discoveredBlockFeature,
       id: type,
-      title: 'OneWire Temp Sensor',
+      title,
       role: 'Process',
       component: cref(app, widget),
       widgetSize: {

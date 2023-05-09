@@ -111,7 +111,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          modelValue: driverMax.value.value,
+          modelValue: driverMax.value.value ?? undefined,
           type: 'number',
           suffix: prettyUnit(driverMax.value),
         },
@@ -143,7 +143,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <WizardBody>
+  <QuickstartCard>
     <q-card-section class="text-weight-light">
       <q-item>
         <q-item-section>
@@ -298,5 +298,5 @@ export default defineComponent({
         @click="done"
       />
     </template>
-  </WizardBody>
+  </QuickstartCard>
 </template>

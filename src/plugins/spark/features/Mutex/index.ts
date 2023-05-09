@@ -9,6 +9,7 @@ import { Plugin } from 'vue';
 import widget from './MutexWidget.vue';
 
 const type = BlockType.Mutex;
+const title = 'Mutex';
 
 const plugin: Plugin = {
   install(app) {
@@ -17,6 +18,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MutexBlock> = {
       type,
+      title,
       generate: (): MutexBlock['data'] => ({
         waitRemaining: bloxQty('0s'),
       }),
@@ -26,7 +28,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Mutex',
+      title,
       role: 'Constraint',
       component: cref(app, widget),
       widgetSize: {

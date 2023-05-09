@@ -56,8 +56,17 @@ export function ifCompatible<T extends Block>(
   return block && isCompatible(block.type, intf) ? (block as T) : null;
 }
 
-export function isSystemBlockType(type: Maybe<string>): boolean {
+export function isSystemBlockType(
+  type: Maybe<string>,
+): type is SystemBlockType {
   return Enum.isType(SystemBlockType, type);
+}
+
+export function isDiscoveredBlockType(type: Maybe<string>): type is BlockType {
+  return isCompatible(type, [
+    BlockIntfType.OneWireBusInterface,
+    BlockIntfType.OneWireDeviceInterface,
+  ]);
 }
 
 export function isBlockDisplayReady(addr: BlockAddress): boolean {

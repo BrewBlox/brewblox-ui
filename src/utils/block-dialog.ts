@@ -25,7 +25,7 @@ export function createBlockDialog(
   addr: BlockAddress | null,
   opts: BlockDialogOpts = {},
 ): DialogChainObject | null {
-  if (!addr || !addr.id) {
+  if (!addr || !addr.serviceId || !addr.id) {
     return null;
   }
   if (

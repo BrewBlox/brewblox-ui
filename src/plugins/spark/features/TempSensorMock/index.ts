@@ -9,6 +9,7 @@ import { Plugin } from 'vue';
 import widget from './TempSensorMockWidget.vue';
 
 const type = BlockType.TempSensorMock;
+const title = 'Temp Sensor (Mock)';
 
 const plugin: Plugin = {
   install(app) {
@@ -17,6 +18,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<TempSensorMockBlock> = {
       type,
+      title,
       generate: (): TempSensorMockBlock['data'] => ({
         value: tempQty(20),
         setting: tempQty(20),
@@ -60,7 +62,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Temp Sensor (Mock)',
+      title,
       role: 'Process',
       component: cref(app, widget),
       widgetSize: {

@@ -2,7 +2,7 @@
 import { BuilderLayout } from '@/plugins/builder/types';
 import { defineComponent, PropType } from 'vue';
 import { useRouter } from 'vue-router';
-import { startAddLayout, startImportLayout } from '../utils';
+import { startCreateLayout, startImportLayout } from '../utils';
 
 export default defineComponent({
   name: 'BuilderActions',
@@ -19,20 +19,13 @@ export default defineComponent({
       router.push(`/builder/${id}`).catch(() => {});
     }
 
-    async function createLayout(): Promise<void> {
-      const id = await startAddLayout();
-      if (id) {
-        selectLayout(id);
-      }
-    }
-
     async function importLayout(): Promise<void> {
       startImportLayout((id) => selectLayout(id));
     }
 
     return {
+      startCreateLayout,
       selectLayout,
-      createLayout,
       importLayout,
     };
   },
@@ -46,7 +39,7 @@ export default defineComponent({
       <ActionItem
         icon="add"
         label="New Layout"
-        @click="createLayout"
+        @click="startCreateLayout($router)"
       />
       <ActionItem
         icon="mdi-file-import"

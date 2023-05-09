@@ -356,9 +356,10 @@ export async function startImportLayout(
   });
 }
 
-export async function startAddLayout(
+export async function startCreateLayout(
+  router: Router,
   source?: Maybe<BuilderLayout>,
-): Promise<string | null> {
+): Promise<void> {
   const title = await createDialogPromise({
     component: 'InputDialog',
     componentProps: {
@@ -368,7 +369,7 @@ export async function startAddLayout(
     },
   });
   if (!title) {
-    return null;
+    return;
   }
   const id = nanoid();
   const builderStore = useBuilderStore();
@@ -379,7 +380,7 @@ export async function startAddLayout(
     height: source?.height ?? DEFAULT_LAYOUT_HEIGHT,
     parts: deepCopy(source?.parts) ?? [],
   });
-  return id;
+  router.push(`/builder/${id}`);
 }
 
 export function startChangeLayoutTitle(layout: Maybe<BuilderLayout>): void {
@@ -413,8 +414,8 @@ export function startRemoveLayout(
     componentProps: {
       title: 'Remove layout',
       message: `Are you sure you wish to remove ${layout.title}?`,
-      noBackdropDismiss: true,
     },
+    noBackdropDismiss: true,
   }).onOk(async () => {
     if (layout) {
       const builderStore = useBuilderStore();

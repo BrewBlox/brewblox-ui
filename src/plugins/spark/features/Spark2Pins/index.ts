@@ -8,6 +8,7 @@ import { Plugin } from 'vue';
 import widget from './Spark2PinsWidget.vue';
 
 const type = BlockType.Spark2Pins;
+const title = 'Spark 2 Pins';
 
 const plugin: Plugin = {
   install(app) {
@@ -16,6 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<Spark2PinsBlock> = {
       type,
+      title,
       generate: (): Spark2PinsBlock['data'] => ({
         channels: [],
         soundAlarm: false,
@@ -27,7 +29,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...systemBlockFeature,
       id: type,
-      title: 'Spark 2 Pins',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

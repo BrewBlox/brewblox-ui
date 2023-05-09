@@ -3,9 +3,9 @@ import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
-import { createBlockWizard } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 import { Block, Link } from 'brewblox-proto/ts';
@@ -96,10 +96,13 @@ export default defineComponent({
     }
 
     function createBlock(): void {
-      createBlockWizard(
-        props.serviceId,
-        props.compatible ?? local.value.type,
-      ).onOk(({ block }) => {
+      createDialog({
+        component: 'BlockWizardDialog',
+        componentProps: {
+          serviceId: props.serviceId,
+          compatible: props.compatible ?? local.value.type,
+        },
+      }).onOk((block: Maybe<Block>) => {
         if (block) {
           // Retain original type
           local.value = bloxLink(block.id, props.modelValue.type);

@@ -6,7 +6,6 @@ import * as fs from 'fs';
 import { ServerOptions } from 'https';
 import * as path from 'path';
 import { defineConfig, PluginOption, UserConfig } from 'vite';
-import CheckerPlugin from 'vite-plugin-checker';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }): UserConfig => {
@@ -48,16 +47,18 @@ export default defineConfig(({ command, mode }): UserConfig => {
       cert: fs.readFileSync('./dev/traefik/brewblox.crt'),
     };
 
-    plugins.push(
-      CheckerPlugin({
-        typescript: true,
-        vueTsc: true,
-        eslint: {
-          lintCommand:
-            'eslint --ext .js,.ts,.vue --ignore-path .gitignore ./src ./test',
-        },
-      }),
-    );
+    // Disabled because it fails to infer types from global components
+    //
+    // plugins.push(
+    //   CheckerPlugin({
+    //     typescript: true,
+    //     vueTsc: true,
+    //     eslint: {
+    //       lintCommand:
+    //         'eslint --ext .js,.ts,.vue --ignore-path .gitignore ./src ./test',
+    //     },
+    //   }),
+    // );
   }
 
   return {

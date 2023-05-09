@@ -18,6 +18,7 @@ import { Plugin } from 'vue';
 import widget from './FastPwmWidget.vue';
 
 const type = BlockType.FastPwm;
+const title = 'Fast PWM';
 
 const plugin: Plugin = {
   install(app) {
@@ -26,6 +27,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<FastPwmBlock> = {
       type,
+      title,
       generate: (): FastPwmBlock['data'] => ({
         enabled: true,
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
@@ -126,7 +128,7 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Fast PWM',
+      title,
       role: 'Output',
       component: cref(app, widget),
       widgetSize: {

@@ -94,10 +94,10 @@ export default defineComponent({
       <div class="text-h5">System</div>
 
       <ActionItem
-        label="Start a wizard"
+        label="Quickstart"
         icon="mdi-creation"
         class="text-secondary text-h6 text-bold"
-        @click="createDialog({ component: 'WizardDialog' })"
+        @click="createDialog({ component: 'QuickstartWizardDialog' })"
       />
 
       <q-expansion-item
@@ -168,6 +168,11 @@ export default defineComponent({
               {{ buildDate }}
             </q-item-section>
           </q-item>
+          <ActionItem
+            icon="mdi-format-paint"
+            label="Theme colors"
+            to="/styles"
+          />
           <ExportErrorsAction />
         </ActionSubmenu>
       </q-expansion-item>

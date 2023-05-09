@@ -53,7 +53,7 @@ const plugin: Plugin = {
       configComponent: cref(app, SparkActions),
       onStart: (service) => sparkStore.addService(service.id),
       onRemove: (service) => sparkStore.removeService(service.id),
-      wizard: (stub) => ({
+      generate: (stub) => ({
         ...stub,
         title: stub.id,
         order: 0,

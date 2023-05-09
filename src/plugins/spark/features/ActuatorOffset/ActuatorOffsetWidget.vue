@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog } from '@/utils/dialog';
 import { fixedNumber, prettyLink } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
@@ -67,7 +67,7 @@ export default defineComponent({
       if (enabled) {
         patchBlock({ enabled });
       } else {
-        createDialog({
+        createComponentDialog({
           component: ActuatorOffsetDisableDialog,
           componentProps: {
             block: block.value,
