@@ -55,10 +55,13 @@ export default defineComponent({
   <HistoryGraph
     :graph-id="widgetId"
     :config="graphConfig"
-    :source-revision="sourceRevision"
-    :render-revision="renderRevision"
+    v-bind="{
+      sourceRevision,
+      renderRevision,
+    }"
     use-presets
     use-range
+    class="fit"
     @params="saveGraphParams"
     @layout="saveGraphLayout"
   />
