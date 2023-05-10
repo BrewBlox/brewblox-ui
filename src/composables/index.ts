@@ -5,4 +5,5 @@ export * from './use-field';
 export * from './use-globals';
 export * from './use-kiosk';
 export * from './use-route-id';
+export * from './use-undo-redo';
 export * from './use-widget';
