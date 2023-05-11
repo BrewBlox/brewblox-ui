@@ -77,16 +77,7 @@ export interface WidgetFeature<ConfigT = any> {
    * If set, this will be rendered instead of `component`.
    * It is then the wrapper's responsibility to render the actual component.
    */
-  wrapperComponent?: string;
-
-  /**
-   * Wizard component.
-   * There are three possible values:
-   * - string: the name of a globally registered Vue component.
-   * - true: the generic widget wizard component will be used.
-   * - false: this widget can not be created by users.
-   */
-  wizard?: boolean | string;
+  wrapperComponent?: ComponentName;
 
   /**
    * Name of the editor component used during the wizard.

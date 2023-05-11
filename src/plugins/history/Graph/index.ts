@@ -15,7 +15,6 @@ const plugin: Plugin = {
       id: typeName,
       title: 'Graph',
       component: cref(app, widget),
-      wizard: true,
       generateConfig: emptyGraphConfig,
       widgetSize: {
         cols: 10,

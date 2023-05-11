@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { useGlobals } from '@/composables';
+import { Y2_COLOR } from '@/plugins/history/const';
+import { GraphAnnotation } from '@/plugins/history/types';
+import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
 import get from 'lodash/get';
-import isNumber from 'lodash/isNumber';
 import merge from 'lodash/merge';
 import Plotly, {
   ClickAnnotationEvent,
   Config,
-  Frame,
   Layout,
   PlotData,
   PlotlyHTMLElement,
@@ -21,11 +24,49 @@ import {
   watch,
 } from 'vue';
 
-const props = defineProps({
-  id: {
-    type: String,
-    required: true,
+const layoutDefaults = (): Partial<Layout> => ({
+  title: '',
+  font: {
+    color: '#fff',
   },
+  margin: {
+    t: 40,
+    l: 40,
+    r: 0,
+    b: 40,
+  },
+  legend: { orientation: 'h' },
+  showlegend: true,
+  xaxis: {
+    type: 'date',
+    gridcolor: '#666',
+    autorange: true,
+    domain: [0, 0.9],
+  },
+  yaxis: {
+    side: 'right',
+    position: 0.9,
+    gridcolor: '#666',
+    zerolinecolor: '#eee',
+    autorange: true,
+  },
+  yaxis2: {
+    overlaying: 'y',
+    side: 'right',
+    position: 0.95,
+    gridcolor: '#467',
+    zerolinecolor: Y2_COLOR,
+    autorange: true,
+    tickfont: {
+      color: Y2_COLOR,
+    },
+  },
+  paper_bgcolor: 'transparent',
+  plot_bgcolor: 'transparent',
+  hovermode: 'closest',
+});
+
+const props = defineProps({
   data: {
     type: Array as PropType<Partial<PlotData>[]>,
     default: () => [],
@@ -38,11 +79,11 @@ const props = defineProps({
     type: Object as PropType<Partial<Config>>,
     default: () => ({}),
   },
-  frames: {
-    type: Array as PropType<Frame[]>,
-    default: () => [],
+  annotated: {
+    type: Boolean,
+    default: false,
   },
-  autoFit: {
+  maximized: {
     type: Boolean,
     default: false,
   },
@@ -61,19 +102,37 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  // From this component
-  (e: 'error', msg: string): void;
-
-  // Forwarded from plotly
-  // This is not an exhaustive list
-  // more should be added if desired
-  (e: 'plotly_click', evt: PlotMouseEvent): void;
-  (e: 'plotly_clickannotation', evt: ClickAnnotationEvent): void;
+  (e: 'annotations', data: GraphAnnotation[]);
 }>();
 
+// const emit = defineEmits<{
+//   // From this component
+//   (e: 'error', msg: string): void;
+
+//   // Forwarded from plotly
+//   // This is not an exhaustive list
+//   // more should be added if desired
+//   (e: 'plotly_click', evt: PlotMouseEvent): void;
+//   (e: 'plotly_clickannotation', evt: ClickAnnotationEvent): void;
+// }>();
+
+const { dense } = useGlobals.setup();
 const plotlyElement = ref<PlotlyHTMLElement>();
 let zoomed = false;
 let skippedRender = false;
+
+const annotations = computed<GraphAnnotation[]>(
+  () => props.layout.annotations ?? [],
+);
+
+function ifFinite(v: any): number | undefined {
+  return v != null && isFinite(v) ? v : undefined;
+}
+
+const layoutSize = computed<{ width?: number; height?: number }>(() => ({
+  width: ifFinite(props.layout.width),
+  height: ifFinite(props.layout.height),
+}));
 
 function attachListeners(): void {
   const el = plotlyElement.value;
@@ -81,46 +140,78 @@ function attachListeners(): void {
     return;
   }
 
-  // Local
   el.on('plotly_relayout', onRelayout);
+  el.on('plotly_click', onClick);
   el.on('plotly_doubleclick', onDoubleClick);
-
-  // Forwarded to parent
-  el.on('plotly_click', (evt) => emit('plotly_click', evt));
-  el.on('plotly_clickannotation', (evt) => emit('plotly_clickannotation', evt));
+  el.on('plotly_clickannotation', onAnnotationClick);
 }
 
-function getSize(): { width: number; height: number } {
-  const layout = props.layout;
-  let rect: any = {};
-  const layoutWidth = layout ? layout.width : null;
-  const layoutHeight = layout ? layout.height : null;
-  const hasWidth = isNumber(layoutWidth);
-  const hasHeight = isNumber(layoutHeight);
-
-  if (!hasWidth || !hasHeight) {
-    rect = plotlyElement.value?.parentElement!.getBoundingClientRect();
-  }
+function calcSize(): { width: number; height: number } {
+  const { width, height } = layoutSize.value;
+  const rect = plotlyElement.value?.parentElement?.getBoundingClientRect();
 
   return {
-    width: hasWidth ? layoutWidth : rect.width,
-    height: hasHeight ? layoutHeight : rect.height,
+    width: width || rect?.width || 200,
+    height: height || rect?.height || 200,
   };
 }
 
-function adjustedLayout(): Partial<Layout> {
-  const layout = merge({}, props.layout);
-  if (props.autoFit) {
-    merge(layout, getSize());
-  }
-  if (!props.interactable) {
-    merge(layout, { dragmode: false, hovermode: false });
-  }
-  return layout;
+function combinedConfig(): Partial<Config> {
+  return merge<Partial<Config>, Partial<Config>>(
+    {
+      displaylogo: false,
+      responsive: true,
+      staticPlot: dense.value && !props.maximized,
+      modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
+      modeBarButtonsToAdd: [
+        {
+          name: 'toImageLargeJpeg',
+          title: 'Download plot as a jpeg',
+          icon: Plotly['Icons'].camera,
+          click: (el) =>
+            Plotly.downloadImage(el, {
+              format: 'jpeg',
+              width: 3000,
+              height: 1500,
+              filename: (get(props.layout, 'title.text', props.layout.title) ||
+                'graph') as string,
+            }),
+        },
+        {
+          name: 'toImageLargePng',
+          title: 'Download plot as a png',
+          icon: Plotly['Icons'].camera,
+          click: (el) =>
+            Plotly.downloadImage(el, {
+              format: 'png',
+              width: 3000,
+              height: 1500,
+              filename: (get(props.layout, 'title.text', props.layout.title) ||
+                'graph') as string,
+            }),
+        },
+      ],
+    },
+    props.config,
+  );
+}
+
+function combinedLayout(): Partial<Layout> {
+  return merge<
+    Partial<Layout>,
+    Partial<Layout>,
+    Partial<Layout>,
+    Partial<Layout>
+  >(
+    layoutDefaults(),
+    props.layout,
+    calcSize(),
+    props.interactable ? {} : { dragmode: false, hovermode: false },
+  );
 }
 
 async function relayoutPlot(): Promise<void> {
-  await Plotly.relayout(plotlyElement.value!, adjustedLayout());
+  await Plotly.relayout(plotlyElement.value!, combinedLayout());
 }
 
 async function resizePlot(): Promise<void> {
@@ -131,8 +222,8 @@ async function reactPlot(): Promise<void> {
   await Plotly.react(
     plotlyElement.value!,
     props.data,
-    adjustedLayout(),
-    extendedConfig.value,
+    combinedLayout(),
+    combinedConfig(),
   );
 }
 
@@ -140,6 +231,34 @@ function onRelayout(eventdata: Mapped<any>): void {
   if (eventdata['xaxis.range[0]'] || eventdata['xaxis.range[1]']) {
     zoomed = true;
   }
+}
+
+function onClick(evt: PlotMouseEvent): void {
+  if (!props.annotated || !evt.points.length) {
+    return;
+  }
+
+  const point = evt.points[0];
+  createDialog({
+    component: 'InputDialog',
+    componentProps: {
+      modelValue: 'New annotation',
+      title: 'Add annotation',
+    },
+  }).onOk((text: string) => {
+    const a: GraphAnnotation = {
+      x: point.x as string,
+      y: parseFloat((point.y as number).toPrecision(4)),
+      xref: 'x',
+      yref: point.data.yaxis as 'y',
+      text,
+      visible: true,
+      arrowhead: 7,
+      arrowcolor: 'white',
+      captureevents: true,
+    };
+    emit('annotations', [...annotations.value, a]);
+  });
 }
 
 function onDoubleClick(): void {
@@ -150,38 +269,30 @@ function onDoubleClick(): void {
   }
 }
 
-const extendedConfig = computed<Partial<Config>>(() => ({
-  ...props.config,
-  modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
-  modeBarButtonsToAdd: [
-    {
-      name: 'toImageLargeJpeg',
-      title: 'Download plot as a jpeg',
-      icon: Plotly['Icons'].camera,
-      click: (el) =>
-        Plotly.downloadImage(el, {
-          format: 'jpeg',
-          width: 3000,
-          height: 1500,
-          filename: (get(props.layout, 'title.text', props.layout.title) ||
-            'graph') as string,
-        }),
+function onAnnotationClick(evt: ClickAnnotationEvent): void {
+  if (!props.annotated || annotations.value.length < evt.index) {
+    return;
+  }
+
+  const annotation = annotations.value[evt.index];
+  createDialog({
+    component: 'GraphAnnotationDialog',
+    componentProps: {
+      title: 'Edit annotation',
+      modelValue: annotation.text,
     },
-    {
-      name: 'toImageLargePng',
-      title: 'Download plot as a png',
-      icon: Plotly['Icons'].camera,
-      click: (el) =>
-        Plotly.downloadImage(el, {
-          format: 'png',
-          width: 3000,
-          height: 1500,
-          filename: (get(props.layout, 'title.text', props.layout.title) ||
-            'graph') as string,
-        }),
-    },
-  ],
-}));
+  }).onOk(({ text, remove }: { text: string; remove: boolean }) => {
+    const updated = [...annotations.value];
+    remove
+      ? updated.splice(evt.index, 1)
+      : updated.splice(evt.index, 1, { ...annotation, text });
+    emit('annotations', updated);
+  });
+}
+
+function displayError(msg: string): void {
+  notify.warn(`Failed to render graph: ${msg}`);
+}
 
 async function createPlot(): Promise<void> {
   if (!plotlyElement.value) {
@@ -192,12 +303,12 @@ async function createPlot(): Promise<void> {
     await Plotly.newPlot(
       plotlyElement.value,
       props.data,
-      adjustedLayout(),
-      extendedConfig.value,
+      combinedLayout(),
+      combinedConfig(),
     );
     attachListeners();
   } catch (e: any) {
-    emit('error', e.message);
+    displayError(e.message);
   }
 }
 
@@ -212,12 +323,13 @@ async function renderPlot(layoutChanged = false): Promise<void> {
   try {
     layoutChanged ? await relayoutPlot() : await reactPlot();
   } catch (e: any) {
-    emit('error', e.message);
+    displayError(e.message);
   }
 }
 
 function resizeHandler(): void {
-  if (props.autoFit) {
+  if (true) {
+    // TODO(Bob)
     relayoutPlot();
   }
   if (props.autoResize) {
@@ -228,7 +340,7 @@ function resizeHandler(): void {
 const updateFunc = debounce(renderPlot, 50, false);
 
 watch(
-  () => [props.config, props.data, props.frames, props.revision],
+  () => [props.config, props.data, props.revision],
   () => updateFunc(),
 );
 
@@ -259,3 +371,18 @@ onBeforeUnmount(() => {
 <template>
   <div ref="plotlyElement" />
 </template>
+
+<style lang="sass">
+.plotly
+  .modebar
+    left: 0px
+  .modebar-group
+    background: transparent !important
+  .modebar-btn path
+    fill: rgba(255, 255, 255, 0.6)
+  .modebar-btn.active path, .modebar-btn:hover path
+    fill: rgba(255, 255, 255, 1)
+
+.xy2
+  color: green
+</style>

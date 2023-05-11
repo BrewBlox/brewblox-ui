@@ -86,7 +86,7 @@ export default defineComponent({
     :no-scroll="context.mode === 'Basic'"
   >
     <template #preview>
-      <GenericGraph
+      <PlotlyGraph
         :data="graphProps.data"
         :layout="graphProps.layout"
         :revision="revision"
@@ -129,7 +129,7 @@ export default defineComponent({
 
       <template #graph>
         <q-resize-observer @resize="refresh" />
-        <GenericGraph
+        <PlotlyGraph
           v-bind="graphProps"
           :revision="revision"
           :maximized="inDialog"

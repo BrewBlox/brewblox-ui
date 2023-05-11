@@ -20,7 +20,7 @@ const plugin: Plugin = {
       id: 'QuickActions',
       title: 'Quick Actions',
       component: cref(app, widget),
-      wizard: true,
+      creatable: true,
       widgetSize: {
         cols: 4,
         rows: 5,

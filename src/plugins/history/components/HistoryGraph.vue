@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
         {{ error }}
       </div>
     </div>
-    <GenericGraph
+    <PlotlyGraph
       v-else
       ref="displayRef"
       :data="graphData"
