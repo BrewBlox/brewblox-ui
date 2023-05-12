@@ -72,6 +72,16 @@ const moveKeys: Record<string, XYPosition> = {
   ArrowRight: { x: 1, y: 0 },
 };
 
+const partDraggingTools: (BuilderToolName | null)[] = ['move', 'copy'];
+const partSelectionTools: (BuilderToolName | null)[] = [
+  'select',
+  'move',
+  'copy',
+  'rotate',
+  'flip',
+  'delete',
+];
+
 const props = defineProps({
   routeId: {
     type: String,
@@ -563,7 +573,10 @@ const builderToolActions: Record<BuilderToolName, (src: ToolSource) => void> = {
   redo: toolRedo,
 };
 
-function applyTool(name: BuilderToolName, src: ToolSource): void {
+function applyTool(name: BuilderToolName | null, src: ToolSource): void {
+  if (!name) {
+    return;
+  }
   const action = builderToolActions[name];
   if (action) {
     action(src);
@@ -747,7 +760,6 @@ const gridResizeDragBehavior = d3
 
 const gridDragBehavior = d3
   .drag<SVGElement, unknown>()
-  .clickDistance(25)
   .on('start', (evt: SVGDragEvent) => {
     if (!floater.value) {
       const { x, y } = d3EventPos(evt);
@@ -794,15 +806,26 @@ const gridDragBehavior = d3
   });
 
 const partDragBehavior = d3
-  .drag()
-  .clickDistance(25)
+  .drag<SVGElement, unknown>()
   .on('start', (evt: SVGDragEvent) => {
+    if (!partDraggingTools.includes(activeToolId.value)) {
+      // Active tool can never drag parts
+      // We only need to handle the end event
+      return;
+    }
+
     // We're not sure yet whether this is a drag or a click
     // The action becomes a drag once the mouse leaves the square
     // The action is a click if the end event is in the same square
     partDragStart.value = toCoords(d3EventPos(evt));
   })
   .on('drag', function (this: Element, evt: SVGDragEvent) {
+    if (!partDraggingTools.includes(activeToolId.value)) {
+      // Active tool can never drag parts
+      // We only need to handle the end event
+      return;
+    }
+
     const pos = d3EventPos(evt);
     const coords = toCoords(pos);
     const start = partDragStart.value;
@@ -844,23 +867,13 @@ const partDragBehavior = d3
     if (floater.value) {
       dropFloater(toFractionCoords(d3EventPos(evt)));
       evt.sourceEvent.stopPropagation();
-    } else {
-      const tool = activeToolId.value;
-      switch (tool) {
-        case 'select':
-        case 'add':
-        case 'move':
-        case 'copy':
-        case 'rotate':
-        case 'flip':
-        case 'delete':
-          applyTool(tool, 'click');
-          evt.sourceEvent.stopPropagation();
-          break;
-        default:
-          break;
-      }
+      return;
     }
+
+    // We weren't dragging or floating parts
+    // We can now consider this a part click event
+    applyTool(activeToolId.value, 'click');
+    evt.sourceEvent.stopPropagation();
   });
 
 function assignGridEventHandlers(
@@ -876,32 +889,28 @@ function assignGridEventHandlers(
     case 'move':
     case 'delete':
       selection.call(gridDragBehavior);
+      selection.on('click', null);
       break;
     case 'gridresize':
       selection.call(gridResizeDragBehavior);
+      selection.on('click', null);
       break;
+    case 'pan': // handled by useSvgZoom
     default:
-      // pan is handled by useSvgZoom
       selection.on('.drag', null);
+      selection.on('click', (evt: Event) => {
+        if (floater.value) {
+          dropFloater(toFractionCoords(d3EventPos(evt)));
+        }
+      });
+
       break;
   }
 }
 
-function assignPartEventHandlers(
-  el: SVGElement,
-  tool: BuilderToolName | null,
-): void {
-  const selection = d3.select(el).selectAll<Element, any>('.flowpart');
-
-  switch (tool) {
-    case 'copy':
-    case 'move':
-      selection.call(partDragBehavior);
-      break;
-    default:
-      selection.on('.drag', null);
-      break;
-  }
+function assignPartEventHandlers(el: SVGElement): void {
+  const selection = d3.select(el).selectAll<SVGElement, any>('.flowpart');
+  selection.call(partDragBehavior);
 }
 
 watch(
@@ -936,10 +945,10 @@ watch(
 
 watch(
   [svgContentRef, activeToolId, orderedParts],
-  async ([el, tool]) => {
+  async ([el]) => {
     await nextTick();
     if (el) {
-      assignPartEventHandlers(el, tool);
+      assignPartEventHandlers(el);
     }
   },
   { immediate: true },
@@ -1079,7 +1088,7 @@ onBeforeUnmount(() => {
             <PartWrapper
               :part="part"
               :selected="selectedIds.includes(part.id)"
-              :selectable="!['interact', 'pan', null].includes(activeToolId)"
+              :selectable="partSelectionTools.includes(activeToolId)"
               :interactable="activeToolId === 'interact'"
               @patch:part="(patch) => patchPart(part.id, patch)"
               @patch:settings="(patch) => patchPartSettings(part.id, patch)"

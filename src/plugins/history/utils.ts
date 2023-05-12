@@ -87,6 +87,10 @@ export async function selectGraphPrecision(): Promise<
 }
 
 export function upgradeGraphConfig(config: any): GraphConfig | null {
+  if (config == null) {
+    return emptyGraphConfig();
+  }
+
   if (config.version == null) {
     if (config.targets) {
       config.fields = config.targets.flatMap((t: QueryTarget) =>
