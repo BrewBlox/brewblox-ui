@@ -12,7 +12,6 @@ const plugin: Plugin = {
       id: 'Countdown',
       title: 'Countdown',
       component: cref(app, widget),
-      wizard: true,
       widgetSize: {
         cols: 4,
         rows: 3,

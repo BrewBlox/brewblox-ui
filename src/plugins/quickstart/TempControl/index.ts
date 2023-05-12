@@ -21,7 +21,6 @@ const plugin: Plugin = {
       id: 'TempControl',
       title: 'Temp Control Assistant',
       component: cref(app, widget),
-      wizard: true,
       widgetSize: {
         cols: 4,
         rows: 4,

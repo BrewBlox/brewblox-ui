@@ -20,7 +20,7 @@ const deprecated: WidgetFeature[] = [
     id: 'StepView',
     title: 'Step View',
     component: 'DeprecatedWidget',
-    wizard: false,
+    creatable: false,
     widgetSize: { cols: 0, rows: 0 },
   },
 ];

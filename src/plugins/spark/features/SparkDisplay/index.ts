@@ -12,7 +12,6 @@ const plugin: Plugin = {
       id: 'SparkDisplay',
       title: 'Spark Sim Display',
       component: cref(app, widget),
-      wizard: true,
       widgetSize: {
         cols: 4,
         rows: 4,
