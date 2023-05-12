@@ -1,50 +1,34 @@
-<script lang="ts">
+<script setup lang="ts">
 import { LEFT, RIGHT, UP } from '@/plugins/builder/const';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
-export default defineComponent({
-  name: 'TeeTubePartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const topSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, UP),
-    );
+const topSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, UP),
+);
 
-    const leftSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, LEFT),
-    );
+const leftSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, LEFT),
+);
 
-    const rightSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, RIGHT),
-    );
+const rightSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, RIGHT),
+);
 
-    const topLiquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, UP),
-    );
+const topLiquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, UP),
+);
 
-    const leftLiquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, LEFT),
-    );
+const leftLiquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, LEFT),
+);
 
-    const rightLiquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, RIGHT),
-    );
-
-    return {
-      width,
-      height,
-      topSpeed,
-      leftSpeed,
-      rightSpeed,
-      topLiquids,
-      leftLiquids,
-      rightLiquids,
-    };
-  },
-});
+const rightLiquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, RIGHT),
+);
 </script>
 
 <template>

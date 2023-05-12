@@ -1,6 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
 import { LEFT } from '@/plugins/builder/const';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
@@ -9,28 +9,15 @@ const paths = {
   liquid: ['M0,25H20a5,5,0,0,1,5,5V40'],
 };
 
-export default defineComponent({
-  name: 'DipTubePartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const flowSpeed = computed<number>(
-      () => -flowOnCoord(part.value, flows.value, LEFT),
-    );
+const flowSpeed = computed<number>(
+  () => -flowOnCoord(part.value, flows.value, LEFT),
+);
 
-    const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, LEFT),
-    );
-
-    return {
-      width,
-      height,
-      paths,
-      flowSpeed,
-      liquids,
-    };
-  },
-});
+const liquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, LEFT),
+);
 </script>
 
 <template>

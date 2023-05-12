@@ -1,5 +1,5 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { COIL_BOTTOM } from '../blueprints/Coil';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
@@ -34,28 +34,15 @@ const paths = {
   ],
 };
 
-export default defineComponent({
-  name: 'CoilPartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const flowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, COIL_BOTTOM),
-    );
+const flowSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, COIL_BOTTOM),
+);
 
-    const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, COIL_BOTTOM),
-    );
-
-    return {
-      width,
-      height,
-      paths,
-      flowSpeed,
-      liquids,
-    };
-  },
-});
+const liquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, COIL_BOTTOM),
+);
 </script>
 
 <template>

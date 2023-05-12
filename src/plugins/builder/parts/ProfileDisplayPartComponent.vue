@@ -1,92 +1,61 @@
-<script lang="ts">
+<script setup lang="ts">
 import { userUnits } from '@/user-settings';
 import { makeObjectSorter } from '@/utils/functional';
 import { durationMs, preciseNumber, prettyUnit } from '@/utils/quantity';
 import { Setpoint } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/ProfileDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
 import { liquidBorderColor } from '../utils';
 
-export default defineComponent({
-  name: 'ProfileDisplayPartComponent',
-  setup() {
-    const { flows, width, height, bordered, passthrough, placeholder } =
-      usePart.setup();
+const { flows, width, height, bordered, passthrough, placeholder } =
+  usePart.setup();
 
-    const color = computed<string>(() => liquidBorderColor(flows.value));
+const color = computed<string>(() => liquidBorderColor(flows.value));
 
-    const {
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-    } = useSettingsBlock.setup<ProfileBlockT>(PROFILE_KEY, PROFILE_TYPES);
+const { block, blockStatus, isBroken, showBlockDialog, showBlockSelectDialog } =
+  useSettingsBlock.setup<ProfileBlockT>(PROFILE_KEY, PROFILE_TYPES);
 
-    const points = computed<Setpoint[]>(() => {
-      if (!block.value) {
-        return [];
-      }
-      // Sorting modifies the list. Make a copy to prevent this.
-      return [...block.value.data.points].sort(makeObjectSorter('time'));
-    });
-
-    const currentValue = computed<number | null>(() => {
-      if (placeholder) {
-        return 19;
-      }
-      if (!block.value) {
-        return null;
-      }
-      return block.value.data.setting.value;
-    });
-
-    const nextValue = computed<number | null>(() => {
-      if (placeholder) {
-        return 21;
-      }
-      if (!block.value || !block.value.data.start) {
-        return null;
-      }
-      const now = new Date().getTime();
-      const start = new Date(block.value.data.start).getTime();
-      if (!block.value.data.enabled || !block.value.data.targetId.id) {
-        return null;
-      }
-      const point: Setpoint | undefined = points.value.find(
-        (point) => start + durationMs(point.time) > now,
-      );
-      return point ? point.temperature.value : null;
-    });
-
-    const tempUnit = computed<string>(() =>
-      prettyUnit(userUnits.value.temperature),
-    );
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      preciseNumber,
-      width,
-      height,
-      bordered,
-      passthrough,
-      placeholder,
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-      currentValue,
-      nextValue,
-      tempUnit,
-      color,
-    };
-  },
+const points = computed<Setpoint[]>(() => {
+  if (!block.value) {
+    return [];
+  }
+  // Sorting modifies the list. Make a copy to prevent this.
+  return [...block.value.data.points].sort(makeObjectSorter('time'));
 });
+
+const currentValue = computed<number | null>(() => {
+  if (placeholder) {
+    return 19;
+  }
+  if (!block.value) {
+    return null;
+  }
+  return block.value.data.setting.value;
+});
+
+const nextValue = computed<number | null>(() => {
+  if (placeholder) {
+    return 21;
+  }
+  if (!block.value || !block.value.data.start) {
+    return null;
+  }
+  const now = new Date().getTime();
+  const start = new Date(block.value.data.start).getTime();
+  if (!block.value.data.enabled || !block.value.data.targetId.id) {
+    return null;
+  }
+  const point: Setpoint | undefined = points.value.find(
+    (point) => start + durationMs(point.time) > now,
+  );
+  return point ? point.temperature.value : null;
+});
+
+const tempUnit = computed<string>(() =>
+  prettyUnit(userUnits.value.temperature),
+);
 </script>
 
 <template>

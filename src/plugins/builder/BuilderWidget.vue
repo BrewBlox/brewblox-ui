@@ -1,118 +1,85 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { usePreselect } from './composables/use-preselect';
 import { useBuilderStore } from './store';
 import { BuilderConfig, BuilderLayout, BuilderPart } from './types';
-import { coord2grid, coord2translate } from './utils';
+import { coord2grid } from './utils';
 
-export default defineComponent({
-  name: 'BuilderWidget',
-  setup() {
-    const builderStore = useBuilderStore();
-    const router = useRouter();
-    const { inDialog } = useContext.setup();
-    const { dense } = useGlobals.setup();
-    const { config, patchConfig } = useWidget.setup<Widget<BuilderConfig>>();
-    const { preselectable, preselectedId, preselect } = usePreselect.setup();
-    const zoomEnabled = ref<boolean>(inDialog.value);
+const builderStore = useBuilderStore();
+const router = useRouter();
+const { inDialog } = useContext.setup();
+const { dense } = useGlobals.setup();
+const { config, patchConfig } = useWidget.setup<Widget<BuilderConfig>>();
+const { preselectable, preselectedId, preselect } = usePreselect.setup();
+const zoomEnabled = ref<boolean>(inDialog.value);
 
-    const storeLayouts = computed<BuilderLayout[]>(() => builderStore.layouts);
+const storeLayouts = computed<BuilderLayout[]>(() => builderStore.layouts);
 
-    const layoutId = computed<string | null>(
-      () => config.value.currentLayoutId,
-    );
+const layoutId = computed<string | null>(() => config.value.currentLayoutId);
 
-    useMetrics.setupProvider(layoutId);
-    const { layout, orderedParts, updateParts, reflow } =
-      useFlowParts.setup(layoutId);
+useMetrics.setupProvider(layoutId);
+const { layout, orderedParts, updateParts, reflow } =
+  useFlowParts.setup(layoutId);
 
-    const gridDimensions = computed<UseSvgZoomDimensions>(() => ({
-      width: coord2grid(layout.value?.width || 10),
-      height: coord2grid(layout.value?.height || 10),
-    }));
+const gridDimensions = computed<UseSvgZoomDimensions>(() => ({
+  width: coord2grid(layout.value?.width || 10),
+  height: coord2grid(layout.value?.height || 10),
+}));
 
-    const { svgRef, svgContentRef, resetZoom } = useSvgZoom.setup(
-      gridDimensions,
-      {
-        dragEnabled: zoomEnabled,
-        wheelEnabled: zoomEnabled,
-      },
-    );
-
-    function startSelectLayout(): void {
-      createDialog({
-        component: 'SelectedLayoutDialog',
-        componentProps: {
-          modelValue: config.value.currentLayoutId,
-        },
-      }).onOk((id) => {
-        patchConfig({ currentLayoutId: id });
-      });
-    }
-
-    function selectLayout(id: string | null): void {
-      if (id) {
-        config.value.layoutIds = [...config.value.layoutIds, id].filter(
-          uniqueFilter,
-        );
-      }
-      patchConfig({ currentLayoutId: id });
-    }
-
-    function startEditor(): void {
-      if (!dense.value) {
-        router.push(`/builder/${layout.value?.id ?? ''}`);
-      }
-    }
-    function patchPart(id: string, patch: Partial<BuilderPart>): void {
-      updateParts((draft) => {
-        const part = draft[id];
-        draft[id] = { ...part, ...patch, id };
-      });
-    }
-
-    function patchPartSettings(
-      id: string,
-      patch: Partial<BuilderPart['settings']>,
-    ): void {
-      updateParts((draft) => {
-        const part = draft[id];
-        part.settings = { ...part.settings, ...patch };
-      });
-    }
-
-    return {
-      coord2grid,
-      coord2translate,
-      startSelectLayout,
-      inDialog,
-      dense,
-      svgRef,
-      svgContentRef,
-      preselectable,
-      preselectedId,
-      preselect,
-      startEditor,
-      gridDimensions,
-      layout,
-      storeLayouts,
-      selectLayout,
-      orderedParts,
-      patchPart,
-      patchPartSettings,
-      reflow,
-      resetZoom,
-      zoomEnabled,
-    };
-  },
+const { svgRef, svgContentRef, resetZoom } = useSvgZoom.setup(gridDimensions, {
+  dragEnabled: zoomEnabled,
+  wheelEnabled: zoomEnabled,
 });
+
+function startSelectLayout(): void {
+  createDialog({
+    component: 'SelectedLayoutDialog',
+    componentProps: {
+      modelValue: config.value.currentLayoutId,
+    },
+  }).onOk((id) => {
+    patchConfig({ currentLayoutId: id });
+  });
+}
+
+function selectLayout(id: string | null): void {
+  if (id) {
+    config.value.layoutIds = [...config.value.layoutIds, id].filter(
+      uniqueFilter,
+    );
+  }
+  patchConfig({ currentLayoutId: id });
+}
+
+function startEditor(): void {
+  if (!dense.value) {
+    router.push(`/builder/${layout.value?.id ?? ''}`);
+  }
+}
+
+function patchPart(id: string, patch: Partial<BuilderPart>): void {
+  updateParts((draft) => {
+    const part = draft[id];
+    draft[id] = { ...part, ...patch, id };
+  });
+}
+
+function patchPartSettings(
+  id: string,
+  patch: Partial<BuilderPart['settings']>,
+): void {
+  updateParts((draft) => {
+    const part = draft[id];
+    part.settings = { ...part.settings, ...patch };
+  });
+}
 </script>
 
 <template>

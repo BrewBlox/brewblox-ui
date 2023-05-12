@@ -1,10 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog, useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, provide, ref } from 'vue';
+import { computed, PropType, provide, ref } from 'vue';
 import { PlaceholderKey } from '../symbols';
 import { BuilderBlueprint, BuilderPart } from '../types';
 import { coord2grid } from '../utils';
@@ -14,83 +14,63 @@ interface PartDisplay {
   blueprint: BuilderBlueprint;
 }
 
-export default defineComponent({
-  name: 'BuilderCatalogDialog',
-  props: {
-    ...useDialog.props,
-    partial: {
-      type: Object as PropType<Partial<BuilderPart>>,
-      default: () => ({}),
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const builderStore = useBuilderStore();
-    const { dense } = useGlobals.setup();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-
-    // Rendered parts should display dummy values instead of errors
-    provide(PlaceholderKey, true);
-
-    const partFilter = ref<string | null>(null);
-
-    const available = computed<PartDisplay[]>(() => {
-      const filter = new RegExp(partFilter.value || '', 'i');
-      return builderStore.blueprints
-        .filter((blueprint) =>
-          `${blueprint.type}|${blueprint.title}`.match(filter),
-        )
-        .sort(makeObjectSorter('title'))
-        .map((blueprint) => ({
-          blueprint,
-          part: {
-            type: blueprint.type,
-            id: nanoid(),
-            x: 0,
-            y: 0,
-            width: blueprint.defaultSize.width,
-            height: blueprint.defaultSize.height,
-            rotate: 0,
-            settings: {},
-            flipped: false,
-          },
-        }));
-    });
-
-    function partViewBox(display: PartDisplay): string {
-      const { width, height } = display.part;
-      return `${coord2grid(width)} ${coord2grid(height)}`;
-    }
-
-    function selectPart(display: PartDisplay): void {
-      onDialogOK({ ...display.part, ...props.partial });
-    }
-
-    function showSearchKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: partFilter.value ?? undefined,
-        },
-      }).onOk((v: string) => (partFilter.value = v));
-    }
-
-    return {
-      coord2grid,
-      dense,
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      partFilter,
-      available,
-      partViewBox,
-      selectPart,
-      showSearchKeyboard,
-    };
+const props = defineProps({
+  ...useDialog.props,
+  partial: {
+    type: Object as PropType<Partial<BuilderPart>>,
+    default: () => ({}),
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const builderStore = useBuilderStore();
+const { dense } = useGlobals.setup();
+const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+
+// Rendered parts should display dummy values instead of errors
+provide(PlaceholderKey, true);
+
+const partFilter = ref<string | null>(null);
+
+const available = computed<PartDisplay[]>(() => {
+  const filter = new RegExp(partFilter.value || '', 'i');
+  return builderStore.blueprints
+    .filter((blueprint) => `${blueprint.type}|${blueprint.title}`.match(filter))
+    .sort(makeObjectSorter('title'))
+    .map((blueprint) => ({
+      blueprint,
+      part: {
+        type: blueprint.type,
+        id: nanoid(),
+        x: 0,
+        y: 0,
+        width: blueprint.defaultSize.width,
+        height: blueprint.defaultSize.height,
+        rotate: 0,
+        settings: {},
+        flipped: false,
+      },
+    }));
+});
+
+function partViewBox(display: PartDisplay): string {
+  const { width, height } = display.part;
+  return `${coord2grid(width)} ${coord2grid(height)}`;
+}
+
+function selectPart(display: PartDisplay): void {
+  onDialogOK({ ...display.part, ...props.partial });
+}
+
+function showSearchKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: partFilter.value ?? undefined,
+    },
+  }).onOk((v: string) => (partFilter.value = v));
+}
 </script>
 
 <template>

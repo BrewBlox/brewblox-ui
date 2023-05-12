@@ -1,6 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
 import { DOWN, LEFT, RIGHT, UP } from '@/plugins/builder/const';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
@@ -12,34 +12,21 @@ const paths = {
   right: 'M25,25 H50',
 };
 
-export default defineComponent({
-  name: 'CrossTubePartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const speed = computed<Record<Direction, number>>(() => ({
-      up: flowOnCoord(part.value, flows.value, UP),
-      down: flowOnCoord(part.value, flows.value, DOWN),
-      left: flowOnCoord(part.value, flows.value, LEFT),
-      right: flowOnCoord(part.value, flows.value, RIGHT),
-    }));
+const speed = computed<Record<Direction, number>>(() => ({
+  up: flowOnCoord(part.value, flows.value, UP),
+  down: flowOnCoord(part.value, flows.value, DOWN),
+  left: flowOnCoord(part.value, flows.value, LEFT),
+  right: flowOnCoord(part.value, flows.value, RIGHT),
+}));
 
-    const liquids = computed<Record<Direction, string[]>>(() => ({
-      up: liquidOnCoord(part.value, flows.value, UP),
-      down: liquidOnCoord(part.value, flows.value, DOWN),
-      left: liquidOnCoord(part.value, flows.value, LEFT),
-      right: liquidOnCoord(part.value, flows.value, RIGHT),
-    }));
-
-    return {
-      width,
-      height,
-      paths,
-      speed,
-      liquids,
-    };
-  },
-});
+const liquids = computed<Record<Direction, string[]>>(() => ({
+  up: liquidOnCoord(part.value, flows.value, UP),
+  down: liquidOnCoord(part.value, flows.value, DOWN),
+  left: liquidOnCoord(part.value, flows.value, LEFT),
+  right: liquidOnCoord(part.value, flows.value, RIGHT),
+}));
 </script>
 
 <template>

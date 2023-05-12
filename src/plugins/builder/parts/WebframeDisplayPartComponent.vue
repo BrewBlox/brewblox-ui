@@ -1,5 +1,5 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -9,45 +9,25 @@ import {
 import { usePart } from '../composables';
 import { URL_KEY } from '../const';
 
-export default defineComponent({
-  name: 'WebframeDisplayPartComponent',
-  setup() {
-    const { settings, width, height, editable, placeholder } = usePart.setup();
+const { settings, width, height, editable, placeholder } = usePart.setup();
 
-    const url = computed<string>(() => {
-      if (placeholder) {
-        return 'https://xkcd.com';
-      }
-      return settings.value[URL_KEY] || '';
-    });
-
-    const scale = computed<number>(() => {
-      if (placeholder) {
-        return 0.6;
-      }
-      return Number(settings.value[WEBFRAME_SCALE_KEY] || 100) / 100;
-    });
-
-    const counterScale = computed<number>(
-      () => (1 - scale.value) / scale.value + 1,
-    );
-
-    return {
-      MIN_SIZE,
-      MAX_SIZE,
-      DEFAULT_SIZE,
-      URL_KEY,
-      WEBFRAME_SCALE_KEY,
-      width,
-      height,
-      editable,
-      placeholder,
-      url,
-      scale,
-      counterScale,
-    };
-  },
+const url = computed<string>(() => {
+  if (placeholder) {
+    return 'https://xkcd.com';
+  }
+  return settings.value[URL_KEY] || '';
 });
+
+const scale = computed<number>(() => {
+  if (placeholder) {
+    return 0.6;
+  }
+  return Number(settings.value[WEBFRAME_SCALE_KEY] || 100) / 100;
+});
+
+const counterScale = computed<number>(
+  () => (1 - scale.value) / scale.value + 1,
+);
 </script>
 
 <template>

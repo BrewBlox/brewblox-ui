@@ -1,5 +1,5 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import {
   CFC_BOTTOM_LEFT,
   CFC_TOP_RIGHT,
@@ -46,38 +46,23 @@ const paths = {
       `,
 };
 
-export default defineComponent({
-  name: 'CounterflowChillerPartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const topFlowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, CFC_TOP_RIGHT),
-    );
+const topFlowSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, CFC_TOP_RIGHT),
+);
 
-    const bottomFlowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, CFC_BOTTOM_LEFT),
-    );
+const bottomFlowSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, CFC_BOTTOM_LEFT),
+);
 
-    const topLiquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, CFC_TOP_RIGHT),
-    );
+const topLiquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, CFC_TOP_RIGHT),
+);
 
-    const bottomLiquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, CFC_BOTTOM_LEFT),
-    );
-
-    return {
-      width,
-      height,
-      paths,
-      topFlowSpeed,
-      bottomFlowSpeed,
-      topLiquids,
-      bottomLiquids,
-    };
-  },
-});
+const bottomLiquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, CFC_BOTTOM_LEFT),
+);
 </script>
 
 <template>

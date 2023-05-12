@@ -1,8 +1,7 @@
-<script lang="ts">
-import { useGlobals } from '@/composables';
+<script setup lang="ts">
 import { startupDone } from '@/user-settings';
 import { useQuasar } from 'quasar';
-import { computed, defineComponent, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
@@ -10,114 +9,84 @@ import { usePreselect } from './composables/use-preselect';
 import { BuilderPart } from './types';
 import {
   coord2grid,
-  coord2translate,
   startChangeLayoutTitle,
   startCreateLayout,
   startImportLayout,
 } from './utils';
 
-export default defineComponent({
-  name: 'BreweryPage',
-  props: {
-    routeId: {
-      type: String,
-      default: '',
-    },
-  },
-  setup(props) {
-    const { dense } = useGlobals.setup();
-    const router = useRouter();
-    const { localStorage } = useQuasar();
-    const { preselectable, preselectedId, preselect } = usePreselect.setup();
-
-    const layoutId = computed<string | null>(() => props.routeId);
-
-    useMetrics.setupProvider(layoutId);
-    const { layout, orderedParts, updateParts, reflow } =
-      useFlowParts.setup(layoutId);
-
-    const gridDimensions = computed<UseSvgZoomDimensions>(() => ({
-      width: coord2grid(layout.value?.width || 10),
-      height: coord2grid(layout.value?.height || 10),
-    }));
-
-    const { svgRef, svgContentRef, resetZoom } =
-      useSvgZoom.setup(gridDimensions);
-
-    const layoutTitle = computed<string>(
-      () => layout.value?.title ?? 'Builder layout',
-    );
-
-    function selectLayout(id: string): void {
-      router.push(`/brewery/${id}`).catch(() => {});
-    }
-
-    function patchPart(id: string, patch: Partial<BuilderPart>): void {
-      updateParts((draft) => {
-        const part = draft[id];
-        draft[id] = { ...part, ...patch, id };
-      });
-    }
-
-    function patchPartSettings(
-      id: string,
-      patch: Partial<BuilderPart['settings']>,
-    ): void {
-      updateParts((draft) => {
-        const part = draft[id];
-        part.settings = { ...part.settings, ...patch };
-      });
-    }
-
-    function editTitle(): void {
-      startChangeLayoutTitle(layout.value);
-    }
-
-    async function importLayout(): Promise<void> {
-      startImportLayout((id) => selectLayout(id));
-    }
-
-    watch(
-      () => layoutTitle.value,
-      (title) => (document.title = `Brewblox | ${title}`),
-      { immediate: true },
-    );
-
-    watch(
-      () => layoutId.value,
-      () => {
-        try {
-          localStorage.set('brewery-page', layoutId.value);
-        } catch (e) {
-          /* ignore */
-        }
-      },
-    );
-
-    return {
-      coord2grid,
-      dense,
-      layoutId,
-      layout,
-      layoutTitle,
-      editTitle,
-      startCreateLayout,
-      importLayout,
-      svgRef,
-      svgContentRef,
-      resetZoom,
-      coord2translate,
-      preselectable,
-      preselectedId,
-      preselect,
-      startupDone,
-      orderedParts,
-      patchPart,
-      patchPartSettings,
-      reflow,
-    };
+const props = defineProps({
+  routeId: {
+    type: String,
+    default: '',
   },
 });
+
+const router = useRouter();
+const { localStorage } = useQuasar();
+const { preselectable, preselectedId, preselect } = usePreselect.setup();
+
+const layoutId = computed<string | null>(() => props.routeId);
+
+useMetrics.setupProvider(layoutId);
+const { layout, orderedParts, updateParts, reflow } =
+  useFlowParts.setup(layoutId);
+
+const gridDimensions = computed<UseSvgZoomDimensions>(() => ({
+  width: coord2grid(layout.value?.width || 10),
+  height: coord2grid(layout.value?.height || 10),
+}));
+
+const { svgRef, svgContentRef, resetZoom } = useSvgZoom.setup(gridDimensions);
+
+const layoutTitle = computed<string>(
+  () => layout.value?.title ?? 'Builder layout',
+);
+
+function selectLayout(id: string): void {
+  router.push(`/brewery/${id}`).catch(() => {});
+}
+
+function patchPart(id: string, patch: Partial<BuilderPart>): void {
+  updateParts((draft) => {
+    const part = draft[id];
+    draft[id] = { ...part, ...patch, id };
+  });
+}
+
+function patchPartSettings(
+  id: string,
+  patch: Partial<BuilderPart['settings']>,
+): void {
+  updateParts((draft) => {
+    const part = draft[id];
+    part.settings = { ...part.settings, ...patch };
+  });
+}
+
+function editTitle(): void {
+  startChangeLayoutTitle(layout.value);
+}
+
+async function importLayout(): Promise<void> {
+  startImportLayout((id) => selectLayout(id));
+}
+
+watch(
+  () => layoutTitle.value,
+  (title) => (document.title = `Brewblox | ${title}`),
+  { immediate: true },
+);
+
+watch(
+  () => layoutId.value,
+  () => {
+    try {
+      localStorage.set('brewery-page', layoutId.value);
+    } catch (e) {
+      /* ignore */
+    }
+  },
+);
 </script>
 
 <template>

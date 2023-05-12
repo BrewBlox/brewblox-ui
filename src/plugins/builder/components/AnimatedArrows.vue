@@ -1,62 +1,49 @@
-<script lang="ts">
+<script setup lang="ts">
 import { svgPathProperties } from 'svg-path-properties';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'AnimatedArrows',
-  props: {
-    path: {
-      type: String,
-      required: true,
-    },
-    speed: {
-      type: Number,
-      default: 0,
-    },
-    numArrows: {
-      type: Number,
-      default: 2,
-    },
+const props = defineProps({
+  path: {
+    type: String,
+    required: true,
   },
-  setup(props) {
-    const pathLength = computed<number>(() =>
-      new svgPathProperties(props.path).getTotalLength(),
-    );
-
-    const duration = computed<number>(() => {
-      if (props.speed && pathLength.value) {
-        return pathLength.value / (25 * Math.abs(props.speed));
-      }
-      return 0;
-    });
-
-    const reversed = computed<boolean>(() => props.speed < 0);
-
-    const starts = computed<string[]>(() => {
-      const interval = duration.value / props.numArrows;
-      return [...Array(props.numArrows).keys()].map(
-        (idx) => `${idx * interval}s`,
-      );
-    });
-
-    const transform = computed<string>(
-      // Flips the arrow
-      () => (reversed.value ? 'scale (-1, 1)' : ''),
-    );
-
-    const keyPoints = computed<string>(
-      // Makes the arrow travel end-to-start
-      () => (reversed.value ? '1;0' : '0;1'),
-    );
-
-    return {
-      duration,
-      starts,
-      transform,
-      keyPoints,
-    };
+  speed: {
+    type: Number,
+    default: 0,
+  },
+  numArrows: {
+    type: Number,
+    default: 2,
   },
 });
+
+const pathLength = computed<number>(() =>
+  new svgPathProperties(props.path).getTotalLength(),
+);
+
+const duration = computed<number>(() => {
+  if (props.speed && pathLength.value) {
+    return pathLength.value / (25 * Math.abs(props.speed));
+  }
+  return 0;
+});
+
+const reversed = computed<boolean>(() => props.speed < 0);
+
+const starts = computed<string[]>(() => {
+  const interval = duration.value / props.numArrows;
+  return [...Array(props.numArrows).keys()].map((idx) => `${idx * interval}s`);
+});
+
+const transform = computed<string>(
+  // Flips the arrow
+  () => (reversed.value ? 'scale (-1, 1)' : ''),
+);
+
+const keyPoints = computed<string>(
+  // Makes the arrow travel end-to-start
+  () => (reversed.value ? '1;0' : '0;1'),
+);
 </script>
 
 <template>

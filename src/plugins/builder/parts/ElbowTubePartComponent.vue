@@ -1,7 +1,7 @@
-<script lang="ts">
+<script setup lang="ts">
 import { RIGHT } from '@/plugins/builder/const';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart } from '../composables';
 
 const paths = {
@@ -12,28 +12,15 @@ const paths = {
   liquid: [`M25,0 v17 ${elbow(8, 8, false)} H50`],
 };
 
-export default defineComponent({
-  name: 'ElbowTubePartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const flowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, RIGHT),
-    );
+const flowSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, RIGHT),
+);
 
-    const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, RIGHT),
-    );
-
-    return {
-      width,
-      height,
-      paths,
-      flowSpeed,
-      liquids,
-    };
-  },
-});
+const liquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, RIGHT),
+);
 </script>
 
 <template>

@@ -1,5 +1,5 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import {
   DEFAULT_SHELF_Y,
   DEFAULT_SIZE,
@@ -11,28 +11,11 @@ import { usePart } from '../composables';
 import { LABEL_KEY } from '../const';
 import { coord2grid } from '../utils';
 
-export default defineComponent({
-  name: 'FridgePartComponent',
-  setup() {
-    const { settings, width, height } = usePart.setup();
+const { settings, width, height } = usePart.setup();
 
-    const shelfHeight = computed<number>(() =>
-      coord2grid(settings.value[SHELF_Y_KEY] || DEFAULT_SHELF_Y),
-    );
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      SHELF_Y_KEY,
-      DEFAULT_SHELF_Y,
-      LABEL_KEY,
-      width,
-      height,
-      shelfHeight,
-    };
-  },
-});
+const shelfHeight = computed<number>(() =>
+  coord2grid(settings.value[SHELF_Y_KEY] || DEFAULT_SHELF_Y),
+);
 </script>
 
 <template>
