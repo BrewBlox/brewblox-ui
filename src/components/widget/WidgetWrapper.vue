@@ -9,8 +9,8 @@ import {
   VolatileKey,
   WidgetKey,
 } from '@/symbols';
-import { deepCopy } from '@/utils/objects';
 import { startChangeWidgetTitle, startRemoveWidget } from '@/utils/widgets';
+import cloneDeep from 'lodash/cloneDeep';
 import {
   computed,
   defineComponent,
@@ -61,7 +61,7 @@ export default defineComponent({
       emit('update:widget', { ...props.widget, ...patch }),
     );
 
-    provide(ContextKey, reactive<WidgetContext>(deepCopy(props.context)));
+    provide(ContextKey, reactive<WidgetContext>(cloneDeep(props.context)));
 
     provide(InvalidateKey, (reason?: string) => {
       error.value = reason ?? 'Unknown error';

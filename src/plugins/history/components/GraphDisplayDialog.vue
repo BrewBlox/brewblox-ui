@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import { defaultLabel } from '../nodes';
 import { GraphAxis, GraphConfig } from '../types';
@@ -23,7 +23,7 @@ export default defineComponent({
     const { dialogProps, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
 
-    const local = reactive(deepCopy(props.config));
+    const local = reactive(cloneDeep(props.config));
     const axisOpts: SelectOption<GraphAxis>[] = [
       {
         value: 'y',

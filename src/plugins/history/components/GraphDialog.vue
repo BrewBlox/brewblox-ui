@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, reactive, ref } from 'vue';
 import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
@@ -45,7 +45,7 @@ export default defineComponent({
 
     // Dialog props are not reactive.
     // We'll keep changes cached locally, and assume the parent applies them unchanged
-    const localConfig = reactive(deepCopy(props.config));
+    const localConfig = reactive(cloneDeep(props.config));
 
     function saveLocalParams(params: QueryParams): void {
       localConfig.params = params;

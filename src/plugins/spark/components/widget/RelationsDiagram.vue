@@ -1,10 +1,11 @@
 <script lang="ts">
 import { BlockRelationNode } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
-import { deepCopy, isJsonEqual } from '@/utils/objects';
+import { isJsonEqual } from '@/utils/objects';
 import { BlockRelation } from 'brewblox-proto/ts';
 import * as d3 from 'd3';
 import ELK, { ElkExtendedEdge, ElkNode } from 'elkjs/lib/elk.bundled';
+import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import toFinite from 'lodash/toFinite';
 import { defineComponent, onMounted, PropType, ref, watch } from 'vue';
@@ -117,8 +118,8 @@ export default defineComponent({
         return;
       }
 
-      nodes = deepCopy(nodes);
-      edges = deepCopy(edges);
+      nodes = cloneDeep(nodes);
+      edges = cloneDeep(edges);
 
       renderedNodes.value = nodes;
       renderedEdges.value = edges;

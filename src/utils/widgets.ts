@@ -4,7 +4,7 @@ import { useWidgetStore, Widget } from '@/store/widgets';
 import { nanoid } from 'nanoid';
 import { createDialog } from './dialog';
 import { notify } from './notify';
-import { deepCopy } from './objects';
+import { cloneDeep } from './objects';
 
 export function startChangeWidgetTitle(widget: Widget): void {
   const widgetTitle = widget.title;
@@ -41,7 +41,7 @@ export function startCopyWidget(widget: Widget): void {
   }).onOk((dashboard: string) => {
     if (dashboard) {
       useWidgetStore().appendWidget({
-        ...deepCopy(widget),
+        ...cloneDeep(widget),
         id,
         dashboard,
         pinnedPosition: null,

@@ -22,12 +22,10 @@ const { context, inDialog } = useContext.setup();
 const { widgetId, widget, config, patchWidget } =
   useWidget.setup<Widget<GraphConfig>>();
 
-function cloned(): GraphConfig {
-  return cloneDeep(defaults(config.value, emptyGraphConfig()));
-}
-
 const presets = defaultPresets();
-const renderedConfig = ref(cloned());
+const renderedConfig = ref(
+  cloneDeep(defaults(config.value, emptyGraphConfig())),
+);
 
 // Separate IDs for graphs in widget and dialog wrapper
 // This prevents source create/delete race conditions when switching

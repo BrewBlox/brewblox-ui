@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useWidgetStore, Widget } from '@/store/widgets';
-import { deepCopy } from '@/utils/objects';
 import clamp from 'lodash/clamp';
+import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE, MIN_COLS, MIN_ROWS } from './const';
@@ -37,11 +37,11 @@ export default defineComponent({
       () => widgetStore.widgetById(props.widgetId)!,
     );
 
-    const localWidget = ref<Widget>(deepCopy(widget.value));
+    const localWidget = ref<Widget>(cloneDeep(widget.value));
 
     watch(
       () => widget.value,
-      (v) => (localWidget.value = deepCopy(v)),
+      (v) => (localWidget.value = cloneDeep(v)),
     );
 
     const resizing = ref(false);

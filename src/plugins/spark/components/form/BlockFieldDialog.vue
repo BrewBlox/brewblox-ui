@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
 import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
-import { deepCopy } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 export default defineComponent({
@@ -35,7 +35,7 @@ export default defineComponent({
       onDialogOK(local.value);
     }
 
-    onBeforeMount(() => (local.value = deepCopy(props.modelValue)));
+    onBeforeMount(() => (local.value = cloneDeep(props.modelValue)));
 
     return {
       dialogRef,

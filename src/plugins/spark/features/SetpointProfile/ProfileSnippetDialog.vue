@@ -2,9 +2,9 @@
 import { useDialog } from '@/composables';
 import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 import { BlockType, SetpointProfileBlock } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
@@ -27,7 +27,7 @@ export default defineComponent({
       useDialog.setup();
 
     const selected = ref<SelectOption | null>(null);
-    const block = ref<SetpointProfileBlock>(deepCopy(props.block));
+    const block = ref<SetpointProfileBlock>(cloneDeep(props.block));
 
     const options = computed<SelectOption[]>(() =>
       snippetStore.blockSnippets
@@ -66,7 +66,7 @@ export default defineComponent({
       }
       const { value } = selected.value;
       const snippet = snippetStore.snippetById(value)!;
-      const points = deserialize(deepCopy(snippet.data.points));
+      const points = deserialize(cloneDeep(snippet.data.points));
 
       createDialog({
         component: 'ConfirmDialog',
@@ -99,7 +99,7 @@ export default defineComponent({
       const { value } = selected.value;
       const snippet = snippetStore.snippetById(value)!;
       snippet.data = {
-        points: deepCopy(block.value.data.points),
+        points: cloneDeep(block.value.data.points),
       };
       await snippetStore.saveSnippet(snippet);
       onDialogOK();
@@ -118,7 +118,7 @@ export default defineComponent({
           name,
           type: typeName,
           data: {
-            points: deepCopy(block.value.data.points),
+            points: cloneDeep(block.value.data.points),
           },
         });
         onDialogOK();

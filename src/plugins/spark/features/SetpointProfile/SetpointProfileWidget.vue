@@ -2,9 +2,10 @@
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createComponentDialog } from '@/utils/dialog';
-import { deepCopy, isJsonEqual } from '@/utils/objects';
+import { isJsonEqual } from '@/utils/objects';
 import { prettyLink } from '@/utils/quantity';
 import { Link, SetpointProfileBlock } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';
@@ -29,7 +30,7 @@ export default defineComponent({
     const { context, inDialog } = useContext.setup();
     const { block, patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
-    const usedData = ref<SetpointProfileData>(deepCopy(block.value.data));
+    const usedData = ref<SetpointProfileData>(cloneDeep(block.value.data));
     const revision = ref<Date>(new Date());
 
     const target = computed<Link>(() => block.value.data.targetId);
@@ -39,7 +40,7 @@ export default defineComponent({
     );
 
     function refresh(): void {
-      usedData.value = deepCopy(block.value.data);
+      usedData.value = cloneDeep(block.value.data);
       revision.value = new Date();
     }
 

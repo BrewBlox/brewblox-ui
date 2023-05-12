@@ -4,9 +4,9 @@ import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { filterById, spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 import { Block } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, ref } from 'vue';
 import QuickActionChange from './QuickActionChange.vue';
@@ -49,7 +49,7 @@ export default defineComponent({
           id: nanoid(),
           name: `${action.name} (copy)`,
           changes: action.changes.map((change) => ({
-            ...deepCopy(change),
+            ...cloneDeep(change),
             id: nanoid(),
           })),
         },

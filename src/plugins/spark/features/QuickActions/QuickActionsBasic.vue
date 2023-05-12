@@ -5,10 +5,10 @@ import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
-import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 import { prettyAny } from '@/utils/quantity';
 import type { Block } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, ref } from 'vue';
 import {
@@ -139,7 +139,7 @@ export default defineComponent({
 
       const applied: AppliedChange[] = action.changes.map((c) => ({
         block: blockByChange(c)!,
-        patch: deepCopy(c.data),
+        patch: cloneDeep(c.data),
         confirmed: Object.entries(c.confirmed)
           .filter(([, v]) => v === true)
           .map(([k]) => k),

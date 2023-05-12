@@ -6,9 +6,9 @@ import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
-import { deepCopy } from '@/utils/objects';
 import { clampRotation } from '@/utils/quantity';
 import * as d3 from 'd3';
+import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
@@ -19,7 +19,6 @@ import {
   onBeforeUnmount,
   provide,
   ref,
-  UnwrapRef,
   watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
@@ -91,7 +90,7 @@ const gridHoverPos = ref<XYPosition | null>(null);
 const partDragStart = ref<XYPosition | null>(null);
 
 const selectedIds = ref<string[]>([]);
-const floater = ref<UnwrapRef<Floater> | null>(null);
+const floater = ref<Floater | null>(null);
 
 const focusWarningEnabled = computed<boolean>({
   get: () => builderStore.focusWarningEnabled,
@@ -208,7 +207,7 @@ function isFloating(id: string): boolean {
 }
 
 function makeFloater(source: Floater): void {
-  floater.value = deepCopy(source);
+  floater.value = cloneDeep(source);
   moveFloater(source);
 }
 
@@ -228,7 +227,7 @@ function dropFloater(coords: XYPosition | null): void {
   }
 
   if (coords) {
-    const sourceParts = floater.value.parts;
+    const sourceParts = [...floater.value.parts];
     const offset: AreaSize = {
       width: floater.value.width / 2,
       height: floater.value.height / 2,
@@ -284,7 +283,7 @@ function findPartAtCoords(coords: XYPosition | null): BuilderPart | null {
         coords.y >= part.y &&
         coords.y < part.y + height
       ) {
-        return deepCopy(part);
+        return cloneDeep(part);
       }
     }
   }
@@ -298,7 +297,7 @@ function findHoveredPart(): BuilderPart | null {
 function findActiveParts(alwaysIncludeSelected = false): BuilderPart[] {
   const hovered = findHoveredPart();
   const selected = selectedIds.value
-    .map((id) => deepCopy(parts.value[id]))
+    .map((id) => cloneDeep(parts.value[id]))
     .filter((part) => part != null);
 
   if (hovered) {
@@ -772,7 +771,7 @@ const gridDragHandler = d3
 
     const { altKey, shiftKey } = evt;
 
-    const sourceIds = deepCopy(selectedIds.value);
+    const sourceIds = cloneDeep(selectedIds.value);
     const targetIds = orderedParts.value
       .filter(makeSelectAreaFilter())
       .map((v) => v.id);

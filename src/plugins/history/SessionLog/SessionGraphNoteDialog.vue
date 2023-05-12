@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, ref } from 'vue';
 import { SessionGraphNote } from '../types';
 
@@ -20,7 +20,7 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
-    const local = ref<NoteDates>(deepCopy(props.modelValue));
+    const local = ref<NoteDates>(cloneDeep(props.modelValue));
 
     function save(): void {
       onDialogOK(local.value);

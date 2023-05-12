@@ -38,9 +38,12 @@ const interactionAllowed = inject(
 const style = computed<CSSProperties>(() => {
   const styleObj: CSSProperties = {};
 
-  if (interactionAllowed.value && props.onInteract != null) {
-    styleObj.cursor = 'pointer';
+  if (interactionAllowed.value) {
     styleObj.pointerEvents = 'auto';
+
+    if (props.onInteract != null) {
+      styleObj.cursor = 'pointer';
+    }
   }
 
   return styleObj;

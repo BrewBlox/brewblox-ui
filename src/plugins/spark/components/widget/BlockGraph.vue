@@ -1,7 +1,7 @@
 <script lang="ts">
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
-import { deepCopy, isJsonEqual } from '@/utils/objects';
+import { cloneDeep, isJsonEqual } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
 import isObject from 'lodash/isObject';
 import isString from 'lodash/isString';
@@ -38,7 +38,7 @@ export default defineComponent({
       ...props.config,
     }));
 
-    const renderedConfig = ref<GraphConfig>(deepCopy(graphConfig.value));
+    const renderedConfig = ref<GraphConfig>(cloneDeep(graphConfig.value));
 
     const graphTitle = computed<string>(() => {
       const actual = graphConfig.value.layout.title;
@@ -55,7 +55,7 @@ export default defineComponent({
       () => graphConfig.value,
       (newV) => {
         if (!isJsonEqual(newV, renderedConfig.value)) {
-          renderedConfig.value = deepCopy(newV);
+          renderedConfig.value = cloneDeep(newV);
           sourceRevision.value = new Date();
         }
       },
