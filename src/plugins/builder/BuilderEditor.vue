@@ -350,11 +350,11 @@ function clear(): void {
 // Tools
 ////////////////////////////////////////////////////////////////
 
-function usePan(): void {
+function toolPan(): void {
   activeToolId.value = 'pan';
 }
 
-function useSelect(): void {
+function toolSelect(): void {
   if (activeToolId.value !== 'select') {
     activeToolId.value = 'select';
   } else {
@@ -365,12 +365,12 @@ function useSelect(): void {
   }
 }
 
-function useGridResize(): void {
+function toolGridResize(): void {
   activeToolId.value = 'gridresize';
   cancelFloater();
 }
 
-function useAdd(): void {
+function toolAdd(): void {
   if (!floater.value) {
     createDialog({
       component: 'BuilderCatalogDialog',
@@ -389,7 +389,7 @@ function useAdd(): void {
   }
 }
 
-function useMove(src: ToolSource): void {
+function toolMove(src: ToolSource): void {
   if (activeToolId.value !== 'move') {
     activeToolId.value = 'move';
     cancelFloater();
@@ -427,7 +427,7 @@ function useMove(src: ToolSource): void {
   }
 }
 
-function useCopy(src: ToolSource): void {
+function toolCopy(src: ToolSource): void {
   if (activeToolId.value !== 'copy') {
     activeToolId.value = 'copy';
     cancelFloater();
@@ -465,7 +465,7 @@ function useCopy(src: ToolSource): void {
   }
 }
 
-function useRotate(): void {
+function toolRotate(): void {
   if (floater.value) {
     if (floater.value.parts.length === 1) {
       const part = floater.value.parts[0];
@@ -483,7 +483,7 @@ function useRotate(): void {
   }
 }
 
-function useFlip(): void {
+function toolFlip(): void {
   if (floater.value) {
     if (floater.value.parts.length === 1) {
       const part = floater.value.parts[0];
@@ -501,14 +501,14 @@ function useFlip(): void {
   }
 }
 
-function useInteract(): void {
+function toolInteract(): void {
   activeToolId.value = 'interact';
   if (floater.value) {
     cancelFloater();
   }
 }
 
-function useDelete(): void {
+function toolDelete(): void {
   if (activeToolId.value !== 'delete') {
     activeToolId.value = 'delete';
     cancelFloater();
@@ -532,7 +532,7 @@ function useDelete(): void {
   }
 }
 
-function useUndo(): void {
+function toolUndo(): void {
   if (floater.value) {
     cancelFloater();
   } else {
@@ -540,7 +540,7 @@ function useUndo(): void {
   }
 }
 
-function useRedo(): void {
+function toolRedo(): void {
   if (floater.value) {
     cancelFloater();
   } else {
@@ -549,21 +549,21 @@ function useRedo(): void {
 }
 
 const builderToolActions: Record<BuilderToolName, (src: ToolSource) => void> = {
-  pan: usePan,
-  select: useSelect,
-  gridresize: useGridResize,
-  add: useAdd,
-  move: useMove,
-  copy: useCopy,
-  rotate: useRotate,
-  flip: useFlip,
-  interact: useInteract,
-  delete: useDelete,
-  undo: useUndo,
-  redo: useRedo,
+  pan: toolPan,
+  select: toolSelect,
+  gridresize: toolGridResize,
+  add: toolAdd,
+  move: toolMove,
+  copy: toolCopy,
+  rotate: toolRotate,
+  flip: toolFlip,
+  interact: toolInteract,
+  delete: toolDelete,
+  undo: toolUndo,
+  redo: toolRedo,
 };
 
-function useTool(name: BuilderToolName, src: ToolSource): void {
+function applyTool(name: BuilderToolName, src: ToolSource): void {
   const action = builderToolActions[name];
   if (action) {
     action(src);
@@ -670,7 +670,7 @@ function keyHandler(evt: KeyboardEvent): void {
     deltaMove(keyDelta);
   } else if (tool) {
     if (!disabledTools.value.includes(tool.value)) {
-      useTool(tool.value, 'shortcut');
+      applyTool(tool.value, 'shortcut');
     }
   } else {
     return; // not handled - don't stop propagation
@@ -889,7 +889,7 @@ function definePartEventHandlers(
     ].includes(tool)
   ) {
     partSelection.on('click', function (evt: Event) {
-      builderToolActions[tool]('click');
+      applyTool(tool, 'click');
       evt.stopPropagation();
     });
   } else {
@@ -1105,7 +1105,7 @@ onBeforeUnmount(() => {
         v-model:expanded="toolsMenuExpanded"
         :active-tool="activeToolId"
         :disabled-tools="disabledTools"
-        @use="(v) => useTool(v, 'menu')"
+        @use="(v) => applyTool(v, 'menu')"
         @touchstart.stop
         @mousedown.stop
       />

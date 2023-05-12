@@ -1,8 +1,9 @@
 <script lang="ts">
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
-import { cloneDeep, isJsonEqual } from '@/utils/objects';
+import { isJsonEqual } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
+import cloneDeep from 'lodash/cloneDeep';
 import isObject from 'lodash/isObject';
 import isString from 'lodash/isString';
 import { Layout } from 'plotly.js';

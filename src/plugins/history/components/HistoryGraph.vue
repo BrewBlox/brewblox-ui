@@ -4,6 +4,7 @@ import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 import { defaultPresets } from '@/plugins/history/utils';
 import { isJsonEqual } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import { Layout, PlotData } from 'plotly.js';
 import {
@@ -62,11 +63,11 @@ const revision = ref(new Date());
 const displayRef = ref(null);
 
 function saveParams(params: QueryParams): void {
-  emit('params', structuredClone(params));
+  emit('params', cloneDeep(params));
 }
 
 function saveLayout(layout: Partial<Layout>): void {
-  emit('layout', structuredClone(layout));
+  emit('layout', cloneDeep(layout));
 }
 
 function isActivePreset(preset: QueryParams): boolean {
