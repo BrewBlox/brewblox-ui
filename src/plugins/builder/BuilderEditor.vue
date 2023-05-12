@@ -49,6 +49,7 @@ import {
 } from './utils';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>;
+type SVGDragEvent = d3.D3DragEvent<SVGElement, unknown, unknown>;
 
 type ToolSource = 'shortcut' | 'menu' | 'click';
 
@@ -437,7 +438,6 @@ function toolCopy(src: ToolSource): void {
   if (src === 'menu') {
     return;
   }
-
   if (floater.value) {
     dropFloater(floater.value);
     return;
@@ -682,7 +682,7 @@ function keyHandler(evt: KeyboardEvent): void {
 }
 
 // Return the exact position of the current event
-function d3EventPos(evt: Event): XYPosition {
+function d3EventPos(evt: Event | { sourceEvent: Event }): XYPosition {
   const [x, y] = d3.pointer(evt, svgContentRef.value!);
   return { x, y };
 }
@@ -700,9 +700,9 @@ function gridHoverHandler(selection: SVGSelection): SVGSelection {
     });
 }
 
-const gridResizeDragHandler = d3
+const gridResizeDragBehavior = d3
   .drag<SVGElement, unknown>()
-  .on('start', (evt) => {
+  .on('start', (evt: SVGDragEvent) => {
     const { x, y } = d3EventPos(evt);
     const sqX = coord2grid(grid2coord(x));
     const sqY = coord2grid(grid2coord(y));
@@ -713,7 +713,7 @@ const gridResizeDragHandler = d3
       endY: sqY,
     });
   })
-  .on('drag', (evt) => {
+  .on('drag', (evt: SVGDragEvent) => {
     const { x, y } = d3EventPos(evt);
     const sqX = coord2grid(grid2coord(x));
     const sqY = coord2grid(grid2coord(y));
@@ -745,10 +745,10 @@ const gridResizeDragHandler = d3
     }
   });
 
-const gridDragHandler = d3
+const gridDragBehavior = d3
   .drag<SVGElement, unknown>()
   .clickDistance(25)
-  .on('start', (evt) => {
+  .on('start', (evt: SVGDragEvent) => {
     if (!floater.value) {
       const { x, y } = d3EventPos(evt);
       startDragSelect({
@@ -759,17 +759,18 @@ const gridDragHandler = d3
       });
     }
   })
-  .on('drag', (evt) => {
+  .on('drag', (evt: SVGDragEvent) => {
     const { x, y } = d3EventPos(evt);
     updateDragSelect(x, y);
   })
-  .on('end', async (evt) => {
+  .on('end', (evt: SVGDragEvent) => {
     if (floater.value) {
       dropFloater(toFractionCoords(d3EventPos(evt)));
+      evt.sourceEvent.stopPropagation();
       return;
     }
 
-    const { altKey, shiftKey } = evt;
+    const { altKey, shiftKey } = evt.sourceEvent;
 
     const sourceIds = cloneDeep(selectedIds.value);
     const targetIds = orderedParts.value
@@ -792,16 +793,16 @@ const gridDragHandler = d3
     stopDragSelect();
   });
 
-const partDragHandler = d3
+const partDragBehavior = d3
   .drag()
   .clickDistance(25)
-  .on('start', (evt) => {
+  .on('start', (evt: SVGDragEvent) => {
     // We're not sure yet whether this is a drag or a click
     // The action becomes a drag once the mouse leaves the square
-    // The action is a click if the mouseup event is in the same square
+    // The action is a click if the end event is in the same square
     partDragStart.value = toCoords(d3EventPos(evt));
   })
-  .on('drag', function (this: Element, evt) {
+  .on('drag', function (this: Element, evt: SVGDragEvent) {
     const pos = d3EventPos(evt);
     const coords = toCoords(pos);
     const start = partDragStart.value;
@@ -809,10 +810,12 @@ const partDragHandler = d3
     // We're already dragging.
     if (floater.value) {
       moveFloater(toFractionCoords(pos));
+      return;
     }
+
     // Check if the drag event has left the initial square
     // Create a floater when this happens
-    else if (start && !isEqual(start, coords)) {
+    if (start && !isEqual(start, coords)) {
       const targetId = this.getAttribute('part-id')!;
       const relevantIds = selectedIds.value.includes(targetId)
         ? [...selectedIds.value]
@@ -835,70 +838,74 @@ const partDragHandler = d3
       });
     }
   })
-  .on('end', (evt) => {
+  .on('end', (evt: SVGDragEvent) => {
     partDragStart.value = null;
-    dropFloater(toFractionCoords(d3EventPos(evt)));
+
+    if (floater.value) {
+      dropFloater(toFractionCoords(d3EventPos(evt)));
+      evt.sourceEvent.stopPropagation();
+    } else {
+      const tool = activeToolId.value;
+      switch (tool) {
+        case 'select':
+        case 'add':
+        case 'move':
+        case 'copy':
+        case 'rotate':
+        case 'flip':
+        case 'delete':
+          applyTool(tool, 'click');
+          evt.sourceEvent.stopPropagation();
+          break;
+        default:
+          break;
+      }
+    }
   });
 
-function defineGridEventHandlers(
+function assignGridEventHandlers(
   el: SVGElement,
   tool: BuilderToolName | null,
 ): void {
   const selection = d3.select(el);
   selection.call(gridHoverHandler);
 
-  selection.on('click', (evt) => {
-    if (floater.value) {
-      dropFloater(toFractionCoords(d3EventPos(evt)));
-    }
-  });
-
-  if (tool && ['select', 'copy', 'move', 'delete'].includes(tool)) {
-    selection.call(gridDragHandler);
-  } else if (tool === 'gridresize') {
-    selection.call(gridResizeDragHandler);
-  } else {
-    // pan is handled by useSvgZoom
-    selection.on('.drag', null);
+  switch (tool) {
+    case 'select':
+    case 'copy':
+    case 'move':
+    case 'delete':
+      selection.call(gridDragBehavior);
+      break;
+    case 'gridresize':
+      selection.call(gridResizeDragBehavior);
+      break;
+    default:
+      // pan is handled by useSvgZoom
+      selection.on('.drag', null);
+      break;
   }
 }
 
-function definePartEventHandlers(
+function assignPartEventHandlers(
   el: SVGElement,
   tool: BuilderToolName | null,
 ): void {
-  const partSelection = d3.select(el).selectAll<Element, any>('.flowpart');
+  const selection = d3.select(el).selectAll<Element, any>('.flowpart');
 
-  if (tool === 'move' || tool === 'copy') {
-    partSelection.call(partDragHandler);
-  } else {
-    partSelection.on('.drag', null);
-  }
-
-  if (
-    tool &&
-    [
-      'select',
-      'new',
-      'move',
-      'copy',
-      'rotate',
-      'flip',
-      'edit',
-      'delete',
-    ].includes(tool)
-  ) {
-    partSelection.on('click', function (evt: Event) {
-      applyTool(tool, 'click');
-      evt.stopPropagation();
-    });
-  } else {
-    partSelection.on('click', null);
+  switch (tool) {
+    case 'copy':
+    case 'move':
+      selection.call(partDragBehavior);
+      break;
+    default:
+      selection.on('.drag', null);
+      break;
   }
 }
 
 watch(
-  () => layoutId.value,
+  layoutId,
   (newV, oldV) => {
     if (newV !== oldV) {
       clearUndoStack();
@@ -910,14 +917,20 @@ watch(
 );
 
 watch(
-  () => layoutTitle.value,
-  (title) => (document.title = `Brewblox | ${title}`),
+  layoutTitle,
+  (title) => {
+    document.title = `Brewblox | ${title}`;
+  },
   { immediate: true },
 );
 
 watch(
   [svgRef, activeToolId],
-  ([el, tool]) => el && defineGridEventHandlers(el, tool),
+  ([el, tool]) => {
+    if (el) {
+      assignGridEventHandlers(el, tool);
+    }
+  },
   { immediate: true },
 );
 
@@ -926,7 +939,7 @@ watch(
   async ([el, tool]) => {
     await nextTick();
     if (el) {
-      definePartEventHandlers(el, tool);
+      assignPartEventHandlers(el, tool);
     }
   },
   { immediate: true },
