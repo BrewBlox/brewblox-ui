@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useContext, useWidget } from '@/composables';
+import { useContext, useGlobals, useWidget } from '@/composables';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
 import { Widget } from '@/store/widgets';
@@ -16,9 +16,8 @@ import { useRouter } from 'vue-router';
 import { addBlockGraph, selectSessionGraph } from './utils';
 
 const router = useRouter();
-
+const { dense } = useGlobals.setup();
 const { context, inDialog } = useContext.setup();
-
 const { widgetId, widget, config, patchWidget } =
   useWidget.setup<Widget<GraphConfig>>();
 
@@ -37,11 +36,6 @@ const widgetGraphRef = ref();
 
 const sourceRevision = ref<Date>(new Date());
 const renderRevision = ref<Date>(new Date());
-
-async function refresh(): Promise<void> {
-  await nextTick();
-  renderRevision.value = new Date();
-}
 
 async function regraph(): Promise<void> {
   await nextTick();
@@ -126,8 +120,8 @@ watch(
           sourceRevision,
           renderRevision,
         }"
-        use-presets
-        use-range
+        control-presets
+        control-range
         class="fit"
         @params="saveParams"
         @layout="saveLayout"
@@ -197,19 +191,16 @@ watch(
     </template>
 
     <template v-if="context.mode === 'Basic'">
-      <q-resize-observer
-        :debounce="200"
-        @resize="refresh"
-      />
       <HistoryGraph
         ref="widgetGraphRef"
         :graph-id="widgetGraphId"
-        class="fit"
+        :static="dense"
         v-bind="{
           config,
           sourceRevision,
           renderRevision,
         }"
+        class="fit"
       />
     </template>
 

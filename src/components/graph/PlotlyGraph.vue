@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useGlobals } from '@/composables';
 import { Y2_COLOR } from '@/plugins/history/const';
 import { GraphAnnotation } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
+import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
 import Plotly, {
@@ -14,7 +14,6 @@ import Plotly, {
   PlotlyHTMLElement,
   PlotMouseEvent,
 } from 'plotly.js';
-import { debounce } from 'quasar';
 import {
   computed,
   onBeforeUnmount,
@@ -87,10 +86,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  interactable: {
-    type: Boolean,
-    default: true,
-  },
   autoResize: {
     type: Boolean,
     default: false,
@@ -99,25 +94,19 @@ const props = defineProps({
     type: Date,
     default: () => new Date(),
   },
+  static: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
   (e: 'annotations', data: GraphAnnotation[]);
 }>();
 
-// const emit = defineEmits<{
-//   // From this component
-//   (e: 'error', msg: string): void;
-
-//   // Forwarded from plotly
-//   // This is not an exhaustive list
-//   // more should be added if desired
-//   (e: 'plotly_click', evt: PlotMouseEvent): void;
-//   (e: 'plotly_clickannotation', evt: ClickAnnotationEvent): void;
-// }>();
-
-const { dense } = useGlobals.setup();
 const plotlyElement = ref<PlotlyHTMLElement>();
+const containerSize = ref<AreaSize>({ width: 200, height: 200 });
+
 let zoomed = false;
 let skippedRender = false;
 
@@ -125,34 +114,18 @@ const annotations = computed<GraphAnnotation[]>(
   () => props.layout.annotations ?? [],
 );
 
-function ifFinite(v: any): number | undefined {
-  return v != null && isFinite(v) ? v : undefined;
-}
-
-const layoutSize = computed<{ width?: number; height?: number }>(() => ({
-  width: ifFinite(props.layout.width),
-  height: ifFinite(props.layout.height),
+const layoutSize = computed<AreaSize>(() => ({
+  width: props.layout.width ?? 0,
+  height: props.layout.height ?? 0,
 }));
 
-function attachListeners(): void {
-  const el = plotlyElement.value;
-  if (!el) {
-    return;
-  }
-
-  el.on('plotly_relayout', onRelayout);
-  el.on('plotly_click', onClick);
-  el.on('plotly_doubleclick', onDoubleClick);
-  el.on('plotly_clickannotation', onAnnotationClick);
-}
-
-function calcSize(): { width: number; height: number } {
-  const { width, height } = layoutSize.value;
-  const rect = plotlyElement.value?.parentElement?.getBoundingClientRect();
+function calcSize(): AreaSize {
+  const lsize = layoutSize.value;
+  const csize = containerSize.value;
 
   return {
-    width: width || rect?.width || 200,
-    height: height || rect?.height || 200,
+    width: lsize.width || csize.width || 200,
+    height: lsize.height || csize.height || 200,
   };
 }
 
@@ -161,7 +134,7 @@ function combinedConfig(): Partial<Config> {
     {
       displaylogo: false,
       responsive: true,
-      staticPlot: dense.value && !props.maximized,
+      staticPlot: props.static,
       modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
       modeBarButtonsToAdd: [
         {
@@ -201,21 +174,25 @@ function combinedLayout(): Partial<Layout> {
     Partial<Layout>,
     Partial<Layout>,
     Partial<Layout>,
+    Partial<Layout>,
     Partial<Layout>
   >(
     layoutDefaults(),
     props.layout,
     calcSize(),
-    props.interactable ? {} : { dragmode: false, hovermode: false },
+    props.static ? { dragmode: false, hovermode: false } : {},
+    props.data.some((d) => d.yaxis === 'y2')
+      ? { xaxis: { domain: [0, 0.89] }, yaxis: { position: 0.9 } }
+      : { xaxis: { domain: [0, 0.94] }, yaxis: { position: 0.95 } },
   );
+}
+
+function displayError(msg: string): void {
+  notify.warn(`Failed to render graph: ${msg}`);
 }
 
 async function relayoutPlot(): Promise<void> {
   await Plotly.relayout(plotlyElement.value!, combinedLayout());
-}
-
-async function resizePlot(): Promise<void> {
-  Plotly.Plots.resize(plotlyElement.value!);
 }
 
 async function reactPlot(): Promise<void> {
@@ -227,9 +204,39 @@ async function reactPlot(): Promise<void> {
   );
 }
 
-function onRelayout(eventdata: Mapped<any>): void {
-  if (eventdata['xaxis.range[0]'] || eventdata['xaxis.range[1]']) {
-    zoomed = true;
+async function createPlot(): Promise<void> {
+  if (!plotlyElement.value) {
+    return;
+  }
+  try {
+    // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
+    await Plotly.newPlot(
+      plotlyElement.value,
+      props.data,
+      combinedLayout(),
+      combinedConfig(),
+    );
+    plotlyElement.value.on('plotly_relayout', onRelayout);
+    plotlyElement.value.on('plotly_click', onClick);
+    plotlyElement.value.on('plotly_doubleclick', onDoubleClick);
+    plotlyElement.value.on('plotly_clickannotation', onAnnotationClick);
+  } catch (e: any) {
+    displayError(e.message);
+  }
+}
+
+async function renderPlot(layoutChanged: boolean): Promise<void> {
+  if (!plotlyElement.value) {
+    return;
+  }
+  if (zoomed) {
+    skippedRender = true;
+    return;
+  }
+  try {
+    layoutChanged ? await relayoutPlot() : await reactPlot();
+  } catch (e: any) {
+    displayError(e.message);
   }
 }
 
@@ -265,7 +272,7 @@ function onDoubleClick(): void {
   zoomed = false;
   if (skippedRender) {
     skippedRender = false;
-    renderPlot();
+    renderPlot(false);
   }
 }
 
@@ -290,86 +297,52 @@ function onAnnotationClick(evt: ClickAnnotationEvent): void {
   });
 }
 
-function displayError(msg: string): void {
-  notify.warn(`Failed to render graph: ${msg}`);
-}
-
-async function createPlot(): Promise<void> {
-  if (!plotlyElement.value) {
-    return;
-  }
-  try {
-    // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
-    await Plotly.newPlot(
-      plotlyElement.value,
-      props.data,
-      combinedLayout(),
-      combinedConfig(),
-    );
-    attachListeners();
-  } catch (e: any) {
-    displayError(e.message);
+function onRelayout(eventdata: Mapped<any>): void {
+  if (eventdata['xaxis.range[0]'] || eventdata['xaxis.range[1]']) {
+    zoomed = true;
   }
 }
 
-async function renderPlot(layoutChanged = false): Promise<void> {
-  if (!plotlyElement.value) {
-    return;
-  }
-  if (zoomed) {
-    skippedRender = true;
-    return;
-  }
-  try {
-    layoutChanged ? await relayoutPlot() : await reactPlot();
-  } catch (e: any) {
-    displayError(e.message);
-  }
-}
-
-function resizeHandler(): void {
-  if (true) {
-    // TODO(Bob)
-    relayoutPlot();
-  }
-  if (props.autoResize) {
-    resizePlot();
-  }
-}
-
-const updateFunc = debounce(renderPlot, 50, false);
+const debouncedRender = debounce(renderPlot, 50);
+const debouncedRelayout = debounce(relayoutPlot, 100);
 
 watch(
   () => [props.config, props.data, props.revision],
-  () => updateFunc(),
+  () => debouncedRender(false),
 );
 
 watch(
   () => props.layout,
-  () => updateFunc(true),
+  () => debouncedRender(true),
   { deep: true },
-);
-
-watch(
-  () => props.revision,
-  () => resizePlot(),
 );
 
 onMounted(() => {
   createPlot();
-  window.addEventListener('resize', resizeHandler);
-  window.addEventListener('orientationchange', resizeHandler);
+  window.addEventListener('resize', debouncedRelayout);
+  window.addEventListener('orientationchange', debouncedRelayout);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', resizeHandler);
-  window.removeEventListener('orientationchange', resizeHandler);
+  window.removeEventListener('resize', debouncedRelayout);
+  window.removeEventListener('orientationchange', debouncedRelayout);
   Plotly.purge(plotlyElement.value!);
 });
 </script>
 
 <template>
-  <div ref="plotlyElement" />
+  <div ref="containerElement">
+    <q-resize-observer
+      :debounce="200"
+      @resize="
+        (v) => {
+          containerSize = v;
+          debouncedRender(true);
+        }
+      "
+    />
+    <div ref="plotlyElement" />
+  </div>
 </template>
 
 <style lang="sass">

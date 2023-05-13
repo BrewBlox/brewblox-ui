@@ -133,9 +133,9 @@ export default defineComponent({
         :graph-id="id"
         :config="graphConfig"
         :source-revision="sourceRevision"
-        :use-presets="!noDuration"
-        use-range
-        maximized
+        :control-presets="!noDuration"
+        control-range
+        class="fit"
         @params="saveParams"
         @layout="saveLayout"
       >

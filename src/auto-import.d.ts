@@ -48,7 +48,6 @@ declare module '@vue/runtime-core' {
     AnalogConstraintsValEdit: typeof import('src/plugins/spark/components/form/AnalogConstraintsValEdit.vue').default;
     AnalogConstraintsField: typeof import('src/plugins/spark/components/form/AnalogConstraintsField.vue').default;
     AnalogConstraintsEditor: typeof import('src/plugins/spark/components/form/AnalogConstraintsEditor.vue').default;
-    WizardCard: typeof import('src/plugins/quickstart/components/WizardCard.vue').default;
     QuickstartTaskMaster: typeof import('src/plugins/quickstart/components/QuickstartTaskMaster.vue').default;
     QuickstartServiceTask: typeof import('src/plugins/quickstart/components/QuickstartServiceTask.vue').default;
     QuickstartSensorField: typeof import('src/plugins/quickstart/components/QuickstartSensorField.vue').default;
@@ -58,11 +57,13 @@ declare module '@vue/runtime-core' {
     QuickstartMockCreateField: typeof import('src/plugins/quickstart/components/QuickstartMockCreateField.vue').default;
     QuickstartDiscoveryTask: typeof import('src/plugins/quickstart/components/QuickstartDiscoveryTask.vue').default;
     QuickstartChannelField: typeof import('src/plugins/quickstart/components/QuickstartChannelField.vue').default;
+    QuickstartCard: typeof import('src/plugins/quickstart/components/QuickstartCard.vue').default;
     SelectBlockGraphDialog: typeof import('src/plugins/history/components/SelectBlockGraphDialog.vue').default;
     QueryEditor: typeof import('src/plugins/history/components/QueryEditor.vue').default;
     MetricsEditorDialog: typeof import('src/plugins/history/components/MetricsEditorDialog.vue').default;
     MetricsEditor: typeof import('src/plugins/history/components/MetricsEditor.vue').default;
     MetricsDisplayDialog: typeof import('src/plugins/history/components/MetricsDisplayDialog.vue').default;
+    HistoryGraphControls: typeof import('src/plugins/history/components/HistoryGraphControls.vue').default;
     HistoryGraph: typeof import('src/plugins/history/components/HistoryGraph.vue').default;
     GraphRangeSubmenu: typeof import('src/plugins/history/components/GraphRangeSubmenu.vue').default;
     GraphRangeDialog: typeof import('src/plugins/history/components/GraphRangeDialog.vue').default;
@@ -116,9 +117,6 @@ declare module '@vue/runtime-core' {
     WatcherContainer: typeof import('src/components/sidebar/WatcherContainer.vue').default;
     SidebarNavigator: typeof import('src/components/sidebar/SidebarNavigator.vue').default;
     SidebarIndex: typeof import('src/components/sidebar/SidebarIndex.vue').default;
-    PlotlyGraph: typeof import('src/components/plotly/PlotlyGraph.vue').default;
-    GraphAnnotationDialog: typeof import('src/components/plotly/GraphAnnotationDialog.vue').default;
-    GenericGraph: typeof import('src/components/plotly/GenericGraph.vue').default;
     PageError: typeof import('src/components/misc/PageError.vue').default;
     ExportErrorsAction: typeof import('src/components/menu/ExportErrorsAction.vue').default;
     ExportAction: typeof import('src/components/menu/ExportAction.vue').default;
@@ -138,6 +136,8 @@ declare module '@vue/runtime-core' {
     AnalogSvgIcon: typeof import('src/components/icons/AnalogSvgIcon.vue').default;
     GridItem: typeof import('src/components/grid/GridItem.vue').default;
     GridContainer: typeof import('src/components/grid/GridContainer.vue').default;
+    PlotlyGraph: typeof import('src/components/graph/PlotlyGraph.vue').default;
+    GraphAnnotationDialog: typeof import('src/components/graph/GraphAnnotationDialog.vue').default;
     InvalidWidget: typeof import('src/components/generic/InvalidWidget.vue').default;
     DeprecatedWidget: typeof import('src/components/generic/DeprecatedWidget.vue').default;
     TreeSelectDialog: typeof import('src/components/form/TreeSelectDialog.vue').default;

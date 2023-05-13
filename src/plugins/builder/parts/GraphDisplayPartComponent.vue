@@ -78,32 +78,6 @@ const refresh = debounce(
   { leading: false, trailing: true },
 );
 
-watch(
-  settings,
-  (newSettings) => {
-    const cfg: GraphConfig = merge(
-      emptyGraphConfig(),
-      newSettings[GRAPH_CONFIG_KEY],
-    );
-    if (!isEqual(cfg, baseConfig.value)) {
-      baseConfig.value = cfg;
-      sourceRevision.value = new Date();
-    }
-  },
-  { immediate: true },
-);
-
-// The graph is transformed smoothly on non-Safari browsers
-// No need to hide and re-render it
-if (isSafari) {
-  watch(activeTransform, () => {
-    graphHidden.value = true;
-    refresh();
-  });
-}
-
-watch([interactable, width, height], () => refresh());
-
 function edit(): void {
   createDialog({
     component: 'GraphEditorDialog',
@@ -133,6 +107,32 @@ function showMaximized(): void {
 function activatePreset(params: QueryParams): void {
   patchSettings({ [GRAPH_CONFIG_KEY]: { ...baseConfig.value, params } });
 }
+
+watch(
+  settings,
+  (newSettings) => {
+    const cfg: GraphConfig = merge(
+      emptyGraphConfig(),
+      newSettings[GRAPH_CONFIG_KEY],
+    );
+    if (!isEqual(cfg, baseConfig.value)) {
+      baseConfig.value = cfg;
+      sourceRevision.value = new Date();
+    }
+  },
+  { immediate: true },
+);
+
+// The graph is transformed smoothly on non-Safari browsers
+// No need to hide and re-render it
+if (isSafari) {
+  watch(activeTransform, () => {
+    graphHidden.value = true;
+    refresh();
+  });
+}
+
+watch([interactable, width, height], () => refresh());
 </script>
 
 <template>
@@ -155,12 +155,18 @@ function activatePreset(params: QueryParams): void {
           sourceRevision,
           renderRevision,
           config: sizedConfig,
-          interactable: false,
-          autoFit: true,
+          static: true,
         }"
         class="fit"
         style="position: fixed"
-      />
+      >
+        <template
+          v-if="isSafari"
+          #error="{ error }"
+        >
+          <div class="q-pa-md">Graph error: {{ error }}</div>
+        </template>
+      </HistoryGraph>
     </foreignObject>
     <BuilderInteraction
       v-bind="{ width, height }"

@@ -3,9 +3,14 @@ import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
-import { PropType, ref } from 'vue';
+import isEqual from 'lodash/isEqual';
+import { computed, PropType, ref } from 'vue';
 import { GraphConfig, SharedGraphConfig } from '../types';
 import { emptyGraphConfig } from '../utils';
+
+function withDefaults(cfg: GraphConfig): GraphConfig {
+  return defaults(cloneDeep(cfg), emptyGraphConfig());
+}
 
 const props = defineProps({
   ...useDialog.props,
@@ -25,12 +30,13 @@ const props = defineProps({
 
 defineEmits({ ...useDialog.emitsObject });
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+const { dialogRef, dialogProps, onDialogOK, onDialogCancel } =
   useDialog.setup();
 
-const local = ref<GraphConfig>(
-  defaults(cloneDeep(props.config), emptyGraphConfig()),
-);
+const initial = ref<GraphConfig>(withDefaults(props.config));
+const local = ref<GraphConfig>(withDefaults(props.config));
+
+const dirty = computed<boolean>(() => !isEqual(initial.value, local.value));
 
 function loadShared(): void {
   createDialog({
@@ -48,13 +54,21 @@ function loadShared(): void {
   } as any).onOk((id) => {
     const shared = props.shared.find((s) => s.id === id);
     if (shared) {
-      local.value = defaults(cloneDeep(shared.config), emptyGraphConfig());
+      local.value = withDefaults(shared.config);
     }
   });
 }
 
-function save(): void {
-  onDialogOK(local.value);
+function revert(): void {
+  local.value = cloneDeep(initial.value);
+}
+
+function confirm(): void {
+  if (dirty.value) {
+    onDialogOK(local.value);
+  } else {
+    onDialogCancel();
+  }
 }
 </script>
 
@@ -62,8 +76,8 @@ function save(): void {
   <q-dialog
     ref="dialogRef"
     v-bind="dialogProps"
-    @hide="onDialogHide"
-    @keyup.enter="save"
+    @hide="confirm"
+    @keyup.enter="confirm"
   >
     <Card no-scroll>
       <template #toolbar>
@@ -82,25 +96,20 @@ function save(): void {
           style="border-top: 1px solid silver"
         >
           <q-btn
+            :disable="!dirty"
             flat
-            label="Cancel"
-            @click="onDialogCancel"
+            label="Revert"
+            @click="revert"
           />
           <q-space />
           <q-btn
-            :disable="shared.length === 0"
+            v-if="shared.length > 0"
             flat
             label="Import config"
             @click="loadShared"
           >
             <q-tooltip>Copy configuration from another graph</q-tooltip>
           </q-btn>
-          <q-btn
-            unelevated
-            label="Save"
-            color="primary"
-            @click="save"
-          />
         </q-card-actions>
       </div>
     </Card>

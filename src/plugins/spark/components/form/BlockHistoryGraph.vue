@@ -59,8 +59,8 @@ export default defineComponent({
       sourceRevision,
       renderRevision,
     }"
-    use-presets
-    use-range
+    control-presets
+    control-range
     class="fit"
     @params="saveGraphParams"
     @layout="saveGraphLayout"

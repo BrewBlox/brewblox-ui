@@ -2,9 +2,6 @@
 import { addSource } from '@/plugins/history/sources/graph';
 import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
-import { defaultPresets } from '@/plugins/history/utils';
-import { isJsonEqual } from '@/utils/objects';
-import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import { Layout, PlotData } from 'plotly.js';
 import {
@@ -30,15 +27,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  usePresets: {
+  controlPresets: {
     type: Boolean,
     default: false,
   },
-  useRange: {
+  controlRange: {
     type: Boolean,
     default: false,
   },
-  useTeleport: {
+  teleportControls: {
     type: Boolean,
     default: false,
   },
@@ -55,26 +52,21 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'params', data: QueryParams): void;
   (e: 'layout', data: Partial<Layout>): void;
+  (e: 'error', msg: string): void;
 }>();
 
 const historyStore = useHistoryStore();
-const presets = defaultPresets();
 const revision = ref(new Date());
-const displayRef = ref(null);
 
-function saveParams(params: QueryParams): void {
-  emit('params', cloneDeep(params));
-}
+const params = computed<QueryParams>({
+  get: () => props.config.params ?? {},
+  set: (v) => emit('params', v),
+});
 
-function saveLayout(layout: Partial<Layout>): void {
-  emit('layout', cloneDeep(layout));
-}
-
-function isActivePreset(preset: QueryParams): boolean {
-  return isJsonEqual(preset, props.config.params);
-}
-
-const layout = computed<Partial<Layout>>(() => props.config.layout ?? {});
+const layout = computed<Partial<Layout>>({
+  get: () => props.config.layout ?? {},
+  set: (v) => emit('layout', v),
+});
 
 const source = computed<GraphSource | null>(
   () => historyStore.sourceById(props.graphId) as GraphSource | null,
@@ -161,55 +153,53 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="column">
-    <component
-      :is="useTeleport ? 'ButtonsTeleport' : 'div'"
-      :class="useTeleport ? '' : 'col-auto row justify-end z-top'"
-    >
-      <ActionMenu
-        v-if="useRange"
-        icon="mdi-arrow-expand-vertical"
+  <div class="col column">
+    <ButtonsTeleport v-if="teleportControls">
+      <HistoryGraphControls
+        v-model:layout="layout"
+        v-model:params="params"
+        :show-presets="controlPresets"
+        :show-range="controlRange"
       >
-        <template #menus>
-          <GraphRangeSubmenu
-            :layout="layout"
-            :save="(v) => saveLayout(v)"
-          />
+        <template #controls>
+          <slot name="controls" />
         </template>
-      </ActionMenu>
-      <ActionMenu
-        v-if="usePresets"
-        icon="mdi-timelapse"
-      >
-        <template #menus>
-          <ActionSubmenu label="Presets">
-            <ActionItem
-              v-for="(preset, idx) in presets"
-              :key="`preset-${idx}`"
-              :active="isActivePreset(preset)"
-              :label="`${preset.duration}`"
-              @click="saveParams(preset)"
-            />
-          </ActionSubmenu>
-        </template>
-      </ActionMenu>
-      <slot name="controls" />
-    </component>
+      </HistoryGraphControls>
+    </ButtonsTeleport>
     <div
-      v-if="error"
-      class="col row justify-center items-center text-h5 q-gutter-x-md"
+      v-else
+      class="col-auto row justify-end z-top"
     >
-      <q-icon
-        name="warning"
-        color="negative"
-      />
-      <div class="col-auto">
-        {{ error }}
-      </div>
+      <HistoryGraphControls
+        v-model:layout="layout"
+        v-model:params="params"
+        :show-presets="controlPresets"
+        :show-range="controlRange"
+      >
+        <template #controls>
+          <slot name="controls" />
+        </template>
+      </HistoryGraphControls>
     </div>
+
+    <slot
+      v-if="error"
+      name="error"
+      :error="error"
+    >
+      <div class="col row text-h5 justify-center items-center">
+        <q-icon
+          name="warning"
+          color="negative"
+        />
+        <div class="col-auto q-px-md">
+          {{ error }}
+        </div>
+      </div>
+    </slot>
+
     <PlotlyGraph
       v-else
-      ref="displayRef"
       :data="graphData"
       :layout="layout"
       :revision="revision"

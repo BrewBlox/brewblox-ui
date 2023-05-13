@@ -129,12 +129,10 @@ export default defineComponent({
       </template>
 
       <template #graph>
-        <q-resize-observer @resize="refresh" />
         <PlotlyGraph
           v-bind="graphProps"
           :revision="revision"
           :maximized="inDialog"
-          auto-fit
           auto-resize
         />
       </template>
