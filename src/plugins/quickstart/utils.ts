@@ -5,7 +5,6 @@ import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore } from '@/store/widgets';
 import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
-import cloneDeep from 'lodash/cloneDeep';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
 import {
   BlockType,
@@ -13,6 +12,7 @@ import {
   OneWireGpioModuleBlock,
   PidBlock,
 } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import {
   GpioChange,
   IoChannelAddress,
