@@ -1,29 +1,15 @@
-<script lang="ts">
+<script setup lang="ts">
 import { colorString } from '@/plugins/builder/utils';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/Keg';
 import { usePart } from '../composables';
 import { COLOR_KEY } from '../const';
 
-export default defineComponent({
-  name: 'KegPartComponent',
-  setup() {
-    const { settings, width, height } = usePart.setup();
+const { settings, width, height } = usePart.setup();
 
-    const fillColor = computed<string>(() =>
-      colorString(settings.value[COLOR_KEY]),
-    );
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      width,
-      height,
-      fillColor,
-    };
-  },
-});
+const fillColor = computed<string>(() =>
+  colorString(settings.value[COLOR_KEY]),
+);
 </script>
 
 <template>

@@ -12,7 +12,6 @@ const plugin: Plugin = {
       id: 'QuickValues',
       title: 'Quick Values',
       component: cref(app, widget),
-      wizard: true,
       widgetSize: {
         cols: 4,
         rows: 4,

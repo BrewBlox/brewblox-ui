@@ -1,6 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
 import { colorString } from '@/plugins/builder/utils';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import {
   DEFAULT_KETTLE_FILL_PCT,
   DEFAULT_SIZE,
@@ -11,35 +11,14 @@ import {
 import { usePart } from '../composables';
 import { COLOR_KEY, LABEL_KEY } from '../const';
 
-export default defineComponent({
-  name: 'KettlePartComponent',
-  setup() {
-    const { settings, width, height } = usePart.setup();
+const { settings, width, height } = usePart.setup();
 
-    const filledHeight = computed<number>(() => {
-      const pct =
-        settings.value[KETTLE_FILL_PCT_KEY] ?? DEFAULT_KETTLE_FILL_PCT;
-      return pct * (height.value / 100);
-    });
-
-    const color = computed<string>(() =>
-      colorString(settings.value[COLOR_KEY]),
-    );
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      KETTLE_FILL_PCT_KEY,
-      DEFAULT_KETTLE_FILL_PCT,
-      LABEL_KEY,
-      width,
-      height,
-      filledHeight,
-      color,
-    };
-  },
+const filledHeight = computed<number>(() => {
+  const pct = settings.value[KETTLE_FILL_PCT_KEY] ?? DEFAULT_KETTLE_FILL_PCT;
+  return pct * (height.value / 100);
 });
+
+const color = computed<string>(() => colorString(settings.value[COLOR_KEY]));
 </script>
 
 <template>

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
   DEFAULT_PUMP_PRESSURE,
   DigitalBlockT,
@@ -17,194 +17,162 @@ import {
 import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, defineComponent, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { OnInteractBehavior, ON_INTERACT_KEY } from '../blueprints/Pump';
 import { usePart, useSettingsBlock } from '../composables';
 
-export default defineComponent({
-  name: 'PumpPartComponent',
-  setup() {
-    const { part, flows, settings, width, height, patchSettings, reflow } =
-      usePart.setup();
+const { part, flows, settings, width, height, patchSettings, reflow } =
+  usePart.setup();
 
-    const {
-      block,
-      blockStatus,
-      hasAddress,
-      isBroken,
-      isClaimed,
-      showBlockDialog,
-      showBlockSelectDialog,
-      patchBlock,
-    } = useSettingsBlock.setup<PumpBlockT>(PUMP_KEY, PUMP_TYPES);
+const {
+  block,
+  blockStatus,
+  hasAddress,
+  isClaimed,
+  showBlockDialog,
+  showBlockSelectDialog,
+  patchBlock,
+} = useSettingsBlock.setup<PumpBlockT>(PUMP_KEY, PUMP_TYPES);
 
-    function isDigital(v: Maybe<PumpBlockT>): v is DigitalBlockT {
-      return isBlockCompatible<DigitalBlockT>(v, DIGITAL_TYPES);
-    }
+function isDigital(v: Maybe<PumpBlockT>): v is DigitalBlockT {
+  return isBlockCompatible<DigitalBlockT>(v, DIGITAL_TYPES);
+}
 
-    function isPwm(v: Maybe<PumpBlockT>): v is PwmBlockT {
-      return isBlockCompatible<PwmBlockT>(v, PWM_TYPES);
-    }
+function isPwm(v: Maybe<PumpBlockT>): v is PwmBlockT {
+  return isBlockCompatible<PwmBlockT>(v, PWM_TYPES);
+}
 
-    const onInteract = computed<OnInteractBehavior>(
-      () => settings.value[ON_INTERACT_KEY] ?? 'toggle',
-    );
+const onInteract = computed<OnInteractBehavior>(
+  () => settings.value[ON_INTERACT_KEY] ?? 'toggle',
+);
 
-    const enabled = computed<boolean>(() => {
-      if (!hasAddress.value) {
-        return Boolean(settings.value[IO_ENABLED_KEY]);
-      }
+const enabled = computed<boolean>(() => {
+  if (!hasAddress.value) {
+    return Boolean(settings.value[IO_ENABLED_KEY]);
+  }
 
-      if (isDigital(block.value)) {
-        return block.value.data.state === DigitalState.STATE_ACTIVE;
-      }
+  if (isDigital(block.value)) {
+    return block.value.data.state === DigitalState.STATE_ACTIVE;
+  }
 
-      if (isPwm(block.value)) {
-        return block.value.data.enabled;
-      }
+  if (isPwm(block.value)) {
+    return block.value.data.enabled;
+  }
 
-      return false;
-    });
-
-    const active = computed<boolean>(() => {
-      if (isPwm(block.value)) {
-        return enabled.value && Boolean(block.value.data.setting);
-      }
-      return enabled.value;
-    });
-
-    const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, LEFT),
-    );
-
-    const pwmSetting = computed<number>(() =>
-      isPwm(block.value) ? Number(block.value.data.setting) : 100,
-    );
-
-    const duration = computed<number>(() => {
-      const onPressure = Number(
-        settings.value[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE,
-      );
-      const pressure = (onPressure / 100) * pwmSetting.value || 0.01;
-      const animationDuration = 60 / pressure;
-      return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
-    });
-
-    function checkDirty(
-      newV: PumpBlockT | null,
-      oldV: PumpBlockT | null,
-    ): boolean {
-      if (newV == null || oldV == null) {
-        return true;
-      }
-      if (newV.type !== oldV.type) {
-        return true;
-      }
-      if (isDigital(newV) && isDigital(oldV)) {
-        return newV.data.state !== oldV.data.state;
-      }
-      if (isPwm(newV) && isPwm(oldV)) {
-        return (
-          newV.data.setting !== oldV.data.setting ||
-          newV.data.enabled !== oldV.data.enabled
-        );
-      }
-      return false;
-    }
-
-    watch(
-      () => block.value,
-      (newV, oldV) => {
-        if (checkDirty(newV, oldV)) {
-          reflow();
-        }
-      },
-    );
-
-    function toggleHandler(): void {
-      // No block has been linked - change the part setting
-      if (!hasAddress.value) {
-        patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
-        return;
-      }
-
-      // A block has been linked, but is not available
-      // We can't change the block setting
-      if (!block.value) {
-        showAbsentBlock(part.value, PUMP_KEY);
-        return;
-      }
-
-      // We can't toggle the block setting if it's claimed
-      // Show the dialog as fallback behavior
-      if (isClaimed.value) {
-        showBlockDialog();
-        return;
-      }
-
-      if (isDigital(block.value)) {
-        const storedState =
-          block.value.data.state === DigitalState.STATE_INACTIVE
-            ? DigitalState.STATE_ACTIVE
-            : DigitalState.STATE_INACTIVE;
-        patchBlock({ storedState }, true);
-        return;
-      }
-
-      if (isPwm(block.value)) {
-        const enabled = !block.value.data.enabled;
-        patchBlock({ enabled }, true);
-        return;
-      }
-    }
-
-    function interactHandler(): void {
-      // No block has been linked - we always toggle
-      if (!hasAddress.value) {
-        toggleHandler();
-        return;
-      }
-
-      // A block has been linked, but is not available
-      // We can't toggle or show a dialog - we show an error message instead
-      if (!block.value) {
-        showAbsentBlock(part.value, PUMP_KEY);
-        return;
-      }
-
-      // We can now either toggle or show a dialog
-      // This comes down to the onInteract setting
-      if (onInteract.value === 'dialog') {
-        showBlockDialog();
-      } else {
-        toggleHandler();
-      }
-    }
-
-    return {
-      IO_PRESSURE_KEY,
-      MIN_PUMP_PRESSURE,
-      MAX_PUMP_PRESSURE,
-      DEFAULT_PUMP_PRESSURE,
-      ON_INTERACT_KEY,
-      width,
-      height,
-      block,
-      hasAddress,
-      blockStatus,
-      isBroken,
-      isClaimed,
-      enabled,
-      active,
-      liquids,
-      duration,
-      interactHandler,
-      toggleHandler,
-      showBlockDialog,
-      showBlockSelectDialog,
-    };
-  },
+  return false;
 });
+
+const active = computed<boolean>(() => {
+  if (isPwm(block.value)) {
+    return enabled.value && Boolean(block.value.data.setting);
+  }
+  return enabled.value;
+});
+
+const liquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, LEFT),
+);
+
+const pwmSetting = computed<number>(() =>
+  isPwm(block.value) ? Number(block.value.data.setting) : 100,
+);
+
+const duration = computed<number>(() => {
+  const onPressure = Number(
+    settings.value[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE,
+  );
+  const pressure = (onPressure / 100) * pwmSetting.value || 0.01;
+  const animationDuration = 60 / pressure;
+  return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
+});
+
+function checkDirty(newV: PumpBlockT | null, oldV: PumpBlockT | null): boolean {
+  if (newV == null || oldV == null) {
+    return true;
+  }
+  if (newV.type !== oldV.type) {
+    return true;
+  }
+  if (isDigital(newV) && isDigital(oldV)) {
+    return newV.data.state !== oldV.data.state;
+  }
+  if (isPwm(newV) && isPwm(oldV)) {
+    return (
+      newV.data.setting !== oldV.data.setting ||
+      newV.data.enabled !== oldV.data.enabled
+    );
+  }
+  return false;
+}
+
+watch(
+  () => block.value,
+  (newV, oldV) => {
+    if (checkDirty(newV, oldV)) {
+      reflow();
+    }
+  },
+);
+
+function toggleHandler(): void {
+  // No block has been linked - change the part setting
+  if (!hasAddress.value) {
+    patchSettings({ [IO_ENABLED_KEY]: !settings.value[IO_ENABLED_KEY] });
+    return;
+  }
+
+  // A block has been linked, but is not available
+  // We can't change the block setting
+  if (!block.value) {
+    showAbsentBlock(part.value, PUMP_KEY);
+    return;
+  }
+
+  // We can't toggle the block setting if it's claimed
+  // Show the dialog as fallback behavior
+  if (isClaimed.value) {
+    showBlockDialog();
+    return;
+  }
+
+  if (isDigital(block.value)) {
+    const storedState =
+      block.value.data.state === DigitalState.STATE_INACTIVE
+        ? DigitalState.STATE_ACTIVE
+        : DigitalState.STATE_INACTIVE;
+    patchBlock({ storedState }, true);
+    return;
+  }
+
+  if (isPwm(block.value)) {
+    const enabled = !block.value.data.enabled;
+    patchBlock({ enabled }, true);
+    return;
+  }
+}
+
+function interactHandler(): void {
+  // No block has been linked - we always toggle
+  if (!hasAddress.value) {
+    toggleHandler();
+    return;
+  }
+
+  // A block has been linked, but is not available
+  // We can't toggle or show a dialog - we show an error message instead
+  if (!block.value) {
+    showAbsentBlock(part.value, PUMP_KEY);
+    return;
+  }
+
+  // We can now either toggle or show a dialog
+  // This comes down to the onInteract setting
+  if (onInteract.value === 'dialog') {
+    showBlockDialog();
+  } else {
+    toggleHandler();
+  }
+}
 </script>
 
 <template>

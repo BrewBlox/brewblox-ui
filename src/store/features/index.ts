@@ -1,6 +1,5 @@
 import type { Widget } from '@/store/widgets/types';
 import { findById } from '@/utils/collections';
-import isString from 'lodash/isString';
 import { defineStore } from 'pinia';
 import type {
   GridSize,
@@ -53,19 +52,6 @@ export const useFeatureStore = defineStore('featureStore', {
     widgetRole(id: Maybe<string>): WidgetRole {
       return this.widgetById(id)?.role ?? 'Other';
     },
-    widgetWizard(id: string): string | null {
-      const feature = this.widgetById(id);
-      if (feature === null) {
-        return null;
-      }
-      if (isString(feature.wizard)) {
-        return feature.wizard;
-      }
-      if (feature.wizard === true) {
-        return 'GenericWidgetWizard';
-      }
-      return null;
-    },
     widgetComponent(widget: Maybe<Widget>): string | null {
       return this.widgetById(widget?.feature)?.component ?? null;
     },
@@ -80,10 +66,10 @@ export const useFeatureStore = defineStore('featureStore', {
       return func ? func(widget) : null;
     },
     addWidgetFeature(feature: WidgetFeature): void {
-      if (feature.wizard === true && feature.generateConfig === undefined) {
+      if (feature.creatable !== false && feature.generateConfig === undefined) {
         throw new Error(
           `Widget feature ${feature.id} ` +
-            'must define a generateConfig function to use the default wizard',
+            'must define a generateConfig function to be creatable',
         );
       }
       if (this.widgetById(feature.id)) {

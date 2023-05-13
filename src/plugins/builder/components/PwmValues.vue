@@ -1,72 +1,50 @@
-<script lang="ts">
-import { coord2grid, textTransformation } from '@/plugins/builder/utils';
+<script setup lang="ts">
+import { textTransformation } from '@/plugins/builder/utils';
 import { preciseNumber } from '@/utils/quantity';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 import { PwmBlockT, PWM_KEY, PWM_TYPES } from '../const';
 
-export default defineComponent({
-  name: 'PwmValues',
-  props: {
-    width: {
-      type: Number,
-      default: 50,
-    },
-    height: {
-      type: Number,
-      default: 50,
-    },
-    settingsKey: {
-      type: String,
-      default: PWM_KEY,
-    },
-    x: {
-      type: Number,
-      default: 0,
-    },
-    y: {
-      type: Number,
-      default: 0,
-    },
+const props = defineProps({
+  width: {
+    type: Number,
+    default: 50,
   },
-  setup(props) {
-    const { part, placeholder } = usePart.setup();
-    const {
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-    } = useSettingsBlock.setup<PwmBlockT>(props.settingsKey, PWM_TYPES);
-
-    const pwmValue = computed<number | null>(() => {
-      if (placeholder) {
-        return 64;
-      }
-      if (block.value?.data.enabled) {
-        return block.value.data.value;
-      }
-      return null;
-    });
-
-    const contentTransform = computed<string>(() =>
-      textTransformation(part.value, { width: 1, height: 1 }),
-    );
-
-    return {
-      coord2grid,
-      preciseNumber,
-      contentTransform,
-      block,
-      blockStatus,
-      isBroken,
-      placeholder,
-      pwmValue,
-      showBlockDialog,
-      showBlockSelectDialog,
-    };
+  height: {
+    type: Number,
+    default: 50,
+  },
+  settingsKey: {
+    type: String,
+    default: PWM_KEY,
+  },
+  x: {
+    type: Number,
+    default: 0,
+  },
+  y: {
+    type: Number,
+    default: 0,
   },
 });
+
+const { part, placeholder } = usePart.setup();
+const { block, blockStatus, isBroken, showBlockDialog, showBlockSelectDialog } =
+  useSettingsBlock.setup<PwmBlockT>(props.settingsKey, PWM_TYPES);
+
+const pwmValue = computed<number | null>(() => {
+  if (placeholder) {
+    return 64;
+  }
+  if (block.value?.data.enabled) {
+    return block.value.data.value;
+  }
+  return null;
+});
+
+const contentTransform = computed<string>(() =>
+  textTransformation(part.value, { width: 1, height: 1 }),
+);
 </script>
 
 <template>

@@ -15,7 +15,7 @@ const plugin: Plugin = {
       title: 'Deprecated Object',
       role: 'Other',
       component: cref(app, widget),
-      wizard: false,
+      creatable: false,
       widgetSize: {
         cols: 4,
         rows: 2,

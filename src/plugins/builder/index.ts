@@ -19,7 +19,6 @@ const plugin: Plugin = {
       id: 'Builder',
       title: 'Brewery Builder',
       component: cref(app, BuilderWidget),
-      wizard: true,
       widgetSize: {
         cols: 8,
         rows: 8,

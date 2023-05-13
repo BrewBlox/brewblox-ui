@@ -1,103 +1,83 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { makeTypeFilter } from '@/utils/functional';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { BlockType, PidBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 import { SetpointBlockT, SETPOINT_KEY, SETPOINT_TYPES } from '../const';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
 
-export default defineComponent({
-  name: 'SetpointValues',
-  props: {
-    width: {
-      type: Number,
-      default: 100,
-    },
-    height: {
-      type: Number,
-      default: 50,
-    },
-    settingsKey: {
-      type: String,
-      default: SETPOINT_KEY,
-    },
-    x: {
-      type: Number,
-      default: 0,
-    },
-    y: {
-      type: Number,
-      default: 0,
-    },
-    always: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  width: {
+    type: Number,
+    default: 100,
   },
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const { placeholder } = usePart.setup();
-    const {
-      address,
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-    } = useSettingsBlock.setup<SetpointBlockT>(
-      props.settingsKey,
-      SETPOINT_TYPES,
-    );
-
-    const isUsed = computed<boolean>(
-      () =>
-        block.value !== null &&
-        block.value.data.enabled &&
-        sparkStore
-          .blocksByService(address.value.serviceId)
-          .filter(pidFilter)
-          .some((blk) => blk.data.inputId.id === address.value.id),
-    );
-
-    const setpointSetting = computed<number | null>(() => {
-      if (placeholder) {
-        return 26;
-      }
-      if (block.value && isUsed.value) {
-        return block.value.data.desiredSetting.value;
-      }
-      return null;
-    });
-
-    const setpointValue = computed<number | null>(() => {
-      if (placeholder) {
-        return 21;
-      }
-      return block.value?.data.value.value ?? null;
-    });
-
-    const tempUnit = computed<string>(() =>
-      prettyUnit(userUnits.value.temperature),
-    );
-
-    return {
-      preciseNumber,
-      block,
-      blockStatus,
-      isBroken,
-      placeholder,
-      showBlockDialog,
-      showBlockSelectDialog,
-      setpointSetting,
-      setpointValue,
-      tempUnit,
-    };
+  height: {
+    type: Number,
+    default: 50,
+  },
+  settingsKey: {
+    type: String,
+    default: SETPOINT_KEY,
+  },
+  x: {
+    type: Number,
+    default: 0,
+  },
+  y: {
+    type: Number,
+    default: 0,
+  },
+  always: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const sparkStore = useSparkStore();
+const { placeholder } = usePart.setup();
+const {
+  address,
+  block,
+  blockStatus,
+  isBroken,
+  showBlockDialog,
+  showBlockSelectDialog,
+} = useSettingsBlock.setup<SetpointBlockT>(props.settingsKey, SETPOINT_TYPES);
+
+const isUsed = computed<boolean>(
+  () =>
+    block.value !== null &&
+    block.value.data.enabled &&
+    sparkStore
+      .blocksByService(address.value.serviceId)
+      .filter(pidFilter)
+      .some((blk) => blk.data.inputId.id === address.value.id),
+);
+
+const setpointSetting = computed<number | null>(() => {
+  if (placeholder) {
+    return 26;
+  }
+  if (block.value && isUsed.value) {
+    return block.value.data.desiredSetting.value;
+  }
+  return null;
+});
+
+const setpointValue = computed<number | null>(() => {
+  if (placeholder) {
+    return 21;
+  }
+  return block.value?.data.value.value ?? null;
+});
+
+const tempUnit = computed<string>(() =>
+  prettyUnit(userUnits.value.temperature),
+);
 </script>
 
 <template>

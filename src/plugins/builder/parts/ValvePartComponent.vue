@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
   RIGHT,
   ValveBlockT,
@@ -7,7 +7,7 @@ import {
   VALVE_TYPES,
 } from '@/plugins/builder/const';
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, defineComponent, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
@@ -25,107 +25,83 @@ const paths = {
   arrows: 'M0,25H50',
 };
 
-export default defineComponent({
-  name: 'ValvePartComponent',
-  setup() {
-    const { part, flows, settings, width, height, patchSettings, reflow } =
-      usePart.setup();
+const { part, flows, settings, width, height, patchSettings, reflow } =
+  usePart.setup();
 
-    const {
-      hasAddress,
-      block,
-      blockStatus,
-      isBroken,
-      isClaimed,
-      patchBlock,
-      showBlockDialog,
-      showBlockSelectDialog,
-    } = useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
+const {
+  hasAddress,
+  block,
+  blockStatus,
+  isBroken,
+  isClaimed,
+  patchBlock,
+  showBlockDialog,
+  showBlockSelectDialog,
+} = useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
 
-    const flowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, RIGHT),
-    );
+const flowSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, RIGHT),
+);
 
-    const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, RIGHT),
-    );
+const liquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, RIGHT),
+);
 
-    const closed = computed<boolean>(() =>
-      hasAddress.value
-        ? block.value?.data.state !== DigitalState.STATE_ACTIVE
-        : Boolean(settings.value[VALVE_CLOSED_KEY]),
-    );
+const closed = computed<boolean>(() =>
+  hasAddress.value
+    ? block.value?.data.state !== DigitalState.STATE_ACTIVE
+    : Boolean(settings.value[VALVE_CLOSED_KEY]),
+);
 
-    const pending = computed<boolean>(() =>
-      hasAddress.value
-        ? block.value?.data.desiredState !== block.value?.data.state
-        : false,
-    );
+const pending = computed<boolean>(() =>
+  hasAddress.value
+    ? block.value?.data.desiredState !== block.value?.data.state
+    : false,
+);
 
-    const valveRotation = computed<number>(() => {
-      if (isBroken.value) {
-        return 45;
-      }
-      if (!hasAddress.value) {
-        return closed.value ? 90 : 0;
-      }
-      switch (block.value?.data.state) {
-        case undefined:
-          return 90;
-        case DigitalState.STATE_INACTIVE:
-          return 90;
-        case DigitalState.STATE_ACTIVE:
-          return 0;
-        default:
-          return 45;
-      }
-    });
-
-    watch(
-      () => block.value,
-      (newV, oldV) => {
-        if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
-          reflow();
-        }
-      },
-    );
-
-    function toggle(): void {
-      if (hasAddress.value) {
-        if (block.value) {
-          const storedState =
-            block.value.data.state === DigitalState.STATE_INACTIVE
-              ? DigitalState.STATE_ACTIVE
-              : DigitalState.STATE_INACTIVE;
-          patchBlock({ storedState }, true);
-        }
-      } else {
-        patchSettings({
-          [VALVE_CLOSED_KEY]: !settings.value[VALVE_CLOSED_KEY],
-        });
-      }
-    }
-
-    return {
-      width,
-      height,
-      blockStatus,
-      paths,
-      hasAddress,
-      block,
-      isBroken,
-      isClaimed,
-      flowSpeed,
-      liquids,
-      closed,
-      pending,
-      valveRotation,
-      toggle,
-      showBlockDialog,
-      showBlockSelectDialog,
-    };
-  },
+const valveRotation = computed<number>(() => {
+  if (isBroken.value) {
+    return 45;
+  }
+  if (!hasAddress.value) {
+    return closed.value ? 90 : 0;
+  }
+  switch (block.value?.data.state) {
+    case undefined:
+      return 90;
+    case DigitalState.STATE_INACTIVE:
+      return 90;
+    case DigitalState.STATE_ACTIVE:
+      return 0;
+    default:
+      return 45;
+  }
 });
+
+watch(
+  () => block.value,
+  (newV, oldV) => {
+    if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
+      reflow();
+    }
+  },
+);
+
+function toggle(): void {
+  if (hasAddress.value) {
+    if (block.value) {
+      const storedState =
+        block.value.data.state === DigitalState.STATE_INACTIVE
+          ? DigitalState.STATE_ACTIVE
+          : DigitalState.STATE_INACTIVE;
+      patchBlock({ storedState }, true);
+    }
+  } else {
+    patchSettings({
+      [VALVE_CLOSED_KEY]: !settings.value[VALVE_CLOSED_KEY],
+    });
+  }
+}
 </script>
 
 <template>

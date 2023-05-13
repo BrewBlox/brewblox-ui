@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
   DEFAULT_PUMP_PRESSURE,
   IO_PRESSURE_KEY,
@@ -6,35 +6,19 @@ import {
   MIN_PUMP_PRESSURE,
   RIGHT,
 } from '@/plugins/builder/const';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
-export default defineComponent({
-  name: 'GravityTubePartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const flowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, RIGHT),
-    );
+const flowSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, RIGHT),
+);
 
-    const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, RIGHT),
-    );
-
-    return {
-      IO_PRESSURE_KEY,
-      MAX_PUMP_PRESSURE,
-      MIN_PUMP_PRESSURE,
-      DEFAULT_PUMP_PRESSURE,
-      width,
-      height,
-      flowSpeed,
-      liquids,
-    };
-  },
-});
+const liquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, RIGHT),
+);
 </script>
 
 <template>

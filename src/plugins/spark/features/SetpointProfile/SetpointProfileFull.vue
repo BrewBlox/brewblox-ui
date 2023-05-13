@@ -2,9 +2,9 @@
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
-import { deepCopy } from '@/utils/objects';
 import { bloxQty, durationMs, durationString, tempQty } from '@/utils/quantity';
 import { Quantity, Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent } from 'vue';
 
 interface DisplaySetpoint {
@@ -56,7 +56,7 @@ export default defineComponent({
     function addPoint(): void {
       const newPoint =
         points.value.length > 0
-          ? deepCopy(points.value[points.value.length - 1])
+          ? cloneDeep(points.value[points.value.length - 1])
           : defaultPoint();
       points.value.push(newPoint);
       savePoints();
@@ -112,7 +112,7 @@ export default defineComponent({
         points.value[0].datetime.getTime() < now.getTime() &&
         points.value[points.value.length - 1].datetime.getTime() > now.getTime()
       ) {
-        const copy = deepCopy(points.value);
+        const copy = cloneDeep(points.value);
         copy[index] = changed;
 
         const current = intermediateTemp(points.value, now);

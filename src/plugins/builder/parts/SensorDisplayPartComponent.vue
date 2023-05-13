@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
   SensorBlockT,
   SENSOR_KEY,
@@ -6,63 +6,30 @@ import {
 } from '@/plugins/builder/const';
 import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
-export default defineComponent({
-  name: 'SensorDisplayPartComponent',
-  setup() {
-    const { part, flows, width, height, bordered, passthrough, placeholder } =
-      usePart.setup();
+const { part, flows, width, height, bordered, passthrough, placeholder } =
+  usePart.setup();
 
-    const color = computed<string>(() => liquidBorderColor(flows.value));
+const color = computed<string>(() => liquidBorderColor(flows.value));
 
-    const {
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-    } = useSettingsBlock.setup<SensorBlockT>(SENSOR_KEY, SENSOR_TYPES);
+const { block, blockStatus, isBroken, showBlockDialog, showBlockSelectDialog } =
+  useSettingsBlock.setup<SensorBlockT>(SENSOR_KEY, SENSOR_TYPES);
 
-    const contentTransform = computed<string>(() =>
-      textTransformation(part.value, { width: 1, height: 1 }),
-    );
+const contentTransform = computed<string>(() =>
+  textTransformation(part.value, { width: 1, height: 1 }),
+);
 
-    const tempValue = computed<number | null>(() => {
-      if (placeholder) {
-        return 21;
-      }
-      return block.value?.data.value?.value ?? null;
-    });
-
-    const tempUnit = computed<string>(() =>
-      prettyUnit(block.value?.data.value),
-    );
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      fixedNumber,
-      width,
-      height,
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-      contentTransform,
-      tempValue,
-      tempUnit,
-      color,
-      bordered,
-      passthrough,
-      placeholder,
-    };
-  },
+const tempValue = computed<number | null>(() => {
+  if (placeholder) {
+    return 21;
+  }
+  return block.value?.data.value?.value ?? null;
 });
+
+const tempUnit = computed<string>(() => prettyUnit(block.value?.data.value));
 </script>
 
 <template>

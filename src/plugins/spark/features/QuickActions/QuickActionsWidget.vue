@@ -4,9 +4,9 @@ import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
-import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 import { bloxQty, prettyUnit } from '@/utils/quantity';
+import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent } from 'vue';
 import QuickActionsBasic from './QuickActionsBasic.vue';
@@ -54,7 +54,7 @@ export default defineComponent({
       const userTemp = userUnits.value.temperature;
       const otherTemp = userTemp === 'degC' ? 'degF' : 'degC';
 
-      const actions = deepCopy(config.value.actions);
+      const actions = cloneDeep(config.value.actions);
 
       // Convert units if user changed system temperature
       actions.forEach((action) =>

@@ -1,28 +1,12 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PwmDisplay';
 import { usePart } from '../composables';
 import { liquidBorderColor } from '../utils';
 
-export default defineComponent({
-  name: 'PwmDisplayPartComponent',
-  setup() {
-    const { flows, bordered, width, height, passthrough } = usePart.setup();
+const { flows, bordered, width, height, passthrough } = usePart.setup();
 
-    const borderColor = computed<string>(() => liquidBorderColor(flows.value));
-
-    return {
-      MIN_SIZE,
-      MAX_SIZE,
-      DEFAULT_SIZE,
-      width,
-      height,
-      bordered,
-      passthrough,
-      borderColor,
-    };
-  },
-});
+const borderColor = computed<string>(() => liquidBorderColor(flows.value));
 </script>
 
 <template>

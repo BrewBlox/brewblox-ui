@@ -6,9 +6,9 @@ import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
-import { deepCopy } from '@/utils/objects';
 import { clampRotation } from '@/utils/quantity';
 import * as d3 from 'd3';
+import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
@@ -19,7 +19,6 @@ import {
   onBeforeUnmount,
   provide,
   ref,
-  UnwrapRef,
   watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
@@ -50,6 +49,7 @@ import {
 } from './utils';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>;
+type SVGDragEvent = d3.D3DragEvent<SVGElement, unknown, unknown>;
 
 type ToolSource = 'shortcut' | 'menu' | 'click';
 
@@ -72,6 +72,16 @@ const moveKeys: Record<string, XYPosition> = {
   ArrowRight: { x: 1, y: 0 },
 };
 
+const partDraggingTools: (BuilderToolName | null)[] = ['move', 'copy'];
+const partSelectionTools: (BuilderToolName | null)[] = [
+  'select',
+  'move',
+  'copy',
+  'rotate',
+  'flip',
+  'delete',
+];
+
 const props = defineProps({
   routeId: {
     type: String,
@@ -91,7 +101,7 @@ const gridHoverPos = ref<XYPosition | null>(null);
 const partDragStart = ref<XYPosition | null>(null);
 
 const selectedIds = ref<string[]>([]);
-const floater = ref<UnwrapRef<Floater> | null>(null);
+const floater = ref<Floater | null>(null);
 
 const focusWarningEnabled = computed<boolean>({
   get: () => builderStore.focusWarningEnabled,
@@ -208,7 +218,7 @@ function isFloating(id: string): boolean {
 }
 
 function makeFloater(source: Floater): void {
-  floater.value = deepCopy(source);
+  floater.value = cloneDeep(source);
   moveFloater(source);
 }
 
@@ -228,7 +238,7 @@ function dropFloater(coords: XYPosition | null): void {
   }
 
   if (coords) {
-    const sourceParts = floater.value.parts;
+    const sourceParts = [...floater.value.parts];
     const offset: AreaSize = {
       width: floater.value.width / 2,
       height: floater.value.height / 2,
@@ -284,7 +294,7 @@ function findPartAtCoords(coords: XYPosition | null): BuilderPart | null {
         coords.y >= part.y &&
         coords.y < part.y + height
       ) {
-        return deepCopy(part);
+        return cloneDeep(part);
       }
     }
   }
@@ -298,7 +308,7 @@ function findHoveredPart(): BuilderPart | null {
 function findActiveParts(alwaysIncludeSelected = false): BuilderPart[] {
   const hovered = findHoveredPart();
   const selected = selectedIds.value
-    .map((id) => deepCopy(parts.value[id]))
+    .map((id) => cloneDeep(parts.value[id]))
     .filter((part) => part != null);
 
   if (hovered) {
@@ -351,11 +361,11 @@ function clear(): void {
 // Tools
 ////////////////////////////////////////////////////////////////
 
-function usePan(): void {
+function toolPan(): void {
   activeToolId.value = 'pan';
 }
 
-function useSelect(): void {
+function toolSelect(): void {
   if (activeToolId.value !== 'select') {
     activeToolId.value = 'select';
   } else {
@@ -366,12 +376,12 @@ function useSelect(): void {
   }
 }
 
-function useGridResize(): void {
+function toolGridResize(): void {
   activeToolId.value = 'gridresize';
   cancelFloater();
 }
 
-function useAdd(): void {
+function toolAdd(): void {
   if (!floater.value) {
     createDialog({
       component: 'BuilderCatalogDialog',
@@ -390,7 +400,7 @@ function useAdd(): void {
   }
 }
 
-function useMove(src: ToolSource): void {
+function toolMove(src: ToolSource): void {
   if (activeToolId.value !== 'move') {
     activeToolId.value = 'move';
     cancelFloater();
@@ -428,7 +438,7 @@ function useMove(src: ToolSource): void {
   }
 }
 
-function useCopy(src: ToolSource): void {
+function toolCopy(src: ToolSource): void {
   if (activeToolId.value !== 'copy') {
     activeToolId.value = 'copy';
     cancelFloater();
@@ -438,7 +448,6 @@ function useCopy(src: ToolSource): void {
   if (src === 'menu') {
     return;
   }
-
   if (floater.value) {
     dropFloater(floater.value);
     return;
@@ -466,7 +475,7 @@ function useCopy(src: ToolSource): void {
   }
 }
 
-function useRotate(): void {
+function toolRotate(): void {
   if (floater.value) {
     if (floater.value.parts.length === 1) {
       const part = floater.value.parts[0];
@@ -484,7 +493,7 @@ function useRotate(): void {
   }
 }
 
-function useFlip(): void {
+function toolFlip(): void {
   if (floater.value) {
     if (floater.value.parts.length === 1) {
       const part = floater.value.parts[0];
@@ -502,14 +511,14 @@ function useFlip(): void {
   }
 }
 
-function useInteract(): void {
+function toolInteract(): void {
   activeToolId.value = 'interact';
   if (floater.value) {
     cancelFloater();
   }
 }
 
-function useDelete(): void {
+function toolDelete(): void {
   if (activeToolId.value !== 'delete') {
     activeToolId.value = 'delete';
     cancelFloater();
@@ -533,7 +542,7 @@ function useDelete(): void {
   }
 }
 
-function useUndo(): void {
+function toolUndo(): void {
   if (floater.value) {
     cancelFloater();
   } else {
@@ -541,7 +550,7 @@ function useUndo(): void {
   }
 }
 
-function useRedo(): void {
+function toolRedo(): void {
   if (floater.value) {
     cancelFloater();
   } else {
@@ -550,21 +559,24 @@ function useRedo(): void {
 }
 
 const builderToolActions: Record<BuilderToolName, (src: ToolSource) => void> = {
-  pan: usePan,
-  select: useSelect,
-  gridresize: useGridResize,
-  add: useAdd,
-  move: useMove,
-  copy: useCopy,
-  rotate: useRotate,
-  flip: useFlip,
-  interact: useInteract,
-  delete: useDelete,
-  undo: useUndo,
-  redo: useRedo,
+  pan: toolPan,
+  select: toolSelect,
+  gridresize: toolGridResize,
+  add: toolAdd,
+  move: toolMove,
+  copy: toolCopy,
+  rotate: toolRotate,
+  flip: toolFlip,
+  interact: toolInteract,
+  delete: toolDelete,
+  undo: toolUndo,
+  redo: toolRedo,
 };
 
-function useTool(name: BuilderToolName, src: ToolSource): void {
+function applyTool(name: BuilderToolName | null, src: ToolSource): void {
+  if (!name) {
+    return;
+  }
   const action = builderToolActions[name];
   if (action) {
     action(src);
@@ -671,7 +683,7 @@ function keyHandler(evt: KeyboardEvent): void {
     deltaMove(keyDelta);
   } else if (tool) {
     if (!disabledTools.value.includes(tool.value)) {
-      useTool(tool.value, 'shortcut');
+      applyTool(tool.value, 'shortcut');
     }
   } else {
     return; // not handled - don't stop propagation
@@ -683,7 +695,7 @@ function keyHandler(evt: KeyboardEvent): void {
 }
 
 // Return the exact position of the current event
-function d3EventPos(evt: Event): XYPosition {
+function d3EventPos(evt: Event | { sourceEvent: Event }): XYPosition {
   const [x, y] = d3.pointer(evt, svgContentRef.value!);
   return { x, y };
 }
@@ -701,9 +713,9 @@ function gridHoverHandler(selection: SVGSelection): SVGSelection {
     });
 }
 
-const gridResizeDragHandler = d3
+const gridResizeDragBehavior = d3
   .drag<SVGElement, unknown>()
-  .on('start', (evt) => {
+  .on('start', (evt: SVGDragEvent) => {
     const { x, y } = d3EventPos(evt);
     const sqX = coord2grid(grid2coord(x));
     const sqY = coord2grid(grid2coord(y));
@@ -714,7 +726,7 @@ const gridResizeDragHandler = d3
       endY: sqY,
     });
   })
-  .on('drag', (evt) => {
+  .on('drag', (evt: SVGDragEvent) => {
     const { x, y } = d3EventPos(evt);
     const sqX = coord2grid(grid2coord(x));
     const sqY = coord2grid(grid2coord(y));
@@ -746,10 +758,9 @@ const gridResizeDragHandler = d3
     }
   });
 
-const gridDragHandler = d3
+const gridDragBehavior = d3
   .drag<SVGElement, unknown>()
-  .clickDistance(25)
-  .on('start', (evt) => {
+  .on('start', (evt: SVGDragEvent) => {
     if (!floater.value) {
       const { x, y } = d3EventPos(evt);
       startDragSelect({
@@ -760,19 +771,20 @@ const gridDragHandler = d3
       });
     }
   })
-  .on('drag', (evt) => {
+  .on('drag', (evt: SVGDragEvent) => {
     const { x, y } = d3EventPos(evt);
     updateDragSelect(x, y);
   })
-  .on('end', async (evt) => {
+  .on('end', (evt: SVGDragEvent) => {
     if (floater.value) {
       dropFloater(toFractionCoords(d3EventPos(evt)));
+      evt.sourceEvent.stopPropagation();
       return;
     }
 
-    const { altKey, shiftKey } = evt;
+    const { altKey, shiftKey } = evt.sourceEvent;
 
-    const sourceIds = deepCopy(selectedIds.value);
+    const sourceIds = cloneDeep(selectedIds.value);
     const targetIds = orderedParts.value
       .filter(makeSelectAreaFilter())
       .map((v) => v.id);
@@ -793,16 +805,27 @@ const gridDragHandler = d3
     stopDragSelect();
   });
 
-const partDragHandler = d3
-  .drag()
-  .clickDistance(25)
-  .on('start', (evt) => {
+const partDragBehavior = d3
+  .drag<SVGElement, unknown>()
+  .on('start', (evt: SVGDragEvent) => {
+    if (!partDraggingTools.includes(activeToolId.value)) {
+      // Active tool can never drag parts
+      // We only need to handle the end event
+      return;
+    }
+
     // We're not sure yet whether this is a drag or a click
     // The action becomes a drag once the mouse leaves the square
-    // The action is a click if the mouseup event is in the same square
+    // The action is a click if the end event is in the same square
     partDragStart.value = toCoords(d3EventPos(evt));
   })
-  .on('drag', function (this: Element, evt) {
+  .on('drag', function (this: Element, evt: SVGDragEvent) {
+    if (!partDraggingTools.includes(activeToolId.value)) {
+      // Active tool can never drag parts
+      // We only need to handle the end event
+      return;
+    }
+
     const pos = d3EventPos(evt);
     const coords = toCoords(pos);
     const start = partDragStart.value;
@@ -810,10 +833,12 @@ const partDragHandler = d3
     // We're already dragging.
     if (floater.value) {
       moveFloater(toFractionCoords(pos));
+      return;
     }
+
     // Check if the drag event has left the initial square
     // Create a floater when this happens
-    else if (start && !isEqual(start, coords)) {
+    if (start && !isEqual(start, coords)) {
       const targetId = this.getAttribute('part-id')!;
       const relevantIds = selectedIds.value.includes(targetId)
         ? [...selectedIds.value]
@@ -836,70 +861,60 @@ const partDragHandler = d3
       });
     }
   })
-  .on('end', (evt) => {
+  .on('end', (evt: SVGDragEvent) => {
     partDragStart.value = null;
-    dropFloater(toFractionCoords(d3EventPos(evt)));
+
+    if (floater.value) {
+      dropFloater(toFractionCoords(d3EventPos(evt)));
+      evt.sourceEvent.stopPropagation();
+      return;
+    }
+
+    // We weren't dragging or floating parts
+    // We can now consider this a part click event
+    applyTool(activeToolId.value, 'click');
+    evt.sourceEvent.stopPropagation();
   });
 
-function defineGridEventHandlers(
+function assignGridEventHandlers(
   el: SVGElement,
   tool: BuilderToolName | null,
 ): void {
   const selection = d3.select(el);
   selection.call(gridHoverHandler);
 
-  selection.on('click', (evt) => {
-    if (floater.value) {
-      dropFloater(toFractionCoords(d3EventPos(evt)));
-    }
-  });
+  switch (tool) {
+    case 'select':
+    case 'copy':
+    case 'move':
+    case 'delete':
+      selection.call(gridDragBehavior);
+      selection.on('click', null);
+      break;
+    case 'gridresize':
+      selection.call(gridResizeDragBehavior);
+      selection.on('click', null);
+      break;
+    case 'pan': // handled by useSvgZoom
+    default:
+      selection.on('.drag', null);
+      selection.on('click', (evt: Event) => {
+        if (floater.value) {
+          dropFloater(toFractionCoords(d3EventPos(evt)));
+        }
+      });
 
-  if (tool && ['select', 'copy', 'move', 'delete'].includes(tool)) {
-    selection.call(gridDragHandler);
-  } else if (tool === 'gridresize') {
-    selection.call(gridResizeDragHandler);
-  } else {
-    // pan is handled by useSvgZoom
-    selection.on('.drag', null);
+      break;
   }
 }
 
-function definePartEventHandlers(
-  el: SVGElement,
-  tool: BuilderToolName | null,
-): void {
-  const partSelection = d3.select(el).selectAll<Element, any>('.flowpart');
-
-  if (tool === 'move' || tool === 'copy') {
-    partSelection.call(partDragHandler);
-  } else {
-    partSelection.on('.drag', null);
-  }
-
-  if (
-    tool &&
-    [
-      'select',
-      'new',
-      'move',
-      'copy',
-      'rotate',
-      'flip',
-      'edit',
-      'delete',
-    ].includes(tool)
-  ) {
-    partSelection.on('click', function (evt: Event) {
-      builderToolActions[tool]('click');
-      evt.stopPropagation();
-    });
-  } else {
-    partSelection.on('click', null);
-  }
+function assignPartEventHandlers(el: SVGElement): void {
+  const selection = d3.select(el).selectAll<SVGElement, any>('.flowpart');
+  selection.call(partDragBehavior);
 }
 
 watch(
-  () => layoutId.value,
+  layoutId,
   (newV, oldV) => {
     if (newV !== oldV) {
       clearUndoStack();
@@ -911,23 +926,29 @@ watch(
 );
 
 watch(
-  () => layoutTitle.value,
-  (title) => (document.title = `Brewblox | ${title}`),
+  layoutTitle,
+  (title) => {
+    document.title = `Brewblox | ${title}`;
+  },
   { immediate: true },
 );
 
 watch(
   [svgRef, activeToolId],
-  ([el, tool]) => el && defineGridEventHandlers(el, tool),
+  ([el, tool]) => {
+    if (el) {
+      assignGridEventHandlers(el, tool);
+    }
+  },
   { immediate: true },
 );
 
 watch(
   [svgContentRef, activeToolId, orderedParts],
-  async ([el, tool]) => {
+  async ([el]) => {
     await nextTick();
     if (el) {
-      definePartEventHandlers(el, tool);
+      assignPartEventHandlers(el);
     }
   },
   { immediate: true },
@@ -1067,7 +1088,7 @@ onBeforeUnmount(() => {
             <PartWrapper
               :part="part"
               :selected="selectedIds.includes(part.id)"
-              :selectable="!['interact', 'pan', null].includes(activeToolId)"
+              :selectable="partSelectionTools.includes(activeToolId)"
               :interactable="activeToolId === 'interact'"
               @patch:part="(patch) => patchPart(part.id, patch)"
               @patch:settings="(patch) => patchPartSettings(part.id, patch)"
@@ -1106,7 +1127,7 @@ onBeforeUnmount(() => {
         v-model:expanded="toolsMenuExpanded"
         :active-tool="activeToolId"
         :disabled-tools="disabledTools"
-        @use="(v) => useTool(v, 'menu')"
+        @use="(v) => applyTool(v, 'menu')"
         @touchstart.stop
         @mousedown.stop
       />

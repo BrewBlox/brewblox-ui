@@ -1,23 +1,14 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { coord2grid } from '../utils';
 
-export default defineComponent({
-  name: 'EditorBackground',
-  props: {
-    width: {
-      type: Number,
-      required: true,
-    },
-    height: {
-      type: Number,
-      required: true,
-    },
+defineProps({
+  width: {
+    type: Number,
+    required: true,
   },
-  setup() {
-    return {
-      coord2grid,
-    };
+  height: {
+    type: Number,
+    required: true,
   },
 });
 </script>

@@ -1,30 +1,18 @@
-<script lang="ts">
+<script setup lang="ts">
 import { LEFT } from '@/plugins/builder/const';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
-export default defineComponent({
-  name: 'StraightInletTubePartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const flowSpeed = computed<number>(
-      () => -flowOnCoord(part.value, flows.value, LEFT),
-    );
+const flowSpeed = computed<number>(
+  () => -flowOnCoord(part.value, flows.value, LEFT),
+);
 
-    const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, LEFT),
-    );
-
-    return {
-      width,
-      height,
-      flowSpeed,
-      liquids,
-    };
-  },
-});
+const liquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, LEFT),
+);
 </script>
 
 <template>

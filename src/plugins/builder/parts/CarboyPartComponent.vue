@@ -1,23 +1,8 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/Carboy';
 import { usePart } from '../composables';
 
-export default defineComponent({
-  name: 'CarboyPartComponent',
-  setup() {
-    const { width, height, color } = usePart.setup();
-
-    return {
-      MIN_SIZE,
-      MAX_SIZE,
-      DEFAULT_SIZE,
-      width,
-      height,
-      color,
-    };
-  },
-});
+const { width, height, color } = usePart.setup();
 </script>
 
 <template>

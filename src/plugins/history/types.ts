@@ -84,7 +84,7 @@ export interface TimeSeriesMetricsResult {
 }
 
 export interface RangeValue extends PlotData {
-  type: 'scatter';
+  type: 'scattergl';
   mode: 'lines';
   name: string;
   yaxis: GraphAxis;

@@ -1,5 +1,5 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -8,25 +8,9 @@ import {
 import { usePart } from '../composables';
 import { liquidBorderColor } from '../utils';
 
-export default defineComponent({
-  name: 'SetpointDisplayPartComponent',
-  setup() {
-    const { flows, width, height, bordered, passthrough } = usePart.setup();
+const { flows, width, height, bordered, passthrough } = usePart.setup();
 
-    const borderColor = computed<string>(() => liquidBorderColor(flows.value));
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      width,
-      height,
-      bordered,
-      borderColor,
-      passthrough,
-    };
-  },
-});
+const borderColor = computed<string>(() => liquidBorderColor(flows.value));
 </script>
 
 <template>

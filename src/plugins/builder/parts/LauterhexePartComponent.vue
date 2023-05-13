@@ -1,5 +1,4 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { usePart } from '../composables';
 
 const paths = {
@@ -46,18 +45,7 @@ const paths = {
   ],
 };
 
-export default defineComponent({
-  name: 'LauterhexePartComponent',
-  setup() {
-    const { width, height } = usePart.setup();
-
-    return {
-      width,
-      height,
-      paths,
-    };
-  },
-});
+const { width, height } = usePart.setup();
 </script>
 
 <template>

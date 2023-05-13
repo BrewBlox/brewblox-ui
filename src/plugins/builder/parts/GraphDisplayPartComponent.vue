@@ -1,104 +1,138 @@
-<script lang="ts">
+<script setup lang="ts">
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import {
   defaultPresets as durationPresets,
   emptyGraphConfig,
 } from '@/plugins/history/utils';
 import { createDialog } from '@/utils/dialog';
+import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid';
-import { defineComponent, ref, shallowRef, watch } from 'vue';
+import { useQuasar } from 'quasar';
+import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/GraphDisplay';
 import { usePart } from '../composables';
 import { GRAPH_CONFIG_KEY } from '../const';
+import { ZoomTransformKey } from '../symbols';
 
-export default defineComponent({
-  name: 'GraphDisplayPartComponent',
-  setup() {
-    const {
-      settings,
-      patchSettings,
-      width,
-      height,
-      interactable,
-      placeholder,
-    } = usePart.setup();
+/**
+ * This component has some workarounds for a Safari bug.
+ * SVG transformation is not applied correctly to SVG foreignObject content.
+ * See: https://bugs.webkit.org/show_bug.cgi?id=23113
+ *
+ * The graph is never rotated, but it is transformed during SVG zoom/pan.
+ * To compensate for the lack of transformation by Safari, we explicitly set rendered width/height.
+ * For non-Safari browsers, this is always equal to the width/height of the SVG part.
+ * For Safari, we get the (transformed) width/height of the foreignObject element.
+ */
 
-    const graphId = nanoid();
-    const sourceRevision = ref<Date>(new Date());
-    const renderRevision = ref<Date>(new Date());
-    const config = shallowRef<GraphConfig>(emptyGraphConfig());
-    const presets = durationPresets();
+const $q = useQuasar();
+const { settings, patchSettings, width, height, interactable, placeholder } =
+  usePart.setup();
 
-    watch(
-      settings,
-      (newSettings) => {
-        const cfg: GraphConfig = merge(
-          emptyGraphConfig(),
-          newSettings[GRAPH_CONFIG_KEY],
-        );
-        if (!isEqual(cfg, config.value)) {
-          config.value = cfg;
-          sourceRevision.value = new Date();
-        }
-      },
-      { immediate: true },
-    );
+const graphId = nanoid();
+const presets = durationPresets();
 
-    watch([interactable, width, height], () => {
-      renderRevision.value = new Date();
-    });
-
-    function edit(): void {
-      createDialog({
-        component: 'GraphEditorDialog',
-        componentProps: {
-          title: 'Edit Graph',
-          config: config.value,
-        },
-      }).onOk((cfg) => {
-        patchSettings({ [GRAPH_CONFIG_KEY]: cfg });
-      });
-    }
-
-    function maximized(): void {
-      createDialog({
-        component: 'GraphDialog',
-        componentProps: {
-          graphId,
-          config: config.value,
-          sharedSources: true,
-          usePresets: true,
-        },
-      }).onOk((cfg) => {
-        patchSettings({ [GRAPH_CONFIG_KEY]: cfg });
-      });
-    }
-
-    function activatePreset(params: QueryParams): void {
-      patchSettings({ [GRAPH_CONFIG_KEY]: { ...config.value, params } });
-    }
-
-    return {
-      MIN_SIZE,
-      MAX_SIZE,
-      DEFAULT_SIZE,
-      width,
-      height,
-      interactable,
-      placeholder,
-      graphId,
-      config,
-      presets,
-      sourceRevision,
-      renderRevision,
-      edit,
-      maximized,
-      activatePreset,
-    };
-  },
+const sourceRevision = ref<Date>(new Date());
+const renderRevision = ref<Date>(new Date());
+const baseConfig = shallowRef<GraphConfig>(emptyGraphConfig());
+const actualGraphSize = ref({
+  width: width.value,
+  height: height.value,
 });
+
+const isSafari = $q.platform.is.name === 'safari';
+const graphHidden = ref(false);
+const fobjElement = ref<SVGForeignObjectElement>();
+const activeTransform = inject(ZoomTransformKey, ref());
+
+const sizedConfig = computed<GraphConfig>(() => ({
+  ...baseConfig.value,
+  layout: {
+    ...actualGraphSize.value,
+    margin: { t: 5, l: 5, r: 0, b: 5 },
+  },
+}));
+
+const refresh = debounce(
+  () =>
+    nextTick(() => {
+      if (isSafari && fobjElement.value) {
+        const rect = fobjElement.value.getBoundingClientRect();
+        actualGraphSize.value = {
+          width: rect.width,
+          height: rect.height,
+        };
+      } else {
+        actualGraphSize.value = {
+          width: width.value,
+          height: height.value,
+        };
+      }
+
+      renderRevision.value = new Date();
+      graphHidden.value = false;
+    }),
+  500,
+  { leading: false, trailing: true },
+);
+
+function edit(): void {
+  createDialog({
+    component: 'GraphEditorDialog',
+    componentProps: {
+      title: 'Edit Graph',
+      config: baseConfig.value,
+    },
+  }).onOk((cfg) => {
+    patchSettings({ [GRAPH_CONFIG_KEY]: cfg });
+  });
+}
+
+function showMaximized(): void {
+  createDialog({
+    component: 'GraphDialog',
+    componentProps: {
+      graphId,
+      config: baseConfig.value,
+      sharedSources: true,
+      usePresets: true,
+    },
+  }).onOk((cfg) => {
+    patchSettings({ [GRAPH_CONFIG_KEY]: cfg });
+  });
+}
+
+function activatePreset(params: QueryParams): void {
+  patchSettings({ [GRAPH_CONFIG_KEY]: { ...baseConfig.value, params } });
+}
+
+watch(
+  settings,
+  (newSettings) => {
+    const cfg: GraphConfig = merge(
+      emptyGraphConfig(),
+      newSettings[GRAPH_CONFIG_KEY],
+    );
+    if (!isEqual(cfg, baseConfig.value)) {
+      baseConfig.value = cfg;
+      sourceRevision.value = new Date();
+    }
+  },
+  { immediate: true },
+);
+
+// The graph is transformed smoothly on non-Safari browsers
+// No need to hide and re-render it
+if (isSafari) {
+  watch(activeTransform, () => {
+    graphHidden.value = true;
+    refresh();
+  });
+}
+
+watch([interactable, width, height], () => refresh());
 </script>
 
 <template>
@@ -111,21 +145,32 @@ export default defineComponent({
     />
     <foreignObject
       v-else
+      ref="fobjElement"
       v-bind="{ width, height }"
     >
       <HistoryGraph
+        v-show="!graphHidden"
         v-bind="{
           graphId,
-          config,
           sourceRevision,
           renderRevision,
-          interactable: false,
+          config: sizedConfig,
+          static: true,
         }"
-      />
+        class="fit"
+        style="position: fixed"
+      >
+        <template
+          v-if="isSafari"
+          #error="{ error }"
+        >
+          <div class="q-pa-md">Graph error: {{ error }}</div>
+        </template>
+      </HistoryGraph>
     </foreignObject>
     <BuilderInteraction
       v-bind="{ width, height }"
-      @interact="maximized"
+      @interact="showMaximized"
     >
       <q-menu
         touch-position
@@ -135,7 +180,7 @@ export default defineComponent({
           <q-item
             v-close-popup
             clickable
-            @click="maximized"
+            @click="showMaximized"
           >
             <q-item-section>Show fullscreen</q-item-section>
           </q-item>
@@ -162,7 +207,7 @@ export default defineComponent({
                   v-close-popup
                   dense
                   clickable
-                  :active="config.params.duration === cfg.duration"
+                  :active="baseConfig.params.duration === cfg.duration"
                   @click="activatePreset(cfg)"
                 >
                   <q-item-section>{{ cfg.duration }}</q-item-section>

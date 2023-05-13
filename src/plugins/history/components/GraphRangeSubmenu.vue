@@ -1,6 +1,6 @@
 <script lang="ts">
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import { Layout } from 'plotly.js';
 import { defineComponent, PropType } from 'vue';
 
@@ -34,7 +34,7 @@ export default defineComponent({
         },
       }).onOk((range) =>
         props.save({
-          ...deepCopy(props.layout),
+          ...cloneDeep(props.layout),
           [key]: range ? { range, autorange: false } : undefined,
         }),
       );

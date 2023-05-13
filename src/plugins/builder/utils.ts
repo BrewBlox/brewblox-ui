@@ -4,8 +4,8 @@ import { isCompatible } from '@/plugins/spark/utils/info';
 import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { loadFile } from '@/utils/import-export';
-import { deepCopy } from '@/utils/objects';
 import { Block } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import isObject from 'lodash/isObject';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
@@ -378,7 +378,7 @@ export async function startCreateLayout(
     title,
     width: source?.width ?? DEFAULT_LAYOUT_WIDTH,
     height: source?.height ?? DEFAULT_LAYOUT_HEIGHT,
-    parts: deepCopy(source?.parts) ?? [],
+    parts: cloneDeep(source?.parts) ?? [],
   });
   router.push(`/builder/${id}`);
 }

@@ -1,82 +1,83 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
-import { defineComponent, PropType, ref } from 'vue';
+import isEqual from 'lodash/isEqual';
+import { computed, PropType, ref } from 'vue';
 import { GraphConfig, SharedGraphConfig } from '../types';
 import { emptyGraphConfig } from '../utils';
 
-export default defineComponent({
-  name: 'GraphEditorDialog',
-  props: {
-    ...useDialog.props,
-    config: {
-      type: Object as PropType<GraphConfig>,
-      required: true,
-    },
-    noPeriod: {
-      type: Boolean,
-      default: false,
-    },
-    shared: {
-      type: Array as PropType<SharedGraphConfig[]>,
-      default: () => [],
-    },
+function withDefaults(cfg: GraphConfig): GraphConfig {
+  return defaults(cloneDeep(cfg), emptyGraphConfig());
+}
+
+const props = defineProps({
+  ...useDialog.props,
+  config: {
+    type: Object as PropType<GraphConfig>,
+    required: true,
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-
-    const local = ref<GraphConfig>(
-      defaults(deepCopy(props.config), emptyGraphConfig()),
-    );
-
-    function loadShared(): void {
-      createDialog({
-        title: 'Import config',
-        message: 'Copy configuration from another graph',
-        options: {
-          type: 'radio',
-          model: '',
-          items: props.shared.map((shared) => ({
-            label: shared.title,
-            value: shared.id,
-          })),
-        },
-        cancel: true,
-      } as any).onOk((id) => {
-        const shared = props.shared.find((s) => s.id === id);
-        if (shared) {
-          local.value = defaults(deepCopy(shared.config), emptyGraphConfig());
-        }
-      });
-    }
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      loadShared,
-      save,
-    };
+  noPeriod: {
+    type: Boolean,
+    default: false,
+  },
+  shared: {
+    type: Array as PropType<SharedGraphConfig[]>,
+    default: () => [],
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogRef, dialogProps, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const initial = ref<GraphConfig>(withDefaults(props.config));
+const local = ref<GraphConfig>(withDefaults(props.config));
+
+const dirty = computed<boolean>(() => !isEqual(initial.value, local.value));
+
+function loadShared(): void {
+  createDialog({
+    title: 'Import config',
+    message: 'Copy configuration from another graph',
+    options: {
+      type: 'radio',
+      model: '',
+      items: props.shared.map((shared) => ({
+        label: shared.title,
+        value: shared.id,
+      })),
+    },
+    cancel: true,
+  } as any).onOk((id) => {
+    const shared = props.shared.find((s) => s.id === id);
+    if (shared) {
+      local.value = withDefaults(shared.config);
+    }
+  });
+}
+
+function revert(): void {
+  local.value = cloneDeep(initial.value);
+}
+
+function confirm(): void {
+  if (dirty.value) {
+    onDialogOK(local.value);
+  } else {
+    onDialogCancel();
+  }
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
     v-bind="dialogProps"
-    @hide="onDialogHide"
-    @keyup.enter="save"
+    @hide="confirm"
+    @keyup.enter="confirm"
   >
     <Card no-scroll>
       <template #toolbar>
@@ -95,25 +96,20 @@ export default defineComponent({
           style="border-top: 1px solid silver"
         >
           <q-btn
+            :disable="!dirty"
             flat
-            label="Cancel"
-            @click="onDialogCancel"
+            label="Revert"
+            @click="revert"
           />
           <q-space />
           <q-btn
-            :disable="shared.length === 0"
+            v-if="shared.length > 0"
             flat
             label="Import config"
             @click="loadShared"
           >
             <q-tooltip>Copy configuration from another graph</q-tooltip>
           </q-btn>
-          <q-btn
-            unelevated
-            label="Save"
-            color="primary"
-            @click="save"
-          />
         </q-card-actions>
       </div>
     </Card>

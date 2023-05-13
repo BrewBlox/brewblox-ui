@@ -1,14 +1,11 @@
-<script lang="ts">
+<script setup lang="ts">
 import { BlockStatus } from '@/plugins/spark/types';
-import { defineComponent, PropType } from 'vue';
+import { PropType } from 'vue';
 
-export default defineComponent({
-  name: 'BlockStatusSvg',
-  props: {
-    status: {
-      type: null as unknown as PropType<BlockStatus | null>,
-      required: true,
-    },
+defineProps({
+  status: {
+    type: null as unknown as PropType<BlockStatus | null>,
+    required: true,
   },
 });
 </script>

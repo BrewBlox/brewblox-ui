@@ -14,7 +14,7 @@ import { App, Component } from 'vue';
  * @returns registered string name
  */
 export function cref(app: App, component: Component): string {
-  const name = component.name;
+  const name = component.name ?? component['__name'];
   if (!name) {
     throw new Error('Unable to register nameless component');
   }

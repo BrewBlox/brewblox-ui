@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/objects';
 import { durationMs, durationString } from '@/utils/quantity';
+import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { defaultLabel } from '../nodes';
@@ -25,7 +25,7 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
 
-    const local = reactive(deepCopy(props.config));
+    const local = reactive(cloneDeep(props.config));
 
     const rename = computed<string>({
       get: () => local.renames[props.field] ?? defaultLabel(props.field),

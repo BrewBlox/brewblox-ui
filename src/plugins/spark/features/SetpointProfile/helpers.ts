@@ -14,7 +14,7 @@ export const profileGraphProps = (block: SetpointProfileBlock): GraphProps => {
     data: [
       {
         name: `${block.data.targetId.id || ''} setting`,
-        type: 'scatter',
+        type: 'scattergl',
         x: block.data.points.map((p) => start + durationMs(p.time)),
         y: block.data.points.map((p) => p.temperature.value),
       },

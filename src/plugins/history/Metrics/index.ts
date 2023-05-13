@@ -14,7 +14,6 @@ const plugin: Plugin = {
       id: 'Metrics',
       title: 'Metrics',
       component: cref(app, widget),
-      wizard: true,
       generateConfig: emptyMetricsConfig,
       widgetSize: {
         cols: 4,

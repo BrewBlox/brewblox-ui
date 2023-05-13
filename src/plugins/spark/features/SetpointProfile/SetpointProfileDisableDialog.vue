@@ -3,7 +3,6 @@ import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/objects';
 import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 import {
   Quantity,
@@ -11,6 +10,7 @@ import {
   SetpointSensorPairBlock,
   SettingMode,
 } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
@@ -31,7 +31,7 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
-    const profile: SetpointProfileBlock = deepCopy(props.block);
+    const profile: SetpointProfileBlock = cloneDeep(props.block);
     const setpoint: SetpointSensorPairBlock | null = sparkStore.blockByLink(
       profile.serviceId,
       profile.data.targetId,

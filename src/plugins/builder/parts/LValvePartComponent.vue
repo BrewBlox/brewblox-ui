@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
   UP,
   ValveBlockT,
@@ -8,7 +8,7 @@ import {
 } from '@/plugins/builder/const';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, defineComponent, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 
 const paths = {
@@ -24,82 +24,61 @@ const paths = {
   liquidRight: `M25,0 v17 ${elbow(8, 8, false)} H50`,
 };
 
-export default defineComponent({
-  name: 'LValvePartComponent',
-  setup() {
-    const { part, flows, settings, width, height, patchSettings, reflow } =
-      usePart.setup();
+const { part, flows, settings, width, height, patchSettings, reflow } =
+  usePart.setup();
 
-    const {
-      hasAddress,
-      block,
-      patchBlock,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-    } = useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
+const {
+  hasAddress,
+  block,
+  patchBlock,
+  blockStatus,
+  isBroken,
+  showBlockDialog,
+  showBlockSelectDialog,
+} = useSettingsBlock.setup<ValveBlockT>(VALVE_KEY, VALVE_TYPES);
 
-    const closed = computed<boolean>(() =>
-      block.value !== null
-        ? Boolean(block.value.data.state === DigitalState.STATE_ACTIVE)
-        : Boolean(settings.value[VALVE_CLOSED_KEY]),
-    );
+const closed = computed<boolean>(() =>
+  block.value !== null
+    ? Boolean(block.value.data.state === DigitalState.STATE_ACTIVE)
+    : Boolean(settings.value[VALVE_CLOSED_KEY]),
+);
 
-    const liquidPath = computed<string>(() =>
-      closed.value ? paths.liquidLeft : paths.liquidRight,
-    );
+const liquidPath = computed<string>(() =>
+  closed.value ? paths.liquidLeft : paths.liquidRight,
+);
 
-    const liquidSpeed = computed<number>(
-      () => -flowOnCoord(part.value, flows.value, UP),
-    );
+const liquidSpeed = computed<number>(
+  () => -flowOnCoord(part.value, flows.value, UP),
+);
 
-    const liquidColor = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, UP),
-    );
+const liquidColor = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, UP),
+);
 
-    function toggle(): void {
-      if (hasAddress.value) {
-        if (block.value) {
-          const storedState =
-            block.value.data.state === DigitalState.STATE_INACTIVE
-              ? DigitalState.STATE_ACTIVE
-              : DigitalState.STATE_INACTIVE;
-          patchBlock({ storedState }, true);
-        }
-      } else {
-        patchSettings({
-          [VALVE_CLOSED_KEY]: !settings.value[VALVE_CLOSED_KEY],
-        });
-      }
+function toggle(): void {
+  if (hasAddress.value) {
+    if (block.value) {
+      const storedState =
+        block.value.data.state === DigitalState.STATE_INACTIVE
+          ? DigitalState.STATE_ACTIVE
+          : DigitalState.STATE_INACTIVE;
+      patchBlock({ storedState }, true);
     }
+  } else {
+    patchSettings({
+      [VALVE_CLOSED_KEY]: !settings.value[VALVE_CLOSED_KEY],
+    });
+  }
+}
 
-    watch(
-      () => block.value,
-      (newV, oldV) => {
-        if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
-          reflow();
-        }
-      },
-    );
-
-    return {
-      width,
-      height,
-      paths,
-      block,
-      blockStatus,
-      isBroken,
-      closed,
-      liquidPath,
-      liquidSpeed,
-      liquidColor,
-      toggle,
-      showBlockDialog,
-      showBlockSelectDialog,
-    };
+watch(
+  () => block.value,
+  (newV, oldV) => {
+    if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
+      reflow();
+    }
   },
-});
+);
 </script>
 
 <template>

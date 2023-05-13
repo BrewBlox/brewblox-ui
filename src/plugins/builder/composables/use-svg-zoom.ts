@@ -3,7 +3,8 @@ import defaults from 'lodash/defaults';
 import isEqual from 'lodash/isEqual';
 import isFinite from 'lodash/isFinite';
 import toFinite from 'lodash/toFinite';
-import { Ref, ref, watch } from 'vue';
+import { provide, Ref, ref, watch } from 'vue';
+import { ZoomTransformKey } from '../symbols';
 
 export interface UseSvgZoomDimensions {
   width: number;
@@ -38,6 +39,9 @@ export const useSvgZoom: UseSvgZoomComposable = {
     const svgRef = ref<SVGElement>();
     const svgContentRef = ref<SVGGElement>();
     const { dragEnabled, wheelEnabled } = defaults(opts, defaultOpts());
+    const activeTransform = ref<d3.ZoomTransform>();
+
+    provide(ZoomTransformKey, activeTransform);
 
     function transformCenter(scaleOffset = -0.05): d3.ZoomTransform {
       if (!svgRef.value) {
@@ -59,6 +63,7 @@ export const useSvgZoom: UseSvgZoomComposable = {
     const gridZoom = d3.zoom<SVGElement, unknown>().on('zoom', function (evt) {
       const { transform } = evt;
       if (isFinite(transform.x + transform.y + transform.k)) {
+        activeTransform.value = transform;
         svgContentRef.value?.setAttribute('transform', transform);
       }
     });
