@@ -363,9 +363,11 @@ export async function startCreateLayout(
   const title = await createDialogPromise({
     component: 'InputDialog',
     componentProps: {
-      modelValue: 'Brewery Layout',
+      modelValue: '',
       title: 'New Layout',
+      placeholder: 'New Layout',
       message: 'Create a new Brewery Builder layout',
+      rules: [(v) => !!v || 'Name should not be empty'],
     },
   });
   if (!title) {

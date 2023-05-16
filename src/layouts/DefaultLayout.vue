@@ -92,7 +92,7 @@ const drawerOpen = computed<boolean>({
         <q-space />
         <q-btn-dropdown
           fab-mini
-          icon="mdi-creation"
+          icon="add"
           color="secondary"
         >
           <q-list>

@@ -86,7 +86,7 @@ function selectValue(opt: any, save: boolean): void {
         optionClass,
         {
           'q-py-sm': !dense,
-          'depth-24': matches(opt),
+          'text-primary': matches(opt),
           clickable: !opt.disable,
           darkened: !!opt.disable,
           'fade-5': !!opt.disable,

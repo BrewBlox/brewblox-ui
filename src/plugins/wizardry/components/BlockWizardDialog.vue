@@ -358,7 +358,7 @@ onMounted(() => {
 
         <q-step
           name="service"
-          title="Service"
+          title="Spark"
         >
           <ListSelect
             v-model="selectedServiceOpt"

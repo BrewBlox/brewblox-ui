@@ -52,7 +52,6 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: 'params', data: QueryParams): void;
   (e: 'layout', data: Partial<Layout>): void;
-  (e: 'error', msg: string): void;
 }>();
 
 const historyStore = useHistoryStore();
@@ -187,13 +186,16 @@ onBeforeUnmount(() => {
       name="error"
       :error="error"
     >
-      <div class="col row text-h5 justify-center items-center">
+      <div class="col column items-center justify-center q-gutter-y-md">
         <q-icon
-          name="warning"
-          color="negative"
+          name="mdi-chart-line"
+          size="lg"
+          class="col-auto"
         />
-        <div class="col-auto q-px-md">
-          {{ error }}
+        <div class="col-auto row text-h5 justify-center items-center">
+          <div class="col-auto q-px-md">
+            {{ error }}
+          </div>
         </div>
       </div>
     </slot>
