@@ -13,7 +13,7 @@ import { useQuasar } from 'quasar';
 import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/GraphDisplay';
 import { usePart } from '../composables';
-import { GRAPH_CONFIG_KEY } from '../const';
+import { GRAPH_CONFIG_KEY, SQUARE_SIZE } from '../const';
 import { ZoomTransformKey } from '../symbols';
 
 /**
@@ -138,10 +138,9 @@ watch([interactable, width, height], () => refresh());
 <template>
   <svg v-bind="{ width, height }">
     <ChartSvgIcon
-      v-if="placeholder"
-      :width="height"
-      :height="height"
-      :x="width / 2 - height / 2"
+      v-if="placeholder || graphHidden"
+      :x="width / 2 - SQUARE_SIZE / 2"
+      :y="height / 2 - SQUARE_SIZE / 2"
     />
     <foreignObject
       v-else
@@ -164,7 +163,13 @@ watch([interactable, width, height], () => refresh());
           v-if="isSafari"
           #error="{ error }"
         >
-          <div class="q-pa-md">Graph error: {{ error }}</div>
+          <div class="q-pa-md q-gutter-sm">
+            <q-icon
+              name="mdi-chart-line"
+              size="md"
+            />
+            <div>{{ error }}</div>
+          </div>
         </template>
       </HistoryGraph>
     </foreignObject>

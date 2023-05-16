@@ -123,10 +123,12 @@ export function startCreateDashboard(router: Router | null): void {
   createDialog({
     component: 'InputDialog',
     componentProps: {
-      modelValue: 'New dashboard',
+      modelValue: '',
       title: 'Add dashboard',
+      placeholder: 'New Dashboard',
       message:
         'Add widgets to dashboards to create a custom UI for your brewery.',
+      rules: [(v) => !!v || 'Name should not be empty'],
     },
   }).onOk((title) => {
     const dashboardStore = useDashboardStore();

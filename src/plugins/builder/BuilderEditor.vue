@@ -911,6 +911,12 @@ function assignGridEventHandlers(
 function assignPartEventHandlers(el: SVGElement): void {
   const selection = d3.select(el).selectAll<SVGElement, any>('.flowpart');
   selection.call(partDragBehavior);
+
+  // Prevent zoom reset on double click
+  selection.on('dblclick', (evt) => {
+    evt.stopPropagation();
+    evt.preventDefault();
+  });
 }
 
 watch(

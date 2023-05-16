@@ -40,11 +40,9 @@ const layoutDefaults = (): Partial<Layout> => ({
     type: 'date',
     gridcolor: '#666',
     autorange: true,
-    domain: [0, 0.9],
   },
   yaxis: {
     side: 'right',
-    position: 0.9,
     gridcolor: '#666',
     zerolinecolor: '#eee',
     autorange: true,

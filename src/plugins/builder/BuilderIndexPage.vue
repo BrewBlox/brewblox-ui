@@ -42,7 +42,7 @@ watch(
       <q-btn
         unelevated
         color="secondary"
-        icon="mdi-creation"
+        icon="add"
         size="lg"
         label="New layout"
         @click="startCreateLayout($router)"
