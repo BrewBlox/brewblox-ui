@@ -1,29 +1,24 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'SpinnerSvgIcon',
-  props: {
-    width: {
-      type: Number,
-      default: 50,
-    },
-    height: {
-      type: Number,
-      default: 50,
-    },
-    x: {
-      type: Number,
-      default: 0,
-    },
-    y: {
-      type: Number,
-      default: 0,
-    },
-    color: {
-      type: String,
-      default: 'grey',
-    },
+<script setup lang="ts">
+defineProps({
+  width: {
+    type: Number,
+    default: 50,
+  },
+  height: {
+    type: Number,
+    default: 50,
+  },
+  x: {
+    type: Number,
+    default: 0,
+  },
+  y: {
+    type: Number,
+    default: 0,
+  },
+  color: {
+    type: String,
+    default: 'grey',
   },
 });
 </script>

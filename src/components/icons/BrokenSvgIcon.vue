@@ -1,19 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { mdiAlertCircleOutline } from '@quasar/extras/mdi-v5';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'BrokenSvgIcon',
-  props: {
-    color: {
-      type: String,
-      default: 'firebrick',
-    },
-  },
-  setup() {
-    return {
-      mdiAlertCircleOutline,
-    };
+defineProps({
+  color: {
+    type: String,
+    default: 'firebrick',
   },
 });
 </script>

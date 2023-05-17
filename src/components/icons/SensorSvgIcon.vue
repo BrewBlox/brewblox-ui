@@ -1,17 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { mdiThermometer } from '@quasar/extras/mdi-v5';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'SensorSvgIcon',
-  props: {
-    color: {
-      type: String,
-      default: 'white',
-    },
-  },
-  setup() {
-    return { mdiThermometer };
+defineProps({
+  color: {
+    type: String,
+    default: 'white',
   },
 });
 </script>
