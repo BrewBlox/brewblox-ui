@@ -80,14 +80,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  maximized: {
-    type: Boolean,
-    default: false,
-  },
-  autoResize: {
-    type: Boolean,
-    default: false,
-  },
   revision: {
     type: Date,
     default: () => new Date(),

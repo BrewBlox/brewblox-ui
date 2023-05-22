@@ -83,7 +83,6 @@ export default defineComponent({
           annotated,
           sourceRevision,
         }"
-        maximized
         class="fit"
         @annotations="saveAnnotations"
         @params="saveLocalParams"

@@ -1,37 +1,28 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { saveFile } from '@/utils/import-export';
 import { SetpointProfileBlock } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'ProfileExportAction',
-  props: {
-    icon: {
-      type: String,
-      default: 'mdi-file-export',
-    },
-    label: {
-      type: String,
-      default: 'Export profile to file',
-    },
+defineProps({
+  icon: {
+    type: String,
+    default: 'mdi-file-export',
   },
-  setup() {
-    const { block } = useBlockWidget.setup<SetpointProfileBlock>();
-
-    function startExport(): void {
-      const { points } = block.value.data;
-      saveFile(
-        { points },
-        `${block.value.serviceId}-${block.value.id}.profile.json`,
-      );
-    }
-
-    return {
-      startExport,
-    };
+  label: {
+    type: String,
+    default: 'Export profile to file',
   },
 });
+
+const { block } = useBlockWidget.setup<SetpointProfileBlock>();
+
+function startExport(): void {
+  const { points } = block.value.data;
+  saveFile(
+    { points },
+    `${block.value.serviceId}-${block.value.id}.profile.json`,
+  );
+}
 </script>
 
 <template>

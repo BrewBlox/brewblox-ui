@@ -1,12 +1,13 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { WidgetMode } from '@/store/features';
 import { createComponentDialog } from '@/utils/dialog';
 import { isJsonEqual } from '@/utils/objects';
 import { prettyLink } from '@/utils/quantity';
 import { Link, SetpointProfileBlock } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { Component, computed, ref, watch } from 'vue';
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';
@@ -17,67 +18,47 @@ import SetpointProfileFull from './SetpointProfileFull.vue';
 
 type SetpointProfileData = SetpointProfileBlock['data'];
 
-export default defineComponent({
-  name: 'SetpointProfileWidget',
-  components: {
-    Basic: SetpointProfileBasic,
-    Full: SetpointProfileFull,
-    ProfileImportAction,
-    ProfilePresetAction,
-    ProfileExportAction,
-  },
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { block, patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();
+const views: Record<WidgetMode, Component> = {
+  Basic: SetpointProfileBasic,
+  Full: SetpointProfileFull,
+};
 
-    const usedData = ref<SetpointProfileData>(cloneDeep(block.value.data));
-    const revision = ref<Date>(new Date());
+const { context, inDialog } = useContext.setup();
+const { block, patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
-    const target = computed<Link>(() => block.value.data.targetId);
+const usedData = ref<SetpointProfileData>(cloneDeep(block.value.data));
+const revision = ref<Date>(new Date());
 
-    const graphProps = computed<GraphProps>(() =>
-      profileGraphProps(block.value),
-    );
+const target = computed<Link>(() => block.value.data.targetId);
 
-    function refresh(): void {
-      usedData.value = cloneDeep(block.value.data);
-      revision.value = new Date();
-    }
+const graphProps = computed<GraphProps>(() => profileGraphProps(block.value));
 
-    function changeEnabled(enabled: boolean): void {
-      if (enabled) {
-        patchBlock({ enabled });
-      } else {
-        createComponentDialog({
-          component: SetpointProfileDisableDialog,
-          componentProps: {
-            block: block.value,
-          },
-        });
-      }
-    }
+function refresh(): void {
+  usedData.value = cloneDeep(block.value.data);
+  revision.value = new Date();
+}
 
-    watch(
-      () => block.value.data,
-      (newV) => {
-        if (!isJsonEqual(newV, usedData.value)) {
-          refresh();
-        }
+function changeEnabled(enabled: boolean): void {
+  if (enabled) {
+    patchBlock({ enabled });
+  } else {
+    createComponentDialog({
+      component: SetpointProfileDisableDialog,
+      componentProps: {
+        block: block.value,
       },
-    );
+    });
+  }
+}
 
-    return {
-      prettyLink,
-      context,
-      inDialog,
-      revision,
-      target,
-      graphProps,
-      refresh,
-      changeEnabled,
-    };
+watch(
+  () => block.value.data,
+  (newV) => {
+    if (!isJsonEqual(newV, usedData.value)) {
+      refresh();
+    }
   },
-});
+);
 </script>
 
 <template>
@@ -88,9 +69,9 @@ export default defineComponent({
   >
     <template #preview>
       <PlotlyGraph
-        :data="graphProps.data"
-        :layout="graphProps.layout"
+        v-bind="graphProps"
         :revision="revision"
+        class="fit"
       />
     </template>
 
@@ -104,7 +85,7 @@ export default defineComponent({
       </BlockWidgetToolbar>
     </template>
 
-    <component :is="context.mode">
+    <component :is="views[context.mode]">
       <template #warnings>
         <CardWarning v-if="!target.id">
           <template #message>
@@ -132,8 +113,7 @@ export default defineComponent({
         <PlotlyGraph
           v-bind="graphProps"
           :revision="revision"
-          :maximized="inDialog"
-          auto-resize
+          class="fit"
         />
       </template>
     </component>
