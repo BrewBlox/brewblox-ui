@@ -90,7 +90,10 @@ watch(
 </script>
 
 <template>
-  <q-page class="page-height">
+  <q-page
+    class="page-height"
+    @contextmenu.prevent
+  >
     <div
       v-if="!startupDone"
       class="text-h5 darkened absolute-center column items-center q-gutter-md"

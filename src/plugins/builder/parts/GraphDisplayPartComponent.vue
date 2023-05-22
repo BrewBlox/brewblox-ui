@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { IS_WEBKIT } from '@/const';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import {
   defaultPresets as durationPresets,
@@ -9,40 +10,37 @@ import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid';
-import { useQuasar } from 'quasar';
 import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/GraphDisplay';
 import { usePart } from '../composables';
 import { GRAPH_CONFIG_KEY, SQUARE_SIZE } from '../const';
 import { ZoomTransformKey } from '../symbols';
 
-/**
- * This component has some workarounds for a Safari bug.
- * SVG transformation is not applied correctly to SVG foreignObject content.
- * See: https://bugs.webkit.org/show_bug.cgi?id=23113
- *
- * The graph is never rotated, but it is transformed during SVG zoom/pan.
- * To compensate for the lack of transformation by Safari, we explicitly set rendered width/height.
- * For non-Safari browsers, this is always equal to the width/height of the SVG part.
- * For Safari, we get the (transformed) width/height of the foreignObject element.
- */
-
-const $q = useQuasar();
 const { settings, patchSettings, width, height, interactable, placeholder } =
   usePart.setup();
 
 const graphId = nanoid();
 const presets = durationPresets();
 
-const sourceRevision = ref<Date>(new Date());
-const renderRevision = ref<Date>(new Date());
-const baseConfig = shallowRef<GraphConfig>(emptyGraphConfig());
+/**
+ * This component has some workarounds for a WebKit bug.
+ * SVG transformation is not applied correctly to SVG foreignObject content.
+ * See: https://bugs.webkit.org/show_bug.cgi?id=23113
+ *
+ * The element is never rotated, but it is transformed during SVG zoom/pan.
+ * To compensate for the lack of transformation by WebKit, we explicitly set rendered width/height.
+ * For non-WebKit browsers, this is always equal to the width/height of the SVG part.
+ * For WebKit, we get the (transformed) width/height of the foreignObject element.
+ */
 const actualGraphSize = ref({
   width: width.value,
   height: height.value,
 });
 
-const isSafari = $q.platform.is.name === 'safari';
+const sourceRevision = ref<Date>(new Date());
+const renderRevision = ref<Date>(new Date());
+const baseConfig = shallowRef<GraphConfig>(emptyGraphConfig());
+
 const graphHidden = ref(false);
 const fobjElement = ref<SVGForeignObjectElement>();
 const activeTransform = inject(ZoomTransformKey, ref());
@@ -58,7 +56,7 @@ const sizedConfig = computed<GraphConfig>(() => ({
 const refresh = debounce(
   () =>
     nextTick(() => {
-      if (isSafari && fobjElement.value) {
+      if (IS_WEBKIT && fobjElement.value) {
         const rect = fobjElement.value.getBoundingClientRect();
         actualGraphSize.value = {
           width: rect.width,
@@ -123,9 +121,9 @@ watch(
   { immediate: true },
 );
 
-// The graph is transformed smoothly on non-Safari browsers
+// The graph is transformed smoothly on non-WebKit browsers
 // No need to hide and re-render it
-if (isSafari) {
+if (IS_WEBKIT) {
   watch(activeTransform, () => {
     graphHidden.value = true;
     refresh();
@@ -137,11 +135,13 @@ watch([interactable, width, height], () => refresh());
 
 <template>
   <svg v-bind="{ width, height }">
-    <ChartSvgIcon
-      v-if="placeholder || graphHidden"
-      :x="width / 2 - SQUARE_SIZE / 2"
-      :y="height / 2 - SQUARE_SIZE / 2"
-    />
+    <template v-if="placeholder || graphHidden">
+      <PatternBackground v-bind="{ width, height }" />
+      <ChartSvgIcon
+        :x="width / 2 - SQUARE_SIZE / 2"
+        :y="height / 2 - SQUARE_SIZE / 2"
+      />
+    </template>
     <foreignObject
       v-else
       ref="fobjElement"
@@ -160,7 +160,7 @@ watch([interactable, width, height], () => refresh());
         style="position: fixed"
       >
         <template
-          v-if="isSafari"
+          v-if="IS_WEBKIT"
           #error="{ error }"
         >
           <div class="q-pa-md q-gutter-sm">

@@ -979,6 +979,7 @@ onBeforeUnmount(() => {
     @keydown="keyHandler"
     @cut="onClipboardCut"
     @paste="onClipboardPaste"
+    @contextmenu.prevent
   >
     <TitleTeleport v-if="layout">
       <span
@@ -1141,7 +1142,7 @@ onBeforeUnmount(() => {
         v-if="focusWarningEnabled"
         class="unfocus-overlay"
         @click.stop="setFocus"
-        @contextmenu="(evt) => !evt.shiftKey && evt.preventDefault()"
+        @contextmenu.prevent
       >
         <transition
           appear
@@ -1151,6 +1152,7 @@ onBeforeUnmount(() => {
         </transition>
       </div>
     </div>
+    <div id="builder-teleport" />
   </q-page>
 </template>
 
