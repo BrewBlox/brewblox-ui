@@ -15,3 +15,4 @@ export const PlaceholderKey: InjectionKey<boolean> = Symbol();
 export const EditableKey: InjectionKey<boolean> = Symbol();
 export const ZoomTransformKey: InjectionKey<ComputedRef<ZoomTransform>> =
   Symbol();
+export const PortalIdKey: InjectionKey<string> = Symbol();

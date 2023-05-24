@@ -135,7 +135,11 @@ watch([interactable, width, height], () => refresh());
 
 <template>
   <svg v-bind="{ width, height }">
-    <template v-if="placeholder || graphHidden">
+    <ChartSvgIcon
+      v-if="placeholder"
+      v-bind="{ width, height }"
+    />
+    <template v-else-if="graphHidden">
       <PatternBackground v-bind="{ width, height }" />
       <ChartSvgIcon
         :x="width / 2 - SQUARE_SIZE / 2"
