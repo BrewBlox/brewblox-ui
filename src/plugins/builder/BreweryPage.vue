@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { startupDone } from '@/user-settings';
+import { nanoid } from 'nanoid';
 import { useQuasar } from 'quasar';
-import { computed, watch } from 'vue';
+import { computed, provide, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { usePreselect } from './composables/use-preselect';
+import { PortalIdKey } from './symbols';
 import { BuilderPart } from './types';
 import {
   coord2grid,
@@ -26,6 +28,9 @@ const { localStorage } = useQuasar();
 const { preselectable, preselectedId, preselect } = usePreselect.setup();
 
 const layoutId = computed<string | null>(() => props.routeId);
+
+const portalId = nanoid();
+provide(PortalIdKey, portalId);
 
 useMetrics.setupProvider(layoutId);
 const { layout, orderedParts, updateParts, reflow } =
@@ -90,7 +95,10 @@ watch(
 </script>
 
 <template>
-  <q-page class="page-height">
+  <q-page
+    class="page-height"
+    @contextmenu.prevent
+  >
     <div
       v-if="!startupDone"
       class="text-h5 darkened absolute-center column items-center q-gutter-md"
@@ -154,7 +162,7 @@ watch(
         </span>
         <svg
           ref="svgRef"
-          class="fit"
+          class="absolute fit"
           @click="preselect(null)"
         >
           <g ref="svgContentRef">
@@ -176,6 +184,12 @@ watch(
             </g>
           </g>
         </svg>
+        <div
+          class="absolute fit"
+          style="pointer-events: none"
+        >
+          <portal-target :name="portalId" />
+        </div>
       </div>
     </template>
   </q-page>

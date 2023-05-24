@@ -1,43 +1,24 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext, useWidget } from '@/composables';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { WebframeWidget } from './types';
 
-export default defineComponent({
-  name: 'WebframeWidget',
-  setup() {
-    const { config, patchConfig } = useWidget.setup<WebframeWidget>();
-    const { context } = useContext.setup();
+const { config, patchConfig } = useWidget.setup<WebframeWidget>();
+const { context } = useContext.setup();
 
-    const scale = computed<number>({
-      get: () => config.value.scale || 1,
-      set: (scale) => patchConfig({ scale }),
-    });
+const scale = computed<number>({
+  get: () => config.value.scale || 1,
+  set: (scale) => patchConfig({ scale }),
+});
 
-    const pctScale = computed<number>({
-      get: () => scale.value * 100,
-      set: (v) => (scale.value = (v || 100) / 100),
-    });
+const pctScale = computed<number>({
+  get: () => scale.value * 100,
+  set: (v) => (scale.value = (v || 100) / 100),
+});
 
-    const url = computed<string>({
-      get: () => config.value.url,
-      set: (url) => patchConfig({ url }),
-    });
-
-    const counterScale = computed<number>(
-      // value * scale * counterScale == value
-      () => (1 - scale.value) / scale.value + 1,
-    );
-
-    return {
-      config,
-      context,
-      url,
-      scale,
-      pctScale,
-      counterScale,
-    };
-  },
+const url = computed<string>({
+  get: () => config.value.url,
+  set: (url) => patchConfig({ url }),
 });
 </script>
 
@@ -64,9 +45,9 @@ export default defineComponent({
 
           // Desired width/height is 98%. (1% margin)
           // To offset scaling, we need to increase/decrease size.
-          // If scale == 0.5, then width/height must be 196%
-          width: 98 * counterScale + '%',
-          height: 98 * counterScale + '%',
+          // If scale == 0.5, then width/height must be 98 * 2 == 196%
+          width: 98 * (1 / scale) + '%',
+          height: 98 * (1 / scale) + '%',
         }"
       />
     </div>

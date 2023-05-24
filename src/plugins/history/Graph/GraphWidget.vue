@@ -110,6 +110,7 @@ watch(
     :enabled="inDialog && context.mode === 'Full'"
     :no-scroll="context.mode === 'Basic'"
     size="lg"
+    @contextmenu.prevent
   >
     <template #preview>
       <HistoryGraph

@@ -28,8 +28,17 @@ export const LAYOUT_NAMESPACE = `${UI_NAMESPACE}:layouts`;
 export const SESSION_NAMESPACE = `${UI_NAMESPACE}:logged-sessions`;
 export const SPARK_SNIPPET_NAMESPACE = `${UI_NAMESPACE}:spark-presets`;
 
+const { userAgent, platform, maxTouchPoints } = navigator;
+
+export const IS_CHROME = userAgent.indexOf('Chrome') > -1;
+export const IS_FIREFOX = userAgent.indexOf('Firefox') > -1;
+export const IS_SAFARI = !IS_CHROME && userAgent.indexOf('Safari') > -1;
+
+export const IS_APPLE = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+export const IS_WEBKIT = IS_SAFARI || IS_APPLE;
+
 export const IS_IOS =
   import.meta.env.MODE !== 'test'
-    ? /iPad|iPhone|iPod/.test(navigator.platform) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    ? /iPad|iPhone|iPod/.test(platform) ||
+      (platform === 'MacIntel' && maxTouchPoints > 1)
     : false;

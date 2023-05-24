@@ -87,6 +87,7 @@ declare module '@vue/runtime-core' {
     SetpointValues: typeof import('src/plugins/builder/components/SetpointValues.vue').default;
     SelectedLayoutDialog: typeof import('src/plugins/builder/components/SelectedLayoutDialog.vue').default;
     PwmValues: typeof import('src/plugins/builder/components/PwmValues.vue').default;
+    PatternBackground: typeof import('src/plugins/builder/components/PatternBackground.vue').default;
     PartWrapper: typeof import('src/plugins/builder/components/PartWrapper.vue').default;
     OverlapIndicators: typeof import('src/plugins/builder/components/OverlapIndicators.vue').default;
     LiquidStroke: typeof import('src/plugins/builder/components/LiquidStroke.vue').default;
@@ -129,6 +130,7 @@ declare module '@vue/runtime-core' {
     SessionSvgIcon: typeof import('src/components/icons/SessionSvgIcon.vue').default;
     SensorSvgIcon: typeof import('src/components/icons/SensorSvgIcon.vue').default;
     PowerSvgIcon: typeof import('src/components/icons/PowerSvgIcon.vue').default;
+    ImageSvgIcon: typeof import('src/components/icons/ImageSvgIcon.vue').default;
     HeatingSvgIcon: typeof import('src/components/icons/HeatingSvgIcon.vue').default;
     CoolingSvgIcon: typeof import('src/components/icons/CoolingSvgIcon.vue').default;
     ChartSvgIcon: typeof import('src/components/icons/ChartSvgIcon.vue').default;

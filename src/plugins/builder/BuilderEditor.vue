@@ -32,7 +32,7 @@ import {
 import { useMetrics } from './composables/use-metrics';
 import { builderTools, SQUARE_SIZE } from './const';
 import { useBuilderStore } from './store';
-import { EditableKey } from './symbols';
+import { EditableKey, PortalIdKey } from './symbols';
 import {
   BuilderLayout,
   BuilderPart,
@@ -93,6 +93,9 @@ const builderStore = useBuilderStore();
 const { dense } = useGlobals.setup();
 const router = useRouter();
 provide(EditableKey, true);
+
+const portalId = nanoid();
+provide(PortalIdKey, portalId);
 
 const toolsMenuExpanded = ref<boolean>(!dense.value);
 const activeToolId = ref<BuilderToolName | null>('pan');
@@ -979,6 +982,7 @@ onBeforeUnmount(() => {
     @keydown="keyHandler"
     @cut="onClipboardCut"
     @paste="onClipboardPaste"
+    @contextmenu.prevent
   >
     <TitleTeleport v-if="layout">
       <span
@@ -1074,7 +1078,7 @@ onBeforeUnmount(() => {
     >
       <svg
         ref="svgRef"
-        class="fit"
+        class="absolute fit"
         :style="{ cursor }"
       >
         <g ref="svgContentRef">
@@ -1129,6 +1133,12 @@ onBeforeUnmount(() => {
           />
         </g>
       </svg>
+      <div
+        class="absolute fit"
+        style="pointer-events: none"
+      >
+        <portal-target :name="portalId" />
+      </div>
       <BuilderToolsMenu
         v-model:expanded="toolsMenuExpanded"
         :active-tool="activeToolId"
@@ -1141,7 +1151,7 @@ onBeforeUnmount(() => {
         v-if="focusWarningEnabled"
         class="unfocus-overlay"
         @click.stop="setFocus"
-        @contextmenu="(evt) => !evt.shiftKey && evt.preventDefault()"
+        @contextmenu.prevent
       >
         <transition
           appear
@@ -1151,6 +1161,7 @@ onBeforeUnmount(() => {
         </transition>
       </div>
     </div>
+    <div id="builder-teleport" />
   </q-page>
 </template>
 
