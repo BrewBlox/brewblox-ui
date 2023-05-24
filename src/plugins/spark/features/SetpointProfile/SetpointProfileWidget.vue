@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { WidgetMode } from '@/store/features';
+import { WidgetModeComponents } from '@/store/features';
 import { createComponentDialog } from '@/utils/dialog';
 import { isJsonEqual } from '@/utils/objects';
 import { prettyLink } from '@/utils/quantity';
 import { Link, SetpointProfileBlock } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
-import { Component, computed, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';
@@ -18,7 +18,7 @@ import SetpointProfileFull from './SetpointProfileFull.vue';
 
 type SetpointProfileData = SetpointProfileBlock['data'];
 
-const views: Record<WidgetMode, Component> = {
+const modes: WidgetModeComponents = {
   Basic: SetpointProfileBasic,
   Full: SetpointProfileFull,
 };
@@ -85,7 +85,7 @@ watch(
       </BlockWidgetToolbar>
     </template>
 
-    <component :is="views[context.mode]">
+    <component :is="modes[context.mode]">
       <template #warnings>
         <CardWarning v-if="!target.id">
           <template #message>
