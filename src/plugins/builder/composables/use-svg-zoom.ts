@@ -24,6 +24,7 @@ const defaultOpts = (): Required<UseSvgZoomOpts> => ({
 export interface UseSvgZoomComponent {
   svgRef: Ref<SVGElement | undefined>;
   svgContentRef: Ref<SVGGElement | undefined>;
+  activeTransform: Ref<d3.ZoomTransform | undefined>;
   resetZoom(): void;
 }
 
@@ -131,6 +132,7 @@ export const useSvgZoom: UseSvgZoomComposable = {
     return {
       svgRef,
       svgContentRef,
+      activeTransform,
       resetZoom,
     };
   },

@@ -165,6 +165,14 @@ watch(
           class="absolute fit"
           @click="preselect(null)"
         >
+          <!-- Background element to ensure mouse events
+          outside content are received by the SVG element -->
+          <rect
+            fill="black"
+            opacity="0"
+            width="100%"
+            height="100%"
+          />
           <g ref="svgContentRef">
             <g
               v-for="part in orderedParts"

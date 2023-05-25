@@ -50,6 +50,7 @@ const sizedConfig = computed<GraphConfig>(() => ({
   layout: {
     ...actualGraphSize.value,
     margin: { t: 5, l: 5, r: 0, b: 5 },
+    showlegend: !IS_WEBKIT || actualGraphSize.value.height > 200,
   },
 }));
 
@@ -147,7 +148,7 @@ watch([interactable, width, height], () => refresh());
       />
     </template>
     <foreignObject
-      v-else
+      v-if="!placeholder"
       ref="fobjElement"
       v-bind="{ width, height }"
     >
