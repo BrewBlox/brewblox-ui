@@ -55,9 +55,4 @@ export interface Widget<ConfigT = any> extends StoreObject {
    * Will only be used by the controlling WidgetFeature
    */
   config: ConfigT;
-
-  /**
-   * Flag for widgets that should not be persisted to the datastore.
-   */
-  volatile?: true;
 }

@@ -119,6 +119,30 @@ export function startChangeDashboardTitle(
   });
 }
 
+export function startCreateDashboard(router: Router | null): void {
+  createDialog({
+    component: 'InputDialog',
+    componentProps: {
+      modelValue: '',
+      title: 'Add dashboard',
+      placeholder: 'New Dashboard',
+      message:
+        'Add widgets to dashboards to create a custom UI for your brewery.',
+      rules: [(v) => !!v || 'Name should not be empty'],
+    },
+  }).onOk((title) => {
+    const dashboardStore = useDashboardStore();
+    const id = suggestId(
+      makeUrlSafe(title),
+      makeRuleValidator(makeDashboardIdRules()),
+    );
+    dashboardStore.createDashboard({ id, title });
+    if (router != null) {
+      router.push(`/dashboard/${id}`);
+    }
+  });
+}
+
 export function startRemoveDashboard(
   dashboard: Maybe<Dashboard>,
   router: Router,

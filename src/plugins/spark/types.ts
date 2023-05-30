@@ -94,7 +94,6 @@ export interface DisplayOpts {
 export interface BlockConfig {
   serviceId: string;
   blockId: string;
-  volatile?: true;
   queryParams?: QueryParams;
   graphAxes?: GraphValueAxes;
   graphLayout?: Partial<Layout>;
@@ -147,6 +146,7 @@ export interface BlockFieldSpec<T extends Block = Block> {
 
 export interface BlockSpec<T extends Block = Block> {
   type: T['type'];
+  title: string;
   generate: () => T['data'];
   analyze: (block: T) => BlockStatus;
 }

@@ -46,7 +46,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-footer class="bg-dark shadow-up-1">
+  <q-footer class="bg-dark">
     <q-bar class="bg-transparent q-px-none row justify-end">
       <div
         v-if="!eventbusConnected"

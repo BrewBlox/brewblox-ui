@@ -1,42 +1,25 @@
-<script lang="ts">
+<script setup lang="ts">
 import { BuilderLayout } from '@/plugins/builder/types';
-import { defineComponent, PropType } from 'vue';
+import { PropType } from 'vue';
 import { useRouter } from 'vue-router';
-import { startAddLayout, startImportLayout } from '../utils';
+import { startCreateLayout, startImportLayout } from '../utils';
 
-export default defineComponent({
-  name: 'BuilderActions',
-  props: {
-    layout: {
-      type: null as unknown as PropType<BuilderLayout | null>,
-      default: null,
-    },
-  },
-  setup() {
-    const router = useRouter();
-
-    function selectLayout(id: string): void {
-      router.push(`/builder/${id}`).catch(() => {});
-    }
-
-    async function createLayout(): Promise<void> {
-      const id = await startAddLayout();
-      if (id) {
-        selectLayout(id);
-      }
-    }
-
-    async function importLayout(): Promise<void> {
-      startImportLayout((id) => selectLayout(id));
-    }
-
-    return {
-      selectLayout,
-      createLayout,
-      importLayout,
-    };
+defineProps({
+  layout: {
+    type: null as unknown as PropType<BuilderLayout | null>,
+    default: null,
   },
 });
+
+const router = useRouter();
+
+function selectLayout(id: string): void {
+  router.push(`/builder/${id}`).catch(() => {});
+}
+
+async function importLayout(): Promise<void> {
+  startImportLayout((id) => selectLayout(id));
+}
 </script>
 
 <template>
@@ -46,7 +29,7 @@ export default defineComponent({
       <ActionItem
         icon="add"
         label="New Layout"
-        @click="createLayout"
+        @click="startCreateLayout($router)"
       />
       <ActionItem
         icon="mdi-file-import"
@@ -55,10 +38,7 @@ export default defineComponent({
       />
     </template>
     <template #menus>
-      <LayoutActionsMenu
-        :layout="layout"
-        @selected="selectLayout"
-      />
+      <LayoutActionsMenu :layout="layout" />
       <slot name="menus" />
     </template>
     <slot />

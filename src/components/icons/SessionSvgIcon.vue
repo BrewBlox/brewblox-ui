@@ -1,19 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { mdiTextSubject } from '@quasar/extras/mdi-v5';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'SessionSvgIcon',
-  props: {
-    color: {
-      type: String,
-      default: 'white',
-    },
-  },
-  setup() {
-    return {
-      mdiTextSubject,
-    };
+defineProps({
+  color: {
+    type: String,
+    default: 'white',
   },
 });
 </script>

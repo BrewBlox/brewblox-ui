@@ -1,17 +1,8 @@
-<script lang="ts">
-import { mdiBullseyeArrow } from '@quasar/extras/mdi-v5';
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'SetpointSvgIcon',
-  props: {
-    color: {
-      type: String,
-      default: 'white',
-    },
-  },
-  setup() {
-    return { mdiBullseyeArrow };
+<script setup lang="ts">
+defineProps({
+  color: {
+    type: String,
+    default: 'white',
   },
 });
 </script>

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
   DEFAULT_IO_PRESSURE,
   IO_ENABLED_KEY,
@@ -12,44 +12,25 @@ import {
   liquidOnCoord,
   verticalChevrons,
 } from '@/plugins/builder/utils';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart } from '../composables';
 
 const chevrons = verticalChevrons(50, 86.4);
 
-export default defineComponent({
-  name: 'ShiftedSystemIOPartComponent',
-  setup() {
-    const { part, flows, settings, patchSettings, width, height } =
-      usePart.setup();
+const { part, flows, settings, patchSettings, width, height } = usePart.setup();
 
-    const pressured = computed<boolean>({
-      get: () => Boolean(settings.value[IO_ENABLED_KEY]),
-      set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
-    });
-
-    const flowSpeed = computed<number>(
-      () => -flowOnCoord(part.value, flows.value, UP),
-    );
-
-    const liquids = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, UP),
-    );
-
-    return {
-      IO_PRESSURE_KEY,
-      MIN_IO_PRESSURE,
-      MAX_IO_PRESSURE,
-      DEFAULT_IO_PRESSURE,
-      width,
-      height,
-      pressured,
-      chevrons,
-      flowSpeed,
-      liquids,
-    };
-  },
+const pressured = computed<boolean>({
+  get: () => Boolean(settings.value[IO_ENABLED_KEY]),
+  set: (v) => patchSettings({ [IO_ENABLED_KEY]: Boolean(v) }),
 });
+
+const flowSpeed = computed<number>(
+  () => -flowOnCoord(part.value, flows.value, UP),
+);
+
+const liquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, UP),
+);
 </script>
 
 <template>

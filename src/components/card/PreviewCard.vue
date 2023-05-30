@@ -1,38 +1,30 @@
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'PreviewCard',
-  props: {
-    enabled: {
-      type: Boolean,
-      default: false,
-    },
-    showInitial: {
-      type: Boolean,
-      default: false,
-    },
-    expandLabel: {
-      type: String,
-      default: 'Show',
-    },
-    collapseLabel: {
-      type: String,
-      default: 'Hide',
-    },
-    toggleIcon: {
-      type: String,
-      default: 'mdi-chart-line',
-    },
+const props = defineProps({
+  enabled: {
+    type: Boolean,
+    default: false,
   },
-  setup(props) {
-    const collapsed = ref(!props.showInitial);
-
-    return {
-      collapsed,
-    };
+  showInitial: {
+    type: Boolean,
+    default: false,
+  },
+  expandLabel: {
+    type: String,
+    default: 'Show',
+  },
+  collapseLabel: {
+    type: String,
+    default: 'Hide',
+  },
+  toggleIcon: {
+    type: String,
+    default: 'mdi-chart-line',
   },
 });
+
+const collapsed = ref(!props.showInitial);
 </script>
 
 <template>
@@ -68,11 +60,9 @@ export default defineComponent({
     <!-- The preview pane -->
     <div
       v-if="!collapsed"
-      class="col-5 bg-dark"
+      class="col-5 bg-dark preview-pane column"
     >
-      <div class="preview-pane fit">
-        <slot name="preview" />
-      </div>
+      <slot name="preview" />
     </div>
   </div>
   <!--
@@ -102,7 +92,6 @@ export default defineComponent({
   max-height: 90vh
   width: 90vw
   min-width: 90vw
-  box-shadow: none
 
 .toggle-tab
   background-color: $dialog-toolbar-color
@@ -117,4 +106,6 @@ export default defineComponent({
 .preview-pane
   border-radius: 4px
   border: 1px solid $blue-grey-9
+  box-sizing: content-box
+  position: relative
 </style>

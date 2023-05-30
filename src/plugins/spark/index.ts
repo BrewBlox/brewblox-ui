@@ -20,7 +20,7 @@ const deprecated: WidgetFeature[] = [
     id: 'StepView',
     title: 'Step View',
     component: 'DeprecatedWidget',
-    wizard: false,
+    creatable: false,
     widgetSize: { cols: 0, rows: 0 },
   },
 ];
@@ -53,7 +53,7 @@ const plugin: Plugin = {
       configComponent: cref(app, SparkActions),
       onStart: (service) => sparkStore.addService(service.id),
       onRemove: (service) => sparkStore.removeService(service.id),
-      wizard: (stub) => ({
+      generate: (stub) => ({
         ...stub,
         title: stub.id,
         order: 0,

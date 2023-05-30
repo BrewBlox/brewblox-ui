@@ -3,13 +3,13 @@ import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
-import { deepCopy } from '@/utils/objects';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
 import {
   BlockType,
   Quantity,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 import { PidConfig } from '../types';
 import { TempControlMode } from './types';
@@ -50,7 +50,7 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
-    const tempMode = reactive<TempControlMode>(deepCopy(props.modelValue));
+    const tempMode = reactive<TempControlMode>(cloneDeep(props.modelValue));
     const sparkStore = useSparkStore();
 
     function save(): void {
@@ -69,8 +69,8 @@ export default defineComponent({
           message:
             `Are you sure you want to remove the ${kind} ` +
             `config from the ${tempMode.title} mode?`,
-          noBackdropDismiss: true,
         },
+        noBackdropDismiss: true,
       }).onOk(() => {
         tempMode[kind + 'Config'] = null;
         save();

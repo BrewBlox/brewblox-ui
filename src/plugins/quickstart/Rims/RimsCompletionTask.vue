@@ -64,7 +64,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <WizardBody>
+  <QuickstartCard>
     <q-card-section>
       <q-item class="text-big"> About your new RIMS dashboard </q-item>
       <q-item class="text-weight-light">
@@ -109,5 +109,5 @@ export default defineComponent({
         <q-tooltip v-if="busy"> Creating everything... </q-tooltip>
       </q-btn>
     </template>
-  </WizardBody>
+  </QuickstartCard>
 </template>

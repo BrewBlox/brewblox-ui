@@ -1,10 +1,10 @@
 import { useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
+import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { createDialog } from './dialog';
 import { notify } from './notify';
-import { deepCopy } from './objects';
 
 export function startChangeWidgetTitle(widget: Widget): void {
   const widgetTitle = widget.title;
@@ -41,11 +41,10 @@ export function startCopyWidget(widget: Widget): void {
   }).onOk((dashboard: string) => {
     if (dashboard) {
       useWidgetStore().appendWidget({
-        ...deepCopy(widget),
+        ...cloneDeep(widget),
         id,
         dashboard,
         pinnedPosition: null,
-        volatile: undefined,
       });
       const dashTitle = dashboardStore.dashboardTitle(dashboard);
       notify.done(`Copied <b>${widget.title}</b> to <b>${dashTitle}</b>`);

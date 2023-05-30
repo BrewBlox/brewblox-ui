@@ -1,8 +1,8 @@
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import {
   BlockType,
   GpioModuleStatus,
@@ -13,6 +13,7 @@ import { Plugin } from 'vue';
 import widget from './OneWireGpioModuleWidget.vue';
 
 const type = BlockType.OneWireGpioModule;
+const title = 'OneWire GPIO Module';
 
 const plugin: Plugin = {
   install(app) {
@@ -21,6 +22,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<OneWireGpioModuleBlock> = {
       type,
+      title,
       generate: (): OneWireGpioModuleBlock['data'] => ({
         channels: [],
         modulePosition: 0,
@@ -50,9 +52,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...discoveredBlockFeature,
       id: type,
-      title: 'OneWire GPIO Module',
+      title,
       role: 'Output',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 4,

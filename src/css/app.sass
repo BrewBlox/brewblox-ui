@@ -6,6 +6,7 @@ $widget-border-radius: 4px
   &__Dialog
     height: 800px
     max-height: 100%
+    position: relative
     border-radius: $widget-border-radius
     border: 1px solid $dialog-toolbar-color
 
@@ -99,6 +100,9 @@ $widget-border-radius: 4px
   -ms-user-select: none
   user-select: none
 
+.not-allowed
+  cursor: not-allowed
+
 .pointer
   cursor: pointer
 
@@ -136,6 +140,9 @@ $widget-border-radius: 4px
   font-family: "Lucida Console", Monaco, monospace
 
 .q-dialog
+  &__backdrop
+    background: rgba(0, 0, 0, 0.9)
+
   &__inner > div
     overflow: visible
 
@@ -210,11 +217,6 @@ label
 @for $d from 1 through 9
   .fade-#{$d}
     opacity: 1-$d/10
-
-// automatically apply shadows to depth class
-@for $d from 0 to 24
-  .depth-#{$d}
-    @extend .shadow-#{$d}
 
 // lighten on dark ui
 $dark-bg-depth-a: (depth-0: 0, depth-1: 0.05, depth-2: 0.07, depth-3: 0.08, depth-4: 0.09, depth-6: 0.11, depth-8: 0.12, depth-12: 0.14, depth-16: 0.15, depth-24: 0.16)

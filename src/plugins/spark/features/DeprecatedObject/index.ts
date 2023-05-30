@@ -1,6 +1,6 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { BlockType } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './DeprecatedObjectWidget.vue';
@@ -14,8 +14,8 @@ const plugin: Plugin = {
       id: BlockType.DeprecatedObject,
       title: 'Deprecated Object',
       role: 'Other',
-      component: blockWidgetSelector(app, widget, null),
-      wizard: false,
+      component: cref(app, widget),
+      creatable: false,
       widgetSize: {
         cols: 4,
         rows: 2,

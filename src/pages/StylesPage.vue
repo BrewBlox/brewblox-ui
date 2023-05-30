@@ -37,7 +37,6 @@ export default defineComponent({
 
 <template>
   <q-page padding>
-    <h1>Quick reference and playground for app theming</h1>
     <div class="q-gutter-md row items-start">
       <q-card
         v-for="color in colors"

@@ -1,17 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { mdiChartLine } from '@quasar/extras/mdi-v5';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'ChartSvgIcon',
-  props: {
-    color: {
-      type: String,
-      default: 'white',
-    },
-  },
-  setup() {
-    return { mdiChartLine };
+defineProps({
+  color: {
+    type: String,
+    default: 'white',
   },
 });
 </script>

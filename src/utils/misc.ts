@@ -1,6 +1,13 @@
 import { colors } from 'quasar';
 
 /**
+ * Returns a promise that will resolve at least `ms` milliseconds from now.
+ */
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
  * Immediately returns explicitly typed input value.
  * This is useful for populating lists of interface types
  * without losing type checking for the actual objects.

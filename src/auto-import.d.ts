@@ -1,16 +1,10 @@
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    WizardDialog: typeof import('src/plugins/wizardry/components/WizardDialog.vue').default;
-    WizardBody: typeof import('src/plugins/wizardry/components/WizardBody.vue').default;
-    WidgetWizardPicker: typeof import('src/plugins/wizardry/components/WidgetWizardPicker.vue').default;
-    SystemBlockWidgetWizard: typeof import('src/plugins/wizardry/components/SystemBlockWidgetWizard.vue').default;
-    QuickstartWizardPicker: typeof import('src/plugins/wizardry/components/QuickstartWizardPicker.vue').default;
-    ImportWizard: typeof import('src/plugins/wizardry/components/ImportWizard.vue').default;
-    GenericWidgetWizard: typeof import('src/plugins/wizardry/components/GenericWidgetWizard.vue').default;
-    DashboardWizard: typeof import('src/plugins/wizardry/components/DashboardWizard.vue').default;
-    BlockWizard: typeof import('src/plugins/wizardry/components/BlockWizard.vue').default;
-    BlockWidgetWizard: typeof import('src/plugins/wizardry/components/BlockWidgetWizard.vue').default;
-    BlockDiscoveryWizard: typeof import('src/plugins/wizardry/components/BlockDiscoveryWizard.vue').default;
+    WidgetWizardDialog: typeof import('src/plugins/wizardry/components/WidgetWizardDialog.vue').default;
+    QuickstartWizardDialog: typeof import('src/plugins/wizardry/components/QuickstartWizardDialog.vue').default;
+    GenericWidgetEditor: typeof import('src/plugins/wizardry/components/GenericWidgetEditor.vue').default;
+    BlockWizardDialog: typeof import('src/plugins/wizardry/components/BlockWizardDialog.vue').default;
+    BlockWidgetEditor: typeof import('src/plugins/wizardry/components/BlockWidgetEditor.vue').default;
     TiltValues: typeof import('src/plugins/tilt/components/TiltValues.vue').default;
     TiltPage: typeof import('src/plugins/tilt/components/TiltPage.vue').default;
     TiltActions: typeof import('src/plugins/tilt/components/TiltActions.vue').default;
@@ -21,13 +15,14 @@ declare module '@vue/runtime-core' {
     OneWireGpioEditor: typeof import('src/plugins/spark/components/widget/OneWireGpioEditor.vue').default;
     IoArray: typeof import('src/plugins/spark/components/widget/IoArray.vue').default;
     GpioChannelDialog: typeof import('src/plugins/spark/components/widget/GpioChannelDialog.vue').default;
+    BlockWidgetWrapper: typeof import('src/plugins/spark/components/widget/BlockWidgetWrapper.vue').default;
     BlockGraph: typeof import('src/plugins/spark/components/widget/BlockGraph.vue').default;
     BlockWidgetToolbar: typeof import('src/plugins/spark/components/toolbar/BlockWidgetToolbar.vue').default;
     BlockActions: typeof import('src/plugins/spark/components/toolbar/BlockActions.vue').default;
-    SparkWifiMenu: typeof import('src/plugins/spark/components/menu/SparkWifiMenu.vue').default;
+    SparkWifiDialog: typeof import('src/plugins/spark/components/menu/SparkWifiDialog.vue').default;
     SparkParticleWifiCard: typeof import('src/plugins/spark/components/menu/SparkParticleWifiCard.vue').default;
     SparkEspWifiCard: typeof import('src/plugins/spark/components/menu/SparkEspWifiCard.vue').default;
-    SparkBackupMenu: typeof import('src/plugins/spark/components/menu/SparkBackupMenu.vue').default;
+    SparkBackupDialog: typeof import('src/plugins/spark/components/menu/SparkBackupDialog.vue').default;
     FirmwareUpdateDialog: typeof import('src/plugins/spark/components/menu/FirmwareUpdateDialog.vue').default;
     BlockJsonDialog: typeof import('src/plugins/spark/components/menu/BlockJsonDialog.vue').default;
     StringValEdit: typeof import('src/plugins/spark/components/form/StringValEdit.vue').default;
@@ -62,11 +57,13 @@ declare module '@vue/runtime-core' {
     QuickstartMockCreateField: typeof import('src/plugins/quickstart/components/QuickstartMockCreateField.vue').default;
     QuickstartDiscoveryTask: typeof import('src/plugins/quickstart/components/QuickstartDiscoveryTask.vue').default;
     QuickstartChannelField: typeof import('src/plugins/quickstart/components/QuickstartChannelField.vue').default;
+    QuickstartCard: typeof import('src/plugins/quickstart/components/QuickstartCard.vue').default;
     SelectBlockGraphDialog: typeof import('src/plugins/history/components/SelectBlockGraphDialog.vue').default;
     QueryEditor: typeof import('src/plugins/history/components/QueryEditor.vue').default;
     MetricsEditorDialog: typeof import('src/plugins/history/components/MetricsEditorDialog.vue').default;
     MetricsEditor: typeof import('src/plugins/history/components/MetricsEditor.vue').default;
     MetricsDisplayDialog: typeof import('src/plugins/history/components/MetricsDisplayDialog.vue').default;
+    HistoryGraphControls: typeof import('src/plugins/history/components/HistoryGraphControls.vue').default;
     HistoryGraph: typeof import('src/plugins/history/components/HistoryGraph.vue').default;
     GraphRangeSubmenu: typeof import('src/plugins/history/components/GraphRangeSubmenu.vue').default;
     GraphRangeDialog: typeof import('src/plugins/history/components/GraphRangeDialog.vue').default;
@@ -90,6 +87,7 @@ declare module '@vue/runtime-core' {
     SetpointValues: typeof import('src/plugins/builder/components/SetpointValues.vue').default;
     SelectedLayoutDialog: typeof import('src/plugins/builder/components/SelectedLayoutDialog.vue').default;
     PwmValues: typeof import('src/plugins/builder/components/PwmValues.vue').default;
+    PatternBackground: typeof import('src/plugins/builder/components/PatternBackground.vue').default;
     PartWrapper: typeof import('src/plugins/builder/components/PartWrapper.vue').default;
     OverlapIndicators: typeof import('src/plugins/builder/components/OverlapIndicators.vue').default;
     LiquidStroke: typeof import('src/plugins/builder/components/LiquidStroke.vue').default;
@@ -103,8 +101,9 @@ declare module '@vue/runtime-core' {
     BuilderActions: typeof import('src/plugins/builder/components/BuilderActions.vue').default;
     BlockStatusSvg: typeof import('src/plugins/builder/components/BlockStatusSvg.vue').default;
     AnimatedArrows: typeof import('src/plugins/builder/components/AnimatedArrows.vue').default;
-    WidgetProvider: typeof import('src/components/widget/WidgetProvider.vue').default;
+    WidgetWrapper: typeof import('src/components/widget/WidgetWrapper.vue').default;
     WidgetDialog: typeof import('src/components/widget/WidgetDialog.vue').default;
+    InlineWidgetDialog: typeof import('src/components/widget/InlineWidgetDialog.vue').default;
     BlockWidgetDialog: typeof import('src/components/widget/BlockWidgetDialog.vue').default;
     WidgetToolbar: typeof import('src/components/toolbar/WidgetToolbar.vue').default;
     WidgetActions: typeof import('src/components/toolbar/WidgetActions.vue').default;
@@ -119,9 +118,6 @@ declare module '@vue/runtime-core' {
     WatcherContainer: typeof import('src/components/sidebar/WatcherContainer.vue').default;
     SidebarNavigator: typeof import('src/components/sidebar/SidebarNavigator.vue').default;
     SidebarIndex: typeof import('src/components/sidebar/SidebarIndex.vue').default;
-    PlotlyGraph: typeof import('src/components/plotly/PlotlyGraph.vue').default;
-    GraphAnnotationDialog: typeof import('src/components/plotly/GraphAnnotationDialog.vue').default;
-    GenericGraph: typeof import('src/components/plotly/GenericGraph.vue').default;
     PageError: typeof import('src/components/misc/PageError.vue').default;
     ExportErrorsAction: typeof import('src/components/menu/ExportErrorsAction.vue').default;
     ExportAction: typeof import('src/components/menu/ExportAction.vue').default;
@@ -134,6 +130,7 @@ declare module '@vue/runtime-core' {
     SessionSvgIcon: typeof import('src/components/icons/SessionSvgIcon.vue').default;
     SensorSvgIcon: typeof import('src/components/icons/SensorSvgIcon.vue').default;
     PowerSvgIcon: typeof import('src/components/icons/PowerSvgIcon.vue').default;
+    ImageSvgIcon: typeof import('src/components/icons/ImageSvgIcon.vue').default;
     HeatingSvgIcon: typeof import('src/components/icons/HeatingSvgIcon.vue').default;
     CoolingSvgIcon: typeof import('src/components/icons/CoolingSvgIcon.vue').default;
     ChartSvgIcon: typeof import('src/components/icons/ChartSvgIcon.vue').default;
@@ -141,6 +138,8 @@ declare module '@vue/runtime-core' {
     AnalogSvgIcon: typeof import('src/components/icons/AnalogSvgIcon.vue').default;
     GridItem: typeof import('src/components/grid/GridItem.vue').default;
     GridContainer: typeof import('src/components/grid/GridContainer.vue').default;
+    PlotlyGraph: typeof import('src/components/graph/PlotlyGraph.vue').default;
+    GraphAnnotationDialog: typeof import('src/components/graph/GraphAnnotationDialog.vue').default;
     InvalidWidget: typeof import('src/components/generic/InvalidWidget.vue').default;
     DeprecatedWidget: typeof import('src/components/generic/DeprecatedWidget.vue').default;
     TreeSelectDialog: typeof import('src/components/form/TreeSelectDialog.vue').default;

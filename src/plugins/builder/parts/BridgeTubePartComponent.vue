@@ -1,6 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
 import { LEFT, UP } from '@/plugins/builder/const';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
@@ -21,39 +21,23 @@ const highPaths = {
         H21.69 a7.69,7.69,0,0,0-6,3.46 l-1,1.73 a7.69,7.69,0,0,1-6,3.46 H0`,
 };
 
-export default defineComponent({
-  name: 'BridgeTubePartComponent',
-  setup() {
-    const { part, flows, width, height } = usePart.setup();
+const { part, flows, width, height } = usePart.setup();
 
-    const lowLiquid = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, UP),
-    );
+const lowLiquid = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, UP),
+);
 
-    const highLiquid = computed<string[]>(() =>
-      liquidOnCoord(part.value, flows.value, LEFT),
-    );
+const highLiquid = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, LEFT),
+);
 
-    const lowFlowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, UP),
-    );
+const lowFlowSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, UP),
+);
 
-    const highFlowSpeed = computed<number>(() =>
-      flowOnCoord(part.value, flows.value, LEFT),
-    );
-
-    return {
-      width,
-      height,
-      lowPaths,
-      highPaths,
-      lowLiquid,
-      highLiquid,
-      lowFlowSpeed,
-      highFlowSpeed,
-    };
-  },
-});
+const highFlowSpeed = computed<number>(() =>
+  flowOnCoord(part.value, flows.value, LEFT),
+);
 </script>
 
 <template>

@@ -2,8 +2,8 @@
 import { useDialog } from '@/composables';
 import { ENUM_LABELS_DIGITAL_OP } from '@/plugins/spark/const';
 import { selectable } from '@/utils/collections';
-import { deepCopy } from '@/utils/objects';
 import { DigitalCompare } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, ref } from 'vue';
 
 const operatorOpts = selectable(ENUM_LABELS_DIGITAL_OP);
@@ -25,7 +25,7 @@ export default defineComponent({
   setup(props) {
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
-    const local = ref<DigitalCompare>(deepCopy(props.modelValue));
+    const local = ref<DigitalCompare>(cloneDeep(props.modelValue));
 
     function save(): void {
       onDialogOK(local.value);

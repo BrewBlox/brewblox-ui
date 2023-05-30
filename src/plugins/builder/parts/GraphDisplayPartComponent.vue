@@ -1,131 +1,186 @@
-<script lang="ts">
+<script setup lang="ts">
+import { IS_WEBKIT } from '@/const';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import {
   defaultPresets as durationPresets,
   emptyGraphConfig,
 } from '@/plugins/history/utils';
 import { createDialog } from '@/utils/dialog';
+import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid';
-import { defineComponent, ref, shallowRef, watch } from 'vue';
+import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/GraphDisplay';
 import { usePart } from '../composables';
-import { GRAPH_CONFIG_KEY } from '../const';
+import { GRAPH_CONFIG_KEY, SQUARE_SIZE } from '../const';
+import { ZoomTransformKey } from '../symbols';
 
-export default defineComponent({
-  name: 'GraphDisplayPartComponent',
-  setup() {
-    const {
-      settings,
-      patchSettings,
-      width,
-      height,
-      interactable,
-      placeholder,
-    } = usePart.setup();
+const { settings, patchSettings, width, height, interactable, placeholder } =
+  usePart.setup();
 
-    const graphId = nanoid();
-    const sourceRevision = ref<Date>(new Date());
-    const renderRevision = ref<Date>(new Date());
-    const config = shallowRef<GraphConfig>(emptyGraphConfig());
-    const presets = durationPresets();
+const graphId = nanoid();
+const presets = durationPresets();
 
-    watch(
-      settings,
-      (newSettings) => {
-        const cfg: GraphConfig = merge(
-          emptyGraphConfig(),
-          newSettings[GRAPH_CONFIG_KEY],
-        );
-        if (!isEqual(cfg, config.value)) {
-          config.value = cfg;
-          sourceRevision.value = new Date();
-        }
-      },
-      { immediate: true },
-    );
-
-    watch([interactable, width, height], () => {
-      renderRevision.value = new Date();
-    });
-
-    function edit(): void {
-      createDialog({
-        component: 'GraphEditorDialog',
-        componentProps: {
-          title: 'Edit Graph',
-          config: config.value,
-        },
-      }).onOk((cfg) => {
-        patchSettings({ [GRAPH_CONFIG_KEY]: cfg });
-      });
-    }
-
-    function maximized(): void {
-      createDialog({
-        component: 'GraphDialog',
-        componentProps: {
-          graphId,
-          config: config.value,
-          sharedSources: true,
-          usePresets: true,
-        },
-      }).onOk((cfg) => {
-        patchSettings({ [GRAPH_CONFIG_KEY]: cfg });
-      });
-    }
-
-    function activatePreset(params: QueryParams): void {
-      patchSettings({ [GRAPH_CONFIG_KEY]: { ...config.value, params } });
-    }
-
-    return {
-      MIN_SIZE,
-      MAX_SIZE,
-      DEFAULT_SIZE,
-      width,
-      height,
-      interactable,
-      placeholder,
-      graphId,
-      config,
-      presets,
-      sourceRevision,
-      renderRevision,
-      edit,
-      maximized,
-      activatePreset,
-    };
-  },
+/**
+ * This component has some workarounds for a WebKit bug.
+ * SVG transformation is not applied correctly to SVG foreignObject content.
+ * See: https://bugs.webkit.org/show_bug.cgi?id=23113
+ *
+ * The element is never rotated, but it is transformed during SVG zoom/pan.
+ * To compensate for the lack of transformation by WebKit, we explicitly set rendered width/height.
+ * For non-WebKit browsers, this is always equal to the width/height of the SVG part.
+ * For WebKit, we get the (transformed) width/height of the foreignObject element.
+ */
+const actualGraphSize = ref({
+  width: width.value,
+  height: height.value,
 });
+
+const sourceRevision = ref<Date>(new Date());
+const renderRevision = ref<Date>(new Date());
+const baseConfig = shallowRef<GraphConfig>(emptyGraphConfig());
+
+const graphHidden = ref(false);
+const fobjElement = ref<SVGForeignObjectElement>();
+const activeTransform = inject(ZoomTransformKey, ref());
+
+const sizedConfig = computed<GraphConfig>(() => ({
+  ...baseConfig.value,
+  layout: {
+    ...actualGraphSize.value,
+    margin: { t: 5, l: 5, r: 0, b: 5 },
+    showlegend: !IS_WEBKIT || actualGraphSize.value.height > 200,
+  },
+}));
+
+const refresh = debounce(
+  () =>
+    nextTick(() => {
+      if (IS_WEBKIT && fobjElement.value) {
+        const rect = fobjElement.value.getBoundingClientRect();
+        actualGraphSize.value = {
+          width: rect.width,
+          height: rect.height,
+        };
+      } else {
+        actualGraphSize.value = {
+          width: width.value,
+          height: height.value,
+        };
+      }
+
+      renderRevision.value = new Date();
+      graphHidden.value = false;
+    }),
+  500,
+  { leading: false, trailing: true },
+);
+
+function edit(): void {
+  createDialog({
+    component: 'GraphEditorDialog',
+    componentProps: {
+      title: 'Edit Graph',
+      config: baseConfig.value,
+    },
+  }).onOk((cfg) => {
+    patchSettings({ [GRAPH_CONFIG_KEY]: cfg });
+  });
+}
+
+function showMaximized(): void {
+  createDialog({
+    component: 'GraphDialog',
+    componentProps: {
+      graphId,
+      config: baseConfig.value,
+      sharedSources: true,
+      usePresets: true,
+    },
+  }).onOk((cfg) => {
+    patchSettings({ [GRAPH_CONFIG_KEY]: cfg });
+  });
+}
+
+function activatePreset(params: QueryParams): void {
+  patchSettings({ [GRAPH_CONFIG_KEY]: { ...baseConfig.value, params } });
+}
+
+watch(
+  settings,
+  (newSettings) => {
+    const cfg: GraphConfig = merge(
+      emptyGraphConfig(),
+      newSettings[GRAPH_CONFIG_KEY],
+    );
+    if (!isEqual(cfg, baseConfig.value)) {
+      baseConfig.value = cfg;
+      sourceRevision.value = new Date();
+    }
+  },
+  { immediate: true },
+);
+
+// The graph is transformed smoothly on non-WebKit browsers
+// No need to hide and re-render it
+if (IS_WEBKIT) {
+  watch(activeTransform, () => {
+    graphHidden.value = true;
+    refresh();
+  });
+}
+
+watch([interactable, width, height], () => refresh());
 </script>
 
 <template>
   <svg v-bind="{ width, height }">
     <ChartSvgIcon
       v-if="placeholder"
-      :width="height"
-      :height="height"
-      :x="width / 2 - height / 2"
+      v-bind="{ width, height }"
     />
+    <template v-else-if="graphHidden">
+      <PatternBackground v-bind="{ width, height }" />
+      <ChartSvgIcon
+        :x="width / 2 - SQUARE_SIZE / 2"
+        :y="height / 2 - SQUARE_SIZE / 2"
+      />
+    </template>
     <foreignObject
-      v-else
+      v-if="!placeholder"
+      ref="fobjElement"
       v-bind="{ width, height }"
     >
       <HistoryGraph
+        v-show="!graphHidden"
         v-bind="{
           graphId,
-          config,
           sourceRevision,
           renderRevision,
-          interactable: false,
+          config: sizedConfig,
+          static: true,
         }"
-      />
+        class="fit"
+        style="position: fixed"
+      >
+        <template
+          v-if="IS_WEBKIT"
+          #error="{ error }"
+        >
+          <div class="q-pa-md q-gutter-sm">
+            <q-icon
+              name="mdi-chart-line"
+              size="md"
+            />
+            <div>{{ error }}</div>
+          </div>
+        </template>
+      </HistoryGraph>
     </foreignObject>
     <BuilderInteraction
       v-bind="{ width, height }"
-      @interact="maximized"
+      @interact="showMaximized"
     >
       <q-menu
         touch-position
@@ -135,7 +190,7 @@ export default defineComponent({
           <q-item
             v-close-popup
             clickable
-            @click="maximized"
+            @click="showMaximized"
           >
             <q-item-section>Show fullscreen</q-item-section>
           </q-item>
@@ -162,7 +217,7 @@ export default defineComponent({
                   v-close-popup
                   dense
                   clickable
-                  :active="config.params.duration === cfg.duration"
+                  :active="baseConfig.params.duration === cfg.duration"
                   @click="activatePreset(cfg)"
                 >
                   <q-item-section>{{ cfg.duration }}</q-item-section>

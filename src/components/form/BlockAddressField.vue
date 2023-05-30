@@ -52,6 +52,10 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    showCreated: {
+      type: Boolean,
+      default: true,
+    },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -104,6 +108,7 @@ export default defineComponent({
           configurable: props.configurable,
           compatible: props.compatible,
           blockFilter: props.blockFilter,
+          showCreated: props.showCreated,
           ...props.dialogProps,
         },
       }).onOk(save);

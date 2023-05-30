@@ -1,14 +1,15 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxQty } from '@/utils/quantity';
 import { BlockType, MutexBlock } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './MutexWidget.vue';
 
 const type = BlockType.Mutex;
+const title = 'Mutex';
 
 const plugin: Plugin = {
   install(app) {
@@ -17,6 +18,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<MutexBlock> = {
       type,
+      title,
       generate: (): MutexBlock['data'] => ({
         waitRemaining: bloxQty('0s'),
       }),
@@ -26,9 +28,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Mutex',
+      title,
       role: 'Constraint',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 2,

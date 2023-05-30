@@ -7,7 +7,7 @@ services:
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
   victoria:
-    image: victoriametrics/victoria-metrics:v1.69.0
+    image: victoriametrics/victoria-metrics:v1.88.0
     labels:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
     volumes:
@@ -34,7 +34,7 @@ services:
     image: ghcr.io/brewblox/brewblox-history:develop
 
   node-red:
-    image: brewblox/node-red:develop
+    image: ghcr.io/brewblox/node-red:develop
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/node-red

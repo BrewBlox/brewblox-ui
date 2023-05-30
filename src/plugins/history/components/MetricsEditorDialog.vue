@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import { defineComponent, PropType, ref } from 'vue';
 import { MetricsConfig } from '../types';
@@ -21,7 +21,7 @@ export default defineComponent({
       useDialog.setup();
 
     const local = ref<MetricsConfig>(
-      defaults(deepCopy(props.modelValue), emptyMetricsConfig()),
+      defaults(cloneDeep(props.modelValue), emptyMetricsConfig()),
     );
 
     return {

@@ -5,7 +5,6 @@ import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore } from '@/store/widgets';
 import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
-import { deepCopy } from '@/utils/objects';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
 import {
   BlockType,
@@ -13,6 +12,7 @@ import {
   OneWireGpioModuleBlock,
   PidBlock,
 } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import {
   GpioChange,
   IoChannelAddress,
@@ -38,7 +38,7 @@ export function resetGpioChanges(serviceId: string): GpioChange[] {
     .map((block) => ({
       blockId: block.id,
       modulePosition: block.data.modulePosition,
-      channels: deepCopy(block.data.channels),
+      channels: cloneDeep(block.data.channels),
     }));
 }
 
@@ -172,7 +172,7 @@ export function channelsOverlap(
 }
 
 export function hasShared(arr: any[]): boolean {
-  const base = deepCopy(arr).filter(nullFilter);
+  const base = cloneDeep(arr).filter(nullFilter);
   const unique = base.filter(uniqueFilter);
   return base.length > unique.length;
 }

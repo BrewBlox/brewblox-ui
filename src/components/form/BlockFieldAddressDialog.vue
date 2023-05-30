@@ -8,8 +8,8 @@ import {
   ComparedBlockType,
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
-import { createBlockWizard } from '@/plugins/wizardry';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { Block, BlockOrIntfType } from 'brewblox-proto/ts';
 import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
@@ -148,7 +148,13 @@ export default defineComponent({
     }
 
     function createBlock(): void {
-      createBlockWizard(serviceId.value, validTypes.value).onOk(({ block }) => {
+      createDialog({
+        component: 'BlockWizardDialog',
+        componentProps: {
+          serviceId: serviceId.value,
+          compatible: validTypes.value,
+        },
+      }).onOk((block: Maybe<Block>) => {
         if (block) {
           serviceId.value = block.serviceId;
           blockId.value = block.id;

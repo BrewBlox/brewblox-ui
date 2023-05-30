@@ -1,12 +1,7 @@
 <script lang="ts">
-import {
-  ComponentResult,
-  useFeatureStore,
-  WidgetContext,
-} from '@/store/features';
-import { useWidgetStore, Widget } from '@/store/widgets';
-import { computed, defineComponent, PropType, watch } from 'vue';
-import { BlockConfig } from '../types';
+import { useFeatureStore, WidgetContext } from '@/store/features';
+import { computed, defineComponent, PropType, ref } from 'vue';
+import { BlockWidget } from '../types';
 import { ListRenderAddress } from './types';
 
 const context: WidgetContext = {
@@ -25,45 +20,32 @@ export default defineComponent({
   },
   setup(props) {
     const featureStore = useFeatureStore();
-    const widgetStore = useWidgetStore();
 
     const widgetId = computed<string>(() => {
       const { serviceId, id, type } = props.address;
       return [serviceId, id, type].join('/');
     });
 
-    const widget = computed<Widget<BlockConfig> | null>(() =>
-      widgetStore.widgetById(widgetId.value),
-    );
-
-    const widgetComponent = computed<ComponentResult | null>(() =>
-      widget.value ? featureStore.widgetComponent(widget.value) : null,
-    );
-
-    watch(
-      () => widget.value,
-      (newV) => {
-        if (!newV) {
-          const widget: Widget<BlockConfig> = {
-            id: widgetId.value,
-            title: props.address.name,
-            feature: props.address.type,
-            dashboard: '',
-            order: 0,
-            config: {
-              serviceId: props.address.serviceId,
-              blockId: props.address.id,
-            },
-            ...featureStore.widgetSize(props.address.type),
-          };
-          widgetStore.setVolatileWidget(widget);
-        }
+    const widget = ref<BlockWidget>({
+      id: widgetId.value,
+      title: props.address.name,
+      feature: props.address.type,
+      dashboard: '',
+      order: 0,
+      config: {
+        serviceId: props.address.serviceId,
+        blockId: props.address.id,
       },
-      { immediate: true },
+      ...featureStore.widgetSize(props.address.type),
+    });
+
+    const widgetComponent = computed<string | null>(() =>
+      widget.value ? featureStore.widgetComponent(widget.value) : null,
     );
 
     return {
       context,
+      widget,
       widgetId,
       widgetComponent,
     };
@@ -72,14 +54,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <WidgetProvider
-    :widget-id="widgetId"
+  <WidgetWrapper
+    v-if="widget"
+    v-model:widget="widget"
     :context="context"
-  >
-    <component
-      :is="widgetComponent.component"
-      v-if="widgetComponent"
-      :error="widgetComponent.error"
-    />
-  </WidgetProvider>
+    volatile
+  />
 </template>

@@ -1,9 +1,8 @@
-<script lang="ts">
+<script setup lang="ts">
 // import type { SessionLogWidget } from '@/plugins/history/SessionLog/types';
 import { useHistoryStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
-import { mdiTextSubject } from '@quasar/extras/mdi-v5';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -13,52 +12,22 @@ import {
 } from '../blueprints/SessionLogDisplay';
 import { usePart, useSettingsWidget } from '../composables';
 
-export default defineComponent({
-  name: 'SessionLogDisplayPartComponent',
-  setup() {
-    const historyStore = useHistoryStore();
-    const { width, height, bordered, placeholder } = usePart.setup();
-    const {
-      widgetId,
-      widget,
-      isBroken,
-      showWidgetDialog,
-      showWidgetSelectDialog,
-    } = useSettingsWidget.setup(WIDGET_KEY, WIDGET_TYPE);
+const historyStore = useHistoryStore();
+const { width, height, bordered, placeholder } = usePart.setup();
+const { widgetId, widget, isBroken, showWidgetDialog, showWidgetSelectDialog } =
+  useSettingsWidget.setup(WIDGET_KEY, WIDGET_TYPE);
 
-    const available = computed<boolean>(() => widget.value != null);
+const available = computed<boolean>(() => widget.value != null);
 
-    const session = computed<LoggedSession | null>(() =>
-      widget.value?.config.currentSession
-        ? historyStore.sessionById(widget.value.config.currentSession)
-        : null,
-    );
+const session = computed<LoggedSession | null>(() =>
+  widget.value?.config.currentSession
+    ? historyStore.sessionById(widget.value.config.currentSession)
+    : null,
+);
 
-    const displayText = computed<string>(() =>
-      widgetId.value
-        ? session.value?.title ?? 'no active session'
-        : 'Not linked',
-    );
-
-    return {
-      WIDGET_KEY,
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      mdiTextSubject,
-      width,
-      height,
-      bordered,
-      placeholder,
-      widgetId,
-      isBroken,
-      available,
-      displayText,
-      showWidgetDialog,
-      showWidgetSelectDialog,
-    };
-  },
-});
+const displayText = computed<string>(() =>
+  widgetId.value ? session.value?.title ?? 'no active session' : 'Not linked',
+);
 </script>
 
 <template>

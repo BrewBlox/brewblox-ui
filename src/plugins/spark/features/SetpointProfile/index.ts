@@ -1,10 +1,10 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
-import { shortDateString } from '@/utils/quantity';
+import { shortDateString, tempQty } from '@/utils/quantity';
 import {
   BlockIntfType,
   BlockType,
@@ -15,6 +15,7 @@ import { Plugin } from 'vue';
 import widget from './SetpointProfileWidget.vue';
 
 const type = BlockType.SetpointProfile;
+const title = 'Setpoint Profile';
 
 const plugin: Plugin = {
   install(app) {
@@ -23,11 +24,13 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SetpointProfileBlock> = {
       type,
+      title,
       generate: (): SetpointProfileBlock['data'] => ({
         start: new Date().toISOString(),
         points: [],
         enabled: false,
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+        setting: tempQty(null),
       }),
       analyze: (block: SetpointProfileBlock) => {
         const { enabled, targetId } = block.data;
@@ -71,9 +74,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Setpoint Profile',
+      title,
       role: 'Process',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 3,

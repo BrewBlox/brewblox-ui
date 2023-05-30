@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/objects';
 import { parseDate } from '@/utils/quantity';
+import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, ref } from 'vue';
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
@@ -21,7 +21,7 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
-    const local = ref<LoggedSession>(deepCopy(props.modelValue));
+    const local = ref<LoggedSession>(cloneDeep(props.modelValue));
 
     const date = computed<Date | null>({
       get: () => parseDate(local.value.date),

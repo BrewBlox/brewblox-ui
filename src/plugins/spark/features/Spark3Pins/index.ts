@@ -1,13 +1,14 @@
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { BlockType, Spark3PinsBlock } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './Spark3PinsWidget.vue';
 
 const type = BlockType.Spark3Pins;
+const title = 'Spark 3 Pins';
 
 const plugin: Plugin = {
   install(app) {
@@ -16,6 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<Spark3PinsBlock> = {
       type,
+      title,
       generate: (): Spark3PinsBlock['data'] => ({
         channels: [],
         enableIoSupply5V: false,
@@ -70,9 +72,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...systemBlockFeature,
       id: type,
-      title: 'Spark 3 Pins',
+      title,
       role: 'Output',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 4,

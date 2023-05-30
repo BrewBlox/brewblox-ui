@@ -1,145 +1,128 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 import { BlockType, SetpointProfileBlock } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 
 const typeName = BlockType.SetpointProfile;
 
-export default defineComponent({
-  name: 'ProfileSnippetDialog',
-  props: {
-    ...useDialog.props,
-    block: {
-      type: Object as PropType<SetpointProfileBlock>,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const snippetStore = useBlockSnippetStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-
-    const selected = ref<SelectOption | null>(null);
-    const block = ref<SetpointProfileBlock>(deepCopy(props.block));
-
-    const options = computed<SelectOption[]>(() =>
-      snippetStore.blockSnippets
-        .filter((snippet) => snippet.type === typeName)
-        .map((snippet) => ({ label: snippet.name, value: snippet.id })),
-    );
-
-    function removeSelected(): void {
-      if (selected.value === null) {
-        return;
-      }
-      const { value } = selected.value;
-      const snippet = snippetStore.snippetById(value)!;
-      selected.value = null;
-      snippetStore.removeSnippet(snippet);
-    }
-
-    function editSelected(): void {
-      if (selected.value === null) {
-        return;
-      }
-      const { value } = selected.value;
-      const snippet = snippetStore.snippetById(value)!;
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          title: 'Edit profile name',
-          modelValue: snippet.name,
-        },
-      }).onOk((name) => snippetStore.saveSnippet({ ...snippet, name }));
-    }
-
-    async function loadSelected(): Promise<void> {
-      if (selected.value === null) {
-        return;
-      }
-      const { value } = selected.value;
-      const snippet = snippetStore.snippetById(value)!;
-      const points = deserialize(deepCopy(snippet.data.points));
-
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: 'Profile start',
-          message: `Do you want to change '${block.value.id}' start time to now?`,
-          ok: 'Yes',
-          cancel: 'No',
-        },
-      })
-        .onOk(async () => {
-          await sparkStore.patchBlock(block.value, {
-            points,
-            start: new Date().toISOString(),
-          });
-          onDialogOK();
-        })
-        .onCancel(async () => {
-          await sparkStore.patchBlock(block.value, {
-            points,
-          });
-          onDialogOK();
-        });
-    }
-
-    async function saveSelected(): Promise<void> {
-      if (selected.value === null) {
-        return;
-      }
-      const { value } = selected.value;
-      const snippet = snippetStore.snippetById(value)!;
-      snippet.data = {
-        points: deepCopy(block.value.data.points),
-      };
-      await snippetStore.saveSnippet(snippet);
-      onDialogOK();
-    }
-
-    function createSnippet(): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: `${block.value.id} profile`,
-          title: 'Save as new profile',
-        },
-      }).onOk(async (name: string) => {
-        await snippetStore.createSnippet({
-          id: nanoid(),
-          name,
-          type: typeName,
-          data: {
-            points: deepCopy(block.value.data.points),
-          },
-        });
-        onDialogOK();
-      });
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      selected,
-      options,
-      editSelected,
-      removeSelected,
-      loadSelected,
-      saveSelected,
-      createSnippet,
-    };
+const props = defineProps({
+  ...useDialog.props,
+  block: {
+    type: Object as PropType<SetpointProfileBlock>,
+    required: true,
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const sparkStore = useSparkStore();
+const snippetStore = useBlockSnippetStore();
+const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const selected = ref<SelectOption | null>(null);
+const block = ref<SetpointProfileBlock>(cloneDeep(props.block));
+
+const options = computed<SelectOption[]>(() =>
+  snippetStore.blockSnippets
+    .filter((snippet) => snippet.type === typeName)
+    .map((snippet) => ({ label: snippet.name, value: snippet.id })),
+);
+
+function removeSelected(): void {
+  if (selected.value === null) {
+    return;
+  }
+  const { value } = selected.value;
+  const snippet = snippetStore.snippetById(value)!;
+  selected.value = null;
+  snippetStore.removeSnippet(snippet);
+}
+
+function editSelected(): void {
+  if (selected.value === null) {
+    return;
+  }
+  const { value } = selected.value;
+  const snippet = snippetStore.snippetById(value)!;
+  createDialog({
+    component: 'InputDialog',
+    componentProps: {
+      title: 'Edit profile name',
+      modelValue: snippet.name,
+    },
+  }).onOk((name) => snippetStore.saveSnippet({ ...snippet, name }));
+}
+
+async function loadSelected(): Promise<void> {
+  if (selected.value === null) {
+    return;
+  }
+  const { value } = selected.value;
+  const snippet = snippetStore.snippetById(value)!;
+  const points = deserialize(cloneDeep(snippet.data.points));
+
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: 'Profile start',
+      message: `Do you want to change '${block.value.id}' start time to now?`,
+      ok: 'Yes',
+      cancel: 'No',
+    },
+  })
+    .onOk(async () => {
+      await sparkStore.patchBlock(block.value, {
+        points,
+        start: new Date().toISOString(),
+      });
+      onDialogOK();
+    })
+    .onCancel(async () => {
+      await sparkStore.patchBlock(block.value, {
+        points,
+      });
+      onDialogOK();
+    });
+}
+
+async function saveSelected(): Promise<void> {
+  if (selected.value === null) {
+    return;
+  }
+  const { value } = selected.value;
+  const snippet = snippetStore.snippetById(value)!;
+  snippet.data = {
+    points: cloneDeep(block.value.data.points),
+  };
+  await snippetStore.saveSnippet(snippet);
+  onDialogOK();
+}
+
+function createSnippet(): void {
+  createDialog({
+    component: 'InputDialog',
+    componentProps: {
+      modelValue: `${block.value.id} profile`,
+      title: 'Save as new profile',
+    },
+  }).onOk(async (name: string) => {
+    await snippetStore.createSnippet({
+      id: nanoid(),
+      name,
+      type: typeName,
+      data: {
+        points: cloneDeep(block.value.data.points),
+      },
+    });
+    onDialogOK();
+  });
+}
 </script>
 
 <template>

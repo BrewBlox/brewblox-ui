@@ -1,13 +1,8 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'CoolingSvgIcon',
-  props: {
-    color: {
-      type: String,
-      default: 'white',
-    },
+<script setup lang="ts">
+defineProps({
+  color: {
+    type: String,
+    default: 'white',
   },
 });
 </script>

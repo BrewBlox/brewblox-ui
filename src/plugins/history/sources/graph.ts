@@ -75,7 +75,7 @@ function transformer(
         ...existing, // Plotly can set values
         x,
         y,
-        type: 'scatter',
+        type: 'scattergl',
         mode: 'lines',
         name: fieldLabel(source, key, last(y)),
         yaxis: source.axes[key] ?? 'y',

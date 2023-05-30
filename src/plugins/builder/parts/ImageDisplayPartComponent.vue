@@ -1,30 +1,14 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/ImageDisplay';
 import { usePart } from '../composables';
 import { URL_KEY } from '../const';
 
-export default defineComponent({
-  name: 'ImageDisplayPartComponent',
-  setup() {
-    const { settings, width, height, passthrough } = usePart.setup();
+const { settings, width, height, passthrough } = usePart.setup();
 
-    const href = computed<string>(
-      () => settings.value[URL_KEY] || '/image-placeholder.png',
-    );
-
-    return {
-      URL_KEY,
-      MIN_SIZE,
-      MAX_SIZE,
-      DEFAULT_SIZE,
-      width,
-      height,
-      passthrough,
-      href,
-    };
-  },
-});
+const href = computed<string>(
+  () => settings.value[URL_KEY] || '/image-placeholder.png',
+);
 </script>
 
 <template>

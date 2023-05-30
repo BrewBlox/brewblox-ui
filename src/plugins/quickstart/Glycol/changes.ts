@@ -103,6 +103,7 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(names.beerSetpoint),
+        setting: tempQty(null),
         points: [
           {
             time: bloxQty('0s'),

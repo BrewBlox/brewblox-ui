@@ -16,13 +16,10 @@ export default defineComponent({
   setup() {
     const { context, inDialog } = useContext.setup();
     const sparkStore = useSparkStore();
-    const { serviceId, blockId, isVolatileBlock } =
+    const { serviceId, blockId } =
       useBlockWidget.setup<SetpointSensorPairBlock>();
 
     const usedBy = computed<Block[]>(() => {
-      if (isVolatileBlock.value) {
-        return [];
-      }
       return sparkStore
         .blocksByService(serviceId)
         .filter((b) => b.data.inputId?.id === blockId);

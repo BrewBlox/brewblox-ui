@@ -1,8 +1,6 @@
 <script lang="ts">
-import { useContext, useWidget } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { startChangeWidgetTitle } from '@/utils/widgets';
-import { computed, defineComponent } from 'vue';
+import { useContext, useGlobals, useWidget } from '@/composables';
+import { computed, defineComponent, ref } from 'vue';
 import Toolbar from './Toolbar.vue';
 
 export default defineComponent({
@@ -15,14 +13,18 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    changeTitleFn: {
-      type: Function,
-      default: null,
-    },
   },
-  setup(props) {
+  setup() {
+    const { dense } = useGlobals.setup();
     const { inDialog, context, toggleMode } = useContext.setup();
-    const { widgetId, widget, featureTitle } = useWidget.setup();
+    const {
+      widget,
+      featureTitle,
+      isVolatileWidget,
+      widgetComponent,
+      changeWidgetTitle,
+    } = useWidget.setup();
+    const dialogActive = ref(false);
 
     const toggleBtnIcon = computed<string>(() =>
       context.mode === 'Basic'
@@ -34,32 +36,18 @@ export default defineComponent({
       context.mode === 'Basic' ? 'Show full widget' : 'Show basic widget',
     );
 
-    function showDialog(): void {
-      createDialog({
-        component: 'WidgetDialog',
-        componentProps: {
-          widgetId,
-        },
-      });
-    }
-
-    function changeTitle(): void {
-      if (props.changeTitleFn) {
-        props.changeTitleFn();
-      } else {
-        startChangeWidgetTitle(widget.value);
-      }
-    }
-
     return {
+      dense,
+      dialogActive,
       inDialog,
       widget,
+      isVolatileWidget,
+      widgetComponent,
       featureTitle,
       toggleBtnIcon,
       toggleBtnTooltip,
       toggleMode,
-      showDialog,
-      changeTitle,
+      changeWidgetTitle,
     };
   },
 });
@@ -69,8 +57,9 @@ export default defineComponent({
   <Toolbar
     :title="widget.title"
     :subtitle="featureTitle"
-    :change-title-fn="changeTitle"
+    :change-title-fn="changeWidgetTitle"
   >
+    <InlineWidgetDialog v-model:active="dialogActive" />
     <slot />
     <template #buttons>
       <q-btn
@@ -91,7 +80,7 @@ export default defineComponent({
         flat
         dense
         round
-        @click="showDialog"
+        @click="dialogActive = true"
       >
         <q-tooltip> Show in dialog </q-tooltip>
       </q-btn>

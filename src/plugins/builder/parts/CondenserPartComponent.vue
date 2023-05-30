@@ -1,6 +1,5 @@
-<script lang="ts">
+<script setup lang="ts">
 import { elbow } from '@/plugins/builder/utils';
-import { defineComponent } from 'vue';
 import {
   DEFAULT_OUTLET_PRESSURE,
   MAX_OUTLET_PRESSURE,
@@ -9,38 +8,23 @@ import {
 import { usePart } from '../composables';
 import { IO_PRESSURE_KEY } from '../const';
 
-export default defineComponent({
-  name: 'CondenserPartComponent',
-  setup() {
-    const { width, height } = usePart.setup();
+const { width, height } = usePart.setup();
 
-    function outlinePath(closed: boolean): string {
-      const moveChar = closed ? 'L' : 'M';
-      return [
-        'M0,21 H10 V10',
-        `${elbow(4, -4, false)} H21 V0`,
-        `${moveChar}29,0 V6 H36`,
-        `${elbow(4, 4, true)} V90`,
-        `${elbow(-4, 4, false)} H29 V100`,
-        `${moveChar}21,100 V94 H14`,
-        `${elbow(-4, -4, true)} V29 H0`,
-      ].join(' ');
-    }
+function outlinePath(closed: boolean): string {
+  const moveChar = closed ? 'L' : 'M';
+  return [
+    'M0,21 H10 V10',
+    `${elbow(4, -4, false)} H21 V0`,
+    `${moveChar}29,0 V6 H36`,
+    `${elbow(4, 4, true)} V90`,
+    `${elbow(-4, 4, false)} H29 V100`,
+    `${moveChar}21,100 V94 H14`,
+    `${elbow(-4, -4, true)} V29 H0`,
+  ].join(' ');
+}
 
-    const casing = outlinePath(false);
-    const smokeArea = outlinePath(true);
-    return {
-      IO_PRESSURE_KEY,
-      MIN_OUTLET_PRESSURE,
-      MAX_OUTLET_PRESSURE,
-      DEFAULT_OUTLET_PRESSURE,
-      width,
-      height,
-      casing,
-      smokeArea,
-    };
-  },
-});
+const casing = outlinePath(false);
+const smokeArea = outlinePath(true);
 </script>
 
 <template>

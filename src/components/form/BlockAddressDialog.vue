@@ -3,9 +3,9 @@ import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
-import { createBlockWizard } from '@/plugins/wizardry';
 import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { Block } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType, ref } from 'vue';
@@ -49,6 +49,10 @@ export default defineComponent({
       default: true,
     },
     configurable: {
+      type: Boolean,
+      default: true,
+    },
+    showCreated: {
       type: Boolean,
       default: true,
     },
@@ -119,10 +123,14 @@ export default defineComponent({
     }
 
     function createBlock(): void {
-      createBlockWizard(
-        serviceId.value,
-        props.compatible ?? modelValueAddr.value.type,
-      ).onOk(({ block }) => {
+      createDialog({
+        component: 'BlockWizardDialog',
+        componentProps: {
+          serviceId: serviceId.value,
+          compatible: props.compatible ?? modelValueAddr.value.type,
+          showCreated: props.showCreated,
+        },
+      }).onOk((block: Maybe<Block>) => {
         if (block) {
           local.value = asAddr(block);
         }

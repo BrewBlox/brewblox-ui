@@ -1,7 +1,8 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
+import { BlockConfig } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { BlockType, InactiveObjectBlock } from 'brewblox-proto/ts';
+import { cref } from '@/utils/component-ref';
+import { BlockType } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './InactiveObjectWidget.vue';
 
@@ -11,12 +12,12 @@ const plugin: Plugin = {
   install(app) {
     const featureStore = useFeatureStore();
 
-    const feature: WidgetFeature<InactiveObjectBlock> = {
+    const feature: WidgetFeature<BlockConfig> = {
       ...genericBlockFeature,
       id: type,
       title: 'Inactive Block',
-      component: blockWidgetSelector(app, widget, type),
-      wizard: false,
+      component: cref(app, widget),
+      creatable: false,
       widgetSize: {
         cols: 4,
         rows: 2,

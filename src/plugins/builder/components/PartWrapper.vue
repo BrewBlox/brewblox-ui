@@ -1,9 +1,9 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
-import { computed, defineComponent, PropType, provide } from 'vue';
+import { computed, PropType, provide } from 'vue';
 import parts from '../parts';
 import {
   InteractableKey,
@@ -13,110 +13,101 @@ import {
   ReflowKey,
 } from '../symbols';
 
-export default defineComponent({
-  name: 'PartWrapper',
-  components: {
-    ...parts,
+const props = defineProps({
+  part: {
+    type: Object as PropType<BuilderPart>,
+    required: true,
   },
-  props: {
-    part: {
-      type: Object as PropType<BuilderPart>,
-      required: true,
-    },
-    /**
-     * Mouse events for the wrapped part are enabled.
-     */
-    interactable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * The part is highlighted on hover.
-     */
-    selectable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * The part is actively selected, and should be highlighted.
-     */
-    selected: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * Mouse events for the wrapped part are disabled.
-     * The 'preselect' event is emitted on click.
-     */
-    preselectable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * Element is darkened and non-interactable.
-     */
-    dimmed: {
-      type: Boolean,
-      default: false,
-    },
+  /**
+   * Mouse events for the wrapped part are enabled.
+   */
+  interactable: {
+    type: Boolean,
+    default: false,
   },
-  emits: ['patch:part', 'patch:settings', 'preselect', 'reflow'],
-  setup(props, { emit }) {
-    const builderStore = useBuilderStore();
-    const component = builderStore.componentByType(props.part.type);
-
-    provide(ReflowKey, () => emit('reflow'));
-    provide(
-      PartKey,
-      computed<BuilderPart>(() => props.part),
-    );
-    provide(
-      InteractableKey,
-      computed(() => props.interactable),
-    );
-
-    provide(PatchPartKey, (patch) => emit('patch:part', patch));
-    provide(PatchSettingsKey, (patch) => emit('patch:settings', patch));
-
-    const dimensions = computed(() => ({
-      width: coord2grid(props.part.width),
-      height: coord2grid(props.part.height),
-    }));
-
-    const positionTransform = computed<string>(() =>
-      coord2translate(props.part.x, props.part.y),
-    );
-
-    const rotateTransform = computed<string>(() => {
-      const { width, height } = props.part;
-      const renderSize = rotatedSize(props.part.rotate, props.part);
-
-      const farEdge = new Coordinates([width, height, 0]).rotate(
-        props.part.rotate,
-        [0, 0, 0],
-      );
-
-      const trX = farEdge.x < 0 ? coord2grid(renderSize.width) : 0;
-      const trY = farEdge.y < 0 ? coord2grid(renderSize.height) : 0;
-
-      return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
-    });
-
-    const flipTransform = computed<string>(() => {
-      if (props.part.flipped) {
-        return `translate(${coord2grid(props.part.width)}, 0) scale(-1, 1)`;
-      }
-      return '';
-    });
-
-    return {
-      component,
-      dimensions,
-      positionTransform,
-      rotateTransform,
-      flipTransform,
-    };
+  /**
+   * The part is highlighted on hover.
+   */
+  selectable: {
+    type: Boolean,
+    default: false,
   },
+  /**
+   * The part is actively selected, and should be highlighted.
+   */
+  selected: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * Mouse events for the wrapped part are disabled.
+   * The 'preselect' event is emitted on click.
+   */
+  preselectable: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * Element is darkened and non-interactable.
+   */
+  dimmed: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits<{
+  (e: 'patch:part', data: Partial<BuilderPart>): void;
+  (e: 'patch:settings', data: Partial<BuilderPart['settings']>): void;
+  (e: 'preselect'): void;
+  (e: 'reflow'): void;
+}>();
+
+const builderStore = useBuilderStore();
+const component = parts[builderStore.componentByType(props.part.type)];
+
+provide(ReflowKey, () => emit('reflow'));
+provide(
+  PartKey,
+  computed<BuilderPart>(() => props.part),
+);
+provide(
+  InteractableKey,
+  computed(() => props.interactable),
+);
+
+provide(PatchPartKey, (patch) => emit('patch:part', patch));
+provide(PatchSettingsKey, (patch) => emit('patch:settings', patch));
+
+const dimensions = computed(() => ({
+  width: coord2grid(props.part.width),
+  height: coord2grid(props.part.height),
+}));
+
+const positionTransform = computed<string>(() =>
+  coord2translate(props.part.x, props.part.y),
+);
+
+const rotateTransform = computed<string>(() => {
+  const { width, height } = props.part;
+  const renderSize = rotatedSize(props.part.rotate, props.part);
+
+  const farEdge = new Coordinates([width, height, 0]).rotate(
+    props.part.rotate,
+    [0, 0, 0],
+  );
+
+  const trX = farEdge.x < 0 ? coord2grid(renderSize.width) : 0;
+  const trY = farEdge.y < 0 ? coord2grid(renderSize.height) : 0;
+
+  return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
+});
+
+const flipTransform = computed<string>(() => {
+  if (props.part.flipped) {
+    return `translate(${coord2grid(props.part.width)}, 0) scale(-1, 1)`;
+  }
+  return '';
 });
 </script>
 
@@ -207,10 +198,11 @@ export default defineComponent({
   fill: none
 
   &:hover
-    .interaction:hover
+    .interaction:hover > .interaction-highlight
       opacity: 0.2
       fill: white
       background-color: white
+      rx: 4
 
   text
     fill: white
@@ -222,14 +214,6 @@ export default defineComponent({
     line-height: 1
     vertical-align: middle
     display: inline-block
-
-  .interaction
-    pointer-events: auto
-    width: 100%
-    height: 100%
-    opacity: 0
-    rx: 4
-    border-radius: 4px
 
   :not(.interactable) .native-interaction
     pointer-events: none !important

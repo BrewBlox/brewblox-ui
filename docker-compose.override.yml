@@ -65,3 +65,11 @@ services:
   #     - type: bind
   #       source: ./dev/tilt_share
   #       target: /share
+
+  # hass:
+  #   image: ghcr.io/brewblox/brewblox-hass:develop
+  #   restart: unless-stopped
+  #   volumes:
+  #     - type: bind
+  #       source: ../brewblox-hass/brewblox_hass
+  #       target: /app/brewblox_hass

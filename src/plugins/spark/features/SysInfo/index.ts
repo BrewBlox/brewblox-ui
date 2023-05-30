@@ -1,8 +1,8 @@
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxQty } from '@/utils/quantity';
 import {
   BlockType,
@@ -14,6 +14,7 @@ import { Plugin } from 'vue';
 import widget from './SysInfoWidget.vue';
 
 const type = BlockType.SysInfo;
+const title = 'Spark System Info';
 
 const plugin: Plugin = {
   install(app) {
@@ -22,6 +23,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SysInfoBlock> = {
       type,
+      title,
       generate: (): SysInfoBlock['data'] => ({
         deviceId: '',
         platform: SparkPlatform.PLATFORM_UNKNOWN,
@@ -48,9 +50,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...systemBlockFeature,
       id: type,
-      title: 'Spark System Info',
+      title,
       role: 'Display',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 3,

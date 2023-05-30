@@ -1,13 +1,14 @@
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { BlockType, DS2413Block } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import widget from './DS2413Widget.vue';
 
 const type = BlockType.DS2413;
+const title = 'DS2413 Chip';
 
 const plugin: Plugin = {
   install(app) {
@@ -16,6 +17,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<DS2413Block> = {
       type,
+      title,
       generate: (): DS2413Block['data'] => ({
         oneWireBusId: 0,
         address: '',
@@ -33,9 +35,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...discoveredBlockFeature,
       id: type,
-      title: 'DS2413 Chip',
+      title,
       role: 'Output',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 3,

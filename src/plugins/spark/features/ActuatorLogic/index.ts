@@ -1,9 +1,9 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { enumHint } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 import {
   ActuatorLogicBlock,
@@ -16,6 +16,7 @@ import widget from './ActuatorLogicWidget.vue';
 import { nonErrorResults } from './const';
 
 const type = BlockType.ActuatorLogic;
+const title = 'Logic Actuator';
 
 const plugin: Plugin = {
   install(app) {
@@ -24,6 +25,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<ActuatorLogicBlock> = {
       type,
+      title,
       generate: (): ActuatorLogicBlock['data'] => ({
         enabled: true,
         result: LogicResult.RESULT_EMPTY,
@@ -72,9 +74,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Logic Actuator',
+      title,
       role: 'Control',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 3,

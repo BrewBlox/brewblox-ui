@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/objects';
 import { DigitalConstraints } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
@@ -22,7 +22,7 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
-    const local = ref<DigitalConstraints>(deepCopy(props.modelValue));
+    const local = ref<DigitalConstraints>(cloneDeep(props.modelValue));
 
     function save(): void {
       onDialogOK(local.value);

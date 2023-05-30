@@ -1,5 +1,8 @@
 import { Service, ServiceStub } from '@/store/services/types';
 import { Widget } from '@/store/widgets/types';
+import { Component, GlobalComponents } from 'vue';
+
+export type ComponentName = keyof GlobalComponents & string;
 
 export type WidgetRole =
   | 'Process'
@@ -13,6 +16,8 @@ export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';
 export type ServiceHook = (service: Service) => Awaitable<unknown>;
+
+export type WidgetModeComponents = Record<WidgetMode, Component>;
 
 export interface GridSize {
   cols: number;
@@ -28,11 +33,6 @@ export interface WidgetContext {
 export interface WidgetRemoveAction {
   description: string;
   action: (widget: Widget) => void;
-}
-
-export interface ComponentResult {
-  component: string;
-  error?: string;
 }
 
 /**
@@ -69,22 +69,27 @@ export interface WidgetFeature<ConfigT = any> {
 
   /**
    * Rendering component for this widget.
-   * Should be or return the name of a globally registered Vue component.
+   * Should be the name of a globally registered Vue component.
    */
-  component: string | ((widget: Widget) => ComponentResult);
+  component: string;
 
   /**
-   * Wizard component.
-   * There are three possible values:
-   * - string: the name of a globally registered Vue component.
-   * - true: the generic widget wizard component will be used.
-   * - false: this widget can not be created by users.
+   * Wrapping component for this widget.
+   * Should be the name of a globally registered Vue component.
+   * If set, this will be rendered instead of `component`.
+   * It is then the wrapper's responsibility to render the actual component.
    */
-  wizard: boolean | string;
+  wrapperComponent?: ComponentName;
+
+  /**
+   * Name of the editor component used during the wizard.
+   * If not set, the generic editor component is used.
+   */
+  editor?: ComponentName;
 
   /**
    * Should return a new object that can be used as `widget.config`.
-   * Required if `WidgetFeature.wizard` === true.
+   * If not set, the widget is not creatable by users.
    */
   generateConfig?: () => ConfigT;
 
@@ -93,6 +98,12 @@ export interface WidgetFeature<ConfigT = any> {
    * Should return null if no changes are required.
    */
   upgrade?: (widget: Widget<unknown>) => Widget<ConfigT> | null;
+
+  /**
+   * Widget is creatable by users.
+   * Defaults to true.
+   */
+  creatable?: boolean;
 
   /**
    * Wizard should only be shown if experimental features are enabled.
@@ -138,13 +149,9 @@ export interface ServiceFeature {
   onRemove?: ServiceHook;
 
   /**
-   * Wizard implementation.
-   * This can either be the name of a Vue component, or a function.
-   *
-   * If it's a Vue component, it will be rendered as child of WizardDialog,
-   * and given the stub as prop.
+   * Create a service from the discovered stub.
    */
-  wizard: string | ((stub: ServiceStub) => Service | PromiseLike<Service>);
+  generate: (stub: ServiceStub) => Service | PromiseLike<Service>;
 }
 
 /**

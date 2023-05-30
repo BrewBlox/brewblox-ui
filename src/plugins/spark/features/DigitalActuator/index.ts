@@ -1,9 +1,9 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { enumHint, prettyConstraints } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 import { bloxQty } from '@/utils/quantity';
 import {
@@ -18,6 +18,7 @@ import { Plugin } from 'vue';
 import widget from './DigitalActuatorWidget.vue';
 
 const type = BlockType.DigitalActuator;
+const title = 'Digital Actuator';
 
 const plugin: Plugin = {
   install(app) {
@@ -26,6 +27,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<DigitalActuatorBlock> = {
       type,
+      title,
       generate: (): DigitalActuatorBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,
@@ -98,9 +100,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Digital Actuator',
+      title,
       role: 'Output',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 2,

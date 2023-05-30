@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import {
   COLD_WATER,
   HOT_WATER,
@@ -11,106 +11,62 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { userUnits } from '@/user-settings';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
-import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { Block, BlockType } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 
-export default defineComponent({
-  name: 'PidDisplayPartComponent',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { part, flows, width, height, bordered, passthrough, placeholder } =
-      usePart.setup();
+const sparkStore = useSparkStore();
+const { part, flows, width, height, bordered, passthrough, placeholder } =
+  usePart.setup();
 
-    const color = computed<string>(() => liquidBorderColor(flows.value));
+const color = computed<string>(() => liquidBorderColor(flows.value));
 
-    const {
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-    } = useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
+const { block, blockStatus, isBroken, showBlockDialog, showBlockSelectDialog } =
+  useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
 
-    const contentTransform = computed<string>(() =>
-      textTransformation(part.value, { width: 1, height: 1 }),
-    );
+const contentTransform = computed<string>(() =>
+  textTransformation(part.value, { width: 1, height: 1 }),
+);
 
-    const outputValue = computed<number | null>(() => {
-      if (placeholder) {
-        return 83;
-      }
-      if (block.value?.data.enabled) {
-        return block.value.data.outputValue;
-      }
-      return null;
-    });
+const outputValue = computed<number | null>(() => {
+  if (placeholder) {
+    return 83;
+  }
+  if (block.value?.data.enabled) {
+    return block.value.data.outputValue;
+  }
+  return null;
+});
 
-    const outputSetting = computed<number | null>(() => {
-      if (placeholder) {
-        return 83;
-      }
-      if (block.value?.data.enabled) {
-        return block.value.data.outputSetting;
-      }
-      return null;
-    });
+const outputSetting = computed<number | null>(() => {
+  if (placeholder) {
+    return 83;
+  }
+  if (block.value?.data.enabled) {
+    return block.value.data.outputSetting;
+  }
+  return null;
+});
 
-    const kp = computed<number | null>(
-      () => block.value?.data.kp.value ?? null,
-    );
+const kp = computed<number | null>(() => block.value?.data.kp.value ?? null);
 
-    const target = computed<Block | null>(() =>
-      sparkStore.blockById(
-        block.value?.serviceId,
-        block.value?.data.outputId.id,
-      ),
-    );
+const target = computed<Block | null>(() =>
+  sparkStore.blockById(block.value?.serviceId, block.value?.data.outputId.id),
+);
 
-    const targetingOffset = computed<boolean>(() =>
-      isBlockCompatible(target.value, BlockType.ActuatorOffset),
-    );
+const targetingOffset = computed<boolean>(() =>
+  isBlockCompatible(target.value, BlockType.ActuatorOffset),
+);
 
-    const suffix = computed<string>(() => {
-      if (outputSetting.value == null) {
-        return '';
-      }
-      if (targetingOffset.value) {
-        return prettyUnit(userUnits.value.temperature);
-      }
-      return '%';
-    });
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      HOT_WATER,
-      COLD_WATER,
-      preciseNumber,
-      mdiCalculatorVariant,
-      mdiPlusMinus,
-      contentTransform,
-      width,
-      height,
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-      outputValue,
-      outputSetting,
-      kp,
-      target,
-      suffix,
-      color,
-      bordered,
-      passthrough,
-      placeholder,
-    };
-  },
+const suffix = computed<string>(() => {
+  if (outputSetting.value == null) {
+    return '';
+  }
+  if (targetingOffset.value) {
+    return prettyUnit(userUnits.value.temperature);
+  }
+  return '%';
 });
 </script>
 

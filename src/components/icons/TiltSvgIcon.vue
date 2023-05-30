@@ -1,17 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { mdiTestTube } from '@quasar/extras/mdi-v5';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'SensorSvgIcon',
-  props: {
-    color: {
-      type: String,
-      default: 'white',
-    },
-  },
-  setup() {
-    return { mdiTestTube };
+defineProps({
+  color: {
+    type: String,
+    default: 'white',
   },
 });
 </script>

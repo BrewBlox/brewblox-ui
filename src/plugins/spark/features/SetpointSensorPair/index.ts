@@ -1,8 +1,8 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 import { deltaTempQty, tempQty } from '@/utils/quantity';
 import {
@@ -16,6 +16,7 @@ import { Plugin } from 'vue';
 import widget from './SetpointSensorPairWidget.vue';
 
 const type = BlockType.SetpointSensorPair;
+const title = 'Setpoint';
 
 const plugin: Plugin = {
   install(app) {
@@ -24,6 +25,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SetpointSensorPairBlock> = {
       type,
+      title,
       generate: (): SetpointSensorPairBlock['data'] => ({
         sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
         storedSetting: tempQty(20),
@@ -123,9 +125,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Setpoint',
+      title,
       role: 'Process',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 2,

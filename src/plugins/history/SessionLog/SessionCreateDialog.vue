@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/objects';
+import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { useHistoryStore } from '../store';
@@ -108,7 +108,7 @@ export default defineComponent({
         return [];
       }
       return source.value.notes.map((note) => {
-        const copy = deepCopy(note);
+        const copy = cloneDeep(note);
         copy.id = nanoid();
         if (note.type === 'Text') {
           return { ...copy, value: '' };

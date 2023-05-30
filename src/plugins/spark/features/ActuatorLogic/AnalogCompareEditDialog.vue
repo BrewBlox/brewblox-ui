@@ -4,9 +4,9 @@ import { ENUM_LABELS_ANALOG_OP } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { selectable } from '@/utils/collections';
-import { deepCopy } from '@/utils/objects';
 import { bloxQty, tempQty } from '@/utils/quantity';
 import { AnalogCompare, BlockType, Quantity } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 const operatorOpts = selectable(ENUM_LABELS_ANALOG_OP);
@@ -29,7 +29,7 @@ export default defineComponent({
     const sparkStore = useSparkStore();
     const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
-    const local = ref<AnalogCompare>(deepCopy(props.modelValue));
+    const local = ref<AnalogCompare>(cloneDeep(props.modelValue));
 
     const isTemp = computed<boolean>(() =>
       isBlockCompatible(

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
@@ -8,72 +8,53 @@ import {
   startRemoveDashboard,
 } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
-export default defineComponent({
-  name: 'DashboardActions',
-  props: {
-    dashboardId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const dashboardStore = useDashboardStore();
-    const systemStore = useSystemStore();
-    const router = useRouter();
-
-    const dashboard = computed<Dashboard | null>(() =>
-      dashboardStore.dashboardById(props.dashboardId),
-    );
-
-    const title = computed<string>(
-      () => dashboard.value?.title ?? props.dashboardId,
-    );
-
-    const isHomePage = computed<boolean>({
-      get: () =>
-        userUISettings.value.homePage === `/dashboard/${props.dashboardId}`,
-      set: (v) =>
-        systemStore.patchUserUISettings({
-          homePage: v ? `/dashboard/${props.dashboardId}` : null,
-        }),
-    });
-
-    function showWizard(): void {
-      createDialog({
-        component: 'WizardDialog',
-        componentProps: {
-          initialWizard: 'WidgetWizardPicker',
-          activeDashboardId: props.dashboardId,
-        },
-      });
-    }
-
-    function changeDashboardId(): void {
-      startChangeDashboardId(dashboard.value, router);
-    }
-
-    function changeDashboardTitle(): void {
-      startChangeDashboardTitle(dashboard.value, router);
-    }
-
-    function removeDashboard(): void {
-      startRemoveDashboard(dashboard.value, router);
-    }
-
-    return {
-      dashboard,
-      title,
-      isHomePage,
-      showWizard,
-      changeDashboardId,
-      changeDashboardTitle,
-      removeDashboard,
-    };
+const props = defineProps({
+  dashboardId: {
+    type: String,
+    required: true,
   },
 });
+
+const dashboardStore = useDashboardStore();
+const systemStore = useSystemStore();
+const router = useRouter();
+
+const dashboard = computed<Dashboard | null>(() =>
+  dashboardStore.dashboardById(props.dashboardId),
+);
+
+const isHomePage = computed<boolean>({
+  get: () =>
+    userUISettings.value.homePage === `/dashboard/${props.dashboardId}`,
+  set: (v) =>
+    systemStore.patchUserUISettings({
+      homePage: v ? `/dashboard/${props.dashboardId}` : null,
+    }),
+});
+
+function startWidgetWizard(): void {
+  createDialog({
+    component: 'WidgetWizardDialog',
+    componentProps: {
+      dashboardId: props.dashboardId,
+    },
+  });
+}
+
+function changeDashboardId(): void {
+  startChangeDashboardId(dashboard.value, router);
+}
+
+function changeDashboardTitle(): void {
+  startChangeDashboardTitle(dashboard.value, router);
+}
+
+function removeDashboard(): void {
+  startRemoveDashboard(dashboard.value, router);
+}
 </script>
 
 <template>
@@ -82,7 +63,7 @@ export default defineComponent({
       <ActionItem
         icon="add"
         label="New widget"
-        @click="showWizard"
+        @click="startWidgetWizard"
       />
       <ToggleAction
         v-model="isHomePage"

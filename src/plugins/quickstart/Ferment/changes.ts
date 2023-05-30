@@ -225,6 +225,7 @@ export function defineCreatedBlocks(config: FermentConfig): Block[] {
         start: new Date().toISOString(),
         enabled: false,
         targetId: bloxLink(activeSetpointId),
+        setting: tempQty(null),
         points: [
           {
             time: bloxQty('0s'),

@@ -1,9 +1,9 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
-import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
+import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -13,92 +13,57 @@ import { usePart, useSettingsBlock } from '../composables';
 import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
 import { liquidBorderColor } from '../utils';
 
-export default defineComponent({
-  name: 'SetpointDriverDisplayPartComponent',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { flows, width, height, bordered, passthrough, placeholder } =
-      usePart.setup();
+const sparkStore = useSparkStore();
+const { flows, width, height, bordered, passthrough, placeholder } =
+  usePart.setup();
 
-    const color = computed<string>(() => liquidBorderColor(flows.value));
+const color = computed<string>(() => liquidBorderColor(flows.value));
 
-    const {
-      block,
-      blockStatus,
-      isBroken,
-      showBlockDialog,
-      showBlockSelectDialog,
-    } = useSettingsBlock.setup<DriverBlockT>(DRIVER_KEY, DRIVER_TYPES);
+const { block, blockStatus, isBroken, showBlockDialog, showBlockSelectDialog } =
+  useSettingsBlock.setup<DriverBlockT>(DRIVER_KEY, DRIVER_TYPES);
 
-    const refBlock = computed<SetpointSensorPairBlock | null>(() =>
-      block.value !== null
-        ? sparkStore.blockById(
-            block.value.serviceId,
-            block.value.data.referenceId.id,
-          )
-        : null,
-    );
+const refBlock = computed<SetpointSensorPairBlock | null>(() =>
+  block.value !== null
+    ? sparkStore.blockById(
+        block.value.serviceId,
+        block.value.data.referenceId.id,
+      )
+    : null,
+);
 
-    const refKind = computed<ReferenceKind>(
-      () =>
-        block.value?.data.referenceSettingOrValue ?? ReferenceKind.REF_SETTING,
-    );
+const refKind = computed<ReferenceKind>(
+  () => block.value?.data.referenceSettingOrValue ?? ReferenceKind.REF_SETTING,
+);
 
-    const refAmount = computed<number | null>(() => {
-      if (!block.value || !refBlock.value) {
-        return null;
-      }
-      return refKind.value === ReferenceKind.REF_SETTING
-        ? refBlock.value.data.setting.value
-        : refBlock.value.data.value.value;
-    });
-
-    const setting = computed<number | null>(() => {
-      if (placeholder) {
-        return 8;
-      }
-      return block.value?.data.setting.value ?? null;
-    });
-
-    const appliedSetting = computed<number | null>(() => {
-      if (placeholder) {
-        return 26;
-      }
-      if (refAmount.value == null || setting.value == null) {
-        return null;
-      }
-      return refAmount.value + setting.value;
-    });
-
-    const tempUnit = computed<string>(() =>
-      prettyUnit(userUnits.value.temperature),
-    );
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      ReferenceKind,
-      prettyQty,
-      fixedNumber,
-      width,
-      height,
-      bordered,
-      passthrough,
-      block,
-      blockStatus,
-      isBroken,
-      placeholder,
-      showBlockDialog,
-      showBlockSelectDialog,
-      refKind,
-      setting,
-      appliedSetting,
-      tempUnit,
-      color,
-    };
-  },
+const refAmount = computed<number | null>(() => {
+  if (!block.value || !refBlock.value) {
+    return null;
+  }
+  return refKind.value === ReferenceKind.REF_SETTING
+    ? refBlock.value.data.setting.value
+    : refBlock.value.data.value.value;
 });
+
+const setting = computed<number | null>(() => {
+  if (placeholder) {
+    return 8;
+  }
+  return block.value?.data.setting.value ?? null;
+});
+
+const appliedSetting = computed<number | null>(() => {
+  if (placeholder) {
+    return 26;
+  }
+  if (refAmount.value == null || setting.value == null) {
+    return null;
+  }
+  return refAmount.value + setting.value;
+});
+
+const tempUnit = computed<string>(() =>
+  prettyUnit(userUnits.value.temperature),
+);
 </script>
 
 <template>

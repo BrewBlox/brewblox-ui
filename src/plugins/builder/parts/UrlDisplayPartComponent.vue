@@ -1,47 +1,28 @@
-<script lang="ts">
+<script setup lang="ts">
 import { isAbsoluteUrl } from '@/utils/url';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/UrlDisplay';
 import { usePart } from '../composables';
 import { LABEL_KEY, URL_KEY } from '../const';
 
-export default defineComponent({
-  name: 'UrlDisplayPartComponent',
-  setup() {
-    const { settings, width, height, bordered } = usePart.setup();
+const { settings, width, height, bordered } = usePart.setup();
 
-    const url = computed<string>(() => settings.value[URL_KEY] || '');
+const url = computed<string>(() => settings.value[URL_KEY] || '');
 
-    const titleText = computed<string>(
-      () => settings.value[LABEL_KEY] || url.value || 'Url Display',
-    );
+const titleText = computed<string>(
+  () => settings.value[LABEL_KEY] || url.value || 'Url Display',
+);
 
-    function interact(): void {
-      if (url.value) {
-        if (isAbsoluteUrl(url.value)) {
-          window.open(url.value, '_blank');
-        } else {
-          useRouter().push(url.value);
-        }
-      }
+function interact(): void {
+  if (url.value) {
+    if (isAbsoluteUrl(url.value)) {
+      window.open(url.value, '_blank');
+    } else {
+      useRouter().push(url.value);
     }
-
-    return {
-      DEFAULT_SIZE,
-      MAX_SIZE,
-      MIN_SIZE,
-      LABEL_KEY,
-      URL_KEY,
-      width,
-      height,
-      bordered,
-      url,
-      titleText,
-      interact,
-    };
-  },
-});
+  }
+}
 </script>
 
 <template>

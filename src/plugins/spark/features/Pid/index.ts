@@ -1,8 +1,8 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 import {
   bloxQty,
@@ -21,6 +21,7 @@ import { Plugin } from 'vue';
 import widget from './PidWidget.vue';
 
 const type = BlockType.Pid;
+const title = 'PID';
 
 const plugin: Plugin = {
   install(app) {
@@ -29,6 +30,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<PidBlock> = {
       type,
+      title,
       generate: (): PidBlock['data'] => ({
         inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
@@ -184,9 +186,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'PID',
+      title,
       role: 'Control',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 3,

@@ -1,8 +1,8 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
-import { blockWidgetSelector } from '@/plugins/spark/utils/components';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import { bloxQty } from '@/utils/quantity';
 import {
   BlockType,
@@ -14,6 +14,7 @@ import { Plugin } from 'vue';
 import widget from './SequenceWidget.vue';
 
 const type = BlockType.Sequence;
+const title = 'Sequence';
 
 const plugin: Plugin = {
   install(app) {
@@ -22,6 +23,7 @@ const plugin: Plugin = {
 
     const blockSpec: BlockSpec<SequenceBlock> = {
       type,
+      title,
       generate: (): SequenceBlock['data'] => ({
         enabled: false,
         overrideState: false,
@@ -48,9 +50,9 @@ const plugin: Plugin = {
     const feature: WidgetFeature = {
       ...genericBlockFeature,
       id: type,
-      title: 'Sequence',
+      title,
       role: 'Process',
-      component: blockWidgetSelector(app, widget, type),
+      component: cref(app, widget),
       widgetSize: {
         cols: 4,
         rows: 4,

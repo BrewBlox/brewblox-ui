@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog } from '@/utils/dialog';
 import { dateString } from '@/utils/quantity';
 import { computed, defineComponent, PropType } from 'vue';
 import { LoggedSession } from '../types';
@@ -18,7 +18,7 @@ export default defineComponent({
     const tags = computed<string[]>(() => props.session.tags ?? []);
 
     function showDialog(): void {
-      createDialog({
+      createComponentDialog({
         component: SessionHeaderDialog,
         componentProps: {
           modelValue: props.session,

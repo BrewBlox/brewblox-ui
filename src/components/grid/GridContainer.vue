@@ -5,7 +5,6 @@ import { nullFilter } from '@/utils/functional';
 import { computed, defineComponent, PropType, ref } from 'vue';
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import GridItem from './GridItem.vue';
-import { RenderedItem } from './types';
 
 export default defineComponent({
   name: 'GridContainer',
@@ -13,8 +12,8 @@ export default defineComponent({
     GridItem,
   },
   props: {
-    items: {
-      type: Array as PropType<RenderedItem[]>,
+    widgets: {
+      type: Array as PropType<Widget[]>,
       required: true,
     },
     context: {
@@ -31,8 +30,8 @@ export default defineComponent({
     const containerRef = ref<HTMLDivElement>();
 
     const minWidth = computed<number>(() =>
-      props.items.reduce((width: number, item: RenderedItem) => {
-        const { cols, pinnedPosition } = item.widget;
+      props.widgets.reduce((width: number, widget: Widget) => {
+        const { cols, pinnedPosition } = widget;
         const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
         return Math.max(
           width,
@@ -48,6 +47,10 @@ export default defineComponent({
       };
     });
 
+    async function saveWidget(widget: Widget): Promise<void> {
+      return widgetStore.saveWidget(widget);
+    }
+
     function patchWidgets(updated: Patch<Widget>[]): void {
       updated
         .map((change) => {
@@ -55,7 +58,7 @@ export default defineComponent({
           return existing ? { ...existing, ...change } : null;
         })
         .filter(nullFilter)
-        .forEach((v) => widgetStore.saveWidget(v));
+        .forEach((v) => saveWidget(v));
     }
 
     function updateItemPosition(
@@ -87,6 +90,7 @@ export default defineComponent({
       gridStyle,
       updateItemSize,
       updateItemPosition,
+      saveWidget,
     };
   },
 });
@@ -99,24 +103,20 @@ export default defineComponent({
     :style="gridStyle"
   >
     <GridItem
-      v-for="item in items"
-      :key="`grid-item-${item.widget.id}`"
-      :widget-id="item.widget.id"
+      v-for="widget in widgets"
+      :key="`grid-item-${widget.id}`"
+      :widget-id="widget.id"
       :editable="editable"
       @size="updateItemSize"
       @position="updateItemPosition"
     >
-      <WidgetProvider
+      <WidgetWrapper
         :context="context"
-        :widget-id="item.widget.id"
-      >
-        <component
-          :is="item.component"
-          :error="item.error"
-          class="fit"
-          @dblclick.stop
-        />
-      </WidgetProvider>
+        :widget="widget"
+        class="fit"
+        @update:widget="saveWidget"
+        @dblclick.stop
+      />
     </GridItem>
     <div
       v-if="editable"

@@ -4,8 +4,8 @@ import { isCompatible } from '@/plugins/spark/utils/info';
 import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { loadFile } from '@/utils/import-export';
-import { deepCopy } from '@/utils/objects';
 import { Block } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import isObject from 'lodash/isObject';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
@@ -356,19 +356,22 @@ export async function startImportLayout(
   });
 }
 
-export async function startAddLayout(
+export async function startCreateLayout(
+  router: Router,
   source?: Maybe<BuilderLayout>,
-): Promise<string | null> {
+): Promise<void> {
   const title = await createDialogPromise({
     component: 'InputDialog',
     componentProps: {
-      modelValue: 'Brewery Layout',
+      modelValue: '',
       title: 'New Layout',
+      placeholder: 'New Layout',
       message: 'Create a new Brewery Builder layout',
+      rules: [(v) => !!v || 'Name should not be empty'],
     },
   });
   if (!title) {
-    return null;
+    return;
   }
   const id = nanoid();
   const builderStore = useBuilderStore();
@@ -377,9 +380,9 @@ export async function startAddLayout(
     title,
     width: source?.width ?? DEFAULT_LAYOUT_WIDTH,
     height: source?.height ?? DEFAULT_LAYOUT_HEIGHT,
-    parts: deepCopy(source?.parts) ?? [],
+    parts: cloneDeep(source?.parts) ?? [],
   });
-  return id;
+  router.push(`/builder/${id}`);
 }
 
 export function startChangeLayoutTitle(layout: Maybe<BuilderLayout>): void {
@@ -413,8 +416,8 @@ export function startRemoveLayout(
     componentProps: {
       title: 'Remove layout',
       message: `Are you sure you wish to remove ${layout.title}?`,
-      noBackdropDismiss: true,
     },
+    noBackdropDismiss: true,
   }).onOk(async () => {
     if (layout) {
       const builderStore = useBuilderStore();

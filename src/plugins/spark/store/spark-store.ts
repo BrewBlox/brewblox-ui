@@ -8,9 +8,8 @@ import type {
 } from '@/plugins/spark/types';
 import { useServiceStore } from '@/store/services';
 import { useWidgetStore } from '@/store/widgets';
-import { concatById, filterById } from '@/utils/collections';
+import { concatById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
-import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 import {
   Block,
@@ -21,7 +20,7 @@ import {
   SparkStatusDescription,
 } from 'brewblox-proto/ts';
 import { defineStore } from 'pinia';
-import { isBlockVolatile, isSparkPatch, isSparkState } from '../utils/info';
+import { isSparkPatch, isSparkState } from '../utils/info';
 import * as sparkApi from './spark-api';
 import {
   asServiceStatus,
@@ -49,7 +48,6 @@ interface SparkStoreState {
   stateListenerIds: ByService<string>;
   patchListenerIds: ByService<string>;
   blocks: ByService<Block[]>;
-  volatileBlocks: ByService<Block[]>;
   discoveredBlockIds: ByService<string[]>;
   statuses: ByService<SparkStatusDescription | null>;
   relations: ByService<BlockRelation[]>;
@@ -65,7 +63,6 @@ export const useSparkStore = defineStore('sparkStore', {
     stateListenerIds: {},
     patchListenerIds: {},
     blocks: {},
-    volatileBlocks: {},
     discoveredBlockIds: {},
     statuses: {},
     relations: {},
@@ -103,10 +100,7 @@ export const useSparkStore = defineStore('sparkStore', {
       if (!this.has(serviceId) || !blockId) {
         return null;
       }
-      return (
-        findBlockById(this.blocks[serviceId], blockId) ??
-        findBlockById(this.volatileBlocks[serviceId], blockId)
-      );
+      return findBlockById(this.blocks[serviceId], blockId);
     },
 
     blockByAddress<T extends Block>(addr: T | Maybe<BlockAddress>): T | null {
@@ -114,10 +108,7 @@ export const useSparkStore = defineStore('sparkStore', {
       if (!this.has(serviceId)) {
         return null;
       }
-      return (
-        findBlockByAddress(this.blocks[serviceId], addr) ??
-        findBlockByAddress(this.volatileBlocks[serviceId], addr)
-      );
+      return findBlockByAddress(this.blocks[serviceId], addr);
     },
 
     blockByLink<T extends Block>(
@@ -128,10 +119,7 @@ export const useSparkStore = defineStore('sparkStore', {
       if (!this.has(serviceId) || !blockId) {
         return null;
       }
-      return (
-        findBlockById(this.blocks[serviceId], blockId) ??
-        findBlockById(this.volatileBlocks[serviceId], blockId)
-      );
+      return findBlockById(this.blocks[serviceId], blockId);
     },
 
     fieldByAddress(addr: Maybe<BlockFieldAddress>): any {
@@ -139,10 +127,7 @@ export const useSparkStore = defineStore('sparkStore', {
       if (!this.has(serviceId)) {
         return null;
       }
-      return (
-        findBlockFieldByAddress(this.blocks[serviceId], addr) ??
-        findBlockFieldByAddress(this.volatileBlocks[serviceId], addr)
-      );
+      return findBlockFieldByAddress(this.blocks[serviceId], addr);
     },
 
     discoveredBlockIdsByService(serviceId: Maybe<string>): string[] {
@@ -175,57 +160,19 @@ export const useSparkStore = defineStore('sparkStore', {
         : defaultSessionConfig();
     },
 
-    setVolatileBlock(block: Block): void {
-      const { serviceId } = block;
-      if (!this.has(serviceId)) {
-        throw new Error(`Service ${block.serviceId} does not exist in store`);
-      }
-      if (this.blocks[serviceId].some((v) => v.id === block.id)) {
-        throw new Error(`Block ${block.id} already exists as persistent block`);
-      }
-      block.meta = block.meta ?? {};
-      block.meta.volatile = true;
-      this.volatileBlocks[serviceId] = concatById(
-        this.volatileBlocks[serviceId],
-        deepCopy(block),
-      );
-    },
-
-    removeVolatileBlock({ serviceId, id }: BlockAddress): void {
-      if (!this.has(serviceId) || !id) {
-        return;
-      }
-      this.volatileBlocks[serviceId] = filterById(
-        this.volatileBlocks[serviceId],
-        { id },
-      );
-    },
-
     async createBlock(block: Block): Promise<void> {
-      if (isBlockVolatile(block)) {
-        throw new Error(`Block ${block.id} is volatile`);
-      }
       await sparkApi.createBlock(block); // triggers patch event
     },
 
     async saveBlock(block: Block): Promise<void> {
-      if (isBlockVolatile(block)) {
-        this.setVolatileBlock(block);
-      } else {
-        await sparkApi.persistBlock(block); // triggers patch event
-      }
+      await sparkApi.persistBlock(block); // triggers patch event
     },
 
     async patchBlock<T extends Block>(
       block: Maybe<T>,
       data: Partial<T['data']>,
     ): Promise<void> {
-      if (block == null) {
-        return;
-      }
-      if (isBlockVolatile(block)) {
-        this.setVolatileBlock({ ...block, data: { ...block.data, ...data } });
-      } else {
+      if (block) {
         await sparkApi.patchBlock(block, data); // triggers patch event
       }
     },
@@ -243,19 +190,6 @@ export const useSparkStore = defineStore('sparkStore', {
         throw new Error(`Block ${newId} already exists`);
       }
 
-      // Volatile blocks are updated in local data
-      // No need to make API calls
-      const volatile = findBlockById(this.volatileBlocks[serviceId], currentId);
-      if (volatile) {
-        this.volatileBlocks[serviceId] = [
-          ...filterById(this.volatileBlocks[serviceId], volatile),
-          { ...volatile, id: newId },
-        ];
-        return;
-      }
-
-      // Block was not volatile
-      // Rename block in API
       const widgetStore = useWidgetStore();
       await sparkApi.renameBlock(serviceId, currentId, newId);
       await this.fetchBlocks(serviceId);
@@ -274,15 +208,7 @@ export const useSparkStore = defineStore('sparkStore', {
     },
 
     async removeBlock(block: Block): Promise<void> {
-      if (isBlockVolatile(block)) {
-        const { serviceId } = block;
-        this.volatileBlocks[serviceId] = filterById(
-          this.volatileBlocks[serviceId],
-          block,
-        );
-      } else {
-        await sparkApi.deleteBlock(block); // triggers patch event
-      }
+      await sparkApi.deleteBlock(block); // triggers patch event
     },
 
     async clearBlocks(serviceId: string): Promise<void> {
@@ -315,12 +241,11 @@ export const useSparkStore = defineStore('sparkStore', {
     async fetchBlock(block: Maybe<Block>): Promise<void> {
       if (block) {
         const fetched = await sparkApi.fetchBlock(block);
-        if (!isBlockVolatile(block)) {
-          this.blocks[block.serviceId] = concatById(
-            this.blocks[block.serviceId],
-            fetched,
-          );
-        }
+
+        this.blocks[block.serviceId] = concatById(
+          this.blocks[block.serviceId],
+          fetched,
+        );
       }
     },
 
@@ -481,7 +406,6 @@ export const useSparkStore = defineStore('sparkStore', {
 
       this.serviceIds.push(serviceId);
       this.blocks[serviceId] = [];
-      this.volatileBlocks[serviceId] = [];
       this.discoveredBlockIds[serviceId] = [];
       this.statuses[serviceId] = null;
       this.relations[serviceId] = [];
@@ -536,7 +460,6 @@ export const useSparkStore = defineStore('sparkStore', {
       delete this.stateListenerIds[serviceId];
       delete this.patchListenerIds[serviceId];
       delete this.blocks[serviceId];
-      delete this.volatileBlocks[serviceId];
       delete this.discoveredBlockIds[serviceId];
       delete this.statuses[serviceId];
       delete this.relations[serviceId];

@@ -1,49 +1,27 @@
-<script lang="ts">
-import brewbloxIconSvg from '@/assets/logo-x.svg';
-
+<script setup lang="ts">
 import brewbloxLogoSvg from '@/assets/logo-wordmark-dark.svg';
 import { useGlobals, useKiosk } from '@/composables';
+import { startCreateLayout } from '@/plugins/builder/utils';
 import { startCreateFolder } from '@/store/sidebar/utils';
+import { startCreateDashboard } from '@/utils/dashboards';
+import { createDialog } from '@/utils/dialog';
 import { useQuasar } from 'quasar';
-import { computed, defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'DefaultLayout',
-  setup() {
-    const { localStorage } = useQuasar();
-    const { dense } = useGlobals.setup();
-    const { kiosk } = useKiosk.setup();
-    const router = useRouter();
+const { localStorage } = useQuasar();
+const { dense } = useGlobals.setup();
+const { kiosk } = useKiosk.setup();
 
-    const devMode = Boolean(import.meta.env.DEV);
-    const editing = ref<boolean>(false);
+const editing = ref<boolean>(false);
 
-    const _drawerOpen = ref<boolean>(
-      localStorage.getItem('drawer') ?? !dense.value,
-    );
-    const drawerOpen = computed<boolean>({
-      get: () => _drawerOpen.value,
-      set: (v) => {
-        _drawerOpen.value = v;
-        localStorage.set('drawer', v);
-      },
-    });
-
-    function routeActive(route: string): boolean {
-      return Boolean(router.currentRoute.value.path.match(route));
-    }
-
-    return {
-      brewbloxLogoSvg,
-      brewbloxIconSvg,
-      kiosk,
-      devMode,
-      editing,
-      drawerOpen,
-      routeActive,
-      startCreateFolder,
-    };
+const _drawerOpen = ref<boolean>(
+  localStorage.getItem('drawer') ?? !dense.value,
+);
+const drawerOpen = computed<boolean>({
+  get: () => _drawerOpen.value,
+  set: (v) => {
+    _drawerOpen.value = v;
+    localStorage.set('drawer', v);
   },
 });
 </script>
@@ -83,7 +61,6 @@ export default defineComponent({
       v-if="!kiosk"
       v-model="drawerOpen"
       class="column"
-      elevated
     >
       <SidebarNavigator />
 
@@ -96,31 +73,12 @@ export default defineComponent({
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
         <q-btn
-          v-if="devMode"
-          flat
-          round
-          icon="mdi-format-paint"
-          to="/styles"
-          :color="routeActive('/styles') ? 'primary' : ''"
-        >
-          <q-tooltip>Theming</q-tooltip>
-        </q-btn>
-        <q-btn
           flat
           round
           icon="mdi-fullscreen"
           @click="kiosk = true"
         >
           <q-tooltip>Kiosk mode</q-tooltip>
-        </q-btn>
-        <q-space />
-        <q-btn
-          flat
-          round
-          icon="mdi-folder-plus"
-          @click="startCreateFolder(null)"
-        >
-          <q-tooltip>Add folder</q-tooltip>
         </q-btn>
         <q-btn
           :color="editing ? 'primary' : ''"
@@ -131,6 +89,44 @@ export default defineComponent({
         >
           <q-tooltip>Edit sidebar</q-tooltip>
         </q-btn>
+        <q-space />
+        <q-btn-dropdown
+          fab-mini
+          icon="add"
+          color="secondary"
+        >
+          <q-list>
+            <ActionItem
+              label="Quickstart"
+              @click="createDialog({ component: 'QuickstartWizardDialog' })"
+            />
+            <ActionItem
+              label="New block"
+              @click="
+                createDialog({
+                  component: 'BlockWizardDialog',
+                  componentProps: { addWidget: true },
+                })
+              "
+            />
+            <ActionItem
+              label="New widget"
+              @click="createDialog({ component: 'WidgetWizardDialog' })"
+            />
+            <ActionItem
+              label="New dashboard"
+              @click="startCreateDashboard($router)"
+            />
+            <ActionItem
+              label="New layout"
+              @click="startCreateLayout($router)"
+            />
+            <ActionItem
+              label="New folder"
+              @click="startCreateFolder(null)"
+            />
+          </q-list>
+        </q-btn-dropdown>
       </div>
     </q-drawer>
 

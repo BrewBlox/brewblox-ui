@@ -1,8 +1,9 @@
 <script lang="ts">
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
-import { deepCopy, isJsonEqual } from '@/utils/objects';
+import { isJsonEqual } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
+import cloneDeep from 'lodash/cloneDeep';
 import isObject from 'lodash/isObject';
 import isString from 'lodash/isString';
 import { Layout } from 'plotly.js';
@@ -38,7 +39,7 @@ export default defineComponent({
       ...props.config,
     }));
 
-    const renderedConfig = ref<GraphConfig>(deepCopy(graphConfig.value));
+    const renderedConfig = ref<GraphConfig>(cloneDeep(graphConfig.value));
 
     const graphTitle = computed<string>(() => {
       const actual = graphConfig.value.layout.title;
@@ -55,7 +56,7 @@ export default defineComponent({
       () => graphConfig.value,
       (newV) => {
         if (!isJsonEqual(newV, renderedConfig.value)) {
-          renderedConfig.value = deepCopy(newV);
+          renderedConfig.value = cloneDeep(newV);
           sourceRevision.value = new Date();
         }
       },
@@ -132,9 +133,9 @@ export default defineComponent({
         :graph-id="id"
         :config="graphConfig"
         :source-revision="sourceRevision"
-        :use-presets="!noDuration"
-        use-range
-        maximized
+        :control-presets="!noDuration"
+        control-range
+        class="fit"
         @params="saveParams"
         @layout="saveLayout"
       >

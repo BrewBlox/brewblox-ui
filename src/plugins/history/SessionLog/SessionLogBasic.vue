@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useWidget } from '@/composables';
 import { spliceById } from '@/utils/collections';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog, createDialog } from '@/utils/dialog';
 import { shortDateString } from '@/utils/quantity';
 import { computed, defineComponent } from 'vue';
 import { useHistoryStore } from '../store';
@@ -53,13 +53,11 @@ export default defineComponent({
 
     function openNote(note: SessionNote): void {
       if (note.type === 'Text') {
-        createDialog({
+        createComponentDialog({
           component: SessionTextNoteDialog,
           componentProps: {
             title: note.title,
             modelValue: note.value,
-            type: 'text',
-            label: 'Content',
           },
         }).onOk((value) => saveNote({ ...note, value }));
       }
@@ -95,13 +93,12 @@ export default defineComponent({
     }
 
     function editGraphNote(note: SessionGraphNote): void {
-      createDialog({
+      createComponentDialog({
         component: SessionGraphNoteDialog,
         componentProps: {
           modelValue: note,
           title: note.title,
           message: 'You can choose graph lines in the widget settings.',
-          label: 'Dates',
         },
       }).onOk(({ start, end }) => {
         const actual = notes.value.find((n) => n.id === note.id);

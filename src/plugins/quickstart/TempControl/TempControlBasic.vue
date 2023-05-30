@@ -5,7 +5,7 @@ import { ProfileValues } from '@/plugins/spark/types';
 import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { concatById } from '@/utils/collections';
-import { createDialog } from '@/utils/dialog';
+import { createComponentDialog, createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import {
   bloxQty,
@@ -203,7 +203,11 @@ export default defineComponent({
         return;
       }
 
-      createDialog({
+      if (!serviceId.value) {
+        return;
+      }
+
+      createComponentDialog({
         component: TempControlModeDialog,
         componentProps: {
           modelValue: mode,

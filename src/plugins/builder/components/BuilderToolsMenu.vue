@@ -1,43 +1,37 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useGlobals } from '@/composables';
-import { defineComponent, PropType } from 'vue';
+import { PropType } from 'vue';
 import { builderTools } from '../const';
 import { BuilderToolName } from '../types';
 
-export default defineComponent({
-  name: 'BuilderToolsMenu',
-  props: {
-    expanded: {
-      type: Boolean,
-      required: true,
-    },
-    activeTool: {
-      type: null as unknown as PropType<string | null>,
-      required: true,
-    },
-    disabledTools: {
-      type: Array as PropType<BuilderToolName[]>,
-      default: () => [],
-    },
+const props = defineProps({
+  expanded: {
+    type: Boolean,
+    required: true,
   },
-  emits: ['update:expanded', 'use'],
-  setup(props, { emit }) {
-    const { dense } = useGlobals.setup();
-
-    function handleSwipe(args: SwipeArguments): void {
-      const desiredState = args.direction === 'left';
-      if (props.expanded !== desiredState) {
-        emit('update:expanded', desiredState);
-      }
-    }
-
-    return {
-      builderTools,
-      dense,
-      handleSwipe,
-    };
+  activeTool: {
+    type: null as unknown as PropType<string | null>,
+    required: true,
+  },
+  disabledTools: {
+    type: Array as PropType<BuilderToolName[]>,
+    default: () => [],
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:expanded', value: boolean): void;
+  (e: 'use', value: BuilderToolName);
+}>();
+
+const { dense } = useGlobals.setup();
+
+function handleSwipe(args: SwipeArguments): void {
+  const desiredState = args.direction === 'left';
+  if (props.expanded !== desiredState) {
+    emit('update:expanded', desiredState);
+  }
+}
 </script>
 
 <template>

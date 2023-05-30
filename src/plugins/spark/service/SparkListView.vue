@@ -1,12 +1,11 @@
 <script lang="ts">
 import { useElementRefs, useGlobals } from '@/composables';
-import { createBlockWizard } from '@/plugins/wizardry';
 import { useFeatureStore, WidgetRole } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { BlockType } from 'brewblox-proto/ts';
+import { Block, BlockType } from 'brewblox-proto/ts';
 import capitalize from 'lodash/capitalize';
 import { computed, defineComponent, nextTick, ref } from 'vue';
 import { useBlockSpecStore, useSparkStore } from '../store';
@@ -113,7 +112,7 @@ export default defineComponent({
 
     const filteredRenderItems = computed<ListRenderAddress[]>(() =>
       allRenderItems.value.filter((item) =>
-        `${item.id} ${item.title}`.match(searchExpression.value),
+        searchExpression.value.test(`${item.id} ${item.title}`),
       ),
     );
 
@@ -155,7 +154,12 @@ export default defineComponent({
     }
 
     function startCreateBlock(): void {
-      createBlockWizard(props.serviceId).onOk(({ block }) => {
+      createDialog({
+        component: 'BlockWizardDialog',
+        componentProps: {
+          serviceId: props.serviceId,
+        },
+      }).onOk((block: Maybe<Block>) => {
         if (block) {
           setExpanded(block.id, true);
         }
@@ -166,7 +170,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          modelValue: searchText.value,
+          modelValue: searchText.value ?? '',
         },
       }).onOk((v) => (searchText.value = v));
     }
