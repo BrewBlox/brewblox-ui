@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
@@ -7,7 +7,7 @@ import { createDialog } from '@/utils/dialog';
 import { Block } from 'brewblox-proto/ts';
 import difference from 'lodash/difference';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
+import { computed, PropType, reactive, ref, watch } from 'vue';
 import { BlockChange, EditableBlockField } from './types';
 
 interface EditableBlockChange {
@@ -20,129 +20,119 @@ interface EditableBlockChange {
   fields: EditableBlockField[];
 }
 
-export default defineComponent({
-  name: 'QuickActionChange',
-  props: {
-    modelValue: {
-      type: Object as PropType<BlockChange>,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue', 'remove', 'switch'],
-  setup(props, { emit }) {
-    const sparkStore = useSparkStore();
-    const specStore = useBlockSpecStore();
-    const featureStore = useFeatureStore();
-
-    const block = computed<Block | null>(() => {
-      const { blockId, serviceId } = props.modelValue;
-      return sparkStore.blockById(serviceId, blockId);
-    });
-
-    function makeChange(): EditableBlockChange {
-      const { id, blockId, serviceId } = props.modelValue;
-      const spec = specStore.blockSpecByAddress(block.value);
-      const fieldSpecs = specStore.fieldSpecsByType(block.value?.type);
-
-      const data = props.modelValue.data ?? {};
-      const confirmed = props.modelValue.confirmed ?? {};
-
-      return reactive({
-        id,
-        blockId,
-        serviceId,
-        spec,
-        block: block.value,
-        title: featureStore.widgetTitle(block.value?.type),
-        fields:
-          fieldSpecs
-            .filter((f) => !f.readonly)
-            .map((f) => ({
-              id: f.key,
-              specField: f,
-              value: data[f.key] ?? null,
-              confirmed: confirmed[f.key] ?? false,
-            })) ?? [],
-      });
-    }
-
-    const change = ref<EditableBlockChange>(makeChange());
-    const rev = ref<string>('');
-
-    watch(
-      () => props.modelValue,
-      () => {
-        change.value = makeChange();
-        rev.value = nanoid(6);
-      },
-    );
-
-    const unknownValues = computed<string[]>(() => {
-      const keys = Object.keys(props.modelValue.data ?? {});
-      const fieldSpecs = specStore.fieldSpecsByType(block.value?.type);
-      const validKeys = fieldSpecs.filter((f) => !f.readonly).map((f) => f.key);
-      return difference(keys, validKeys);
-    });
-
-    function saveChange(): void {
-      const data = {};
-      const confirmed = {};
-
-      change.value.fields
-        .filter((field) => field.value !== null)
-        .forEach((field) => {
-          data[field.id] = field.value;
-          confirmed[field.id] = field.confirmed;
-        });
-
-      emit('update:modelValue', {
-        ...props.modelValue,
-        data,
-        confirmed,
-      });
-    }
-
-    function saveField(field: EditableBlockField): void {
-      spliceById(change.value.fields, field);
-      saveChange();
-    }
-
-    function toggleField(field: EditableBlockField): void {
-      field.value = field.value === null ? field.specField.generate() : null;
-      saveField(field);
-    }
-
-    function editField(field: EditableBlockField): void {
-      createDialog({
-        component: 'BlockFieldDialog',
-        componentProps: {
-          modelValue: field.value,
-          field: field.specField,
-          address: {
-            id: change.value.blockId,
-            serviceId: change.value.serviceId,
-            type: null,
-          },
-          title: `${change.value.blockId} ${field.specField.title}`,
-        },
-      }).onOk((value) => {
-        field.value = value;
-        saveField(field);
-      });
-    }
-
-    return {
-      block,
-      change,
-      rev,
-      unknownValues,
-      saveChange,
-      toggleField,
-      saveField,
-      editField,
-    };
+const props = defineProps({
+  modelValue: {
+    type: Object as PropType<BlockChange>,
+    required: true,
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: BlockChange);
+  (e: 'remove');
+  (e: 'switch');
+}>();
+
+const sparkStore = useSparkStore();
+const specStore = useBlockSpecStore();
+const featureStore = useFeatureStore();
+
+const block = computed<Block | null>(() => {
+  const { blockId, serviceId } = props.modelValue;
+  return sparkStore.blockById(serviceId, blockId);
+});
+
+function makeChange(): EditableBlockChange {
+  const { id, blockId, serviceId } = props.modelValue;
+  const spec = specStore.blockSpecByAddress(block.value);
+  const fieldSpecs = specStore.fieldSpecsByType(block.value?.type);
+
+  const data = props.modelValue.data ?? {};
+  const confirmed = props.modelValue.confirmed ?? {};
+
+  return reactive({
+    id,
+    blockId,
+    serviceId,
+    spec,
+    block: block.value,
+    title: featureStore.widgetTitle(block.value?.type),
+    fields:
+      fieldSpecs
+        .filter((f) => !f.readonly)
+        .map((f) => ({
+          id: f.key,
+          specField: f,
+          value: data[f.key] ?? null,
+          confirmed: confirmed[f.key] ?? false,
+        })) ?? [],
+  });
+}
+
+const change = ref<EditableBlockChange>(makeChange());
+const rev = ref<string>('');
+
+watch(
+  () => props.modelValue,
+  () => {
+    change.value = makeChange();
+    rev.value = nanoid(6);
+  },
+);
+
+const unknownValues = computed<string[]>(() => {
+  const keys = Object.keys(props.modelValue.data ?? {});
+  const fieldSpecs = specStore.fieldSpecsByType(block.value?.type);
+  const validKeys = fieldSpecs.filter((f) => !f.readonly).map((f) => f.key);
+  return difference(keys, validKeys);
+});
+
+function saveChange(): void {
+  const data = {};
+  const confirmed = {};
+
+  change.value.fields
+    .filter((field) => field.value !== null)
+    .forEach((field) => {
+      data[field.id] = field.value;
+      confirmed[field.id] = field.confirmed;
+    });
+
+  emit('update:modelValue', {
+    ...props.modelValue,
+    data,
+    confirmed,
+  });
+}
+
+function saveField(field: EditableBlockField): void {
+  spliceById(change.value.fields, field);
+  saveChange();
+}
+
+function toggleField(field: EditableBlockField): void {
+  field.value = field.value === null ? field.specField.generate() : null;
+  saveField(field);
+}
+
+function editField(field: EditableBlockField): void {
+  createDialog({
+    component: 'BlockFieldDialog',
+    componentProps: {
+      modelValue: field.value,
+      field: field.specField,
+      address: {
+        id: change.value.blockId,
+        serviceId: change.value.serviceId,
+        type: null,
+      },
+      title: `${change.value.blockId} ${field.specField.title}`,
+    },
+  }).onOk((value) => {
+    field.value = value;
+    saveField(field);
+  });
+}
 </script>
 
 <template>

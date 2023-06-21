@@ -1,4 +1,4 @@
-import { BlockIds, SparkBackup } from '@/plugins/spark/types';
+import { BlockIds, BlockPatchArgs, SparkBackup } from '@/plugins/spark/types';
 import { http, intercept } from '@/utils/http';
 import { notify } from '@/utils/notify';
 import { AxiosResponse } from 'axios';
@@ -46,8 +46,8 @@ export const persistBlock = (block: Block): Promise<Block> =>
     .catch(intercept(`Failed to persist ${block.id}`));
 
 export const patchBlock = <T extends Block>(
-  block: T,
-  data: Partial<T['data']>,
+  block: BlockPatchArgs<T>[0],
+  data: BlockPatchArgs<T>[1],
 ): Promise<T> =>
   http
     .post<T>(`/${encodeURIComponent(block.serviceId)}/blocks/patch`, {
@@ -74,6 +74,65 @@ export const deleteBlock = ({ serviceId, id }: Block): Promise<string> =>
     .post<BlockIds>(`/${encodeURIComponent(serviceId)}/blocks/delete`, { id })
     .then((resp) => resp.data.id!)
     .catch(intercept(`Failed to delete ${id}`));
+
+export async function batchCreateBlocks(blocks: Block[]): Promise<Block[]> {
+  if (!blocks.length) {
+    return [];
+  }
+  const { serviceId } = blocks[0];
+  return http
+    .post<Block[]>(
+      `/${encodeURIComponent(serviceId)}/blocks/batch/create`,
+      blocks,
+    )
+    .then((resp) => resp.data)
+    .catch(intercept('Failed to batch create blocks'));
+}
+
+export async function batchPersistBlocks(blocks: Block[]): Promise<Block[]> {
+  if (!blocks.length) {
+    return [];
+  }
+  const { serviceId } = blocks[0];
+  return http
+    .post<Block[]>(
+      `/${encodeURIComponent(serviceId)}/blocks/batch/write`,
+      blocks,
+    )
+    .then((resp) => resp.data)
+    .catch(intercept('Failed to batch write blocks'));
+}
+
+export async function batchPatchBlocks(
+  args: BlockPatchArgs<Block>[],
+): Promise<Block[]> {
+  if (!args.length) {
+    return [];
+  }
+  const { serviceId } = args[0][0];
+  const blocks = args.map(([block, data]) => ({ ...block, data }));
+  return http
+    .post<Block[]>(
+      `/${encodeURIComponent(serviceId)}/blocks/batch/patch`,
+      blocks,
+    )
+    .then((resp) => resp.data)
+    .catch(intercept('Failed to batch patch blocks'));
+}
+
+export async function batchDeleteBlocks(blocks: Block[]): Promise<string[]> {
+  if (!blocks.length) {
+    return [];
+  }
+  const { serviceId } = blocks[0];
+  return http
+    .post<BlockIds[]>(
+      `/${encodeURIComponent(serviceId)}/blocks/delete`,
+      blocks.map((v) => ({ id: v.id })),
+    )
+    .then((resp) => resp.data.map((v) => v.id!))
+    .catch(intercept('Failed to batch delete blocks'));
+}
 
 export const clearBlocks = (serviceId: string): Promise<any> =>
   http

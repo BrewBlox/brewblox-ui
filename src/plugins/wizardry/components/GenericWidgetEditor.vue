@@ -23,7 +23,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: 'update:widget', value: Widget);
-  (e: 'update:valid', value: boolean): void;
+  (e: 'update:valid', value: boolean);
 }>();
 
 const title = computed<string>({

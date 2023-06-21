@@ -106,6 +106,12 @@ export interface BlockIds {
   nid?: number;
 }
 
+export type BlockPatchArgs<T extends Block> = [T, Partial<T['data']>];
+
+export type BlockPatch<T extends Block> = Omit<T, 'data'> & {
+  data: Partial<T['data']>;
+};
+
 /**
  * There are two approaches to having a serializable reference to a block:
  * Link, and BlockAddress
