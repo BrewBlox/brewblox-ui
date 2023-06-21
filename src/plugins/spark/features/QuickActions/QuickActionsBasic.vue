@@ -160,8 +160,7 @@ async function applyChanges(action: ChangeAction): Promise<void> {
   // The patches are sent twice
   // This is a quick and dirty hack to ensure that you can
   // disable a claiming block, and update the setting for a claimed block in one action
-  await sparkStore.batchPatchBlocks(patches);
-  await sparkStore.batchPatchBlocks(patches);
+  await sparkStore.batchPatchBlocks([...patches, ...patches]);
 
   await updateConfig((cfg) => {
     cfg.lastActionId = action.id;
