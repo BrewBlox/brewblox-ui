@@ -11,6 +11,7 @@ import type { Block } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, ref } from 'vue';
+import { BlockPatchArgs } from '../../types';
 import {
   BlockChange,
   ChangeAction,
@@ -152,11 +153,15 @@ async function applyChanges(action: ChangeAction): Promise<void> {
     }
   }
 
-  // Users can interrupt the action by cancelling the confirm
-  // Only apply the action when data is final
-  await sparkStore.batchPatchBlocks(
-    applied.map((change) => [change.block, change.patch]),
+  const patches = applied.map(
+    (change): BlockPatchArgs<Block> => [change.block, change.patch],
   );
+
+  // The patches are sent twice
+  // This is a quick and dirty hack to ensure that you can
+  // disable a claiming block, and update the setting for a claimed block in one action
+  await sparkStore.batchPatchBlocks(patches);
+  await sparkStore.batchPatchBlocks(patches);
 
   await updateConfig((cfg) => {
     cfg.lastActionId = action.id;
