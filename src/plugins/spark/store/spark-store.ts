@@ -3,6 +3,7 @@ import { eventbus } from '@/eventbus';
 import type {
   BlockAddress,
   BlockFieldAddress,
+  BlockPatchArgs,
   SparkBackup,
   SparkSessionConfig,
 } from '@/plugins/spark/types';
@@ -189,9 +190,7 @@ export const useSparkStore = defineStore('sparkStore', {
       await sparkApi.batchPersistBlocks(blocks); // triggers patch event
     },
 
-    async batchPatchBlocks(
-      args: [Block, Partial<Block['data']>][],
-    ): Promise<void> {
+    async batchPatchBlocks(args: BlockPatchArgs<Block>[]): Promise<void> {
       await sparkApi.batchPatchBlocks(args); // triggers patch event
     },
 

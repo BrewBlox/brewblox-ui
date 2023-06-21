@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -8,163 +8,141 @@ import { deserialize } from '@/utils/parsing';
 import { Block } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
 import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, ChangeAction, QuickActionsWidget } from './types';
 
-export default defineComponent({
-  name: 'QuickActionsFull',
-  components: {
-    QuickActionChange,
-  },
-  props: {
-    activeId: {
-      type: String,
-      default: null,
-    },
-  },
-  setup() {
-    const sparkStore = useSparkStore();
-    const specStore = useBlockSpecStore();
-    const { dense } = useGlobals.setup();
-    const { config, patchConfig } = useWidget.setup<QuickActionsWidget>();
-    const draggingStep = ref(false);
-
-    const actions = computed<ChangeAction[]>(() =>
-      deserialize(config.value.actions),
-    );
-
-    function saveActions(acs: ChangeAction[]): void {
-      patchConfig({ actions: acs });
-    }
-
-    function saveAction(action: ChangeAction): void {
-      saveActions(spliceById([...actions.value], action));
-    }
-
-    function duplicateAction(action: ChangeAction): void {
-      saveActions([
-        ...actions.value,
-        {
-          id: nanoid(),
-          name: `${action.name} (copy)`,
-          changes: action.changes.map((change) => ({
-            ...cloneDeep(change),
-            id: nanoid(),
-          })),
-        },
-      ]);
-    }
-
-    function renameAction(action: ChangeAction): void {
-      const stepName = action.name;
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: stepName,
-          title: 'Change ChangeAction name',
-          message: `Choose a new name for '${action.name}'`,
-        },
-      }).onOk((name) => {
-        if (name !== stepName) {
-          saveAction({ ...action, name });
-        }
-      });
-    }
-
-    function startRemoveStep(action: ChangeAction): void {
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: 'Remove ChangeAction',
-          message: `Are you sure you want to remove ${action.name}?`,
-          ok: 'Confirm',
-          cancel: 'Cancel',
-        },
-      }).onOk(() => saveActions(filterById(actions.value, action)));
-    }
-
-    function startAddChange(action: ChangeAction): void {
-      createDialog({
-        component: 'BlockAddressDialog',
-        componentProps: {
-          modelValue: {
-            id: null,
-            serviceId: null,
-            type: null,
-          },
-          title: 'Choose a Block',
-          anyService: true,
-          clearable: false,
-          blockFilter: (block: Block) =>
-            specStore.fieldSpecsByType(block.type).some((f) => !f.readonly),
-        },
-      }).onOk((addr: BlockAddress) => {
-        if (addr && addr.id && addr.serviceId) {
-          action.changes.push({
-            id: nanoid(),
-            blockId: addr.id,
-            serviceId: addr.serviceId,
-            data: {},
-            confirmed: {},
-          });
-          saveAction(action);
-        }
-      });
-    }
-
-    function saveChanges(action: ChangeAction, changes: BlockChange[]): void {
-      action.changes = changes;
-      saveAction(action);
-    }
-
-    function saveChange(action: ChangeAction, change: BlockChange): void {
-      spliceById(action.changes, change);
-      saveAction(action);
-    }
-
-    function removeChange(action: ChangeAction, change: BlockChange): void {
-      spliceById(action.changes, change, false);
-      saveAction(action);
-    }
-
-    function startSwitchBlock(action: ChangeAction, change: BlockChange): void {
-      const { serviceId, blockId } = change;
-      const currentBlock = sparkStore.blockById(serviceId, blockId);
-      createDialog({
-        component: 'BlockAddressDialog',
-        componentProps: {
-          modelValue: currentBlock,
-          title: `Switch target block '${blockId}'`,
-          anyService: true,
-          blockFilter: (block) =>
-            currentBlock === null || block.type === currentBlock.type,
-        },
-      }).onOk((addr: BlockAddress) => {
-        if (addr && addr.id && addr.serviceId) {
-          change.blockId = addr.id;
-          change.serviceId = addr.serviceId;
-          saveChange(action, change);
-        }
-      });
-    }
-
-    return {
-      dense,
-      draggingStep,
-      actions,
-      saveActions,
-      saveChanges,
-      saveChange,
-      removeChange,
-      startSwitchBlock,
-      startAddChange,
-      duplicateAction,
-      renameAction,
-      startRemoveStep,
-    };
+defineProps({
+  activeId: {
+    type: String,
+    default: null,
   },
 });
+
+const sparkStore = useSparkStore();
+const specStore = useBlockSpecStore();
+const { dense } = useGlobals.setup();
+const { config, patchConfig } = useWidget.setup<QuickActionsWidget>();
+const draggingStep = ref(false);
+
+const actions = computed<ChangeAction[]>(() =>
+  deserialize(config.value.actions),
+);
+
+function saveActions(acs: ChangeAction[]): void {
+  patchConfig({ actions: acs });
+}
+
+function saveAction(action: ChangeAction): void {
+  saveActions(spliceById([...actions.value], action));
+}
+
+function duplicateAction(action: ChangeAction): void {
+  saveActions([
+    ...actions.value,
+    {
+      id: nanoid(),
+      name: `${action.name} (copy)`,
+      changes: action.changes.map((change) => ({
+        ...cloneDeep(change),
+        id: nanoid(),
+      })),
+    },
+  ]);
+}
+
+function renameAction(action: ChangeAction): void {
+  const stepName = action.name;
+  createDialog({
+    component: 'InputDialog',
+    componentProps: {
+      modelValue: stepName,
+      title: 'Change ChangeAction name',
+      message: `Choose a new name for '${action.name}'`,
+    },
+  }).onOk((name) => {
+    if (name !== stepName) {
+      saveAction({ ...action, name });
+    }
+  });
+}
+
+function startRemoveStep(action: ChangeAction): void {
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: 'Remove ChangeAction',
+      message: `Are you sure you want to remove ${action.name}?`,
+      ok: 'Confirm',
+      cancel: 'Cancel',
+    },
+  }).onOk(() => saveActions(filterById(actions.value, action)));
+}
+
+function startAddChange(action: ChangeAction): void {
+  createDialog({
+    component: 'BlockAddressDialog',
+    componentProps: {
+      modelValue: {
+        id: null,
+        serviceId: null,
+        type: null,
+      },
+      title: 'Choose a Block',
+      anyService: true,
+      clearable: false,
+      blockFilter: (block: Block) =>
+        specStore.fieldSpecsByType(block.type).some((f) => !f.readonly),
+    },
+  }).onOk((addr: BlockAddress) => {
+    if (addr && addr.id && addr.serviceId) {
+      action.changes.push({
+        id: nanoid(),
+        blockId: addr.id,
+        serviceId: addr.serviceId,
+        data: {},
+        confirmed: {},
+      });
+      saveAction(action);
+    }
+  });
+}
+
+function saveChanges(action: ChangeAction, changes: BlockChange[]): void {
+  action.changes = changes;
+  saveAction(action);
+}
+
+function saveChange(action: ChangeAction, change: BlockChange): void {
+  spliceById(action.changes, change);
+  saveAction(action);
+}
+
+function removeChange(action: ChangeAction, change: BlockChange): void {
+  spliceById(action.changes, change, false);
+  saveAction(action);
+}
+
+function startSwitchBlock(action: ChangeAction, change: BlockChange): void {
+  const { serviceId, blockId } = change;
+  const currentBlock = sparkStore.blockById(serviceId, blockId);
+  createDialog({
+    component: 'BlockAddressDialog',
+    componentProps: {
+      modelValue: currentBlock,
+      title: `Switch target block '${blockId}'`,
+      anyService: true,
+      blockFilter: (block) =>
+        currentBlock === null || block.type === currentBlock.type,
+    },
+  }).onOk((addr: BlockAddress) => {
+    if (addr && addr.id && addr.serviceId) {
+      change.blockId = addr.id;
+      change.serviceId = addr.serviceId;
+      saveChange(action, change);
+    }
+  });
+}
 </script>
 
 <template>
