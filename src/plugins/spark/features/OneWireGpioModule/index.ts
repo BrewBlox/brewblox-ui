@@ -38,7 +38,8 @@ const plugin: Plugin = {
         pullDownWhenInactive: GpioPins.NONE,
         overCurrent: GpioPins.NONE,
         openLoad: GpioPins.NONE,
-        clearFaults: false, // write-only
+        faultsHistory5m: GpioModuleStatus.NONE,
+        faultsHistory60m: GpioModuleStatus.NONE,
       }),
       analyze: (block: OneWireGpioModuleBlock) => {
         const { moduleStatus } = block.data;

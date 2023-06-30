@@ -184,10 +184,10 @@ export async function setExclusiveChannelActuator(
   channel: number,
 ): Promise<void> {
   if (
-    !isBlockCompatible<IoDriverInterfaceBlock>(actuator, [
+    !isBlockCompatible<IoDriverInterfaceBlock>(
+      actuator,
       BlockIntfType.IoDriverInterface,
-      BlockType.DigitalInput, // TODO(Bob): Add DigitalInput to IoDriverInterface
-    ])
+    )
   ) {
     return;
   }
