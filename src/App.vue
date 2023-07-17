@@ -1,8 +1,8 @@
-<script lang="ts">
+<script setup lang="ts">
+import { login } from '@/auth';
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
-import { defineComponent } from 'vue';
 
 /**
  * Order of startup is important here.
@@ -12,18 +12,13 @@ import { defineComponent } from 'vue';
  * they will miss the first (immediate) data push.
  */
 async function onAppSetup(): Promise<void> {
+  await login({ username: 'username', password: 'password' });
   await database.connect();
   await startup.start();
   await eventbus.connect();
 }
 
-export default defineComponent({
-  name: 'App',
-  setup() {
-    onAppSetup();
-    return {};
-  },
-});
+onAppSetup();
 </script>
 
 <template>

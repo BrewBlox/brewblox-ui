@@ -1,9 +1,18 @@
-import { HOST } from '@/const';
-import axios, { AxiosError } from 'axios';
+import { AUTH_TOKEN_KEY, HOST, PROTOCOL } from '@/const';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import get from 'lodash/get';
 import { notify } from './notify';
 
 export const http = axios.create({ baseURL: HOST });
+
+http.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
+  if (PROTOCOL === 'https' && cfg.baseURL === HOST) {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY) ?? undefined;
+    console.log('token', token);
+    cfg.headers.Authorization = token;
+  }
+  return cfg;
+});
 
 /**
  * Extracts human-readable error message from given Axios error.

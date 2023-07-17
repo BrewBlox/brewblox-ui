@@ -1,6 +1,6 @@
 export const HOSTNAME = __BREWBLOX_API_HOST || window.location.hostname;
-export const PROTOCOL =
-  __BREWBLOX_API_PROTOCOL || window.location.protocol.replace(':', '');
+export const PROTOCOL: 'https' | 'http' =
+  __BREWBLOX_API_PROTOCOL || (window.location.protocol.replace(':', '') as any);
 export const WS_PROTOCOL = PROTOCOL === 'https' ? 'wss' : 'ws';
 
 export const PORT =
@@ -42,3 +42,5 @@ export const IS_IOS =
     ? /iPad|iPhone|iPod/.test(platform) ||
       (platform === 'MacIntel' && maxTouchPoints > 1)
     : false;
+
+export const AUTH_TOKEN_KEY = 'brewblox-auth-token';
