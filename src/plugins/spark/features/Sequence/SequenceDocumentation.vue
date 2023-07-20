@@ -1,13 +1,5 @@
-<script lang="ts">
+<script setup lang="ts">
 import { instructions } from 'brewblox-proto/docs/Sequence.json';
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'SequenceDocumentation',
-  setup() {
-    return { instructions };
-  },
-});
 </script>
 
 <template>
@@ -72,11 +64,17 @@ export default defineComponent({
           it must be quoted using single quotes. For all other arguments, quotes
           are allowed but optional.
         </p>
+        <p>
+          Lines that start with a <code>#</code> are comments, and will not be
+          executed. Comments are stored on the Spark, and may cause it to run
+          out of memory.
+        </p>
         <p>Example instructions:</p>
         <p>
           <code>SET_SETPOINT target=BK Setpoint, setting=65C</code><br />
           <code>ENABLE target='BK Setpoint'</code><br />
           <code>WAIT_SETPOINT target='BK Setpoint', precision=1dC</code><br />
+          <code># Starting the profile sets its start time to 'now'</code><br />
           <code>START_PROFILE target='BK Profile '</code><br />
           <code>ENABLE target='BK Profile'</code><br />
           <code>WAIT_PROFILE target='BK Profile '</code><br />
