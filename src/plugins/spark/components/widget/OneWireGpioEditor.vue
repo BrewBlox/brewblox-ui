@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import {
@@ -7,7 +7,7 @@ import {
   GpioModuleChannel,
   GpioPins,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 
 interface DeviceSlot extends GpioModuleChannel {
   start: number;
@@ -34,6 +34,7 @@ function pinLegend(channel: GpioModuleChannel): string[] {
     case GpioDeviceType.GPIO_DEV_COIL_2P_BIDIRECTIONAL:
     case GpioDeviceType.GPIO_DEV_MOTOR_2P:
     case GpioDeviceType.GPIO_DEV_MOTOR_2P_BIDIRECTIONAL:
+    case GpioDeviceType.GPIO_DEV_GND_POWER_2P_LOAD_DETECT_HIGH_CURRENT:
       output.fill('-', 0, width / 2);
       output.fill('+', width / 2, width);
       break;
@@ -41,6 +42,8 @@ function pinLegend(channel: GpioModuleChannel): string[] {
     case GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_1P_HIGH_SIDE:
     case GpioDeviceType.GPIO_DEV_COIL_1P_HIGH_SIDE:
     case GpioDeviceType.GPIO_DEV_MOTOR_1P_HIGH_SIDE:
+    case GpioDeviceType.GPIO_DEV_POWER_1P_LOAD_DETECT_LOW_CURRENT:
+    case GpioDeviceType.GPIO_DEV_POWER_1P_LOAD_DETECT_HIGH_CURRENT:
       output.fill('+');
       break;
     case GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_1P_LOW_SIDE:
@@ -52,6 +55,8 @@ function pinLegend(channel: GpioModuleChannel): string[] {
       output.fill('P');
       break;
     case GpioDeviceType.GPIO_DEV_GND_1P:
+    case GpioDeviceType.GPIO_DEV_GND_1P_LOAD_DETECT_LOW_CURRENT:
+    case GpioDeviceType.GPIO_DEV_GND_1P_LOAD_DETECT_HIGH_CURRENT:
       output.fill('G');
       break;
     default:
@@ -62,185 +67,168 @@ function pinLegend(channel: GpioModuleChannel): string[] {
   return output;
 }
 
-export default defineComponent({
-  name: 'OneWireGpioEditor',
-  props: {
-    channels: {
-      type: Array as PropType<GpioModuleChannel[]>,
-      required: true,
-    },
-    errorPins: {
-      type: Number as PropType<GpioPins>,
-      default: GpioPins.NONE,
-    },
+const props = defineProps({
+  channels: {
+    type: Array as PropType<GpioModuleChannel[]>,
+    required: true,
   },
-  emits: ['update:channels'],
-  setup(props, { emit }) {
-    const selectedId = ref<number | null>(null);
-
-    const selectedChannel = computed<GpioModuleChannel | null>(
-      () => props.channels.find((c) => c.id === selectedId.value) ?? null,
-    );
-
-    function saveChannels(channels: GpioModuleChannel[]): void {
-      emit('update:channels', channels);
-    }
-
-    const unassigned = computed<DeviceSlot[]>(() =>
-      props.channels
-        .filter((c) => c.pinsMask === GpioPins.NONE)
-        .map((c) => ({ ...c, start: -1 })),
-    );
-
-    const active = computed<DeviceSlot[]>(() =>
-      props.channels
-        .filter((c) => c.pinsMask !== GpioPins.NONE)
-        .map((c) => ({ ...c, start: startBit(c.pinsMask) })),
-    );
-
-    const unused = computed<UnusedSlot[]>(() => {
-      // always set a bit at idx 8
-      // this provides an upper boundary when calculating free space
-      const mask: number = props.channels.reduce(
-        (acc, c) => acc | c.pinsMask,
-        1 << 8,
-      );
-
-      const output: UnusedSlot[] = [];
-      for (let i = 0; i <= 8; i++) {
-        if (!((1 << i) & mask)) {
-          output.push({
-            start: i,
-            free: startBit(mask >> i),
-          });
-        }
-      }
-      return output;
-    });
-
-    function clickUnassignedArea(): void {
-      const channel = selectedChannel.value;
-      if (!channel) {
-        return;
-      }
-      saveChannels(
-        props.channels.map((c) =>
-          c.id === channel.id ? { ...c, pinsMask: GpioPins.NONE } : c,
-        ),
-      );
-      selectedId.value = null;
-    }
-
-    function clickUnassigned(id: number): void {
-      if (selectedId.value === id) {
-        selectedId.value = null;
-      } else {
-        selectedId.value = id;
-      }
-    }
-
-    function clickActive(id: number): void {
-      if (selectedId.value === id) {
-        selectedId.value = null;
-      } else {
-        selectedId.value = id;
-      }
-    }
-
-    function buildMask(start: number, width: number): number {
-      let mask = 0;
-      for (let i = 0; i < width; i++) {
-        mask |= 1 << (i + start);
-      }
-      return mask;
-    }
-
-    function clickUnused(slot: UnusedSlot): void {
-      const channel = selectedChannel.value;
-      if (!channel || channel.width > slot.free) {
-        return;
-      }
-      saveChannels(
-        props.channels.map((c) =>
-          c.id === channel.id
-            ? { ...c, pinsMask: buildMask(slot.start, channel.width) }
-            : c,
-        ),
-      );
-      selectedId.value = null;
-    }
-
-    function unusedId(): number {
-      const ids = props.channels.map((c) => c.id);
-      let i = 1;
-      while (ids.includes(i)) {
-        i++;
-      }
-      return i;
-    }
-
-    function modifyChannel(channel: GpioModuleChannel): void {
-      createDialog({
-        component: 'GpioChannelDialog',
-        componentProps: {
-          title: 'Edit channel',
-          channel,
-        },
-      }).onOk((updated: GpioModuleChannel) => {
-        saveChannels([
-          ...props.channels.filter((c) => c.id !== updated.id),
-          updated,
-        ]);
-      });
-    }
-
-    function addChannel(): void {
-      const id = unusedId();
-      const channel: GpioModuleChannel = {
-        id,
-        name: `Channel ${id}`,
-        deviceType: GpioDeviceType.GPIO_DEV_SSR_2P,
-        pinsMask: GpioPins.NONE,
-        width: 2,
-        capabilities: ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT,
-        claimedBy: bloxLink(null),
-      };
-      modifyChannel(channel);
-    }
-
-    function editChannel(): void {
-      const channel = selectedChannel.value;
-      if (!channel) {
-        return;
-      }
-      modifyChannel(channel);
-    }
-
-    function removeChannel(): void {
-      const channel = selectedChannel.value;
-      if (!channel) {
-        return;
-      }
-      saveChannels(props.channels.filter((c) => c.id !== channel.id));
-    }
-
-    return {
-      pinLegend,
-      selectedId,
-      selectedChannel,
-      unassigned,
-      active,
-      unused,
-      clickUnassignedArea,
-      clickUnassigned,
-      clickActive,
-      clickUnused,
-      addChannel,
-      editChannel,
-      removeChannel,
-    };
+  errorPins: {
+    type: Number as PropType<GpioPins>,
+    default: GpioPins.NONE,
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:channels', data: GpioModuleChannel[]);
+}>();
+
+const selectedId = ref<number | null>(null);
+
+const selectedChannel = computed<GpioModuleChannel | null>(
+  () => props.channels.find((c) => c.id === selectedId.value) ?? null,
+);
+
+function saveChannels(channels: GpioModuleChannel[]): void {
+  emit('update:channels', channels);
+}
+
+const unassigned = computed<DeviceSlot[]>(() =>
+  props.channels
+    .filter((c) => c.pinsMask === GpioPins.NONE)
+    .map((c) => ({ ...c, start: -1 })),
+);
+
+const active = computed<DeviceSlot[]>(() =>
+  props.channels
+    .filter((c) => c.pinsMask !== GpioPins.NONE)
+    .map((c) => ({ ...c, start: startBit(c.pinsMask) })),
+);
+
+const unused = computed<UnusedSlot[]>(() => {
+  // always set a bit at idx 8
+  // this provides an upper boundary when calculating free space
+  const mask: number = props.channels.reduce(
+    (acc, c) => acc | c.pinsMask,
+    1 << 8,
+  );
+
+  const output: UnusedSlot[] = [];
+  for (let i = 0; i <= 8; i++) {
+    if (!((1 << i) & mask)) {
+      output.push({
+        start: i,
+        free: startBit(mask >> i),
+      });
+    }
+  }
+  return output;
+});
+
+function clickUnassignedArea(): void {
+  const channel = selectedChannel.value;
+  if (!channel) {
+    return;
+  }
+  saveChannels(
+    props.channels.map((c) =>
+      c.id === channel.id ? { ...c, pinsMask: GpioPins.NONE } : c,
+    ),
+  );
+  selectedId.value = null;
+}
+
+function clickUnassigned(id: number): void {
+  if (selectedId.value === id) {
+    selectedId.value = null;
+  } else {
+    selectedId.value = id;
+  }
+}
+
+function clickActive(id: number): void {
+  if (selectedId.value === id) {
+    selectedId.value = null;
+  } else {
+    selectedId.value = id;
+  }
+}
+
+function buildMask(start: number, width: number): number {
+  let mask = 0;
+  for (let i = 0; i < width; i++) {
+    mask |= 1 << (i + start);
+  }
+  return mask;
+}
+
+function clickUnused(slot: UnusedSlot): void {
+  const channel = selectedChannel.value;
+  if (!channel || channel.width > slot.free) {
+    return;
+  }
+  saveChannels(
+    props.channels.map((c) =>
+      c.id === channel.id
+        ? { ...c, pinsMask: buildMask(slot.start, channel.width) }
+        : c,
+    ),
+  );
+  selectedId.value = null;
+}
+
+function unusedId(): number {
+  const ids = props.channels.map((c) => c.id);
+  let i = 1;
+  while (ids.includes(i)) {
+    i++;
+  }
+  return i;
+}
+
+function modifyChannel(channel: GpioModuleChannel): void {
+  createDialog({
+    component: 'GpioChannelDialog',
+    componentProps: {
+      title: 'Edit channel',
+      channel,
+    },
+  }).onOk((updated: GpioModuleChannel) => {
+    saveChannels([
+      ...props.channels.filter((c) => c.id !== updated.id),
+      updated,
+    ]);
+  });
+}
+
+function addChannel(): void {
+  const id = unusedId();
+  const channel: GpioModuleChannel = {
+    id,
+    name: `Channel ${id}`,
+    deviceType: GpioDeviceType.GPIO_DEV_SSR_2P,
+    pinsMask: GpioPins.NONE,
+    width: 2,
+    capabilities: ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT,
+    claimedBy: bloxLink(null),
+  };
+  modifyChannel(channel);
+}
+
+function editChannel(): void {
+  const channel = selectedChannel.value;
+  if (!channel) {
+    return;
+  }
+  modifyChannel(channel);
+}
+
+function removeChannel(): void {
+  const channel = selectedChannel.value;
+  if (!channel) {
+    return;
+  }
+  saveChannels(props.channels.filter((c) => c.id !== channel.id));
+}
 </script>
 
 <template>
