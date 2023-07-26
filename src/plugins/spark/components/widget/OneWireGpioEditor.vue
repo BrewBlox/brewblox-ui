@@ -34,7 +34,8 @@ function pinLegend(channel: GpioModuleChannel): string[] {
     case GpioDeviceType.GPIO_DEV_COIL_2P_BIDIRECTIONAL:
     case GpioDeviceType.GPIO_DEV_MOTOR_2P:
     case GpioDeviceType.GPIO_DEV_MOTOR_2P_BIDIRECTIONAL:
-    case GpioDeviceType.GPIO_DEV_GND_POWER_2P_LOAD_DETECT_HIGH_CURRENT:
+    case GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_2P:
+    case GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_2P:
       output.fill('-', 0, width / 2);
       output.fill('+', width / 2, width);
       break;
@@ -42,8 +43,8 @@ function pinLegend(channel: GpioModuleChannel): string[] {
     case GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_1P_HIGH_SIDE:
     case GpioDeviceType.GPIO_DEV_COIL_1P_HIGH_SIDE:
     case GpioDeviceType.GPIO_DEV_MOTOR_1P_HIGH_SIDE:
-    case GpioDeviceType.GPIO_DEV_POWER_1P_LOAD_DETECT_LOW_CURRENT:
-    case GpioDeviceType.GPIO_DEV_POWER_1P_LOAD_DETECT_HIGH_CURRENT:
+    case GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_1P_POWER:
+    case GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_1P_POWER:
       output.fill('+');
       break;
     case GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_1P_LOW_SIDE:
@@ -55,8 +56,8 @@ function pinLegend(channel: GpioModuleChannel): string[] {
       output.fill('P');
       break;
     case GpioDeviceType.GPIO_DEV_GND_1P:
-    case GpioDeviceType.GPIO_DEV_GND_1P_LOAD_DETECT_LOW_CURRENT:
-    case GpioDeviceType.GPIO_DEV_GND_1P_LOAD_DETECT_HIGH_CURRENT:
+    case GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_1P_GND:
+    case GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_1P_GND:
       output.fill('G');
       break;
     default:
