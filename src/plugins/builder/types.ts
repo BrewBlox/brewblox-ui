@@ -13,6 +13,7 @@ export const BuilderType = Enum(
   'Conical',
   'CounterflowChiller',
   'CrossTube',
+  'DigitalBaseDisplay',
   'DipTube',
   'ElbowTube',
   'FilterBottom',

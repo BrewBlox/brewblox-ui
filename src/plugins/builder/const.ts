@@ -4,6 +4,7 @@ import {
   BlockIntfType,
   BlockType,
   DigitalActuatorBlock,
+  DigitalInputBlock,
   FastPwmBlock,
   MotorValveBlock,
   PidBlock,
@@ -99,6 +100,13 @@ export const PROFILE_TYPES = [BlockType.SetpointProfile] as const;
 
 export type DigitalBlockT = DigitalActuatorBlock;
 export const DIGITAL_TYPES = [BlockType.DigitalActuator] as const;
+
+export type DigitalBaseBlockT = DigitalActuatorBlock | DigitalInputBlock;
+export const DIGITAL_BASE_KEY = 'digitalBase';
+export const DIGITAL_BASE_TYPES = [
+  BlockType.DigitalActuator,
+  BlockType.DigitalInput,
+] as const;
 
 export type PumpBlockT = PwmBlockT | DigitalBlockT;
 export const PUMP_KEY = 'actuator';

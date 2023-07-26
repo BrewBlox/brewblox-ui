@@ -9,6 +9,7 @@ import Condenser from './Condenser';
 import Conical from './Conical';
 import CounterflowChiller from './CounterflowChiller';
 import CrossTube from './CrossTube';
+import DigitalBaseDisplay from './DigitalBaseDisplay';
 import DipTube from './DipTube';
 import ElbowTube from './ElbowTube';
 import FilterBottom from './FilterBottom';
@@ -54,6 +55,7 @@ const blueprints: Record<BuilderType, BuilderBlueprint> = {
   Conical,
   CounterflowChiller,
   CrossTube,
+  DigitalBaseDisplay,
   DipTube,
   ElbowTube,
   FilterBottom,
