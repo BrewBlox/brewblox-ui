@@ -31,11 +31,7 @@ interface EditingChannel {
 }
 
 function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
-  if (deviceType.endsWith('LOAD_DETECT_LOW_CURRENT')) {
-    return 'DETECT_LOW';
-  } else if (deviceType.endsWith('LOAD_DETECT_HIGH_CURRENT')) {
-    return 'DETECT_HIGH';
-  } else if (deviceType.startsWith('GPIO_DEV_SSR')) {
+  if (deviceType.startsWith('GPIO_DEV_SSR')) {
     return 'SSR';
   } else if (deviceType.startsWith('GPIO_DEV_MOTOR')) {
     return 'MOTOR';
@@ -47,6 +43,10 @@ function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
     return 'POWER';
   } else if (deviceType.startsWith('GPIO_DEV_GND')) {
     return 'GROUND';
+  } else if (deviceType.startsWith('GPIO_DEV_DETECT_LOW')) {
+    return 'DETECT_LOW';
+  } else if (deviceType.startsWith('GPIO_DEV_DETECT_HIGH')) {
+    return 'DETECT_HIGH';
   } else {
     return 'UNKNOWN';
   }
@@ -55,9 +55,9 @@ function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
 function inferEditingMode({ deviceType }: GpioModuleChannel): EditingMode {
   if (/_2P_BIDIRECTIONAL/.test(deviceType)) {
     return 'BIDIRECTIONAL';
-  } else if (/(_1P_HIGH_SIDE|_SSR_1P|POWER_1P_LOAD)/.test(deviceType)) {
+  } else if (/(_1P_HIGH_SIDE|_1P_POWER|_SSR_1P)/.test(deviceType)) {
     return 'PLUS';
-  } else if (/(_1P_LOW_SIDE|GND_1P_LOAD)/.test(deviceType)) {
+  } else if (/(_1P_LOW_SIDE|_1P_GND)/.test(deviceType)) {
     return 'MINUS';
   } else if (/(POWER|GND)_1P/.test(deviceType)) {
     return 'NONE';
@@ -120,19 +120,19 @@ function inferChannelDeviceType({
     return GpioDeviceType.GPIO_DEV_GND_1P;
   } else if (kind === 'DETECT_LOW') {
     if (mode === 'BOTH') {
-      return GpioDeviceType.GPIO_DEV_GND_POWER_2P_LOAD_DETECT_LOW_CURRENT;
+      return GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_2P;
     } else if (mode === 'PLUS') {
-      return GpioDeviceType.GPIO_DEV_POWER_1P_LOAD_DETECT_LOW_CURRENT;
+      return GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_1P_POWER;
     } else if (mode === 'MINUS') {
-      return GpioDeviceType.GPIO_DEV_GND_1P_LOAD_DETECT_LOW_CURRENT;
+      return GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_1P_GND;
     }
   } else if (kind === 'DETECT_HIGH') {
     if (mode === 'BOTH') {
-      return GpioDeviceType.GPIO_DEV_GND_POWER_2P_LOAD_DETECT_HIGH_CURRENT;
+      return GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_2P;
     } else if (mode === 'PLUS') {
-      return GpioDeviceType.GPIO_DEV_POWER_1P_LOAD_DETECT_HIGH_CURRENT;
+      return GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_1P_POWER;
     } else if (mode === 'MINUS') {
-      return GpioDeviceType.GPIO_DEV_GND_1P_LOAD_DETECT_HIGH_CURRENT;
+      return GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_1P_GND;
     }
   }
   // Return NONE for all invalid combinations of kind and mode
