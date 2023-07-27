@@ -43,7 +43,6 @@ function pinLegend(channel: GpioModuleChannel): string[] {
     case GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_1P_HIGH_SIDE:
     case GpioDeviceType.GPIO_DEV_COIL_1P_HIGH_SIDE:
     case GpioDeviceType.GPIO_DEV_MOTOR_1P_HIGH_SIDE:
-    case GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_1P_POWER:
     case GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_1P_POWER:
       output.fill('+');
       break;
