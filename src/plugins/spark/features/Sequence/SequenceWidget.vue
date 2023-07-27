@@ -1,8 +1,8 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
-import { bloxQty } from '@/utils/quantity';
+import { bloxQty, durationMs, durationString } from '@/utils/quantity';
 import {
   Compartment,
   EditorState,
@@ -19,6 +19,7 @@ import {
   ViewUpdate,
 } from '@codemirror/view';
 import {
+  Quantity,
   SequenceBlock,
   SequenceError,
   SequenceStatus,
@@ -26,15 +27,7 @@ import {
 import { basicDark } from 'cm6-theme-basic-dark';
 import { minimalSetup } from 'codemirror';
 import { colors } from 'quasar';
-import {
-  computed,
-  defineComponent,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import SequenceDocumentation from './SequenceDocumentation.vue';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
@@ -58,304 +51,281 @@ const activeInstructionAttributes = Decoration.line({
   attributes: { class: 'cm-activeInstruction' },
 });
 
-export default defineComponent({
-  name: 'SequenceWidget',
-  components: {
-    SequenceDocumentation,
-  },
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
-    const editor = ref<HTMLDivElement>();
-    const configError = ref<string | undefined>();
+const { inDialog } = useContext.setup();
+const { block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
+const editor = ref<HTMLDivElement>();
+const configError = ref<string | undefined>();
 
-    const editableSetting = new Compartment();
-    const readonlySetting = new Compartment();
-    let view: EditorView; // Set when mounted
+const editableSetting = new Compartment();
+const readonlySetting = new Compartment();
+let view: EditorView; // Set when mounted
 
-    const localInstructionsText = ref<string>(
-      block.value.data.instructions.join('\n'),
-    );
+const localInstructionsText = ref<string>(
+  block.value.data.instructions.join('\n'),
+);
 
-    const blockInstructionsText = computed<string>(() =>
-      block.value.data.instructions.join('\n'),
-    );
+const blockInstructionsText = computed<string>(() =>
+  block.value.data.instructions.join('\n'),
+);
 
-    const _editing = ref<boolean>(false);
-    const editing = computed<boolean>({
-      get: () => _editing.value,
-      set: (v) => {
-        _editing.value = v;
-        view.dispatch({
-          effects: [
-            editableSetting.reconfigure(EditorView.editable.of(v)),
-            readonlySetting.reconfigure(EditorState.readOnly.of(!v)),
-          ],
-        });
-      },
+const _editing = ref<boolean>(false);
+const editing = computed<boolean>({
+  get: () => _editing.value,
+  set: (v) => {
+    _editing.value = v;
+    view.dispatch({
+      effects: [
+        editableSetting.reconfigure(EditorView.editable.of(v)),
+        readonlySetting.reconfigure(EditorState.readOnly.of(!v)),
+      ],
     });
-
-    const dirty = computed<boolean>(
-      () => localInstructionsText.value !== blockInstructionsText.value,
-    );
-
-    const activeInstruction = computed<number>(
-      () => block.value.data.activeInstruction,
-    );
-
-    const numInstructions = computed<number>(
-      () => block.value.data.instructions.length,
-    );
-
-    const inactive = computed<boolean>(
-      () =>
-        !block.value.data.enabled &&
-        block.value.data.status !== SequenceStatus.PAUSED &&
-        block.value.data.status !== SequenceStatus.END,
-    );
-
-    const playing = computed<boolean>(
-      () =>
-        block.value.data.enabled &&
-        block.value.data.status !== SequenceStatus.END,
-    );
-
-    const paused = computed<boolean>(
-      () => block.value.data.status === SequenceStatus.PAUSED,
-    );
-
-    const ended = computed<boolean>(
-      () => block.value.data.status === SequenceStatus.END,
-    );
-
-    const runtimeError = computed<string | null>(() => {
-      const { error, instructions, activeInstruction } = block.value.data;
-      const msg = ERROR_TEXT[error];
-      if (msg == null) {
-        return null;
-      }
-      const instruction = instructions[activeInstruction];
-      if (!instruction) {
-        return msg;
-      }
-      const [opcode] = instruction.split(' ', 1);
-      return `${opcode}: ${msg}`;
-    });
-
-    function activeInstructionDecorations(
-      view: EditorView,
-      shown: boolean,
-      lineNo: number,
-    ): DecorationSet {
-      const builder = new RangeSetBuilder<Decoration>();
-      if (shown && lineNo > 0 && lineNo <= view.state.doc.lines) {
-        const line = view.state.doc.line(lineNo);
-        builder.add(line.from, line.from, activeInstructionAttributes);
-      }
-      return builder.finish();
-    }
-
-    const highlightActiveInstruction = ViewPlugin.fromClass(
-      class {
-        decorations: DecorationSet;
-        shown: boolean;
-        lineNo: number;
-
-        constructor(view: EditorView) {
-          this.shown = !editing.value && !inactive.value;
-          this.lineNo = activeInstruction.value + 1;
-          this.decorations = activeInstructionDecorations(
-            view,
-            this.shown,
-            this.lineNo,
-          );
-        }
-
-        update(update: ViewUpdate): void {
-          const shown = !editing.value && !inactive.value;
-          const lineNo = activeInstruction.value + 1;
-          if (shown !== this.shown || lineNo !== this.lineNo) {
-            this.shown = shown;
-            this.lineNo = lineNo;
-            this.decorations = activeInstructionDecorations(
-              update.view,
-              this.shown,
-              this.lineNo,
-            );
-          }
-        }
-      },
-      {
-        decorations: (v) => v.decorations,
-      },
-    );
-
-    watch(blockInstructionsText, (newV, oldV) => {
-      // Apply external changes to instructions if we weren't actively editing them
-      if (localInstructionsText.value === oldV) {
-        revertLocal();
-      }
-    });
-
-    watch(activeInstruction, (idx: number) => {
-      if (!editing.value && idx >= 0 && idx < numInstructions.value) {
-        view.dispatch({
-          effects: [
-            EditorView.scrollIntoView(view.state.doc.line(idx + 1).from),
-          ],
-        });
-      } else {
-        view.dispatch();
-      }
-    });
-
-    onMounted(async () => {
-      view = new EditorView({
-        parent: editor.value,
-        doc: localInstructionsText.value,
-        extensions: [
-          minimalSetup,
-          basicDark,
-          placeholder('No instructions defined'),
-          lineNumbers(),
-          EditorView.lineWrapping,
-          editableSetting.of(EditorView.editable.of(editing.value)),
-          readonlySetting.of(EditorState.readOnly.of(!editing.value)),
-          activeInstructionTheme,
-          highlightActiveInstruction,
-        ],
-        dispatch: (tr: Transaction) => {
-          view.update([tr]);
-          if (!tr.changes.empty) {
-            localInstructionsText.value = view.state.doc.toString();
-          }
-        },
-      });
-      await nextTick();
-    });
-
-    onUnmounted(() => view?.destroy());
-
-    function revertLocal(): void {
-      localInstructionsText.value = blockInstructionsText.value;
-      configError.value = undefined;
-      view.dispatch({
-        changes: {
-          from: 0,
-          to: view.state.doc.length,
-          insert: localInstructionsText.value,
-        },
-      });
-    }
-
-    async function saveLocal(): Promise<void> {
-      try {
-        await patchBlock({
-          instructions: localInstructionsText.value
-            .trim()
-            .split('\n')
-            .filter((s) => !!s.trim()),
-        });
-        configError.value = undefined;
-      } catch (e) {
-        configError.value = (e as any).response?.data?.error;
-      }
-    }
-
-    function toggleEditing(): void {
-      if (!editing.value || !dirty.value) {
-        editing.value = !editing.value;
-        return;
-      }
-
-      createDialog({
-        component: 'SaveConfirmDialog',
-        componentProps: {
-          title: 'Save changes',
-          message: 'You have unsaved changes. Do you want to save them now?',
-        },
-      }).onOk(async (saved: boolean) => {
-        if (saved) {
-          await saveLocal();
-          // do not exit editing mode if we failed to save
-          if (!configError.value) {
-            editing.value = false;
-          }
-        } else {
-          revertLocal();
-          editing.value = false;
-        }
-      });
-    }
-
-    // Reset activeInstruction to 0
-    // Optionally halt execution
-    function reset(enabled: boolean): void {
-      patchBlock({
-        enabled,
-        overrideState: true,
-        activeInstruction: 0,
-        activeInstructionStartedAt: null,
-        disabledAt: null,
-        disabledDuration: bloxQty('0s'),
-      });
-    }
-
-    // If inactive: start
-    // If paused: resume
-    // If ended: restart
-    function play(): void {
-      if (ended.value) {
-        reset(true);
-      } else {
-        patchBlock({ enabled: true });
-      }
-    }
-
-    // Halt execution, but retain activeInstruction
-    function pause(): void {
-      patchBlock({ enabled: false });
-    }
-
-    // Retain current enabled state
-    // Set active instruction to idx if it's within range
-    function skipTo(idx: number): void {
-      if (idx >= 0 && idx < numInstructions.value) {
-        patchBlock({
-          overrideState: true,
-          activeInstruction: idx,
-          activeInstructionStartedAt: null,
-          disabledAt: null,
-          disabledDuration: bloxQty('0s'),
-        });
-      }
-    }
-
-    return {
-      context,
-      inDialog,
-      block,
-      editor,
-      editing,
-      dirty,
-      configError,
-      inactive,
-      playing,
-      paused,
-      ended,
-      activeInstruction,
-      numInstructions,
-      runtimeError,
-      revertLocal,
-      saveLocal,
-      toggleEditing,
-      reset,
-      play,
-      pause,
-      skipTo,
-    };
   },
 });
+
+const dirty = computed<boolean>(
+  () => localInstructionsText.value !== blockInstructionsText.value,
+);
+
+const activeInstruction = computed<number>(
+  () => block.value.data.activeInstruction,
+);
+
+const numInstructions = computed<number>(
+  () => block.value.data.instructions.length,
+);
+
+const inactive = computed<boolean>(
+  () =>
+    !block.value.data.enabled &&
+    block.value.data.status !== SequenceStatus.PAUSED &&
+    block.value.data.status !== SequenceStatus.END,
+);
+
+const playing = computed<boolean>(
+  () =>
+    block.value.data.enabled && block.value.data.status !== SequenceStatus.END,
+);
+
+const ended = computed<boolean>(
+  () => block.value.data.status === SequenceStatus.END,
+);
+
+const runtimeError = computed<string | null>(() => {
+  const { error, instructions, activeInstruction } = block.value.data;
+  const msg = ERROR_TEXT[error];
+  if (msg == null) {
+    return null;
+  }
+  const instruction = instructions[activeInstruction];
+  if (!instruction) {
+    return msg;
+  }
+  const [opcode] = instruction.split(' ', 1);
+  return `${opcode}: ${msg}`;
+});
+
+const timeRemaining = computed<Quantity | null>(() => {
+  const { instructions, activeInstruction, elapsed } = block.value.data;
+  const instruction = instructions[activeInstruction];
+  if (!instruction) {
+    return null;
+  }
+
+  const waitDuration = instruction.match(/WAIT_DURATION duration=(\w+)/);
+  if (waitDuration) {
+    return bloxQty(durationMs(waitDuration[1]) - durationMs(elapsed), 'ms');
+  }
+
+  const waitUntil = instruction.match(/WAIT_UNTIL time=(.+)/);
+  if (waitUntil) {
+    const end = new Date(waitUntil[1]).getTime();
+    const now = new Date().getTime();
+    return bloxQty(end - now, 'ms');
+  }
+
+  return null;
+});
+
+function activeInstructionDecorations(
+  view: EditorView,
+  shown: boolean,
+  lineNo: number,
+): DecorationSet {
+  const builder = new RangeSetBuilder<Decoration>();
+  if (shown && lineNo > 0 && lineNo <= view.state.doc.lines) {
+    const line = view.state.doc.line(lineNo);
+    builder.add(line.from, line.from, activeInstructionAttributes);
+  }
+  return builder.finish();
+}
+
+const highlightActiveInstruction = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet;
+    shown: boolean;
+    lineNo: number;
+
+    constructor(view: EditorView) {
+      this.shown = !editing.value && !inactive.value;
+      this.lineNo = activeInstruction.value + 1;
+      this.decorations = activeInstructionDecorations(
+        view,
+        this.shown,
+        this.lineNo,
+      );
+    }
+
+    update(update: ViewUpdate): void {
+      const shown = !editing.value && !inactive.value;
+      const lineNo = activeInstruction.value + 1;
+      if (shown !== this.shown || lineNo !== this.lineNo) {
+        this.shown = shown;
+        this.lineNo = lineNo;
+        this.decorations = activeInstructionDecorations(
+          update.view,
+          this.shown,
+          this.lineNo,
+        );
+      }
+    }
+  },
+  {
+    decorations: (v) => v.decorations,
+  },
+);
+
+watch(blockInstructionsText, (newV, oldV) => {
+  // Apply external changes to instructions if we weren't actively editing them
+  if (localInstructionsText.value === oldV) {
+    revertLocal();
+  }
+});
+
+watch(activeInstruction, (idx: number) => {
+  if (!editing.value && idx >= 0 && idx < numInstructions.value) {
+    view.dispatch({
+      effects: [EditorView.scrollIntoView(view.state.doc.line(idx + 1).from)],
+    });
+  } else {
+    view.dispatch();
+  }
+});
+
+onMounted(async () => {
+  view = new EditorView({
+    parent: editor.value,
+    doc: localInstructionsText.value,
+    extensions: [
+      minimalSetup,
+      basicDark,
+      placeholder('No instructions defined'),
+      lineNumbers(),
+      EditorView.lineWrapping,
+      editableSetting.of(EditorView.editable.of(editing.value)),
+      readonlySetting.of(EditorState.readOnly.of(!editing.value)),
+      activeInstructionTheme,
+      highlightActiveInstruction,
+    ],
+    dispatch: (tr: Transaction) => {
+      view.update([tr]);
+      if (!tr.changes.empty) {
+        localInstructionsText.value = view.state.doc.toString();
+      }
+    },
+  });
+  await nextTick();
+});
+
+onUnmounted(() => view?.destroy());
+
+function revertLocal(): void {
+  localInstructionsText.value = blockInstructionsText.value;
+  configError.value = undefined;
+  view.dispatch({
+    changes: {
+      from: 0,
+      to: view.state.doc.length,
+      insert: localInstructionsText.value,
+    },
+  });
+}
+
+async function saveLocal(): Promise<void> {
+  try {
+    await patchBlock({
+      instructions: localInstructionsText.value
+        .trim()
+        .split('\n')
+        .filter((s) => !!s.trim()),
+    });
+    configError.value = undefined;
+  } catch (e) {
+    configError.value = (e as any).response?.data?.error;
+  }
+}
+
+function toggleEditing(): void {
+  if (!editing.value || !dirty.value) {
+    editing.value = !editing.value;
+    return;
+  }
+
+  createDialog({
+    component: 'SaveConfirmDialog',
+    componentProps: {
+      title: 'Save changes',
+      message: 'You have unsaved changes. Do you want to save them now?',
+    },
+  }).onOk(async (saved: boolean) => {
+    if (saved) {
+      await saveLocal();
+      // do not exit editing mode if we failed to save
+      if (!configError.value) {
+        editing.value = false;
+      }
+    } else {
+      revertLocal();
+      editing.value = false;
+    }
+  });
+}
+
+// Reset activeInstruction to 0
+// Optionally halt execution
+function reset(enabled: boolean): void {
+  patchBlock({
+    enabled,
+    overrideState: true,
+    activeInstruction: 0,
+  });
+}
+
+// If inactive: start
+// If paused: resume
+// If ended: restart
+function play(): void {
+  if (ended.value) {
+    reset(true);
+  } else {
+    patchBlock({ enabled: true });
+  }
+}
+
+// Halt execution, but retain activeInstruction
+function pause(): void {
+  patchBlock({ enabled: false });
+}
+
+// Retain current enabled state
+// Set active instruction to idx if it's within range
+function skipTo(idx: number): void {
+  if (idx >= 0 && idx < numInstructions.value) {
+    patchBlock({
+      overrideState: true,
+      activeInstruction: idx,
+    });
+  }
+}
 </script>
 
 <template>
@@ -409,6 +379,13 @@ export default defineComponent({
           :disable="editing || activeInstruction + 1 >= numInstructions"
           @click="skipTo(activeInstruction + 1)"
         />
+      </div>
+
+      <div class="text-italic text-center">
+        <template v-if="timeRemaining">
+          Time remaining: {{ durationString(timeRemaining, false) }}
+        </template>
+        <template v-else> --- </template>
       </div>
 
       <div

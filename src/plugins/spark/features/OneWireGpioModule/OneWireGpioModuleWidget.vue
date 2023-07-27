@@ -103,13 +103,6 @@ export default defineComponent({
           {{ e }}
         </div>
       </template>
-      <template #actions>
-        <q-btn
-          flat
-          label="Clear errors"
-          @click="patchBlock({ clearFaults: true })"
-        />
-      </template>
     </CardWarning>
 
     <div class="widget-body">

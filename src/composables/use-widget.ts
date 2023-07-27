@@ -7,7 +7,8 @@ import {
   VolatileKey,
   WidgetKey,
 } from '@/symbols';
-import { computed, ComputedRef, inject } from 'vue';
+import produce from 'immer';
+import { computed, ComputedRef, inject, toRaw } from 'vue';
 
 export interface UseWidgetComponent<WidgetT extends Widget> {
   widgetId: string;
@@ -20,6 +21,9 @@ export interface UseWidgetComponent<WidgetT extends Widget> {
   patchWidget(patch: Partial<WidgetT>): Promise<void>;
   saveConfig(config: WidgetT['config']): Promise<void>;
   patchConfig(patch: Partial<WidgetT['config']>): Promise<void>;
+  updateConfig(
+    cb: (draft: WidgetT['config']) => void | WidgetT['config'],
+  ): Promise<void>;
   invalidate(reason?: string): void;
   changeWidgetTitle(): void;
 }
@@ -30,6 +34,8 @@ export interface UseWidgetComposable {
 
 export const useWidget: UseWidgetComposable = {
   setup<WidgetT extends Widget>(): UseWidgetComponent<WidgetT> {
+    type ConfigT = WidgetT['config'];
+
     const featureStore = useFeatureStore();
     const widget = inject<ComputedRef<WidgetT>>(WidgetKey)!;
     const patchWidget = inject(PatchWidgetKey)!;
@@ -43,7 +49,7 @@ export const useWidget: UseWidgetComposable = {
 
     const widgetId = widget.value.id;
 
-    const config = computed<WidgetT['config']>(() => widget.value.config);
+    const config = computed<ConfigT>(() => widget.value.config);
 
     const featureTitle = computed<string>(
       () =>
@@ -54,14 +60,19 @@ export const useWidget: UseWidgetComposable = {
       () => featureStore.widgetComponent(widget.value)!,
     );
 
-    async function saveConfig(config: WidgetT['config']): Promise<void> {
+    async function saveConfig(config: ConfigT): Promise<void> {
       await patchWidget({ config });
     }
 
-    async function patchConfig(
-      patch: Partial<WidgetT['config']>,
-    ): Promise<void> {
+    async function patchConfig(patch: Partial<ConfigT>): Promise<void> {
       await saveConfig({ ...widget.value.config, ...patch });
+    }
+
+    async function updateConfig(
+      cb: (draft: ConfigT) => void | ConfigT,
+    ): Promise<void> {
+      const updated = produce<ConfigT>(toRaw(config.value), cb);
+      await patchConfig(updated);
     }
 
     return {
@@ -74,6 +85,7 @@ export const useWidget: UseWidgetComposable = {
       saveConfig,
       patchWidget,
       patchConfig,
+      updateConfig,
       invalidate,
       changeWidgetTitle,
     };

@@ -1,7 +1,7 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import { spliceById } from '@/utils/collections';
+import { findById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
@@ -10,7 +10,8 @@ import { prettyAny } from '@/utils/quantity';
 import type { Block } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
+import { BlockPatchArgs } from '../../types';
 import {
   BlockChange,
   ChangeAction,
@@ -44,220 +45,195 @@ interface AppliedChange {
   confirmed: string[];
 }
 
-export default defineComponent({
-  name: 'QuickActionsBasic',
-  setup() {
-    const sparkStore = useSparkStore();
-    const specStore = useBlockSpecStore();
-    const { touch } = useGlobals.setup();
-    const { widgetId, config, patchConfig } =
-      useWidget.setup<QuickActionsWidget>();
+const sparkStore = useSparkStore();
+const specStore = useBlockSpecStore();
+const { touch } = useGlobals.setup();
+const { widgetId, config, updateConfig } =
+  useWidget.setup<QuickActionsWidget>();
 
-    const applying = ref(false);
+const applying = ref(false);
 
-    const actions = computed<ChangeAction[]>(() =>
-      deserialize(config.value.actions),
-    );
+const actions = computed<ChangeAction[]>(() =>
+  deserialize(config.value.actions),
+);
 
-    const lastActionId = computed<string | null>(
-      () => config.value.lastActionId ?? null,
-    );
+const lastActionId = computed<string | null>(
+  () => config.value.lastActionId ?? null,
+);
 
-    async function saveAction(action: ChangeAction): Promise<void> {
-      const { id, name, changes } = action;
-      await patchConfig({
-        actions: spliceById([...actions.value], { id, name, changes }),
-      });
+function blockByChange(change: BlockChange): Block | null {
+  return sparkStore.blockById(change.serviceId, change.blockId);
+}
+
+const actionDisplays = computed<ActionDisplay[]>(() =>
+  actions.value.map((action: ChangeAction): ActionDisplay => {
+    const applicable = action.changes.every((change) => blockByChange(change));
+    const diffs = applicable ? action.changes.map(blockDiff) : [];
+    const active =
+      applicable &&
+      diffs.every((bdiff) => bdiff.diffs.every((fdiff) => !fdiff.changed));
+    return {
+      ...action,
+      applicable,
+      diffs,
+      active,
+    };
+  }),
+);
+
+function confirmActionChange(
+  block: Block,
+  key: string,
+  value: any,
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const specField = specStore
+      .fieldSpecsByType(block.type)
+      .find((field) => field.key === key && !field.readonly);
+    if (!specField) {
+      resolve(value);
+      return;
     }
+    const pretty = specField.pretty ?? prettyAny;
+    const field: EditableBlockField = {
+      value,
+      specField,
+      id: nanoid(), // not relevant
+      confirmed: true, // duh
+    };
 
-    function blockByChange(change: BlockChange): Block | null {
-      return sparkStore.blockById(change.serviceId, change.blockId);
-    }
-
-    const actionDisplays = computed<ActionDisplay[]>(() =>
-      actions.value.map((action: ChangeAction): ActionDisplay => {
-        const applicable = action.changes.every((change) =>
-          blockByChange(change),
-        );
-        const diffs = applicable ? action.changes.map(blockDiff) : [];
-        const active =
-          applicable &&
-          diffs.every((bdiff) => bdiff.diffs.every((fdiff) => !fdiff.changed));
-        return {
-          ...action,
-          applicable,
-          diffs,
-          active,
-        };
-      }),
-    );
-
-    function confirmActionChange(
-      block: Block,
-      key: string,
-      value: any,
-    ): Promise<any> {
-      return new Promise((resolve, reject) => {
-        const specField = specStore
-          .fieldSpecsByType(block.type)
-          .find((field) => field.key === key && !field.readonly);
-        if (!specField) {
-          resolve(value);
-          return;
-        }
-        const pretty = specField.pretty ?? prettyAny;
-        const field: EditableBlockField = {
-          value,
-          specField,
-          id: nanoid(), // not relevant
-          confirmed: true, // duh
-        };
-
-        createDialog({
-          component: 'BlockFieldDialog',
-          componentProps: {
-            modelValue: field.value,
-            field: specField,
-            address: block,
-            title: `Confirm ${specField.title}`,
-            html: true,
-            message: `
+    createDialog({
+      component: 'BlockFieldDialog',
+      componentProps: {
+        modelValue: field.value,
+        field: specField,
+        address: block,
+        title: `Confirm ${specField.title}`,
+        html: true,
+        message: `
           Please confirm the <b>${specField.title}</b> value in <i>${
-              block.id
-            }</i>.
+          block.id
+        }</i>.
           Current value is '${pretty(block.data[key])}'.
           `,
-          },
-        })
-          .onOk((value) => resolve(value))
-          .onCancel(() => reject());
+      },
+    })
+      .onOk((value) => resolve(value))
+      .onCancel(() => reject());
+  });
+}
+
+async function applyChanges(action: ChangeAction): Promise<void> {
+  let dirty = false;
+
+  const applied: AppliedChange[] = action.changes.map((c) => ({
+    block: blockByChange(c)!,
+    patch: cloneDeep(c.data),
+    confirmed: Object.entries(c.confirmed)
+      .filter(([, v]) => v === true)
+      .map(([k]) => k),
+  }));
+
+  // Update data in action where required
+  for (const change of applied) {
+    const fieldSpecs = specStore.fieldSpecsByType(change.block.type);
+    for (const key in change.patch) {
+      if (!fieldSpecs.some((c) => c.key === key)) {
+        dirty = true;
+        delete change.patch[key];
+      }
+      if (change.confirmed.includes(key)) {
+        dirty = true;
+        change.patch[key] = await confirmActionChange(
+          change.block,
+          key,
+          change.patch[key],
+        );
+      }
+    }
+  }
+
+  const patches = applied.map(
+    (change): BlockPatchArgs<Block> => [change.block, change.patch],
+  );
+
+  // The patches are sent twice
+  // This is a quick and dirty hack to ensure that you can
+  // disable a claiming block, and update the setting for a claimed block in one action
+  await sparkStore.batchPatchBlocks([...patches, ...patches]);
+
+  await updateConfig((cfg) => {
+    cfg.lastActionId = action.id;
+
+    if (dirty) {
+      const active = findById(cfg.actions, action.id);
+      active?.changes.forEach((change, idx) => {
+        change.data = applied[idx].patch;
       });
     }
+  });
+}
 
-    async function applyChanges(action: ChangeAction): Promise<void> {
-      let dirty = false;
+function applyAction(action: ChangeAction): void {
+  applying.value = true;
+  applyChanges(action)
+    .then(() =>
+      // Fetch all blocks to show secondary effects
+      Promise.all(
+        action.changes
+          .map((v) => v.serviceId)
+          .filter(uniqueFilter)
+          .map((serviceId) => sparkStore.fetchBlocks(serviceId)),
+      ),
+    )
+    .then(() => notify.done(`Applied ${action.name}`))
+    .catch((e) => notify.warn(`Failed to apply ${action.name}: ${e}`))
+    .finally(() => (applying.value = false));
+}
 
-      const applied: AppliedChange[] = action.changes.map((c) => ({
-        block: blockByChange(c)!,
-        patch: cloneDeep(c.data),
-        confirmed: Object.entries(c.confirmed)
-          .filter(([, v]) => v === true)
-          .map(([k]) => k),
-      }));
+function showActionDialog(action: ChangeAction): void {
+  createDialog({
+    component: 'WidgetDialog',
+    componentProps: {
+      widgetId,
+      mode: 'Full',
+      getProps: () => ({ active: action.id }),
+    },
+  });
+}
 
-      // Update data in action where required
-      for (const change of applied) {
-        const fieldSpecs = specStore.fieldSpecsByType(change.block.type);
-        for (const key in change.patch) {
-          if (!fieldSpecs.some((c) => c.key === key)) {
-            dirty = true;
-            delete change.patch[key];
-          }
-          if (change.confirmed.includes(key)) {
-            dirty = true;
-            change.patch[key] = await confirmActionChange(
-              change.block,
-              key,
-              change.patch[key],
-            );
-          }
-        }
-      }
-
-      // Users can interrupt the action by cancelling the confirm
-      // Only apply the action when data is final
-      for (const change of applied) {
-        await sparkStore.patchBlock(change.block, change.patch);
-      }
-
-      if (dirty) {
-        await saveAction({
-          ...action,
-          changes: [
-            // Explicitly create an array to prevent Proxy objects with numbered keys
-            ...action.changes.map((change, idx) => ({
-              ...change,
-              data: applied[idx].patch,
-            })),
-          ],
-        });
-      }
-    }
-
-    function applyAction(action: ChangeAction): void {
-      applying.value = true;
-      applyChanges(action)
-        .then(() => {
-          notify.done(`Applied ${action.name}`);
-          return patchConfig({ lastActionId: action.id });
-        })
-        .then(() =>
-          // Fetch all blocks to show secondary effects
-          Promise.all(
-            action.changes
-              .map((v) => v.serviceId)
-              .filter(uniqueFilter)
-              .map((serviceId) => sparkStore.fetchBlocks(serviceId)),
-          ),
-        )
-        .catch((e) => notify.warn(`Failed to apply ${action.name}: ${e}`))
-        .finally(() => (applying.value = false));
-    }
-
-    function showActionDialog(action: ChangeAction): void {
-      createDialog({
-        component: 'WidgetDialog',
-        componentProps: {
-          widgetId,
-          mode: 'Full',
-          getProps: () => ({ active: action.id }),
-        },
-      });
-    }
-
-    function blockDiff(change: BlockChange): BlockDiff {
-      const block = blockByChange(change);
-      if (!block) {
-        return {
-          id: change.id,
-          serviceId: change.serviceId ?? '???',
-          blockId: change.blockId ?? '???',
-          diffs: [],
-        };
-      }
-
-      const fieldSpecs = specStore.fieldSpecsByType(block.type);
-      const diffs = Object.entries(change.data).map(([key, val]) => {
-        const specChange = fieldSpecs.find((s) => s.key === key);
-        const pretty = specChange?.pretty ?? prettyAny;
-        const oldV = pretty(block.data[key]);
-        const newV = pretty(val);
-        return {
-          key: specChange?.title ?? key,
-          oldV,
-          newV,
-          changed: oldV !== newV,
-        };
-      });
-
-      return {
-        id: change.id,
-        serviceId: change.serviceId,
-        blockId: change.blockId!,
-        diffs,
-      };
-    }
-
+function blockDiff(change: BlockChange): BlockDiff {
+  const block = blockByChange(change);
+  if (!block) {
     return {
-      touch,
-      applying,
-      applyAction,
-      actionDisplays,
-      lastActionId,
-      showActionDialog,
+      id: change.id,
+      serviceId: change.serviceId ?? '???',
+      blockId: change.blockId ?? '???',
+      diffs: [],
     };
-  },
-});
+  }
+
+  const fieldSpecs = specStore.fieldSpecsByType(block.type);
+  const diffs = Object.entries(change.data).map(([key, val]) => {
+    const specChange = fieldSpecs.find((s) => s.key === key);
+    const pretty = specChange?.pretty ?? prettyAny;
+    const oldV = pretty(block.data[key]);
+    const newV = pretty(val);
+    return {
+      key: specChange?.title ?? key,
+      oldV,
+      newV,
+      changed: oldV !== newV,
+    };
+  });
+
+  return {
+    id: change.id,
+    serviceId: change.serviceId,
+    blockId: change.blockId!,
+    diffs,
+  };
+}
 </script>
 
 <template>

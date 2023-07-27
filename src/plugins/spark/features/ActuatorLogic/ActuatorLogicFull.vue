@@ -35,7 +35,7 @@ import {
 } from './utils';
 
 const validTypes: BlockIntfType[] = [
-  BlockIntfType.ActuatorDigitalInterface,
+  BlockIntfType.DigitalInterface,
   BlockIntfType.ProcessValueInterface,
 ];
 
@@ -128,7 +128,7 @@ export default defineComponent({
     );
 
     function addComparison(compared: Block): void {
-      if (isCompatible(compared.type, BlockIntfType.ActuatorDigitalInterface)) {
+      if (isCompatible(compared.type, BlockIntfType.DigitalInterface)) {
         patchBlock({
           digital: [
             ...block.value.data.digital,

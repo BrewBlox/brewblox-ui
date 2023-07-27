@@ -6,6 +6,7 @@ import ActuatorPwm from './ActuatorPwm';
 import Balancer from './Balancer';
 import DeprecatedObject from './DeprecatedObject';
 import DigitalActuator from './DigitalActuator';
+import DigitalInput from './DigitalInput';
 import DisplaySettings from './DisplaySettings';
 import DS2408 from './DS2408';
 import DS2413 from './DS2413';
@@ -37,6 +38,7 @@ const plugins: Plugin[] = [
   ActuatorPwm,
   Balancer,
   DigitalActuator,
+  DigitalInput,
   DisplaySettings,
   DS2408,
   DS2413,

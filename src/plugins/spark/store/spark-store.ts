@@ -3,6 +3,7 @@ import { eventbus } from '@/eventbus';
 import type {
   BlockAddress,
   BlockFieldAddress,
+  BlockPatchArgs,
   SparkBackup,
   SparkSessionConfig,
 } from '@/plugins/spark/types';
@@ -177,6 +178,26 @@ export const useSparkStore = defineStore('sparkStore', {
       }
     },
 
+    async removeBlock(block: Block): Promise<void> {
+      await sparkApi.deleteBlock(block); // triggers patch event
+    },
+
+    async batchCreateBlocks(blocks: Block[]): Promise<void> {
+      await sparkApi.batchCreateBlocks(blocks); // triggers patch event
+    },
+
+    async batchSaveBlocks(blocks: Block[]): Promise<void> {
+      await sparkApi.batchPersistBlocks(blocks); // triggers patch event
+    },
+
+    async batchPatchBlocks(args: BlockPatchArgs<Block>[]): Promise<void> {
+      await sparkApi.batchPatchBlocks(args); // triggers patch event
+    },
+
+    async batchRemoveBlocks(blocks: Block[]): Promise<void> {
+      await sparkApi.batchDeleteBlocks(blocks); // triggers patch event
+    },
+
     async renameBlock(
       serviceId: string,
       currentId: string,
@@ -205,10 +226,6 @@ export const useSparkStore = defineStore('sparkStore', {
           widget.title = newId;
           widgetStore.saveWidget(widget);
         });
-    },
-
-    async removeBlock(block: Block): Promise<void> {
-      await sparkApi.deleteBlock(block); // triggers patch event
     },
 
     async clearBlocks(serviceId: string): Promise<void> {
