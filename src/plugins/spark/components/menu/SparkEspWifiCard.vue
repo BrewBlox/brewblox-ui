@@ -31,16 +31,15 @@ export default defineComponent({
       </p>
       <p>To set Wifi credentials:</p>
       <ul>
-        <li>Press the <b>(R)ESET</b> button on your Spark.</li>
+        <li>Download the <b>ESP BLE Provisioning</b> app.</li>
+        <li>Enable Bluetooth in your phone settings.</li>
         <li>
-          While the Spark restarts, press and hold the
-          <b>OK</b> button for five seconds. <br />
+          Press and hold the <b>OK</b> button on the Spark for five seconds. It
+          will beep twice.
         </li>
         <li>
           The Spark is ready for provisioning if its buttons are blinking blue.
         </li>
-        <li>Download the <b>ESP BLE Provisioning</b> app.</li>
-        <li>Enable Bluetooth in your phone settings.</li>
         <li>Open the app.</li>
         <li>Click <b>Provision New Device</b>.</li>
         <li>Click <b>I don't have a QR code</b>.</li>
@@ -48,8 +47,8 @@ export default defineComponent({
         <li>Select your Wifi network, and enter your credentials.</li>
       </ul>
       <p>
-        The app will now set Wifi credentials for your Spark. An additional IP
-        address will be shown in the top left corner of the Spark display.
+        The app will now set Wifi credentials for your Spark. An IP address will
+        be shown in the top left corner of the Spark display.
       </p>
     </q-card-section>
     <template #actions>
