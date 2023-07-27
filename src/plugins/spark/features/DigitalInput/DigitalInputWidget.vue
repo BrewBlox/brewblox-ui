@@ -2,7 +2,16 @@
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
-import { ChannelCapabilities, DigitalInputBlock } from 'brewblox-proto/ts';
+import {
+  ChannelCapabilities,
+  DigitalInputBlock,
+  ToggleBehavior,
+} from 'brewblox-proto/ts';
+
+const behaviorOpts: SelectOption<ToggleBehavior>[] = [
+  { value: ToggleBehavior.DIRECT, label: 'Direct' },
+  { value: ToggleBehavior.ALTERNATING, label: 'Toggle ON/OFF' },
+];
 
 const { context } = useContext.setup();
 const { serviceId, block, patchBlock } =
@@ -64,6 +73,41 @@ const { serviceId, block, patchBlock } =
             @update:model-value="(v) => patchBlock({ invert: v })"
           />
         </LabeledField>
+
+        <div class="col-break" />
+
+        <DurationField
+          :model-value="block.data.minActiveTime"
+          title="Minimum active time"
+          label="Minimum active time"
+          class="col-grow"
+          @update:model-value="(v) => patchBlock({ minActiveTime: v })"
+        />
+
+        <SelectField
+          v-model="block.data.behavior"
+          :options="behaviorOpts"
+          title="Behavior"
+          label="Behavior"
+          message="
+            <p>
+              The Input block can track GPIO in two ways:
+            </p>
+            <ul>
+              <li>
+                <b>Direct</b> tracks GPIO state.
+                The Input block is active for as long as the circuit is closed.
+              </li>
+              <li>
+                <b>Toggle ON/OFF</b> tracks changes to GPIO state.
+                The Input block will toggle between ON and OFF
+                whenever the circuit changes from open to closed.
+              </li>
+            </ul>
+          "
+          html
+          class="col-grow"
+        />
       </div>
     </template>
   </Card>
