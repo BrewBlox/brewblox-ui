@@ -11,11 +11,20 @@ import {
   DigitalBaseBlockT,
   DIGITAL_BASE_KEY,
   DIGITAL_BASE_TYPES,
+  LABEL_KEY,
 } from '../const';
 import { liquidBorderColor, textTransformation } from '../utils';
 
-const { part, flows, width, height, bordered, passthrough, placeholder } =
-  usePart.setup();
+const {
+  part,
+  flows,
+  width,
+  height,
+  bordered,
+  passthrough,
+  placeholder,
+  settings,
+} = usePart.setup();
 
 const color = computed<string>(() => liquidBorderColor(flows.value));
 
@@ -29,66 +38,80 @@ const contentTransform = computed<string>(() =>
   textTransformation(part.value, { width: 1, height: 1 }),
 );
 
-const stateText = computed<string>(() => {
+const labelText = computed<string>(
+  () => settings.value[LABEL_KEY] || block.value?.id || '---',
+);
+
+const backgroundColor = computed<string>(() => {
   if (placeholder) {
-    return 'ON/OFF';
+    return 'dodgerblue';
   }
 
   switch (block.value?.data.state) {
     case DigitalState.STATE_ACTIVE:
-      return 'ON';
-    case DigitalState.STATE_INACTIVE:
-      return 'OFF';
+      return 'dodgerblue';
+    case DigitalState.STATE_UNKNOWN:
+      return 'warning';
     default:
-      return '???';
+      return '#333';
   }
 });
 
-const stateColor = computed<string>(() => {
+const labelColor = computed<string>(() => {
   if (placeholder) {
     return 'white';
   }
 
   switch (block.value?.data.state) {
     case DigitalState.STATE_ACTIVE:
-      return 'positive';
-    case DigitalState.STATE_UNKNOWN:
-      return 'warning';
+      return 'white';
     default:
-      return 'grey';
+      return '#AAA';
   }
 });
 </script>
 
 <template>
-  <svg
-    v-bind="{ width, height }"
-    viewBox="0 0 50 50"
-  >
+  <svg v-bind="{ width, height }">
     <g
       :transform="contentTransform"
       class="content"
     >
+      <rect
+        v-bind="{ width, height }"
+        rx="6"
+        :fill="backgroundColor"
+      />
       <BrokenSvgIcon v-if="isBroken" />
       <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <foreignObject
-          y="15"
-          width="50"
-          height="15"
+          :y="height / 2 - 10"
+          :width="width"
+          :height="20"
         >
-          <div :class="`fit builder-text text-bold text-${stateColor}`">
-            {{ stateText }}
+          <div
+            class="fit builder-text text-bold"
+            :style="{
+              'line-height': '18px',
+              color: labelColor,
+            }"
+          >
+            {{ labelText }}
           </div>
         </foreignObject>
       </template>
     </g>
     <BuilderBorder
       v-if="bordered"
+      v-bind="{ width, height }"
       :color="color"
     />
-    <BuilderInteraction @interact="showBlockDialog">
+    <BuilderInteraction
+      v-bind="{ width, height }"
+      @interact="showBlockDialog"
+    >
       <q-menu
         touch-position
         context-menu
@@ -111,6 +134,10 @@ const stateColor = computed<string>(() => {
           <ToggleMenuContent
             v-model="passthrough"
             label="Flow through part"
+          />
+          <TextMenuContent
+            :settings-key="LABEL_KEY"
+            label="Edit label"
           />
         </q-list>
       </q-menu>

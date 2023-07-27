@@ -121,8 +121,6 @@ function inferChannelDeviceType({
   } else if (kind === 'DETECT_LOW') {
     if (mode === 'BOTH') {
       return GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_2P;
-    } else if (mode === 'PLUS') {
-      return GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_1P_POWER;
     } else if (mode === 'MINUS') {
       return GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_1P_GND;
     }
@@ -174,8 +172,8 @@ const kindOpts: SelectOption<EditingKind>[] = [
   { value: 'MECH_RELAY', label: 'Mechanical Relay' },
   { value: 'POWER', label: 'Power (always on)' },
   { value: 'GROUND', label: 'Ground' },
-  { value: 'DETECT_LOW', label: 'Input (<100mA)' },
-  { value: 'DETECT_HIGH', label: 'Input (<1A)' },
+  { value: 'DETECT_LOW', label: 'Input (detect current 2-100mA)' },
+  { value: 'DETECT_HIGH', label: 'Input (detect current 30-1000mA)' },
 ];
 
 const modeOpts = computed<SelectOption<EditingMode>[]>(() => {
@@ -185,8 +183,10 @@ const modeOpts = computed<SelectOption<EditingMode>[]>(() => {
 
   const opts: SelectOption<EditingMode>[] = [
     { value: 'BOTH', label: '- and +' },
-    { value: 'PLUS', label: 'Only +' },
   ];
+  if (local.kind !== 'DETECT_LOW') {
+    opts.push({ value: 'PLUS', label: 'Only +' });
+  }
   if (local.kind !== 'SSR') {
     opts.push({ value: 'MINUS', label: 'Only -' });
   }
