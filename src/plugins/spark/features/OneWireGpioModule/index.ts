@@ -43,7 +43,10 @@ const plugin: Plugin = {
       }),
       analyze: (block: OneWireGpioModuleBlock) => {
         const { moduleStatus } = block.data;
-        if (moduleStatus != GpioModuleStatus.NONE) {
+        if (
+          moduleStatus != GpioModuleStatus.NONE &&
+          moduleStatus != GpioModuleStatus.OPEN_LOAD
+        ) {
           return 'Invalid';
         }
         return 'Active';
