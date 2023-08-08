@@ -1314,9 +1314,9 @@ braces@^3.0.2, braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-"brewblox-proto@https://github.com/brewblox/brewblox-proto#53ea906d":
+"brewblox-proto@https://github.com/brewblox/brewblox-proto#67da1ac7":
   version "1.0.0"
-  resolved "https://github.com/brewblox/brewblox-proto#53ea906df8c392909775d8635f6bdf782d44cce0"
+  resolved "https://github.com/brewblox/brewblox-proto#67da1ac735853fe7964ba86db4815876bdc14899"
   dependencies:
     typescript-string-enums "^1.0.0"
 
@@ -6257,9 +6257,9 @@ wildcard-match@^5.1.2:
   integrity sha512-qNXwI591Z88c8bWxp+yjV60Ch4F8Riawe3iGxbzquhy8Xs9m+0+SLFBGb/0yCTIDElawtaImC37fYZ+dr32KqQ==
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.3.tgz#610636f6b1f703891bd34771ccb17fb93b47079c"
-  integrity sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.4.tgz#cb4b50ec9aca570abd1f52f33cd45b6c61739a9f"
+  integrity sha512-2V81OA4ugVo5pRo46hAoD2ivUJx8jXmWXfUkY4KFNw0hEptvN0QfH3K4nHiwzGeKl5rFKedV48QVoqYavy4YpA==
 
 world-calendars@^1.0.3:
   version "1.0.3"

@@ -444,14 +444,16 @@ export function durationString(
     return '0s';
   }
 
-  const secondsTotal = Number(ms) / 1000;
+  const sign = ms < 0 ? '-' : '';
+  const absMs = Math.abs(Number(ms));
+  const secondsTotal = absMs / 1000;
   const days = Math.floor(secondsTotal / 86400);
   const hours = Math.floor((secondsTotal - days * 86400) / 3600);
   const minutes = Math.floor((secondsTotal - days * 86400 - hours * 3600) / 60);
   const seconds = Math.floor(
     secondsTotal - days * 86400 - hours * 3600 - minutes * 60,
   );
-  const milliseconds = msIncluded && secondsTotal < 10 ? ms % 1000 : 0;
+  const milliseconds = msIncluded && secondsTotal < 10 ? absMs % 1000 : 0;
   const values = [
     [days, 'd'],
     [hours, 'h'],
@@ -464,7 +466,7 @@ export function durationString(
     .filter(([val]) => !!val)
     .map(([val, unit]) => `${val}${unit}`)
     .join(' ');
-  return strVal;
+  return sign + strVal;
 }
 
 const converted = (

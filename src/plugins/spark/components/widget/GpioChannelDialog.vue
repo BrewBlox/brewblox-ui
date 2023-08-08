@@ -18,7 +18,8 @@ type EditingKind =
   | 'MECH_RELAY'
   | 'GROUND'
   | 'POWER'
-  | 'SWITCH';
+  | 'DETECT_LOW'
+  | 'DETECT_HIGH';
 
 type EditingMode = 'BOTH' | 'PLUS' | 'MINUS' | 'BIDIRECTIONAL' | 'NONE';
 
@@ -42,8 +43,10 @@ function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
     return 'POWER';
   } else if (deviceType.startsWith('GPIO_DEV_GND')) {
     return 'GROUND';
-  } else if (deviceType.startsWith('GPIO_DEV_SWITCH')) {
-    return 'SWITCH';
+  } else if (deviceType.startsWith('GPIO_DEV_DETECT_LOW')) {
+    return 'DETECT_LOW';
+  } else if (deviceType.startsWith('GPIO_DEV_DETECT_HIGH')) {
+    return 'DETECT_HIGH';
   } else {
     return 'UNKNOWN';
   }
@@ -52,9 +55,9 @@ function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
 function inferEditingMode({ deviceType }: GpioModuleChannel): EditingMode {
   if (/_2P_BIDIRECTIONAL/.test(deviceType)) {
     return 'BIDIRECTIONAL';
-  } else if (/(_1P_HIGH_SIDE|_SSR_1P)/.test(deviceType)) {
+  } else if (/(_1P_HIGH_SIDE|_1P_POWER|_SSR_1P)/.test(deviceType)) {
     return 'PLUS';
-  } else if (/_1P_LOW_SIDE/.test(deviceType)) {
+  } else if (/(_1P_LOW_SIDE|_1P_GND)/.test(deviceType)) {
     return 'MINUS';
   } else if (/(POWER|GND)_1P/.test(deviceType)) {
     return 'NONE';
@@ -115,9 +118,20 @@ function inferChannelDeviceType({
   } else if (kind === 'GROUND') {
     // Mode is always NONE
     return GpioDeviceType.GPIO_DEV_GND_1P;
-  } else if (kind === 'SWITCH') {
-    // TODO: external GND/PWR variants
-    return GpioDeviceType.GPIO_DEV_SWITCH_2P;
+  } else if (kind === 'DETECT_LOW') {
+    if (mode === 'BOTH') {
+      return GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_2P;
+    } else if (mode === 'MINUS') {
+      return GpioDeviceType.GPIO_DEV_DETECT_LOW_CURRENT_1P_GND;
+    }
+  } else if (kind === 'DETECT_HIGH') {
+    if (mode === 'BOTH') {
+      return GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_2P;
+    } else if (mode === 'PLUS') {
+      return GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_1P_POWER;
+    } else if (mode === 'MINUS') {
+      return GpioDeviceType.GPIO_DEV_DETECT_HIGH_CURRENT_1P_GND;
+    }
   }
   // Return NONE for all invalid combinations of kind and mode
   return GpioDeviceType.GPIO_DEV_NONE;
@@ -158,7 +172,8 @@ const kindOpts: SelectOption<EditingKind>[] = [
   { value: 'MECH_RELAY', label: 'Mechanical Relay' },
   { value: 'POWER', label: 'Power (always on)' },
   { value: 'GROUND', label: 'Ground' },
-  { value: 'SWITCH', label: 'Switch Input' },
+  { value: 'DETECT_LOW', label: 'Input (detect current 2-100mA)' },
+  { value: 'DETECT_HIGH', label: 'Input (detect current 30-1000mA)' },
 ];
 
 const modeOpts = computed<SelectOption<EditingMode>[]>(() => {
@@ -168,8 +183,10 @@ const modeOpts = computed<SelectOption<EditingMode>[]>(() => {
 
   const opts: SelectOption<EditingMode>[] = [
     { value: 'BOTH', label: '- and +' },
-    { value: 'PLUS', label: 'Only +' },
   ];
+  if (local.kind !== 'DETECT_LOW') {
+    opts.push({ value: 'PLUS', label: 'Only +' });
+  }
   if (local.kind !== 'SSR') {
     opts.push({ value: 'MINUS', label: 'Only -' });
   }
@@ -273,7 +290,7 @@ watch(
         <div class="col-break" />
 
         <LabeledField
-          :disable="local.kind === 'SWITCH'"
+          :disable="local.kind === 'DETECT_LOW'"
           label="Multiply pins"
           class="col-6"
         >
