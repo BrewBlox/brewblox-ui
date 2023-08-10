@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { login } from '@/auth';
+import { authLogin, authRefresh } from '@/auth';
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
@@ -12,7 +12,10 @@ import { startup } from '@/startup';
  * they will miss the first (immediate) data push.
  */
 async function onAppSetup(): Promise<void> {
-  await login({ username: 'username', password: 'password' });
+  // TODO(Bob): show login component
+  if (!(await authRefresh())) {
+    await authLogin({ username: 'username', password: 'password' });
+  }
   await database.connect();
   await startup.start();
   await eventbus.connect();

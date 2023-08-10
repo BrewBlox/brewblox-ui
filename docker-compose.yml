@@ -5,7 +5,6 @@ services:
     image: ghcr.io/brewblox/mosquitto:develop
     labels:
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
-      - traefik.http.routers.eventbus.middlewares=auth
 
   victoria:
     image: victoriametrics/victoria-metrics:v1.88.0
@@ -16,7 +15,6 @@ services:
       --search.latencyOffset=10s
     labels:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
-      - traefik.http.routers.victoria.middlewares=auth
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/victoria
@@ -34,8 +32,6 @@ services:
 
   history:
     image: ghcr.io/brewblox/brewblox-history:develop
-    labels:
-      - traefik.http.routers.history.middlewares=auth
 
   node-red:
     image: ghcr.io/brewblox/node-red:develop
@@ -49,8 +45,6 @@ services:
     command: --name=sparkey --simulation --device-id=123456789012345678901234
     restart: unless-stopped
     privileged: true
-    labels:
-      - traefik.http.routers.sparkey.middlewares=auth
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/simulator__sparkey
@@ -61,8 +55,6 @@ services:
     command: --name=spock --simulation --device-id=432109876543210987654321
     restart: unless-stopped
     privileged: true
-    labels:
-      - traefik.http.routers.spock.middlewares=auth
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/simulator__spock
@@ -83,12 +75,12 @@ services:
 
   auth:
     image: ghcr.io/brewblox/brewblox-auth:develop
-    labels:
-      - traefik.http.middlewares.auth.forwardauth.address=http://auth:5000/auth/verify
-      - traefik.http.middlewares.auth.forwardauth.authResponseHeaders=Authorization
+    environment:
+      - BREWBLOX_AUTH_JWT_SECRET=supersecret
+      - BREWBLOX_AUTH_VERIFY_IGNORE=/,/ui/.*
 
   traefik:
-    image: traefik:2.2
+    image: traefik:2.10
     ports:
       - '9000:9000'
       - '9001:9001'
@@ -96,6 +88,11 @@ services:
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
       - traefik.http.routers.api.service=api@internal
       - traefik.http.middlewares.prefix-strip.stripprefixregex.regex=/[^/]+
+      - traefik.http.middlewares.auth.forwardauth.address=http://auth:5000/auth/verify
+      - traefik.http.middlewares.cors.headers.AccessControlAllowMethods=CONNECT,HEAD,GET,DELETE,OPTIONS,PATCH,POST,PUT,TRACE
+      - traefik.http.middlewares.cors.headers.accessControlAllowOriginListRegex=.*
+      - traefik.http.middlewares.cors.headers.AccessControlAllowCredentials=true
+      - traefik.http.middlewares.cors.headers.AccessControlAllowHeaders=Origin,X-Requested-With,Content-Type,Accept
     volumes:
       - type: bind
         source: ./dev/traefik
@@ -111,6 +108,8 @@ services:
       --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
       --providers.file.directory=/config
       --entrypoints.web.address=:9000
+      --entrypoints.web.http.middlewares=cors
       --entrypoints.websecure.address=:9001
       --entrypoints.websecure.http.tls=true
+      --entrypoints.websecure.http.middlewares=cors,auth
     # --entrypoints.web.http.redirections.entrypoint.to=websecure

@@ -1,5 +1,5 @@
 // import mqtt from 'mqtt';
-import { AUTH_TOKEN_KEY, HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';
+import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';
 import { popById } from '@/utils/collections';
 import { mqttTopicExp } from '@/utils/misc';
 import { notify } from '@/utils/notify';
@@ -29,11 +29,6 @@ export class BrewbloxEventbus {
       port: PORT,
       path: '/eventbus',
       rejectUnauthorized: false,
-      wsOptions: {
-        headers: {
-          Authorization: localStorage.getItem(AUTH_TOKEN_KEY) ?? undefined,
-        },
-      },
     };
     if (this.client) {
       this.client.end();

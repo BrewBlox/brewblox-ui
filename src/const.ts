@@ -42,5 +42,3 @@ export const IS_IOS =
     ? /iPad|iPhone|iPod/.test(platform) ||
       (platform === 'MacIntel' && maxTouchPoints > 1)
     : false;
-
-export const AUTH_TOKEN_KEY = 'brewblox-auth-token';

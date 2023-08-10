@@ -74,12 +74,8 @@ services:
   #       source: ../brewblox-hass/brewblox_hass
   #       target: /app/brewblox_hass
 
-  auth:
-    image: ghcr.io/brewblox/brewblox-auth:develop
-    labels:
-      - traefik.http.middlewares.auth.forwardauth.address=http://auth:5000/auth/verify
-      - traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=Authorization
-    volumes:
-      - type: bind
-        source: ../brewblox-auth/brewblox_auth
-        target: /app/brewblox_auth
+  # auth:
+  #   volumes:
+  #     - type: bind
+  #       source: ../brewblox-auth/brewblox_auth
+  #       target: /app/brewblox_auth
