@@ -76,7 +76,6 @@ services:
   auth:
     image: ghcr.io/brewblox/brewblox-auth:develop
     environment:
-      - BREWBLOX_AUTH_JWT_SECRET=supersecret
       - BREWBLOX_AUTH_VERIFY_IGNORE=/,/ui/.*
 
   traefik:
