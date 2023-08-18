@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { authLogin, authRefresh } from '@/auth';
+import { authRefresh } from '@/auth';
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
+import { createDialog } from './utils/dialog';
 
 /**
  * Order of startup is important here.
@@ -12,9 +13,8 @@ import { startup } from '@/startup';
  * they will miss the first (immediate) data push.
  */
 async function onAppSetup(): Promise<void> {
-  // TODO(Bob): show login component
   if (!(await authRefresh())) {
-    await authLogin({ username: 'username', password: 'password' });
+    createDialog({ component: 'LoginDialog' });
   }
   await database.connect();
   await startup.start();

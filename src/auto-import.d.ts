@@ -157,6 +157,7 @@ declare module '@vue/runtime-core' {
     QuantityDialog: typeof import('src/components/form/QuantityDialog.vue').default;
     MarkdownView: typeof import('src/components/form/MarkdownView.vue').default;
     MarkdownDialog: typeof import('src/components/form/MarkdownDialog.vue').default;
+    LoginDialog: typeof import('src/components/form/LoginDialog.vue').default;
     ListSelect: typeof import('src/components/form/ListSelect.vue').default;
     ListMultiSelect: typeof import('src/components/form/ListMultiSelect.vue').default;
     LinkField: typeof import('src/components/form/LinkField.vue').default;
