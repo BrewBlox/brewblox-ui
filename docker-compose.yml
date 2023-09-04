@@ -87,6 +87,7 @@ services:
     ports:
       - '9000:9000'
       - '9001:9001'
+      - '127.0.0.1:9601:9601'
     labels:
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
       - traefik.http.routers.api.service=api@internal
@@ -110,9 +111,10 @@ services:
       --providers.docker.constraints="Label(`com.docker.compose.project`, `brewblox-ui`)"
       --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
       --providers.file.directory=/config
-      --entrypoints.web.address=:9000
-      --entrypoints.web.http.middlewares=cors
       --entrypoints.websecure.address=:9001
       --entrypoints.websecure.http.tls=true
       --entrypoints.websecure.http.middlewares=cors,auth
-    # --entrypoints.web.http.redirections.entrypoint.to=websecure
+      --entrypoints.web.address=:9000
+      --entrypoints.web.http.redirections.entrypoint.to=websecure
+      --entrypoints.admin.address=:9601
+      --entrypoints.admin.http.middlewares=cors
