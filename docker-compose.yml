@@ -77,6 +77,10 @@ services:
     image: ghcr.io/brewblox/brewblox-auth:develop
     environment:
       - BREWBLOX_AUTH_VERIFY_IGNORE=/,/ui/.*
+    volumes:
+      - type: bind
+        source: ./dev/auth
+        target: /app/data
 
   traefik:
     image: traefik:2.10
