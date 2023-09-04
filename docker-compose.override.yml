@@ -73,3 +73,9 @@ services:
   #     - type: bind
   #       source: ../brewblox-hass/brewblox_hass
   #       target: /app/brewblox_hass
+
+  # auth:
+  #   volumes:
+  #     - type: bind
+  #       source: ../brewblox-auth/brewblox_auth
+  #       target: /app/brewblox_auth

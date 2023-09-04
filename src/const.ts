@@ -1,6 +1,6 @@
 export const HOSTNAME = __BREWBLOX_API_HOST || window.location.hostname;
-export const PROTOCOL =
-  __BREWBLOX_API_PROTOCOL || window.location.protocol.replace(':', '');
+export const PROTOCOL: 'https' | 'http' =
+  __BREWBLOX_API_PROTOCOL || (window.location.protocol.replace(':', '') as any);
 export const WS_PROTOCOL = PROTOCOL === 'https' ? 'wss' : 'ws';
 
 export const PORT =

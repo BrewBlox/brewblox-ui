@@ -30,6 +30,9 @@ export class BrewbloxEventbus {
       path: '/eventbus',
       rejectUnauthorized: false,
     };
+    if (this.client) {
+      this.client.end();
+    }
     const client = mqtt.connect(opts);
     this.client = client;
     this.checkIOSBug();
