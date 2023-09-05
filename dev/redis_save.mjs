@@ -1,13 +1,12 @@
-const axios = require('axios');
-const fs = require('fs');
-const {
-  datastore,
-  retry,
+import axios from 'axios';
+import get from 'lodash/get';
+import {
   databases,
+  datastore,
   fileDir,
   objectSorter,
-} = require('./utils');
-const get = require('lodash/get');
+  retry,
+} from './utils.mjs';
 
 async function run() {
   await retry('Waiting for datastore', () => axios.get(`${datastore}/ping`));
@@ -28,5 +27,5 @@ async function run() {
 }
 
 run()
-  .then(() => console.log('Script done!', __filename))
+  .then(() => console.log('Script done!', import.meta.url))
   .catch((e) => console.log(get(e, 'response.data', e)));

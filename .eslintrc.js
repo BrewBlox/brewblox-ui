@@ -66,14 +66,14 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.js'],
+      files: ['*.mjs'],
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
       },
     },
     {
-      files: ['dev/**.js'],
+      files: ['dev/**.mjs'],
       rules: {
         'no-console': 'off',
       },
