@@ -76,7 +76,8 @@ services:
   auth:
     image: ghcr.io/brewblox/brewblox-auth:develop
     environment:
-      - BREWBLOX_AUTH_VERIFY_IGNORE=/,/ui/.*
+      - BREWBLOX_AUTH_ENABLED=False
+      - BREWBLOX_AUTH_IGNORE=/|/ui/.*
     volumes:
       - type: bind
         source: ./dev/auth
