@@ -1,5 +1,6 @@
 import axios from 'axios';
-import get from 'lodash/get';
+import { readFileSync } from 'fs';
+import get from 'lodash/get.js';
 import { databases, datastore, fileDir, retry } from './utils.mjs';
 
 async function run() {
@@ -7,7 +8,7 @@ async function run() {
 
   for (let db of databases) {
     const fname = `${fileDir}/${db}.redis.json`;
-    const docs = JSON.parse(fs.readFileSync(fname));
+    const docs = JSON.parse(readFileSync(fname));
 
     await axios.post(`${datastore}/mdelete`, {
       namespace: db,

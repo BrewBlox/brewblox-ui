@@ -1,5 +1,6 @@
 import axios from 'axios';
-import get from 'lodash/get';
+import { writeFileSync } from 'fs';
+import get from 'lodash/get.js';
 import {
   databases,
   datastore,
@@ -21,7 +22,7 @@ async function run() {
       .then((values) => values.sort(objectSorter('id')));
 
     const fname = `${fileDir}/${db}.redis.json`;
-    fs.writeFileSync(fname, JSON.stringify(docs, undefined, 2));
+    writeFileSync(fname, JSON.stringify(docs, undefined, 2));
     console.log('Database saved', fname);
   }
 }

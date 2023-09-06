@@ -704,6 +704,11 @@
   resolved "https://registry.yarnpkg.com/@types/marked/-/marked-4.0.8.tgz#b316887ab3499d0a8f4c70b7bd8508f92d477955"
   integrity sha512-HVNzMT5QlWCOdeuBsgXP8EZzKUf0+AXzN+sLmjvaB3ZlLqO+e4u0uXrdw9ub69wBKFs+c6/pA4r9sy6cCDvImw==
 
+"@types/minimist@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"
+  integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
+
 "@types/node@*":
   version "18.16.1"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.1.tgz#5db121e9c5352925bb1f1b892c4ae620e3526799"

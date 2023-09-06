@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { writeFileSync } from 'fs';
 import Minimist from 'minimist';
 import { fileDir, host, objectSorter, sparks } from './utils.mjs';
 
@@ -11,7 +12,7 @@ async function run() {
     const resp = await axios.post(`${host}/${svc}/blocks/backup/save`);
     resp.data.blocks.sort(objectSorter('id'));
     const fname = `${fileDir}/${svc}.spark.json`;
-    fs.writeFileSync(fname, JSON.stringify(resp.data, undefined, 2));
+    writeFileSync(fname, JSON.stringify(resp.data, undefined, 2));
     console.log('Spark blocks saved', fname);
   }
 }
