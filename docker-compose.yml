@@ -1,5 +1,4 @@
-version: '3.7'
-
+name: brewblox-ui
 services:
   eventbus:
     image: ghcr.io/brewblox/mosquitto:develop
@@ -109,7 +108,7 @@ services:
     command: >-
       --api.dashboard=true
       --providers.docker=true
-      --providers.docker.constraints="Label(`com.docker.compose.project`, `brewblox-ui`)"
+      --providers.docker.constraints="Label(`com.docker.compose.project`, `${COMPOSE_PROJECT_NAME}`)"
       --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
       --providers.file.directory=/config
       --entrypoints.websecure.address=:9001
