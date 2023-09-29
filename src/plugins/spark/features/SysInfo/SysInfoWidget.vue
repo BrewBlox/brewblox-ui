@@ -115,8 +115,8 @@ export default defineComponent({
           tag-class="q-gutter-y-xs"
         >
           <div>Total: {{ block.data.memoryFree }}</div>
-          <div>Contiguous: {{ block.data.memoryFree }}</div>
-          <div>Lowest: {{ block.data.memoryFree }}</div>
+          <div>Contiguous: {{ block.data.memoryFreeContiguous }}</div>
+          <div>Lowest: {{ block.data.memoryFreeLowest }}</div>
         </LabeledField>
       </div>
     </div>
