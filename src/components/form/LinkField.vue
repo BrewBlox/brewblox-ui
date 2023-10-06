@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useField } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { ComparedBlockType } from '@/plugins/spark/types';
@@ -7,107 +7,98 @@ import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { Block, Link } from 'brewblox-proto/ts';
 import truncate from 'lodash/truncate';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, PropType } from 'vue';
 
-export default defineComponent({
-  name: 'LinkField',
-  props: {
-    ...useField.props,
-    modelValue: {
-      type: Object as PropType<Link>,
-      default: () => bloxLink(null),
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    label: {
-      type: String,
-      default: 'Link',
-    },
-    compatible: {
-      type: [String, Array] as PropType<ComparedBlockType>,
-      default: null,
-    },
-    blockFilter: {
-      type: Function as PropType<(block: Block) => boolean>,
-      default: () => true,
-    },
-    clearable: {
-      type: Boolean,
-      default: true,
-    },
-    creatable: {
-      type: Boolean,
-      default: true,
-    },
-    configurable: {
-      type: Boolean,
-      default: true,
-    },
-    show: {
-      type: Boolean,
-      default: true,
-    },
+const props = defineProps({
+  ...useField.props,
+  modelValue: {
+    type: Object as PropType<Link>,
+    default: () => bloxLink(null),
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const { activeSlots } = useField.setup();
-    const sparkStore = useSparkStore();
-
-    function save(val: Link): void {
-      emit('update:modelValue', val);
-    }
-
-    const displayValue = computed<string>(() =>
-      truncate(props.modelValue.id ?? 'click to assign'),
-    );
-
-    const block = computed<Block | null>(() =>
-      sparkStore.blockById(props.serviceId, props.modelValue.id),
-    );
-
-    const canEdit = computed<boolean>(
-      () => block.value !== null && props.configurable && props.show,
-    );
-
-    function editBlock(): void {
-      createBlockDialog(block.value);
-    }
-
-    function openDialog(): void {
-      if (props.readonly) {
-        return;
-      }
-
-      createDialog({
-        component: 'LinkDialog',
-        componentProps: {
-          modelValue: props.modelValue,
-          title: props.title,
-          message: props.message,
-          html: props.html,
-          label: props.label,
-          serviceId: props.serviceId,
-          compatible: props.compatible,
-          blockFilter: props.blockFilter,
-          clearable: props.clearable,
-          creatable: props.creatable,
-          configurable: props.configurable,
-          ...props.dialogProps,
-        },
-      }).onOk(save);
-    }
-
-    return {
-      activeSlots,
-      displayValue,
-      canEdit,
-      editBlock,
-      openDialog,
-    };
+  serviceId: {
+    type: String,
+    required: true,
+  },
+  label: {
+    type: String,
+    default: 'Link',
+  },
+  compatible: {
+    type: [String, Array] as PropType<ComparedBlockType>,
+    default: null,
+  },
+  blockFilter: {
+    type: Function as PropType<(block: Block) => boolean>,
+    default: () => true,
+  },
+  clearable: {
+    type: Boolean,
+    default: true,
+  },
+  creatable: {
+    type: Boolean,
+    default: true,
+  },
+  configurable: {
+    type: Boolean,
+    default: true,
+  },
+  show: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', data: Link): void;
+}>();
+
+const { activeSlots } = useField.setup();
+const sparkStore = useSparkStore();
+
+function save(val: Link): void {
+  emit('update:modelValue', val);
+}
+
+const displayValue = computed<string>(() =>
+  truncate(props.modelValue.id ?? 'click to assign'),
+);
+
+const block = computed<Block | null>(() =>
+  sparkStore.blockById(props.serviceId, props.modelValue.id),
+);
+
+const canEdit = computed<boolean>(
+  () => block.value !== null && props.configurable && props.show,
+);
+
+function editBlock(): void {
+  createBlockDialog(block.value);
+}
+
+function openDialog(): void {
+  if (props.readonly) {
+    return;
+  }
+
+  createDialog({
+    component: 'LinkDialog',
+    componentProps: {
+      modelValue: props.modelValue,
+      title: props.title,
+      message: props.message,
+      html: props.html,
+      label: props.label,
+      serviceId: props.serviceId,
+      compatible: props.compatible,
+      blockFilter: props.blockFilter,
+      clearable: props.clearable,
+      creatable: props.creatable,
+      configurable: props.configurable,
+      ...props.dialogProps,
+    },
+  }).onOk(save);
+}
 </script>
 
 <template>

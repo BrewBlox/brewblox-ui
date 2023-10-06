@@ -1,57 +1,40 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { date as qdate } from 'quasar';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'DatepickerDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Date,
-      required: true,
-    },
-    label: {
-      type: String,
-      default: 'Date and time',
-    },
+const props = defineProps({
+  ...useDialog.props,
+  modelValue: {
+    type: Date,
+    required: true,
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const tab = ref<'date' | 'time'>('date');
-    const stringValue = ref<string>(
-      qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'),
-    );
-
-    const parsed = computed<Date>(() =>
-      qdate.extractDate(stringValue.value, 'YYYY/MM/DD HH:mm:ss'),
-    );
-
-    const valid = computed<boolean>(() =>
-      Number.isFinite(parsed.value.getTime()),
-    );
-
-    function save(): void {
-      if (valid.value) {
-        onDialogOK(parsed.value);
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      tab,
-      stringValue,
-      parsed,
-      valid,
-      save,
-    };
+  label: {
+    type: String,
+    default: 'Date and time',
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup();
+const tab = ref<'date' | 'time'>('date');
+const stringValue = ref<string>(
+  qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'),
+);
+
+const parsed = computed<Date>(() =>
+  qdate.extractDate(stringValue.value, 'YYYY/MM/DD HH:mm:ss'),
+);
+
+const valid = computed<boolean>(() => Number.isFinite(parsed.value.getTime()));
+
+function save(): void {
+  if (valid.value) {
+    onDialogOK(parsed.value);
+  }
+}
 </script>
 
 <template>

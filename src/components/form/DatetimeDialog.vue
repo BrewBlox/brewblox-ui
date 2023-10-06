@@ -1,56 +1,43 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { makeRuleValidator } from '@/utils/rules';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 
-export default defineComponent({
-  name: 'DatetimeDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Date,
-      required: true,
-    },
-    label: {
-      type: String,
-      default: 'Date and time',
-    },
-    resetIcon: {
-      type: String,
-      default: 'restore',
-    },
-    rules: {
-      type: Array as PropType<InputRule[]>,
-      default: () => [],
-    },
+const props = defineProps({
+  ...useDialog.props,
+  modelValue: {
+    type: Date,
+    required: true,
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const local = ref<Date | null>(props.modelValue);
-
-    const valid = computed<boolean>(() =>
-      makeRuleValidator(props.rules)(local.value),
-    );
-
-    function save(): void {
-      if (valid.value) {
-        onDialogOK(local.value);
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      valid,
-      save,
-    };
+  label: {
+    type: String,
+    default: 'Date and time',
+  },
+  resetIcon: {
+    type: String,
+    default: 'restore',
+  },
+  rules: {
+    type: Array as PropType<InputRule[]>,
+    default: () => [],
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup();
+const local = ref<Date | null>(props.modelValue);
+
+const valid = computed<boolean>(() =>
+  makeRuleValidator(props.rules)(local.value),
+);
+
+function save(): void {
+  if (valid.value) {
+    onDialogOK(local.value);
+  }
+}
 </script>
 
 <template>

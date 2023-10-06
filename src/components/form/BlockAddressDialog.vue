@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
@@ -8,7 +8,7 @@ import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { Block } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 
 const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
   id: v?.id ?? null,
@@ -16,158 +16,135 @@ const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
   type: v?.type ?? null,
 });
 
-export default defineComponent({
-  name: 'BlockAddressDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: null as unknown as PropType<BlockAddress | null>,
-      default: null,
-    },
-    label: {
-      type: String,
-      default: 'Block',
-    },
-    anyService: {
-      type: Boolean,
-      default: false,
-    },
-    compatible: {
-      type: [String, Array] as PropType<ComparedBlockType>,
-      default: null,
-    },
-    blockFilter: {
-      type: Function as PropType<(block: Block) => boolean>,
-      default: () => true,
-    },
-    clearable: {
-      type: Boolean,
-      default: true,
-    },
-    creatable: {
-      type: Boolean,
-      default: true,
-    },
-    configurable: {
-      type: Boolean,
-      default: true,
-    },
-    showCreated: {
-      type: Boolean,
-      default: true,
-    },
+const props = defineProps({
+  ...useDialog.props,
+  modelValue: {
+    type: null as unknown as PropType<BlockAddress | null>,
+    default: null,
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogCancel, onDialogHide, onDialogOK } =
-      useDialog.setup();
-    const sparkStore = useSparkStore();
-    const featureStore = useFeatureStore();
-
-    const modelValueAddr = computed<BlockAddress>(
-      () => props.modelValue ?? asAddr(null),
-    );
-
-    const local = ref<BlockAddress | null>(modelValueAddr.value);
-
-    const serviceIds = computed<string[]>(() => sparkStore.serviceIds);
-
-    const serviceId = computed<string>({
-      get: () => {
-        const { serviceId } = local.value ?? modelValueAddr.value;
-        return serviceId && serviceIds.value.includes(serviceId)
-          ? serviceId
-          : serviceIds.value[0] ?? '';
-      },
-      set: (serviceId) => {
-        if (local.value?.serviceId !== serviceId) {
-          local.value = {
-            serviceId,
-            id: null,
-            type: modelValueAddr.value.type,
-          };
-        }
-      },
-    });
-
-    const typeFilter = computed<(type: string) => boolean>(() => {
-      const intf = props.compatible ?? modelValueAddr.value.type;
-      return (type) => isCompatible(type, intf);
-    });
-
-    const addressOpts = computed<BlockAddress[]>(() =>
-      sparkStore
-        .blocksByService(serviceId.value)
-        .filter((block) => typeFilter.value(block.type))
-        .filter(props.blockFilter)
-        .map(asAddr)
-        .sort(makeObjectSorter('id')),
-    );
-
-    const block = computed<Block | null>(() =>
-      local.value
-        ? sparkStore.blockById(serviceId.value, local.value.id)
-        : null,
-    );
-
-    const tooltip = computed<string | null>(() =>
-      block.value ? featureStore.widgetTitle(block.value.type) : null,
-    );
-
-    const localOk = computed<boolean>(
-      () => block.value !== null || props.clearable,
-    );
-
-    function configureBlock(): void {
-      createBlockDialog(local.value);
-    }
-
-    function createBlock(): void {
-      createDialog({
-        component: 'BlockWizardDialog',
-        componentProps: {
-          serviceId: serviceId.value,
-          compatible: props.compatible ?? modelValueAddr.value.type,
-          showCreated: props.showCreated,
-        },
-      }).onOk((block: Maybe<Block>) => {
-        if (block) {
-          local.value = asAddr(block);
-        }
-      });
-    }
-
-    function save(): void {
-      if (localOk.value) {
-        onDialogOK(
-          local.value ?? {
-            id: null,
-            serviceId: serviceId.value,
-            type: modelValueAddr.value.type,
-          },
-        );
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogCancel,
-      onDialogHide,
-      local,
-      serviceIds,
-      serviceId,
-      typeFilter,
-      addressOpts,
-      block,
-      tooltip,
-      localOk,
-      configureBlock,
-      createBlock,
-      save,
-    };
+  label: {
+    type: String,
+    default: 'Block',
+  },
+  anyService: {
+    type: Boolean,
+    default: false,
+  },
+  compatible: {
+    type: [String, Array] as PropType<ComparedBlockType>,
+    default: null,
+  },
+  blockFilter: {
+    type: Function as PropType<(block: Block) => boolean>,
+    default: () => true,
+  },
+  clearable: {
+    type: Boolean,
+    default: true,
+  },
+  creatable: {
+    type: Boolean,
+    default: true,
+  },
+  configurable: {
+    type: Boolean,
+    default: true,
+  },
+  showCreated: {
+    type: Boolean,
+    default: true,
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogRef, dialogProps, onDialogCancel, onDialogHide, onDialogOK } =
+  useDialog.setup();
+const sparkStore = useSparkStore();
+const featureStore = useFeatureStore();
+
+const modelValueAddr = computed<BlockAddress>(
+  () => props.modelValue ?? asAddr(null),
+);
+
+const local = ref<BlockAddress | null>(modelValueAddr.value);
+
+const serviceIds = computed<string[]>(() => sparkStore.serviceIds);
+
+const serviceId = computed<string>({
+  get: () => {
+    const { serviceId } = local.value ?? modelValueAddr.value;
+    return serviceId && serviceIds.value.includes(serviceId)
+      ? serviceId
+      : serviceIds.value[0] ?? '';
+  },
+  set: (serviceId) => {
+    if (local.value?.serviceId !== serviceId) {
+      local.value = {
+        serviceId,
+        id: null,
+        type: modelValueAddr.value.type,
+      };
+    }
+  },
+});
+
+const typeFilter = computed<(type: string) => boolean>(() => {
+  const intf = props.compatible ?? modelValueAddr.value.type;
+  return (type) => isCompatible(type, intf);
+});
+
+const addressOpts = computed<BlockAddress[]>(() =>
+  sparkStore
+    .blocksByService(serviceId.value)
+    .filter((block) => typeFilter.value(block.type))
+    .filter(props.blockFilter)
+    .map(asAddr)
+    .sort(makeObjectSorter('id')),
+);
+
+const block = computed<Block | null>(() =>
+  local.value ? sparkStore.blockById(serviceId.value, local.value.id) : null,
+);
+
+const tooltip = computed<string | null>(() =>
+  block.value ? featureStore.widgetTitle(block.value.type) : null,
+);
+
+const localOk = computed<boolean>(
+  () => block.value !== null || props.clearable,
+);
+
+function configureBlock(): void {
+  createBlockDialog(local.value);
+}
+
+function createBlock(): void {
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: serviceId.value,
+      compatible: props.compatible ?? modelValueAddr.value.type,
+      showCreated: props.showCreated,
+    },
+  }).onOk((block: Maybe<Block>) => {
+    if (block) {
+      local.value = asAddr(block);
+    }
+  });
+}
+
+function save(): void {
+  if (localOk.value) {
+    onDialogOK(
+      local.value ?? {
+        id: null,
+        serviceId: serviceId.value,
+        type: modelValueAddr.value.type,
+      },
+    );
+  }
+}
 </script>
 
 <template>

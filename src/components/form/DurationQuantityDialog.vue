@@ -1,99 +1,81 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
 import { Quantity } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 
-export default defineComponent({
-  name: 'DurationQuantityDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<Quantity>,
-      validator: isQuantity,
-      required: true,
-    },
-    label: {
-      type: String,
-      default: 'Value',
-    },
-    rules: {
-      type: Array as PropType<InputRule[]>,
-      default: () => [],
-    },
+const props = defineProps({
+  ...useDialog.props,
+  modelValue: {
+    type: Object as PropType<Quantity>,
+    validator: isQuantity,
+    required: true,
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const local = ref<string | null>(durationString(props.modelValue));
-
-    function findUnit(s: string): string {
-      const match = s.match(/^[0-9\.]*([a-z]*)/i);
-      return match && match[1] ? match[1] : '';
-    }
-
-    const defaultUnit = computed<string>(() =>
-      findUnit(local.value || '') === ''
-        ? findUnit(durationString(props.modelValue))
-        : '',
-    );
-
-    const localMs = computed<number>(() =>
-      durationMs(`${local.value || 0}${defaultUnit.value}`),
-    );
-
-    const valueOk = computed<boolean>(() =>
-      makeRuleValidator(props.rules)(localMs.value),
-    );
-
-    const error = computed<string | undefined>(() =>
-      makeRuleValidator(props.rules, 'error')(localMs.value),
-    );
-
-    function normalize(): void {
-      local.value = durationString(localMs.value);
-    }
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value ?? '',
-          type: 'duration',
-          rules: props.rules.map((f) => (s: string) => f(durationMs(s))),
-        },
-      }).onOk((v: string) => {
-        local.value = v;
-        normalize();
-      });
-    }
-
-    function save(): void {
-      if (valueOk.value) {
-        onDialogOK(bloxQty(local.value ?? '0s'));
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      defaultUnit,
-      localMs,
-      valueOk,
-      error,
-      normalize,
-      showKeyboard,
-      save,
-    };
+  label: {
+    type: String,
+    default: 'Value',
+  },
+  rules: {
+    type: Array as PropType<InputRule[]>,
+    default: () => [],
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup();
+const local = ref<string | null>(durationString(props.modelValue));
+
+function findUnit(s: string): string {
+  const match = s.match(/^[0-9\.]*([a-z]*)/i);
+  return match && match[1] ? match[1] : '';
+}
+
+const defaultUnit = computed<string>(() =>
+  findUnit(local.value || '') === ''
+    ? findUnit(durationString(props.modelValue))
+    : '',
+);
+
+const localMs = computed<number>(() =>
+  durationMs(`${local.value || 0}${defaultUnit.value}`),
+);
+
+const valueOk = computed<boolean>(() =>
+  makeRuleValidator(props.rules)(localMs.value),
+);
+
+const error = computed<string | undefined>(() =>
+  makeRuleValidator(props.rules, 'error')(localMs.value),
+);
+
+function normalize(): void {
+  local.value = durationString(localMs.value);
+}
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value ?? '',
+      type: 'duration',
+      rules: props.rules.map((f) => (s: string) => f(durationMs(s))),
+    },
+  }).onOk((v: string) => {
+    local.value = v;
+    normalize();
+  });
+}
+
+function save(): void {
+  if (valueOk.value) {
+    onDialogOK(bloxQty(local.value ?? '0s'));
+  }
+}
 </script>
 
 <template>

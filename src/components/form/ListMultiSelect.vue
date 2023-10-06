@@ -1,56 +1,48 @@
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import { PropType } from 'vue';
 
-export default defineComponent({
-  name: 'ListMultiSelect',
-  props: {
-    modelValue: {
-      type: Array as PropType<any[]>,
-      required: true,
-    },
-    options: {
-      type: Array as PropType<any[]>,
-      required: true,
-    },
-    optionValue: {
-      type: String,
-      default: 'id',
-    },
-    optionLabel: {
-      type: String,
-      default: 'title',
-    },
-    dense: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  modelValue: {
+    type: Array as PropType<any[]>,
+    required: true,
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    function matches(val: any): boolean {
-      const key = val[props.optionValue];
-      return props.modelValue.some((v) => v[props.optionValue] === key);
-    }
-
-    function selectValue(val: any): void {
-      const key = val[props.optionValue];
-      // Check if value already selected
-      const updated = props.modelValue.filter(
-        (v) => v[props.optionValue] !== key,
-      );
-      // Add if it was not
-      if (updated.length === props.modelValue.length) {
-        updated.push(val);
-      }
-      emit('update:modelValue', updated);
-    }
-
-    return {
-      matches,
-      selectValue,
-    };
+  options: {
+    type: Array as PropType<any[]>,
+    required: true,
+  },
+  optionValue: {
+    type: String,
+    default: 'id',
+  },
+  optionLabel: {
+    type: String,
+    default: 'title',
+  },
+  dense: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', data: any[]): void;
+}>();
+
+function matches(val: any): boolean {
+  const key = val[props.optionValue];
+  return props.modelValue.some((v) => v[props.optionValue] === key);
+}
+
+function selectValue(val: any): void {
+  const key = val[props.optionValue];
+  // Check if value already selected
+  const updated = props.modelValue.filter((v) => v[props.optionValue] !== key);
+  // Add if it was not
+  if (updated.length === props.modelValue.length) {
+    updated.push(val);
+  }
+  emit('update:modelValue', updated);
+}
 </script>
 
 <template>

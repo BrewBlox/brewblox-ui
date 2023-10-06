@@ -1,87 +1,80 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { dateString, shortDateString } from '@/utils/quantity';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, PropType } from 'vue';
 
-export default defineComponent({
-  name: 'DatetimeField',
-  props: {
-    ...useField.props,
-    modelValue: {
-      type: null as unknown as PropType<Date | null>,
-      default: null,
-    },
-    short: {
-      type: Boolean,
-      default: false,
-    },
-    resetIcon: {
-      type: String,
-      default: 'restore',
-    },
-    label: {
-      type: String,
-      default: 'Date and time',
-    },
-    clearLabel: {
-      type: String,
-      default: '<not set>',
-    },
-    defaultNow: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  ...useField.props,
+  modelValue: {
+    type: null as unknown as PropType<Date | null>,
+    default: null,
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const { activeSlots } = useField.setup();
-
-    function save(v: Date | null): void {
-      emit('update:modelValue', v);
-    }
-
-    const displayValue = computed<string>(() =>
-      props.short
-        ? shortDateString(props.modelValue, props.clearLabel)
-        : dateString(props.modelValue, props.clearLabel),
-    );
-
-    function openDialog(): void {
-      if (props.readonly) {
-        return;
-      }
-
-      const date =
-        props.modelValue == null && props.defaultNow
-          ? new Date()
-          : props.modelValue;
-
-      if (date == null) {
-        return;
-      }
-
-      createDialog({
-        component: 'DatetimeDialog',
-        componentProps: {
-          modelValue: date,
-          title: props.title,
-          message: props.message,
-          html: props.html,
-          label: props.label,
-          resetIcon: props.resetIcon,
-          rules: props.rules,
-        },
-      }).onOk(save);
-    }
-
-    return {
-      activeSlots,
-      displayValue,
-      openDialog,
-    };
+  short: {
+    type: Boolean,
+    default: false,
+  },
+  resetIcon: {
+    type: String,
+    default: 'restore',
+  },
+  label: {
+    type: String,
+    default: 'Date and time',
+  },
+  clearLabel: {
+    type: String,
+    default: '<not set>',
+  },
+  defaultNow: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', data: Date | null): void;
+}>();
+
+const { activeSlots } = useField.setup();
+
+function save(v: Date | null): void {
+  emit('update:modelValue', v);
+}
+
+const displayValue = computed<string>(() =>
+  props.short
+    ? shortDateString(props.modelValue, props.clearLabel)
+    : dateString(props.modelValue, props.clearLabel),
+);
+
+function openDialog(): void {
+  if (props.readonly) {
+    return;
+  }
+
+  const date =
+    props.modelValue == null && props.defaultNow
+      ? new Date()
+      : props.modelValue;
+
+  if (date == null) {
+    return;
+  }
+
+  createDialog({
+    component: 'DatetimeDialog',
+    componentProps: {
+      modelValue: date,
+      title: props.title,
+      message: props.message,
+      html: props.html,
+      label: props.label,
+      resetIcon: props.resetIcon,
+      rules: props.rules,
+    },
+  }).onOk(save);
+}
 </script>
 
 <template>

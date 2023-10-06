@@ -1,25 +1,20 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'DialogCard',
-  props: {
-    title: {
-      type: String,
-      default: null,
-    },
-    message: {
-      type: String,
-      default: '',
-    },
-    html: {
-      type: Boolean,
-      default: false,
-    },
-    separated: {
-      type: Boolean,
-      default: false,
-    },
+<script setup lang="ts">
+defineProps({
+  title: {
+    type: String,
+    default: null,
+  },
+  message: {
+    type: String,
+    default: '',
+  },
+  html: {
+    type: Boolean,
+    default: false,
+  },
+  separated: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>

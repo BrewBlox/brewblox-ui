@@ -1,11 +1,3 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'KeyboardButton',
-});
-</script>
-
 <template>
   <q-icon
     name="mdi-keyboard"
