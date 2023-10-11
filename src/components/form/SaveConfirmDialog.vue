@@ -1,38 +1,26 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'SaveConfirmDialog',
-  props: {
-    ...useDialog.props,
-    title: {
-      type: String,
-      default: 'Unsaved changes',
-    },
-    message: {
-      type: String,
-      default: 'Do you want to save your changes before closing?',
-    },
+defineProps({
+  ...useDialog.props,
+  title: {
+    type: String,
+    default: 'Unsaved changes',
   },
-  emits: [...useDialog.emits],
-  setup() {
-    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-
-    async function done(save: boolean): Promise<void> {
-      onDialogOK(save);
-    }
-
-    return {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogCancel,
-      done,
-    };
+  message: {
+    type: String,
+    default: 'Do you want to save your changes before closing?',
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+async function done(save: boolean): Promise<void> {
+  onDialogOK(save);
+}
 </script>
 
 <template>

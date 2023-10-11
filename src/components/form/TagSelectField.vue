@@ -1,51 +1,43 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useField } from '@/composables';
-import { defineComponent, PropType, ref } from 'vue';
+import { PropType, ref } from 'vue';
 
-export default defineComponent({
-  name: 'TagSelectField',
-  props: {
-    ...useField.props,
-    modelValue: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
-    existing: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
+const props = defineProps({
+  ...useField.props,
+  modelValue: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const { activeSlots } = useField.setup();
-    const suggestions = ref<string[]>([]);
-
-    function save(tags: string[]): void {
-      emit('update:modelValue', tags);
-    }
-
-    function onInput(val, update): void {
-      if (val === '') {
-        update(() => (suggestions.value = []));
-        return;
-      }
-      update(() => {
-        const needle = val.toLowerCase();
-        suggestions.value = props.existing
-          .filter((t) => !props.modelValue.includes(t))
-          .filter((t) => t.toLowerCase().match(needle))
-          .slice(0, 5);
-      });
-    }
-
-    return {
-      activeSlots,
-      suggestions,
-      save,
-      onInput,
-    };
+  existing: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', data: string[]): void;
+}>();
+
+const { activeSlots } = useField.setup();
+const suggestions = ref<string[]>([]);
+
+function save(tags: string[]): void {
+  emit('update:modelValue', tags);
+}
+
+function onInput(val, update): void {
+  if (val === '') {
+    update(() => (suggestions.value = []));
+    return;
+  }
+  update(() => {
+    const needle = val.toLowerCase();
+    suggestions.value = props.existing
+      .filter((t) => !props.modelValue.includes(t))
+      .filter((t) => t.toLowerCase().match(needle))
+      .slice(0, 5);
+  });
+}
 </script>
 
 <template>

@@ -1,83 +1,74 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed, CSSProperties, defineComponent, PropType } from 'vue';
+import { computed, CSSProperties, PropType } from 'vue';
 
-export default defineComponent({
-  name: 'ColorField',
-  props: {
-    ...useField.props,
-    modelValue: {
-      type: null as unknown as PropType<string | null>,
-      required: true,
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-    nullText: {
-      type: String,
-      default: '<not set>',
-    },
-    presets: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
+const props = defineProps({
+  ...useField.props,
+  modelValue: {
+    type: null as unknown as PropType<string | null>,
+    required: true,
   },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const { activeSlots } = useField.setup();
-
-    const color = computed<string>(() => {
-      const c = props.modelValue || '#ffffff';
-      return c.startsWith('#') ? c : `#${c}`;
-    });
-
-    const colorDesc = computed<string>(() =>
-      !!props.modelValue ? color.value : props.nullText,
-    );
-
-    const colorStyle = computed<CSSProperties>(() => ({
-      color: color.value,
-      backgroundColor: props.modelValue ? color.value : undefined,
-      border: `1px ${props.modelValue ? 'solid' : 'dashed'} ${color.value}`,
-      borderRadius: '50%',
-      height: '20px',
-      width: '20px',
-      display: 'inline-block',
-    }));
-
-    function change(c: string | null): void {
-      emit('update:modelValue', c?.replace('#', '') ?? null);
-    }
-
-    function openDialog(): void {
-      if (props.readonly) {
-        return;
-      }
-
-      createDialog({
-        component: 'ColorDialog',
-        componentProps: {
-          modelValue: color.value,
-          title: props.title,
-          message: props.message,
-          html: props.html,
-          clearable: props.clearable,
-          presets: props.presets,
-        },
-      }).onOk(change);
-    }
-
-    return {
-      activeSlots,
-      color,
-      colorDesc,
-      colorStyle,
-      openDialog,
-    };
+  clearable: {
+    type: Boolean,
+    default: false,
+  },
+  nullText: {
+    type: String,
+    default: '<not set>',
+  },
+  presets: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
 });
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', data: string | null): void;
+}>();
+
+const { activeSlots } = useField.setup();
+
+const color = computed<string>(() => {
+  const c = props.modelValue || '#ffffff';
+  return c.startsWith('#') ? c : `#${c}`;
+});
+
+const colorDesc = computed<string>(() =>
+  !!props.modelValue ? color.value : props.nullText,
+);
+
+const colorStyle = computed<CSSProperties>(() => ({
+  color: color.value,
+  backgroundColor: props.modelValue ? color.value : undefined,
+  border: `1px ${props.modelValue ? 'solid' : 'dashed'} ${color.value}`,
+  borderRadius: '50%',
+  height: '20px',
+  width: '20px',
+  display: 'inline-block',
+}));
+
+function change(c: string | null): void {
+  emit('update:modelValue', c?.replace('#', '') ?? null);
+}
+
+function openDialog(): void {
+  if (props.readonly) {
+    return;
+  }
+
+  createDialog({
+    component: 'ColorDialog',
+    componentProps: {
+      modelValue: color.value,
+      title: props.title,
+      message: props.message,
+      html: props.html,
+      clearable: props.clearable,
+      presets: props.presets,
+    },
+  }).onOk(change);
+}
 </script>
 
 <template>

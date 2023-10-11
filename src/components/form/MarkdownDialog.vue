@@ -1,62 +1,42 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog, useGlobals } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { QInput } from 'quasar';
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'MarkdownDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dense } = useGlobals.setup();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-
-    const local = ref<string>(props.modelValue);
-    const editorRef = ref<QInput>();
-    const preview = ref<boolean>(false);
-
-    if (
-      local.value.length &&
-      local.value.charAt(local.value.length - 1) !== '\n'
-    ) {
-      local.value += '\n';
-    }
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-        },
-      }).onOk((v) => (local.value = v));
-    }
-
-    return {
-      dense,
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      preview,
-      editorRef,
-      save,
-      showKeyboard,
-    };
+const props = defineProps({
+  ...useDialog.props,
+  modelValue: {
+    type: String,
+    required: true,
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dense } = useGlobals.setup();
+const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const local = ref<string>(props.modelValue);
+const editorRef = ref<QInput>();
+
+if (local.value.length && local.value.charAt(local.value.length - 1) !== '\n') {
+  local.value += '\n';
+}
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+    },
+  }).onOk((v) => (local.value = v));
+}
 </script>
 
 <template>

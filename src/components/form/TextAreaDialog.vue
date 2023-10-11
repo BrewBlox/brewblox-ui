@@ -1,61 +1,48 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { defineComponent, PropType, ref } from 'vue';
+import { PropType, ref } from 'vue';
 
-export default defineComponent({
-  name: 'TextAreaDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: String,
-      required: true,
-    },
-    autogrow: {
-      type: Boolean,
-      default: true,
-    },
-    rules: {
-      type: Array as PropType<InputRule[]>,
-      default: () => [],
-    },
-    label: {
-      type: String,
-      default: 'Value',
-    },
+const props = defineProps({
+  ...useDialog.props,
+  modelValue: {
+    type: String,
+    required: true,
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-
-    const local = ref<string>(props.modelValue ?? '');
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-          rules: props.rules,
-        },
-      }).onOk((v) => (local.value = v));
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-      showKeyboard,
-    };
+  autogrow: {
+    type: Boolean,
+    default: true,
+  },
+  rules: {
+    type: Array as PropType<InputRule[]>,
+    default: () => [],
+  },
+  label: {
+    type: String,
+    default: 'Value',
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const local = ref<string>(props.modelValue ?? '');
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+      rules: props.rules,
+    },
+  }).onOk((v) => (local.value = v));
+}
 </script>
 
 <template>

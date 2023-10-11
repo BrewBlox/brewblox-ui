@@ -1,48 +1,35 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'ConfirmDialog',
-  props: {
-    ...useDialog.props,
-    ok: {
-      type: String,
-      default: 'OK',
-    },
-    nok: {
-      type: [String, Boolean],
-      default: false,
-    },
-    cancel: {
-      type: [String, Boolean],
-      default: true,
-    },
+const props = defineProps({
+  ...useDialog.props,
+  ok: {
+    type: String,
+    default: 'OK',
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-
-    const cancelLabel = computed<string>(() =>
-      typeof props.cancel === 'string' ? props.cancel : 'Cancel',
-    );
-
-    const nokLabel = computed<string>(() =>
-      typeof props.nok === 'string' ? props.nok : 'No',
-    );
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-      cancelLabel,
-      nokLabel,
-    };
+  nok: {
+    type: [String, Boolean],
+    default: false,
+  },
+  cancel: {
+    type: [String, Boolean],
+    default: true,
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup();
+
+const cancelLabel = computed<string>(() =>
+  typeof props.cancel === 'string' ? props.cancel : 'Cancel',
+);
+
+const nokLabel = computed<string>(() =>
+  typeof props.nok === 'string' ? props.nok : 'No',
+);
 </script>
 
 <template>

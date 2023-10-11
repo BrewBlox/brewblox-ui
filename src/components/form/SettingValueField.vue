@@ -1,26 +1,20 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'SettingValueField',
-  props: {
-    editable: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['click'],
-  setup(props, { emit }) {
-    function edit(): void {
-      if (props.editable) {
-        emit('click');
-      }
-    }
-    return {
-      edit,
-    };
+<script setup lang="ts">
+const props = defineProps({
+  editable: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits<{
+  (e: 'click'): void;
+}>();
+
+function edit(): void {
+  if (props.editable) {
+    emit('click');
+  }
+}
 </script>
 
 <template>

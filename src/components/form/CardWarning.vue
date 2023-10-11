@@ -1,17 +1,12 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'CardWarning',
-  props: {
-    icon: {
-      type: String,
-      default: 'warning',
-    },
-    color: {
-      type: String,
-      default: 'warning',
-    },
+<script setup lang="ts">
+defineProps({
+  icon: {
+    type: String,
+    default: 'warning',
+  },
+  color: {
+    type: String,
+    default: 'warning',
   },
 });
 </script>

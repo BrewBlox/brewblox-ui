@@ -1,49 +1,36 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
-import { defineComponent, PropType, ref } from 'vue';
+import { PropType, ref } from 'vue';
 
-export default defineComponent({
-  name: 'ColorDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: String,
-      required: true,
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-    presets: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
+const props = defineProps({
+  ...useDialog.props,
+  modelValue: {
+    type: String,
+    required: true,
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const local = ref<string>(props.modelValue);
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    function clear(): void {
-      onDialogOK('');
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-      clear,
-    };
+  clearable: {
+    type: Boolean,
+    default: false,
+  },
+  presets: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
 });
+
+defineEmits({ ...useDialog.emitsObject });
+
+const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup();
+const local = ref<string>(props.modelValue);
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+function clear(): void {
+  onDialogOK('');
+}
 </script>
 
 <template>
