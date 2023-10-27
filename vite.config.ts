@@ -44,8 +44,9 @@ export default defineConfig(({ command, mode }): UserConfig => {
     apiHost = undefined;
     apiPort = 9001;
     serverHttps = {
-      key: fs.readFileSync('./dev/traefik/brewblox.key'),
-      cert: fs.readFileSync('./dev/traefik/brewblox.crt'),
+      ca: fs.readFileSync('./dev/traefik/minica.pem'),
+      key: fs.readFileSync('./dev/traefik/brew.blox/key.pem'),
+      cert: fs.readFileSync('./dev/traefik/brew.blox/cert.pem'),
     };
 
     // Disabled because it fails to infer types from global components

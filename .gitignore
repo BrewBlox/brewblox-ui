@@ -24,5 +24,6 @@ stats.html
 # Dev environment files
 /.env
 /dev/.env
-/dev/traefik/brewblox.crt
-/dev/traefik/brewblox.key
+/dev/traefik/**/*.pem
+/dev/traefik/**/*.crt
+/dev/traefik/**/*.key

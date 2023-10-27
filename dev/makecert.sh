@@ -5,9 +5,13 @@ pushd "$(git rev-parse --show-toplevel)" >/dev/null
 mkdir -p dev/traefik/
 cd dev/traefik/
 
-if [ ! -f brewblox.key ]; then
-  docker run --rm -v "$PWD/":/certs/ brewblox/omgwtfssl:develop
-  sudo chown "$USER" brewblox.key brewblox.crt
-  sudo chmod 644 brewblox.crt
-  sudo chmod 600 brewblox.key
+if [ ! -f minica.pem ]; then
+  rm -rf ./brew.blox/
+  docker run \
+    --rm \
+    --user="$(id -u):$(id -g)" \
+    --volume="$PWD":/cert \
+    ghcr.io/brewblox/minica:develop \
+    --domains="brew.blox,$(hostname),$(hostname).local,$(hostname).home,localhost" \
+    --ip-addresses="127.0.0.1,$(hostname -I | tr ' ' , | sed 's/,$//')"
 fi

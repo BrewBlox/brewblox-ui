@@ -75,6 +75,34 @@ yarn components
 yarn firmware
 ```
 
+## Trusting the self-signed certificate
+
+On first run, `yarn start` generated CA and leaf certificates.
+When you navigate to `localhost:8080`, your browser shows a warning that the certificate is invalid.
+
+This can be resolved by importing the generated CA certificate in your browser.
+
+For Chrome:
+
+* "Settings"
+* -> "Privacy and security"
+* -> "Security"
+* -> "Manage device certificates"
+* -> "Authorities" (tab)
+* -> "Import" (button)
+* Select the "brewblox-ui/dev/traefik/minica.pem" file
+* Select the "trust this CA to identify websites" option
+
+For Firefox:
+
+* "Settings"
+* -> "Privacy and security"
+* -> "View Certificates" (button, under *Certificates* header)
+* -> "Authorities" (tab)
+* -> "Import" (button)
+* Select the "brewblox-ui/dev/traefik/minica.pem" file
+* Select the "trust this CA to identify websites" option
+
 ## Common issues
 
 ### MetricsWidget.vue is blocked

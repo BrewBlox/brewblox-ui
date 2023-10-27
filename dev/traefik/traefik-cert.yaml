@@ -2,5 +2,9 @@ tls:
   stores:
     default:
       defaultCertificate:
-        certFile: /config/brewblox.crt
-        keyFile: /config/brewblox.key
+        certFile: /config/brew.blox/cert.pem
+        keyFile: /config/brew.blox/key.pem
+
+serversTransport:
+  rootCAs:
+    - /config/minica.pem
