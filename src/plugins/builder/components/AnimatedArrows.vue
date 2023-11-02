@@ -2,19 +2,15 @@
 import { svgPathProperties } from 'svg-path-properties';
 import { computed } from 'vue';
 
-const props = defineProps({
-  path: {
-    type: String,
-    required: true,
-  },
-  speed: {
-    type: Number,
-    default: 0,
-  },
-  numArrows: {
-    type: Number,
-    default: 2,
-  },
+interface Props {
+  path: string;
+  speed?: number;
+  numArrows?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  speed: 0,
+  numArrows: 2,
 });
 
 const pathLength = computed<number>(() =>

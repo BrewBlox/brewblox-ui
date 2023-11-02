@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: null as unknown as PropType<string | null>,
-    default: null,
-  },
-  title: {
-    type: String,
-    default: 'Select layout',
-  },
+interface Props extends UseDialogProps {
+  modelValue: string | null;
+  title?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Select layout',
 });
 
 defineEmits<UseDialogEmits>();

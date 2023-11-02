@@ -1,28 +1,22 @@
 <script setup lang="ts">
-import { useGlobals } from '@/composables';
-import { PropType } from 'vue';
 import { builderTools } from '../const';
 import { BuilderToolName } from '../types';
+import { useGlobals } from '@/composables';
 import { TouchSwipeValue } from 'quasar';
 
-const props = defineProps({
-  expanded: {
-    type: Boolean,
-    required: true,
-  },
-  activeTool: {
-    type: null as unknown as PropType<string | null>,
-    required: true,
-  },
-  disabledTools: {
-    type: Array as PropType<BuilderToolName[]>,
-    default: () => [],
-  },
+interface Props {
+  expanded: boolean;
+  activeTool: BuilderToolName | null;
+  disabledTools?: BuilderToolName[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  disabledTools: () => [],
 });
 
 const emit = defineEmits<{
-  (e: 'update:expanded', value: boolean): void;
-  (e: 'use', value: BuilderToolName);
+  'update:expanded': [data: boolean];
+  use: [data: BuilderToolName];
 }>();
 
 const { dense } = useGlobals.setup();

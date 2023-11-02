@@ -2,24 +2,30 @@
 import { PlaceholderKey } from '../symbols';
 import { BuilderBlueprint, BuilderPart } from '../types';
 import { coord2grid } from '../utils';
-import { useDialog, useGlobals } from '@/composables';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+} from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
-import { computed, PropType, provide, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 
 interface PartDisplay {
   part: BuilderPart;
   blueprint: BuilderBlueprint;
 }
 
-const props = defineProps({
-  ...useDialog.props,
-  partial: {
-    type: Object as PropType<Partial<BuilderPart>>,
-    default: () => ({}),
-  },
+interface Props extends UseDialogProps {
+  partial?: Partial<BuilderPart>;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  partial: () => ({}),
 });
 
 defineEmits<UseDialogEmits>();
@@ -67,7 +73,7 @@ function showSearchKeyboard(): void {
   createDialog({
     component: 'KeyboardDialog',
     componentProps: {
-      modelValue: partFilter.value ?? undefined,
+      modelValue: partFilter.value,
     },
   }).onOk((v: string) => (partFilter.value = v));
 }

@@ -1,32 +1,25 @@
 <script setup lang="ts">
-import { computed, CSSProperties, inject } from 'vue';
 import { InteractableKey, PlaceholderKey } from '../symbols';
+import { computed, CSSProperties, inject } from 'vue';
 
-const props = defineProps({
-  width: {
-    type: Number,
-    default: 50,
-  },
-  height: {
-    type: Number,
-    default: 50,
-  },
-  x: {
-    type: Number,
-    default: 0,
-  },
-  y: {
-    type: Number,
-    default: 0,
-  },
+interface Props {
+  width?: number;
+  height?: number;
+  x?: number;
+  y?: number;
   /**
    * Handled as a property instead of an emitted event
    * to allow for presence checks.
    */
-  onInteract: {
-    type: Function,
-    default: null,
-  },
+  onInteract?: (evt: MouseEvent) => unknown;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  width: 50,
+  height: 50,
+  x: 0,
+  y: 0,
+  onInteract: undefined,
 });
 
 const placeholder = inject(PlaceholderKey, false);
@@ -49,9 +42,9 @@ const style = computed<CSSProperties>(() => {
   return styleObj;
 });
 
-function interact(): void {
+function interact(evt: MouseEvent): void {
   if (interactionAllowed.value) {
-    props.onInteract?.();
+    props.onInteract?.(evt);
   }
 }
 </script>

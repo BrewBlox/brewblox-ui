@@ -1,31 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-const props = defineProps({
-  width: {
-    type: Number,
-    default: 50,
-  },
-  height: {
-    type: Number,
-    default: 50,
-  },
-  x: {
-    type: Number,
-    default: 0,
-  },
-  y: {
-    type: Number,
-    default: 0,
-  },
-  color: {
-    type: String,
-    default: 'white',
-  },
-  large: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  width?: number;
+  height?: number;
+  x?: number;
+  y?: number;
+  color?: string;
+  large?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  width: 50,
+  height: 50,
+  x: 0,
+  y: 0,
+  color: 'white',
+  large: false,
 });
 
 const thickness = computed<number>(() => (props.large ? 4 : 2));

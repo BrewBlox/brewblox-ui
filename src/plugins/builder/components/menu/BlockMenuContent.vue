@@ -1,16 +1,15 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'BlockMenuContent',
-  props: {
-    available: {
-      type: Boolean,
-      default: true,
-    },
+<script setup lang="ts">
+defineProps({
+  available: {
+    type: Boolean,
+    default: true,
   },
-  emits: ['show', 'assign'],
 });
+
+defineEmits<{
+  show: [];
+  assign: [];
+}>();
 </script>
 
 <template>

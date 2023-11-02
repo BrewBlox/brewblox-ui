@@ -1,44 +1,30 @@
-<script lang="ts">
-import { createDialog } from '@/utils/dialog';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { usePart } from '../../composables';
+import { createDialog } from '@/utils/dialog';
 
-export default defineComponent({
-  name: 'TextMenuContent',
-  props: {
-    settingsKey: {
-      type: String,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    message: {
-      type: String,
-      default: '',
-    },
-  },
-  setup(props) {
-    const { settings, patchSettings } = usePart.setup();
+interface Props {
+  settingsKey: string;
+  label: string;
+  message?: string;
+}
 
-    function edit(): void {
-      createDialog({
-        component: 'TextAreaDialog',
-        componentProps: {
-          modelValue: settings.value[props.settingsKey] ?? '',
-          title: props.label,
-          message: props.message,
-          label: '',
-        },
-      }).onOk((text) => patchSettings({ [props.settingsKey]: text }));
-    }
-
-    return {
-      edit,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  message: '',
 });
+
+const { settings, patchSettings } = usePart.setup();
+
+function edit(): void {
+  createDialog({
+    component: 'TextAreaDialog',
+    componentProps: {
+      modelValue: settings.value[props.settingsKey] ?? '',
+      title: props.label,
+      message: props.message,
+      label: '',
+    },
+  }).onOk((text) => patchSettings({ [props.settingsKey]: text }));
+}
 </script>
 
 <template>

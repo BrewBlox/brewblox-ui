@@ -1,20 +1,14 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+interface Props {
+  modelValue: boolean;
+  label: string;
+}
 
-export default defineComponent({
-  name: 'ToggleMenuContent',
-  props: {
-    modelValue: {
-      type: Boolean,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue'],
-});
+defineProps<Props>();
+
+defineEmits<{
+  'update:modelValue': [data: boolean];
+}>();
 </script>
 
 <template>

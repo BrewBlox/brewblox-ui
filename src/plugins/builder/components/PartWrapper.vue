@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { useBuilderStore } from '@/plugins/builder/store';
-import { BuilderPart } from '@/plugins/builder/types';
-import { coord2grid, coord2translate } from '@/plugins/builder/utils';
-import { Coordinates, rotatedSize } from '@/utils/coordinates';
-import { computed, PropType, provide } from 'vue';
 import parts from '../parts';
 import {
   InteractableKey,
@@ -12,55 +7,55 @@ import {
   PatchSettingsKey,
   ReflowKey,
 } from '../symbols';
+import { useBuilderStore } from '@/plugins/builder/store';
+import { BuilderPart } from '@/plugins/builder/types';
+import { coord2grid, coord2translate } from '@/plugins/builder/utils';
+import { Coordinates, rotatedSize } from '@/utils/coordinates';
+import { computed, provide } from 'vue';
 
-const props = defineProps({
-  part: {
-    type: Object as PropType<BuilderPart>,
-    required: true,
-  },
+interface Props {
+  part: BuilderPart;
+
   /**
    * Mouse events for the wrapped part are enabled.
    */
-  interactable: {
-    type: Boolean,
-    default: false,
-  },
+  interactable?: boolean;
+
   /**
    * The part is highlighted on hover.
    */
-  selectable: {
-    type: Boolean,
-    default: false,
-  },
+  selectable?: boolean;
+
   /**
    * The part is actively selected, and should be highlighted.
    */
-  selected: {
-    type: Boolean,
-    default: false,
-  },
+  selected?: boolean;
+
   /**
    * Mouse events for the wrapped part are disabled.
    * The 'preselect' event is emitted on click.
    */
-  preselectable: {
-    type: Boolean,
-    default: false,
-  },
+  preselectable?: boolean;
+
   /**
    * Element is darkened and non-interactable.
    */
-  dimmed: {
-    type: Boolean,
-    default: false,
-  },
+  dimmed?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  interactable: false,
+  selectable: false,
+  selected: false,
+  preselectable: false,
+  dimmed: false,
 });
 
 const emit = defineEmits<{
-  (e: 'patch:part', data: Partial<BuilderPart>): void;
-  (e: 'patch:settings', data: Partial<BuilderPart['settings']>): void;
-  (e: 'preselect'): void;
-  (e: 'reflow'): void;
+  'patch:part': [data: Partial<BuilderPart>];
+  'patch:settings': [data: Partial<BuilderPart['settings']>];
+  preselect: [];
+  reflow: [];
 }>();
 
 const builderStore = useBuilderStore();

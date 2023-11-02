@@ -1,16 +1,16 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+interface Props {
+  available?: boolean;
+}
 
-export default defineComponent({
-  name: 'WidgetMenuContent',
-  props: {
-    available: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  emits: ['show', 'assign'],
+withDefaults(defineProps<Props>(), {
+  available: true,
 });
+
+defineEmits<{
+  show: [];
+  assign: [];
+}>();
 </script>
 
 <template>
