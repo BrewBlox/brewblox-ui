@@ -1,8 +1,4 @@
 <script setup lang="ts">
-// import type { SessionLogWidget } from '@/plugins/history/SessionLog/types';
-import { useHistoryStore } from '@/plugins/history/store';
-import { LoggedSession } from '@/plugins/history/types';
-import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -11,6 +7,9 @@ import {
   WIDGET_TYPE,
 } from '../blueprints/SessionLogDisplay';
 import { usePart, useSettingsWidget } from '../composables';
+import { useHistoryStore } from '@/plugins/history/store';
+import { LoggedSession } from '@/plugins/history/types';
+import { computed } from 'vue';
 
 const historyStore = useHistoryStore();
 const { width, height, bordered, placeholder } = usePart.setup();

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { colorString } from '@/plugins/builder/utils';
-import { computed } from 'vue';
 import {
   DEFAULT_KETTLE_FILL_PCT,
   DEFAULT_SIZE,
@@ -10,6 +8,8 @@ import {
 } from '../blueprints/Kettle';
 import { usePart } from '../composables';
 import { COLOR_KEY, LABEL_KEY } from '../const';
+import { colorString } from '@/plugins/builder/utils';
+import { computed } from 'vue';
 
 const { settings, width, height } = usePart.setup();
 

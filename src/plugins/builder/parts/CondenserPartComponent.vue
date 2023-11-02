@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { elbow } from '@/plugins/builder/utils';
 import {
   DEFAULT_OUTLET_PRESSURE,
   MAX_OUTLET_PRESSURE,
@@ -7,6 +6,7 @@ import {
 } from '../blueprints/Condenser';
 import { usePart } from '../composables';
 import { IO_PRESSURE_KEY } from '../const';
+import { elbow } from '@/plugins/builder/utils';
 
 const { width, height } = usePart.setup();
 

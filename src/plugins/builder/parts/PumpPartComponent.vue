@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { OnInteractBehavior, ON_INTERACT_KEY } from '../blueprints/Pump';
+import { usePart, useSettingsBlock } from '../composables';
 import {
   DEFAULT_PUMP_PRESSURE,
   DigitalBlockT,
@@ -18,8 +20,6 @@ import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, watch } from 'vue';
-import { OnInteractBehavior, ON_INTERACT_KEY } from '../blueprints/Pump';
-import { usePart, useSettingsBlock } from '../composables';
 
 const { part, flows, settings, width, height, patchSettings, reflow } =
   usePart.setup();

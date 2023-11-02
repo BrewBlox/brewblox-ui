@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { usePart } from '../composables';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 import {
   DEFAULT_PUMP_PRESSURE,
   IO_PRESSURE_KEY,
@@ -7,8 +9,6 @@ import {
   RIGHT,
 } from '@/plugins/builder/const';
 import { computed } from 'vue';
-import { usePart } from '../composables';
-import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const { part, flows, width, height } = usePart.setup();
 

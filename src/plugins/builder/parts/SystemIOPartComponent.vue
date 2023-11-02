@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { usePart } from '../composables';
 import {
   DEFAULT_IO_PRESSURE,
   IO_ENABLED_KEY,
@@ -13,7 +14,6 @@ import {
   liquidOnCoord,
 } from '@/plugins/builder/utils';
 import { computed } from 'vue';
-import { usePart } from '../composables';
 
 const chevrons = horizontalChevrons(15, 25);
 

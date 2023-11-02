@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PidDisplay';
+import { usePart, useSettingsBlock } from '../composables';
 import {
   COLD_WATER,
   HOT_WATER,
@@ -13,8 +15,6 @@ import { userUnits } from '@/user-settings';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { Block, BlockType } from 'brewblox-proto/ts';
 import { computed } from 'vue';
-import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PidDisplay';
-import { usePart, useSettingsBlock } from '../composables';
 
 const sparkStore = useSparkStore();
 const { part, flows, width, height, bordered, passthrough, placeholder } =
