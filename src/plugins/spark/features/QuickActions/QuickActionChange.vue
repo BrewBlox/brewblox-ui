@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { BlockChange, EditableBlockField } from './types';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
@@ -8,7 +9,6 @@ import { Block } from 'brewblox-proto/ts';
 import difference from 'lodash/difference';
 import { nanoid } from 'nanoid';
 import { computed, PropType, reactive, ref, watch } from 'vue';
-import { BlockChange, EditableBlockField } from './types';
 
 interface EditableBlockChange {
   id: string;

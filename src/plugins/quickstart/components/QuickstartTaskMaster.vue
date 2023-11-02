@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { PropType, provide, ref } from 'vue';
 import { QuickstartCardTitleKey } from '../symbols';
 import { QuickstartAction } from '../types';
+import { PropType, provide, ref } from 'vue';
 
 const props = defineProps({
   tasks: {

@@ -1,6 +1,6 @@
+import { HOST } from './const';
 import { http } from '@/utils/http';
 import { AxiosError, AxiosResponse } from 'axios';
-import { HOST } from './const';
 
 export interface LoginArgs {
   username: string;

@@ -1,8 +1,8 @@
 <script lang="ts">
-import { useFeatureStore, WidgetContext } from '@/store/features';
-import { computed, defineComponent, PropType, ref } from 'vue';
 import { BlockWidget } from '../types';
 import { ListRenderAddress } from './types';
+import { useFeatureStore, WidgetContext } from '@/store/features';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 const context: WidgetContext = {
   mode: 'Basic',

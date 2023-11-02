@@ -1,10 +1,10 @@
 <script lang="ts">
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { MetricsConfig } from '../types';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/quantity';
 import { QTreeNode } from 'quasar';
 import { defineComponent, PropType } from 'vue';
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
-import { MetricsConfig } from '../types';
 
 export default defineComponent({
   name: 'MetricsEditor',

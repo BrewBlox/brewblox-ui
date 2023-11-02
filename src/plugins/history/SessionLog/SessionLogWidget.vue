@@ -1,4 +1,12 @@
 <script lang="ts">
+import { useHistoryStore } from '../store';
+import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
+import { selectGraphPrecision } from '../utils';
+import SessionCreateDialog from './SessionCreateDialog.vue';
+import SessionLoadDialog from './SessionLoadDialog.vue';
+import SessionLogBasic from './SessionLogBasic.vue';
+import SessionLogFull from './SessionLogFull.vue';
+import { SessionLogWidget } from './types';
 import { useContext, useWidget } from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
 import { createComponentDialog, createDialog } from '@/utils/dialog';
@@ -9,14 +17,6 @@ import { dateString } from '@/utils/quantity';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { computed, defineComponent } from 'vue';
-import { useHistoryStore } from '../store';
-import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
-import { selectGraphPrecision } from '../utils';
-import SessionCreateDialog from './SessionCreateDialog.vue';
-import SessionLoadDialog from './SessionLoadDialog.vue';
-import SessionLogBasic from './SessionLogBasic.vue';
-import SessionLogFull from './SessionLogFull.vue';
-import { SessionLogWidget } from './types';
 
 const graphFilter = makeTypeFilter<SessionGraphNote>('Graph');
 

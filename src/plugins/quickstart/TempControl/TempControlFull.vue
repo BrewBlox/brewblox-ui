@@ -1,4 +1,7 @@
 <script lang="ts">
+import TempControlModeDialog from './TempControlModeDialog.vue';
+import TempControlPidView from './TempControlPidView.vue';
+import { TempControlMode, TempControlWidget } from './types';
 import { useWidget } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { concatById } from '@/utils/collections';
@@ -6,9 +9,6 @@ import { createComponentDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 import { BlockType, PidBlock, SetpointProfileBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import TempControlModeDialog from './TempControlModeDialog.vue';
-import TempControlPidView from './TempControlPidView.vue';
-import { TempControlMode, TempControlWidget } from './types';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
 const profileFilter = makeTypeFilter<SetpointProfileBlock>(

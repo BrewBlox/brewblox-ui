@@ -1,3 +1,5 @@
+import { withPrefix } from '../utils';
+import { BrewKettleConfig } from './types';
 import {
   BORDER_KEY,
   COLOR_KEY,
@@ -9,8 +11,6 @@ import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
 import { nanoid } from 'nanoid';
-import { withPrefix } from '../utils';
-import { BrewKettleConfig } from './types';
 
 export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
   const { serviceId, prefix, names } = config;

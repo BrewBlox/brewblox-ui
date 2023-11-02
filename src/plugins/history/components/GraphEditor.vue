@@ -1,9 +1,9 @@
 <script lang="ts">
+import { DEFAULT_GRAPH_DECIMALS } from '../const';
+import { GraphConfig } from '../types';
 import { createDialog } from '@/utils/dialog';
 import { QTreeNode } from 'quasar';
 import { defineComponent, PropType } from 'vue';
-import { DEFAULT_GRAPH_DECIMALS } from '../const';
-import { GraphConfig } from '../types';
 
 export default defineComponent({
   name: 'GraphEditor',

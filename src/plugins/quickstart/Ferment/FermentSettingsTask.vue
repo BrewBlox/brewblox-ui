@@ -1,8 +1,8 @@
 <script lang="ts">
-import { tempQty } from '@/utils/quantity';
-import { defineComponent, PropType, reactive } from 'vue';
 import { QuickstartAction } from '../types';
 import { FermentConfig, FermentMode, FermentOpts } from './types';
+import { tempQty } from '@/utils/quantity';
+import { defineComponent, PropType, reactive } from 'vue';
 
 const targetOpts: SelectOption<FermentMode>[] = [
   {

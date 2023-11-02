@@ -1,7 +1,7 @@
+import { ChangeCb, DeleteCb } from './types';
 import { database } from '@/database';
 import { deserialize } from '@/utils/parsing';
 import { StoreObject } from 'brewblox-proto/ts';
-import { ChangeCb, DeleteCb } from './types';
 
 export interface DatabaseApi<T extends StoreObject> {
   subscribe(onChanged: ChangeCb<T>, onDeleted: DeleteCb): void;

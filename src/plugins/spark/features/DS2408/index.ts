@@ -1,3 +1,4 @@
+import widget from './DS2408Widget.vue';
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
@@ -5,7 +6,6 @@ import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { BlockType, DS2408Block, DS2408ConnectMode } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './DS2408Widget.vue';
 
 const type = BlockType.DS2408;
 const title = 'DS2408 Chip';

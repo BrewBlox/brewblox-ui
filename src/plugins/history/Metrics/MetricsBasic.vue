@@ -1,4 +1,6 @@
 <script lang="ts">
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { MetricsWidget } from './types';
 import { useContext, useWidget } from '@/composables';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { addSource } from '@/plugins/history/sources/metrics';
@@ -20,8 +22,6 @@ import {
   onMounted,
   watch,
 } from 'vue';
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
-import { MetricsWidget } from './types';
 
 interface CurrentValue extends MetricValue {
   name: string;

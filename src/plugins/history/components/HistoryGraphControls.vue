@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { QueryParams } from '../types';
+import { defaultPresets } from '../utils';
 import { isJsonEqual } from '@/utils/objects';
 import cloneDeep from 'lodash/cloneDeep';
 import { Layout } from 'plotly.js';
 import { PropType } from 'vue';
-import { QueryParams } from '../types';
-import { defaultPresets } from '../utils';
 
 const props = defineProps({
   layout: {

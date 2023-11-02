@@ -1,7 +1,7 @@
 <script lang="ts">
+import { PidConfig } from '../types';
 import { prettyQty } from '@/utils/quantity';
 import { computed, defineComponent, PropType } from 'vue';
-import { PidConfig } from '../types';
 
 export default defineComponent({
   name: 'TempControlPidView',

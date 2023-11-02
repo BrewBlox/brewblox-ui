@@ -1,4 +1,5 @@
 <script lang="ts">
+import { startChangeBlockId } from '../../utils/actions';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockKey } from '@/plugins/spark/symbols';
 import { BlockWidget } from '@/plugins/spark/types';
@@ -22,7 +23,6 @@ import {
   ref,
   watch,
 } from 'vue';
-import { startChangeBlockId } from '../../utils/actions';
 
 export default defineComponent({
   name: 'BlockWidgetWrapper',

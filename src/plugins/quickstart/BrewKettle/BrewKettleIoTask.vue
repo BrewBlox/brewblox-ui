@@ -1,7 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, reactive } from 'vue';
 import { GpioChange } from '../types';
 import { BrewKettleConfig } from './types';
+import { defineComponent, PropType, reactive } from 'vue';
 
 export default defineComponent({
   name: 'BrewKettleIoTask',

@@ -1,8 +1,8 @@
 <script lang="ts">
+import { prettyConstraints, prettyLimitations } from '../../utils/formatting';
 import { prettyLink } from '@/utils/quantity';
 import { AnalogConstraintBase, AnalogConstraints } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
-import { prettyConstraints, prettyLimitations } from '../../utils/formatting';
 
 export default defineComponent({
   name: 'AnalogConstraintsField',

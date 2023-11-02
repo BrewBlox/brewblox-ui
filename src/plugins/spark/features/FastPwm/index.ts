@@ -1,3 +1,4 @@
+import widget from './FastPwmWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -15,7 +16,6 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './FastPwmWidget.vue';
 
 const type = BlockType.FastPwm;
 const title = 'Fast PWM';

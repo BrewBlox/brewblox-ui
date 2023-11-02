@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
 import { GlycolBlockNames, GlycolConfig } from './types';
+import { computed, defineComponent, PropType } from 'vue';
 
 const defaultNames: GlycolBlockNames = {
   beerSensor: 'Beer Sensor',

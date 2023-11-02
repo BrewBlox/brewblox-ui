@@ -1,12 +1,12 @@
 <script lang="ts">
+import { QuickstartConfig } from '../types';
+import { withPrefix } from '../utils';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { makeDashboardIdRules } from '@/utils/dashboards';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { makeUrlSafe } from '@/utils/url';
 import mapValues from 'lodash/mapValues';
 import { computed, defineComponent, PropType, reactive } from 'vue';
-import { QuickstartConfig } from '../types';
-import { withPrefix } from '../utils';
 
 export default defineComponent({
   name: 'QuickstartNamingTask',

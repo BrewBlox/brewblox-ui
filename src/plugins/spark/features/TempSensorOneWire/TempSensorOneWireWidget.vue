@@ -1,10 +1,10 @@
 <script lang="ts">
+import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createComponentDialog } from '@/utils/dialog';
 import { TempSensorOneWireBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 
 export default defineComponent({
   name: 'TempSensorOneWireWidget',

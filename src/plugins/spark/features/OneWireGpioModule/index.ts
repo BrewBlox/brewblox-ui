@@ -1,3 +1,4 @@
+import widget from './OneWireGpioModuleWidget.vue';
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
@@ -10,7 +11,6 @@ import {
   OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './OneWireGpioModuleWidget.vue';
 
 const type = BlockType.OneWireGpioModule;
 const title = 'OneWire GPIO Module';

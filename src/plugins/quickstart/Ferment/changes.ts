@@ -1,3 +1,17 @@
+import { TempControlWidget } from '../TempControl/types';
+import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
+import {
+  changedIoModules,
+  makeBeerCoolConfig,
+  makeBeerHeatConfig,
+  makeFridgeCoolConfig,
+  makeFridgeHeatConfig,
+  pidDefaults,
+  unlinkedActuators,
+  withoutPrefix,
+  withPrefix,
+} from '../utils';
+import { FermentConfig } from './types';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { useFeatureStore } from '@/store/features';
@@ -21,20 +35,6 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
-import {
-  changedIoModules,
-  makeBeerCoolConfig,
-  makeBeerHeatConfig,
-  makeFridgeCoolConfig,
-  makeFridgeHeatConfig,
-  pidDefaults,
-  unlinkedActuators,
-  withoutPrefix,
-  withPrefix,
-} from '../utils';
-import { FermentConfig } from './types';
 
 export function defineChangedBlocks(
   config: FermentConfig,

@@ -1,9 +1,9 @@
 <script lang="ts">
+import { QuickstartAction } from '../types';
+import { GlycolConfig, GlycolOpts } from './types';
 import { tempQty } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import { defineComponent, PropType, ref } from 'vue';
-import { QuickstartAction } from '../types';
-import { GlycolConfig, GlycolOpts } from './types';
 
 export default defineComponent({
   name: 'GlycolSettingsTask',

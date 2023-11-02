@@ -1,4 +1,7 @@
 <script lang="ts">
+import { GpioChange, IoChannelAddress } from '../types';
+import { resetGpioChanges } from '../utils';
+import { BrewKettleConfig } from './types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
 import {
@@ -9,9 +12,6 @@ import {
   reactive,
   ref,
 } from 'vue';
-import { GpioChange, IoChannelAddress } from '../types';
-import { resetGpioChanges } from '../utils';
-import { BrewKettleConfig } from './types';
 
 export default defineComponent({
   name: 'BrewKettleHardwareTask',

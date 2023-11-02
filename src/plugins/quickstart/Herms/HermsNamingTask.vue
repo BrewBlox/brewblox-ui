@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
 import { HermsBlockNames, HermsConfig } from './types';
+import { computed, defineComponent, PropType } from 'vue';
 
 const defaultNames: HermsBlockNames = {
   hltSensor: 'HLT Sensor',

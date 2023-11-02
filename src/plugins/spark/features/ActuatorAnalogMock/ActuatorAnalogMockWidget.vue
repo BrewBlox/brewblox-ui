@@ -1,9 +1,9 @@
 <script lang="ts">
-import { useContext } from '@/composables';
-import { defineComponent } from 'vue';
 import BlockEnableToggle from '../../components/form/BlockEnableToggle.vue';
 import ActuatorAnalogMockBasic from './ActuatorAnalogMockBasic.vue';
 import ActuatorAnalogMockFull from './ActuatorAnalogMockFull.vue';
+import { useContext } from '@/composables';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ActuatorAnalogMockWidget',

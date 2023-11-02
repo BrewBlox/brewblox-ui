@@ -1,9 +1,9 @@
 <script lang="ts">
+import { LoggedSession } from '../types';
+import SessionHeaderDialog from './SessionHeaderDialog.vue';
 import { createComponentDialog } from '@/utils/dialog';
 import { dateString } from '@/utils/quantity';
 import { computed, defineComponent, PropType } from 'vue';
-import { LoggedSession } from '../types';
-import SessionHeaderDialog from './SessionHeaderDialog.vue';
 
 export default defineComponent({
   name: 'SessionHeaderField',

@@ -1,3 +1,5 @@
+import widget from './ActuatorLogicWidget.vue';
+import { nonErrorResults } from './const';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -12,8 +14,6 @@ import {
   LogicResult,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './ActuatorLogicWidget.vue';
-import { nonErrorResults } from './const';
 
 const type = BlockType.ActuatorLogic;
 const title = 'Logic Actuator';

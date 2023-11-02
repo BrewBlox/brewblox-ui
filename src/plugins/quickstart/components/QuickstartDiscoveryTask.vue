@@ -1,4 +1,5 @@
 <script lang="ts">
+import { QuickstartConfig } from '../types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { discoverBlocks } from '@/plugins/spark/utils/actions';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
@@ -19,7 +20,6 @@ import {
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent, onBeforeMount, PropType } from 'vue';
-import { QuickstartConfig } from '../types';
 
 export default defineComponent({
   name: 'QuickstartDiscoveryTask',

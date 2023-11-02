@@ -1,4 +1,5 @@
 <script lang="ts">
+import { isBlockCompatible } from '../../utils/info';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
@@ -11,7 +12,6 @@ import {
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import { isBlockCompatible } from '../../utils/info';
 
 export default defineComponent({
   name: 'PidBasic',

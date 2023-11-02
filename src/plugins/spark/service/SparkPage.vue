@@ -1,4 +1,6 @@
 <script lang="ts">
+import SparkListView from './SparkListView.vue';
+import SparkTroubleshooter from './SparkTroubleshooter.vue';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type {
   BlockRelationNode,
@@ -15,8 +17,6 @@ import {
   SparkStatusDescription,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent, watch } from 'vue';
-import SparkListView from './SparkListView.vue';
-import SparkTroubleshooter from './SparkTroubleshooter.vue';
 
 export default defineComponent({
   name: 'SparkPage',

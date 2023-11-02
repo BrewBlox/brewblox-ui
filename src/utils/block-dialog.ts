@@ -1,9 +1,9 @@
+import { createDialog } from './dialog';
+import { notify } from './notify';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 import { DialogChainObject } from 'quasar';
-import { createDialog } from './dialog';
-import { notify } from './notify';
 
 interface BlockDialogOpts {
   props?: any;

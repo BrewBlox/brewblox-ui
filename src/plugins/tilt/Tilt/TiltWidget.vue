@@ -1,12 +1,12 @@
 <script lang="ts">
-import { useContext, useWidget } from '@/composables';
-import { findById } from '@/utils/collections';
-import { computed, defineComponent } from 'vue';
 import { fieldLabels } from '../const';
 import { useTiltStore } from '../store';
 import { TiltStateValue } from '../types';
 import { makeTiltId, splitTiltId } from '../utils';
 import { TiltWidget } from './types';
+import { useContext, useWidget } from '@/composables';
+import { findById } from '@/utils/collections';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TiltWidget',

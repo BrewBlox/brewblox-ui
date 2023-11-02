@@ -1,3 +1,4 @@
+import widget from './SequenceWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
@@ -11,7 +12,6 @@ import {
   SequenceStatus,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './SequenceWidget.vue';
 
 const type = BlockType.Sequence;
 const title = 'Sequence';

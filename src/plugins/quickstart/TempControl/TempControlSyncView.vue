@@ -1,7 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
 import { PidConfig } from '../types';
 import TempControlPidView from './TempControlPidView.vue';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'TempControlSyncView',

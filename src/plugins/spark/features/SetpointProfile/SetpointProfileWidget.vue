@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import ProfileExportAction from './ProfileExportAction.vue';
+import ProfileImportAction from './ProfileImportAction.vue';
+import ProfilePresetAction from './ProfilePresetAction.vue';
+import SetpointProfileBasic from './SetpointProfileBasic.vue';
+import SetpointProfileDisableDialog from './SetpointProfileDisableDialog.vue';
+import SetpointProfileFull from './SetpointProfileFull.vue';
+import { GraphProps, profileGraphProps } from './helpers';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { WidgetModeComponents } from '@/store/features';
@@ -8,13 +15,6 @@ import { prettyLink } from '@/utils/quantity';
 import { Link, SetpointProfileBlock } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, ref, watch } from 'vue';
-import { GraphProps, profileGraphProps } from './helpers';
-import ProfileExportAction from './ProfileExportAction.vue';
-import ProfileImportAction from './ProfileImportAction.vue';
-import ProfilePresetAction from './ProfilePresetAction.vue';
-import SetpointProfileBasic from './SetpointProfileBasic.vue';
-import SetpointProfileDisableDialog from './SetpointProfileDisableDialog.vue';
-import SetpointProfileFull from './SetpointProfileFull.vue';
 
 type SetpointProfileData = SetpointProfileBlock['data'];
 

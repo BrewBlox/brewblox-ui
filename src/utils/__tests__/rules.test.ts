@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { makeRuleValidator, suggestId } from '../rules';
+import { describe, expect, it } from 'vitest';
 
 describe('InputRule validation', () => {
   it('Should generate a rule validator', () => {

@@ -1,8 +1,8 @@
 <script lang="ts">
-import { useContext } from '@/composables';
-import { defineComponent } from 'vue';
 import TempControlBasic from './TempControlBasic.vue';
 import TempControlFull from './TempControlFull.vue';
+import { useContext } from '@/composables';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TempControlWidget',

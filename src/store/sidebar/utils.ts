@@ -1,7 +1,7 @@
+import { SidebarFolder } from './types';
 import { useSidebarStore } from '@/store/sidebar';
 import { createDialog } from '@/utils/dialog';
 import { nanoid } from 'nanoid';
-import { SidebarFolder } from './types';
 
 export function startChangeFolderTitle(folder: Maybe<SidebarFolder>): void {
   if (!folder) {

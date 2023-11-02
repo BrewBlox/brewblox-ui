@@ -1,4 +1,5 @@
 <script lang="ts">
+import { GpioChange, IoChannelAddress } from '../types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { channelName } from '@/plugins/spark/utils/formatting';
 import { isCompatible } from '@/plugins/spark/utils/info';
@@ -13,7 +14,6 @@ import {
   IoChannel,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
-import { GpioChange, IoChannelAddress } from '../types';
 
 function unusedId(change: GpioChange): number {
   const ids = change.channels.map((c) => c.id);

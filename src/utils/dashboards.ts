@@ -1,12 +1,12 @@
+import { createDialog } from './dialog';
+import { notify } from './notify';
+import { makeRuleValidator, suggestId } from './rules';
+import { isUrlSafe, makeUrlSafe } from './url';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { useWidgetStore } from '@/store/widgets';
 import { userUISettings } from '@/user-settings';
 import { Router } from 'vue-router';
-import { createDialog } from './dialog';
-import { notify } from './notify';
-import { makeRuleValidator, suggestId } from './rules';
-import { isUrlSafe, makeUrlSafe } from './url';
 
 export const makeDashboardIdRules = (): InputRule[] => [
   (v) => !!v || 'Value is required',

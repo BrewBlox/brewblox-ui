@@ -1,4 +1,5 @@
 <script lang="ts">
+import { QuickstartConfig } from '../types';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
@@ -6,7 +7,6 @@ import { makeTypeFilter } from '@/utils/functional';
 import { startCreateService } from '@/utils/services';
 import { BlockType } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType, ref } from 'vue';
-import { QuickstartConfig } from '../types';
 
 const sparkFilter = makeTypeFilter(SPARK_SERVICE_TYPE);
 

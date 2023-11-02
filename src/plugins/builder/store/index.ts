@@ -1,8 +1,8 @@
+import { upgradeLayout } from '../utils';
+import api from './api';
 import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
 import { concatById, filterById, findById } from '@/utils/collections';
 import { defineStore } from 'pinia';
-import { upgradeLayout } from '../utils';
-import api from './api';
 
 interface BuilderStoreState {
   blueprints: BuilderBlueprint[];

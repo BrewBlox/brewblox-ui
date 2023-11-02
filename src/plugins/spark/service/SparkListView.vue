@@ -1,4 +1,8 @@
 <script lang="ts">
+import { useBlockSpecStore, useSparkStore } from '../store';
+import { SparkService } from '../types';
+import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';
+import { ListRenderAddress } from './types';
 import { useElementRefs, useGlobals } from '@/composables';
 import { useFeatureStore, WidgetRole } from '@/store/features';
 import { useServiceStore } from '@/store/services';
@@ -8,10 +12,6 @@ import { makeObjectSorter } from '@/utils/functional';
 import { Block, BlockType } from 'brewblox-proto/ts';
 import capitalize from 'lodash/capitalize';
 import { computed, defineComponent, nextTick, ref } from 'vue';
-import { useBlockSpecStore, useSparkStore } from '../store';
-import { SparkService } from '../types';
-import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';
-import { ListRenderAddress } from './types';
 
 type ItemSortFunction = (a: ListRenderAddress, b: ListRenderAddress) => number;
 

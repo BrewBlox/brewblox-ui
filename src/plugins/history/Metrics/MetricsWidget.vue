@@ -1,8 +1,8 @@
 <script lang="ts">
-import { useContext } from '@/composables';
-import { defineComponent, ref } from 'vue';
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
+import { useContext } from '@/composables';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'MetricsWidget',

@@ -1,3 +1,4 @@
+import widget from './MotorValveWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -14,7 +15,6 @@ import {
   ValveState,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './MotorValveWidget.vue';
 
 const type = BlockType.MotorValve;
 const title = 'Motor Valve';

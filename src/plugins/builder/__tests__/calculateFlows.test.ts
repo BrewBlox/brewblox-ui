@@ -1,3 +1,4 @@
+import { FlowPart, FlowSegment } from '@/plugins/builder/FlowSegment';
 import blueprints from '@/plugins/builder/blueprints';
 import {
   asFlowParts,
@@ -12,7 +13,6 @@ import {
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
 } from '@/plugins/builder/const';
-import { FlowPart, FlowSegment } from '@/plugins/builder/FlowSegment';
 import {
   BuilderPart,
   FlowRoute,

@@ -1,3 +1,11 @@
+import { isSparkPatch, isSparkState } from '../utils/info';
+import * as sparkApi from './spark-api';
+import {
+  asServiceStatus,
+  findBlockByAddress,
+  findBlockById,
+  findBlockFieldByAddress,
+} from './utils';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import type {
@@ -21,14 +29,6 @@ import {
   SparkStatusDescription,
 } from 'brewblox-proto/ts';
 import { defineStore } from 'pinia';
-import { isSparkPatch, isSparkState } from '../utils/info';
-import * as sparkApi from './spark-api';
-import {
-  asServiceStatus,
-  findBlockByAddress,
-  findBlockById,
-  findBlockFieldByAddress,
-} from './utils';
 
 const defaultSessionConfig = (): SparkSessionConfig => ({
   pageMode: 'Relations',

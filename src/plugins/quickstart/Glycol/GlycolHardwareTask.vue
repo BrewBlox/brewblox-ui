@@ -1,4 +1,7 @@
 <script lang="ts">
+import { GpioChange, IoChannelAddress } from '../types';
+import { hasShared, resetGpioChanges } from '../utils';
+import { GlycolConfig, GlycolControlMode } from './types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
 import {
@@ -9,9 +12,6 @@ import {
   reactive,
   ref,
 } from 'vue';
-import { GpioChange, IoChannelAddress } from '../types';
-import { hasShared, resetGpioChanges } from '../utils';
-import { GlycolConfig, GlycolControlMode } from './types';
 
 export default defineComponent({
   name: 'GlycolHardwareTask',

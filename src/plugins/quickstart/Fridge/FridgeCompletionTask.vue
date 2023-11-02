@@ -1,6 +1,4 @@
 <script lang="ts">
-import { defineComponent, onMounted, PropType, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { QuickstartAction } from '../types';
 import { createOutputActions, executeActions } from '../utils';
 import {
@@ -11,6 +9,8 @@ import {
 } from './changes';
 import { defineLayouts } from './changes-layout';
 import { FridgeConfig } from './types';
+import { defineComponent, onMounted, PropType, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'FridgeCompletionTask',

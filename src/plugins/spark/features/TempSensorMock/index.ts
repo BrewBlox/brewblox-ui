@@ -1,3 +1,4 @@
+import widget from './TempSensorMockWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -6,7 +7,6 @@ import { cref } from '@/utils/component-ref';
 import { tempQty } from '@/utils/quantity';
 import { BlockType, TempSensorMockBlock } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './TempSensorMockWidget.vue';
 
 const type = BlockType.TempSensorMock;
 const title = 'Temp Sensor (Mock)';

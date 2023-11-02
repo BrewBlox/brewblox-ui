@@ -1,4 +1,5 @@
 <script lang="ts">
+import { isBlockCompatible } from '../../utils/info';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
@@ -16,7 +17,6 @@ import {
 } from 'brewblox-proto/ts';
 import { QTableColumn } from 'quasar';
 import { computed, defineComponent } from 'vue';
-import { isBlockCompatible } from '../../utils/info';
 
 interface AnalogConstrainedBlock extends Block {
   data: {

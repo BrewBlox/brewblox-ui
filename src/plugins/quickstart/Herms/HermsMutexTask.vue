@@ -1,6 +1,6 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
 import { HermsConfig } from './types';
+import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'HermsMutexTask',

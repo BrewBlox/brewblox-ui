@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import QuickActionChange from './QuickActionChange.vue';
+import { BlockChange, ChangeAction, QuickActionsWidget } from './types';
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -9,8 +11,6 @@ import { Block } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, ref } from 'vue';
-import QuickActionChange from './QuickActionChange.vue';
-import { BlockChange, ChangeAction, QuickActionsWidget } from './types';
 
 defineProps({
   activeId: {

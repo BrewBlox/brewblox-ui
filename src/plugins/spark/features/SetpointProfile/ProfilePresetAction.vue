@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import ProfileSnippetDialog from './ProfileSnippetDialog.vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createComponentDialog } from '@/utils/dialog';
 import { SetpointProfileBlock } from 'brewblox-proto/ts';
-import ProfileSnippetDialog from './ProfileSnippetDialog.vue';
 
 defineProps({
   icon: {

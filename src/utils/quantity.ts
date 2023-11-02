@@ -1,12 +1,3 @@
-import { userUISettings, userUnits } from '@/user-settings';
-import { Link, Quantity, TempUnit } from 'brewblox-proto/ts';
-import formatDate from 'date-fns/format';
-import isFinite from 'lodash/isFinite';
-import isNumber from 'lodash/isNumber';
-import isString from 'lodash/isString';
-import round from 'lodash/round';
-import parseDuration from 'parse-duration';
-import { date } from 'quasar';
 import {
   isCompatibleQty,
   isDurationString,
@@ -16,6 +7,15 @@ import {
   libUnit,
   toLibQty,
 } from './identity';
+import { userUISettings, userUnits } from '@/user-settings';
+import { Link, Quantity, TempUnit } from 'brewblox-proto/ts';
+import formatDate from 'date-fns/format';
+import isFinite from 'lodash/isFinite';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
+import round from 'lodash/round';
+import parseDuration from 'parse-duration';
+import { date } from 'quasar';
 
 type DateCompatible = Date | number | string;
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
 import { FermentBlockNames, FermentConfig } from './types';
+import { computed, defineComponent, PropType } from 'vue';
 
 const defaultNames: FermentBlockNames = {
   fridgeSensor: 'Fridge Sensor',

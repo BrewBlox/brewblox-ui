@@ -1,11 +1,11 @@
 <script lang="ts">
+import { QueryConfig, QueryParams } from '../types';
 import { durationString, parseDate } from '@/utils/quantity';
 import find from 'lodash/find';
 import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
 import { date as dateUtil } from 'quasar';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
-import { QueryConfig, QueryParams } from '../types';
 
 interface PeriodDisplay {
   start: boolean;

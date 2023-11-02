@@ -1,3 +1,4 @@
+import { ExpressionError } from './types';
 import {
   ENUM_LABELS_ANALOG_OP,
   ENUM_LABELS_DIGITAL_OP,
@@ -11,7 +12,6 @@ import {
   BlockType,
   DigitalCompare,
 } from 'brewblox-proto/ts';
-import { ExpressionError } from './types';
 
 export const keyCode = (s: string): number => s.charCodeAt(0);
 

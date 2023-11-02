@@ -3,7 +3,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty, deltaTempQty, prettyQty } from '@/utils/quantity';
-import { Fluctuation, Quantity, TempSensorMockBlock } from 'brewblox-proto/ts';
+import { Fluctuation, TempSensorMockBlock } from 'brewblox-proto/ts';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

@@ -1,10 +1,3 @@
-import { STATE_TOPIC } from '@/const';
-import { eventbus } from '@/eventbus';
-import { startup } from '@/startup';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { useServiceStore } from '@/store/services';
-import { cref, globRegister } from '@/utils/component-ref';
-import { Plugin } from 'vue';
 import { SPARK_SERVICE_TYPE } from './const';
 import features from './features';
 import SparkActions from './service/SparkActions.vue';
@@ -12,6 +5,13 @@ import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
 import { useBlockSnippetStore, useSparkStore } from './store';
 import { isSparkState } from './utils/info';
+import { STATE_TOPIC } from '@/const';
+import { eventbus } from '@/eventbus';
+import { startup } from '@/startup';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { useServiceStore } from '@/store/services';
+import { cref, globRegister } from '@/utils/component-ref';
+import { Plugin } from 'vue';
 
 // Allows lookups based on the old type ID
 // DeprecatedWidget will update the widget in the datastore

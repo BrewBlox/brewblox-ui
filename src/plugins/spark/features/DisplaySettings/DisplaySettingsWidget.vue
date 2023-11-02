@@ -1,10 +1,10 @@
 <script lang="ts">
+import DisplaySettingsBasic from './DisplaySettingsBasic.vue';
+import DisplaySettingsFull from './DisplaySettingsFull.vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { DisplaySettingsBlock } from 'brewblox-proto/ts';
 import { defineComponent } from 'vue';
-import DisplaySettingsBasic from './DisplaySettingsBasic.vue';
-import DisplaySettingsFull from './DisplaySettingsFull.vue';
 
 export default defineComponent({
   name: 'DisplaySettingsWidget',

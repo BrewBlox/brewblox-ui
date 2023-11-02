@@ -1,4 +1,5 @@
 <script lang="ts">
+import ActuatorOffsetDisableDialog from './ActuatorOffsetDisableDialog.vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createComponentDialog } from '@/utils/dialog';
@@ -11,7 +12,6 @@ import {
   ReferenceKind,
 } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';
-import ActuatorOffsetDisableDialog from './ActuatorOffsetDisableDialog.vue';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
   { label: 'Setting', value: ReferenceKind.REF_SETTING },

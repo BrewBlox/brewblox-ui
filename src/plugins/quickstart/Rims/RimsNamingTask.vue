@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
 import { RimsBlockNames, RimsConfig } from './types';
+import { computed, defineComponent, PropType } from 'vue';
 
 const defaultNames: RimsBlockNames = {
   kettleSensor: 'Kettle Sensor',

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { QuickValuesWidget } from './types';
 import { useContext, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockFieldSpec } from '@/plugins/spark/types';
@@ -9,7 +10,6 @@ import { Block, Quantity } from 'brewblox-proto/ts';
 import isNumber from 'lodash/isNumber';
 import { debounce } from 'quasar';
 import { computed, defineComponent } from 'vue';
-import { QuickValuesWidget } from './types';
 
 export default defineComponent({
   name: 'QuickValuesWidget',

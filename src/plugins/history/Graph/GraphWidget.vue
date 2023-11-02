@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { addBlockGraph, selectSessionGraph } from './utils';
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
@@ -13,7 +14,6 @@ import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
 import { nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { addBlockGraph, selectSessionGraph } from './utils';
 
 const router = useRouter();
 const { dense } = useGlobals.setup();

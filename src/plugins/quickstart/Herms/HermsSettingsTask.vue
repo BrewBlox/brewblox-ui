@@ -1,4 +1,6 @@
 <script lang="ts">
+import { QuickstartAction } from '../types';
+import { HermsConfig, HermsOpts } from './types';
 import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import {
@@ -10,8 +12,6 @@ import {
 } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType, ref } from 'vue';
-import { QuickstartAction } from '../types';
-import { HermsConfig, HermsOpts } from './types';
 
 const volumeRules: InputRule[] = [
   (v) => Number(v) !== 0 || "Volume can't be 0",
