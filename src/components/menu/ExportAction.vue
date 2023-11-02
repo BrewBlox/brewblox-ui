@@ -2,15 +2,14 @@
 import { useWidget } from '@/composables';
 import { saveFile } from '@/utils/import-export';
 
-defineProps({
-  icon: {
-    type: String,
-    default: 'mdi-file-export',
-  },
-  label: {
-    type: String,
-    default: 'Export widget',
-  },
+interface Props {
+  icon?: string;
+  label?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  icon: 'mdi-file-export',
+  label: 'Export widget',
 });
 
 const { widget } = useWidget.setup();

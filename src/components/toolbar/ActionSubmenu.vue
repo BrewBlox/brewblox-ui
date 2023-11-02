@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+interface Props {
+  label?: string | null;
+}
 
-defineProps({
-  label: {
-    type: null as unknown as PropType<string | null>,
-    default: null,
-  },
+withDefaults(defineProps<Props>(), {
+  label: null,
 });
 </script>
 

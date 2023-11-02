@@ -2,15 +2,14 @@
 import { useLoggingStore } from '@/store/logging';
 import { saveFile } from '@/utils/import-export';
 
-defineProps({
-  icon: {
-    type: String,
-    default: 'mdi-file-export',
-  },
-  label: {
-    type: String,
-    default: 'Export UI logs',
-  },
+interface Props {
+  icon?: string;
+  label?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  icon: 'mdi-file-export',
+  label: 'Export UI logs',
 });
 
 const loggingStore = useLoggingStore();

@@ -1,30 +1,28 @@
 <script setup lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+} from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockWidget } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetContext, WidgetMode } from '@/store/features';
 import type { Block } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  serviceId: {
-    type: String,
-    required: true,
-  },
-  blockId: {
-    type: String,
-    required: true,
-  },
-  mode: {
-    type: String as PropType<WidgetMode>,
-    default: 'Full',
-  },
-  getProps: {
-    type: Function as PropType<() => AnyDict>,
-    default: () => ({}),
-  },
+interface Props extends UseDialogProps {
+  serviceId: string;
+  blockId: string;
+  mode?: WidgetMode;
+  getProps?: () => AnyDict;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  mode: 'Full',
+  getProps: () => ({}),
 });
 
 defineEmits<UseDialogEmits>();

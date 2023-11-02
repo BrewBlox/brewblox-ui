@@ -1,17 +1,14 @@
 <script setup lang="ts">
-defineProps({
-  icon: {
-    type: String,
-    default: 'mdi-dots-vertical',
-  },
-  flat: {
-    type: Boolean,
-    default: true,
-  },
-  label: {
-    type: String,
-    default: 'Actions',
-  },
+interface Props {
+  icon?: string;
+  flat?: boolean;
+  label?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  icon: 'mdi-dots-vertical',
+  flat: true,
+  label: 'Actions',
 });
 </script>
 

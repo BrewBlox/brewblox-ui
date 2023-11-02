@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+} from '@/composables';
 import { WidgetContext, WidgetMode } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  widgetId: {
-    type: String,
-    required: true,
-  },
-  mode: {
-    type: String as PropType<WidgetMode>,
-    default: 'Full',
-  },
+interface Props extends UseDialogProps {
+  widgetId: string;
+  mode?: WidgetMode;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  mode: 'Full',
 });
 
 defineEmits<UseDialogEmits>();

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
@@ -17,7 +17,7 @@ import {
 import { startupDone, userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
 interface ConfigService {
   serviceId: string;
@@ -27,61 +27,37 @@ interface ConfigService {
 
 const sorter = makeObjectSorter<Dashboard>('title');
 
-export default defineComponent({
-  name: 'AdminPage',
-  setup() {
-    const systemStore = useSystemStore();
-    const dashboardStore = useDashboardStore();
-    const featureStore = useFeatureStore();
-    const serviceStore = useServiceStore();
-    const builderStore = useBuilderStore();
+const systemStore = useSystemStore();
+const dashboardStore = useDashboardStore();
+const featureStore = useFeatureStore();
+const serviceStore = useServiceStore();
+const builderStore = useBuilderStore();
 
-    const experimental = computed<boolean>({
-      get: () => userUISettings.value.experimental,
-      set: (v) => systemStore.patchUserUISettings({ experimental: v }),
-    });
-
-    const buildDate = computed<string>(
-      () => __BREWBLOX_BUILD_DATE ?? 'UNKNOWN',
-    );
-
-    const dashboards = computed<Dashboard[]>(() =>
-      [...dashboardStore.dashboards].sort(sorter),
-    );
-
-    const serviceComponents = computed<ConfigService[]>(() =>
-      [...serviceStore.services]
-        .sort(sorter)
-        .map((v) => ({
-          serviceId: v.id,
-          title: v.title,
-          configComponent: featureStore.serviceById(v.type)?.configComponent,
-        }))
-        .filter((v): v is ConfigService => !!v.configComponent),
-    );
-
-    const layouts = computed<BuilderLayout[]>(() =>
-      [...builderStore.layouts].sort(sorter),
-    );
-
-    return {
-      createDialog,
-      startChangeKeyboardLayout,
-      startChangeTempUnit,
-      startChangeGravityUnit,
-      startChangeTimezone,
-      startChangeDateFormat,
-      startChangeTimeFormat,
-      startEditBuilderTouchDelay,
-      startupDone,
-      experimental,
-      buildDate,
-      dashboards,
-      serviceComponents,
-      layouts,
-    };
-  },
+const experimental = computed<boolean>({
+  get: () => userUISettings.value.experimental,
+  set: (v) => systemStore.patchUserUISettings({ experimental: v }),
 });
+
+const buildDate = computed<string>(() => __BREWBLOX_BUILD_DATE ?? 'UNKNOWN');
+
+const dashboards = computed<Dashboard[]>(() =>
+  [...dashboardStore.dashboards].sort(sorter),
+);
+
+const serviceComponents = computed<ConfigService[]>(() =>
+  [...serviceStore.services]
+    .sort(sorter)
+    .map((v) => ({
+      serviceId: v.id,
+      title: v.title,
+      configComponent: featureStore.serviceById(v.type)?.configComponent,
+    }))
+    .filter((v): v is ConfigService => !!v.configComponent),
+);
+
+const layouts = computed<BuilderLayout[]>(() =>
+  [...builderStore.layouts].sort(sorter),
+);
 </script>
 
 <template>

@@ -1,24 +1,19 @@
 <script setup lang="ts">
+import GridItem from './GridItem.vue';
+import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import { WidgetContext } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { nullFilter } from '@/utils/functional';
-import { computed, PropType, ref } from 'vue';
-import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
-import GridItem from './GridItem.vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  widgets: {
-    type: Array as PropType<Widget[]>,
-    required: true,
-  },
-  context: {
-    type: Object as PropType<WidgetContext>,
-    required: true,
-  },
-  editable: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  widgets: Widget[];
+  context: WidgetContext;
+  editable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  editable: false,
 });
 
 const widgetStore = useWidgetStore();
@@ -141,7 +136,10 @@ function updateItemSize(id: string, cols: number, rows: number): void {
   background-image: linear-gradient(#121a1f 20px, transparent 0px),
     linear-gradient(90deg, #121a1f 20px, transparent 0px),
     linear-gradient(#fff, #fff);
-  background-position: 0 -20px, -20px, 0 0;
+  background-position:
+    0 -20px,
+    -20px,
+    0 0;
   grid-column-start: 1;
   grid-column-end: -1;
   grid-row-start: 1;

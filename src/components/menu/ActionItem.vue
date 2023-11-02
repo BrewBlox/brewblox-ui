@@ -1,35 +1,24 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
 
-const props = defineProps({
-  label: {
-    type: String,
-    default: '',
-  },
-  icon: {
-    type: String,
-    default: '',
-  },
-  tooltip: {
-    type: String,
-    default: '',
-  },
-  active: {
-    type: Boolean,
-    default: false,
-  },
-  noClose: {
-    type: Boolean,
-    default: false,
-  },
-  itemProps: {
-    type: Object,
-    default: () => ({}),
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  label?: string;
+  icon?: string;
+  tooltip?: string;
+  active?: boolean;
+  noClose?: boolean;
+  itemProps?: AnyDict;
+  disabled?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  label: '',
+  icon: '',
+  tooltip: '',
+  active: false,
+  noClose: false,
+  itemProps: () => ({}),
+  disabled: false,
 });
 
 const emit = defineEmits<{

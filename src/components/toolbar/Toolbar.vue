@@ -2,23 +2,16 @@
 import { getNumDialogs } from '@/utils/dialog';
 import { computed, ref } from 'vue';
 
-defineProps({
-  icon: {
-    type: String,
-    default: '',
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  subtitle: {
-    type: String,
-    default: '',
-  },
-  changeTitleFn: {
-    type: Function,
-    default: null,
-  },
+interface Props {
+  title: string;
+  subtitle?: string;
+  icon?: string;
+  changeTitleFn?: () => unknown;
+}
+
+withDefaults(defineProps<Props>(), {
+  subtitle: '',
+  icon: '',
 });
 
 defineEmits<{
@@ -50,7 +43,7 @@ const numDialogs = computed<number>(() => getNumDialogs());
     />
     <div class="col row no-wrap ellipsis q-px-xs text-h6 items-center">
       <div
-        :class="{ pointer: !!changeTitleFn }"
+        :class="{ pointer: changeTitleFn != null }"
         @click="changeTitleFn && changeTitleFn()"
       >
         {{ title }}

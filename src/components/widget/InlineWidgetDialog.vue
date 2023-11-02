@@ -2,17 +2,15 @@
 import { useGlobals, useWidget } from '@/composables';
 import { WidgetContext, WidgetMode } from '@/store/features';
 import { ContextKey } from '@/symbols';
-import { computed, PropType, provide, reactive } from 'vue';
+import { computed, provide, reactive } from 'vue';
 
-const props = defineProps({
-  active: {
-    type: Boolean,
-    required: true,
-  },
-  mode: {
-    type: String as PropType<WidgetMode>,
-    default: 'Full',
-  },
+interface Props {
+  active: boolean;
+  mode?: WidgetMode;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  mode: 'Full',
 });
 
 const emit = defineEmits<{

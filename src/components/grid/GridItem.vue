@@ -1,11 +1,25 @@
 <script setup lang="ts">
+import { GRID_GAP_SIZE, GRID_SQUARE_SIZE, MIN_COLS, MIN_ROWS } from './const';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import clamp from 'lodash/clamp';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
-import { computed, ref, watch } from 'vue';
-import { GRID_GAP_SIZE, GRID_SQUARE_SIZE, MIN_COLS, MIN_ROWS } from './const';
 import { TouchPanValue } from 'quasar';
+import { computed, ref, watch } from 'vue';
+
+interface Props {
+  widgetId: string;
+  editable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  editable: false,
+});
+
+const emit = defineEmits<{
+  position: [id: string, pos: XYPosition | null];
+  size: [id: string, cols: number, rows: number];
+}>();
 
 const MAX_TICK_DELTA = 15;
 
@@ -17,22 +31,6 @@ const moveCodes: Record<string, XYPosition> = {
   ArrowLeft: { x: -1, y: 0 },
   ArrowRight: { x: 1, y: 0 },
 };
-
-const props = defineProps({
-  widgetId: {
-    type: String,
-    required: true,
-  },
-  editable: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits<{
-  position: [id: string, pos: XYPosition | null];
-  size: [id: string, cols: number, rows: number];
-}>();
 
 const debouncedEmitPosition = debounce(
   (id: string, pos: XYPosition | null) => emit('position', id, pos),

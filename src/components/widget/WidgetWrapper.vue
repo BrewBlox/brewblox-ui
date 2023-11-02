@@ -11,29 +11,16 @@ import {
 } from '@/symbols';
 import { startChangeWidgetTitle, startRemoveWidget } from '@/utils/widgets';
 import cloneDeep from 'lodash/cloneDeep';
-import {
-  computed,
-  inject,
-  onErrorCaptured,
-  PropType,
-  provide,
-  reactive,
-  ref,
-} from 'vue';
+import { computed, inject, onErrorCaptured, provide, reactive, ref } from 'vue';
 
-const props = defineProps({
-  widget: {
-    type: Object as PropType<Widget>,
-    required: true,
-  },
-  context: {
-    type: Object as PropType<WidgetContext>,
-    required: true,
-  },
-  volatile: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  widget: Widget;
+  context: WidgetContext;
+  volatile?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  volatile: false,
 });
 
 const emit = defineEmits<{

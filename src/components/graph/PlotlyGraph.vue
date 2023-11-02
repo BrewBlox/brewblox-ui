@@ -14,14 +14,29 @@ import Plotly, {
   PlotlyHTMLElement,
   PlotMouseEvent,
 } from 'plotly.js';
-import {
-  computed,
-  onBeforeUnmount,
-  onMounted,
-  PropType,
-  ref,
-  watch,
-} from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+
+interface Props {
+  data?: Partial<PlotData>[];
+  layout?: Partial<Layout>;
+  config?: Partial<Config>;
+  annotated?: boolean;
+  revision?: Date;
+  static?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  data: () => [],
+  layout: () => ({}),
+  config: () => ({}),
+  annotated: false,
+  revision: () => new Date(),
+  static: false,
+});
+
+const emit = defineEmits<{
+  annotations: [data: GraphAnnotation[]];
+}>();
 
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
@@ -62,37 +77,6 @@ const layoutDefaults = (): Partial<Layout> => ({
   plot_bgcolor: 'transparent',
   hovermode: 'closest',
 });
-
-const props = defineProps({
-  data: {
-    type: Array as PropType<Partial<PlotData>[]>,
-    default: () => [],
-  },
-  layout: {
-    type: Object as PropType<Partial<Layout>>,
-    default: () => ({}),
-  },
-  config: {
-    type: Object as PropType<Partial<Config>>,
-    default: () => ({}),
-  },
-  annotated: {
-    type: Boolean,
-    default: false,
-  },
-  revision: {
-    type: Date,
-    default: () => new Date(),
-  },
-  static: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits<{
-  (e: 'annotations', data: GraphAnnotation[]);
-}>();
 
 const plotlyElement = ref<PlotlyHTMLElement>();
 const containerSize = ref<AreaSize>({ width: 200, height: 200 });
@@ -276,7 +260,7 @@ function onAnnotationClick(evt: ClickAnnotationEvent): void {
     component: 'GraphAnnotationDialog',
     componentProps: {
       title: 'Edit annotation',
-      modelValue: annotation.text,
+      modelValue: annotation.text ?? '',
     },
   }).onOk(({ text, remove }: { text: string; remove: boolean }) => {
     const updated = [...annotations.value];
