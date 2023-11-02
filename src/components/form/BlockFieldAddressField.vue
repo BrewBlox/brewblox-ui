@@ -12,7 +12,7 @@ import { prettyAny } from '@/utils/quantity';
 import { Block } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 
-interface Props {
+interface Props extends UseFieldProps {
   modelValue: BlockFieldAddress;
   title?: string;
   label?: string;
@@ -26,7 +26,7 @@ interface Props {
   showValue?: boolean;
 }
 
-const props = withDefaults(defineProps<UseFieldProps & Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   ...useField.defaultProps,
   title: 'Choose field',
   label: 'Field',

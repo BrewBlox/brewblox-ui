@@ -2,13 +2,13 @@
 import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { ref } from 'vue';
 
-interface Props {
+interface Props extends UseDialogProps {
   modelValue: AreaSize;
   min: AreaSize;
   max: AreaSize;
 }
 
-const props = withDefaults(defineProps<UseDialogProps & Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   ...useDialog.defaultProps,
 });
 

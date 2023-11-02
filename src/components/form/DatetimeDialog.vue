@@ -1,26 +1,20 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { makeRuleValidator } from '@/utils/rules';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Date,
-    required: true,
-  },
-  label: {
-    type: String,
-    default: 'Date and time',
-  },
-  resetIcon: {
-    type: String,
-    default: 'restore',
-  },
-  rules: {
-    type: Array as PropType<InputRule[]>,
-    default: () => [],
-  },
+interface Props extends UseDialogProps {
+  modelValue: Date;
+  label?: string;
+  resetIcon?: string;
+  rules?: InputRule[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  label: 'Date and time',
+  resetIcon: 'restore',
+  rules: () => [],
 });
 
 defineEmits<UseDialogEmits>();

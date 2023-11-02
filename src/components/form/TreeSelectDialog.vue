@@ -1,22 +1,17 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { QTreeNode } from 'quasar';
-import { PropType, ref } from 'vue';
+import { ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: String,
-    default: null,
-  },
-  nodes: {
-    type: Array as PropType<QTreeNode[]>,
-    required: true,
-  },
-  clearable: {
-    type: Boolean,
-    default: false,
-  },
+interface Props extends UseDialogProps {
+  modelValue: string;
+  nodes: QTreeNode[];
+  clearable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  clearable: false,
 });
 
 defineEmits<UseDialogEmits>();

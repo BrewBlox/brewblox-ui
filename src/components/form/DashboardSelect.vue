@@ -1,24 +1,20 @@
 <script setup lang="ts">
 import { useDashboardStore } from '@/store/dashboards';
-import { computed, onBeforeMount, PropType } from 'vue';
+import { computed, onBeforeMount } from 'vue';
 
-const props = defineProps({
-  modelValue: {
-    type: null as unknown as PropType<string | null>,
-    default: () => null,
-  },
-  defaultValue: {
-    type: null as unknown as PropType<string | null>,
-    default: () => null,
-  },
-  label: {
-    type: String,
-    default: 'Dashboard',
-  },
+interface Props {
+  modelValue: string | null;
+  defaultValue?: string | null;
+  label?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  defaultValue: null,
+  label: 'Dashboard',
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: string | null): void;
+  'update:modelValue': [data: string | null];
 }>();
 
 const dashboardStore = useDashboardStore();

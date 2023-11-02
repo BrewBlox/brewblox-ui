@@ -13,7 +13,7 @@ import { createDialog } from '@/utils/dialog';
 import { Block, BlockOrIntfType } from 'brewblox-proto/ts';
 import { computed, onBeforeMount, ref } from 'vue';
 
-interface Props {
+interface Props extends UseDialogProps {
   modelValue: BlockFieldAddress;
   services?: string[] | null;
   compatible?: ComparedBlockType;
@@ -21,7 +21,7 @@ interface Props {
   fieldFilter?: (field: BlockFieldSpec) => boolean;
 }
 
-const props = withDefaults(defineProps<UseDialogProps & Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   ...useDialog.defaultProps,
   modelValue: () => ({
     serviceId: null,

@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { authLogin } from '@/auth';
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { ref } from 'vue';
 
-defineProps({
-  ...useDialog.props,
-  title: {
-    type: String,
-    default: 'Login',
-  },
+interface Props extends UseDialogProps {
+  title?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Login',
 });
 
 defineEmits<UseDialogEmits>();

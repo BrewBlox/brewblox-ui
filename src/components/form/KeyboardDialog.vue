@@ -1,14 +1,32 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { userUISettings } from '@/user-settings';
 import { isDurationString } from '@/utils/identity';
 import { makeRuleValidator } from '@/utils/rules';
 import Keyboard from 'simple-keyboard';
 import KeyboardLayouts from 'simple-keyboard-layouts';
 import 'simple-keyboard/build/css/index.css';
-import { computed, PropType, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 type BoardType = 'text' | 'number' | 'duration';
+
+interface Props extends UseDialogProps {
+  modelValue: string | number | null;
+  suffix?: string;
+  type?: BoardType;
+  password?: boolean;
+  rules?: InputRule[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  suffix: '',
+  type: 'text',
+  password: false,
+  rules: () => [],
+});
+
+defineEmits<UseDialogEmits>();
 
 const customLayouts = {
   // text layout is fetched from system store
@@ -25,34 +43,6 @@ const basicRules: Record<BoardType, InputRule[]> = {
   number: [(v) => isFinite(Number(v)) || 'Value is not a number'],
   duration: [(v) => isDurationString(v) || 'Value is not a duration'],
 };
-
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: null as unknown as PropType<string | number | null>,
-    default: null,
-  },
-  suffix: {
-    type: String,
-    default: '',
-  },
-  type: {
-    type: String as PropType<BoardType>,
-    default: 'text',
-    validator: (v: BoardType): boolean =>
-      ['text', 'number', 'duration'].includes(v),
-  },
-  password: {
-    type: Boolean,
-    default: false,
-  },
-  rules: {
-    type: Array as PropType<InputRule[]>,
-    default: () => [],
-  },
-});
-
-defineEmits<UseDialogEmits>();
 
 const { dialogOpts, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup();

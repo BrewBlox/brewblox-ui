@@ -1,54 +1,34 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: null as unknown as PropType<string | number | null>,
-    default: null,
-  },
-  type: {
-    type: String as PropType<'text' | 'number'>,
-    default: 'text',
-    validator: (v: unknown): boolean =>
-      typeof v === 'string' && ['text', 'number'].includes(v),
-  },
-  decimals: {
-    type: Number,
-    default: 2,
-  },
-  label: {
-    type: String,
-    default: '',
-  },
-  rules: {
-    type: Array as PropType<InputRule[]>,
-    default: () => [],
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  autogrow: {
-    type: Boolean,
-    default: false,
-  },
-  fontSize: {
-    type: String,
-    default: '170%',
-  },
-  suffix: {
-    type: String,
-    default: '',
-  },
-  placeholder: {
-    type: String,
-    default: undefined,
-  },
+interface Props extends UseDialogProps {
+  modelValue: string | number | null;
+  type?: 'text' | 'number';
+  decimals?: number;
+  label?: string;
+  rules?: InputRule[];
+  clearable?: boolean;
+  autogrow?: boolean;
+  fontSize?: string;
+  suffix?: string;
+  placeholder?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  type: 'text',
+  decimals: 2,
+  label: '',
+  rules: () => [],
+  clearable: true,
+  autogrow: false,
+  fontSize: '170%',
+  suffix: '',
+  placeholder: undefined,
 });
 
 defineEmits<UseDialogEmits>();

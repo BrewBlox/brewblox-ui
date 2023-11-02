@@ -1,37 +1,24 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
-import { PropType, ref } from 'vue';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Number,
-    default: 0,
-  },
-  min: {
-    type: Number,
-    default: 0,
-  },
-  max: {
-    type: Number,
-    default: 100,
-  },
-  step: {
-    type: Number,
-    default: 1,
-  },
-  label: {
-    type: String,
-    default: '',
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  quickActions: {
-    type: Array as PropType<SelectOption[]>,
-    default: () => [],
-  },
+interface Props extends UseDialogProps {
+  modelValue: number;
+  min?: number;
+  max?: number;
+  step?: number;
+  label?: string;
+  clearable?: boolean;
+  quickActions?: SelectOption[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  min: 0,
+  max: 100,
+  step: 1,
+  label: '',
+  clearable: true,
+  quickActions: () => [],
 });
 
 defineEmits<UseDialogEmits>();

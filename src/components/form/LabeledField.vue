@@ -1,35 +1,27 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { useField, UseFieldProps } from '@/composables';
 import { fixedNumber } from '@/utils/quantity';
 import { QField } from 'quasar';
-import { computed, onMounted, PropType, ref, useSlots } from 'vue';
+import { computed, onMounted, ref, useSlots } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: [String, Number, Boolean, Array, Object, Date] as PropType<any>,
-    default: null,
-  },
-  number: {
-    type: Boolean,
-    default: false,
-  },
-  suffix: {
-    type: String,
-    default: '',
-  },
-  decimals: {
-    type: Number,
-    default: 2,
-  },
-  readonly: {
-    type: Boolean,
-    default: true,
-  },
+interface Props extends UseFieldProps {
+  modelValue?: any;
+  number?: boolean;
+  suffix?: string;
+  decimals?: number;
+  readonly?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: null,
+  number: false,
+  suffix: '',
+  decimals: 2,
+  readonly: true,
 });
 
 const emit = defineEmits<{
-  (e: 'click'): void;
+  click: [];
 }>();
 
 const slots = useSlots();

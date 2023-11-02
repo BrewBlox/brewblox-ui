@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 
-defineProps({
-  ...useDialog.props,
-  title: {
-    type: String,
-    default: 'Unsaved changes',
-  },
-  message: {
-    type: String,
-    default: 'Do you want to save your changes before closing?',
-  },
+interface Props extends UseDialogProps {
+  title?: string;
+  message?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Unsaved changes',
+  message: 'Do you want to save your changes before closing?',
 });
 
 defineEmits<UseDialogEmits>();

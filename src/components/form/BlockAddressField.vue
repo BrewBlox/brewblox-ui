@@ -8,7 +8,7 @@ import { Block } from 'brewblox-proto/ts';
 import truncate from 'lodash/truncate';
 import { computed } from 'vue';
 
-interface Props {
+interface Props extends UseFieldProps {
   modelValue: BlockAddress;
   anyService?: boolean;
   compatible?: ComparedBlockType;
@@ -20,7 +20,7 @@ interface Props {
   showCreated?: boolean;
 }
 
-const props = withDefaults(defineProps<UseFieldProps & Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   ...useField.defaultProps,
   title: 'Choose block',
   label: 'Block',

@@ -3,11 +3,12 @@ import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { computed } from 'vue';
 
-const props = defineProps({
-  text: {
-    type: String,
-    default: '',
-  },
+interface Props {
+  text?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  text: '',
 });
 
 const rendered = computed<string>(() =>

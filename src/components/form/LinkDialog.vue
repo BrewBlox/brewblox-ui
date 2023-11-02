@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
@@ -9,42 +9,27 @@ import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 import { Block, Link } from 'brewblox-proto/ts';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Object as PropType<Link>,
-    default: () => bloxLink(null),
-  },
-  serviceId: {
-    type: String,
-    required: true,
-  },
-  label: {
-    type: String,
-    default: 'Link',
-  },
-  compatible: {
-    type: [String, Array] as PropType<ComparedBlockType>,
-    default: null,
-  },
-  blockFilter: {
-    type: Function as PropType<(block: Block) => boolean>,
-    default: () => true,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  creatable: {
-    type: Boolean,
-    default: true,
-  },
-  configurable: {
-    type: Boolean,
-    default: true,
-  },
+interface Props extends UseDialogProps {
+  modelValue: Link;
+  serviceId: string;
+  label?: string;
+  compatible?: ComparedBlockType;
+  blockFilter?: (block: Block) => boolean;
+  clearable?: boolean;
+  creatable?: boolean;
+  configurable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  label: 'Link',
+  compatible: null,
+  blockFilter: () => true,
+  clearable: true,
+  creatable: true,
+  configurable: true,
 });
 
 defineEmits<UseDialogEmits>();

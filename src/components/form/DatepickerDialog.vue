@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { date as qdate } from 'quasar';
 import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Date,
-    required: true,
-  },
-  label: {
-    type: String,
-    default: 'Date and time',
-  },
+interface Props extends UseDialogProps {
+  modelValue: Date;
+  label?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  label: 'Date and time',
 });
 
 defineEmits<UseDialogEmits>();

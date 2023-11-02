@@ -10,7 +10,7 @@ import { makeObjectSorter } from '@/utils/functional';
 import { Block } from 'brewblox-proto/ts';
 import { computed, ref } from 'vue';
 
-interface Props {
+interface Props extends UseDialogProps {
   modelValue: BlockAddress | null;
   label?: string;
   anyService?: boolean;
@@ -22,7 +22,7 @@ interface Props {
   showCreated?: boolean;
 }
 
-const props = withDefaults(defineProps<UseDialogProps & Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   ...useDialog.defaultProps,
   label: 'Block',
   anyService: false,

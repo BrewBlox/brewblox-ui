@@ -4,7 +4,7 @@ import { createDialog } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/quantity';
 import { computed } from 'vue';
 
-export interface Props {
+export interface Props extends UseFieldProps {
   modelValue: string | number | null;
   type?: 'text' | 'number';
   decimals?: number;
@@ -13,7 +13,7 @@ export interface Props {
   suffix?: string;
 }
 
-const props = withDefaults(defineProps<UseFieldProps & Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   ...useField.defaultProps,
   type: 'text',
   decimals: 2,

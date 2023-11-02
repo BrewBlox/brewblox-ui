@@ -5,14 +5,13 @@ import { bloxQty, durationString } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 
-defineOptions({
-  inheritAttrs: true,
-});
+interface Props extends UseFieldProps {
+  modelValue: Quantity;
+}
 
-const props = withDefaults(
-  defineProps<UseFieldProps & { modelValue: Quantity }>(),
-  { ...useField.defaultProps },
-);
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+});
 
 const emit = defineEmits<{
   'update:modelValue': [data: Quantity];

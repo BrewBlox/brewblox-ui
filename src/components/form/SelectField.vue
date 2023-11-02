@@ -1,47 +1,31 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import isArray from 'lodash/isArray';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: [Object, String, Number, Symbol] as PropType<any>,
-    default: null as any,
-  },
-  options: {
-    type: Array as PropType<any[]>,
-    required: true,
-  },
-  label: {
-    type: String,
-    default: 'value',
-  },
-  optionValue: {
-    type: String,
-    default: 'value',
-  },
-  optionLabel: {
-    type: String,
-    default: 'label',
-  },
-  clearable: {
-    type: Boolean,
-    default: false,
-  },
-  listSelect: {
-    type: Boolean,
-    default: false,
-  },
-  selectProps: {
-    type: Object,
-    default: () => ({}),
-  },
+interface Props extends UseFieldProps {
+  modelValue: any;
+  options: any[];
+  label?: string;
+  optionValue?: string;
+  optionLabel?: string;
+  clearable?: boolean;
+  listSelect?: boolean;
+  selectProps?: AnyDict;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  label: 'value',
+  optionValue: 'value',
+  optionLabel: 'label',
+  clearable: false,
+  listSelect: false,
+  selectProps: () => ({}),
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: object | string | number | symbol): void;
+  'update:modelValue': [data: any];
 }>();
 
 const { activeSlots } = useField.setup();

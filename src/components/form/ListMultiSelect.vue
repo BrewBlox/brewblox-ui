@@ -1,31 +1,20 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
+interface Props {
+  modelValue: any[];
+  options: any[];
+  optionValue?: string;
+  optionLabel?: string;
+  dense?: boolean;
+}
 
-const props = defineProps({
-  modelValue: {
-    type: Array as PropType<any[]>,
-    required: true,
-  },
-  options: {
-    type: Array as PropType<any[]>,
-    required: true,
-  },
-  optionValue: {
-    type: String,
-    default: 'id',
-  },
-  optionLabel: {
-    type: String,
-    default: 'title',
-  },
-  dense: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<Props>(), {
+  optionValue: 'id',
+  optionLabel: 'title',
+  dense: false,
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: any[]): void;
+  'update:modelValue': [data: any[]];
 }>();
 
 function matches(val: any): boolean {
