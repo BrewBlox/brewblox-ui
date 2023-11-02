@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useFeatureStore, WidgetContext } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import {
@@ -13,7 +13,6 @@ import { startChangeWidgetTitle, startRemoveWidget } from '@/utils/widgets';
 import cloneDeep from 'lodash/cloneDeep';
 import {
   computed,
-  defineComponent,
   inject,
   onErrorCaptured,
   PropType,
@@ -22,67 +21,59 @@ import {
   ref,
 } from 'vue';
 
-export default defineComponent({
-  name: 'WidgetWrapper',
-  props: {
-    widget: {
-      type: Object as PropType<Widget>,
-      required: true,
-    },
-    context: {
-      type: Object as PropType<WidgetContext>,
-      required: true,
-    },
-    volatile: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  widget: {
+    type: Object as PropType<Widget>,
+    required: true,
   },
-  emits: ['update:widget'],
-  setup(props, { emit }) {
-    const featureStore = useFeatureStore();
-    const error = ref<string>();
-
-    const invalidateParent = inject(
-      InvalidateKey,
-      (reason?: string) => void reason,
-    );
-
-    const feature = featureStore.widgetById(props.widget.feature);
-    const widgetComponent =
-      feature?.wrapperComponent ?? feature?.component ?? null;
-
-    provide(
-      WidgetKey,
-      computed<Widget>(() => props.widget),
-    );
-
-    provide(PatchWidgetKey, (patch: Partial<Widget>) =>
-      emit('update:widget', { ...props.widget, ...patch }),
-    );
-
-    provide(ContextKey, reactive<WidgetContext>(cloneDeep(props.context)));
-
-    provide(InvalidateKey, (reason?: string) => {
-      error.value = reason ?? 'Unknown error';
-      invalidateParent(reason);
-    });
-
-    provide(VolatileKey, props.volatile);
-
-    provide(ChangeWidgetTitleKey, () => startChangeWidgetTitle(props.widget));
-
-    onErrorCaptured((err: Error) => {
-      error.value = err.message;
-      return false;
-    });
-
-    return {
-      error,
-      widgetComponent,
-      startRemoveWidget,
-    };
+  context: {
+    type: Object as PropType<WidgetContext>,
+    required: true,
   },
+  volatile: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits<{
+  'update:widget': [data: Widget];
+}>();
+
+const featureStore = useFeatureStore();
+const error = ref<string>();
+
+const invalidateParent = inject(
+  InvalidateKey,
+  (reason?: string) => void reason,
+);
+
+const feature = featureStore.widgetById(props.widget.feature);
+const widgetComponent = feature?.wrapperComponent ?? feature?.component ?? null;
+
+provide(
+  WidgetKey,
+  computed<Widget>(() => props.widget),
+);
+
+provide(PatchWidgetKey, (patch: Partial<Widget>) => {
+  emit('update:widget', { ...props.widget, ...patch });
+});
+
+provide(ContextKey, reactive<WidgetContext>(cloneDeep(props.context)));
+
+provide(InvalidateKey, (reason?: string) => {
+  error.value = reason ?? 'Unknown error';
+  invalidateParent(reason);
+});
+
+provide(VolatileKey, props.volatile);
+
+provide(ChangeWidgetTitleKey, () => startChangeWidgetTitle(props.widget));
+
+onErrorCaptured((err: Error) => {
+  error.value = err.message;
+  return false;
 });
 </script>
 

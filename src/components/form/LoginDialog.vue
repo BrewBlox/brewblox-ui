@@ -13,9 +13,9 @@ defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup();
 
 const username = ref<string>('');
@@ -56,7 +56,7 @@ function showPasswordKeyboard(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     no-backdrop-dismiss
     @hide="onDialogHide"
     @keyup.enter="login"

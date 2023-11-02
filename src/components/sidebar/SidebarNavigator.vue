@@ -1,5 +1,5 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 const btnAttrs = {
@@ -9,25 +9,13 @@ const btnAttrs = {
   class: 'col-grow q-py-sm max-small',
 };
 
-export default defineComponent({
-  name: 'SidebarNavigator',
-  setup() {
-    const route = useRoute();
+const route = useRoute();
 
-    const activeSection = computed<string>(
-      () => route.path.split('/')[1] ?? '',
-    );
+const activeSection = computed<string>(() => route.path.split('/')[1] ?? '');
 
-    function btnColor(...sections: string[]): string {
-      return sections.includes(activeSection.value) ? 'primary' : '';
-    }
-
-    return {
-      btnAttrs,
-      btnColor,
-    };
-  },
-});
+function btnColor(...sections: string[]): string {
+  return sections.includes(activeSection.value) ? 'primary' : '';
+}
 </script>
 
 <template>

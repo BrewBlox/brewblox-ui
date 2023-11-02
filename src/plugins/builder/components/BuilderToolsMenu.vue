@@ -3,6 +3,7 @@ import { useGlobals } from '@/composables';
 import { PropType } from 'vue';
 import { builderTools } from '../const';
 import { BuilderToolName } from '../types';
+import { TouchSwipeValue } from 'quasar';
 
 const props = defineProps({
   expanded: {
@@ -26,12 +27,12 @@ const emit = defineEmits<{
 
 const { dense } = useGlobals.setup();
 
-function handleSwipe(args: SwipeArguments): void {
-  const desiredState = args.direction === 'left';
+const handleSwipe: TouchSwipeValue = (details) => {
+  const desiredState = details.direction === 'left';
   if (props.expanded !== desiredState) {
     emit('update:expanded', desiredState);
   }
-}
+};
 </script>
 
 <template>

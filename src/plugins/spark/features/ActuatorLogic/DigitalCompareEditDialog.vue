@@ -23,7 +23,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
     const local = ref<DigitalCompare>(cloneDeep(props.modelValue));
 
@@ -34,7 +34,7 @@ export default defineComponent({
     return {
       operatorOpts,
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       local,
@@ -47,7 +47,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

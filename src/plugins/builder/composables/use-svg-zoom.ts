@@ -1,10 +1,10 @@
+import { ZoomTransformKey } from '../symbols';
 import * as d3 from 'd3';
 import defaults from 'lodash/defaults';
 import isEqual from 'lodash/isEqual';
 import isFinite from 'lodash/isFinite';
 import toFinite from 'lodash/toFinite';
 import { provide, Ref, ref, watch } from 'vue';
-import { ZoomTransformKey } from '../symbols';
 
 export interface UseSvgZoomDimensions {
   width: number;
@@ -40,7 +40,9 @@ export const useSvgZoom: UseSvgZoomComposable = {
     const svgRef = ref<SVGElement>();
     const svgContentRef = ref<SVGGElement>();
     const { dragEnabled, wheelEnabled } = defaults(opts, defaultOpts());
-    const activeTransform = ref<d3.ZoomTransform>();
+    const activeTransform = ref<d3.ZoomTransform>(
+      new d3.ZoomTransform(0, 0, 0),
+    );
 
     provide(ZoomTransformKey, activeTransform);
 

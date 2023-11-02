@@ -1,13 +1,10 @@
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import { PropType } from 'vue';
 
-export default defineComponent({
-  name: 'ActionSubmenu',
-  props: {
-    label: {
-      type: null as unknown as PropType<string | null>,
-      default: null,
-    },
+defineProps({
+  label: {
+    type: null as unknown as PropType<string | null>,
+    default: null,
   },
 });
 </script>

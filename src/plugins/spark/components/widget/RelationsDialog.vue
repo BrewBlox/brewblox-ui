@@ -35,11 +35,11 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup() {
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+    const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
     };
   },
@@ -50,7 +50,7 @@ export default defineComponent({
   <q-dialog
     ref="dialogRef"
     maximized
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     transition-show="fade"
     @hide="onDialogHide"
   >

@@ -24,7 +24,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
     const block = ifCompatible<SetpointSensorPairBlock>(
@@ -64,7 +64,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       enabled,
@@ -81,7 +81,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

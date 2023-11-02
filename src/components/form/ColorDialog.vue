@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits } from '@/composables';
 import { PropType, ref } from 'vue';
 
 const props = defineProps({
@@ -18,9 +18,9 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup();
 const local = ref<string>(props.modelValue);
 
@@ -36,7 +36,7 @@ function clear(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

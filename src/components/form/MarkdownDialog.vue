@@ -12,10 +12,10 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
 const { dense } = useGlobals.setup();
-const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
   useDialog.setup();
 
 const local = ref<string>(props.modelValue);
@@ -42,7 +42,7 @@ function showKeyboard(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     :maximized="dense"
     @hide="onDialogHide"
     @keyup.enter="save"

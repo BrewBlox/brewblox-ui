@@ -1,9 +1,9 @@
 <script lang="ts">
+import SparkEspWifiCard from './SparkEspWifiCard.vue';
+import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { computed, defineComponent } from 'vue';
-import SparkEspWifiCard from './SparkEspWifiCard.vue';
-import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
 
 export default defineComponent({
   name: 'SparkWifiDialog',
@@ -21,7 +21,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+    const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
     const { dense } = useGlobals.setup();
 
     const platformVendor = computed<'esp' | 'particle' | 'sim' | 'unknown'>(
@@ -43,7 +43,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       dense,
       platformVendor,
@@ -56,7 +56,7 @@ export default defineComponent({
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <SparkEspWifiCard

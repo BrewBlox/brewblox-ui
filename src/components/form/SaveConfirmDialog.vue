@@ -13,9 +13,9 @@ defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
   useDialog.setup();
 
 async function done(save: boolean): Promise<void> {
@@ -26,7 +26,7 @@ async function done(save: boolean): Promise<void> {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     no-esc-dismiss
     @hide="onDialogHide"
   >

@@ -1,39 +1,29 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/quantity';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: null as unknown as PropType<string | number | null>,
-    required: true,
-  },
-  type: {
-    type: String as PropType<'text' | 'number'>,
-    default: 'text',
-  },
-  decimals: {
-    type: Number,
-    default: 2,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  autogrow: {
-    type: Boolean,
-    default: false,
-  },
-  suffix: {
-    type: String,
-    default: '',
-  },
+export interface Props {
+  modelValue: string | number | null;
+  type?: 'text' | 'number';
+  decimals?: number;
+  clearable?: boolean;
+  autogrow?: boolean;
+  suffix?: string;
+}
+
+const props = withDefaults(defineProps<UseFieldProps & Props>(), {
+  ...useField.defaultProps,
+  type: 'text',
+  decimals: 2,
+  clearable: true,
+  autogrow: false,
+  suffix: '',
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: string | number | null): void;
+  'update:modelValue': [data: string | number | null];
 }>();
 
 const { activeSlots } = useField.setup();
@@ -70,7 +60,7 @@ function openDialog(): void {
       clearable: props.clearable,
       autogrow: props.autogrow,
       suffix: props.suffix,
-      ...props.dialogProps,
+      ...props.editorProps,
     },
   }).onOk(change);
 }

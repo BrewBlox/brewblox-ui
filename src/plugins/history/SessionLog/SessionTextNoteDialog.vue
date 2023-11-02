@@ -18,7 +18,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const { dense } = useGlobals.setup();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
     const local = ref<string>(props.modelValue);
@@ -91,7 +91,7 @@ export default defineComponent({
     return {
       dense,
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       local,
@@ -108,7 +108,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     :maximized="dense"
     @hide="onDialogHide"
     @keyup.enter="save"

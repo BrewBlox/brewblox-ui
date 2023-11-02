@@ -1,9 +1,9 @@
 <script lang="ts">
+import { defaultLabel } from '../nodes';
+import { GraphAxis, GraphConfig } from '../types';
 import { useDialog } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, reactive } from 'vue';
-import { defaultLabel } from '../nodes';
-import { GraphAxis, GraphConfig } from '../types';
 
 export default defineComponent({
   name: 'GraphDisplayDialog',
@@ -20,7 +20,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogProps, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+    const { dialogOpts, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
 
     const local = reactive(cloneDeep(props.config));
@@ -70,7 +70,7 @@ export default defineComponent({
     return {
       defaultLabel,
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       rename,
@@ -87,7 +87,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

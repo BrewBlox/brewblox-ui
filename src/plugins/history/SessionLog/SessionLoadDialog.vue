@@ -1,9 +1,9 @@
 <script lang="ts">
-import { useDialog } from '@/composables';
-import { computed, defineComponent, ref } from 'vue';
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
+import { useDialog } from '@/composables';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'SessionLoadDialog',
@@ -16,7 +16,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup() {
     const historyStore = useHistoryStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
     const local = ref<LoggedSession | null>(null);
@@ -29,7 +29,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       local,
@@ -43,7 +43,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

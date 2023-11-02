@@ -1,4 +1,6 @@
 <script lang="ts">
+import { PidConfig } from '../types';
+import { TempControlMode } from './types';
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
@@ -11,8 +13,6 @@ import {
 } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, reactive } from 'vue';
-import { PidConfig } from '../types';
-import { TempControlMode } from './types';
 
 const setpointFilter = makeTypeFilter(BlockType.SetpointSensorPair);
 const durationRules: InputRule[] = [
@@ -48,7 +48,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const { dense } = useGlobals.setup();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
     const tempMode = reactive<TempControlMode>(cloneDeep(props.modelValue));
     const sparkStore = useSparkStore();
@@ -112,7 +112,7 @@ export default defineComponent({
       durationRules,
       dense,
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       onDialogOK,
@@ -132,7 +132,7 @@ export default defineComponent({
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <Card>

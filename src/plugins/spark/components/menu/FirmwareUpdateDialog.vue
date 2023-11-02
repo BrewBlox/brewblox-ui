@@ -32,7 +32,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+    const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
 
     const progress = ref<UpdateProgress>('Pending');
     const error = ref<string>('');
@@ -115,7 +115,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       status,
       progress,
@@ -133,7 +133,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="updateFirmware"
   >

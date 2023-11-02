@@ -1,8 +1,8 @@
 <script lang="ts">
+import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 import { useDialog } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, reactive, ref } from 'vue';
-import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
 export default defineComponent({
   name: 'GraphDialog',
@@ -39,7 +39,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+    const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
 
     const sourceRevision = ref<Date>(new Date());
 
@@ -55,7 +55,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       sourceRevision,
       localConfig,
@@ -68,7 +68,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     transition-show="fade"
     maximized
     @hide="onDialogHide"

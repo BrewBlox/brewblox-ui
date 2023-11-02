@@ -1,18 +1,9 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useFeatureStore, WatcherFeature } from '@/store/features';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'WatcherContainer',
-  setup() {
-    const featureStore = useFeatureStore();
-    const watchers = computed<WatcherFeature[]>(() => featureStore.watchers);
-
-    return {
-      watchers,
-    };
-  },
-});
+const featureStore = useFeatureStore();
+const watchers = computed<WatcherFeature[]>(() => featureStore.watchers);
 </script>
 
 <template>

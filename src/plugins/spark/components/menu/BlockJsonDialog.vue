@@ -1,10 +1,10 @@
 <script lang="ts">
+import { useSparkStore } from '../../store';
+import { BlockAddress } from '../../types';
 import { useDialog } from '@/composables';
 import { notify } from '@/utils/notify';
 import { Block } from 'brewblox-proto/ts';
 import { computed, defineComponent, PropType } from 'vue';
-import { useSparkStore } from '../../store';
-import { BlockAddress } from '../../types';
 
 export default defineComponent({
   name: 'BlockJsonDialog',
@@ -18,7 +18,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+    const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
 
     const block = computed<Block | null>(() =>
       sparkStore.blockByAddress(props.address),
@@ -39,7 +39,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       block,
       displayValue,
@@ -52,7 +52,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <Card>

@@ -6,7 +6,6 @@ import {
   nextTick,
   onBeforeUnmount,
   onMounted,
-  PropType,
   provide,
   reactive,
   Ref,
@@ -16,61 +15,34 @@ import {
 import { useRouter } from 'vue-router';
 
 export interface UseDialogProps {
-  title: {
-    type: PropType<string>;
-    default: string;
-  };
-  message: {
-    type: PropType<string>;
-    default: string;
-  };
-  html: {
-    type: PropType<boolean>;
-    default: false;
-  };
+  title?: string;
+  message?: string;
+  html?: boolean;
 }
 
-export type UseDialogEmitsArray = ['ok', 'hide'];
-
-export interface UseDialogEmitsObject {
-  ok: (payload?: any) => void;
-  hide: () => void;
-}
+export type UseDialogEmits = {
+  ok: [payload?: any];
+  hide: [];
+};
 
 export interface UseDialogComponent {
   dialogRef: Ref<QDialog | null>;
   onDialogHide: () => void;
   onDialogOK: (payload?: any) => void;
   onDialogCancel: () => void;
-  dialogProps: Partial<QDialogOptions>;
+  dialogOpts: Partial<QDialogOptions>;
 }
 
 export interface UseDialogComposable {
-  props: UseDialogProps;
-  emits: UseDialogEmitsArray;
-  emitsObject: UseDialogEmitsObject;
+  defaultProps: InferDefaults<UseDialogProps>;
   setup(): UseDialogComponent;
 }
 
 export const useDialog: UseDialogComposable = {
-  props: {
-    title: {
-      type: String,
-      default: '',
-    },
-    message: {
-      type: String,
-      default: '',
-    },
-    html: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['ok', 'hide'],
-  emitsObject: {
-    ok: () => true,
-    hide: () => true,
+  defaultProps: {
+    title: '',
+    message: '',
+    html: false,
   },
   setup(): UseDialogComponent {
     const instance = getCurrentInstance()!;
@@ -108,7 +80,7 @@ export const useDialog: UseDialogComposable = {
         container: 'Dialog',
         size: 'Fixed',
         mode: 'Basic',
-      }),
+      } as const),
     );
 
     // Lets all nested elements declare that the dialog should be closed immediately
@@ -181,7 +153,7 @@ export const useDialog: UseDialogComposable = {
       onDialogHide,
       onDialogCancel,
       onDialogOK,
-      dialogProps: {
+      dialogOpts: {
         noRouteDismiss: true,
         noBackdropDismiss: true,
       },

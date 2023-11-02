@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { GraphConfig, SharedGraphConfig } from '../types';
+import { emptyGraphConfig } from '../utils';
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import isEqual from 'lodash/isEqual';
 import { computed, PropType, ref } from 'vue';
-import { GraphConfig, SharedGraphConfig } from '../types';
-import { emptyGraphConfig } from '../utils';
 
 function withDefaults(cfg: GraphConfig): GraphConfig {
   return defaults(cloneDeep(cfg), emptyGraphConfig());
@@ -28,10 +28,9 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogOK, onDialogCancel } = useDialog.setup();
 
 const initial = ref<GraphConfig>(withDefaults(props.config));
 const local = ref<GraphConfig>(withDefaults(props.config));
@@ -75,7 +74,7 @@ function confirm(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="confirm"
     @keyup.enter="confirm"
   >

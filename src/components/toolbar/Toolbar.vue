@@ -1,47 +1,40 @@
-<script lang="ts">
+<script setup lang="ts">
 import { getNumDialogs } from '@/utils/dialog';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'Toolbar',
-  props: {
-    icon: {
-      type: String,
-      default: '',
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    subtitle: {
-      type: String,
-      default: '',
-    },
-    changeTitleFn: {
-      type: Function,
-      default: null,
-    },
+defineProps({
+  icon: {
+    type: String,
+    default: '',
   },
-  emits: ['close'],
-  setup() {
-    const toolbarRef = ref<Element>();
-
-    // We can't use WidgetContext here: this component is also used by non-widgets.
-    // We'll assume that if any parent is a q-dialog, this is a dialog toolbar.
-    // This will break if we have a dialog with a nested component with toolbar.
-    const inDialog = computed<boolean>(
-      () => toolbarRef.value?.closest('.q-dialog') != null,
-    );
-
-    const numDialogs = computed<number>(() => getNumDialogs());
-
-    return {
-      toolbarRef,
-      inDialog,
-      numDialogs,
-    };
+  title: {
+    type: String,
+    required: true,
+  },
+  subtitle: {
+    type: String,
+    default: '',
+  },
+  changeTitleFn: {
+    type: Function,
+    default: null,
   },
 });
+
+defineEmits<{
+  close: [];
+}>();
+
+const toolbarRef = ref<Element>();
+
+// We can't use WidgetContext here: this component is also used by non-widgets.
+// We'll assume that if any parent is a q-dialog, this is a dialog toolbar.
+// This will break if we have a dialog with a nested component with toolbar.
+const inDialog = computed<boolean>(
+  () => toolbarRef.value?.closest('.q-dialog') != null,
+);
+
+const numDialogs = computed<number>(() => getNumDialogs());
 </script>
 
 <template>

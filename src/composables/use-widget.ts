@@ -7,7 +7,7 @@ import {
   VolatileKey,
   WidgetKey,
 } from '@/symbols';
-import produce from 'immer';
+import { produce } from 'immer';
 import { computed, ComputedRef, inject, toRaw } from 'vue';
 
 export interface UseWidgetComponent<WidgetT extends Widget> {
@@ -18,9 +18,9 @@ export interface UseWidgetComponent<WidgetT extends Widget> {
   featureTitle: ComputedRef<string>;
   widgetComponent: ComputedRef<string>;
 
-  patchWidget(patch: Partial<WidgetT>): Promise<void>;
-  saveConfig(config: WidgetT['config']): Promise<void>;
-  patchConfig(patch: Partial<WidgetT['config']>): Promise<void>;
+  patchWidget(patch: Partial<WidgetT>): Awaitable<void>;
+  saveConfig(config: WidgetT['config']): Awaitable<void>;
+  patchConfig(patch: Partial<WidgetT['config']>): Awaitable<void>;
   updateConfig(
     cb: (draft: WidgetT['config']) => void | WidgetT['config'],
   ): Promise<void>;

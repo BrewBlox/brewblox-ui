@@ -1,47 +1,40 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useGlobals, useWidget } from '@/composables';
 import { WidgetContext, WidgetMode } from '@/store/features';
 import { ContextKey } from '@/symbols';
-import { computed, defineComponent, PropType, provide, reactive } from 'vue';
+import { computed, PropType, provide, reactive } from 'vue';
 
-export default defineComponent({
-  name: 'InlineWidgetDialog',
-  props: {
-    active: {
-      type: Boolean,
-      required: true,
-    },
-    mode: {
-      type: String as PropType<WidgetMode>,
-      default: 'Full',
-    },
+const props = defineProps({
+  active: {
+    type: Boolean,
+    required: true,
   },
-  emits: ['update:active'],
-  setup(props, { emit }) {
-    const { dense } = useGlobals.setup();
-    const { widgetComponent } = useWidget.setup();
-
-    const dialogActive = computed<boolean>({
-      get: () => props.active,
-      set: (v) => emit('update:active', v),
-    });
-
-    const context = reactive<WidgetContext>({
-      container: 'Dialog',
-      mode: props.mode,
-      size: 'Fixed',
-    });
-
-    // Overrides parent context
-    provide(ContextKey, context);
-
-    return {
-      dense,
-      dialogActive,
-      widgetComponent,
-    };
+  mode: {
+    type: String as PropType<WidgetMode>,
+    default: 'Full',
   },
 });
+
+const emit = defineEmits<{
+  'update:active': [value: boolean];
+}>();
+
+const { dense } = useGlobals.setup();
+const { widgetComponent } = useWidget.setup();
+
+const dialogActive = computed<boolean>({
+  get: () => props.active,
+  set: (v) => emit('update:active', v),
+});
+
+const context = reactive<WidgetContext>({
+  container: 'Dialog',
+  mode: props.mode,
+  size: 'Fixed',
+});
+
+// Overrides parent context
+provide(ContextKey, context);
 </script>
 
 <template>

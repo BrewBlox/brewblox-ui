@@ -1,10 +1,10 @@
 <script lang="ts">
+import { useHistoryStore } from '../store';
+import { LoggedSession } from '../types';
 import { useDialog } from '@/composables';
 import { parseDate } from '@/utils/quantity';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, ref } from 'vue';
-import { useHistoryStore } from '../store';
-import { LoggedSession } from '../types';
 
 export default defineComponent({
   name: 'SessionHeaderDialog',
@@ -18,7 +18,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const historyStore = useHistoryStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
     const local = ref<LoggedSession>(cloneDeep(props.modelValue));
@@ -37,7 +37,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       local,
@@ -52,7 +52,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

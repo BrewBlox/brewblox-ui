@@ -16,10 +16,10 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
 const builderStore = useBuilderStore();
-const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
   useDialog.setup();
 const local = ref<BuilderLayout | null>(
   builderStore.layoutById(props.modelValue),
@@ -35,7 +35,7 @@ function save(layout: BuilderLayout | null): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save(local)"
   >

@@ -1,8 +1,8 @@
 <script lang="ts">
+import { SessionGraphNote } from '../types';
 import { useDialog } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
 import { defineComponent, PropType, ref } from 'vue';
-import { SessionGraphNote } from '../types';
 
 type NoteDates = Pick<SessionGraphNote, 'start' | 'end'>;
 
@@ -17,7 +17,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
     const local = ref<NoteDates>(cloneDeep(props.modelValue));
@@ -28,7 +28,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       local,
@@ -41,7 +41,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

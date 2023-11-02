@@ -47,9 +47,9 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup();
 const sparkStore = useSparkStore();
 const featureStore = useFeatureStore();
@@ -119,7 +119,7 @@ function save(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

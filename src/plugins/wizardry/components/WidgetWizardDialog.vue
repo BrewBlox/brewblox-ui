@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { tryCreateWidget } from '../utils';
 import { useDialog, useGlobals, useRouteId } from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
 import {
@@ -13,7 +14,6 @@ import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
 import { computed, nextTick, onMounted, PropType, ref } from 'vue';
-import { tryCreateWidget } from '../utils';
 
 interface FeatureOption extends SelectOption<string> {
   editor: ComponentName;
@@ -44,9 +44,9 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } = useDialog.setup();
 const { dense } = useGlobals.setup();
 const { activeDashboardId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();
@@ -223,7 +223,7 @@ onMounted(() => {
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="next"
   >

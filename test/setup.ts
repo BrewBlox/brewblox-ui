@@ -1,4 +1,4 @@
-import { installQuasar } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import {
   Cookies,
@@ -15,7 +15,7 @@ const app = createApp({});
 const pinia = createPinia();
 app.use(pinia);
 
-installQuasar({
+installQuasarPlugin({
   plugins: { Cookies, Dialog, LocalStorage, Meta, Notify, SessionStorage },
 });
 

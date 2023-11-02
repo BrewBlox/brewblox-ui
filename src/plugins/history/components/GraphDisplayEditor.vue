@@ -1,7 +1,7 @@
 <script lang="ts">
+import { GraphAxis, GraphConfig } from '../types';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
-import { GraphAxis, GraphConfig } from '../types';
 
 export default defineComponent({
   name: 'GraphDisplayEditor',

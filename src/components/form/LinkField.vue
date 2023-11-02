@@ -95,7 +95,7 @@ function openDialog(): void {
       clearable: props.clearable,
       creatable: props.creatable,
       configurable: props.configurable,
-      ...props.dialogProps,
+      ...props.editorProps,
     },
   }).onOk(save);
 }

@@ -7,9 +7,9 @@ defineProps({
   ...useDialog.props,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
 const { dense } = useGlobals.setup();
 const featureStore = useFeatureStore();
 
@@ -25,7 +25,7 @@ const quickstartOpts = computed<QuickstartFeature[]>(
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <!-- Display selected wizard -->

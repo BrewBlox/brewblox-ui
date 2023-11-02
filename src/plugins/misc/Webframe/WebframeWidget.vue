@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { WebframeWidget } from './types';
 import { useContext, useWidget } from '@/composables';
 import { computed } from 'vue';
-import { WebframeWidget } from './types';
 
 const { config, patchConfig } = useWidget.setup<WebframeWidget>();
 const { context } = useContext.setup();
@@ -63,7 +63,7 @@ const url = computed<string>({
         message="URLs must include the http:// or https:// prefix."
         class="col-grow"
         tag-style="word-break: break-word"
-        :dialog-props="{ fontSize: '100%' }"
+        :editor-props="{ fontSize: '100%' }"
       />
 
       <InputField

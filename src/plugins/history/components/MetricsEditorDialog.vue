@@ -1,10 +1,10 @@
 <script lang="ts">
+import { MetricsConfig } from '../types';
+import { emptyMetricsConfig } from '../utils';
 import { useDialog } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import { defineComponent, PropType, ref } from 'vue';
-import { MetricsConfig } from '../types';
-import { emptyMetricsConfig } from '../utils';
 
 export default defineComponent({
   name: 'MetricsEditorDialog',
@@ -17,7 +17,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
 
     const local = ref<MetricsConfig>(
@@ -26,7 +26,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogOK,
       onDialogHide,
       onDialogCancel,
@@ -39,7 +39,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="onDialogOK(local)"
   >

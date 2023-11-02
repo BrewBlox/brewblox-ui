@@ -18,11 +18,11 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
 const sparkStore = useSparkStore();
 const snippetStore = useBlockSnippetStore();
-const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
   useDialog.setup();
 
 const selected = ref<SelectOption | null>(null);
@@ -128,7 +128,7 @@ function createSnippet(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <DialogCard v-bind="{ title, message, html }">

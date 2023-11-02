@@ -1,26 +1,20 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
-import { PropType, ref } from 'vue';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Object as PropType<AreaSize>,
-    required: true,
-  },
-  min: {
-    type: Object as PropType<AreaSize>,
-    required: true,
-  },
-  max: {
-    type: Object as PropType<AreaSize>,
-    required: true,
-  },
+interface Props {
+  modelValue: AreaSize;
+  min: AreaSize;
+  max: AreaSize;
+}
+
+const props = withDefaults(defineProps<UseDialogProps & Props>(), {
+  ...useDialog.defaultProps,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup();
 
 const local = ref<AreaSize>({
@@ -36,7 +30,7 @@ function save(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

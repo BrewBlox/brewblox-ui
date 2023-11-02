@@ -1,58 +1,44 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'GraphAnnotationDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const local = ref<string>(props.modelValue);
-
-    function save(): void {
-      onDialogOK({ text: local.value, remove: false });
-    }
-
-    function remove(): void {
-      onDialogOK({ text: local.value, remove: true });
-    }
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-        },
-      }).onOk((v: string) => (local.value = v));
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-      remove,
-      showKeyboard,
-    };
+const props = defineProps({
+  ...useDialog.props,
+  modelValue: {
+    type: String,
+    default: '',
   },
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup();
+const local = ref<string>(props.modelValue);
+
+function save(): void {
+  onDialogOK({ text: local.value, remove: false });
+}
+
+function remove(): void {
+  onDialogOK({ text: local.value, remove: true });
+}
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+    },
+  }).onOk((v: string) => (local.value = v));
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.ctrl.enter="save"
   >

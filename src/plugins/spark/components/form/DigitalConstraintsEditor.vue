@@ -1,7 +1,7 @@
 <script lang="ts">
 import { emptyDigitalConstraints } from '@/plugins/spark/utils/configuration';
 import { DigitalConstraints } from 'brewblox-proto/ts';
-import produce from 'immer';
+import { produce } from 'immer';
 import defaults from 'lodash/defaults';
 import { computed, defineComponent, PropType, toRaw } from 'vue';
 

@@ -14,7 +14,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
 
     const minV = ref(props.value[0] ?? -10);
@@ -66,7 +66,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       minV,
@@ -86,7 +86,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

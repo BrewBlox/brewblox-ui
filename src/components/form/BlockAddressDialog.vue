@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
@@ -8,7 +8,33 @@ import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { Block } from 'brewblox-proto/ts';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
+
+interface Props {
+  modelValue: BlockAddress | null;
+  label?: string;
+  anyService?: boolean;
+  compatible?: ComparedBlockType;
+  blockFilter?: (block: Block) => boolean;
+  clearable?: boolean;
+  creatable?: boolean;
+  configurable?: boolean;
+  showCreated?: boolean;
+}
+
+const props = withDefaults(defineProps<UseDialogProps & Props>(), {
+  ...useDialog.defaultProps,
+  label: 'Block',
+  anyService: false,
+  compatible: null,
+  blockFilter: () => true,
+  clearable: true,
+  creatable: true,
+  configurable: true,
+  showCreated: true,
+});
+
+defineEmits<UseDialogEmits>();
 
 const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
   id: v?.id ?? null,
@@ -16,49 +42,7 @@ const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
   type: v?.type ?? null,
 });
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: null as unknown as PropType<BlockAddress | null>,
-    default: null,
-  },
-  label: {
-    type: String,
-    default: 'Block',
-  },
-  anyService: {
-    type: Boolean,
-    default: false,
-  },
-  compatible: {
-    type: [String, Array] as PropType<ComparedBlockType>,
-    default: null,
-  },
-  blockFilter: {
-    type: Function as PropType<(block: Block) => boolean>,
-    default: () => true,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  creatable: {
-    type: Boolean,
-    default: true,
-  },
-  configurable: {
-    type: Boolean,
-    default: true,
-  },
-  showCreated: {
-    type: Boolean,
-    default: true,
-  },
-});
-
-defineEmits({ ...useDialog.emitsObject });
-
-const { dialogRef, dialogProps, onDialogCancel, onDialogHide, onDialogOK } =
+const { dialogRef, dialogOpts, onDialogCancel, onDialogHide, onDialogOK } =
   useDialog.setup();
 const sparkStore = useSparkStore();
 const featureStore = useFeatureStore();
@@ -150,7 +134,7 @@ function save(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

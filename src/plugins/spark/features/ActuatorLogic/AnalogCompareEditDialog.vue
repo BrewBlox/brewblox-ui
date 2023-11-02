@@ -27,7 +27,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
     const local = ref<AnalogCompare>(cloneDeep(props.modelValue));
 
@@ -62,7 +62,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       operatorOpts,
@@ -79,7 +79,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

@@ -18,7 +18,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogCancel } =
       useDialog.setup();
     const { dense } = useGlobals.setup();
     const sparkStore = useSparkStore();
@@ -182,7 +182,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       dense,
@@ -204,7 +204,7 @@ export default defineComponent({
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <Card>

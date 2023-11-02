@@ -22,9 +22,9 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
   useDialog.setup();
 
 const local = ref<any>(props.modelValue);
@@ -39,7 +39,7 @@ function save(value: any): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save(local)"
   >

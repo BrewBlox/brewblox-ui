@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { tryCreateBlock } from '../utils';
 import { useDialog, useGlobals, useRouteId } from '@/composables';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore } from '@/plugins/spark/store';
@@ -26,7 +27,6 @@ import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { computed, nextTick, onMounted, PropType, ref } from 'vue';
-import { tryCreateBlock } from '../utils';
 
 interface BlockOption extends SelectOption<BlockType> {
   generate: BlockSpec['generate'];
@@ -63,9 +63,9 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } = useDialog.setup();
 const { dense } = useGlobals.setup();
 const { activeDashboardId, activeServiceId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();
@@ -315,7 +315,7 @@ onMounted(() => {
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="next"
   >

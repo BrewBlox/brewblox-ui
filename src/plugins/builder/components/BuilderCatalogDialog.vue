@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { PlaceholderKey } from '../symbols';
+import { BuilderBlueprint, BuilderPart } from '../types';
+import { coord2grid } from '../utils';
 import { useDialog, useGlobals } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
 import { computed, PropType, provide, ref } from 'vue';
-import { PlaceholderKey } from '../symbols';
-import { BuilderBlueprint, BuilderPart } from '../types';
-import { coord2grid } from '../utils';
 
 interface PartDisplay {
   part: BuilderPart;
@@ -22,11 +22,11 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
 const builderStore = useBuilderStore();
 const { dense } = useGlobals.setup();
-const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } = useDialog.setup();
 
 // Rendered parts should display dummy values instead of errors
 provide(PlaceholderKey, true);
@@ -77,7 +77,7 @@ function showSearchKeyboard(): void {
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     transition-hide="fade"
     @hide="onDialogHide"
   >

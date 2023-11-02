@@ -1,99 +1,81 @@
-<script lang="ts">
+<script setup lang="ts">
 import { WidgetContext } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { nullFilter } from '@/utils/functional';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import GridItem from './GridItem.vue';
 
-export default defineComponent({
-  name: 'GridContainer',
-  components: {
-    GridItem,
+const props = defineProps({
+  widgets: {
+    type: Array as PropType<Widget[]>,
+    required: true,
   },
-  props: {
-    widgets: {
-      type: Array as PropType<Widget[]>,
-      required: true,
-    },
-    context: {
-      type: Object as PropType<WidgetContext>,
-      required: true,
-    },
-    editable: {
-      type: Boolean,
-      default: false,
-    },
+  context: {
+    type: Object as PropType<WidgetContext>,
+    required: true,
   },
-  setup(props) {
-    const widgetStore = useWidgetStore();
-    const containerRef = ref<HTMLDivElement>();
-
-    const minWidth = computed<number>(() =>
-      props.widgets.reduce((width: number, widget: Widget) => {
-        const { cols, pinnedPosition } = widget;
-        const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
-        return Math.max(
-          width,
-          minCols * GRID_SQUARE_SIZE + minCols * GRID_GAP_SIZE,
-        );
-      }, 0),
-    );
-
-    const gridStyle = computed<Mapped<string>>(() => {
-      return {
-        minHeight: props.editable ? '3000px' : '0px',
-        minWidth: `${minWidth.value}px`,
-      };
-    });
-
-    async function saveWidget(widget: Widget): Promise<void> {
-      return widgetStore.saveWidget(widget);
-    }
-
-    function patchWidgets(updated: Patch<Widget>[]): void {
-      updated
-        .map((change) => {
-          const existing = widgetStore.widgetById(change.id);
-          return existing ? { ...existing, ...change } : null;
-        })
-        .filter(nullFilter)
-        .forEach((v) => saveWidget(v));
-    }
-
-    function updateItemPosition(
-      updatedId: string,
-      pos: XYPosition | null,
-    ): void {
-      const updated = Array.from(
-        containerRef.value!.getElementsByClassName('grid-item'),
-      )
-        .map((el): [string, DOMRect] => [
-          el.getAttribute('widget-id')!,
-          el.getBoundingClientRect(),
-        ])
-        .sort(([, rectA], [, rectB]) => rectA.y - rectB.y || rectA.x - rectB.x)
-        .map(([id], idx) =>
-          id === updatedId
-            ? { id, order: idx + 1, pinnedPosition: pos }
-            : { id, order: idx + 1 },
-        );
-      patchWidgets(updated);
-    }
-
-    function updateItemSize(id: string, cols: number, rows: number): void {
-      patchWidgets([{ id, cols, rows }]);
-    }
-
-    return {
-      containerRef,
-      gridStyle,
-      updateItemSize,
-      updateItemPosition,
-      saveWidget,
-    };
+  editable: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const widgetStore = useWidgetStore();
+const containerRef = ref<HTMLDivElement>();
+
+const minWidth = computed<number>(() =>
+  props.widgets.reduce((width: number, widget: Widget) => {
+    const { cols, pinnedPosition } = widget;
+    const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
+    return Math.max(
+      width,
+      minCols * GRID_SQUARE_SIZE + minCols * GRID_GAP_SIZE,
+    );
+  }, 0),
+);
+
+const gridStyle = computed<Mapped<string>>(() => {
+  return {
+    minHeight: props.editable ? '3000px' : '0px',
+    minWidth: `${minWidth.value}px`,
+  };
+});
+
+async function saveWidget(widget: Widget): Promise<void> {
+  return widgetStore.saveWidget(widget);
+}
+
+function patchWidgets(updated: Patch<Widget>[]): void {
+  updated
+    .map((change) => {
+      const existing = widgetStore.widgetById(change.id);
+      return existing ? { ...existing, ...change } : null;
+    })
+    .filter(nullFilter)
+    .forEach((v) => saveWidget(v));
+}
+
+function updateItemPosition(updatedId: string, pos: XYPosition | null): void {
+  const updated = Array.from(
+    containerRef.value!.getElementsByClassName('grid-item'),
+  )
+    .map((el): [string, DOMRect] => [
+      el.getAttribute('widget-id')!,
+      el.getBoundingClientRect(),
+    ])
+    .sort(([, rectA], [, rectB]) => rectA.y - rectB.y || rectA.x - rectB.x)
+    .map(([id], idx) =>
+      id === updatedId
+        ? { id, order: idx + 1, pinnedPosition: pos }
+        : { id, order: idx + 1 },
+    );
+  patchWidgets(updated);
+}
+
+function updateItemSize(id: string, cols: number, rows: number): void {
+  patchWidgets([{ id, cols, rows }]);
+}
 </script>
 
 <template>

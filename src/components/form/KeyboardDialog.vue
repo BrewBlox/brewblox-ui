@@ -52,9 +52,9 @@ const props = defineProps({
   },
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogProps, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+const { dialogOpts, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup();
 
 const keyboardElementRef = ref<HTMLElement | null>(null);
@@ -152,7 +152,7 @@ const onWatcherDone = watch(keyboardElementRef, (el) => {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     transition-show="fade"
     :class="`keyboard-dialog--${type}`"
     @hide="onDialogHide"

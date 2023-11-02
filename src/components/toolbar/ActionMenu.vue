@@ -1,21 +1,16 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'ActionMenu',
-  props: {
-    icon: {
-      type: String,
-      default: 'mdi-dots-vertical',
-    },
-    flat: {
-      type: Boolean,
-      default: true,
-    },
-    label: {
-      type: String,
-      default: 'Actions',
-    },
+<script setup lang="ts">
+defineProps({
+  icon: {
+    type: String,
+    default: 'mdi-dots-vertical',
+  },
+  flat: {
+    type: Boolean,
+    default: true,
+  },
+  label: {
+    type: String,
+    default: 'Actions',
   },
 });
 </script>

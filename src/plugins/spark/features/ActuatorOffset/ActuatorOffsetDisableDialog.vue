@@ -28,7 +28,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
     const driver: ActuatorOffsetBlock = cloneDeep(props.block);
     const setpoint: SetpointSensorPairBlock | null = sparkStore.blockByLink(
@@ -73,7 +73,7 @@ export default defineComponent({
     return {
       prettyUnit,
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       setpointId,
@@ -89,7 +89,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="confirm"
   >

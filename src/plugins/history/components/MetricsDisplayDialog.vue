@@ -1,11 +1,11 @@
 <script lang="ts">
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { defaultLabel } from '../nodes';
+import { MetricsConfig } from '../types';
 import { useDialog } from '@/composables';
 import { durationMs, durationString } from '@/utils/quantity';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, defineComponent, PropType, reactive } from 'vue';
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
-import { defaultLabel } from '../nodes';
-import { MetricsConfig } from '../types';
 
 export default defineComponent({
   name: 'MetricsDisplayDialog',
@@ -22,7 +22,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
 
     const local = reactive(cloneDeep(props.config));
@@ -57,7 +57,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       rename,
@@ -72,7 +72,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

@@ -1,13 +1,13 @@
 <script lang="ts">
+import { useHistoryStore } from '../store';
+import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
+import { emptyGraphConfig } from '../utils';
+import SessionSelectField from './SessionSelectField.vue';
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
-import { useHistoryStore } from '../store';
-import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
-import { emptyGraphConfig } from '../utils';
-import SessionSelectField from './SessionSelectField.vue';
 
 export default defineComponent({
   name: 'SessionCreateDialog',
@@ -28,7 +28,7 @@ export default defineComponent({
   emits: [...useDialog.emits],
   setup(props) {
     const historyStore = useHistoryStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
       useDialog.setup();
 
     const sessionTitle = ref<string>('New Session');
@@ -136,7 +136,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       sessionTitle,
@@ -157,7 +157,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

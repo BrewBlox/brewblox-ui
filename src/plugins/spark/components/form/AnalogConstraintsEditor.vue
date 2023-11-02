@@ -1,7 +1,7 @@
 <script lang="ts">
 import { emptyAnalogConstraints } from '@/plugins/spark/utils/configuration';
 import { AnalogConstraints } from 'brewblox-proto/ts';
-import produce from 'immer';
+import { produce } from 'immer';
 import defaults from 'lodash/defaults';
 import { computed, defineComponent, PropType, toRaw } from 'vue';
 

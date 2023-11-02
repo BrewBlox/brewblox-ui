@@ -6,32 +6,6 @@ declare const __BREWBLOX_API_PROTOCOL: 'http' | 'https' | undefined;
 declare const __BREWBLOX_API_HOST: string | undefined;
 declare const __BREWBLOX_API_PORT: number | undefined;
 
-interface PanArguments {
-  evt: MouseEvent | TouchEvent;
-  position: { top: number; left: number };
-  direction: 'left' | 'right' | 'up' | 'down';
-  duration: number;
-  distance: { x: number; y: number };
-  offset: { x: number; y: number };
-  delta: { x: number; y: number };
-  isFirst: boolean;
-  isFinal: boolean;
-}
-
-interface HoldArguments {
-  evt: MouseEvent | TouchEvent;
-  position: { top: number; left: number };
-  duration: number;
-}
-
-interface SwipeArguments {
-  touch: boolean;
-  mouse: boolean;
-  direction: 'up' | 'down' | 'left' | 'right';
-  duration: number;
-  distance: { x: number; y: number };
-}
-
 interface XYPosition {
   x: number;
   y: number;
@@ -70,3 +44,14 @@ type Patch<T> = HasId & Partial<T>;
 type DeepNonNullable<T> = {
   [P in keyof T]-?: NonNullable<T[P]>;
 };
+
+type InferDefaults<T> = {
+  [K in keyof T]?: InferDefault<T, T[K]>;
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type NativeType = null | number | string | boolean | symbol | Function;
+
+type InferDefault<P, T> =
+  | ((props: P) => T & {}) // eslint-disable-line @typescript-eslint/ban-types
+  | (T extends NativeType ? T : never);

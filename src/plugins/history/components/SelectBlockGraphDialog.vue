@@ -1,4 +1,5 @@
 <script lang="ts">
+import { GraphConfig } from '../types';
 import { useDialog } from '@/composables';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
@@ -14,7 +15,6 @@ import { makeTypeFilter } from '@/utils/functional';
 import { Block, BlockType } from 'brewblox-proto/ts';
 import mapValues from 'lodash/mapValues';
 import { computed, defineComponent, PropType, ref } from 'vue';
-import { GraphConfig } from '../types';
 
 export default defineComponent({
   name: 'SelectBlockGraphDialog',
@@ -31,7 +31,7 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+    const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
     const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
@@ -96,7 +96,7 @@ export default defineComponent({
 
     return {
       dialogRef,
-      dialogProps,
+      dialogOpts,
       onDialogHide,
       onDialogCancel,
       services,
@@ -118,7 +118,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
