@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+} from '@/composables';
 import { QuickstartFeature, useFeatureStore } from '@/store/features';
 import { computed, ref } from 'vue';
 
-defineProps({
-  ...useDialog.props,
-});
+defineProps<UseDialogProps>();
 
 defineEmits<UseDialogEmits>();
 

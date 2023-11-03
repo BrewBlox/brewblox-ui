@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { tryCreateWidget } from '../utils';
-import { useDialog, useGlobals, useRouteId } from '@/composables';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+  useRouteId,
+} from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
 import {
   ComponentName,
@@ -13,7 +19,7 @@ import { startCreateDashboard } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
-import { computed, nextTick, onMounted, PropType, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 
 interface FeatureOption extends SelectOption<string> {
   editor: ComponentName;
@@ -24,24 +30,16 @@ type DashboardOption = SelectOption<string>;
 
 type WizardStep = 'widget' | 'editor' | 'dashboard';
 
-const props = defineProps({
-  ...useDialog.props,
-  featureId: {
-    type: String,
-    default: null,
-  },
-  dashboardId: {
-    type: String,
-    default: null,
-  },
-  filter: {
-    type: Function as PropType<(feature: string) => boolean>,
-    default: () => true,
-  },
-  showCreated: {
-    type: Boolean,
-    default: true,
-  },
+interface Props extends UseDialogProps {
+  featureId?: string;
+  dashboardId?: string;
+  filter?: (feature: string) => boolean;
+  showCreated?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  filter: () => true,
+  showCreated: true,
 });
 
 defineEmits<UseDialogEmits>();
