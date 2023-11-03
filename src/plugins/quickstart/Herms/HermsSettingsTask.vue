@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { QuickstartAction } from '../types';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { HermsConfig, HermsOpts } from './types';
 import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
@@ -11,135 +11,99 @@ import {
   tempQty,
 } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
+
+const props = defineProps<UseTaskProps<HermsConfig>>();
+
+const emit = defineEmits<UseTaskEmits<HermsConfig>>();
 
 const volumeRules: InputRule[] = [
   (v) => Number(v) !== 0 || "Volume can't be 0",
 ];
 
-export default defineComponent({
-  name: 'HermsSettingsTask',
-  props: {
-    config: {
-      type: Object as PropType<HermsConfig>,
-      required: true,
-    },
-    actions: {
-      type: Array as PropType<QuickstartAction[]>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next', 'close'],
-  setup(props, { emit }) {
-    const hltFullPowerDelta = ref<Quantity>(deltaTempQty(2));
-    const bkFullPowerDelta = ref<Quantity>(deltaTempQty(2));
-    const hltVolume = ref<number>(25);
-    const mashVolume = ref<number>(25);
-    const driverMax = ref<Quantity>(deltaTempQty(10));
-    const mashTarget = ref<Quantity>(tempQty(67));
-    const mashActual = ref<Quantity>(tempQty(65));
+const hltFullPowerDelta = ref<Quantity>(deltaTempQty(2));
+const bkFullPowerDelta = ref<Quantity>(deltaTempQty(2));
+const hltVolume = ref<number>(25);
+const mashVolume = ref<number>(25);
+const driverMax = ref<Quantity>(deltaTempQty(10));
+const mashTarget = ref<Quantity>(tempQty(67));
+const mashActual = ref<Quantity>(tempQty(65));
 
-    const userTemp = computed<string>(() => userUnits.value.temperature);
+const userTemp = computed<string>(() => userUnits.value.temperature);
 
-    const hltKp = computed<Quantity>(() =>
-      bloxQty(
-        100 / (hltFullPowerDelta.value.value || 2),
-        `1/${userTemp.value}`,
-      ),
-    );
+const hltKp = computed<Quantity>(() =>
+  bloxQty(100 / (hltFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+);
 
-    const bkKp = computed<Quantity>(() =>
-      bloxQty(100 / (bkFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
-    );
+const bkKp = computed<Quantity>(() =>
+  bloxQty(100 / (bkFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+);
 
-    const mtKp = computed<Quantity>(() =>
-      bloxQty(mashVolume.value / (hltVolume.value || 1), `1/${userTemp.value}`),
-    );
+const mtKp = computed<Quantity>(() =>
+  bloxQty(mashVolume.value / (hltVolume.value || 1), `1/${userTemp.value}`),
+);
 
-    const hltSetting = computed<Quantity>(() => {
-      if (
-        mashTarget.value.value &&
-        mtKp.value.value &&
-        mashActual.value.value &&
-        driverMax.value.value
-      ) {
-        const upperLimit = mashTarget.value.value + driverMax.value.value;
-        const setting =
-          mashTarget.value.value +
-          (mashTarget.value.value - mashActual.value.value) * mtKp.value.value;
+const hltSetting = computed<Quantity>(() => {
+  if (
+    mashTarget.value.value &&
+    mtKp.value.value &&
+    mashActual.value.value &&
+    driverMax.value.value
+  ) {
+    const upperLimit = mashTarget.value.value + driverMax.value.value;
+    const setting =
+      mashTarget.value.value +
+      (mashTarget.value.value - mashActual.value.value) * mtKp.value.value;
 
-        return bloxQty(Math.min(upperLimit, setting), userTemp.value);
-      }
-      return bloxQty(null, userTemp.value);
-    });
-
-    function done(): void {
-      const hermsOpts: HermsOpts = {
-        hltKp: hltKp.value,
-        bkKp: bkKp.value,
-        mtKp: mtKp.value,
-        driverMax: driverMax.value,
-      };
-
-      emit('update:config', { ...props.config, hermsOpts });
-      emit('next');
-    }
-
-    function showHltVolumeKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          type: 'number',
-          modelValue: hltVolume.value,
-          rules: volumeRules,
-        },
-      }).onOk((v) => (hltVolume.value = v));
-    }
-
-    function showMashVolumeKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: mashVolume.value,
-          type: 'number',
-          rules: volumeRules,
-        },
-      }).onOk((v) => (mashVolume.value = v));
-    }
-
-    function showDriverMaxKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: driverMax.value.value ?? undefined,
-          type: 'number',
-          suffix: prettyUnit(driverMax.value),
-        },
-      }).onOk((v) => (driverMax.value = v));
-    }
-
-    return {
-      prettyQty,
-      prettyUnit,
-      volumeRules,
-      hltFullPowerDelta,
-      bkFullPowerDelta,
-      hltVolume,
-      mashVolume,
-      driverMax,
-      mashTarget,
-      mashActual,
-      hltKp,
-      bkKp,
-      mtKp,
-      hltSetting,
-      done,
-      showHltVolumeKeyboard,
-      showMashVolumeKeyboard,
-      showDriverMaxKeyboard,
-    };
-  },
+    return bloxQty(Math.min(upperLimit, setting), userTemp.value);
+  }
+  return bloxQty(null, userTemp.value);
 });
+
+function done(): void {
+  const hermsOpts: HermsOpts = {
+    hltKp: hltKp.value,
+    bkKp: bkKp.value,
+    mtKp: mtKp.value,
+    driverMax: driverMax.value,
+  };
+
+  emit('update:config', { ...props.config, hermsOpts });
+  emit('next');
+}
+
+function showHltVolumeKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      type: 'number',
+      modelValue: hltVolume.value,
+      rules: volumeRules,
+    },
+  }).onOk((v) => (hltVolume.value = v));
+}
+
+function showMashVolumeKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: mashVolume.value,
+      type: 'number',
+      rules: volumeRules,
+    },
+  }).onOk((v) => (mashVolume.value = v));
+}
+
+function showDriverMaxKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: driverMax.value.value ?? null,
+      type: 'number',
+      suffix: prettyUnit(driverMax.value),
+    },
+  }).onOk((v) => (driverMax.value = v));
+}
 </script>
 
 <template>

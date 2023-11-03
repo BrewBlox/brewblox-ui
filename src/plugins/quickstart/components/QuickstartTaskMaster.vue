@@ -1,22 +1,18 @@
 <script setup lang="ts">
 import { QuickstartCardTitleKey } from '../symbols';
 import { QuickstartAction } from '../types';
-import { PropType, provide, ref } from 'vue';
+import { provide, ref } from 'vue';
 
-const props = defineProps({
-  tasks: {
-    type: Array as PropType<string[]>,
-    required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-});
+interface Props {
+  tasks: string[];
+  title: string;
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: 'back'): void;
-  (e: 'close'): void;
+  back: [];
+  close: [];
 }>();
 
 const config = ref<AnyDict>({});

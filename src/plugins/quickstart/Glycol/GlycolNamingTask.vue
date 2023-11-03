@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GlycolBlockNames, GlycolConfig } from './types';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
+
+const props = defineProps<UseTaskProps<GlycolConfig>>();
+
+const emit = defineEmits<UseTaskEmits<GlycolConfig>>();
 
 const defaultNames: GlycolBlockNames = {
   beerSensor: 'Beer Sensor',
@@ -20,33 +25,16 @@ const defaultNames: GlycolBlockNames = {
   mutex: 'Mutex',
 };
 
-export default defineComponent({
-  name: 'GlycolNamingTask',
-  props: {
-    config: {
-      type: Object as PropType<GlycolConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const localConfig = computed<GlycolConfig>({
-      get: () => props.config,
-      set: (cfg) =>
-        emit('update:config', {
-          ...cfg,
-          widgets: [],
-          createdBlocks: [],
-          changedBlocks: [],
-          renamedBlocks: {},
-        }),
-    });
-
-    return {
-      defaultNames,
-      localConfig,
-    };
-  },
+const localConfig = computed<GlycolConfig>({
+  get: () => props.config,
+  set: (cfg) =>
+    emit('update:config', {
+      ...cfg,
+      widgets: [],
+      createdBlocks: [],
+      changedBlocks: [],
+      renamedBlocks: {},
+    }),
 });
 </script>
 

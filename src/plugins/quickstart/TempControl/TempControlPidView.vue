@@ -1,28 +1,19 @@
 <script setup lang="ts">
 import { PidConfig } from '../types';
 import { prettyQty } from '@/utils/quantity';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'TempControlPidView',
-  props: {
-    modelValue: {
-      type: Object as PropType<PidConfig>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const colorClass = computed<string>(() => {
-      if (!props.modelValue.kp.value) {
-        return '';
-      }
-      return props.modelValue.kp.value > 0 ? 'text-red' : 'text-blue';
-    });
-    return {
-      prettyQty,
-      colorClass,
-    };
-  },
+interface Props {
+  modelValue: PidConfig;
+}
+
+const props = defineProps<Props>();
+
+const colorClass = computed<string>(() => {
+  if (!props.modelValue.kp.value) {
+    return '';
+  }
+  return props.modelValue.kp.value > 0 ? 'text-red' : 'text-blue';
 });
 </script>
 

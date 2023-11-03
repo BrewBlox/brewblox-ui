@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { QuickstartConfig } from '../types';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
@@ -6,83 +7,58 @@ import { Service, ServiceStub, useServiceStore } from '@/store/services';
 import { makeTypeFilter } from '@/utils/functional';
 import { startCreateService } from '@/utils/services';
 import { BlockType } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
+
+const props = defineProps<UseTaskProps<QuickstartConfig>>();
+
+const emit = defineEmits<UseTaskEmits<QuickstartConfig>>();
 
 const sparkFilter = makeTypeFilter(SPARK_SERVICE_TYPE);
 
-export default defineComponent({
-  name: 'QuickstartServiceTask',
-  props: {
-    config: {
-      type: Object as PropType<QuickstartConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const serviceStore = useServiceStore();
-    const sparkStore = useSparkStore();
-    const serviceId = computed<string>(() => props.config.serviceId);
-    const service = ref<Service | null>(
-      serviceStore.serviceById(serviceId.value),
-    );
-    const handleExisting = ref<'keep' | 'clear' | null>(null);
+const serviceStore = useServiceStore();
+const sparkStore = useSparkStore();
+const serviceId = computed<string>(() => props.config.serviceId);
+const service = ref<Service | null>(serviceStore.serviceById(serviceId.value));
+const handleExisting = ref<'keep' | 'clear' | null>(null);
 
-    const services = computed<Service[]>(() =>
-      serviceStore.services.filter(sparkFilter),
-    );
+const services = computed<Service[]>(() =>
+  serviceStore.services.filter(sparkFilter),
+);
 
-    const stubs = computed<ServiceStub[]>(() =>
-      serviceStore.stubs.filter(sparkFilter),
-    );
+const stubs = computed<ServiceStub[]>(() =>
+  serviceStore.stubs.filter(sparkFilter),
+);
 
-    if (
-      !service.value &&
-      services.value.length === 1 &&
-      stubs.value.length === 0
-    ) {
-      service.value = services.value[0];
-    }
+if (!service.value && services.value.length === 1 && stubs.value.length === 0) {
+  service.value = services.value[0];
+}
 
-    const hasBlocks = computed<boolean>(
-      // Ignore discovered blocks
-      // Any previous control chain will have included a PID
-      () =>
-        sparkStore
-          .blocksByService(service.value?.id)
-          .find((v) => v.type === BlockType.Pid) !== undefined,
-    );
+const hasBlocks = computed<boolean>(
+  // Ignore discovered blocks
+  // Any previous control chain will have included a PID
+  () =>
+    sparkStore
+      .blocksByService(service.value?.id)
+      .find((v) => v.type === BlockType.Pid) !== undefined,
+);
 
-    const ready = computed<boolean>(
-      () =>
-        sparkStore.has(service.value?.id) &&
-        (!hasBlocks.value || handleExisting.value !== null),
-    );
+const ready = computed<boolean>(
+  () =>
+    sparkStore.has(service.value?.id) &&
+    (!hasBlocks.value || handleExisting.value !== null),
+);
 
-    async function taskDone(): Promise<void> {
-      if (!service.value || !ready.value) {
-        return;
-      }
-      const serviceId = service.value.id;
-      if (handleExisting.value === 'clear') {
-        sparkStore.clearBlocks(serviceId);
-      }
-      emit('update:config', { ...props.config, serviceId });
-      emit('next');
-    }
-
-    return {
-      handleExisting,
-      service,
-      services,
-      stubs,
-      hasBlocks,
-      ready,
-      startCreateService,
-      taskDone,
-    };
-  },
-});
+async function taskDone(): Promise<void> {
+  if (!service.value || !ready.value) {
+    return;
+  }
+  const serviceId = service.value.id;
+  if (handleExisting.value === 'clear') {
+    sparkStore.clearBlocks(serviceId);
+  }
+  emit('update:config', { ...props.config, serviceId });
+  emit('next');
+}
 </script>
 
 <template>

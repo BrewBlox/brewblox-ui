@@ -1,31 +1,19 @@
 <script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange } from '../types';
 import { FridgeConfig } from './types';
-import { defineComponent, PropType, reactive } from 'vue';
+import { reactive } from 'vue';
 
-export default defineComponent({
-  name: 'FridgeIoTask',
-  props: {
-    config: {
-      type: Object as PropType<FridgeConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const changedGpio = reactive<GpioChange[]>(props.config.changedGpio);
+const props = defineProps<UseTaskProps<FridgeConfig>>();
 
-    function taskDone(): void {
-      emit('update:config', { ...props.config, changedGpio });
-      emit('next');
-    }
+const emit = defineEmits<UseTaskEmits<FridgeConfig>>();
 
-    return {
-      changedGpio,
-      taskDone,
-    };
-  },
-});
+const changedGpio = reactive<GpioChange[]>(props.config.changedGpio);
+
+function taskDone(): void {
+  emit('update:config', { ...props.config, changedGpio });
+  emit('next');
+}
 </script>
 
 <template>

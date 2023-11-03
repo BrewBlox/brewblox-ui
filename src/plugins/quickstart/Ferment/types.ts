@@ -1,7 +1,7 @@
 import { IoChannelAddress, QuickstartConfig } from '../types';
 import { Quantity } from 'brewblox-proto/ts';
 
-export interface FermentBlockNames {
+export type FermentBlockNames = {
   fridgeSensor: string;
   beerSensor: string;
   fridgeSetpoint: string;
@@ -14,7 +14,7 @@ export interface FermentBlockNames {
   mutex: string;
   coolPid: string;
   heatPid: string;
-}
+};
 
 export type FermentMode = 'beer' | 'fridge';
 

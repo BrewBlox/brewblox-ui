@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { RimsBlockNames, RimsConfig } from './types';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
+
+const props = defineProps<UseTaskProps<RimsConfig>>();
+
+const emit = defineEmits<UseTaskEmits<RimsConfig>>();
 
 const defaultNames: RimsBlockNames = {
   kettleSensor: 'Kettle Sensor',
@@ -15,33 +20,16 @@ const defaultNames: RimsBlockNames = {
   pumpAct: 'Pump Actuator',
 };
 
-export default defineComponent({
-  name: 'RimsNamingTask',
-  props: {
-    config: {
-      type: Object as PropType<RimsConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const localConfig = computed<RimsConfig>({
-      get: () => props.config,
-      set: (cfg) =>
-        emit('update:config', {
-          ...cfg,
-          widgets: [],
-          createdBlocks: [],
-          changedBlocks: [],
-          renamedBlocks: {},
-        }),
-    });
-
-    return {
-      defaultNames,
-      localConfig,
-    };
-  },
+const localConfig = computed<RimsConfig>({
+  get: () => props.config,
+  set: (cfg) =>
+    emit('update:config', {
+      ...cfg,
+      widgets: [],
+      createdBlocks: [],
+      changedBlocks: [],
+      renamedBlocks: {},
+    }),
 });
 </script>
 

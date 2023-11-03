@@ -1,7 +1,7 @@
 import { IoChannelAddress, QuickstartConfig } from '../types';
 import { Quantity } from 'brewblox-proto/ts';
 
-export interface GlycolBlockNames {
+export type GlycolBlockNames = {
   beerSensor: string;
   beerSetpoint: string;
   beerProfile: string;
@@ -23,7 +23,7 @@ export interface GlycolBlockNames {
   glycolPwm: string;
 
   glycolAct: string;
-}
+};
 
 export type GlycolControlMode = 'No' | 'Measure' | 'Control';
 

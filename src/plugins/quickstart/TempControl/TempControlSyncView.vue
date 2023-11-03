@@ -1,34 +1,17 @@
 <script setup lang="ts">
 import { PidConfig } from '../types';
 import TempControlPidView from './TempControlPidView.vue';
-import { defineComponent, PropType } from 'vue';
 
-export default defineComponent({
-  name: 'TempControlSyncView',
-  components: {
-    TempControlPidView,
-  },
-  props: {
-    blockConfig: {
-      type: Object as PropType<PidConfig>,
-      required: true,
-    },
-    modeConfig: {
-      type: Object as PropType<PidConfig>,
-      required: true,
-    },
-  },
-  emits: ['apply'],
-  setup(props, { emit }) {
-    function apply(leading: 'pid' | 'mode'): void {
-      emit('apply', leading);
-    }
+interface Props {
+  blockConfig: PidConfig;
+  modeConfig: PidConfig;
+}
 
-    return {
-      apply,
-    };
-  },
-});
+defineProps<Props>();
+
+defineEmits<{
+  apply: [leading: 'pid' | 'mode'];
+}>();
 </script>
 
 <template>
@@ -60,14 +43,14 @@ export default defineComponent({
         icon="mdi-arrow-left"
         label="Apply"
         stack
-        @click="apply('mode')"
+        @click="$emit('apply', 'mode')"
       />
       <q-btn
         flat
         icon="mdi-arrow-right"
         label="Store"
         stack
-        @click="apply('pid')"
+        @click="$emit('apply', 'pid')"
       />
     </div>
     <LabeledField

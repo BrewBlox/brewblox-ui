@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { QuickstartAction } from '../types';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { createOutputActions, executeActions } from '../utils';
 import {
   defineChangedBlocks,
@@ -9,58 +9,41 @@ import {
 } from './changes';
 import { defineLayouts } from './changes-layout';
 import { RimsConfig } from './types';
-import { defineComponent, onMounted, PropType, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-export default defineComponent({
-  name: 'RimsCompletionTask',
-  props: {
-    config: {
-      type: Object as PropType<RimsConfig>,
-      required: true,
-    },
-    actions: {
-      type: Array as PropType<QuickstartAction[]>,
-      required: true,
-    },
-  },
-  emits: ['close'],
-  setup(props) {
-    const router = useRouter();
-    const busy = ref(true);
+const props = defineProps<UseTaskProps<RimsConfig>>();
 
-    async function execute(): Promise<void> {
-      const createdBlocks = defineCreatedBlocks(props.config);
-      const changedBlocks = defineChangedBlocks(props.config);
-      const displayedBlocks = defineDisplayedBlocks(props.config);
-      const layouts = defineLayouts(props.config);
-      const widgets = defineWidgets(props.config, layouts);
+defineEmits<UseTaskEmits<RimsConfig>>();
 
-      const finalizedConfig: RimsConfig = {
-        ...props.config,
-        createdBlocks,
-        changedBlocks,
-        layouts,
-        widgets,
-        displayedBlocks,
-      };
+const router = useRouter();
+const busy = ref(true);
 
-      await executeActions(createOutputActions(), finalizedConfig);
-    }
+async function execute(): Promise<void> {
+  const createdBlocks = defineCreatedBlocks(props.config);
+  const changedBlocks = defineChangedBlocks(props.config);
+  const displayedBlocks = defineDisplayedBlocks(props.config);
+  const layouts = defineLayouts(props.config);
+  const widgets = defineWidgets(props.config, layouts);
 
-    onMounted(() => execute().finally(() => (busy.value = false)));
+  const finalizedConfig: RimsConfig = {
+    ...props.config,
+    createdBlocks,
+    changedBlocks,
+    layouts,
+    widgets,
+    displayedBlocks,
+  };
 
-    function done(): void {
-      // Will cause dialog to autoclose
-      router.push(`/dashboard/${props.config.dashboardId}`);
-    }
+  await executeActions(createOutputActions(), finalizedConfig);
+}
 
-    return {
-      busy,
-      done,
-    };
-  },
-});
+onMounted(() => execute().finally(() => (busy.value = false)));
+
+function done(): void {
+  // Will cause dialog to autoclose
+  router.push(`/dashboard/${props.config.dashboardId}`);
+}
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 import { IoChannelAddress, QuickstartConfig } from '../types';
 import { Quantity } from 'brewblox-proto/ts';
 
-export interface FridgeConfigNames {
+export type FridgeConfigNames = {
   fridgeSensor: string;
   fridgeSetpoint: string;
   tempProfile: string;
@@ -12,7 +12,7 @@ export interface FridgeConfigNames {
   mutex: string;
   coolPid: string;
   heatPid: string;
-}
+};
 
 export interface FridgeOpts {
   fridgeSetting: Quantity;

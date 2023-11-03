@@ -1,13 +1,13 @@
 import { IoChannelAddress, QuickstartConfig } from '../types';
 import { Quantity } from 'brewblox-proto/ts';
 
-export interface BrewKettleBlockNames {
+export type BrewKettleBlockNames = {
   kettleSensor: string;
   kettleSetpoint: string;
   kettlePid: string;
   kettlePwm: string;
   kettleAct: string;
-}
+};
 
 export interface BrewKettleOpts {
   kp: Quantity;

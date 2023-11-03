@@ -1,117 +1,86 @@
 <script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange, IoChannelAddress } from '../types';
 import { hasShared, resetGpioChanges } from '../utils';
 import { HermsConfig } from './types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  PropType,
-  reactive,
-  ref,
-} from 'vue';
+import { computed, onBeforeMount, reactive, ref } from 'vue';
 
-export default defineComponent({
-  name: 'HermsHardwareTask',
-  props: {
-    config: {
-      type: Object as PropType<HermsConfig>,
-      required: true,
+const props = defineProps<UseTaskProps<HermsConfig>>();
+
+const emit = defineEmits<UseTaskEmits<HermsConfig>>();
+
+const sparkStore = useSparkStore();
+
+const hltChannel = ref<IoChannelAddress | null>(
+  props.config.hltChannel ?? null,
+);
+const bkChannel = ref<IoChannelAddress | null>(props.config.bkChannel ?? null);
+const hltSensor = ref<string | null>(props.config.hltSensor ?? null);
+const mtSensor = ref<string | null>(props.config.mtSensor ?? null);
+const bkSensor = ref<string | null>(props.config.bkSensor ?? null);
+const changedGpio = reactive<GpioChange[]>(
+  props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
+);
+
+const channelSame = computed<boolean>(() =>
+  hasShared([hltChannel.value, bkChannel.value]),
+);
+
+const sensorSame = computed<boolean>(() =>
+  hasShared([hltSensor.value, mtSensor.value, bkSensor.value]),
+);
+
+const valuesOk = computed<boolean>(() =>
+  [
+    hltChannel.value,
+    bkChannel.value,
+    !channelSame.value,
+    hltSensor.value,
+    mtSensor.value,
+    bkSensor.value,
+    !sensorSame.value,
+  ].every(Boolean),
+);
+
+function discover(): void {
+  sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
+}
+
+function startBlockWizard(): void {
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: props.config.serviceId,
     },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const sparkStore = useSparkStore();
+  });
+}
 
-    const hltChannel = ref<IoChannelAddress | null>(
-      props.config.hltChannel ?? null,
-    );
-    const bkChannel = ref<IoChannelAddress | null>(
-      props.config.bkChannel ?? null,
-    );
-    const hltSensor = ref<string | null>(props.config.hltSensor ?? null);
-    const mtSensor = ref<string | null>(props.config.mtSensor ?? null);
-    const bkSensor = ref<string | null>(props.config.bkSensor ?? null);
-    const changedGpio = reactive<GpioChange[]>(
-      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
-    );
+function taskDone(): void {
+  if (!valuesOk.value) {
+    return;
+  }
 
-    const channelSame = computed<boolean>(() =>
-      hasShared([hltChannel.value, bkChannel.value]),
-    );
+  const updates: Partial<HermsConfig> = {
+    changedGpio,
+    hltChannel: hltChannel.value!,
+    bkChannel: bkChannel.value!,
+    hltSensor: hltSensor.value!,
+    mtSensor: mtSensor.value!,
+    bkSensor: bkSensor.value!,
+    renamedBlocks: {
+      [hltSensor.value!]: props.config.names.hltSensor,
+      [mtSensor.value!]: props.config.names.mtSensor,
+      [bkSensor.value!]: props.config.names.bkSensor,
+    },
+  };
 
-    const sensorSame = computed<boolean>(() =>
-      hasShared([hltSensor.value, mtSensor.value, bkSensor.value]),
-    );
+  emit('update:config', { ...props.config, ...updates });
+  emit('next');
+}
 
-    const valuesOk = computed<boolean>(() =>
-      [
-        hltChannel.value,
-        bkChannel.value,
-        !channelSame.value,
-        hltSensor.value,
-        mtSensor.value,
-        bkSensor.value,
-        !sensorSame.value,
-      ].every(Boolean),
-    );
-
-    function discover(): void {
-      sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
-    }
-
-    function startBlockWizard(): void {
-      createDialog({
-        component: 'BlockWizardDialog',
-        componentProps: {
-          serviceId: props.config.serviceId,
-        },
-      });
-    }
-
-    function taskDone(): void {
-      if (!valuesOk.value) {
-        return;
-      }
-
-      const updates: Partial<HermsConfig> = {
-        changedGpio,
-        hltChannel: hltChannel.value!,
-        bkChannel: bkChannel.value!,
-        hltSensor: hltSensor.value!,
-        mtSensor: mtSensor.value!,
-        bkSensor: bkSensor.value!,
-        renamedBlocks: {
-          [hltSensor.value!]: props.config.names.hltSensor,
-          [mtSensor.value!]: props.config.names.mtSensor,
-          [bkSensor.value!]: props.config.names.bkSensor,
-        },
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('next');
-    }
-
-    onBeforeMount(() => discover());
-
-    return {
-      hltChannel,
-      bkChannel,
-      hltSensor,
-      mtSensor,
-      bkSensor,
-      changedGpio,
-      channelSame,
-      sensorSame,
-      valuesOk,
-      discover,
-      startBlockWizard,
-      taskDone,
-    };
-  },
-});
+onBeforeMount(() => discover());
 </script>
 
 <template>

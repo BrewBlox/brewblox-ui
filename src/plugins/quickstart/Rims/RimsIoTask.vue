@@ -1,31 +1,19 @@
 <script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange } from '../types';
 import { RimsConfig } from './types';
-import { defineComponent, PropType, reactive } from 'vue';
+import { reactive } from 'vue';
 
-export default defineComponent({
-  name: 'RimsIoTask',
-  props: {
-    config: {
-      type: Object as PropType<RimsConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const changedGpio = reactive<GpioChange[]>(props.config.changedGpio);
+const props = defineProps<UseTaskProps<RimsConfig>>();
 
-    function taskDone(): void {
-      emit('update:config', { ...props.config, changedGpio });
-      emit('next');
-    }
+const emit = defineEmits<UseTaskEmits<RimsConfig>>();
 
-    return {
-      changedGpio,
-      taskDone,
-    };
-  },
-});
+const changedGpio = reactive<GpioChange[]>(props.config.changedGpio);
+
+function taskDone(): void {
+  emit('update:config', { ...props.config, changedGpio });
+  emit('next');
+}
 </script>
 
 <template>

@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { makeRuleValidator } from '@/utils/rules';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
+
+interface Props {
+  modelValue: string;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:modelValue': [data: string];
+  clear: [];
+}>();
 
 const rules = [
   (v: any) => /^($|[a-zA-Z])/.test(v) || 'Name must start with a letter',
@@ -10,36 +21,19 @@ const rules = [
 ];
 const validator = makeRuleValidator(rules);
 
-export default defineComponent({
-  name: 'QuickstartPrefixField',
-  props: {
-    modelValue: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue', 'clear'],
-  setup(props, { emit }) {
-    const local = ref<string | null>(null);
+const local = ref<string | null>(null);
 
-    const prefix = computed<string>({
-      get: () => local.value ?? props.modelValue,
-      set: (val) => {
-        if (validator(val)) {
-          local.value = null;
-          emit('update:modelValue', val);
-        } else {
-          local.value = val;
-          // Don't emit invalid prefix
-          // The parent element only wants valid updates
-        }
-      },
-    });
-
-    return {
-      prefix,
-      rules,
-    };
+const prefix = computed<string>({
+  get: () => local.value ?? props.modelValue,
+  set: (val) => {
+    if (validator(val)) {
+      local.value = null;
+      emit('update:modelValue', val);
+    } else {
+      local.value = val;
+      // Don't emit invalid prefix
+      // The parent element only wants valid updates
+    }
   },
 });
 </script>
