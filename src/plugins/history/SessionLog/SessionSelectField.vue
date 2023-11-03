@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import { LoggedSession } from '../types';
-import { useField } from '@/composables';
+import { useField, UseFieldProps } from '@/composables';
 import { dateString } from '@/utils/quantity';
 import escapeRegExp from 'lodash/escapeRegExp';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 interface SessionOpt extends SelectOption {
   session: LoggedSession;
 }
+
+interface Props extends UseFieldProps {
+  modelValue: LoggedSession | null;
+  sessions: LoggedSession[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+});
+
+const emit = defineEmits<{
+  'update:modelValue': [data: LoggedSession | null];
+}>();
 
 function asOpt(session: LoggedSession): SessionOpt {
   return {
@@ -17,52 +30,29 @@ function asOpt(session: LoggedSession): SessionOpt {
   };
 }
 
-export default defineComponent({
-  name: 'SessionSelectField',
-  props: {
-    ...useField.props,
-    modelValue: {
-      type: null as unknown as PropType<LoggedSession | null>,
-      default: null,
-    },
-    sessions: {
-      type: Array as PropType<LoggedSession[]>,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const sessionOpts = computed<SessionOpt[]>(() => props.sessions.map(asOpt));
+const sessionOpts = computed<SessionOpt[]>(() => props.sessions.map(asOpt));
 
-    const filteredOpts = ref<SessionOpt[]>(sessionOpts.value);
+const filteredOpts = ref<SessionOpt[]>(sessionOpts.value);
 
-    function filterFn(val, update): void {
-      if (val === '') {
-        update(() => (filteredOpts.value = sessionOpts.value));
-        return;
-      }
+function filterFn(val, update): void {
+  if (val === '') {
+    update(() => (filteredOpts.value = sessionOpts.value));
+    return;
+  }
 
-      update(() => {
-        const needle = escapeRegExp(val.toLowerCase());
-        filteredOpts.value = sessionOpts.value.filter(
-          (opt) =>
-            opt.label.toLowerCase().match(needle) ||
-            opt.session.tags?.some((t) => t.toLowerCase().match(needle)),
-        );
-      });
-    }
+  update(() => {
+    const needle = escapeRegExp(val.toLowerCase());
+    filteredOpts.value = sessionOpts.value.filter(
+      (opt) =>
+        opt.label.toLowerCase().match(needle) ||
+        opt.session.tags?.some((t) => t.toLowerCase().match(needle)),
+    );
+  });
+}
 
-    const selectedOpt = computed<SessionOpt | null>({
-      get: () => (props.modelValue !== null ? asOpt(props.modelValue) : null),
-      set: (opt) => emit('update:modelValue', opt?.session ?? null),
-    });
-
-    return {
-      filteredOpts,
-      filterFn,
-      selectedOpt,
-    };
-  },
+const selectedOpt = computed<SessionOpt | null>({
+  get: () => (props.modelValue !== null ? asOpt(props.modelValue) : null),
+  set: (opt) => emit('update:modelValue', opt?.session ?? null),
 });
 </script>
 

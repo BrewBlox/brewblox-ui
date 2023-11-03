@@ -1,49 +1,31 @@
 <script setup lang="ts">
-import { QuickstartAction } from '../types';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 import { userUnits } from '@/user-settings';
 import { bloxQty, deltaTempQty } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'BrewKettleSettingsTask',
-  props: {
-    config: {
-      type: Object as PropType<BrewKettleConfig>,
-      required: true,
-    },
-    actions: {
-      type: Array as PropType<QuickstartAction[]>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const fullPowerDelta = ref<Quantity>(deltaTempQty(2));
+const props = defineProps<UseTaskProps<BrewKettleConfig>>();
 
-    const userTemp = computed<string>(() => userUnits.value.temperature);
+const emit = defineEmits<UseTaskEmits<BrewKettleConfig>>();
 
-    const kp = computed<Quantity>(() =>
-      bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
-    );
+const fullPowerDelta = ref<Quantity>(deltaTempQty(2));
 
-    function taskDone(): void {
-      const kettleOpts: BrewKettleOpts = {
-        kp: kp.value,
-      };
+const userTemp = computed<string>(() => userUnits.value.temperature);
 
-      emit('update:config', { ...props.config, kettleOpts });
-      emit('next');
-    }
+const kp = computed<Quantity>(() =>
+  bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+);
 
-    return {
-      fullPowerDelta,
-      kp,
-      taskDone,
-    };
-  },
-});
+function taskDone(): void {
+  const kettleOpts: BrewKettleOpts = {
+    kp: kp.value,
+  };
+
+  emit('update:config', { ...props.config, kettleOpts });
+  emit('next');
+}
 </script>
 
 <template>

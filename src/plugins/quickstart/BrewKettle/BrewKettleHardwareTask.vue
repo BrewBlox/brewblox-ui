@@ -1,85 +1,61 @@
 <script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange, IoChannelAddress } from '../types';
 import { resetGpioChanges } from '../utils';
 import { BrewKettleConfig } from './types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  PropType,
-  reactive,
-  ref,
-} from 'vue';
+import { computed, onBeforeMount, reactive, ref } from 'vue';
 
-export default defineComponent({
-  name: 'BrewKettleHardwareTask',
-  props: {
-    config: {
-      type: Object as PropType<BrewKettleConfig>,
-      required: true,
+const props = defineProps<UseTaskProps<BrewKettleConfig>>();
+
+const emit = defineEmits<UseTaskEmits<BrewKettleConfig>>();
+
+const sparkStore = useSparkStore();
+const kettleChannel = ref<IoChannelAddress | null>(
+  props.config.kettleChannel ?? null,
+);
+const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
+const changedGpio = reactive<GpioChange[]>(
+  props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
+);
+
+const valuesOk = computed<boolean>(() =>
+  Boolean(kettleChannel.value && kettleSensor.value),
+);
+
+function discover(): void {
+  sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
+}
+
+function startBlockWizard(): void {
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: props.config.serviceId,
     },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const sparkStore = useSparkStore();
-    const kettleChannel = ref<IoChannelAddress | null>(
-      props.config.kettleChannel ?? null,
-    );
-    const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
-    const changedGpio = reactive<GpioChange[]>(
-      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
-    );
+  });
+}
 
-    const valuesOk = computed<boolean>(() =>
-      Boolean(kettleChannel.value && kettleSensor.value),
-    );
+function taskDone(): void {
+  if (!valuesOk.value) {
+    return;
+  }
+  const updated: BrewKettleConfig = {
+    ...props.config,
+    changedGpio,
+    kettleChannel: kettleChannel.value!,
+    kettleSensor: kettleSensor.value!,
+    renamedBlocks: {
+      ...props.config.renamedBlocks,
+      [kettleSensor.value!]: props.config.names.kettleSensor,
+    },
+  };
+  emit('update:config', updated);
+  emit('next');
+}
 
-    function discover(): void {
-      sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
-    }
-
-    function startBlockWizard(): void {
-      createDialog({
-        component: 'BlockWizardDialog',
-        componentProps: {
-          serviceId: props.config.serviceId,
-        },
-      });
-    }
-
-    function taskDone(): void {
-      if (!valuesOk.value) {
-        return;
-      }
-      const updated: BrewKettleConfig = {
-        ...props.config,
-        changedGpio,
-        kettleChannel: kettleChannel.value!,
-        kettleSensor: kettleSensor.value!,
-        renamedBlocks: {
-          ...props.config.renamedBlocks,
-          [kettleSensor.value!]: props.config.names.kettleSensor,
-        },
-      };
-      emit('update:config', updated);
-      emit('next');
-    }
-
-    onBeforeMount(() => discover());
-
-    return {
-      kettleChannel,
-      kettleSensor,
-      changedGpio,
-      valuesOk,
-      discover,
-      startBlockWizard,
-      taskDone,
-    };
-  },
-});
+onBeforeMount(() => discover());
 </script>
 
 <template>

@@ -22,6 +22,11 @@ const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
 
 const local = ref<LoggedSession>(cloneDeep(props.modelValue));
 
+const tags = computed<string[]>({
+  get: () => local.value.tags ?? [],
+  set: (v) => (local.value.tags = v),
+});
+
 const date = computed<Date | null>({
   get: () => parseDate(local.value.date),
   set: (v) =>
@@ -59,7 +64,7 @@ const knownTags = computed<string[]>(() => historyStore.sessionTags);
         item-aligned
       />
       <TagSelectField
-        v-model="local.tags"
+        v-model="tags"
         :existing="knownTags"
       />
       <template #actions>

@@ -10,7 +10,7 @@ import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
   config: GraphConfig;
-  noPeriod?: false;
+  noPeriod?: boolean;
   shared?: SharedGraphConfig[];
 }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { BrewKettleBlockNames, BrewKettleConfig } from './types';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
 
 const defaultNames: BrewKettleBlockNames = {
   kettleSensor: 'Sensor',
@@ -10,33 +11,20 @@ const defaultNames: BrewKettleBlockNames = {
   kettleAct: 'Actuator',
 };
 
-export default defineComponent({
-  name: 'BrewKettleNamingTask',
-  props: {
-    config: {
-      type: Object as PropType<BrewKettleConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const localConfig = computed<BrewKettleConfig>({
-      get: () => props.config,
-      set: (cfg) =>
-        emit('update:config', {
-          ...cfg,
-          widgets: [],
-          createdBlocks: [],
-          changedBlocks: [],
-          renamedBlocks: {},
-        }),
-    });
+const props = defineProps<UseTaskProps<BrewKettleConfig>>();
 
-    return {
-      defaultNames,
-      localConfig,
-    };
-  },
+const emit = defineEmits<UseTaskEmits<BrewKettleConfig>>();
+
+const localConfig = computed<BrewKettleConfig>({
+  get: () => props.config,
+  set: (cfg) =>
+    emit('update:config', {
+      ...cfg,
+      widgets: [],
+      createdBlocks: [],
+      changedBlocks: [],
+      renamedBlocks: {},
+    }),
 });
 </script>
 
