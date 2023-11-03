@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import TempControlBasic from './TempControlBasic.vue';
 import TempControlFull from './TempControlFull.vue';
 import { useContext } from '@/composables';

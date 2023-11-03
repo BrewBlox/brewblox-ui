@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { prettyConstraints } from '../../utils/formatting';
 import { useValEdit } from '@/plugins/spark/composables';
 import { AnalogConstraints } from 'brewblox-proto/ts';

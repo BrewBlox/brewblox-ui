@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { PidConfig } from '../types';
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlSyncView from './TempControlSyncView.vue';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
 import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
 import { useContext } from '@/composables';

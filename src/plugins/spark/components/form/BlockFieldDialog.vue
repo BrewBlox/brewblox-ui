@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
 import cloneDeep from 'lodash/cloneDeep';

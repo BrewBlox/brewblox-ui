@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { QuickstartAction } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 import { tempQty } from '@/utils/quantity';

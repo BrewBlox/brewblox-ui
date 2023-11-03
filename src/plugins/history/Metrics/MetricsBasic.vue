@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { MetricsWidget } from './types';
 import { useContext, useWidget } from '@/composables';
@@ -15,115 +15,92 @@ import { isJsonEqual } from '@/utils/objects';
 import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
-import {
-  computed,
-  defineComponent,
-  onBeforeUnmount,
-  onMounted,
-  watch,
-} from 'vue';
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
 
 interface CurrentValue extends MetricValue {
   name: string;
   stale: boolean;
 }
 
-export default defineComponent({
-  name: 'MetricsBasic',
-  props: {
-    revision: {
-      type: Date,
-      required: true,
-    },
-  },
-  setup(props) {
-    const historyStore = useHistoryStore();
-    const metricsId = nanoid();
-    const { context } = useContext.setup();
-    const { widget } = useWidget.setup<MetricsWidget>();
+interface Props {
+  revision: Date;
+}
 
-    const config = computed<MetricsConfig>(() =>
-      defaults(widget.value.config, emptyMetricsConfig()),
-    );
+const props = defineProps<Props>();
 
-    const source = computed<MetricsSource | null>(() =>
-      historyStore.sourceById<MetricsSource>(metricsId),
-    );
+const historyStore = useHistoryStore();
+const metricsId = nanoid();
+const { context } = useContext.setup();
+const { widget } = useWidget.setup<MetricsWidget>();
 
-    function fieldFreshDuration(field: string): number {
-      return config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
-    }
+const config = computed<MetricsConfig>(() =>
+  defaults(widget.value.config, emptyMetricsConfig()),
+);
 
-    function fieldDecimals(field: string): number {
-      return config.value.decimals[field] ?? DEFAULT_METRICS_DECIMALS;
-    }
+const source = computed<MetricsSource | null>(() =>
+  historyStore.sourceById<MetricsSource>(metricsId),
+);
 
-    function fixedValue(value: CurrentValue): string {
-      return fixedNumber(value.value, fieldDecimals(value.field));
-    }
+function fieldFreshDuration(field: string): number {
+  return config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
+}
 
-    const values = computed<CurrentValue[]>(() => {
-      const now = new Date().getTime();
-      return (
-        source.value?.values.map((result) => ({
-          ...result,
-          name:
-            config.value.renames[result.field] || defaultLabel(result.field),
-          stale:
-            !!result.time &&
-            ((now - result.time) as number) > fieldFreshDuration(result.field),
-        })) ?? []
-      );
-    });
+function fieldDecimals(field: string): number {
+  return config.value.decimals[field] ?? DEFAULT_METRICS_DECIMALS;
+}
 
-    function createSource(): void {
-      addSource(
-        metricsId,
-        config.value.params,
-        config.value.renames,
-        config.value.fields,
-      );
-    }
+function fixedValue(value: CurrentValue): string {
+  return fixedNumber(value.value, fieldDecimals(value.field));
+}
 
-    function removeSource(): void {
-      historyStore.removeSource(source.value);
-    }
-
-    function resetSource(): void {
-      removeSource();
-      createSource();
-    }
-
-    watch(
-      () => config.value,
-      (newV, oldV) => {
-        if (!isJsonEqual(newV, oldV)) {
-          resetSource();
-        }
-      },
-      { deep: true },
-    );
-
-    watch(
-      () => props.revision,
-      () => resetSource(),
-    );
-
-    onMounted(() => resetSource());
-    onBeforeUnmount(() => removeSource());
-
-    return {
-      shortDateString,
-      context,
-      metricsId,
-      config,
-      values,
-      fixedValue,
-      durationString,
-      fieldFreshDuration,
-    };
-  },
+const values = computed<CurrentValue[]>(() => {
+  const now = new Date().getTime();
+  return (
+    source.value?.values.map((result) => ({
+      ...result,
+      name: config.value.renames[result.field] || defaultLabel(result.field),
+      stale:
+        !!result.time &&
+        ((now - result.time) as number) > fieldFreshDuration(result.field),
+    })) ?? []
+  );
 });
+
+function createSource(): void {
+  addSource(
+    metricsId,
+    config.value.params,
+    config.value.renames,
+    config.value.fields,
+  );
+}
+
+function removeSource(): void {
+  historyStore.removeSource(source.value);
+}
+
+function resetSource(): void {
+  removeSource();
+  createSource();
+}
+
+watch(
+  () => config.value,
+  (newV, oldV) => {
+    if (!isJsonEqual(newV, oldV)) {
+      resetSource();
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  () => props.revision,
+  () => resetSource(),
+);
+
+onMounted(() => resetSource());
+onBeforeUnmount(() => removeSource());
 </script>
 
 <template>

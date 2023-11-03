@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useValEdit } from '@/plugins/spark/composables';
 import { DigitalState } from 'brewblox-proto/ts';
 import { defineComponent } from 'vue';

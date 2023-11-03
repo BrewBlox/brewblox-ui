@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { GpioChange, IoChannelAddress, QuickstartAction } from '../types';
 import { hasShared, resetGpioChanges } from '../utils';
 import { RimsConfig } from './types';

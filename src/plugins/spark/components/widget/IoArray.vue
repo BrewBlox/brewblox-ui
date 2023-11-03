@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import DisplaySettingsBasic from './DisplaySettingsBasic.vue';
 import DisplaySettingsFull from './DisplaySettingsFull.vue';
 import { useContext } from '@/composables';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { fieldLabels } from '@/plugins/tilt/const';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltFieldIndex, TiltStateValue } from '@/plugins/tilt/types';

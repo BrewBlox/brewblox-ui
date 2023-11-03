@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { GlycolBlockNames, GlycolConfig } from './types';
 import { computed, defineComponent, PropType } from 'vue';
 

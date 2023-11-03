@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { FermentBlockNames, FermentConfig } from './types';
 import { computed, defineComponent, PropType } from 'vue';
 

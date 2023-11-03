@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { QuickValuesWidget } from './types';
 import { useContext, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';

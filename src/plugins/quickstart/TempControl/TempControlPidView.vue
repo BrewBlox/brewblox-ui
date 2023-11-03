@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { PidConfig } from '../types';
 import { prettyQty } from '@/utils/quantity';
 import { computed, defineComponent, PropType } from 'vue';

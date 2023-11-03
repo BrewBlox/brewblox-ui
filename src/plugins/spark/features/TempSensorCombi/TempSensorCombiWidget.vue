@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_COMBINE_FUNC } from '@/plugins/spark/const';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { LoggedSession } from '../types';
 import SessionHeaderDialog from './SessionHeaderDialog.vue';
 import { createComponentDialog } from '@/utils/dialog';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { SparkDisplayWidget } from './types';
 import { useContext, useWidget } from '@/composables';
 import { WS_HOST } from '@/const';

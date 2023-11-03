@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';

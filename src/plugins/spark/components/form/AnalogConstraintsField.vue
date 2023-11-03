@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { prettyConstraints, prettyLimitations } from '../../utils/formatting';
 import { prettyLink } from '@/utils/quantity';
 import { AnalogConstraintBase, AnalogConstraints } from 'brewblox-proto/ts';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 import SessionSelectField from './SessionSelectField.vue';

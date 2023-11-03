@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { RimsBlockNames, RimsConfig } from './types';
 import { computed, defineComponent, PropType } from 'vue';
 

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { startChangeBlockId } from '../../utils/actions';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockKey } from '@/plugins/spark/symbols';

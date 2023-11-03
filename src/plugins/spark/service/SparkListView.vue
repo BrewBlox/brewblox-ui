@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockSpecStore, useSparkStore } from '../store';
 import { SparkService } from '../types';
 import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';

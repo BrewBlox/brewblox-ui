@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { CountdownSession, CountdownWidget } from './types';
 import { useWidget } from '@/composables';
 import { createDialog } from '@/utils/dialog';

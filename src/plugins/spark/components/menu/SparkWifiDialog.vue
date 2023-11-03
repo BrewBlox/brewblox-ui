@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import SparkEspWifiCard from './SparkEspWifiCard.vue';
 import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
 import { useDialog, useGlobals } from '@/composables';

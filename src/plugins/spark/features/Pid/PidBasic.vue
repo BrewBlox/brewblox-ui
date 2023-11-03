@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { isBlockCompatible } from '../../utils/info';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';

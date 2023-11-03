@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { QuickstartAction } from '../types';
 import { HermsConfig, HermsOpts } from './types';
 import { userUnits } from '@/user-settings';

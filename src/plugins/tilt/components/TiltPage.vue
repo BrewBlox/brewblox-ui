@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltService, TiltStateValue } from '@/plugins/tilt/types';
 import { WidgetContext } from '@/store/features';

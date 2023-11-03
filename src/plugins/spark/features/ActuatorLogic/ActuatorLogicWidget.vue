@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
 import ActuatorLogicFull from './ActuatorLogicFull.vue';
 import { useContext } from '@/composables';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { EnablerInterfaceBlock } from 'brewblox-proto/ts';
 import { computed, defineComponent } from 'vue';

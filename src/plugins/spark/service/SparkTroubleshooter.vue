@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
 import { WidgetContext } from '@/store/features';
 import { ContextKey } from '@/symbols';

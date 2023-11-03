@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { QuickstartConfig } from '../types';
 import { withPrefix } from '../utils';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';

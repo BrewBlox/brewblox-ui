@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { PidConfig } from '../types';
 import { TempControlMode } from './types';
 import { useDialog, useGlobals } from '@/composables';

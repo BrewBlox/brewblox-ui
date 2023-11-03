@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_FILTER_CHOICE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';

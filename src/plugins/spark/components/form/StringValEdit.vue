@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useValEdit } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { computed, defineComponent } from 'vue';

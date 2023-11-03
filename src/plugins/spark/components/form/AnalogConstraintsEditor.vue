@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { emptyAnalogConstraints } from '@/plugins/spark/utils/configuration';
 import { AnalogConstraints } from 'brewblox-proto/ts';
 import { produce } from 'immer';

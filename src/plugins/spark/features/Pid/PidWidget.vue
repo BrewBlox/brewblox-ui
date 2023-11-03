@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
 import { startRelationsDialog } from './relations';

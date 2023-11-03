@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { DisplaySettingsBlock, DisplaySlot } from 'brewblox-proto/ts';

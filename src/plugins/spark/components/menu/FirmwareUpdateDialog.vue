@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';

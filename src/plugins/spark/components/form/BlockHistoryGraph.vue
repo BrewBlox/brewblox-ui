@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { QueryParams } from '@/plugins/history/types';
 import { useBlockWidget } from '@/plugins/spark/composables';

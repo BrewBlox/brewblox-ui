@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { QuickstartConfig } from '../types';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';

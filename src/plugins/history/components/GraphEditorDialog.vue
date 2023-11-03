@@ -1,39 +1,35 @@
 <script setup lang="ts">
 import { GraphConfig, SharedGraphConfig } from '../types';
 import { emptyGraphConfig } from '../utils';
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import isEqual from 'lodash/isEqual';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-function withDefaults(cfg: GraphConfig): GraphConfig {
-  return defaults(cloneDeep(cfg), emptyGraphConfig());
+interface Props extends UseDialogProps {
+  config: GraphConfig;
+  noPeriod?: false;
+  shared?: SharedGraphConfig[];
 }
 
-const props = defineProps({
-  ...useDialog.props,
-  config: {
-    type: Object as PropType<GraphConfig>,
-    required: true,
-  },
-  noPeriod: {
-    type: Boolean,
-    default: false,
-  },
-  shared: {
-    type: Array as PropType<SharedGraphConfig[]>,
-    default: () => [],
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  noPeriod: false,
+  shared: () => [],
 });
 
 defineEmits<UseDialogEmits>();
 
+function withGraphConfigDefaults(cfg: GraphConfig): GraphConfig {
+  return defaults(cloneDeep(cfg), emptyGraphConfig());
+}
+
 const { dialogRef, dialogOpts, onDialogOK, onDialogCancel } = useDialog.setup();
 
-const initial = ref<GraphConfig>(withDefaults(props.config));
-const local = ref<GraphConfig>(withDefaults(props.config));
+const initial = ref<GraphConfig>(withGraphConfigDefaults(props.config));
+const local = ref<GraphConfig>(withGraphConfigDefaults(props.config));
 
 const dirty = computed<boolean>(() => !isEqual(initial.value, local.value));
 
@@ -53,7 +49,7 @@ function loadShared(): void {
   } as any).onOk((id) => {
     const shared = props.shared.find((s) => s.id === id);
     if (shared) {
-      local.value = withDefaults(shared.config);
+      local.value = withGraphConfigDefaults(shared.config);
     }
   });
 }

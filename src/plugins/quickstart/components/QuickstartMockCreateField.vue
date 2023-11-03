@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { notify } from '@/utils/notify';

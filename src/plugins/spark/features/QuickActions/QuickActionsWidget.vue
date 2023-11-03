@@ -3,7 +3,6 @@ import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';
 import { ChangeAction, QuickActionsWidget } from './types';
 import { useContext, useWidget } from '@/composables';
-import { WidgetModeComponents } from '@/store/features';
 import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
@@ -14,10 +13,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed } from 'vue';
 
-const modes: WidgetModeComponents = {
+const modes = {
   Basic: QuickActionsBasic,
   Full: QuickActionsFull,
-};
+} as const;
 
 defineProps({
   activeId: {

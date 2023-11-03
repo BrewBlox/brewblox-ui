@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { BlockWidget } from '../types';
 import { ListRenderAddress } from './types';
 import { useFeatureStore, WidgetContext } from '@/store/features';

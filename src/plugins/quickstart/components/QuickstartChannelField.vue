@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { GpioChange, IoChannelAddress } from '../types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { channelName } from '@/plugins/spark/utils/formatting';

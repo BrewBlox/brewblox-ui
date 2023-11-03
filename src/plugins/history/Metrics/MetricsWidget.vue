@@ -1,25 +1,16 @@
-<script lang="ts">
+<script setup lang="ts">
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
 import { useContext } from '@/composables';
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'MetricsWidget',
-  components: {
-    Basic: MetricsBasic,
-    Full: MetricsFull,
-  },
-  setup() {
-    const { context } = useContext.setup();
-    const revision = ref<Date>(new Date());
+const modes = {
+  Basic: MetricsBasic,
+  Full: MetricsFull,
+} as const;
 
-    return {
-      context,
-      revision,
-    };
-  },
-});
+const { context } = useContext.setup();
+const revision = ref<Date>(new Date());
 </script>
 
 <template>
@@ -38,7 +29,7 @@ export default defineComponent({
     </template>
 
     <component
-      :is="context.mode"
+      :is="modes[context.mode]"
       :revision="revision"
     />
   </Card>

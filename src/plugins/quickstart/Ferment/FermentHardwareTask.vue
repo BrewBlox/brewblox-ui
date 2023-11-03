@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { GpioChange, IoChannelAddress } from '../types';
 import { hasShared, resetGpioChanges } from '../utils';
 import { FermentConfig } from './types';

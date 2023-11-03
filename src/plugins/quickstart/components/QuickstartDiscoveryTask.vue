@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { QuickstartConfig } from '../types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { discoverBlocks } from '@/plugins/spark/utils/actions';

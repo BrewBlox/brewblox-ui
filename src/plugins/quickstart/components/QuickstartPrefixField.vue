@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { makeRuleValidator } from '@/utils/rules';
 import { computed, defineComponent, ref } from 'vue';
 

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { GpioChange } from '../types';
 import { GlycolConfig } from './types';
 import { defineComponent, PropType, reactive } from 'vue';

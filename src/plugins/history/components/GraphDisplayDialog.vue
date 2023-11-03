@@ -1,87 +1,67 @@
-<script lang="ts">
+<script setup lang="ts">
 import { defaultLabel } from '../nodes';
 import { GraphAxis, GraphConfig } from '../types';
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, defineComponent, PropType, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
-export default defineComponent({
-  name: 'GraphDisplayDialog',
-  props: {
-    ...useDialog.props,
-    config: {
-      type: Object as PropType<GraphConfig>,
-      required: true,
-    },
-    field: {
-      type: String,
-      required: true,
-    },
+interface Props extends UseDialogProps {
+  config: GraphConfig;
+  field: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+});
+
+defineEmits<UseDialogEmits>();
+
+const { dialogOpts, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup();
+
+const local = reactive(cloneDeep(props.config));
+const axisOpts: SelectOption<GraphAxis>[] = [
+  {
+    value: 'y',
+    label: 'Y1',
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogOpts, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
+  {
+    value: 'y2',
+    label: 'Y2',
+  },
+];
 
-    const local = reactive(cloneDeep(props.config));
-    const axisOpts: SelectOption<GraphAxis>[] = [
-      {
-        value: 'y',
-        label: 'Y1',
-      },
-      {
-        value: 'y2',
-        label: 'Y2',
-      },
-    ];
+const label = computed<string>(() => defaultLabel(props.field));
 
-    const label = computed<string>(() => defaultLabel(props.field));
-
-    const rename = computed<string | null>({
-      get: () => local.renames[props.field] ?? label.value,
-      set: (v) => {
-        if (v) {
-          local.renames[props.field] = v;
-        } else {
-          delete local.renames[props.field];
-        }
-      },
-    });
-
-    const axis = computed<GraphAxis>({
-      get: () => local.axes[props.field] || 'y',
-      set: (v) => (local.axes[props.field] = v),
-    });
-
-    const color = computed<string>({
-      get: () => local.colors[props.field] || '',
-      set: (v) => (local.colors[props.field] = v),
-    });
-
-    const precision = computed<number>({
-      get: () => local.precision[props.field] ?? 2,
-      set: (v) => (local.precision[props.field] = v),
-    });
-
-    function save(): void {
-      onDialogOK(local);
+const rename = computed<string | null>({
+  get: () => local.renames[props.field] ?? label.value,
+  set: (v) => {
+    if (v) {
+      local.renames[props.field] = v;
+    } else {
+      delete local.renames[props.field];
     }
-
-    return {
-      defaultLabel,
-      dialogRef,
-      dialogOpts,
-      onDialogHide,
-      onDialogCancel,
-      rename,
-      axis,
-      axisOpts,
-      color,
-      precision,
-      save,
-    };
   },
 });
+
+const axis = computed<GraphAxis>({
+  get: () => local.axes[props.field] || 'y',
+  set: (v) => (local.axes[props.field] = v),
+});
+
+const color = computed<string>({
+  get: () => local.colors[props.field] || '',
+  set: (v) => (local.colors[props.field] = v),
+});
+
+const precision = computed<number>({
+  get: () => local.precision[props.field] ?? 2,
+  set: (v) => (local.precision[props.field] = v),
+});
+
+function save(): void {
+  onDialogOK(local);
+}
 </script>
 
 <template>

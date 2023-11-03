@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { BlockRelationNode } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { isJsonEqual } from '@/utils/objects';

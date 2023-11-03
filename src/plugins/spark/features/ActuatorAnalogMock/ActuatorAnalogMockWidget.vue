@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import BlockEnableToggle from '../../components/form/BlockEnableToggle.vue';
 import ActuatorAnalogMockBasic from './ActuatorAnalogMockBasic.vue';
 import ActuatorAnalogMockFull from './ActuatorAnalogMockFull.vue';

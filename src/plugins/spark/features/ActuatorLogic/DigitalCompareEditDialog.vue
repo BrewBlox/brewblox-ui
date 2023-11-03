@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { ENUM_LABELS_DIGITAL_OP } from '@/plugins/spark/const';
 import { selectable } from '@/utils/collections';

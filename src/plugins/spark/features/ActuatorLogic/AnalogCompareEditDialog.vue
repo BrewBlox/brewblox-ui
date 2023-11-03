@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { ENUM_LABELS_ANALOG_OP } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { Block } from 'brewblox-proto/ts';

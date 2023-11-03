@@ -1,72 +1,53 @@
-<script lang="ts">
+<script setup lang="ts">
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
 import { defaultLabel } from '../nodes';
 import { MetricsConfig } from '../types';
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { durationMs, durationString } from '@/utils/quantity';
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, defineComponent, PropType, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
-export default defineComponent({
-  name: 'MetricsDisplayDialog',
-  props: {
-    ...useDialog.props,
-    config: {
-      type: Object as PropType<MetricsConfig>,
-      required: true,
-    },
-    field: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  config: MetricsConfig;
+  field: string;
+}
 
-    const local = reactive(cloneDeep(props.config));
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+});
 
-    const rename = computed<string>({
-      get: () => local.renames[props.field] ?? defaultLabel(props.field),
-      set: (v) => (local.renames[props.field] = v ?? defaultLabel(props.field)),
-    });
+defineEmits<UseDialogEmits>();
 
-    const fresh = computed<string>({
-      get: () =>
-        durationString(
-          local.freshDuration[props.field] ?? DEFAULT_METRICS_EXPIRY,
-        ),
-      set: (val) => {
-        const ms = durationMs(val) ?? DEFAULT_METRICS_EXPIRY;
-        local.freshDuration[props.field] = ms;
-      },
-    });
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup();
 
-    const decimals = computed<number>({
-      get: () => local.decimals[props.field] ?? DEFAULT_METRICS_DECIMALS,
-      set: (v) => {
-        const numV = v !== null ? v : DEFAULT_METRICS_DECIMALS;
-        local.decimals[props.field] = numV;
-      },
-    });
+const local = reactive(cloneDeep(props.config));
 
-    function save(): void {
-      onDialogOK(local);
-    }
+const rename = computed<string>({
+  get: () => local.renames[props.field] ?? defaultLabel(props.field),
+  set: (v) => (local.renames[props.field] = v ?? defaultLabel(props.field)),
+});
 
-    return {
-      dialogRef,
-      dialogOpts,
-      onDialogHide,
-      onDialogCancel,
-      rename,
-      fresh,
-      decimals,
-      save,
-    };
+const fresh = computed<string>({
+  get: () =>
+    durationString(local.freshDuration[props.field] ?? DEFAULT_METRICS_EXPIRY),
+  set: (val) => {
+    const ms = durationMs(val) ?? DEFAULT_METRICS_EXPIRY;
+    local.freshDuration[props.field] = ms;
   },
 });
+
+const decimals = computed<number>({
+  get: () => local.decimals[props.field] ?? DEFAULT_METRICS_DECIMALS,
+  set: (v) => {
+    const numV = v !== null ? v : DEFAULT_METRICS_DECIMALS;
+    local.decimals[props.field] = numV;
+  },
+});
+
+function save(): void {
+  onDialogOK(local);
+}
 </script>
 
 <template>

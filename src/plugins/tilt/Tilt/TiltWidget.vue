@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { fieldLabels } from '../const';
 import { useTiltStore } from '../store';
 import { TiltStateValue } from '../types';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useValEdit } from '@/plugins/spark/composables';
 import { parseDate, shortDateString } from '@/utils/quantity';
 import { DateString } from 'brewblox-proto/ts';

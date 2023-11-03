@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useSparkStore } from '../../store';
 import { BlockAddress } from '../../types';
 import { useDialog } from '@/composables';

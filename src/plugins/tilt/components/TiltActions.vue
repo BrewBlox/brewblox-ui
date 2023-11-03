@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { TiltService } from '@/plugins/tilt/types';
 import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';

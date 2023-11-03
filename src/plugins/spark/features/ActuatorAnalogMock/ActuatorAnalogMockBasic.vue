@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorAnalogMockBlock } from 'brewblox-proto/ts';
 import { defineComponent } from 'vue';

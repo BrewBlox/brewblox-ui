@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { GpioChange, IoChannelAddress } from '../types';
 import { resetGpioChanges } from '../utils';
 import { BrewKettleConfig } from './types';

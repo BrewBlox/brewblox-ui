@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { BlockRelationNode } from '@/plugins/spark/types';
 import { BlockRelation } from 'brewblox-proto/ts';

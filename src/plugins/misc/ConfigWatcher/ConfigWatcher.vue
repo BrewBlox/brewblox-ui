@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useSystemStore } from '@/store/system';
 import { userUnitsDefined } from '@/user-settings';
 import { Notify } from 'quasar';

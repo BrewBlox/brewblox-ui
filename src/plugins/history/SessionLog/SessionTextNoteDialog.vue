@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog, useGlobals } from '@/composables';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';

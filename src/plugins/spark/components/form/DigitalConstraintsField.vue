@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { durationString, prettyLink } from '@/utils/quantity';
 import {
   DigitalConstraintBase,

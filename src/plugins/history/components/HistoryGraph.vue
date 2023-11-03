@@ -9,49 +9,33 @@ import {
   nextTick,
   onBeforeUnmount,
   onMounted,
-  PropType,
   ref,
   watch,
 } from 'vue';
 
-const props = defineProps({
-  graphId: {
-    type: String,
-    required: true,
-  },
-  config: {
-    type: Object as PropType<GraphConfig>,
-    required: true,
-  },
-  sharedSources: {
-    type: Boolean,
-    default: false,
-  },
-  controlPresets: {
-    type: Boolean,
-    default: false,
-  },
-  controlRange: {
-    type: Boolean,
-    default: false,
-  },
-  teleportControls: {
-    type: Boolean,
-    default: false,
-  },
-  sourceRevision: {
-    type: Date,
-    default: () => new Date(),
-  },
-  renderRevision: {
-    type: Date,
-    default: () => new Date(),
-  },
+interface Props {
+  graphId: string;
+  config: GraphConfig;
+  sharedSources?: boolean;
+  controlPresets?: boolean;
+  controlRange?: boolean;
+  teleportControls?: boolean;
+  sourceRevision?: Date;
+  renderRevision?: Date;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  sharedSources: false,
+  controlPresets: false,
+  controlRange: false,
+  teleportControls: false,
+  sourceRevision: () => new Date(),
+  renderRevision: () => new Date(),
 });
 
 const emit = defineEmits<{
-  (e: 'params', data: QueryParams): void;
-  (e: 'layout', data: Partial<Layout>): void;
+  params: [data: QueryParams];
+  layout: [data: Partial<Layout>];
 }>();
 
 const historyStore = useHistoryStore();

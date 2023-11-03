@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { PidConfig } from '../types';
 import TempControlPidView from './TempControlPidView.vue';
 import { defineComponent, PropType } from 'vue';

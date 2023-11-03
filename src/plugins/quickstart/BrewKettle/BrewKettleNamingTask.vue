@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { BrewKettleBlockNames, BrewKettleConfig } from './types';
 import { computed, defineComponent, PropType } from 'vue';
 

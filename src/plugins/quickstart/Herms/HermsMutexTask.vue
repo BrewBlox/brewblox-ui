@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { HermsConfig } from './types';
 import { defineComponent, PropType, ref } from 'vue';
 

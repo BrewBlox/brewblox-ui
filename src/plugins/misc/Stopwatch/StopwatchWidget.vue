@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { StopwatchSession, StopwatchWidget } from './types';
 import { useWidget } from '@/composables';
 import { computed, defineComponent, onBeforeMount, ref } from 'vue';

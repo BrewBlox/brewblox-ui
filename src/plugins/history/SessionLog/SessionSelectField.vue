@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { LoggedSession } from '../types';
 import { useField } from '@/composables';
 import { dateString } from '@/utils/quantity';

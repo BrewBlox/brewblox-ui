@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { nonErrorResults } from './const';

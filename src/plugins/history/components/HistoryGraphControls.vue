@@ -4,30 +4,22 @@ import { defaultPresets } from '../utils';
 import { isJsonEqual } from '@/utils/objects';
 import cloneDeep from 'lodash/cloneDeep';
 import { Layout } from 'plotly.js';
-import { PropType } from 'vue';
 
-const props = defineProps({
-  layout: {
-    type: Object as PropType<Partial<Layout>>,
-    required: true,
-  },
-  params: {
-    type: Object as PropType<QueryParams>,
-    required: true,
-  },
-  showRange: {
-    type: Boolean,
-    default: false,
-  },
-  showPresets: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  layout: Partial<Layout>;
+  params: QueryParams;
+  showRange?: boolean;
+  showPresets?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showRange: false,
+  showPresets: false,
 });
 
 defineEmits<{
-  (e: 'update:layout', data: Partial<Layout>): void;
-  (e: 'update:params', data: QueryParams): void;
+  'update:layout': [data: Partial<Layout>];
+  'update:params': [data: QueryParams];
 }>();
 
 const presets = defaultPresets();

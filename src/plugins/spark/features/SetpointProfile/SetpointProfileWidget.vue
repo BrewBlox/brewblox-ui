@@ -8,7 +8,6 @@ import SetpointProfileFull from './SetpointProfileFull.vue';
 import { GraphProps, profileGraphProps } from './helpers';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { WidgetModeComponents } from '@/store/features';
 import { createComponentDialog } from '@/utils/dialog';
 import { isJsonEqual } from '@/utils/objects';
 import { prettyLink } from '@/utils/quantity';
@@ -18,10 +17,10 @@ import { computed, ref, watch } from 'vue';
 
 type SetpointProfileData = SetpointProfileBlock['data'];
 
-const modes: WidgetModeComponents = {
+const modes = {
   Basic: SetpointProfileBasic,
   Full: SetpointProfileFull,
-};
+} as const;
 
 const { context, inDialog } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();

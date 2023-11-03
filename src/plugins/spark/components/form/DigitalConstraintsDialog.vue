@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog } from '@/composables';
 import { DigitalConstraints } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';

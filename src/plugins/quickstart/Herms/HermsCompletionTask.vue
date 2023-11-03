@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { QuickstartAction } from '../types';
 import { createOutputActions, executeActions } from '../utils';
 import {

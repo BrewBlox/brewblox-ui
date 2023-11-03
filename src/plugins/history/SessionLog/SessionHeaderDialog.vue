@@ -1,52 +1,38 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { parseDate } from '@/utils/quantity';
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'SessionHeaderDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<LoggedSession>,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const historyStore = useHistoryStore();
-    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: LoggedSession;
+}
 
-    const local = ref<LoggedSession>(cloneDeep(props.modelValue));
-
-    const date = computed<Date | null>({
-      get: () => parseDate(local.value.date),
-      set: (v) =>
-        (local.value.date = v ? v.toISOString() : new Date().toISOString()),
-    });
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    const knownTags = computed<string[]>(() => historyStore.sessionTags);
-
-    return {
-      dialogRef,
-      dialogOpts,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      date,
-      save,
-      knownTags,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
+
+defineEmits<UseDialogEmits>();
+
+const historyStore = useHistoryStore();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const local = ref<LoggedSession>(cloneDeep(props.modelValue));
+
+const date = computed<Date | null>({
+  get: () => parseDate(local.value.date),
+  set: (v) =>
+    (local.value.date = v ? v.toISOString() : new Date().toISOString()),
+});
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+const knownTags = computed<string[]>(() => historyStore.sessionTags);
 </script>
 
 <template>

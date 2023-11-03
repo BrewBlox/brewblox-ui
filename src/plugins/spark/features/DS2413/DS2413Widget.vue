@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { DS2413Block } from 'brewblox-proto/ts';

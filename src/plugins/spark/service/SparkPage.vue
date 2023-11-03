@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import SparkListView from './SparkListView.vue';
 import SparkTroubleshooter from './SparkTroubleshooter.vue';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';

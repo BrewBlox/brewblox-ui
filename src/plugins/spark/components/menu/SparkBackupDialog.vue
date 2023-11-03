@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { SparkBackup } from '@/plugins/spark/types';

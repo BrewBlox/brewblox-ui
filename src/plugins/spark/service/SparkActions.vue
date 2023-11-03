@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
 import { SparkService } from '@/plugins/spark/types';
 import {

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useFeatureStore } from '@/store/features';
 import { InactiveObjectBlock } from 'brewblox-proto/ts';

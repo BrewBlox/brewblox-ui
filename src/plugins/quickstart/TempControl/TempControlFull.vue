@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlPidView from './TempControlPidView.vue';
 import { TempControlMode, TempControlWidget } from './types';

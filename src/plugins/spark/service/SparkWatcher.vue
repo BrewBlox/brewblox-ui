@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import SparkServiceWatcher from './SparkServiceWatcher.vue';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { SparkService } from '@/plugins/spark/types';
