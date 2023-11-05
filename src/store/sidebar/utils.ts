@@ -8,7 +8,7 @@ export function startChangeFolderTitle(folder: Maybe<SidebarFolder>): void {
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Change folder title',
       message: `Choose a new name for ${folder.title}`,
@@ -39,7 +39,7 @@ export function startRemoveFolder(folder: Maybe<SidebarFolder>): void {
 
 export function startCreateFolder(parentFolder: Maybe<string>): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: 'New folder',
       title: 'Add sidebar folder',

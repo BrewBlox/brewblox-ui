@@ -15,10 +15,6 @@ const emit = defineEmits<{
   'update:config': [data: MetricsConfig];
 }>();
 
-function saveConfig(config: MetricsConfig): void {
-  emit('update:config', config);
-}
-
 function editLeaf(node: QTreeNode): void {
   createDialog({
     component: 'MetricsDisplayDialog',
@@ -27,7 +23,7 @@ function editLeaf(node: QTreeNode): void {
       title: node.value,
       field: node.value,
     },
-  }).onOk((config) => saveConfig(config));
+  }).onOk((config) => emit('update:config', config));
 }
 
 function renamed(node: QTreeNode): string {
@@ -48,7 +44,7 @@ function decimals(node: QTreeNode): number {
 <template>
   <QueryEditor
     :config="config"
-    @update:config="saveConfig"
+    @update:config="(config) => emit('update:config', config)"
   >
     <template #leaf="{ node }">
       <div @click="editLeaf(node)">

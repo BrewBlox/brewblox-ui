@@ -32,199 +32,172 @@ import {
   DigitalState,
   LogicResult,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 
 const validTypes: BlockIntfType[] = [
   BlockIntfType.DigitalInterface,
   BlockIntfType.ProcessValueInterface,
 ];
 
-export default defineComponent({
-  name: 'ActuatorLogicFull',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, block, patchBlock } =
-      useBlockWidget.setup<ActuatorLogicBlock>();
-    const localExpression = ref<string | null>(null);
-    const delayedSave = ref<number | null>(null);
+const sparkStore = useSparkStore();
+const { serviceId, block, patchBlock } =
+  useBlockWidget.setup<ActuatorLogicBlock>();
+const localExpression = ref<string | null>(null);
+const delayedSave = ref<number | null>(null);
 
-    function commit(): void {
-      if (localExpression.value != null) {
-        patchBlock({ expression: localExpression.value });
-      }
-    }
+function commit(): void {
+  if (localExpression.value != null) {
+    patchBlock({ expression: localExpression.value });
+  }
+}
 
-    function saveExpression(expr: string | number | null): void {
-      if (delayedSave.value !== null) {
-        clearTimeout(delayedSave.value);
-      }
-      localExpression.value = nonNullString(expr);
-      delayedSave.value = window.setTimeout(commit, 1000);
-    }
+function saveExpression(expr: string | number | null): void {
+  if (delayedSave.value !== null) {
+    clearTimeout(delayedSave.value);
+  }
+  localExpression.value = nonNullString(expr);
+  delayedSave.value = window.setTimeout(commit, 1000);
+}
 
-    onBeforeUnmount(() => {
-      if (delayedSave.value !== null) {
-        clearTimeout(delayedSave.value);
-        commit();
-      }
-    });
-
-    const validBlocks = computed<Block[]>(() =>
-      sparkStore
-        .blocksByService(serviceId)
-        .filter((block) => isCompatible(block.type, validTypes)),
-    );
-
-    const expression = computed<string>(
-      () => localExpression.value ?? block.value.data.expression,
-    );
-
-    const characters = computed<{ char: string; pretty: string }[]>(() =>
-      '()!&|^'
-        .split('')
-        .map((char) => ({ char, pretty: characterTitles[char] ?? char })),
-    );
-
-    const digital = computed<
-      { key: string; cmp: DigitalCompare; pretty: string }[]
-    >(() =>
-      block.value.data.digital.map((cmp, idx) => ({
-        cmp,
-        key: digitalKey(idx),
-        pretty: prettyDigital(cmp),
-      })),
-    );
-
-    const analog = computed<
-      { key: string; cmp: AnalogCompare; pretty: string }[]
-    >(() =>
-      block.value.data.analog.map((cmp, idx) => ({
-        cmp,
-        key: analogKey(idx),
-        pretty: prettyAnalog(
-          cmp,
-          sparkStore.blockById(serviceId, cmp.id.id)?.type ?? null,
-        ),
-      })),
-    );
-
-    const firmwareError = computed<ExpressionError | null>(() => {
-      const { result, errorPos } = block.value.data;
-      const index = Math.max(0, errorPos - 1);
-      return nonErrorResults.includes(result)
-        ? null
-        : {
-            index,
-            message: ENUM_LABELS_LOGIC_RESULT[result],
-            indicator: '-'.repeat(index) + '^',
-          };
-    });
-
-    const err = computed<ExpressionError | null>(
-      () =>
-        syntaxCheck(expression.value) ??
-        comparisonCheck(block.value.data) ??
-        (localExpression.value == null ? firmwareError.value : null),
-    );
-
-    function addComparison(compared: Block): void {
-      if (isCompatible(compared.type, BlockIntfType.DigitalInterface)) {
-        patchBlock({
-          digital: [
-            ...block.value.data.digital,
-            {
-              op: DigitalCompareOp.OP_VALUE_IS,
-              id: bloxLink(compared.id, compared.type),
-              rhs: DigitalState.STATE_ACTIVE,
-              result: LogicResult.RESULT_EMPTY,
-            },
-          ],
-        });
-      } else if (
-        isCompatible(compared.type, BlockIntfType.ProcessValueInterface)
-      ) {
-        patchBlock({
-          analog: [
-            ...block.value.data.analog,
-            {
-              op: AnalogCompareOp.OP_VALUE_GE,
-              id: bloxLink(compared.id, compared.type),
-              rhs: 25,
-              result: LogicResult.RESULT_EMPTY,
-            },
-          ],
-        });
-      }
-    }
-
-    function editDigital(key: string, cmp: DigitalCompare): void {
-      createComponentDialog({
-        component: DigitalCompareEditDialog,
-        componentProps: {
-          modelValue: cmp,
-          serviceId,
-          title: 'Edit comparison',
-        },
-      }).onOk((cmp) => {
-        const digital = [...block.value.data.digital];
-        digital[digitalIdx(key)] = cmp;
-        patchBlock({ digital });
-      });
-    }
-
-    function editAnalog(key: string, cmp: AnalogCompare): void {
-      createComponentDialog({
-        component: AnalogCompareEditDialog,
-        componentProps: {
-          serviceId,
-          title: 'Edit comparison',
-          modelValue: cmp,
-        },
-      }).onOk((cmp) => {
-        const analog = [...block.value.data.analog];
-        analog[analogIdx(key)] = cmp;
-        patchBlock({ analog });
-      });
-    }
-
-    function removeDigital(key: string): void {
-      const { digital } = block.value.data;
-      const removedIdx = digitalIdx(key);
-      patchBlock({
-        digital: digital.filter((_, idx) => idx !== removedIdx),
-        expression: shiftRemainingComparisons(expression.value, key),
-      });
-    }
-
-    function removeAnalog(key: string): void {
-      const { analog } = block.value.data;
-      const removedIdx = analogIdx(key);
-      patchBlock({
-        analog: analog.filter((_, idx) => idx !== removedIdx),
-        expression: shiftRemainingComparisons(expression.value, key),
-      });
-    }
-
-    return {
-      prettyLink,
-      serviceId,
-      block,
-      patchBlock,
-      validBlocks,
-      saveExpression,
-      expression,
-      err,
-      digital,
-      editDigital,
-      removeDigital,
-      analog,
-      editAnalog,
-      removeAnalog,
-      characters,
-      addComparison,
-    };
-  },
+onBeforeUnmount(() => {
+  if (delayedSave.value !== null) {
+    clearTimeout(delayedSave.value);
+    commit();
+  }
 });
+
+const validBlocks = computed<Block[]>(() =>
+  sparkStore
+    .blocksByService(serviceId)
+    .filter((block) => isCompatible(block.type, validTypes)),
+);
+
+const expression = computed<string>(
+  () => localExpression.value ?? block.value.data.expression,
+);
+
+const characters = computed<{ char: string; pretty: string }[]>(() =>
+  '()!&|^'
+    .split('')
+    .map((char) => ({ char, pretty: characterTitles[char] ?? char })),
+);
+
+const digital = computed<
+  { key: string; cmp: DigitalCompare; pretty: string }[]
+>(() =>
+  block.value.data.digital.map((cmp, idx) => ({
+    cmp,
+    key: digitalKey(idx),
+    pretty: prettyDigital(cmp),
+  })),
+);
+
+const analog = computed<{ key: string; cmp: AnalogCompare; pretty: string }[]>(
+  () =>
+    block.value.data.analog.map((cmp, idx) => ({
+      cmp,
+      key: analogKey(idx),
+      pretty: prettyAnalog(
+        cmp,
+        sparkStore.blockById(serviceId, cmp.id.id)?.type ?? null,
+      ),
+    })),
+);
+
+const firmwareError = computed<ExpressionError | null>(() => {
+  const { result, errorPos } = block.value.data;
+  const index = Math.max(0, errorPos - 1);
+  return nonErrorResults.includes(result)
+    ? null
+    : {
+        index,
+        message: ENUM_LABELS_LOGIC_RESULT[result],
+        indicator: '-'.repeat(index) + '^',
+      };
+});
+
+const err = computed<ExpressionError | null>(
+  () =>
+    syntaxCheck(expression.value) ??
+    comparisonCheck(block.value.data) ??
+    (localExpression.value == null ? firmwareError.value : null),
+);
+
+function addComparison(compared: Block): void {
+  if (isCompatible(compared.type, BlockIntfType.DigitalInterface)) {
+    patchBlock({
+      digital: [
+        ...block.value.data.digital,
+        {
+          op: DigitalCompareOp.OP_VALUE_IS,
+          id: bloxLink(compared.id, compared.type),
+          rhs: DigitalState.STATE_ACTIVE,
+          result: LogicResult.RESULT_EMPTY,
+        },
+      ],
+    });
+  } else if (isCompatible(compared.type, BlockIntfType.ProcessValueInterface)) {
+    patchBlock({
+      analog: [
+        ...block.value.data.analog,
+        {
+          op: AnalogCompareOp.OP_VALUE_GE,
+          id: bloxLink(compared.id, compared.type),
+          rhs: 25,
+          result: LogicResult.RESULT_EMPTY,
+        },
+      ],
+    });
+  }
+}
+
+function editDigital(key: string, cmp: DigitalCompare): void {
+  createComponentDialog({
+    component: DigitalCompareEditDialog,
+    componentProps: {
+      modelValue: cmp,
+      serviceId,
+      title: 'Edit comparison',
+    },
+  }).onOk((cmp) => {
+    const digital = [...block.value.data.digital];
+    digital[digitalIdx(key)] = cmp;
+    patchBlock({ digital });
+  });
+}
+
+function editAnalog(key: string, cmp: AnalogCompare): void {
+  createComponentDialog({
+    component: AnalogCompareEditDialog,
+    componentProps: {
+      serviceId,
+      title: 'Edit comparison',
+      modelValue: cmp,
+    },
+  }).onOk((cmp) => {
+    const analog = [...block.value.data.analog];
+    analog[analogIdx(key)] = cmp;
+    patchBlock({ analog });
+  });
+}
+
+function removeDigital(key: string): void {
+  const { digital } = block.value.data;
+  const removedIdx = digitalIdx(key);
+  patchBlock({
+    digital: digital.filter((_, idx) => idx !== removedIdx),
+    expression: shiftRemainingComparisons(expression.value, key),
+  });
+}
+
+function removeAnalog(key: string): void {
+  const { analog } = block.value.data;
+  const removedIdx = analogIdx(key);
+  patchBlock({
+    analog: analog.filter((_, idx) => idx !== removedIdx),
+    expression: shiftRemainingComparisons(expression.value, key),
+  });
+}
 </script>
 <template>
   <div>

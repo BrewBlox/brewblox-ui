@@ -48,7 +48,7 @@ const knownTags = computed<string[]>(() => historyStore.sessionTags);
     @keyup.enter="save"
   >
     <DialogCard :title="title">
-      <InputField
+      <TextField
         v-model="local.title"
         title="Session name"
         label="Session name"

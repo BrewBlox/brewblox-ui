@@ -5,33 +5,18 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { selectable } from '@/utils/collections';
 import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
 const filterOpts = selectable(ENUM_LABELS_FILTER_CHOICE);
 
-export default defineComponent({
-  name: 'SetpointSensorPairFull',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, blockId, block, patchBlock, isClaimed } =
-      useBlockWidget.setup<SetpointSensorPairBlock>();
+const sparkStore = useSparkStore();
+const { serviceId, blockId, block, patchBlock, isClaimed } =
+  useBlockWidget.setup<SetpointSensorPairBlock>();
 
-    const usedBy = computed<Block[]>(() => {
-      return sparkStore
-        .blocksByService(serviceId)
-        .filter((b) => b.data.inputId?.id === blockId);
-    });
-
-    return {
-      createBlockDialog,
-      filterOpts,
-      serviceId,
-      block,
-      patchBlock,
-      isClaimed,
-      usedBy,
-    };
-  },
+const usedBy = computed<Block[]>(() => {
+  return sparkStore
+    .blocksByService(serviceId)
+    .filter((b) => b.data.inputId?.id === blockId);
 });
 </script>
 

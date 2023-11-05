@@ -85,7 +85,7 @@ function removeNote(note: SessionNote): void {
 
 function addTextNote(): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: 'New text note',
       title: 'Add note',
@@ -105,7 +105,7 @@ function addTextNote(): void {
 
 function addGraphNote(): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: 'New graph',
       title: 'Add graph',
@@ -196,7 +196,7 @@ function onSwipe(
                 class="move-border"
               />
               <div class="row q-gutter-x-xs q-pa-xs">
-                <InputField
+                <TextField
                   :model-value="element.title"
                   title="Name"
                   label="Name"
@@ -220,7 +220,7 @@ function onSwipe(
                       color="secondary"
                     />
                   </template>
-                </InputField>
+                </TextField>
                 <div
                   v-if="element.type === 'Graph'"
                   class="col-auto row"

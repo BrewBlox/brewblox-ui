@@ -59,21 +59,20 @@ function save(): void {
   >
     <DialogCard v-bind="{ title, message, html }">
       <div class="column q-gutter-xs">
-        <InputField
+        <TextField
           v-model="rename"
           title="Label"
           label="Label"
         />
-        <InputField
+        <TextField
           v-model="fresh"
           title="Warn when older than"
           label="Warn when older than"
         />
-        <InputField
+        <NumberField
           v-model="decimals"
           :decimals="0"
           :rules="[(v) => v >= 0 || 'Must be 0 or more']"
-          type="number"
           title="Number of decimals"
           label="Number of decimals"
         />

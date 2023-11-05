@@ -11,68 +11,48 @@ import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { createDialog, GlobalDialogName } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'SparkActions',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const systemStore = useSystemStore();
-    const serviceStore = useServiceStore();
-    const sparkStore = useSparkStore();
+interface Props {
+  serviceId: string;
+}
 
-    const service = computed<SparkService | null>(() =>
-      serviceStore.serviceById(props.serviceId),
-    );
+const props = defineProps<Props>();
 
-    const isHomePage = computed<boolean>({
-      get: () =>
-        userUISettings.value.homePage === `/service/${props.serviceId}`,
-      set: (v) => {
-        const homePage =
-          v && service.value ? `/service/${props.serviceId}` : null;
-        systemStore.patchUserUISettings({ homePage });
-      },
-    });
+const systemStore = useSystemStore();
+const serviceStore = useServiceStore();
+const sparkStore = useSparkStore();
 
-    function serviceReboot(): void {
-      sparkStore.serviceReboot(props.serviceId);
-    }
+const service = computed<SparkService | null>(() =>
+  serviceStore.serviceById(props.serviceId),
+);
 
-    function controllerReboot(): void {
-      sparkStore.controllerReboot(props.serviceId);
-    }
-
-    function startDialog(component: GlobalDialogName): void {
-      if (sparkStore.has(props.serviceId)) {
-        createDialog({
-          component,
-          componentProps: {
-            serviceId: props.serviceId,
-          },
-        });
-      }
-    }
-
-    return {
-      startResetBlocks,
-      discoverBlocks,
-      cleanUnusedNames,
-      startChangeServiceTitle,
-      startRemoveService,
-      service,
-      isHomePage,
-      serviceReboot,
-      controllerReboot,
-      startDialog,
-    };
+const isHomePage = computed<boolean>({
+  get: () => userUISettings.value.homePage === `/service/${props.serviceId}`,
+  set: (v) => {
+    const homePage = v && service.value ? `/service/${props.serviceId}` : null;
+    systemStore.patchUserUISettings({ homePage });
   },
 });
+
+function serviceReboot(): void {
+  sparkStore.serviceReboot(props.serviceId);
+}
+
+function controllerReboot(): void {
+  sparkStore.controllerReboot(props.serviceId);
+}
+
+function startDialog(component: GlobalDialogName): void {
+  if (sparkStore.has(props.serviceId)) {
+    createDialog({
+      component,
+      componentProps: {
+        serviceId: props.serviceId,
+      },
+    });
+  }
+}
 </script>
 
 <template>

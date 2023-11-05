@@ -2,23 +2,14 @@
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useFeatureStore } from '@/store/features';
 import { InactiveObjectBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'InactiveObjectWidget',
-  setup() {
-    const featureStore = useFeatureStore();
-    const { block } = useBlockWidget.setup<InactiveObjectBlock>();
+const featureStore = useFeatureStore();
+const { block } = useBlockWidget.setup<InactiveObjectBlock>();
 
-    const actualFeatureTitle = computed<string>(() =>
-      featureStore.widgetTitle(block.value.data.actualType),
-    );
-
-    return {
-      actualFeatureTitle,
-    };
-  },
-});
+const actualFeatureTitle = computed<string>(() =>
+  featureStore.widgetTitle(block.value.data.actualType),
+);
 </script>
 
 <template>

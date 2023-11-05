@@ -10,70 +10,37 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import { channelName, prettyBlock } from '@/plugins/spark/utils/formatting';
 import { selectable } from '@/utils/collections';
-import {
-  fixedNumber,
-  prettyLink,
-  prettyQty,
-  roundedNumber,
-} from '@/utils/quantity';
+import { fixedNumber, prettyQty, roundedNumber } from '@/utils/quantity';
 import {
   ChannelCapabilities,
   FastPwmBlock,
   IoArrayInterfaceBlock,
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
 const frequencyOpts = selectable(ENUM_LABELS_PWM_FREQUENCY);
 const transitionPresetOpts = selectable(ENUM_LABELS_TRANSITION_PRESET);
 
-export default defineComponent({
-  name: 'FastPwmWidget',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { context, inDialog } = useContext.setup();
+const sparkStore = useSparkStore();
+const { context, inDialog } = useContext.setup();
 
-    const { serviceId, block, patchBlock, isClaimed } =
-      useBlockWidget.setup<FastPwmBlock>();
+const { serviceId, block, patchBlock, isClaimed } =
+  useBlockWidget.setup<FastPwmBlock>();
 
-    const target = computed<IoArrayInterfaceBlock | null>(() =>
-      sparkStore.blockByLink(serviceId, block.value.data.hwDevice),
-    );
+const target = computed<IoArrayInterfaceBlock | null>(() =>
+  sparkStore.blockByLink(serviceId, block.value.data.hwDevice),
+);
 
-    const isLimited = computed<boolean>(
-      () =>
-        block.value.data.enabled &&
-        block.value.data.setting !== block.value.data.desiredSetting,
-    );
+const isLimited = computed<boolean>(
+  () =>
+    block.value.data.enabled &&
+    block.value.data.setting !== block.value.data.desiredSetting,
+);
 
-    const pwmDesired = computed<number | null>(() => {
-      const v = block.value.data.desiredSetting;
-      return v ? roundedNumber(v, 0) : v;
-    });
-
-    return {
-      prettyQty,
-      TransitionDurationPreset,
-      transitionPresetOpts,
-      setExclusiveChannelActuator,
-      ChannelCapabilities,
-      prettyLink,
-      fixedNumber,
-      frequencyOpts,
-      PWM_SELECT_OPTIONS,
-      context,
-      inDialog,
-      serviceId,
-      block,
-      target,
-      patchBlock,
-      isClaimed,
-      isLimited,
-      pwmDesired,
-      channelName,
-      prettyBlock,
-    };
-  },
+const pwmDesired = computed<number | null>(() => {
+  const v = block.value.data.desiredSetting;
+  return v ? roundedNumber(v, 0) : v;
 });
 </script>
 

@@ -3,25 +3,15 @@ import SparkServiceWatcher from './SparkServiceWatcher.vue';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { SparkService } from '@/plugins/spark/types';
 import { useServiceStore } from '@/store/services';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'SparkWatcher',
-  components: {
-    SparkServiceWatcher,
-  },
-  setup() {
-    const serviceStore = useServiceStore();
-    const services = computed<SparkService[]>(() =>
-      serviceStore.services.filter(
-        (service) => service.type === SPARK_SERVICE_TYPE,
-      ),
-    );
-    return {
-      services,
-    };
-  },
-});
+const serviceStore = useServiceStore();
+
+const services = computed<SparkService[]>(() =>
+  serviceStore.services.filter(
+    (service) => service.type === SPARK_SERVICE_TYPE,
+  ),
+);
 </script>
 
 <template>

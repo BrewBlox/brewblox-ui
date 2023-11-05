@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { fixedNumber } from '@/utils/quantity';
 import { computed } from 'vue';
 
 export interface Props extends UseFieldProps {
-  modelValue: string | number | null;
-  type?: 'text' | 'number';
-  decimals?: number;
+  modelValue: string | null;
   clearable?: boolean;
   autogrow?: boolean;
   suffix?: string;
@@ -15,8 +12,6 @@ export interface Props extends UseFieldProps {
 
 const props = withDefaults(defineProps<Props>(), {
   ...useField.defaultProps,
-  type: 'text',
-  decimals: 2,
   clearable: true,
   autogrow: false,
   suffix: '',
@@ -24,22 +19,16 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: string | number | null];
+  'update:modelValue': [data: string | null];
 }>();
 
 const { activeSlots } = useField.setup();
-
-function change(v: string | number): void {
-  emit('update:modelValue', v);
-}
 
 const displayValue = computed<string>(() => {
   if (props.modelValue == null || props.modelValue === '') {
     return '<not set>';
   }
-  return props.type === 'number'
-    ? fixedNumber(Number(props.modelValue), props.decimals)
-    : `${props.modelValue}`;
+  return props.modelValue;
 });
 
 function openDialog(): void {
@@ -48,14 +37,12 @@ function openDialog(): void {
   }
 
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: props.modelValue,
       title: props.title,
       message: props.message,
       html: props.html,
-      decimals: props.decimals,
-      type: props.type,
       label: props.label,
       rules: props.rules,
       clearable: props.clearable,
@@ -63,7 +50,7 @@ function openDialog(): void {
       suffix: props.suffix,
       ...props.editorProps,
     },
-  }).onOk(change);
+  }).onOk((v) => emit('update:modelValue', v));
 }
 </script>
 

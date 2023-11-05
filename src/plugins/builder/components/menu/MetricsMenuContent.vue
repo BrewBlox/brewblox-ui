@@ -2,6 +2,7 @@
 import { usePart } from '../../composables';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { createDialog } from '@/utils/dialog';
+import defaults from 'lodash/defaults';
 
 const { part, patchPart } = usePart.setup();
 
@@ -9,7 +10,7 @@ function edit(): void {
   createDialog({
     component: 'MetricsEditorDialog',
     componentProps: {
-      modelValue: part.value.metrics ?? emptyMetricsConfig(),
+      modelValue: defaults(emptyMetricsConfig(), part.value.metrics),
     },
   }).onOk((metrics) => {
     patchPart({ metrics });

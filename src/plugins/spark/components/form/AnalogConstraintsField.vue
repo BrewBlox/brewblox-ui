@@ -4,16 +4,16 @@ import { AnalogConstraintBase, AnalogConstraints } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 
 interface Props {
-  modelValue: AnalogConstraints;
+  modelValue?: AnalogConstraints;
   serviceId: string;
 }
 
-const props = defineProps<Props>();
-
-const constraints = computed<AnalogConstraints>(() => props.modelValue);
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: () => ({}),
+});
 
 const isConstrained = computed<boolean>(() => {
-  const { min, max, balanced } = constraints.value;
+  const { min, max, balanced } = props.modelValue;
   return [min, max, balanced].some((v) => v?.enabled);
 });
 
@@ -40,22 +40,22 @@ function constraintClass(constraint: AnalogConstraintBase): string[] {
     </div>
 
     <div
-      v-if="constraints.min?.enabled"
-      :class="constraintClass(constraints.min)"
+      v-if="modelValue.min?.enabled"
+      :class="constraintClass(modelValue.min)"
     >
-      Minimum: {{ constraints.min.value }}
+      Minimum: {{ modelValue.min.value }}
     </div>
     <div
-      v-if="constraints.max?.enabled"
-      :class="constraintClass(constraints.max)"
+      v-if="modelValue.max?.enabled"
+      :class="constraintClass(modelValue.max)"
     >
-      Maximum: {{ constraints.max.value }}
+      Maximum: {{ modelValue.max.value }}
     </div>
     <div
-      v-if="constraints.balanced?.enabled"
-      :class="constraintClass(constraints.balanced)"
+      v-if="modelValue.balanced?.enabled"
+      :class="constraintClass(modelValue.balanced)"
     >
-      Balanced: {{ prettyLink(constraints.balanced.balancerId) }}
+      Balanced: {{ prettyLink(modelValue.balanced.balancerId) }}
     </div>
   </div>
 </template>

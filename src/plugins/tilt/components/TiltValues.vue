@@ -26,7 +26,7 @@ function saveName(name: string | null): void {
 
 <template>
   <div class="row">
-    <InputField
+    <TextField
       v-if="!hidden.name"
       :label="fieldLabels.name"
       :title="fieldLabels.name"

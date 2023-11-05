@@ -11,57 +11,39 @@ import {
   PidBlock,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'PidBasic',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, block } = useBlockWidget.setup<PidBlock>();
+const sparkStore = useSparkStore();
+const { serviceId, block } = useBlockWidget.setup<PidBlock>();
 
-    const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
-      sparkStore.blockByLink(serviceId, block.value.data.inputId),
-    );
+const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
+  sparkStore.blockByLink(serviceId, block.value.data.inputId),
+);
 
-    const outputBlock = computed<Block | null>(() =>
-      sparkStore.blockByLink(serviceId, block.value.data.outputId),
-    );
+const outputBlock = computed<Block | null>(() =>
+  sparkStore.blockByLink(serviceId, block.value.data.outputId),
+);
 
-    const outputSuffix = computed<string>(() => {
-      if (isBlockCompatible(outputBlock.value, BlockType.ActuatorOffset)) {
-        return prettyUnit(userUnits.value.temperature);
-      }
-      return '%';
-    });
-
-    const kp = computed<number | null>(() => block.value.data.kp.value);
-
-    function fit(v: number): number {
-      return Math.min(v, 100);
-    }
-
-    function showInput(): void {
-      createBlockDialog(inputBlock.value, { mode: 'Basic' });
-    }
-
-    function showOutput(): void {
-      createBlockDialog(outputBlock.value, { mode: 'Basic' });
-    }
-
-    return {
-      prettyQty,
-      fixedNumber,
-      block,
-      inputBlock,
-      outputBlock,
-      outputSuffix,
-      kp,
-      fit,
-      showInput,
-      showOutput,
-    };
-  },
+const outputSuffix = computed<string>(() => {
+  if (isBlockCompatible(outputBlock.value, BlockType.ActuatorOffset)) {
+    return prettyUnit(userUnits.value.temperature);
+  }
+  return '%';
 });
+
+const kp = computed<number | null>(() => block.value.data.kp.value);
+
+function fit(v: number): number {
+  return Math.min(v, 100);
+}
+
+function showInput(): void {
+  createBlockDialog(inputBlock.value, { mode: 'Basic' });
+}
+
+function showOutput(): void {
+  createBlockDialog(outputBlock.value, { mode: 'Basic' });
+}
 </script>
 
 <template>

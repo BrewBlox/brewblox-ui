@@ -54,7 +54,7 @@ function isActivePreset(preset: QueryParams): boolean {
           :key="`preset-${idx}`"
           :active="isActivePreset(preset)"
           :label="`${preset.duration}`"
-          @click="(v) => $emit('update:params', cloneDeep(v))"
+          @click="$emit('update:params', cloneDeep(preset))"
         />
       </ActionSubmenu>
     </template>

@@ -56,7 +56,7 @@ const url = computed<string>({
       v-if="context.mode === 'Full'"
       class="widget-body column q-mt-none"
     >
-      <InputField
+      <TextField
         v-model="url"
         title="URL"
         label="URL"
@@ -66,9 +66,8 @@ const url = computed<string>({
         :editor-props="{ fontSize: '100%' }"
       />
 
-      <InputField
+      <NumberField
         v-model="pctScale"
-        type="number"
         label="Content size"
         title="Set zoom level"
         class="col-grow"

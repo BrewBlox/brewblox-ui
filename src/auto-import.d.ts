@@ -145,6 +145,8 @@ declare module '@vue/runtime-core' {
     TreeSelectDialog: typeof import('src/components/form/TreeSelectDialog.vue').default;
     ToggleButton: typeof import('src/components/form/ToggleButton.vue').default;
     ToggleAction: typeof import('src/components/form/ToggleAction.vue').default;
+    TextField: typeof import('src/components/form/TextField.vue').default;
+    TextDialog: typeof import('src/components/form/TextDialog.vue').default;
     TextAreaDialog: typeof import('src/components/form/TextAreaDialog.vue').default;
     TagSelectField: typeof import('src/components/form/TagSelectField.vue').default;
     SliderField: typeof import('src/components/form/SliderField.vue').default;
@@ -155,6 +157,8 @@ declare module '@vue/runtime-core' {
     SaveConfirmDialog: typeof import('src/components/form/SaveConfirmDialog.vue').default;
     QuantityField: typeof import('src/components/form/QuantityField.vue').default;
     QuantityDialog: typeof import('src/components/form/QuantityDialog.vue').default;
+    NumberField: typeof import('src/components/form/NumberField.vue').default;
+    NumberDialog: typeof import('src/components/form/NumberDialog.vue').default;
     MarkdownView: typeof import('src/components/form/MarkdownView.vue').default;
     MarkdownDialog: typeof import('src/components/form/MarkdownDialog.vue').default;
     LoginDialog: typeof import('src/components/form/LoginDialog.vue').default;
@@ -165,8 +169,6 @@ declare module '@vue/runtime-core' {
     LabeledField: typeof import('src/components/form/LabeledField.vue').default;
     KeyboardDialog: typeof import('src/components/form/KeyboardDialog.vue').default;
     KeyboardButton: typeof import('src/components/form/KeyboardButton.vue').default;
-    InputField: typeof import('src/components/form/InputField.vue').default;
-    InputDialog: typeof import('src/components/form/InputDialog.vue').default;
     InlineQuantityField: typeof import('src/components/form/InlineQuantityField.vue').default;
     DurationQuantityDialog: typeof import('src/components/form/DurationQuantityDialog.vue').default;
     DurationField: typeof import('src/components/form/DurationField.vue').default;

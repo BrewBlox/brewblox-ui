@@ -54,7 +54,7 @@ function duplicateAction(action: ChangeAction): void {
 function renameAction(action: ChangeAction): void {
   const stepName = action.name;
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: stepName,
       title: 'Change ChangeAction name',

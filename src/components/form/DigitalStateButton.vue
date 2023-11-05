@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: DigitalState | number | null];
+  'update:modelValue': [data: DigitalState];
 }>();
 
 const alternatives: Record<number | string, DigitalState> = {

@@ -1,22 +1,9 @@
 <script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorAnalogMockBlock } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'ActuatorAnalogMockFull',
-  setup() {
-    const { serviceId, block, patchBlock, isClaimed } =
-      useBlockWidget.setup<ActuatorAnalogMockBlock>();
-
-    return {
-      serviceId,
-      block,
-      patchBlock,
-      isClaimed,
-    };
-  },
-});
+const { serviceId, block, patchBlock, isClaimed } =
+  useBlockWidget.setup<ActuatorAnalogMockBlock>();
 </script>
 
 <template>
@@ -24,33 +11,30 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row">
-      <InputField
+      <NumberField
         :readonly="isClaimed"
         :model-value="block.data.storedSetting"
         label="Setting"
-        type="number"
         title="Target"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ storedSetting: v })"
+        @update:model-value="(v) => patchBlock({ storedSetting: v! })"
       />
-      <InputField
+      <NumberField
         :model-value="block.data.minSetting"
         title="Setting min"
         label="Clip to min"
-        type="number"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ minSetting: v })"
+        @update:model-value="(v) => patchBlock({ minSetting: v! })"
       />
-      <InputField
+      <NumberField
         :model-value="block.data.maxSetting"
-        type="number"
         title="Setting max"
         label="Clip to max"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ maxSetting: v })"
+        @update:model-value="(v) => patchBlock({ maxSetting: v! })"
       />
 
       <div class="col-break" />
@@ -62,23 +46,21 @@ export default defineComponent({
         tag="big"
         class="col-grow"
       />
-      <InputField
+      <NumberField
         :model-value="block.data.minValue"
-        type="number"
         title="Value min"
         label="Clip to min"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ minValue: v })"
+        @update:model-value="(v) => patchBlock({ minValue: v! })"
       />
-      <InputField
+      <NumberField
         :model-value="block.data.maxValue"
-        type="number"
         title="Value max"
         label="Clip to max"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ maxValue: v })"
+        @update:model-value="(v) => patchBlock({ maxValue: v! })"
       />
 
       <div class="col-break" />
@@ -89,8 +71,8 @@ export default defineComponent({
         class="col-grow"
       />
       <AnalogConstraintsField
-        :model-value="block.data.constraints"
         :service-id="serviceId"
+        :model-value="block.data.constraints"
         class="col-grow"
       />
 

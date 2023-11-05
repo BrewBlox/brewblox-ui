@@ -4,64 +4,46 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty, deltaTempQty, prettyQty } from '@/utils/quantity';
 import { Fluctuation, TempSensorMockBlock } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'TempSensorMockWidget',
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { block, patchBlock } = useBlockWidget.setup<TempSensorMockBlock>();
+const { context, inDialog } = useContext.setup();
+const { block, patchBlock } = useBlockWidget.setup<TempSensorMockBlock>();
 
-    function addFluctuation(): void {
-      patchBlock({
-        fluctuations: [
-          ...block.value.data.fluctuations,
-          {
-            amplitude: deltaTempQty(1),
-            period: bloxQty('6h'),
-          },
-        ],
-      });
-    }
+function addFluctuation(): void {
+  patchBlock({
+    fluctuations: [
+      ...block.value.data.fluctuations,
+      {
+        amplitude: deltaTempQty(1),
+        period: bloxQty('6h'),
+      },
+    ],
+  });
+}
 
-    function updateFluctuation(idx: number, fluct: Fluctuation): void {
-      const fluctuations = [...block.value.data.fluctuations];
-      fluctuations[idx] = fluct;
-      patchBlock({ fluctuations });
-    }
+function updateFluctuation(idx: number, fluct: Fluctuation): void {
+  const fluctuations = [...block.value.data.fluctuations];
+  fluctuations[idx] = fluct;
+  patchBlock({ fluctuations });
+}
 
-    function removeFluctuation(idx: number): void {
-      patchBlock({
-        fluctuations: block.value.data.fluctuations.filter((_, i) => i !== idx),
-      });
-    }
+function removeFluctuation(idx: number): void {
+  patchBlock({
+    fluctuations: block.value.data.fluctuations.filter((_, i) => i !== idx),
+  });
+}
 
-    function editSetting(): void {
-      createDialog({
-        component: 'QuantityDialog',
-        componentProps: {
-          modelValue: block.value.data.setting,
-          title: 'Setting',
-          label: 'Setting',
-        },
-      }).onOk((v) => {
-        patchBlock({ setting: v });
-      });
-    }
-
-    return {
-      prettyQty,
-      context,
-      inDialog,
-      block,
-      patchBlock,
-      addFluctuation,
-      updateFluctuation,
-      removeFluctuation,
-      editSetting,
-    };
-  },
-});
+function editSetting(): void {
+  createDialog({
+    component: 'QuantityDialog',
+    componentProps: {
+      modelValue: block.value.data.setting,
+      title: 'Setting',
+      label: 'Setting',
+    },
+  }).onOk((v) => {
+    patchBlock({ setting: v });
+  });
+}
 </script>
 
 <template>

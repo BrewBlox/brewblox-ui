@@ -16,7 +16,7 @@ import {
   Link,
 } from 'brewblox-proto/ts';
 import { QTableColumn } from 'quasar';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
 interface AnalogConstrainedBlock extends Block {
   data: {
@@ -69,45 +69,40 @@ const COMPATIBLE_COLUMNS: QTableColumn<AnalogConstrainedBlock>[] = [
   },
 ];
 
-export default defineComponent({
-  name: 'BalancerWidget',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { context } = useContext.setup();
-    const { serviceId, block } = useBlockWidget.setup<BalancerBlock>();
+const sparkStore = useSparkStore();
+const { context } = useContext.setup();
+const { serviceId, block } = useBlockWidget.setup<BalancerBlock>();
 
-    const compatibleBlocks = computed<AnalogConstrainedBlock[]>(() => {
-      return sparkStore
-        .blocksByService(serviceId)
-        .filter((v) =>
-          isBlockCompatible(v, BlockIntfType.ActuatorAnalogInterface),
-        );
-    });
+const compatibleBlocks = computed<AnalogConstrainedBlock[]>(() => {
+  return sparkStore
+    .blocksByService(serviceId)
+    .filter((v) => isBlockCompatible(v, BlockIntfType.ActuatorAnalogInterface));
+});
 
-    const nonClientBlocks = computed<AnalogConstrainedBlock[]>(() =>
-      compatibleBlocks.value.filter((b) => {
-        const balanced: BalancedConstraint | undefined =
-          b.data.constraints?.balanced;
-        return !balanced?.enabled || balanced?.balancerId.id !== block.value.id;
-      }),
-    );
+const nonClientBlocks = computed<AnalogConstrainedBlock[]>(() =>
+  compatibleBlocks.value.filter((b) => {
+    const balanced: BalancedConstraint | undefined =
+      b.data.constraints?.balanced;
+    return !balanced?.enabled || balanced?.balancerId.id !== block.value.id;
+  }),
+);
 
-    function showBlock(target: Block | null): void {
-      createBlockDialog(target);
-    }
+function showBlock(target: Block | null): void {
+  createBlockDialog(target);
+}
 
-    function showBlockLink(link: Link): void {
-      showBlock(sparkStore.blockByLink(serviceId, link));
-    }
+function showBlockLink(link: Link): void {
+  showBlock(sparkStore.blockByLink(serviceId, link));
+}
 
-    function showHelpDialog(): void {
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: 'Balancer block',
-          html: true,
-          cancel: false,
-          message: `
+function showHelpDialog(): void {
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: 'Balancer block',
+      html: true,
+      cancel: false,
+      message: `
           <p>
             When two actuators need to share a total available amount,
             the balancer can ensure it is shared fairly.
@@ -136,24 +131,9 @@ export default defineComponent({
             </a>.
           </p>
           `,
-        },
-      });
-    }
-
-    return {
-      prettyLink,
-      fixedNumber,
-      CLIENT_COLUMNS,
-      COMPATIBLE_COLUMNS,
-      context,
-      block,
-      nonClientBlocks,
-      showBlock,
-      showBlockLink,
-      showHelpDialog,
-    };
-  },
-});
+    },
+  });
+}
 </script>
 
 <template>

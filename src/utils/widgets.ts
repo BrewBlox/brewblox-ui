@@ -9,7 +9,7 @@ import { nanoid } from 'nanoid';
 export function startChangeWidgetTitle(widget: Widget): void {
   const widgetTitle = widget.title;
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: widgetTitle,
       title: 'Change widget name',

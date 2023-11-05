@@ -12,76 +12,61 @@ import {
   DS2408ConnectMode,
   MotorValveBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
 const connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
   { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },
   { label: '8 IO channels', value: DS2408ConnectMode.CONNECT_ACTUATOR },
 ];
 
-export default defineComponent({
-  name: 'DS2408Widget',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { context } = useContext.setup();
-    const { serviceId, block, patchBlock } =
-      useBlockWidget.setup<DS2408Block>();
+const sparkStore = useSparkStore();
+const { context } = useContext.setup();
+const { serviceId, block, patchBlock } = useBlockWidget.setup<DS2408Block>();
 
-    const valveMode = computed<boolean>(
-      () => block.value.data.connectMode === DS2408ConnectMode.CONNECT_VALVE,
-    );
+const valveMode = computed<boolean>(
+  () => block.value.data.connectMode === DS2408ConnectMode.CONNECT_VALVE,
+);
 
-    function setConnectMode(mode: DS2408ConnectMode): void {
-      if (!mode || block.value.data.connectMode === mode) {
-        return;
+function setConnectMode(mode: DS2408ConnectMode): void {
+  if (!mode || block.value.data.connectMode === mode) {
+    return;
+  }
+  const linked = sparkStore
+    .blocksByService(serviceId)
+    .filter((b): b is DigitalActuatorBlock | MotorValveBlock =>
+      isCompatible(b.type, BlockIntfType.ActuatorDigitalInterface),
+    )
+    .filter((b) => b.data.hwDevice.id === block.value.id);
+
+  if (linked.length === 0) {
+    patchBlock({ connectMode: mode });
+    return;
+  }
+
+  const names = linked.map((block) => `'${block.id}'`).join(', ');
+  const [has, it] = linked.length > 1 ? ['have', 'them'] : ['has', 'it'];
+  const message =
+    `${names} ${has} this block set as output. ` +
+    `Do you wish to unlink ${it}?`;
+
+  createDialog({
+    component: 'SaveConfirmDialog',
+    componentProps: {
+      title: 'Switch DS2408 mode',
+      message,
+    },
+  }).onOk(async (saved: boolean) => {
+    if (saved) {
+      for (const actuator of linked) {
+        await sparkStore.patchBlock(actuator, {
+          hwDevice: bloxLink(null),
+          channel: 0,
+        });
       }
-      const linked = sparkStore
-        .blocksByService(serviceId)
-        .filter((b): b is DigitalActuatorBlock | MotorValveBlock =>
-          isCompatible(b.type, BlockIntfType.ActuatorDigitalInterface),
-        )
-        .filter((b) => b.data.hwDevice.id === block.value.id);
-
-      if (linked.length === 0) {
-        patchBlock({ connectMode: mode });
-        return;
-      }
-
-      const names = linked.map((block) => `'${block.id}'`).join(', ');
-      const [has, it] = linked.length > 1 ? ['have', 'them'] : ['has', 'it'];
-      const message =
-        `${names} ${has} this block set as output. ` +
-        `Do you wish to unlink ${it}?`;
-
-      createDialog({
-        component: 'SaveConfirmDialog',
-        componentProps: {
-          title: 'Switch DS2408 mode',
-          message,
-        },
-      }).onOk(async (saved: boolean) => {
-        if (saved) {
-          for (const actuator of linked) {
-            await sparkStore.patchBlock(actuator, {
-              hwDevice: bloxLink(null),
-              channel: 0,
-            });
-          }
-        }
-        patchBlock({ connectMode: mode });
-      });
     }
-
-    return {
-      connectModeOpts,
-      context,
-      block,
-      patchBlock,
-      valveMode,
-      setConnectMode,
-    };
-  },
-});
+    patchBlock({ connectMode: mode });
+  });
+}
 </script>
 
 <template>
@@ -115,12 +100,12 @@ export default defineComponent({
             label="Connected"
             class="col-grow"
           />
-          <InputField
+          <TextField
             :model-value="block.data.address"
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="(v) => patchBlock({ address: v })"
+            @update:model-value="(v) => patchBlock({ address: v! })"
           />
         </div>
       </template>

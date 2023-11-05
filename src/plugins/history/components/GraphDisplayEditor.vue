@@ -64,7 +64,7 @@ function saveRename(field: string, label: string | null): void {
       class="align-children row wrap q-pa-sm"
     >
       <q-item-section class="col-5">
-        <InputField
+        <TextField
           :model-value="fieldRename(field)"
           title="Legend"
           @update:model-value="(v) => saveRename(field, v)"

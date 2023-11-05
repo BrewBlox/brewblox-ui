@@ -33,7 +33,7 @@ export function startChangeServiceTitle(service: Maybe<Service>): void {
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Rename service',
       message:

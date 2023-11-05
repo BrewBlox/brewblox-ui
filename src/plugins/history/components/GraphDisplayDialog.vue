@@ -73,16 +73,15 @@ function save(): void {
   >
     <DialogCard v-bind="{ title, message, html }">
       <div class="column q-gutter-xs">
-        <InputField
+        <TextField
           v-model="rename"
           title="Label"
           label="Label"
         />
-        <InputField
+        <NumberField
           v-model="precision"
           :decimals="0"
           :rules="[(v) => v >= 0 || 'Must be 0 or more']"
-          type="number"
           title="Decimals in label"
           label="Decimals in label"
         />

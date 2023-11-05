@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
 import { deserialize } from '@/utils/parsing';
 import { BlockType, SetpointProfileBlock } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const typeName = BlockType.SetpointProfile;
 
-const props = defineProps({
-  ...useDialog.props,
-  block: {
-    type: Object as PropType<SetpointProfileBlock>,
-    required: true,
-  },
+interface Props extends UseDialogProps {
+  block: SetpointProfileBlock;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
 
 defineEmits<UseDialogEmits>();
@@ -51,7 +51,7 @@ function editSelected(): void {
   const { value } = selected.value;
   const snippet = snippetStore.snippetById(value)!;
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Edit profile name',
       modelValue: snippet.name,
@@ -106,7 +106,7 @@ async function saveSelected(): Promise<void> {
 
 function createSnippet(): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: `${block.value.id} profile`,
       title: 'Save as new profile',

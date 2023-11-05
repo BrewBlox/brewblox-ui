@@ -368,7 +368,7 @@ export async function startCreateLayout(
   source?: Maybe<BuilderLayout>,
 ): Promise<void> {
   const title = await createDialogPromise({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: '',
       title: 'New Layout',
@@ -398,7 +398,7 @@ export function startChangeLayoutTitle(layout: Maybe<BuilderLayout>): void {
   }
   const builderStore = useBuilderStore();
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Change Layout title',
       message: `Choose a new name for ${layout.title}`,

@@ -6,37 +6,23 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { prettyLink } from '@/utils/quantity';
 import { Link, PidBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'PidWidget',
-  components: {
-    Basic: PidBasic,
-    Full: PidFull,
-  },
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { block } = useBlockWidget.setup<PidBlock>();
+const modes = {
+  Basic: PidBasic,
+  Full: PidFull,
+} as const;
 
-    const inputLink = computed<Link>(() => block.value.data.inputId);
+const { context, inDialog } = useContext.setup();
+const { block } = useBlockWidget.setup<PidBlock>();
 
-    const outputLink = computed<Link>(() => block.value.data.outputId);
+const inputLink = computed<Link>(() => block.value.data.inputId);
 
-    function showRelations(): void {
-      startRelationsDialog(block.value);
-    }
+const outputLink = computed<Link>(() => block.value.data.outputId);
 
-    return {
-      prettyLink,
-      context,
-      inDialog,
-      block,
-      inputLink,
-      outputLink,
-      showRelations,
-    };
-  },
-});
+function showRelations(): void {
+  startRelationsDialog(block.value);
+}
 </script>
 
 <template>
@@ -57,7 +43,7 @@ export default defineComponent({
       </BlockWidgetToolbar>
     </template>
 
-    <component :is="context.mode">
+    <component :is="modes[context.mode]">
       <template #warnings>
         <CardWarning v-if="!inputLink.id">
           <template #message> PID has no input block configured. </template>

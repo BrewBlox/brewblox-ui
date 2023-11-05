@@ -8,11 +8,13 @@ import { computed, toRaw } from 'vue';
 type DNNDigitalConstraints = DeepNonNullable<DigitalConstraints>;
 
 interface Props {
-  modelValue: DigitalConstraints;
+  modelValue?: DigitalConstraints;
   serviceId: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: () => ({}),
+});
 
 const emit = defineEmits<{
   'update:modelValue': [data: DigitalConstraints];

@@ -43,7 +43,7 @@ const colorStyle = computed<CSSProperties>(() => ({
 }));
 
 function change(c: string | null): void {
-  emit('update:modelValue', c?.replace('#', '') ?? null);
+  emit('update:modelValue', c?.replace('#', '') ?? props.clearable ? null : '');
 }
 
 function openDialog(): void {

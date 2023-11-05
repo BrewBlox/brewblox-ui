@@ -3,20 +3,13 @@ import BlockEnableToggle from '../../components/form/BlockEnableToggle.vue';
 import ActuatorAnalogMockBasic from './ActuatorAnalogMockBasic.vue';
 import ActuatorAnalogMockFull from './ActuatorAnalogMockFull.vue';
 import { useContext } from '@/composables';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'ActuatorAnalogMockWidget',
-  components: {
-    Basic: ActuatorAnalogMockBasic,
-    Full: ActuatorAnalogMockFull,
-    BlockEnableToggle,
-  },
-  setup() {
-    const { context } = useContext.setup();
-    return { context };
-  },
-});
+const modes = {
+  Basic: ActuatorAnalogMockBasic,
+  Full: ActuatorAnalogMockFull,
+} as const;
+
+const { context } = useContext.setup();
 </script>
 
 <template>
@@ -24,7 +17,7 @@ export default defineComponent({
     <template #toolbar>
       <BlockWidgetToolbar has-mode-toggle />
     </template>
-    <component :is="context.mode">
+    <component :is="modes[context.mode]">
       <template #warnings>
         <BlockEnableToggle />
       </template>

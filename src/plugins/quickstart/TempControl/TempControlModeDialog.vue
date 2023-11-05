@@ -118,14 +118,14 @@ function addHeatConfig(): void {
       </template>
 
       <q-card-section class="row q-gutter-xs">
-        <InputField
+        <TextField
           :model-value="tempMode.title"
           label="Mode name"
           title="Mode name"
           class="col-grow"
           @update:model-value="
-            (v: string) => {
-              tempMode.title = v;
+            (v) => {
+              tempMode.title = v!;
               save();
             }
           "

@@ -12,11 +12,13 @@ import { computed } from 'vue';
 interface Props extends UseDialogProps {
   widgetId: string;
   mode?: WidgetMode;
+  widgetProps?: AnyDict;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   ...useDialog.defaultProps,
   mode: 'Full',
+  widgetProps: () => ({}),
 });
 
 defineEmits<UseDialogEmits>();
@@ -50,6 +52,7 @@ const context = computed<WidgetContext>(() => ({
       v-if="widget"
       v-model:widget="widget"
       :context="context"
+      v-bind="widgetProps"
     />
   </q-dialog>
 </template>

@@ -51,7 +51,7 @@ export function startChangeBlockId(block: Maybe<Block>): void {
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: block.id,
       title: 'Change block name',

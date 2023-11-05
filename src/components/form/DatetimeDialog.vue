@@ -21,7 +21,7 @@ defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup();
-const local = ref<Date | null>(props.modelValue);
+const local = ref<Date>(props.modelValue);
 
 const valid = computed<boolean>(() =>
   makeRuleValidator(props.rules)(local.value),

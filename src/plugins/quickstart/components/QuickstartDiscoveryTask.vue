@@ -77,7 +77,7 @@ function show(block: Block): void {
 
 function rename(block: Block): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Change block name',
       message: `Choose a new name for '${block.id}'`,

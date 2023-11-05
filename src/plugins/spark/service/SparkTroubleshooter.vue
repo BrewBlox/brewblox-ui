@@ -5,11 +5,17 @@ import { ContextKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { shortDateString } from '@/utils/quantity';
 import { SparkStatusDescription } from 'brewblox-proto/ts';
-import { computed, defineComponent, provide, reactive } from 'vue';
+import { computed, provide, reactive } from 'vue';
 
 type ConnectStatus = SparkStatusDescription['connection_status'];
 
 type ConnectionStep = 'UNREACHABLE' | ConnectStatus;
+
+interface Props {
+  serviceId: string;
+}
+
+const props = defineProps<Props>();
 
 const stepOrder: ConnectionStep[] = [
   'UNREACHABLE',
@@ -20,90 +26,57 @@ const stepOrder: ConnectionStep[] = [
   'UPDATING',
 ];
 
-export default defineComponent({
-  name: 'SparkTroubleshooter',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    provide(
-      ContextKey,
-      reactive<WidgetContext>({
-        container: 'Dashboard',
-        size: 'Content',
-        mode: 'Basic',
-      }),
-    );
+provide(
+  ContextKey,
+  reactive<WidgetContext>({
+    container: 'Dashboard',
+    size: 'Content',
+    mode: 'Basic',
+  }),
+);
 
-    const sparkStore = useSparkStore();
+const sparkStore = useSparkStore();
 
-    const status = computed<SparkStatusDescription | null>(() =>
-      sparkStore.statusByService(props.serviceId),
-    );
+const status = computed<SparkStatusDescription | null>(() =>
+  sparkStore.statusByService(props.serviceId),
+);
 
-    const lastStatusAt = computed<Date | null>(() =>
-      sparkStore.lastStatusAtByService(props.serviceId),
-    );
+const lastStatusAt = computed<Date | null>(() =>
+  sparkStore.lastStatusAtByService(props.serviceId),
+);
 
-    const connectionStep = computed<ConnectionStep>(() => {
-      if (!status.value) {
-        return 'UNREACHABLE';
-      }
-      return status.value.connection_status;
-    });
-
-    function isStepDone(step: ConnectionStep): boolean {
-      return stepOrder.indexOf(step) < stepOrder.indexOf(connectionStep.value);
-    }
-
-    async function refresh(): Promise<void> {
-      await sparkStore.fetchAll(props.serviceId);
-    }
-
-    async function setAutoconnect(enabled: boolean): Promise<void> {
-      await sparkStore.saveAutoConnecting(props.serviceId, enabled);
-      await refresh();
-    }
-
-    function iconProps(val: boolean | undefined): AnyDict {
-      return {
-        name: val ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline',
-        color: val ? 'positive' : 'negative',
-        size: 'md',
-        class: 'col-auto q-mr-sm',
-      };
-    }
-
-    function startFirmwareUpdate(): void {
-      createDialog({
-        component: 'FirmwareUpdateDialog',
-        componentProps: {
-          serviceId: props.serviceId,
-        },
-      });
-    }
-
-    function serviceReboot(): void {
-      sparkStore.serviceReboot(props.serviceId);
-    }
-
-    return {
-      shortDateString,
-      status,
-      lastStatusAt,
-      connectionStep,
-      isStepDone,
-      refresh,
-      setAutoconnect,
-      iconProps,
-      startFirmwareUpdate,
-      serviceReboot,
-    };
-  },
+const connectionStep = computed<ConnectionStep>(() => {
+  if (!status.value) {
+    return 'UNREACHABLE';
+  }
+  return status.value.connection_status;
 });
+
+function isStepDone(step: ConnectionStep): boolean {
+  return stepOrder.indexOf(step) < stepOrder.indexOf(connectionStep.value);
+}
+
+async function refresh(): Promise<void> {
+  await sparkStore.fetchAll(props.serviceId);
+}
+
+async function setAutoconnect(enabled: boolean): Promise<void> {
+  await sparkStore.saveAutoConnecting(props.serviceId, enabled);
+  await refresh();
+}
+
+function startFirmwareUpdate(): void {
+  createDialog({
+    component: 'FirmwareUpdateDialog',
+    componentProps: {
+      serviceId: props.serviceId,
+    },
+  });
+}
+
+function serviceReboot(): void {
+  sparkStore.serviceReboot(props.serviceId);
+}
 </script>
 
 <template>

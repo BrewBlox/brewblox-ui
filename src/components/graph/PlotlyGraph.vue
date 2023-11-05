@@ -221,7 +221,7 @@ function onClick(evt: PlotMouseEvent): void {
 
   const point = evt.points[0];
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: 'New annotation',
       title: 'Add annotation',

@@ -1,7 +1,8 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends QueryConfig">
 import { QueryConfig, QueryParams } from '../types';
 import { bloxQty, durationString, parseDate } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import find from 'lodash/find';
 import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
@@ -15,13 +16,13 @@ interface PeriodDisplay {
 }
 
 interface Props {
-  config: QueryConfig;
+  config: T;
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:config': [data: QueryConfig];
+  'update:config': [data: T];
 }>();
 
 const periodOptions: SelectOption[] = [
@@ -53,7 +54,7 @@ const paramDefaults = (): QueryParams => ({
   end: new Date().toISOString(),
 });
 
-const local = ref({ ...props.config });
+const local = ref<T>(cloneDeep(props.config));
 const period = ref(makePeriod(props.config.params));
 
 watch(
@@ -74,10 +75,6 @@ function makePeriod(params: QueryParams): PeriodDisplay {
   return matching ? period : opts[0];
 }
 
-function saveConfig(config: QueryConfig): void {
-  emit('update:config', config);
-}
-
 function saveSanitized(period: PeriodDisplay): void {
   const defaults = paramDefaults();
   const { params } = local.value;
@@ -89,7 +86,7 @@ function saveSanitized(period: PeriodDisplay): void {
       : params.duration ?? defaults.duration,
     end: !period.end ? undefined : params.end ?? defaults.end,
   };
-  saveConfig(local.value);
+  emit('update:config', local.value as T);
 }
 
 const isLive = computed<boolean>(() => {

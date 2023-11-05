@@ -6,8 +6,7 @@ import { makeRuleValidator } from '@/utils/rules';
 import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
-  modelValue: string | number | null;
-  type?: 'text' | 'number';
+  modelValue: number | null;
   decimals?: number;
   label?: string;
   rules?: InputRule[];
@@ -20,7 +19,6 @@ interface Props extends UseDialogProps {
 
 const props = withDefaults(defineProps<Props>(), {
   ...useDialog.defaultProps,
-  type: 'text',
   decimals: 2,
   label: '',
   rules: () => [],
@@ -36,32 +34,23 @@ defineEmits<UseDialogEmits>();
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup();
 
-const local = ref<string>(
-  props.type === 'number'
-    ? fixedNumber(Number(props.modelValue), props.decimals)
-    : `${props.modelValue ?? ''}`,
+const local = ref<string | null>(
+  fixedNumber(Number(props.modelValue), props.decimals),
 );
 
 const isValid = computed<boolean>(() =>
   makeRuleValidator(props.rules)(local.value),
 );
 
-const nativeProps = computed<AnyDict>(() =>
-  props.type === 'number'
-    ? {
-        inputmode: 'numeric',
-        pattern: '[0-9\.]*',
-      }
-    : {},
-);
-
 function save(): void {
   if (!isValid.value) {
     return;
   }
-  const outputValue =
-    props.type === 'number' ? parseFloat(local.value) : local.value;
-  onDialogOK(outputValue);
+  if (local.value != null) {
+    onDialogOK(parseFloat(local.value));
+  } else if (props.clearable) {
+    onDialogOK(null);
+  }
 }
 
 function showKeyboard(): void {
@@ -69,7 +58,7 @@ function showKeyboard(): void {
     component: 'KeyboardDialog',
     componentProps: {
       modelValue: local.value,
-      type: props.type,
+      type: 'number',
       rules: props.rules,
     },
   }).onOk((v) => (local.value = v));
@@ -93,9 +82,10 @@ function showKeyboard(): void {
           autogrow,
           suffix,
           placeholder,
-          ...nativeProps,
         }"
         :input-style="{ fontSize }"
+        inputmode="numeric"
+        pattern="[0-9\.]*"
         autofocus
       >
         <template #append>

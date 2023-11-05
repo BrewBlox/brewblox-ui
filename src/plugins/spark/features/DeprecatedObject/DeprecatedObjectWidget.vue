@@ -2,36 +2,24 @@
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, DeprecatedObjectBlock } from 'brewblox-proto/ts';
-import { defineComponent, onBeforeMount, ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 
-export default defineComponent({
-  name: 'DeprecatedObjectWidget',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, widget, featureTitle, block } =
-      useBlockWidget.setup<DeprecatedObjectBlock>();
+const sparkStore = useSparkStore();
+const { serviceId, widget, featureTitle, block } =
+  useBlockWidget.setup<DeprecatedObjectBlock>();
 
-    const actual = ref<Block | null>(null);
+const actual = ref<Block | null>(null);
 
-    onBeforeMount(async () => {
-      actual.value = await sparkStore.fetchStoredBlock(
-        serviceId,
-        block.value.data.actualId,
-      );
-    });
-
-    function removeBlock(): void {
-      sparkStore.removeBlock(block.value);
-    }
-
-    return {
-      widget,
-      featureTitle,
-      actual,
-      removeBlock,
-    };
-  },
+onBeforeMount(async () => {
+  actual.value = await sparkStore.fetchStoredBlock(
+    serviceId,
+    block.value.data.actualId,
+  );
 });
+
+function removeBlock(): void {
+  sparkStore.removeBlock(block.value);
+}
 </script>
 
 <template>

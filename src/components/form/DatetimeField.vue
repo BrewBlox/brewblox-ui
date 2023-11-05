@@ -22,12 +22,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: Date | null): void;
+  (e: 'update:modelValue', data: Date): void;
 }>();
 
 const { activeSlots } = useField.setup();
 
-function save(v: Date | null): void {
+function save(v: Date): void {
   emit('update:modelValue', v);
 }
 

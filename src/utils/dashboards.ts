@@ -54,7 +54,7 @@ export function startChangeDashboardId(
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: dashboard.id,
       title: 'Edit dashboard URL',
@@ -77,7 +77,7 @@ export function startChangeDashboardTitle(
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Edit dashboard name',
       message:
@@ -121,7 +121,7 @@ export function startChangeDashboardTitle(
 
 export function startCreateDashboard(router: Router | null): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: '',
       title: 'Add dashboard',

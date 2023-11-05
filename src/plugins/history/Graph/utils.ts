@@ -54,6 +54,7 @@ export async function selectSessionGraph(): Promise<GraphConfig | null> {
   const selectedId: string | null = await createDialogPromise({
     component: 'SelectDialog',
     componentProps: {
+      modelValue: null,
       selectOptions: historyStore.sessions.flatMap((session) =>
         session.notes
           .filter((note) => note.type === 'Graph')

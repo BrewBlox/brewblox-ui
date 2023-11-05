@@ -8,11 +8,13 @@ import { computed, toRaw } from 'vue';
 type DNNAnalogConstraints = DeepNonNullable<AnalogConstraints>;
 
 interface Props {
-  modelValue: AnalogConstraints;
+  modelValue?: AnalogConstraints;
   serviceId: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: () => ({}),
+});
 
 const emit = defineEmits<{
   'update:modelValue': [data: AnalogConstraints];
@@ -44,12 +46,13 @@ function update(
         "
       />
     </LabeledField>
-    <InputField
+    <NumberField
       :model-value="constraints.min.value"
       label="Value"
-      type="number"
       class="col-auto min-width-md"
-      @update:model-value="(v) => update((draft) => void (draft.min.value = v))"
+      @update:model-value="
+        (v) => update((draft) => void (draft.min.value = v!))
+      "
     />
 
     <div class="col-break" />
@@ -66,12 +69,13 @@ function update(
         "
       />
     </LabeledField>
-    <InputField
+    <NumberField
       :model-value="constraints.max.value"
       label="Value"
-      type="number"
       class="col-auto min-width-md"
-      @update:model-value="(v) => update((draft) => void (draft.max.value = v))"
+      @update:model-value="
+        (v) => update((draft) => void (draft.max.value = v!))
+      "
     />
 
     <div class="col-break" />

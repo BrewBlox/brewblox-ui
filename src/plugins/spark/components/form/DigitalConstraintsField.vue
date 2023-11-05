@@ -9,20 +9,20 @@ import {
 import { computed } from 'vue';
 
 interface Props {
-  modelValue: DigitalConstraints;
+  modelValue?: DigitalConstraints;
   serviceId: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: () => ({}),
+});
 
 defineEmits<{
   'update:modelValue': [data: DigitalConstraints];
 }>();
 
-const constraints = computed<DigitalConstraints>(() => props.modelValue);
-
 const isConstrained = computed<boolean>(() => {
-  const { minOn, minOff, delayedOn, delayedOff, mutexed } = constraints.value;
+  const { minOn, minOff, delayedOn, delayedOff, mutexed } = props.modelValue;
   return [minOn, minOff, delayedOn, delayedOff, mutexed].some(
     (v) => v?.enabled,
   );
@@ -70,39 +70,39 @@ function constraintMutexString(constraint: MutexedConstraint): string {
       </div>
 
       <div
-        v-if="constraints.minOff?.enabled"
-        :class="constraintClass(constraints.minOff)"
+        v-if="modelValue.minOff?.enabled"
+        :class="constraintClass(modelValue.minOff)"
       >
         Minimum OFF time:
-        {{ constraintDurationString(constraints.minOff) }}
+        {{ constraintDurationString(modelValue.minOff) }}
       </div>
       <div
-        v-if="constraints.minOn?.enabled"
-        :class="constraintClass(constraints.minOn)"
+        v-if="modelValue.minOn?.enabled"
+        :class="constraintClass(modelValue.minOn)"
       >
         Minimum ON time:
-        {{ constraintDurationString(constraints.minOn) }}
+        {{ constraintDurationString(modelValue.minOn) }}
       </div>
       <div
-        v-if="constraints.delayedOn?.enabled"
-        :class="constraintClass(constraints.delayedOn)"
+        v-if="modelValue.delayedOn?.enabled"
+        :class="constraintClass(modelValue.delayedOn)"
       >
         Delay ON:
-        {{ constraintDurationString(constraints.delayedOn) }}
+        {{ constraintDurationString(modelValue.delayedOn) }}
       </div>
       <div
-        v-if="constraints.delayedOff?.enabled"
-        :class="constraintClass(constraints.delayedOff)"
+        v-if="modelValue.delayedOff?.enabled"
+        :class="constraintClass(modelValue.delayedOff)"
       >
         Delay OFF:
-        {{ constraintDurationString(constraints.delayedOff) }}
+        {{ constraintDurationString(modelValue.delayedOff) }}
       </div>
       <div
-        v-if="constraints.mutexed?.enabled"
-        :class="constraintClass(constraints.mutexed)"
+        v-if="modelValue.mutexed?.enabled"
+        :class="constraintClass(modelValue.mutexed)"
       >
         Mutex:
-        {{ constraintMutexString(constraints.mutexed) }}
+        {{ constraintMutexString(modelValue.mutexed) }}
       </div>
     </div>
   </div>

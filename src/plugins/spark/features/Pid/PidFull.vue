@@ -22,96 +22,82 @@ import {
   Quantity,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'PidFull',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();
+const sparkStore = useSparkStore();
+const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();
 
-    const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
-      sparkStore.blockByLink(serviceId, block.value.data.inputId),
-    );
+const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
+  sparkStore.blockByLink(serviceId, block.value.data.inputId),
+);
 
-    const inputClaimed = computed<boolean>(() =>
-      isBlockClaimed(inputBlock.value, sparkStore.claims),
-    );
+const inputClaimed = computed<boolean>(() =>
+  isBlockClaimed(inputBlock.value, sparkStore.claims),
+);
 
-    const inputStoredSetting = computed<Quantity | null>({
-      get: () => inputBlock.value?.data.storedSetting ?? null,
-      set: (q) => {
-        if (inputBlock.value && q) {
-          sparkStore.patchBlock(inputBlock.value, { storedSetting: q });
-        }
-      },
-    });
-
-    const outputBlock = computed<Block | null>(() =>
-      sparkStore.blockByLink(serviceId, block.value.data.outputId),
-    );
-
-    const offsetOutput = computed<boolean>(() =>
-      matchesType<ActuatorOffsetBlock>(
-        BlockType.ActuatorOffset,
-        outputBlock.value,
-      ),
-    );
-
-    const baseOutput = computed<number>(() => {
-      const { p, i, d } = block.value.data;
-      return p + i + d;
-    });
-
-    const boiling = computed<boolean>(() => block.value.data.boilModeActive);
-
-    const waterBoilTemp = computed<Quantity>(() => tempQty(100));
-
-    const boilPoint = computed<Quantity>({
-      get: () => {
-        const qty = bloxQty(block.value.data.boilPointAdjust);
-        qty.value = (qty.value ?? 0) + waterBoilTemp.value.value!;
-        return qty;
-      },
-      set: (qty) => {
-        if (qty.value != null) {
-          qty.value -= waterBoilTemp.value.value!;
-        } else {
-          qty.value = 0;
-        }
-        patchBlock({ boilPointAdjust: qty });
-      },
-    });
-
-    const boilMinOutputQty = computed<Quantity>({
-      get: () =>
-        offsetOutput.value
-          ? tempQty(block.value.data.boilMinOutput)
-          : bloxQty(block.value.data.boilMinOutput, '%'),
-      set: (qty) => {
-        const numV = offsetOutput.value
-          ? bloxQty(qty).to('degC').value
-          : qty.value;
-        patchBlock({ boilMinOutput: numV ?? 0 });
-      },
-    });
-
-    function showInput(): void {
-      createBlockDialog(inputBlock.value);
+const inputStoredSetting = computed<Quantity | null>({
+  get: () => inputBlock.value?.data.storedSetting ?? null,
+  set: (q) => {
+    if (inputBlock.value && q) {
+      sparkStore.patchBlock(inputBlock.value, { storedSetting: q });
     }
+  },
+});
 
-    function showOutput(): void {
-      createBlockDialog(outputBlock.value);
+const outputBlock = computed<Block | null>(() =>
+  sparkStore.blockByLink(serviceId, block.value.data.outputId),
+);
+
+const offsetOutput = computed<boolean>(() =>
+  matchesType<ActuatorOffsetBlock>(BlockType.ActuatorOffset, outputBlock.value),
+);
+
+const boiling = computed<boolean>(() => block.value.data.boilModeActive);
+
+const waterBoilTemp = computed<Quantity>(() => tempQty(100));
+
+const boilPoint = computed<Quantity>({
+  get: () => {
+    const qty = bloxQty(block.value.data.boilPointAdjust);
+    qty.value = (qty.value ?? 0) + waterBoilTemp.value.value!;
+    return qty;
+  },
+  set: (qty) => {
+    if (qty.value != null) {
+      qty.value -= waterBoilTemp.value.value!;
+    } else {
+      qty.value = 0;
     }
+    patchBlock({ boilPointAdjust: qty });
+  },
+});
 
-    function startEditIValue(): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: block.value.data.i ?? 0,
-          type: 'number',
-          title: 'Override I part of PID',
-          message: `
+const boilMinOutputQty = computed<Quantity>({
+  get: () =>
+    offsetOutput.value
+      ? tempQty(block.value.data.boilMinOutput)
+      : bloxQty(block.value.data.boilMinOutput, '%'),
+  set: (qty) => {
+    const numV = offsetOutput.value ? bloxQty(qty).to('degC').value : qty.value;
+    patchBlock({ boilMinOutput: numV ?? 0 });
+  },
+});
+
+function showInput(): void {
+  createBlockDialog(inputBlock.value);
+}
+
+function showOutput(): void {
+  createBlockDialog(outputBlock.value);
+}
+
+function startEditIValue(): void {
+  createDialog({
+    component: 'NumberDialog',
+    componentProps: {
+      modelValue: block.value.data.i ?? 0,
+      title: 'Override I part of PID',
+      message: `
                 <p>
                   The integrator slowly builds up when the error is not zero.
                   If you don't want to wait for that,
@@ -121,34 +107,10 @@ export default defineComponent({
                   It will continue to adjust automatically afterwards.
                 </p>
                 `,
-          html: true,
-        },
-      }).onOk((v: number) => patchBlock({ integralReset: v || 0.001 }));
-    }
-
-    return {
-      prettyBlock,
-      prettyQty,
-      fixedNumber,
-      durationString,
-      durationMs,
-      serviceId,
-      block,
-      patchBlock,
-      inputBlock,
-      inputClaimed,
-      inputStoredSetting,
-      outputBlock,
-      baseOutput,
-      boiling,
-      boilMinOutputQty,
-      boilPoint,
-      showInput,
-      showOutput,
-      startEditIValue,
-    };
-  },
-});
+      html: true,
+    },
+  }).onOk((v: number) => patchBlock({ integralReset: v || 0.001 }));
+}
 </script>
 
 <template>

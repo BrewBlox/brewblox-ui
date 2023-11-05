@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends QueryConfig">
 import { filteredNodes, nodeBuilder } from '@/plugins/history/nodes';
 import { useHistoryStore } from '@/plugins/history/store';
 import type { QueryConfig } from '@/plugins/history/types';
@@ -10,13 +10,13 @@ import { QTree, QTreeNode } from 'quasar';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 
 interface Props {
-  config: QueryConfig;
+  config: T;
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:config': [data: QueryConfig];
+  'update:config': [data: T];
 }>();
 
 const historyStore = useHistoryStore();
@@ -98,10 +98,6 @@ function collapse(): void {
   }
 }
 
-function saveConfig(config: QueryConfig): void {
-  emit('update:config', config);
-}
-
 function nodeHandler(node: QTreeNode): void {
   if (!treeRef.value!.isTicked(node.value)) {
     treeRef.value?.setTicked([node.value], true);
@@ -136,7 +132,7 @@ const nodes = computed<QTreeNode[]>(() =>
 const ticked = computed<string[]>({
   get: () => props.config.fields,
   set: (fields) =>
-    saveConfig({
+    emit('update:config', {
       ...props.config,
       fields,
     }),

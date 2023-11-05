@@ -34,7 +34,7 @@ const actions = computed<ChangeAction[]>(() =>
 
 function addAction(): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Add an action',
       message:

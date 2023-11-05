@@ -3,15 +3,14 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { saveFile } from '@/utils/import-export';
 import { SetpointProfileBlock } from 'brewblox-proto/ts';
 
-defineProps({
-  icon: {
-    type: String,
-    default: 'mdi-file-export',
-  },
-  label: {
-    type: String,
-    default: 'Export profile to file',
-  },
+interface Props {
+  icon?: string;
+  label?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  icon: 'mdi-file-export',
+  label: 'Export profile to file',
 });
 
 const { block } = useBlockWidget.setup<SetpointProfileBlock>();

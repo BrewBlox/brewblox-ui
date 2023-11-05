@@ -58,7 +58,7 @@ async function selectNewName(defaultName: string): Promise<string | undefined> {
   let name = defaultName;
   while (true) {
     name = await createDialogPromise({
-      component: 'InputDialog',
+      component: 'TextDialog',
       componentProps: {
         title: 'Create backup',
         message:

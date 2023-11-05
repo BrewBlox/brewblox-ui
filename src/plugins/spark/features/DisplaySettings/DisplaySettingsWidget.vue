@@ -4,28 +4,18 @@ import DisplaySettingsFull from './DisplaySettingsFull.vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { DisplaySettingsBlock } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'DisplaySettingsWidget',
-  components: {
-    Basic: DisplaySettingsBasic,
-    Full: DisplaySettingsFull,
-  },
-  setup() {
-    const { context } = useContext.setup();
-    const { patchBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
+const modes = {
+  Basic: DisplaySettingsBasic,
+  Full: DisplaySettingsFull,
+} as const;
 
-    function clearSlots(): void {
-      patchBlock({ widgets: [] });
-    }
+const { context } = useContext.setup();
+const { patchBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
 
-    return {
-      context,
-      clearSlots,
-    };
-  },
-});
+function clearSlots(): void {
+  patchBlock({ widgets: [] });
+}
 </script>
 
 <template>
@@ -42,6 +32,6 @@ export default defineComponent({
       </BlockWidgetToolbar>
     </template>
 
-    <component :is="context.mode" />
+    <component :is="modes[context.mode]" />
   </Card>
 </template>

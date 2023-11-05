@@ -8,7 +8,7 @@ import { createDialog } from '@/utils/dialog';
 import { Block } from 'brewblox-proto/ts';
 import difference from 'lodash/difference';
 import { nanoid } from 'nanoid';
-import { computed, PropType, reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 interface EditableBlockChange {
   id: string;
@@ -20,17 +20,16 @@ interface EditableBlockChange {
   fields: EditableBlockField[];
 }
 
-const props = defineProps({
-  modelValue: {
-    type: Object as PropType<BlockChange>,
-    required: true,
-  },
-});
+interface Props {
+  modelValue: BlockChange;
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: BlockChange);
-  (e: 'remove');
-  (e: 'switch');
+  'update:modelValue': [data: BlockChange];
+  remove: [];
+  switch: [];
 }>();
 
 const sparkStore = useSparkStore();
