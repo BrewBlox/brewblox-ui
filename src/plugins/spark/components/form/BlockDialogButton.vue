@@ -2,39 +2,22 @@
 import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { Block } from 'brewblox-proto/ts';
-import isString from 'lodash/isString';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-function validateBlockId(v: unknown): boolean {
-  return v === null || isString(v);
+interface Props {
+  blockId?: string | null;
+  serviceId: string;
 }
 
-export default defineComponent({
-  name: 'BlockDialogButton',
-  props: {
-    blockId: {
-      type: String,
-      default: null,
-      validator: validateBlockId,
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const sparkStore = useSparkStore();
-
-    const block = computed<Block | null>(() =>
-      sparkStore.blockById(props.serviceId, props.blockId),
-    );
-
-    return {
-      block,
-      createBlockDialog,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  blockId: null,
 });
+
+const sparkStore = useSparkStore();
+
+const block = computed<Block | null>(() =>
+  sparkStore.blockById(props.serviceId, props.blockId),
+);
 </script>
 
 <template>

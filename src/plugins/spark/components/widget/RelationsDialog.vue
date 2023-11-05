@@ -1,49 +1,26 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { BlockRelationNode } from '@/plugins/spark/types';
 import { BlockRelation } from 'brewblox-proto/ts';
-import { defineComponent, PropType } from 'vue';
 
-export default defineComponent({
-  name: 'RelationsDialog',
-  props: {
-    ...useDialog.props,
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    nodes: {
-      type: Array as PropType<BlockRelationNode[]>,
-      required: true,
-    },
-    edges: {
-      type: Array as PropType<BlockRelation[]>,
-      required: true,
-    },
-    title: {
-      type: String,
-      default: 'Block Relations',
-    },
-    hideUnrelated: {
-      type: Boolean,
-      default: false,
-    },
-    canCreate: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup() {
-    const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
+interface Props extends UseDialogProps {
+  serviceId: string;
+  nodes: BlockRelationNode[];
+  edges: BlockRelation[];
+  title?: string;
+  hideUnrelated?: boolean;
+  canCreate?: boolean;
+}
 
-    return {
-      dialogRef,
-      dialogOpts,
-      onDialogHide,
-    };
-  },
+withDefaults(defineProps<Props>(), {
+  title: 'Block relations',
+  hideUnrelated: false,
+  canCreate: false,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
 </script>
 
 <template>

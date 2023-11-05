@@ -3,44 +3,31 @@ import { emptyAnalogConstraints } from '@/plugins/spark/utils/configuration';
 import { AnalogConstraints } from 'brewblox-proto/ts';
 import { produce } from 'immer';
 import defaults from 'lodash/defaults';
-import { computed, defineComponent, PropType, toRaw } from 'vue';
+import { computed, toRaw } from 'vue';
 
 type DNNAnalogConstraints = DeepNonNullable<AnalogConstraints>;
 
-export default defineComponent({
-  name: 'AnalogConstraintsEditor',
-  props: {
-    modelValue: {
-      type: Object as PropType<AnalogConstraints>,
-      default: () => ({}),
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const constraints = computed<DNNAnalogConstraints>(() =>
-      defaults(props.modelValue, emptyAnalogConstraints()),
-    );
+interface Props {
+  modelValue: AnalogConstraints;
+  serviceId: string;
+}
 
-    function update(
-      cb: (draft: DNNAnalogConstraints) => void | DNNAnalogConstraints,
-    ): void {
-      const updated = produce<DNNAnalogConstraints>(
-        toRaw(constraints.value),
-        cb,
-      );
-      emit('update:modelValue', updated);
-    }
+const props = defineProps<Props>();
 
-    return {
-      constraints,
-      update,
-    };
-  },
-});
+const emit = defineEmits<{
+  'update:modelValue': [data: AnalogConstraints];
+}>();
+
+const constraints = computed<DNNAnalogConstraints>(() =>
+  defaults(props.modelValue, emptyAnalogConstraints()),
+);
+
+function update(
+  cb: (draft: DNNAnalogConstraints) => void | DNNAnalogConstraints,
+): void {
+  const updated = produce<DNNAnalogConstraints>(toRaw(constraints.value), cb);
+  emit('update:modelValue', updated);
+}
 </script>
 
 <template>

@@ -14,47 +14,23 @@ import {
 import { useServiceStore } from '@/store/services';
 import { saveFile } from '@/utils/import-export';
 import { startCopyWidget } from '@/utils/widgets';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'BlockActions',
-  setup() {
-    const serviceStore = useServiceStore();
-    const { serviceId, widget, block, isVolatileWidget, hasGraph } =
-      useBlockWidget.setup();
+const serviceStore = useServiceStore();
+const { serviceId, widget, block, isVolatileWidget, hasGraph } =
+  useBlockWidget.setup();
 
-    const serviceTitle = computed<string>(
-      () => serviceStore.serviceById(serviceId)!.title,
-    );
+const serviceTitle = computed<string>(
+  () => serviceStore.serviceById(serviceId)!.title,
+);
 
-    const canRemove = computed<boolean>(() => isBlockRemovable(block.value));
+const canRemove = computed<boolean>(() => isBlockRemovable(block.value));
 
-    const canDisplay = computed<boolean>(() =>
-      isBlockDisplayReady(block.value),
-    );
+const canDisplay = computed<boolean>(() => isBlockDisplayReady(block.value));
 
-    function exportBlock(): void {
-      saveFile(block.value, `${block.value.id}.json`);
-    }
-
-    return {
-      startAddBlockToGraphWidget,
-      startRemoveBlock,
-      startAddBlockToDisplay,
-      startCopyWidget,
-      startChangeBlockId,
-      serviceTitle,
-      widget,
-      isVolatileWidget,
-      block,
-      hasGraph,
-      canDisplay,
-      canRemove,
-      exportBlock,
-      startShowBlockJson,
-    };
-  },
-});
+function exportBlock(): void {
+  saveFile(block.value, `${block.value.id}.json`);
+}
 </script>
 
 <template>

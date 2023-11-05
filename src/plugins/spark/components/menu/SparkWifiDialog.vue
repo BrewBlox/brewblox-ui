@@ -1,54 +1,42 @@
 <script setup lang="ts">
 import SparkEspWifiCard from './SparkEspWifiCard.vue';
 import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
-import { useDialog, useGlobals } from '@/composables';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+} from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'SparkWifiDialog',
-  components: {
-    SparkEspWifiCard,
-    SparkParticleWifiCard,
-  },
-  props: {
-    ...useDialog.props,
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
-    const { dense } = useGlobals.setup();
+interface Props extends UseDialogProps {
+  serviceId: string;
+}
 
-    const platformVendor = computed<'esp' | 'particle' | 'sim' | 'unknown'>(
-      () => {
-        const status = sparkStore.statusByService(props.serviceId);
-        const platform = status?.controller?.platform;
-        if (platform === 'p1' || platform === 'photon') {
-          return 'particle';
-        }
-        if (platform === 'esp32') {
-          return 'esp';
-        }
-        if (platform === 'gcc') {
-          return 'sim';
-        }
-        return 'unknown';
-      },
-    );
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+});
 
-    return {
-      dialogRef,
-      dialogOpts,
-      onDialogHide,
-      dense,
-      platformVendor,
-    };
-  },
+defineEmits<UseDialogEmits>();
+
+const sparkStore = useSparkStore();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
+const { dense } = useGlobals.setup();
+
+const platformVendor = computed<'esp' | 'particle' | 'sim' | 'unknown'>(() => {
+  const status = sparkStore.statusByService(props.serviceId);
+  const platform = status?.controller?.platform;
+  if (platform === 'p1' || platform === 'photon') {
+    return 'particle';
+  }
+  if (platform === 'esp32') {
+    return 'esp';
+  }
+  if (platform === 'gcc') {
+    return 'sim';
+  }
+  return 'unknown';
 });
 </script>
 

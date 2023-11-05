@@ -1,21 +1,17 @@
 <script setup lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
-import { defineComponent } from 'vue';
+import {
+  UseValEditEmits,
+  UseValEditProps,
+  useValEdit,
+} from '@/plugins/spark/composables';
 
-export default defineComponent({
-  name: 'BoolValEdit',
-  props: {
-    ...useValEdit.props,
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field } = useValEdit.setup<boolean>();
-
-    return {
-      field,
-    };
-  },
+withDefaults(defineProps<UseValEditProps<boolean>>(), {
+  ...useValEdit.defaultProps<boolean>(),
 });
+
+defineEmits<UseValEditEmits<boolean>>();
+
+const { field } = useValEdit.setup<boolean>();
 </script>
 
 <template>

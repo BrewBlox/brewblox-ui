@@ -1,77 +1,62 @@
 <script setup lang="ts">
-import { durationString, prettyLink } from '@/utils/quantity';
+import { durationString } from '@/utils/quantity';
 import {
   DigitalConstraintBase,
   DigitalConstraints,
   DurationConstraint,
   MutexedConstraint,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'DigitalConstraintsField',
-  props: {
-    modelValue: {
-      type: Object as PropType<DigitalConstraints>,
-      default: () => ({}),
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const constraints = computed<DigitalConstraints>(() => props.modelValue);
+interface Props {
+  modelValue: DigitalConstraints;
+  serviceId: string;
+}
 
-    const isConstrained = computed<boolean>(() => {
-      const { minOn, minOff, delayedOn, delayedOff, mutexed } =
-        constraints.value;
-      return [minOn, minOff, delayedOn, delayedOff, mutexed].some(
-        (v) => v?.enabled,
-      );
-    });
+const props = defineProps<Props>();
 
-    function constraintClass(constraint?: DigitalConstraintBase): string[] {
-      const cls: string[] = [];
-      if (constraint) {
-        if ((constraint as MutexedConstraint).hasLock) {
-          cls.push('text-green-4');
-        } else if (constraint.limiting) {
-          cls.push('text-pink-4');
-        } else if (constraint.enabled) {
-          cls.push('text-indigo-4', 'darkish');
-        }
-      }
-      return cls;
-    }
+defineEmits<{
+  'update:modelValue': [data: DigitalConstraints];
+}>();
 
-    function constraintDurationString(constraint: DurationConstraint): string {
-      if (constraint.limiting) {
-        return `${durationString(constraint.remaining, false)} left`;
-      }
-      return durationString(constraint.duration);
-    }
+const constraints = computed<DigitalConstraints>(() => props.modelValue);
 
-    function constraintMutexString(constraint: MutexedConstraint): string {
-      if (constraint.limiting) {
-        return Number(constraint.remaining.value) > 1
-          ? `${durationString(constraint.remaining, false)} left`
-          : 'waiting...';
-      }
-      return durationString(constraint.extraHoldTime);
-    }
-
-    return {
-      constraints,
-      isConstrained,
-      prettyLink,
-      durationString,
-      constraintClass,
-      constraintDurationString,
-      constraintMutexString,
-    };
-  },
+const isConstrained = computed<boolean>(() => {
+  const { minOn, minOff, delayedOn, delayedOff, mutexed } = constraints.value;
+  return [minOn, minOff, delayedOn, delayedOff, mutexed].some(
+    (v) => v?.enabled,
+  );
 });
+
+function constraintClass(constraint?: DigitalConstraintBase): string[] {
+  const cls: string[] = [];
+  if (constraint) {
+    if ((constraint as MutexedConstraint).hasLock) {
+      cls.push('text-green-4');
+    } else if (constraint.limiting) {
+      cls.push('text-pink-4');
+    } else if (constraint.enabled) {
+      cls.push('text-indigo-4', 'darkish');
+    }
+  }
+  return cls;
+}
+
+function constraintDurationString(constraint: DurationConstraint): string {
+  if (constraint.limiting) {
+    return `${durationString(constraint.remaining, false)} left`;
+  }
+  return durationString(constraint.duration);
+}
+
+function constraintMutexString(constraint: MutexedConstraint): string {
+  if (constraint.limiting) {
+    return Number(constraint.remaining.value) > 1
+      ? `${durationString(constraint.remaining, false)} left`
+      : 'waiting...';
+  }
+  return durationString(constraint.extraHoldTime);
+}
 </script>
 
 <template>

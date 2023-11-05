@@ -1,29 +1,26 @@
 <script setup lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
+import {
+  UseValEditEmits,
+  UseValEditProps,
+  useValEdit,
+} from '@/plugins/spark/composables';
 import { prettyConstraints } from '@/plugins/spark/utils/formatting';
 import { DigitalConstraints } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'DigitalConstraintsValEdit',
-  props: {
-    ...useValEdit.props,
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<DigitalConstraints>();
+type VT = DigitalConstraints;
 
-    const displayString = computed<string>(
-      () => prettyConstraints(field.value) || 'Unconstrained',
-    );
-
-    return {
-      field,
-      startEdit,
-      displayString,
-    };
-  },
+withDefaults(defineProps<UseValEditProps<VT>>(), {
+  ...useValEdit.defaultProps<VT>(),
 });
+
+defineEmits<UseValEditEmits<VT>>();
+
+const { field, startEdit } = useValEdit.setup<DigitalConstraints>();
+
+const displayString = computed<string>(
+  () => prettyConstraints(field.value) || 'Unconstrained',
+);
 </script>
 
 <template>

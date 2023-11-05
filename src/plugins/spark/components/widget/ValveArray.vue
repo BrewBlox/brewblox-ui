@@ -16,59 +16,45 @@ import {
   Link,
   MotorValveBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
 interface EditableChannel extends IoChannel {
   name: string;
   actuator: MotorValveBlock | null;
 }
 
-export default defineComponent({
-  name: 'ValveArray',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, block } = useBlockWidget.setup<IoArrayInterfaceBlock>();
+const sparkStore = useSparkStore();
+const { serviceId, block } = useBlockWidget.setup<IoArrayInterfaceBlock>();
 
-    const channels = computed<EditableChannel[]>(() =>
-      block.value.data.channels.map((channel: IoChannel) => ({
-        ...channel,
-        name: channelName(block.value, channel.id) ?? 'Unknown',
-        actuator: sparkStore.blockByLink(serviceId, channel.claimedBy),
-      })),
-    );
+const channels = computed<EditableChannel[]>(() =>
+  block.value.data.channels.map((channel: IoChannel) => ({
+    ...channel,
+    name: channelName(block.value, channel.id) ?? 'Unknown',
+    actuator: sparkStore.blockByLink(serviceId, channel.claimedBy),
+  })),
+);
 
-    function actuatorLimitations(block: Block): string | null {
-      return prettyLimitations(block.data.constraints) || null;
-    }
+function actuatorLimitations(block: Block): string | null {
+  return prettyLimitations(block.data.constraints) || null;
+}
 
-    async function replaceActuator(
-      channel: EditableChannel,
-      link: Link,
-    ): Promise<void> {
-      setExclusiveChannelActuator(
-        sparkStore.blockByLink(serviceId, link),
-        bloxLink(block.value.id),
-        channel.id,
-      );
-    }
+async function replaceActuator(
+  channel: EditableChannel,
+  link: Link,
+): Promise<void> {
+  setExclusiveChannelActuator(
+    sparkStore.blockByLink(serviceId, link),
+    bloxLink(block.value.id),
+    channel.id,
+  );
+}
 
-    async function updateDigitalState(
-      channel: EditableChannel,
-      desiredState: DigitalState,
-    ): Promise<void> {
-      await sparkStore.patchBlock(channel.actuator, { desiredState });
-    }
-
-    return {
-      BlockType,
-      serviceId,
-      channels,
-      actuatorLimitations,
-      updateDigitalState,
-      replaceActuator,
-    };
-  },
-});
+async function updateDigitalState(
+  channel: EditableChannel,
+  desiredState: DigitalState,
+): Promise<void> {
+  await sparkStore.patchBlock(channel.actuator, { desiredState });
+}
 </script>
 
 <template>

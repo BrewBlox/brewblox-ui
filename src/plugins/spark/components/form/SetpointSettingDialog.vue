@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { ifCompatible } from '@/plugins/spark/utils/info';
@@ -10,72 +10,54 @@ import {
   Quantity,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'SetpointSettingDialog',
-  props: {
-    ...useDialog.props,
-    address: {
-      type: Object as PropType<BlockAddress>,
-      required: true,
+interface Props extends UseDialogProps {
+  address: BlockAddress;
+}
+
+const props = defineProps<Props>();
+
+defineEmits<UseDialogEmits>();
+
+const sparkStore = useSparkStore();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const block = ifCompatible<SetpointSensorPairBlock>(
+  sparkStore.blockByAddress(props.address),
+  BlockType.SetpointSensorPair,
+);
+
+const enabled = ref<boolean>(block?.data.enabled ?? false);
+const setting = ref<Quantity>(block?.data.storedSetting ?? tempQty(null));
+
+const notation = prettyUnit(setting.value.unit);
+
+const isValid = computed<boolean>(
+  () => block !== null && setting.value.value !== null,
+);
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: setting.value.value,
+      type: 'number',
+      suffix: notation,
     },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+  }).onOk((v) => (setting.value.value = v));
+}
 
-    const block = ifCompatible<SetpointSensorPairBlock>(
-      sparkStore.blockByAddress(props.address),
-      BlockType.SetpointSensorPair,
-    );
-
-    const enabled = ref<boolean>(block?.data.enabled ?? false);
-    const setting = ref<Quantity>(block?.data.storedSetting ?? tempQty(null));
-
-    const notation = prettyUnit(setting.value.unit);
-
-    const isValid = computed<boolean>(
-      () => block !== null && setting.value.value !== null,
-    );
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: setting.value.value,
-          type: 'number',
-          suffix: notation,
-        },
-      }).onOk((v) => (setting.value.value = v));
-    }
-
-    function save(): void {
-      if (block) {
-        sparkStore.patchBlock(block, {
-          enabled: enabled.value,
-          storedSetting: setting.value,
-        });
-        onDialogOK();
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogOpts,
-      onDialogHide,
-      onDialogCancel,
-      enabled,
-      setting,
-      notation,
-      isValid,
-      showKeyboard,
-      save,
-    };
-  },
-});
+function save(): void {
+  if (block) {
+    sparkStore.patchBlock(block, {
+      enabled: enabled.value,
+      storedSetting: setting.value,
+    });
+    onDialogOK();
+  }
+}
 </script>
 
 <template>

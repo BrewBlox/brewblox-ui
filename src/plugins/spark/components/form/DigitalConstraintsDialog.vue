@@ -1,43 +1,28 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { DigitalConstraints } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, ref } from 'vue';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'ConstraintsDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<DigitalConstraints>,
-      required: true,
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: DigitalConstraints;
+  serviceId: string;
+}
 
-    const local = ref<DigitalConstraints>(cloneDeep(props.modelValue));
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    return {
-      dialogRef,
-      dialogOpts,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const local = ref<DigitalConstraints>(cloneDeep(props.modelValue));
+
+function save(): void {
+  onDialogOK(local.value);
+}
 </script>
 
 <template>
