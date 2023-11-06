@@ -30,7 +30,7 @@ import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { typed } from '@/utils/misc';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
-import { BlockType } from 'brewblox-proto/ts';
+import { Block, BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
 import { computed, nextTick, onMounted, ref } from 'vue';
 
