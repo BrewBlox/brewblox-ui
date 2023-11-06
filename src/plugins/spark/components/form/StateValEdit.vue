@@ -1,22 +1,20 @@
-<script lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
+<script setup lang="ts">
+import {
+  UseValEditEmits,
+  UseValEditProps,
+  useValEdit,
+} from '@/plugins/spark/composables';
 import { DigitalState } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'StateValEdit',
-  props: {
-    ...useValEdit.props,
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field } = useValEdit.setup<DigitalState>();
+type VT = DigitalState;
 
-    return {
-      field,
-    };
-  },
+withDefaults(defineProps<UseValEditProps<VT>>(), {
+  ...useValEdit.defaultProps<VT>(),
 });
+
+defineEmits<UseValEditEmits<VT>>();
+
+const { field } = useValEdit.setup<DigitalState>();
 </script>
 
 <template>

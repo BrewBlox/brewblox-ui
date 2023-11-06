@@ -1,3 +1,4 @@
+import widget from './DigitalInputWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -14,7 +15,6 @@ import {
   ToggleBehavior,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './DigitalInputWidget.vue';
 
 const type = BlockType.DigitalInput;
 const title = 'Digital Input';

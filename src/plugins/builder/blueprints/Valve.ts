@@ -1,3 +1,4 @@
+import { settingsAddress, settingsBlock } from '../utils';
 import {
   LEFT,
   RIGHT,
@@ -8,7 +9,6 @@ import {
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 import { DigitalState } from 'brewblox-proto/ts';
-import { settingsAddress, settingsBlock } from '../utils';
 
 const blueprint: BuilderBlueprint = {
   type: 'Valve',

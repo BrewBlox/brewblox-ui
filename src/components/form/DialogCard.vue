@@ -1,21 +1,16 @@
 <script setup lang="ts">
-defineProps({
-  title: {
-    type: String,
-    default: null,
-  },
-  message: {
-    type: String,
-    default: '',
-  },
-  html: {
-    type: Boolean,
-    default: false,
-  },
-  separated: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  title?: string | null;
+  message?: string;
+  html?: boolean;
+  separated?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  title: null,
+  message: '',
+  html: false,
+  separated: false,
 });
 </script>
 

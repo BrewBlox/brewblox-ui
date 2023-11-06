@@ -1,63 +1,41 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { UseFieldProps, useField } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { Block } from 'brewblox-proto/ts';
 import truncate from 'lodash/truncate';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: Object as PropType<BlockAddress>,
-    required: true,
-  },
-  title: {
-    type: String,
-    default: 'Choose block',
-  },
-  label: {
-    type: String,
-    default: 'Block',
-  },
-  anyService: {
-    type: Boolean,
-    default: false,
-  },
-  compatible: {
-    type: null as unknown as PropType<ComparedBlockType>,
-    default: () => null,
-  },
-  blockFilter: {
-    type: Function as PropType<(block: Block) => boolean>,
-    default: () => true,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  creatable: {
-    type: Boolean,
-    default: true,
-  },
-  configurable: {
-    type: Boolean,
-    default: true,
-  },
-  show: {
-    type: Boolean,
-    default: true,
-  },
-  showCreated: {
-    type: Boolean,
-    default: true,
-  },
+interface Props extends UseFieldProps {
+  modelValue: BlockAddress;
+  anyService?: boolean;
+  compatible?: ComparedBlockType;
+  blockFilter?: (block: Block) => boolean;
+  clearable?: boolean;
+  creatable?: boolean;
+  configurable?: boolean;
+  show?: boolean;
+  showCreated?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  title: 'Choose block',
+  label: 'Block',
+  anyService: false,
+  compatible: null,
+  blockFilter: () => true,
+  clearable: true,
+  creatable: true,
+  configurable: true,
+  show: true,
+  showCreated: true,
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: BlockAddress): void;
+  'update:modelValue': [payload: BlockAddress];
 }>();
 
 const { activeSlots } = useField.setup();

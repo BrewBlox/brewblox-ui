@@ -1,48 +1,29 @@
-<script lang="ts">
+<script setup lang="ts">
 import { TiltService } from '@/plugins/tilt/types';
 import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'TiltActions',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const systemStore = useSystemStore();
-    const serviceStore = useServiceStore();
+interface Props {
+  serviceId: string;
+}
 
-    const service = computed<TiltService | null>(() =>
-      serviceStore.serviceById(props.serviceId),
-    );
+const props = defineProps<Props>();
 
-    const serviceTitle = computed<string>(
-      () => service.value?.title || `Tilt ${props.serviceId}`,
-    );
+const systemStore = useSystemStore();
+const serviceStore = useServiceStore();
 
-    const isHomePage = computed<boolean>({
-      get: () =>
-        userUISettings.value.homePage === `/service/${props.serviceId}`,
-      set: (v) => {
-        const homePage =
-          v && service.value ? `/service/${props.serviceId}` : null;
-        systemStore.patchUserUISettings({ homePage });
-      },
-    });
+const service = computed<TiltService | null>(() =>
+  serviceStore.serviceById(props.serviceId),
+);
 
-    return {
-      startChangeServiceTitle,
-      startRemoveService,
-      service,
-      serviceTitle,
-      isHomePage,
-    };
+const isHomePage = computed<boolean>({
+  get: () => userUISettings.value.homePage === `/service/${props.serviceId}`,
+  set: (v) => {
+    const homePage = v && service.value ? `/service/${props.serviceId}` : null;
+    systemStore.patchUserUISettings({ homePage });
   },
 });
 </script>

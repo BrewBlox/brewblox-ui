@@ -1,3 +1,5 @@
+import { PartKey, PatchSettingsKey } from '../symbols';
+import { settingsAddress, showAbsentBlock } from '../utils';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockAddress,
@@ -15,8 +17,6 @@ import {
   FastPwmBlock,
 } from 'brewblox-proto/ts';
 import { computed, ComputedRef, inject } from 'vue';
-import { PartKey, PatchSettingsKey } from '../symbols';
-import { settingsAddress, showAbsentBlock } from '../utils';
 
 export interface UseSettingsBlockComponent<BlockT extends Block> {
   hasAddress: ComputedRef<boolean>;

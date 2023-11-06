@@ -1,3 +1,4 @@
+import { configApi, globalApi } from './api';
 import timezones from '@/assets/timezones.json';
 import {
   defaultUserTimeZone,
@@ -19,7 +20,6 @@ import omit from 'lodash/omit';
 import { defineStore } from 'pinia';
 import { DialogChainObject } from 'quasar';
 import KeyboardLayouts from 'simple-keyboard-layouts';
-import { configApi, globalApi } from './api';
 
 const UI_SETTINGS_STORE_ID = 'default';
 const USER_UNITS_STORE_ID = 'units';

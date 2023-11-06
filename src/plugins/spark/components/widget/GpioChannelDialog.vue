@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { bloxLink } from '@/utils/link';
 import {
   ChannelCapabilities,
@@ -8,7 +8,7 @@ import {
   GpioPins,
 } from 'brewblox-proto/ts';
 import clamp from 'lodash/clamp';
-import { computed, PropType, reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 type EditingKind =
   | 'UNKNOWN'
@@ -29,6 +29,16 @@ interface EditingChannel {
   mode: EditingMode;
   multiply: number;
 }
+
+interface Props extends UseDialogProps {
+  channel: GpioModuleChannel;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+});
+
+defineEmits<UseDialogEmits>();
 
 function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
   if (deviceType.startsWith('GPIO_DEV_SSR')) {
@@ -145,18 +155,8 @@ function inferChannelWidth({ mode, multiply }: EditingChannel): number {
   }
 }
 
-const props = defineProps({
-  ...useDialog.props,
-  channel: {
-    type: Object as PropType<GpioModuleChannel>,
-    required: true,
-  },
-});
-
-defineEmits({ ...useDialog.emitsObject });
-
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<GpioModuleChannel>();
 
 const local = reactive<EditingChannel>({
   name: props.channel.name,
@@ -259,7 +259,7 @@ watch(
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

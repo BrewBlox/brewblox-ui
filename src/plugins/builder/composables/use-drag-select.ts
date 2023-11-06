@@ -1,7 +1,7 @@
-import { rotatedSize } from '@/utils/coordinates';
-import { Ref, ref } from 'vue';
 import { SQUARE_SIZE } from '../const';
 import { BuilderPart } from '../types';
+import { rotatedSize } from '@/utils/coordinates';
+import { Ref, ref } from 'vue';
 
 interface DragSelectArea {
   startX: number;

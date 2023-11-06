@@ -63,6 +63,7 @@ module.exports = {
       },
     ],
     'vue/no-v-text-v-html-on-component': 0,
+    'vue/require-default-prop': 0,
   },
   overrides: [
     {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { COIL_BOTTOM } from '../blueprints/Coil';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
+import { computed } from 'vue';
 
 const paths = {
   borders: [

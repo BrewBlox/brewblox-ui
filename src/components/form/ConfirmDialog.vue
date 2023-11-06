@@ -1,27 +1,24 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { computed } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  ok: {
-    type: String,
-    default: 'OK',
-  },
-  nok: {
-    type: [String, Boolean],
-    default: false,
-  },
-  cancel: {
-    type: [String, Boolean],
-    default: true,
-  },
+interface Props extends UseDialogProps {
+  ok?: string;
+  nok?: string | boolean;
+  cancel?: string | boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  ok: 'OK',
+  nok: false,
+  cancel: true,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<boolean>();
 
 const cancelLabel = computed<string>(() =>
   typeof props.cancel === 'string' ? props.cancel : 'Cancel',
@@ -35,7 +32,7 @@ const nokLabel = computed<string>(() =>
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="onDialogOK(true)"
   >

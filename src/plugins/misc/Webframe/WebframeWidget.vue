@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { WebframeWidget } from './types';
 import { useContext, useWidget } from '@/composables';
 import { computed } from 'vue';
-import { WebframeWidget } from './types';
 
 const { config, patchConfig } = useWidget.setup<WebframeWidget>();
 const { context } = useContext.setup();
@@ -56,19 +56,18 @@ const url = computed<string>({
       v-if="context.mode === 'Full'"
       class="widget-body column q-mt-none"
     >
-      <InputField
+      <TextField
         v-model="url"
         title="URL"
         label="URL"
         message="URLs must include the http:// or https:// prefix."
         class="col-grow"
         tag-style="word-break: break-word"
-        :dialog-props="{ fontSize: '100%' }"
+        :editor-props="{ fontSize: '100%' }"
       />
 
-      <InputField
+      <NumberField
         v-model="pctScale"
-        type="number"
         label="Content size"
         title="Set zoom level"
         class="col-grow"

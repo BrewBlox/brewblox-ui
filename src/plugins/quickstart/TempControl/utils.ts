@@ -1,3 +1,4 @@
+import { TempControlConfig, TempControlMode } from './types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialogPromise } from '@/utils/block-dialog';
 import { makeTypeFilter } from '@/utils/functional';
@@ -18,7 +19,6 @@ import {
   TempSensorMockBlock,
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
-import { TempControlConfig, TempControlMode } from './types';
 
 interface TempControlBlocks {
   setpoint: SetpointSensorPairBlock;

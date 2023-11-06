@@ -1,58 +1,46 @@
-<script lang="ts">
+<script setup lang="ts">
+import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
+import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
-import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
-import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'SetpointSensorPairWidget',
-  components: {
-    Basic: SetpointSensorPairBasic,
-    Full: SetpointSensorPairFull,
-  },
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const sparkStore = useSparkStore();
-    const { serviceId, blockId } =
-      useBlockWidget.setup<SetpointSensorPairBlock>();
+const modes = {
+  Basic: SetpointSensorPairBasic,
+  Full: SetpointSensorPairFull,
+} as const;
 
-    const usedBy = computed<Block[]>(() => {
-      return sparkStore
-        .blocksByService(serviceId)
-        .filter((b) => b.data.inputId?.id === blockId);
-    });
+const { context, inDialog } = useContext.setup();
+const sparkStore = useSparkStore();
+const { serviceId, blockId } = useBlockWidget.setup<SetpointSensorPairBlock>();
 
-    const formattedUsers = computed<string>(() =>
-      usedBy.value.map((v) => `<i>${v.id}</i>`).join(' and '),
-    );
+const usedBy = computed<Block[]>(() => {
+  return sparkStore
+    .blocksByService(serviceId)
+    .filter((b) => b.data.inputId?.id === blockId);
+});
 
-    const enabledString = computed<string>(() => {
-      if (usedBy.value.length > 0) {
-        return `Setpoint is enabled and used by ${formattedUsers.value}.`;
-      } else {
-        return 'Setpoint is enabled and unused.';
-      }
-    });
+const formattedUsers = computed<string>(() =>
+  usedBy.value.map((v) => `<i>${v.id}</i>`).join(' and '),
+);
 
-    const disabledString = computed<string>(() => {
-      if (usedBy.value.length > 0) {
-        const verb = usedBy.value.length > 1 ? 'are' : 'is';
-        return `Setpoint is disabled and therefore ${formattedUsers.value} ${verb} inactive.`;
-      } else {
-        return 'Setpoint is disabled and unused.';
-      }
-    });
+const enabledString = computed<string>(() => {
+  if (usedBy.value.length > 0) {
+    return `Setpoint is enabled and used by ${formattedUsers.value}.`;
+  } else {
+    return 'Setpoint is enabled and unused.';
+  }
+});
 
-    return {
-      context,
-      inDialog,
-      enabledString,
-      disabledString,
-    };
-  },
+const disabledString = computed<string>(() => {
+  if (usedBy.value.length > 0) {
+    const verb = usedBy.value.length > 1 ? 'are' : 'is';
+    return `Setpoint is disabled and therefore ${formattedUsers.value} ${verb} inactive.`;
+  } else {
+    return 'Setpoint is disabled and unused.';
+  }
 });
 </script>
 
@@ -66,7 +54,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <component :is="context.mode">
+    <component :is="modes[context.mode]">
       <template #warnings>
         <BlockEnableToggle>
           <template #enabled>

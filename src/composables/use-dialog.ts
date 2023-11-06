@@ -1,12 +1,10 @@
 import { ContextKey, InvalidateKey } from '@/symbols';
 import { nanoid } from 'nanoid';
-import { QDialog, QDialogOptions } from 'quasar';
+import { QDialog, QDialogOptions, useDialogPluginComponent } from 'quasar';
 import {
-  getCurrentInstance,
   nextTick,
   onBeforeUnmount,
   onMounted,
-  PropType,
   provide,
   reactive,
   Ref,
@@ -16,89 +14,41 @@ import {
 import { useRouter } from 'vue-router';
 
 export interface UseDialogProps {
-  title: {
-    type: PropType<string>;
-    default: string;
-  };
-  message: {
-    type: PropType<string>;
-    default: string;
-  };
-  html: {
-    type: PropType<boolean>;
-    default: false;
-  };
+  title?: string;
+  message?: string;
+  html?: boolean;
 }
 
-export type UseDialogEmitsArray = ['ok', 'hide'];
+export type UseDialogEmits = {
+  ok: [payload?: any];
+  hide: [];
+};
 
-export interface UseDialogEmitsObject {
-  ok: (payload?: any) => void;
-  hide: () => void;
-}
-
-export interface UseDialogComponent {
-  dialogRef: Ref<QDialog | null>;
+export interface UseDialogComponent<T> {
+  dialogRef: Ref<QDialog | undefined>;
   onDialogHide: () => void;
-  onDialogOK: (payload?: any) => void;
+  onDialogOK: (payload?: T) => void;
   onDialogCancel: () => void;
-  dialogProps: Partial<QDialogOptions>;
+  dialogOpts: Partial<QDialogOptions>;
 }
 
 export interface UseDialogComposable {
-  props: UseDialogProps;
-  emits: UseDialogEmitsArray;
-  emitsObject: UseDialogEmitsObject;
-  setup(): UseDialogComponent;
+  defaultProps: InferDefaults<UseDialogProps>;
+  setup<T = any>(): UseDialogComponent<T>;
 }
 
 export const useDialog: UseDialogComposable = {
-  props: {
-    title: {
-      type: String,
-      default: '',
-    },
-    message: {
-      type: String,
-      default: '',
-    },
-    html: {
-      type: Boolean,
-      default: false,
-    },
+  defaultProps: {
+    title: '',
+    message: '',
+    html: false,
   },
-  emits: ['ok', 'hide'],
-  emitsObject: {
-    ok: () => true,
-    hide: () => true,
-  },
-  setup(): UseDialogComponent {
-    const instance = getCurrentInstance()!;
+  setup<T = any>(): UseDialogComponent<T> {
+    const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialogPluginComponent<T>();
 
     const hashId = `.${nanoid(6)}.`;
-    const dialogRef = ref<QDialog | null>(null);
     const cancelWatcher = ref<() => void>(() => {});
-
-    function show(): void {
-      dialogRef.value?.show();
-    }
-
-    function hide(): void {
-      dialogRef.value?.hide();
-    }
-
-    function onDialogHide(): void {
-      instance.emit('hide');
-    }
-
-    function onDialogCancel(): void {
-      hide();
-    }
-
-    function onDialogOK(payload: unknown): void {
-      instance.emit('ok', payload);
-      hide();
-    }
 
     // Will be overridden if this dialog is showing a widget
     // Used for all other menus and edit dialogs
@@ -108,14 +58,11 @@ export const useDialog: UseDialogComposable = {
         container: 'Dialog',
         size: 'Fixed',
         mode: 'Basic',
-      }),
+      } as const),
     );
 
     // Lets all nested elements declare that the dialog should be closed immediately
-    provide(InvalidateKey, hide);
-
-    // expose public methods required by Dialog plugin
-    Object.assign(instance.proxy as any, { show, hide });
+    provide(InvalidateKey, onDialogHide);
 
     // We want the dialog to be part of the navigation stack.
     // This lets mobile users close dialogs by using the back button.
@@ -136,7 +83,7 @@ export const useDialog: UseDialogComposable = {
             (newRoute) => {
               if (!newRoute.hash.includes(hashId)) {
                 cancelWatcher.value();
-                hide();
+                onDialogHide();
               }
             },
           );
@@ -181,7 +128,7 @@ export const useDialog: UseDialogComposable = {
       onDialogHide,
       onDialogCancel,
       onDialogOK,
-      dialogProps: {
+      dialogOpts: {
         noRouteDismiss: true,
         noBackdropDismiss: true,
       },

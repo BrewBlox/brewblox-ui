@@ -1,42 +1,25 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty, shortDateString } from '@/utils/quantity';
 import { TempSensorExternalBlock } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'TempSensorExternalWidget',
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { block, patchBlock } =
-      useBlockWidget.setup<TempSensorExternalBlock>();
+const { context, inDialog } = useContext.setup();
+const { block, patchBlock } = useBlockWidget.setup<TempSensorExternalBlock>();
 
-    function editSetting(): void {
-      createDialog({
-        component: 'QuantityDialog',
-        componentProps: {
-          modelValue: block.value.data.setting,
-          title: 'Setting',
-          label: 'Setting',
-        },
-      }).onOk((v) => {
-        patchBlock({ setting: v });
-      });
-    }
-
-    return {
-      prettyQty,
-      shortDateString,
-      context,
-      inDialog,
-      block,
-      patchBlock,
-      editSetting,
-    };
-  },
-});
+function editSetting(): void {
+  createDialog({
+    component: 'QuantityDialog',
+    componentProps: {
+      modelValue: block.value.data.setting,
+      title: 'Setting',
+      label: 'Setting',
+    },
+  }).onOk((v) => {
+    patchBlock({ setting: v });
+  });
+}
 </script>
 
 <template>

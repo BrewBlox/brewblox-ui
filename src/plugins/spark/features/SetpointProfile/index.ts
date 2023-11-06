@@ -1,3 +1,4 @@
+import widget from './SetpointProfileWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -12,7 +13,6 @@ import {
   SetpointProfileBlock,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './SetpointProfileWidget.vue';
 
 const type = BlockType.SetpointProfile;
 const title = 'Setpoint Profile';

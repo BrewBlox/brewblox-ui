@@ -1,26 +1,24 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: null as unknown as PropType<string | null>,
-    default: null,
-  },
-  title: {
-    type: String,
-    default: 'Select layout',
-  },
+interface Props extends UseDialogProps {
+  modelValue: string | null;
+  title?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Select layout',
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
 const builderStore = useBuilderStore();
-const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<string | null>();
 const local = ref<BuilderLayout | null>(
   builderStore.layoutById(props.modelValue),
 );
@@ -35,7 +33,7 @@ function save(layout: BuilderLayout | null): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save(local)"
   >

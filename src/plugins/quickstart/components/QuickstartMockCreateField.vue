@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { notify } from '@/utils/notify';
@@ -9,76 +9,60 @@ import {
   SparkStatusDescription,
   TempSensorMockBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'QuickstartMockCreateField',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    names: {
-      type: Array as PropType<string[]>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const specStore = useBlockSpecStore();
-    const finished = ref(false);
+interface Props {
+  serviceId: string;
+  names: string[];
+}
 
-    const status = computed<SparkStatusDescription | null>(() =>
-      sparkStore.statusByService(props.serviceId),
-    );
+const props = defineProps<Props>();
 
-    const isSimulation = computed<boolean>(
-      () => status.value?.connection_kind === 'SIM',
-    );
+const sparkStore = useSparkStore();
+const specStore = useBlockSpecStore();
+const finished = ref(false);
 
-    async function createMockSensors(): Promise<void> {
-      if (!sparkStore.has(props.serviceId)) {
-        return;
-      }
-      const validator = makeRuleValidator(makeBlockIdRules(props.serviceId));
+const status = computed<SparkStatusDescription | null>(() =>
+  sparkStore.statusByService(props.serviceId),
+);
 
-      const sensorSpec = specStore.blockSpecByType<TempSensorMockBlock>(
-        BlockType.TempSensorMock,
-      );
-      const pinSpec = specStore.blockSpecByType<MockPinsBlock>(
-        BlockType.MockPins,
-      );
+const isSimulation = computed<boolean>(
+  () => status.value?.connection_kind === 'SIM',
+);
 
-      for (const name of props.names) {
-        const block: TempSensorMockBlock = {
-          id: suggestId(name, validator),
-          serviceId: props.serviceId,
-          type: BlockType.TempSensorMock,
-          data: sensorSpec.generate(),
-        };
-        await sparkStore.createBlock(block);
-        notify.done(`Created <i>${block.id}</i>`);
-      }
+async function createMockSensors(): Promise<void> {
+  if (!sparkStore.has(props.serviceId)) {
+    return;
+  }
+  const validator = makeRuleValidator(makeBlockIdRules(props.serviceId));
 
-      const pinsBlock: MockPinsBlock = {
-        id: suggestId('Mock Pins', validator),
-        serviceId: props.serviceId,
-        type: BlockType.MockPins,
-        data: pinSpec.generate(),
-      };
-      await sparkStore.createBlock(pinsBlock);
-      notify.done(`Created <i>${pinsBlock.id}</i>`);
+  const sensorSpec = specStore.blockSpecByType<TempSensorMockBlock>(
+    BlockType.TempSensorMock,
+  );
+  const pinSpec = specStore.blockSpecByType<MockPinsBlock>(BlockType.MockPins);
 
-      finished.value = true;
-    }
-
-    return {
-      finished,
-      isSimulation,
-      createMockSensors,
+  for (const name of props.names) {
+    const block: TempSensorMockBlock = {
+      id: suggestId(name, validator),
+      serviceId: props.serviceId,
+      type: BlockType.TempSensorMock,
+      data: sensorSpec.generate(),
     };
-  },
-});
+    await sparkStore.createBlock(block);
+    notify.done(`Created <i>${block.id}</i>`);
+  }
+
+  const pinsBlock: MockPinsBlock = {
+    id: suggestId('Mock Pins', validator),
+    serviceId: props.serviceId,
+    type: BlockType.MockPins,
+    data: pinSpec.generate(),
+  };
+  await sparkStore.createBlock(pinsBlock);
+  notify.done(`Created <i>${pinsBlock.id}</i>`);
+
+  finished.value = true;
+}
 </script>
 
 <template>

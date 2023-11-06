@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PwmDisplay';
 import { usePart } from '../composables';
 import { liquidBorderColor } from '../utils';
+import { computed } from 'vue';
 
 const { flows, bordered, width, height, passthrough } = usePart.setup();
 

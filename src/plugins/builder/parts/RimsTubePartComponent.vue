@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/RimsTube';
+import { usePart } from '../composables';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
 import { computed } from 'vue';
-import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/RimsTube';
-import { usePart } from '../composables';
 
 const { part, flows, bordered, width, height } = usePart.setup();
 

@@ -7,7 +7,7 @@ import {
   GpioModuleChannel,
   GpioPins,
 } from 'brewblox-proto/ts';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 interface DeviceSlot extends GpioModuleChannel {
   start: number;
@@ -17,6 +17,19 @@ interface UnusedSlot {
   start: number;
   free: number;
 }
+
+interface Props {
+  channels: GpioModuleChannel[];
+  errorPins?: GpioPins;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  errorPins: GpioPins.NONE,
+});
+
+const emit = defineEmits<{
+  'update:channels': [payload: GpioModuleChannel[]];
+}>();
 
 function startBit(n: number): number {
   return n > 0 ? Math.log2(n & -n) : -1;
@@ -66,21 +79,6 @@ function pinLegend(channel: GpioModuleChannel): string[] {
 
   return output;
 }
-
-const props = defineProps({
-  channels: {
-    type: Array as PropType<GpioModuleChannel[]>,
-    required: true,
-  },
-  errorPins: {
-    type: Number as PropType<GpioPins>,
-    default: GpioPins.NONE,
-  },
-});
-
-const emit = defineEmits<{
-  (e: 'update:channels', data: GpioModuleChannel[]);
-}>();
 
 const selectedId = ref<number | null>(null);
 

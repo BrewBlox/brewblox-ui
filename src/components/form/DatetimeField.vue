@@ -1,46 +1,30 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { UseFieldProps, useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { dateString, shortDateString } from '@/utils/quantity';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: null as unknown as PropType<Date | null>,
-    default: null,
-  },
-  short: {
-    type: Boolean,
-    default: false,
-  },
-  resetIcon: {
-    type: String,
-    default: 'restore',
-  },
-  label: {
-    type: String,
-    default: 'Date and time',
-  },
-  clearLabel: {
-    type: String,
-    default: '<not set>',
-  },
-  defaultNow: {
-    type: Boolean,
-    default: false,
-  },
+interface Props extends UseFieldProps {
+  modelValue: Date | null;
+  short?: boolean;
+  resetIcon?: string;
+  clearLabel?: string;
+  defaultNow?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  short: false,
+  resetIcon: 'restore',
+  label: 'Date and time',
+  clearLabel: '<not set>',
+  defaultNow: false,
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: Date | null): void;
+  'update:modelValue': [payload: Date];
 }>();
 
 const { activeSlots } = useField.setup();
-
-function save(v: Date | null): void {
-  emit('update:modelValue', v);
-}
 
 const displayValue = computed<string>(() =>
   props.short
@@ -73,7 +57,7 @@ function openDialog(): void {
       resetIcon: props.resetIcon,
       rules: props.rules,
     },
-  }).onOk(save);
+  }).onOk((v: Date) => emit('update:modelValue', v));
 }
 </script>
 

@@ -1,10 +1,4 @@
 <script setup lang="ts">
-import { liquidBorderColor } from '@/plugins/builder/utils';
-import { useTiltStore } from '@/plugins/tilt/store';
-import { TiltStateValue } from '@/plugins/tilt/types';
-import { userUnits } from '@/user-settings';
-import { fixedNumber, preciseNumber, prettyUnit } from '@/utils/quantity';
-import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -12,6 +6,12 @@ import {
   TILT_ID_KEY,
 } from '../blueprints/TiltDisplay';
 import { usePart } from '../composables';
+import { liquidBorderColor } from '@/plugins/builder/utils';
+import { useTiltStore } from '@/plugins/tilt/store';
+import { TiltStateValue } from '@/plugins/tilt/types';
+import { userUnits } from '@/user-settings';
+import { fixedNumber, preciseNumber, prettyUnit } from '@/utils/quantity';
+import { computed } from 'vue';
 
 const { flows, settings, width, height, bordered, passthrough } =
   usePart.setup();

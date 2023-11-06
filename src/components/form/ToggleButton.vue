@@ -1,27 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    required: true,
-  },
-  colored: {
-    type: Boolean,
-    default: true,
-  },
-  iconEnabled: {
-    type: String,
-    default: 'mdi-checkbox-marked-outline',
-  },
-  iconDisabled: {
-    type: String,
-    default: 'mdi-checkbox-blank-outline',
-  },
+interface Props {
+  modelValue: boolean;
+  colored?: boolean;
+  iconEnabled?: string;
+  iconDisabled?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  colored: true,
+  iconEnabled: 'mdi-checkbox-marked-outline',
+  iconDisabled: 'mdi-checkbox-blank-outline',
 });
 
 defineEmits<{
-  (e: 'update:modelValue', data: boolean): void;
+  'update:modelValue': [payload: boolean];
 }>();
 
 const icon = computed<string>(() =>

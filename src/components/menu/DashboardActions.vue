@@ -11,12 +11,11 @@ import { createDialog } from '@/utils/dialog';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
-const props = defineProps({
-  dashboardId: {
-    type: String,
-    required: true,
-  },
-});
+interface Props {
+  dashboardId: string;
+}
+
+const props = defineProps<Props>();
 
 const dashboardStore = useDashboardStore();
 const systemStore = useSystemStore();

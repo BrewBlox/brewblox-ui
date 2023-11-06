@@ -1,30 +1,23 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed, CSSProperties, PropType } from 'vue';
+import { computed, CSSProperties } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: null as unknown as PropType<string | null>,
-    required: true,
-  },
-  clearable: {
-    type: Boolean,
-    default: false,
-  },
-  nullText: {
-    type: String,
-    default: '<not set>',
-  },
-  presets: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
+interface Props extends UseFieldProps {
+  modelValue: string | null;
+  nullText?: string;
+  presets: string[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  clearable: false,
+  nullText: '<not set>',
+  presets: () => [],
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: string | null): void;
+  'update:modelValue': [payload: string | null];
 }>();
 
 const { activeSlots } = useField.setup();
@@ -49,7 +42,7 @@ const colorStyle = computed<CSSProperties>(() => ({
 }));
 
 function change(c: string | null): void {
-  emit('update:modelValue', c?.replace('#', '') ?? null);
+  emit('update:modelValue', c?.replace('#', '') ?? props.clearable ? null : '');
 }
 
 function openDialog(): void {

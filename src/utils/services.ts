@@ -1,8 +1,8 @@
+import { createDialog } from './dialog';
+import { notify } from './notify';
 import { useFeatureStore } from '@/store/features';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
 import { Router } from 'vue-router';
-import { createDialog } from './dialog';
-import { notify } from './notify';
 
 export async function startCreateService(
   stub: ServiceStub,
@@ -33,7 +33,7 @@ export function startChangeServiceTitle(service: Maybe<Service>): void {
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Rename service',
       message:

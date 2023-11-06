@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { LEFT } from '@/plugins/builder/const';
-import { computed } from 'vue';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
+import { LEFT } from '@/plugins/builder/const';
+import { computed } from 'vue';
 
 const paths = {
   borders: ['M29,40V30a9,9,0,0,0-9-9H0', 'M21,40V32a3,3,0,0,0-3-3H0'],

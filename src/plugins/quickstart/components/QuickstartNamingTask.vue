@@ -1,140 +1,116 @@
-<script lang="ts">
+<script setup lang="ts">
+import { QuickstartConfig } from '../types';
+import { withPrefix } from '../utils';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
 import { makeDashboardIdRules } from '@/utils/dashboards';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { makeUrlSafe } from '@/utils/url';
 import mapValues from 'lodash/mapValues';
-import { computed, defineComponent, PropType, reactive } from 'vue';
-import { QuickstartConfig } from '../types';
-import { withPrefix } from '../utils';
+import { computed, reactive } from 'vue';
 
-export default defineComponent({
-  name: 'QuickstartNamingTask',
-  props: {
-    config: {
-      type: Object as PropType<QuickstartConfig>,
-      required: true,
-    },
-    defaultNames: {
-      type: Object as PropType<AnyDict>,
-      required: true,
-    },
-    defaultPrefix: {
-      type: String,
-      required: true,
-    },
-    defaultDashboardTitle: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const customNames = reactive<AnyDict>({});
+interface Props {
+  config: QuickstartConfig;
+  defaultNames: { readonly [k: string]: string };
+  defaultPrefix: string;
+  defaultDashboardTitle: string;
+}
 
-    const serviceId = computed<string>(() => props.config.serviceId);
+const props = defineProps<Props>();
 
-    function updateConfig(cfg: Partial<QuickstartConfig>): void {
-      emit('update:config', { ...props.config, ...cfg });
-    }
+const emit = defineEmits<{
+  'update:config': [payload: QuickstartConfig];
+  back: [];
+  next: [];
+}>();
 
-    const prefix = computed<string>({
-      get: () => props.config.prefix ?? props.defaultPrefix,
-      set: (prefix) => updateConfig({ prefix }),
-    });
+const customNames = reactive<AnyDict>({});
 
-    const dashboardTitle = computed<string>({
-      get: () => props.config.dashboardTitle ?? props.defaultDashboardTitle,
-      set: (dashboardTitle) => updateConfig({ dashboardTitle }),
-    });
+const serviceId = computed<string>(() => props.config.serviceId);
 
-    const dashboardIdRules = makeDashboardIdRules();
-    const dashboardIdValidator = makeRuleValidator(dashboardIdRules);
+function updateConfig(cfg: Partial<QuickstartConfig>): void {
+  emit('update:config', { ...props.config, ...cfg });
+}
 
-    const dashboardId = computed<string>({
-      get: () =>
-        props.config.dashboardId ??
-        suggestId(makeUrlSafe(dashboardTitle.value), dashboardIdValidator),
-      set: (dashboardId) => updateConfig({ dashboardId }),
-    });
-
-    // We want to avoid circular references between
-    // validator and the `actualNames` computed property
-    // These rules do not yet check for duplicates
-    const limitedNameRules = computed<InputRule[]>(() =>
-      makeBlockIdRules(serviceId.value),
-    );
-
-    const actualNames = computed<AnyDict>(() => ({
-      ...mapValues(props.defaultNames, (v) =>
-        suggestId(
-          withPrefix(prefix.value, v),
-          makeRuleValidator(limitedNameRules.value),
-        ),
-      ),
-      ...customNames,
-    }));
-
-    const nameRules = computed<InputRule[]>(() => [
-      ...limitedNameRules.value,
-      (v) =>
-        Object.values(actualNames.value).filter((n) => n === v).length < 2 ||
-        "Name can't be a duplicate",
-    ]);
-
-    const nameValidator = computed<(v: any) => boolean>(() =>
-      makeRuleValidator(nameRules.value),
-    );
-
-    const valuesOk = computed<boolean>(() =>
-      [
-        dashboardTitle,
-        dashboardIdValidator(dashboardId.value),
-        Object.values(actualNames.value).every(nameValidator.value),
-      ].every(Boolean),
-    );
-
-    function updateName(key: string, val: string): void {
-      customNames[key] = val.trim();
-    }
-
-    function clearKey(key: keyof QuickstartConfig): void {
-      updateConfig({ [key]: undefined });
-    }
-
-    function clearName(key: string): void {
-      delete customNames[key];
-    }
-
-    function taskDone(): void {
-      if (!valuesOk.value) {
-        return;
-      }
-      updateConfig({
-        prefix: prefix.value,
-        names: actualNames.value,
-        dashboardId: dashboardId.value,
-        dashboardTitle: dashboardTitle.value,
-      });
-      emit('next');
-    }
-
-    return {
-      dashboardIdRules,
-      serviceId,
-      prefix,
-      dashboardTitle,
-      dashboardId,
-      nameRules,
-      actualNames,
-      valuesOk,
-      updateName,
-      clearKey,
-      clearName,
-      taskDone,
-    };
-  },
+const prefix = computed<string>({
+  get: () => props.config.prefix ?? props.defaultPrefix,
+  set: (prefix) => updateConfig({ prefix }),
 });
+
+const dashboardTitle = computed<string>({
+  get: () => props.config.dashboardTitle ?? props.defaultDashboardTitle,
+  set: (dashboardTitle) => updateConfig({ dashboardTitle }),
+});
+
+const dashboardIdRules = makeDashboardIdRules();
+const dashboardIdValidator = makeRuleValidator(dashboardIdRules);
+
+const dashboardId = computed<string>({
+  get: () =>
+    props.config.dashboardId ??
+    suggestId(makeUrlSafe(dashboardTitle.value), dashboardIdValidator),
+  set: (dashboardId) => updateConfig({ dashboardId }),
+});
+
+// We want to avoid circular references between
+// validator and the `actualNames` computed property
+// These rules do not yet check for duplicates
+const limitedNameRules = computed<InputRule[]>(() =>
+  makeBlockIdRules(serviceId.value),
+);
+
+const actualNames = computed<AnyDict>(() => ({
+  ...mapValues(props.defaultNames, (v) =>
+    suggestId(
+      withPrefix(prefix.value, v),
+      makeRuleValidator(limitedNameRules.value),
+    ),
+  ),
+  ...customNames,
+}));
+
+const nameRules = computed<InputRule[]>(() => [
+  ...limitedNameRules.value,
+  (v) =>
+    Object.values(actualNames.value).filter((n) => n === v).length < 2 ||
+    "Name can't be a duplicate",
+]);
+
+const nameValidator = computed<(v: any) => boolean>(() =>
+  makeRuleValidator(nameRules.value),
+);
+
+const valuesOk = computed<boolean>(() =>
+  [
+    dashboardTitle,
+    dashboardIdValidator(dashboardId.value),
+    Object.values(actualNames.value).every(nameValidator.value),
+  ].every(Boolean),
+);
+
+function updateName(key: string, val: string): void {
+  customNames[key] = val.trim();
+}
+
+function clearKey(key: keyof QuickstartConfig): void {
+  updateConfig({ [key]: undefined });
+}
+
+function clearName(key: string): void {
+  delete customNames[key];
+}
+
+function taskDone(): void {
+  if (!valuesOk.value) {
+    return;
+  }
+  updateConfig({
+    prefix: prefix.value,
+    names: actualNames.value,
+    dashboardId: dashboardId.value,
+    dashboardTitle: dashboardTitle.value,
+  });
+  emit('next');
+}
 </script>
 
 <template>

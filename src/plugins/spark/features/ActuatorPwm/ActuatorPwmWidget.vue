@@ -1,47 +1,27 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
 import { ActuatorPwmBlock, Link } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'ActuatorPwmWidget',
-  setup() {
-    const { context, inDialog } = useContext.setup();
+const { context, inDialog } = useContext.setup();
 
-    const { serviceId, block, patchBlock, isClaimed } =
-      useBlockWidget.setup<ActuatorPwmBlock>();
+const { serviceId, block, patchBlock, isClaimed } =
+  useBlockWidget.setup<ActuatorPwmBlock>();
 
-    const outputLink = computed<Link>(() => block.value.data.actuatorId);
+const outputLink = computed<Link>(() => block.value.data.actuatorId);
 
-    const isLimited = computed<boolean>(
-      () =>
-        block.value.data.enabled &&
-        block.value.data.setting !== block.value.data.desiredSetting,
-    );
+const isLimited = computed<boolean>(
+  () =>
+    block.value.data.enabled &&
+    block.value.data.setting !== block.value.data.desiredSetting,
+);
 
-    const pwmDesired = computed<number | null>(() => {
-      const v = block.value.data.desiredSetting;
-      return v ? roundedNumber(v, 0) : v;
-    });
-
-    return {
-      prettyLink,
-      fixedNumber,
-      PWM_SELECT_OPTIONS,
-      context,
-      inDialog,
-      serviceId,
-      block,
-      patchBlock,
-      isClaimed,
-      outputLink,
-      isLimited,
-      pwmDesired,
-    };
-  },
+const pwmDesired = computed<number | null>(() => {
+  const v = block.value.data.desiredSetting;
+  return v ? roundedNumber(v, 0) : v;
 });
 </script>
 

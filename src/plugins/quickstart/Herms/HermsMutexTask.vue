@@ -1,30 +1,18 @@
-<script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
+<script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { HermsConfig } from './types';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'HermsMutexTask',
-  props: {
-    config: {
-      type: Object as PropType<HermsConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const mutex = ref<boolean>(true);
+const props = defineProps<UseTaskProps<HermsConfig>>();
 
-    function done(): void {
-      emit('update:config', { ...props.config, mutex: mutex.value });
-      emit('next');
-    }
+const emit = defineEmits<UseTaskEmits<HermsConfig>>();
 
-    return {
-      mutex,
-      done,
-    };
-  },
-});
+const mutex = ref<boolean>(true);
+
+function done(): void {
+  emit('update:config', { ...props.config, mutex: mutex.value });
+  emit('next');
+}
 </script>
 
 <template>

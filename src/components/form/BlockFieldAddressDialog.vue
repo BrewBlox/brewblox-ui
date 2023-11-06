@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockFieldAddress,
@@ -11,41 +11,34 @@ import { isCompatible } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { Block, BlockOrIntfType } from 'brewblox-proto/ts';
-import { computed, onBeforeMount, PropType, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Object as PropType<BlockFieldAddress>,
-    default: () => ({
-      serviceId: null,
-      id: null,
-      type: null,
-      field: null,
-    }),
-  },
-  services: {
-    type: null as unknown as PropType<string[] | null>,
-    default: null,
-  },
-  compatible: {
-    type: [String, Array] as PropType<ComparedBlockType>,
-    default: null,
-  },
-  blockFilter: {
-    type: Function as PropType<(block: Block) => boolean>,
-    default: () => true,
-  },
-  fieldFilter: {
-    type: Function as PropType<(field: BlockFieldSpec) => boolean>,
-    default: () => true,
-  },
+interface Props extends UseDialogProps {
+  modelValue: BlockFieldAddress;
+  services?: string[] | null;
+  compatible?: ComparedBlockType;
+  blockFilter?: (block: Block) => boolean;
+  fieldFilter?: (field: BlockFieldSpec) => boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  modelValue: () => ({
+    serviceId: null,
+    id: null,
+    type: null,
+    field: null,
+  }),
+  services: null,
+  compatible: null,
+  blockFilter: () => true,
+  fieldFilter: () => true,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<BlockFieldAddress>();
 const sparkStore = useSparkStore();
 const specStore = useBlockSpecStore();
 
@@ -140,8 +133,6 @@ const localAddress = computed<BlockFieldAddress | null>(() => {
   };
 });
 
-const localOk = computed<boolean>(() => localAddress.value !== null);
-
 function configureBlock(): void {
   createBlockDialog(block.value);
 }
@@ -163,7 +154,7 @@ function createBlock(): void {
 }
 
 function save(): void {
-  if (localOk.value) {
+  if (localAddress.value != null) {
     onDialogOK(localAddress.value);
   }
 }
@@ -172,7 +163,7 @@ function save(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
@@ -241,7 +232,7 @@ function save(): void {
           @click="onDialogCancel"
         />
         <q-btn
-          :disable="!localOk"
+          :disable="localAddress == null"
           flat
           label="OK"
           color="primary"

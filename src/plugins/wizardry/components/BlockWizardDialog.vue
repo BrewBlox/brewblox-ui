@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { useDialog, useGlobals, useRouteId } from '@/composables';
+import { tryCreateBlock } from '../utils';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+  useRouteId,
+} from '@/composables';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
@@ -23,10 +30,9 @@ import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { typed } from '@/utils/misc';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
-import { BlockType } from 'brewblox-proto/ts';
+import { Block, BlockType } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { computed, nextTick, onMounted, PropType, ref } from 'vue';
-import { tryCreateBlock } from '../utils';
+import { computed, nextTick, onMounted, ref } from 'vue';
 
 interface BlockOption extends SelectOption<BlockType> {
   generate: BlockSpec['generate'];
@@ -39,33 +45,26 @@ type DashboardOption = SelectOption<string>;
 
 type WizardStep = 'block' | 'service' | 'name' | 'dashboard';
 
-const props = defineProps({
-  ...useDialog.props,
-  compatible: {
-    type: null as unknown as PropType<ComparedBlockType>,
-    default: null,
-  },
-  filter: {
-    type: Function as PropType<(type: BlockType) => boolean>,
-    default: () => true,
-  },
-  serviceId: {
-    type: null as unknown as PropType<string | null>,
-    default: null,
-  },
-  showCreated: {
-    type: Boolean,
-    default: true,
-  },
-  addWidget: {
-    type: Boolean,
-    default: false,
-  },
+interface Props extends UseDialogProps {
+  compatible?: ComparedBlockType;
+  filter?: (type: BlockType) => boolean;
+  serviceId?: string | null;
+  showCreated?: boolean;
+  addWidget?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  compatible: null,
+  filter: () => true,
+  serviceId: null,
+  showCreated: true,
+  addWidget: false,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } =
+  useDialog.setup<Block | null>();
 const { dense } = useGlobals.setup();
 const { activeDashboardId, activeServiceId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();
@@ -315,7 +314,7 @@ onMounted(() => {
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="next"
   >

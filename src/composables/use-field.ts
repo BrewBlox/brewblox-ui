@@ -1,60 +1,19 @@
-import {
-  computed,
-  ComputedRef,
-  getCurrentInstance,
-  PropType,
-  StyleValue,
-} from 'vue';
+import { VueClassProp, VueStyleProp } from 'quasar';
+import { computed, ComputedRef, getCurrentInstance } from 'vue';
 
 export interface UseFieldProps {
-  tag: {
-    type: PropType<string>;
-    default: string;
-  };
-  title: {
-    type: PropType<string>;
-    default: string;
-  };
-  label: {
-    type: PropType<string>;
-    default: string;
-  };
-  message: {
-    type: PropType<string>;
-    default: string;
-  };
-  html: {
-    type: PropType<boolean>;
-    default: boolean;
-  };
-  tooltip: {
-    type: PropType<string>;
-    default: string;
-  };
-  readonly: {
-    type: PropType<boolean>;
-    default: boolean;
-  };
-  dialogProps: {
-    type: PropType<AnyDict>;
-    default: () => AnyDict;
-  };
-  tagProps: {
-    type: PropType<AnyDict>;
-    default: () => AnyDict;
-  };
-  tagClass: {
-    type: PropType<string | string[] | AnyDict>;
-    default: string;
-  };
-  tagStyle: {
-    type: PropType<StyleValue>;
-    default: string;
-  };
-  rules: {
-    type: PropType<InputRule[]>;
-    default: () => InputRule[];
-  };
+  tag?: string;
+  title?: string;
+  label?: string;
+  message?: string;
+  html?: boolean;
+  tooltip?: string;
+  readonly?: boolean;
+  rules?: InputRule[];
+  tagProps?: AnyDict;
+  tagClass?: VueClassProp;
+  tagStyle?: VueStyleProp;
+  dialogProps?: AnyDict;
 }
 
 export interface UseFieldComponent {
@@ -62,7 +21,7 @@ export interface UseFieldComponent {
 }
 
 export interface UseFieldComposable {
-  props: UseFieldProps;
+  defaultProps: InferDefaults<UseFieldProps>;
   setup(): UseFieldComponent;
 }
 
@@ -79,55 +38,19 @@ const fieldSlots = [
 ];
 
 export const useField: UseFieldComposable = {
-  props: {
-    tag: {
-      type: String,
-      default: 'span',
-    },
-    title: {
-      type: String,
-      default: 'Edit value',
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    message: {
-      type: String,
-      default: '',
-    },
-    html: {
-      type: Boolean,
-      default: false,
-    },
-    tooltip: {
-      type: String,
-      default: '',
-    },
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
-    dialogProps: {
-      type: Object,
-      default: (): AnyDict => ({}),
-    },
-    tagProps: {
-      type: Object,
-      default: (): AnyDict => ({}),
-    },
-    tagClass: {
-      type: [Array, Object, String],
-      default: '',
-    },
-    tagStyle: {
-      type: [Array, Object, String],
-      default: '',
-    },
-    rules: {
-      type: Array as PropType<InputRule[]>,
-      default: (): InputRule[] => [],
-    },
+  defaultProps: {
+    tag: 'span',
+    title: 'Edit value',
+    label: '',
+    message: '',
+    html: false,
+    tooltip: '',
+    readonly: false,
+    rules: () => [],
+    tagProps: () => ({}),
+    tagClass: '',
+    tagStyle: '',
+    dialogProps: () => ({}),
   },
   setup() {
     const instance = getCurrentInstance()!;

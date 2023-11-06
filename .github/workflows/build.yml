@@ -17,7 +17,7 @@ jobs:
       - uses: docker/setup-buildx-action@v2
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Get image metadata
         id: meta
@@ -33,7 +33,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: yarn ci
+      - run: |
+          corepack enable
+          yarn set version stable
+          yarn --version
+      - run: yarn install
       - run: yarn build
         env:
           NODE_OPTIONS: --max_old_space_size=16384

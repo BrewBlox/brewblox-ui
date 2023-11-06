@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useWidget } from '@/composables';
 import {
   startChangeWidgetTitle,
@@ -6,29 +6,15 @@ import {
   startMoveWidget,
   startRemoveWidget,
 } from '@/utils/widgets';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'WidgetActions',
-  props: {
-    noRename: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup() {
-    const { widget, isVolatileWidget } = useWidget.setup();
-
-    return {
-      widget,
-      isVolatileWidget,
-      startChangeWidgetTitle,
-      startCopyWidget,
-      startMoveWidget,
-      startRemoveWidget,
-    };
+defineProps({
+  noRename: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const { widget, isVolatileWidget } = useWidget.setup();
 </script>
 
 <template>

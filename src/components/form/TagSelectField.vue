@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
-import { PropType, ref } from 'vue';
+import { UseFieldProps, useField } from '@/composables';
+import { ref } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
-  existing: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
+interface Props extends UseFieldProps {
+  modelValue: string[];
+  existing?: string[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  existing: () => [],
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: string[]): void;
+  'update:modelValue': [payload: string[]];
 }>();
 
 const { activeSlots } = useField.setup();

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { colorString } from '@/plugins/builder/utils';
-import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/BeerBottle';
 import { usePart } from '../composables';
 import { COLOR_KEY } from '../const';
+import { colorString } from '@/plugins/builder/utils';
+import { computed } from 'vue';
 
 const { settings, width, height } = usePart.setup();
 

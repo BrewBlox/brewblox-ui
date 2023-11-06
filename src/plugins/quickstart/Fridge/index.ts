@@ -1,11 +1,11 @@
-import { QuickstartFeature, useFeatureStore } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { Plugin } from 'vue';
 import FridgeCompletionTask from './FridgeCompletionTask.vue';
 import FridgeHardwareTask from './FridgeHardwareTask.vue';
 import FridgeIoTask from './FridgeIoTask.vue';
 import FridgeNamingTask from './FridgeNamingTask.vue';
 import FridgeSettingsTask from './FridgeSettingsTask.vue';
+import { QuickstartFeature, useFeatureStore } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { Plugin } from 'vue';
 
 const plugin: Plugin = {
   install(app) {

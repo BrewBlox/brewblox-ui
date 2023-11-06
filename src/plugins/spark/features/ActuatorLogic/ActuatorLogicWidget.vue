@@ -1,34 +1,21 @@
-<script lang="ts">
+<script setup lang="ts">
+import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
+import ActuatorLogicFull from './ActuatorLogicFull.vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { prettyLink } from '@/utils/quantity';
 import { ActuatorLogicBlock, Link } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
-import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
-import ActuatorLogicFull from './ActuatorLogicFull.vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'ActuatorLogicWidget',
-  components: {
-    Basic: ActuatorLogicBasic,
-    Full: ActuatorLogicFull,
-  },
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { widgetId, block } = useBlockWidget.setup<ActuatorLogicBlock>();
+const modes = {
+  Basic: ActuatorLogicBasic,
+  Full: ActuatorLogicFull,
+} as const;
 
-    const target = computed<Link>(() => block.value.data.targetId);
+const { context, inDialog } = useContext.setup();
+const { block } = useBlockWidget.setup<ActuatorLogicBlock>();
 
-    return {
-      prettyLink,
-      context,
-      inDialog,
-      widgetId,
-      block,
-      target,
-    };
-  },
-});
+const target = computed<Link>(() => block.value.data.targetId);
 </script>
 
 <template>
@@ -41,7 +28,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <component :is="context.mode">
+    <component :is="modes[context.mode]">
       <template #warnings>
         <CardWarning v-if="!target.id">
           <template #message>

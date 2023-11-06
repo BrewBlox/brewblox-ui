@@ -1,13 +1,14 @@
 <script setup lang="ts">
-const props = defineProps({
-  editable: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  editable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  editable: false,
 });
 
 const emit = defineEmits<{
-  (e: 'click'): void;
+  click: [];
 }>();
 
 function edit(): void {

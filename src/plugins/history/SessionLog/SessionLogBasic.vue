@@ -1,9 +1,4 @@
-<script lang="ts">
-import { useWidget } from '@/composables';
-import { spliceById } from '@/utils/collections';
-import { createComponentDialog, createDialog } from '@/utils/dialog';
-import { shortDateString } from '@/utils/quantity';
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
 import { useHistoryStore } from '../store';
 import {
   GraphAnnotation,
@@ -15,113 +10,98 @@ import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
 import SessionHeaderField from './SessionHeaderField.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
 import { SessionLogWidget } from './types';
+import { useWidget } from '@/composables';
+import { spliceById } from '@/utils/collections';
+import { createComponentDialog, createDialog } from '@/utils/dialog';
+import { shortDateString } from '@/utils/quantity';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'SessionLogBasic',
-  components: {
-    SessionHeaderField,
-  },
-  emits: ['add'],
-  setup() {
-    const historyStore = useHistoryStore();
-    const { config } = useWidget.setup<SessionLogWidget>();
+const historyStore = useHistoryStore();
+const { config } = useWidget.setup<SessionLogWidget>();
 
-    const session = computed<LoggedSession | null>(() =>
-      historyStore.sessionById(config.value.currentSession),
-    );
+const session = computed<LoggedSession | null>(() =>
+  historyStore.sessionById(config.value.currentSession),
+);
 
-    function saveSession(sess: LoggedSession | null = session.value): void {
-      if (sess != null) {
-        historyStore.saveSession(sess);
-      }
-    }
+function saveSession(sess: LoggedSession | null = session.value): void {
+  if (sess != null) {
+    historyStore.saveSession(sess);
+  }
+}
 
-    const notes = computed<SessionNote[]>(() => session.value?.notes ?? []);
+const notes = computed<SessionNote[]>(() => session.value?.notes ?? []);
 
-    function saveNote(note: SessionNote): void {
-      spliceById(notes.value, note);
-      saveSession();
-    }
+function saveNote(note: SessionNote): void {
+  spliceById(notes.value, note);
+  saveSession();
+}
 
-    function saveAnnotations(
-      note: SessionGraphNote,
-      annotations: GraphAnnotation[],
-    ): void {
-      note.config.layout.annotations = annotations;
-      saveNote(note);
-    }
+function saveAnnotations(
+  note: SessionGraphNote,
+  annotations: GraphAnnotation[],
+): void {
+  note.config.layout.annotations = annotations;
+  saveNote(note);
+}
 
-    function openNote(note: SessionNote): void {
-      if (note.type === 'Text') {
-        createComponentDialog({
-          component: SessionTextNoteDialog,
-          componentProps: {
-            title: note.title,
-            modelValue: note.value,
+function openNote(note: SessionNote): void {
+  if (note.type === 'Text') {
+    createComponentDialog({
+      component: SessionTextNoteDialog,
+      componentProps: {
+        title: note.title,
+        modelValue: note.value,
+      },
+    }).onOk((value) => saveNote({ ...note, value }));
+  }
+
+  if (note.type === 'Graph') {
+    createDialog({
+      component: 'GraphDialog',
+      componentProps: {
+        graphId: note.id,
+        annotated: true,
+        saveAnnotations: (v) => saveAnnotations(note, v),
+        config: {
+          ...note.config,
+          params: {
+            start: note.start || undefined,
+            end: note.end || undefined,
+            duration: note.start ? undefined : '1h',
           },
-        }).onOk((value) => saveNote({ ...note, value }));
-      }
-
-      if (note.type === 'Graph') {
-        createDialog({
-          component: 'GraphDialog',
-          componentProps: {
-            graphId: note.id,
-            annotated: true,
-            saveAnnotations: (v) => saveAnnotations(note, v),
-            config: {
-              ...note.config,
-              params: {
-                start: note.start || undefined,
-                end: note.end || undefined,
-                duration: note.start ? undefined : '1h',
-              },
-            },
-          },
-        });
-      }
-    }
-
-    function startGraphNote(note: SessionGraphNote): void {
-      note.start = new Date().toISOString();
-      saveSession();
-    }
-
-    function stopGraphNote(note: SessionGraphNote): void {
-      note.end = new Date().toISOString();
-      saveSession();
-    }
-
-    function editGraphNote(note: SessionGraphNote): void {
-      createComponentDialog({
-        component: SessionGraphNoteDialog,
-        componentProps: {
-          modelValue: note,
-          title: note.title,
-          message: 'You can choose graph lines in the widget settings.',
         },
-      }).onOk(({ start, end }) => {
-        const actual = notes.value.find((n) => n.id === note.id);
-        if (actual && actual.type === 'Graph') {
-          actual.start = start;
-          actual.end = end;
-          saveSession();
-        }
-      });
-    }
+      },
+    });
+  }
+}
 
-    return {
-      shortDateString,
-      session,
-      saveSession,
-      notes,
-      openNote,
-      startGraphNote,
-      stopGraphNote,
-      editGraphNote,
-    };
-  },
-});
+function startGraphNote(note: SessionGraphNote): void {
+  note.start = new Date().toISOString();
+  saveSession();
+}
+
+function stopGraphNote(note: SessionGraphNote): void {
+  note.end = new Date().toISOString();
+  saveSession();
+}
+
+function editGraphNote(note: SessionGraphNote): void {
+  createComponentDialog({
+    component: SessionGraphNoteDialog,
+    componentProps: {
+      modelValue: note,
+      title: note.title,
+      message: 'You can choose graph lines in the widget settings.',
+    },
+  }).onOk(({ start, end }) => {
+    const actual = notes.value.find((n) => n.id === note.id);
+    if (actual && actual.type === 'Graph') {
+      actual.start = start;
+      actual.end = end;
+      saveSession();
+    }
+  });
+}
 </script>
 
 <template>

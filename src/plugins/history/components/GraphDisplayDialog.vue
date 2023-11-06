@@ -1,108 +1,87 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import cloneDeep from 'lodash/cloneDeep';
-import { computed, defineComponent, PropType, reactive } from 'vue';
+<script setup lang="ts">
 import { defaultLabel } from '../nodes';
 import { GraphAxis, GraphConfig } from '../types';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import cloneDeep from 'lodash/cloneDeep';
+import { computed, reactive } from 'vue';
 
-export default defineComponent({
-  name: 'GraphDisplayDialog',
-  props: {
-    ...useDialog.props,
-    config: {
-      type: Object as PropType<GraphConfig>,
-      required: true,
-    },
-    field: {
-      type: String,
-      required: true,
-    },
+interface Props extends UseDialogProps {
+  config: GraphConfig;
+  field: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+});
+
+defineEmits<UseDialogEmits>();
+
+const { dialogOpts, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<GraphConfig>();
+
+const local = reactive(cloneDeep(props.config));
+const axisOpts: SelectOption<GraphAxis>[] = [
+  {
+    value: 'y',
+    label: 'Y1',
   },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogProps, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
+  {
+    value: 'y2',
+    label: 'Y2',
+  },
+];
 
-    const local = reactive(cloneDeep(props.config));
-    const axisOpts: SelectOption<GraphAxis>[] = [
-      {
-        value: 'y',
-        label: 'Y1',
-      },
-      {
-        value: 'y2',
-        label: 'Y2',
-      },
-    ];
+const label = computed<string>(() => defaultLabel(props.field));
 
-    const label = computed<string>(() => defaultLabel(props.field));
-
-    const rename = computed<string | null>({
-      get: () => local.renames[props.field] ?? label.value,
-      set: (v) => {
-        if (v) {
-          local.renames[props.field] = v;
-        } else {
-          delete local.renames[props.field];
-        }
-      },
-    });
-
-    const axis = computed<GraphAxis>({
-      get: () => local.axes[props.field] || 'y',
-      set: (v) => (local.axes[props.field] = v),
-    });
-
-    const color = computed<string>({
-      get: () => local.colors[props.field] || '',
-      set: (v) => (local.colors[props.field] = v),
-    });
-
-    const precision = computed<number>({
-      get: () => local.precision[props.field] ?? 2,
-      set: (v) => (local.precision[props.field] = v),
-    });
-
-    function save(): void {
-      onDialogOK(local);
+const rename = computed<string | null>({
+  get: () => local.renames[props.field] ?? label.value,
+  set: (v) => {
+    if (v) {
+      local.renames[props.field] = v;
+    } else {
+      delete local.renames[props.field];
     }
-
-    return {
-      defaultLabel,
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      rename,
-      axis,
-      axisOpts,
-      color,
-      precision,
-      save,
-    };
   },
 });
+
+const axis = computed<GraphAxis>({
+  get: () => local.axes[props.field] || 'y',
+  set: (v) => (local.axes[props.field] = v),
+});
+
+const color = computed<string>({
+  get: () => local.colors[props.field] || '',
+  set: (v) => (local.colors[props.field] = v),
+});
+
+const precision = computed<number>({
+  get: () => local.precision[props.field] ?? 2,
+  set: (v) => (local.precision[props.field] = v),
+});
+
+function save(): void {
+  onDialogOK(local);
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard v-bind="{ title, message, html }">
       <div class="column q-gutter-xs">
-        <InputField
+        <TextField
           v-model="rename"
           title="Label"
           label="Label"
         />
-        <InputField
+        <NumberField
           v-model="precision"
           :decimals="0"
           :rules="[(v) => v >= 0 || 'Must be 0 or more']"
-          type="number"
           title="Decimals in label"
           label="Decimals in label"
         />

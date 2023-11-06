@@ -1,43 +1,25 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { UseFieldProps, useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { isDurationString, isQuantity } from '@/utils/identity';
 import { bloxQty, durationString } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  // Duration can be:
-  // - Quantity -> bloxQty(10, 'min')
-  // - duration string -> '10m'
-  // update:modelValue events emitted will match type of value
-  // If modelValue is undefined, type is assumed to be string
-  modelValue: {
-    type: [Object, String] as PropType<Quantity | string>,
-    validator: (v: unknown) => isQuantity(v) || isDurationString(v),
-    default: null,
-  },
-  label: {
-    type: String,
-    default: 'duration',
-  },
+interface Props extends UseFieldProps {
+  modelValue: Quantity;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: Quantity | string): void;
+  'update:modelValue': [payload: Quantity];
 }>();
 
 const { activeSlots } = useField.setup();
 
-const isQtyValue = computed<boolean>(() => isQuantity(props.modelValue));
-
 const displayValue = computed<string>(() => durationString(props.modelValue));
-
-function save(v: Quantity): void {
-  const outputValue = isQtyValue.value ? v : durationString(v);
-  emit('update:modelValue', outputValue);
-}
 
 function openDialog(): void {
   if (props.readonly) {
@@ -46,14 +28,14 @@ function openDialog(): void {
   createDialog({
     component: 'DurationQuantityDialog',
     componentProps: {
-      modelValue: bloxQty(props.modelValue ?? ''),
+      modelValue: bloxQty(props.modelValue ?? '0s'),
       title: props.title,
       message: props.message,
       html: props.html,
       label: props.label,
       rules: props.rules,
     },
-  }).onOk(save);
+  }).onOk((v: Quantity) => emit('update:modelValue', v));
 }
 </script>
 

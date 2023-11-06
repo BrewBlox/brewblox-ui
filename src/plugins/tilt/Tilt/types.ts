@@ -1,5 +1,5 @@
-import { Widget } from '@/store/widgets';
 import { TiltFieldIndex } from '../types';
+import { Widget } from '@/store/widgets';
 
 export interface TiltWidgetConfig {
   serviceId: string | null;

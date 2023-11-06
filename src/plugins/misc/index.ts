@@ -1,8 +1,8 @@
-import { Plugin } from 'vue';
 import ConfigWatcher from './ConfigWatcher';
 import Countdown from './Countdown';
 import Stopwatch from './Stopwatch';
 import Webframe from './Webframe';
+import { Plugin } from 'vue';
 
 const plugin: Plugin = {
   install(app) {

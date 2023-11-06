@@ -1,58 +1,38 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, onBeforeMount, PropType, ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 
-export default defineComponent({
-  name: 'BlockFieldDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: [Object, Array, String, Number, Boolean, Date] as PropType<any>,
-      required: true,
-    },
-    address: {
-      type: Object as PropType<BlockAddress>,
-      required: true,
-    },
-    field: {
-      type: Object as PropType<BlockFieldSpec>,
-      required: true,
-    },
-    comparison: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-    const local = ref<any>();
+interface Props extends UseDialogProps {
+  modelValue: any;
+  address: BlockAddress;
+  field: BlockFieldSpec;
+  comparison?: boolean;
+}
 
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    onBeforeMount(() => (local.value = cloneDeep(props.modelValue)));
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  comparison: false,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<any>();
+const local = ref<any>();
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+onBeforeMount(() => (local.value = cloneDeep(props.modelValue)));
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

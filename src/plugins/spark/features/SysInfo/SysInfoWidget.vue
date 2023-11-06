@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import {
@@ -8,33 +8,18 @@ import {
   shortDateString,
 } from '@/utils/quantity';
 import { SysInfoBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'SysInfoWidget',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { block, serviceId } = useBlockWidget.setup<SysInfoBlock>();
+const sparkStore = useSparkStore();
+const { block, serviceId } = useBlockWidget.setup<SysInfoBlock>();
 
-    const lastBlocks = computed<string>(() =>
-      shortDateString(sparkStore.lastBlocksAtByService(serviceId), 'Unknown'),
-    );
+const lastBlocks = computed<string>(() =>
+  shortDateString(sparkStore.lastBlocksAtByService(serviceId), 'Unknown'),
+);
 
-    const ready = computed<boolean>(
-      () => sparkStore.statusByService(serviceId) != null,
-    );
-
-    return {
-      dateString,
-      durationString,
-      roundedNumber,
-      block,
-      serviceId,
-      ready,
-      lastBlocks,
-    };
-  },
-});
+const ready = computed<boolean>(
+  () => sparkStore.statusByService(serviceId) != null,
+);
 </script>
 
 <template>

@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { useDialog, useGlobals, useRouteId } from '@/composables';
+import { tryCreateWidget } from '../utils';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+  useRouteId,
+} from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
 import {
   ComponentName,
@@ -12,8 +19,7 @@ import { startCreateDashboard } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { nanoid } from 'nanoid';
-import { computed, nextTick, onMounted, PropType, ref } from 'vue';
-import { tryCreateWidget } from '../utils';
+import { computed, nextTick, onMounted, ref } from 'vue';
 
 interface FeatureOption extends SelectOption<string> {
   editor: ComponentName;
@@ -24,29 +30,22 @@ type DashboardOption = SelectOption<string>;
 
 type WizardStep = 'widget' | 'editor' | 'dashboard';
 
-const props = defineProps({
-  ...useDialog.props,
-  featureId: {
-    type: String,
-    default: null,
-  },
-  dashboardId: {
-    type: String,
-    default: null,
-  },
-  filter: {
-    type: Function as PropType<(feature: string) => boolean>,
-    default: () => true,
-  },
-  showCreated: {
-    type: Boolean,
-    default: true,
-  },
+interface Props extends UseDialogProps {
+  featureId?: string;
+  dashboardId?: string;
+  filter?: (feature: string) => boolean;
+  showCreated?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  filter: () => true,
+  showCreated: true,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } =
+  useDialog.setup<Widget | null>();
 const { dense } = useGlobals.setup();
 const { activeDashboardId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();
@@ -223,7 +222,7 @@ onMounted(() => {
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="next"
   >

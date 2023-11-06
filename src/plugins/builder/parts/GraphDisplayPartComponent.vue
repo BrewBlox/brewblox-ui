@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/GraphDisplay';
+import { usePart } from '../composables';
+import { GRAPH_CONFIG_KEY, SQUARE_SIZE } from '../const';
+import { ZoomTransformKey } from '../symbols';
 import { IS_WEBKIT } from '@/const';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import {
@@ -11,10 +15,6 @@ import isEqual from 'lodash/isEqual';
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid';
 import { computed, inject, nextTick, ref, shallowRef, watch } from 'vue';
-import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/GraphDisplay';
-import { usePart } from '../composables';
-import { GRAPH_CONFIG_KEY, SQUARE_SIZE } from '../const';
-import { ZoomTransformKey } from '../symbols';
 
 const { settings, patchSettings, width, height, interactable, placeholder } =
   usePart.setup();

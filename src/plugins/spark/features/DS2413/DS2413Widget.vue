@@ -1,22 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { DS2413Block } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'DS2413Widget',
-  setup() {
-    const { context } = useContext.setup();
-    const { block, patchBlock } = useBlockWidget.setup<DS2413Block>();
-
-    return {
-      context,
-      block,
-      patchBlock,
-    };
-  },
-});
+const { context } = useContext.setup();
+const { block, patchBlock } = useBlockWidget.setup<DS2413Block>();
 </script>
 
 <template>
@@ -40,12 +28,12 @@ export default defineComponent({
             label="Connected"
             class="col-grow"
           />
-          <InputField
+          <TextField
             :model-value="block.data.address"
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="(v) => patchBlock({ address: v })"
+            @update:model-value="(v) => patchBlock({ address: v! })"
           />
         </div>
       </template>

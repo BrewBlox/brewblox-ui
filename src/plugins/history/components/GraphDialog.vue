@@ -1,74 +1,49 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, reactive, ref } from 'vue';
+<script setup lang="ts">
 import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import cloneDeep from 'lodash/cloneDeep';
+import { reactive, ref } from 'vue';
 
-export default defineComponent({
-  name: 'GraphDialog',
-  props: {
-    ...useDialog.props,
-    graphId: {
-      type: String,
-      required: true,
-    },
-    config: {
-      type: Object as PropType<GraphConfig>,
-      required: true,
-    },
-    sharedSources: {
-      type: Boolean,
-      default: false,
-    },
-    usePresets: {
-      type: Boolean,
-      default: false,
-    },
-    annotated: {
-      type: Boolean,
-      default: false,
-    },
-    saveAnnotations: {
-      type: Function as PropType<(a: GraphAnnotation[]) => unknown>,
-      default: () => {},
-    },
-    saveParams: {
-      type: Function as PropType<(v: QueryParams) => unknown>,
-      default: () => {},
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+interface Props extends UseDialogProps {
+  graphId: string;
+  config: GraphConfig;
+  sharedSources?: boolean;
+  usePresets?: boolean;
+  annotated?: boolean;
+  saveAnnotations?: (a: GraphAnnotation[]) => unknown;
+  saveParams?: (v: QueryParams) => unknown;
+}
 
-    const sourceRevision = ref<Date>(new Date());
-
-    // Dialog props are not reactive.
-    // We'll keep changes cached locally, and assume the parent applies them unchanged
-    const localConfig = reactive(cloneDeep(props.config));
-
-    function saveLocalParams(params: QueryParams): void {
-      localConfig.params = params;
-      sourceRevision.value = new Date();
-      props.saveParams(params);
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      sourceRevision,
-      localConfig,
-      saveLocalParams,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  sharedSources: false,
+  usePresets: false,
+  annotated: false,
+  saveAnnotations: () => {},
+  saveParams: () => {},
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
+
+const sourceRevision = ref<Date>(new Date());
+
+// Dialog props are not reactive.
+// We'll keep changes cached locally, and assume the parent applies them unchanged
+const localConfig = reactive(cloneDeep(props.config));
+
+function saveLocalParams(params: QueryParams): void {
+  localConfig.params = params;
+  sourceRevision.value = new Date();
+  props.saveParams(params);
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     transition-show="fade"
     maximized
     @hide="onDialogHide"

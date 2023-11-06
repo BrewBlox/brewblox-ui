@@ -1,41 +1,34 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { EnablerInterfaceBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'BlockEnableToggle',
-  props: {
-    hideEnabled: {
-      type: Boolean,
-      default: false,
-    },
-    emitToggle: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['change'],
-  setup(props, { emit }) {
-    const { block, patchBlock } = useBlockWidget.setup<EnablerInterfaceBlock>();
+interface Props {
+  hideEnabled?: boolean;
+  emitToggle?: boolean;
+}
 
-    const enabled = computed<boolean>(() => block.value.data.enabled);
-
-    function toggleEnabled(): void {
-      const newV = !block.value.data.enabled;
-      if (props.emitToggle) {
-        emit('change', newV);
-      } else {
-        patchBlock({ enabled: newV });
-      }
-    }
-
-    return {
-      enabled,
-      toggleEnabled,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  hideEnabled: false,
+  emitToggle: false,
 });
+
+const emit = defineEmits<{
+  change: [enabled: boolean];
+}>();
+
+const { block, patchBlock } = useBlockWidget.setup<EnablerInterfaceBlock>();
+
+const enabled = computed<boolean>(() => block.value.data.enabled);
+
+function toggleEnabled(): void {
+  const newV = !block.value.data.enabled;
+  if (props.emitToggle) {
+    emit('change', newV);
+  } else {
+    patchBlock({ enabled: newV });
+  }
+}
 </script>
 
 <template>

@@ -1,27 +1,23 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
-import { PropType, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: String,
-    required: true,
-  },
-  clearable: {
-    type: Boolean,
-    default: false,
-  },
-  presets: {
-    type: Array as PropType<string[]>,
-    default: () => [],
-  },
+interface Props extends UseDialogProps {
+  modelValue: string;
+  clearable?: boolean;
+  presets?: string[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  clearable: false,
+  presets: () => [],
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<string>();
 const local = ref<string>(props.modelValue);
 
 function save(): void {
@@ -36,7 +32,7 @@ function clear(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

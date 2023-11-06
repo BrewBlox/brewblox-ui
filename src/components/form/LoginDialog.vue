@@ -1,22 +1,23 @@
 <script setup lang="ts">
 import { authLogin } from '@/auth';
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { ref } from 'vue';
 
-defineProps({
-  ...useDialog.props,
-  title: {
-    type: String,
-    default: 'Login',
-  },
+interface Props extends UseDialogProps {
+  title?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Login',
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<never>();
 
 const username = ref<string>('');
 const password = ref<string>('');
@@ -56,7 +57,7 @@ function showPasswordKeyboard(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     no-backdrop-dismiss
     @hide="onDialogHide"
     @keyup.enter="login"

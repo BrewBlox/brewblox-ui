@@ -1,33 +1,26 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { isQuantity } from '@/utils/identity';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
 import { Quantity } from 'brewblox-proto/ts';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Object as PropType<Quantity>,
-    validator: isQuantity,
-    required: true,
-  },
-  label: {
-    type: String,
-    default: 'Value',
-  },
-  rules: {
-    type: Array as PropType<InputRule[]>,
-    default: () => [],
-  },
+interface Props extends UseDialogProps {
+  modelValue: Quantity;
+  label?: string;
+  rules?: InputRule[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  label: 'Value',
+  rules: () => [],
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<Quantity>();
 const local = ref<string | null>(durationString(props.modelValue));
 
 function findUnit(s: string): string {
@@ -81,7 +74,7 @@ function save(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

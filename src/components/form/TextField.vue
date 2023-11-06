@@ -1,54 +1,35 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { fixedNumber } from '@/utils/quantity';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: null as unknown as PropType<string | number | null>,
-    required: true,
-  },
-  type: {
-    type: String as PropType<'text' | 'number'>,
-    default: 'text',
-  },
-  decimals: {
-    type: Number,
-    default: 2,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  autogrow: {
-    type: Boolean,
-    default: false,
-  },
-  suffix: {
-    type: String,
-    default: '',
-  },
+export interface Props extends UseFieldProps {
+  modelValue: string | null;
+  clearable?: boolean;
+  nullable?: boolean;
+  autogrow?: boolean;
+  suffix?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  clearable: true,
+  nullable: false,
+  autogrow: false,
+  suffix: '',
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: string | number | null): void;
+  'update:modelValue': [payload: string | null];
 }>();
 
 const { activeSlots } = useField.setup();
-
-function change(v: string | number): void {
-  emit('update:modelValue', v);
-}
 
 const displayValue = computed<string>(() => {
   if (props.modelValue == null || props.modelValue === '') {
     return '<not set>';
   }
-  return props.type === 'number'
-    ? fixedNumber(Number(props.modelValue), props.decimals)
-    : `${props.modelValue}`;
+  return props.modelValue;
 });
 
 function openDialog(): void {
@@ -57,22 +38,21 @@ function openDialog(): void {
   }
 
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: props.modelValue,
       title: props.title,
       message: props.message,
       html: props.html,
-      decimals: props.decimals,
-      type: props.type,
       label: props.label,
       rules: props.rules,
       clearable: props.clearable,
+      nullable: props.nullable,
       autogrow: props.autogrow,
       suffix: props.suffix,
       ...props.dialogProps,
     },
-  }).onOk(change);
+  }).onOk((v) => emit('update:modelValue', v));
 }
 </script>
 

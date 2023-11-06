@@ -1,6 +1,3 @@
-import type { Widget } from '@/store/widgets/types';
-import { findById } from '@/utils/collections';
-import { defineStore } from 'pinia';
 import type {
   GridSize,
   QuickstartFeature,
@@ -10,6 +7,9 @@ import type {
   WidgetRemoveAction,
   WidgetRole,
 } from './types';
+import type { Widget } from '@/store/widgets/types';
+import { findById } from '@/utils/collections';
+import { defineStore } from 'pinia';
 
 export * from './types';
 

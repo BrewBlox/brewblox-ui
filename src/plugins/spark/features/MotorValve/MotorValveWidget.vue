@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_VALVE_STATE } from '@/plugins/spark/const';
@@ -11,52 +11,32 @@ import {
   Spark3PinsBlock,
   ValveState,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'MotorValveWidget',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { context, inDialog } = useContext.setup();
-    const { serviceId, block, limitations, isClaimed, patchBlock } =
-      useBlockWidget.setup<MotorValveBlock>();
+const sparkStore = useSparkStore();
+const { context, inDialog } = useContext.setup();
+const { serviceId, block, limitations, isClaimed, patchBlock } =
+  useBlockWidget.setup<MotorValveBlock>();
 
-    // Spark 2 pins have no support for toggling 12V
-    const spark3Pins = computed<Spark3PinsBlock | null>(
-      () => getSpark3PinsBlock(serviceId) ?? null,
-    );
+// Spark 2 pins have no support for toggling 12V
+const spark3Pins = computed<Spark3PinsBlock | null>(
+  () => getSpark3PinsBlock(serviceId) ?? null,
+);
 
-    const disabled12V = computed<boolean>(
-      () => spark3Pins.value?.data.enableIoSupply12V === false,
-    );
+const disabled12V = computed<boolean>(
+  () => spark3Pins.value?.data.enableIoSupply12V === false,
+);
 
-    const valveLabel = computed<string>(
-      () =>
-        ENUM_LABELS_VALVE_STATE[
-          block.value.data.valveState ?? ValveState.VALVE_UNKNOWN
-        ],
-    );
+const valveLabel = computed<string>(
+  () =>
+    ENUM_LABELS_VALVE_STATE[
+      block.value.data.valveState ?? ValveState.VALVE_UNKNOWN
+    ],
+);
 
-    function enable12V(): void {
-      sparkStore.patchBlock(spark3Pins.value, { enableIoSupply12V: true });
-    }
-
-    return {
-      ChannelCapabilities,
-      setExclusiveChannelActuator,
-      inDialog,
-      context,
-      serviceId,
-      block,
-      disabled12V,
-      valveLabel,
-      enable12V,
-      limitations,
-      isClaimed,
-      patchBlock,
-    };
-  },
-});
+function enable12V(): void {
+  sparkStore.patchBlock(spark3Pins.value, { enableIoSupply12V: true });
+}
 </script>
 
 <template>

@@ -1,3 +1,5 @@
+import { withPrefix } from '../utils';
+import { RimsConfig } from './types';
 import {
   BORDER_KEY,
   COLOR_KEY,
@@ -10,8 +12,6 @@ import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
 import { nanoid } from 'nanoid';
-import { withPrefix } from '../utils';
-import { RimsConfig } from './types';
 
 export function defineLayouts(config: RimsConfig): BuilderLayout[] {
   const { serviceId, names } = config;

@@ -1,24 +1,22 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { date as qdate } from 'quasar';
 import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Date,
-    required: true,
-  },
-  label: {
-    type: String,
-    default: 'Date and time',
-  },
+interface Props extends UseDialogProps {
+  modelValue: Date;
+  label?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  label: 'Date and time',
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<Date>();
 const tab = ref<'date' | 'time'>('date');
 const stringValue = ref<string>(
   qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'),
@@ -40,7 +38,7 @@ function save(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

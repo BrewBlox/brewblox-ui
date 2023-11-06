@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SequenceDocumentation from './SequenceDocumentation.vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
@@ -28,7 +29,6 @@ import { basicDark } from 'cm6-theme-basic-dark';
 import { minimalSetup } from 'codemirror';
 import { colors } from 'quasar';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import SequenceDocumentation from './SequenceDocumentation.vue';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.NONE]: null,

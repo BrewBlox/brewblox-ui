@@ -98,7 +98,7 @@ export default defineConfig(({ command, mode }): UserConfig => {
       open: false,
       host: '0.0.0.0',
       port: 8080,
-      base: '/ui/',
+      // base: '/ui/',
       https: serverHttps,
     },
 

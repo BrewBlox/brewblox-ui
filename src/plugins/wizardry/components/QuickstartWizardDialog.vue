@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+} from '@/composables';
 import { QuickstartFeature, useFeatureStore } from '@/store/features';
 import { computed, ref } from 'vue';
 
-defineProps({
-  ...useDialog.props,
-});
+defineProps<UseDialogProps>();
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
 const { dense } = useGlobals.setup();
 const featureStore = useFeatureStore();
 
@@ -25,7 +28,7 @@ const quickstartOpts = computed<QuickstartFeature[]>(
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <!-- Display selected wizard -->

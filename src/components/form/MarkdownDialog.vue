@@ -1,22 +1,27 @@
 <script setup lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+} from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { QInput } from 'quasar';
 import { ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: String,
-    required: true,
-  },
+interface Props extends UseDialogProps {
+  modelValue: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
 const { dense } = useGlobals.setup();
-const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<string>();
 
 const local = ref<string>(props.modelValue);
 const editorRef = ref<QInput>();
@@ -42,7 +47,7 @@ function showKeyboard(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     :maximized="dense"
     @hide="onDialogHide"
     @keyup.enter="save"

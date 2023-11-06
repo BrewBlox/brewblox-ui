@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useSparkStore } from '@/plugins/spark/store';
 import { getWiFiSettingsBlock } from '@/plugins/spark/utils/system';
 import { createDialog } from '@/utils/dialog';
@@ -8,7 +8,17 @@ import {
   WifiSecurityType,
   WiFiSettingsBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
+
+interface Props {
+  serviceId: string;
+}
+
+const props = defineProps<Props>();
+
+defineEmits<{
+  cancel: [];
+}>();
 
 const securityOpts: SelectOption<WifiSecurityType>[] = [
   { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },
@@ -29,61 +39,38 @@ const cipherOpts: SelectOption<WifiCipherType>[] = [
   { label: 'AES or TKIP', value: WifiCipherType.WLAN_CIPHER_AES_OR_TKIP },
 ];
 
-export default defineComponent({
-  name: 'SparkParticleWifiCard',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['cancel'],
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const busy = ref(false);
-    const isPwd = ref(true);
-    const values = reactive<WiFiSettingsBlock['data']>({
-      ssid: '',
-      password: '',
-      security: WifiSecurityType.WLAN_SEC_WPA2,
-      cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
-      signal: 0,
-    });
-
-    const block = computed<WiFiSettingsBlock>(
-      () => getWiFiSettingsBlock(props.serviceId)!,
-    );
-
-    async function save(): Promise<void> {
-      busy.value = true;
-      await sparkStore
-        .patchBlock(block.value, values)
-        .then(() => notify.done('Wifi settings updated!'))
-        .finally(() => (busy.value = false));
-    }
-
-    function showKeyboard(field: 'ssid' | 'password'): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: values[field],
-          password: field === 'password',
-        },
-      }).onOk((v) => (values[field] = v));
-    }
-
-    return {
-      values,
-      isPwd,
-      busy,
-      WifiSecurityType,
-      securityOpts,
-      cipherOpts,
-      save,
-      showKeyboard,
-    };
-  },
+const sparkStore = useSparkStore();
+const busy = ref(false);
+const isPwd = ref(true);
+const values = reactive<WiFiSettingsBlock['data']>({
+  ssid: '',
+  password: '',
+  security: WifiSecurityType.WLAN_SEC_WPA2,
+  cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
+  signal: 0,
 });
+
+const block = computed<WiFiSettingsBlock>(
+  () => getWiFiSettingsBlock(props.serviceId)!,
+);
+
+async function save(): Promise<void> {
+  busy.value = true;
+  await sparkStore
+    .patchBlock(block.value, values)
+    .then(() => notify.done('Wifi settings updated!'))
+    .finally(() => (busy.value = false));
+}
+
+function showKeyboard(field: 'ssid' | 'password'): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: values[field],
+      password: field === 'password',
+    },
+  }).onOk((v) => (values[field] = v));
+}
 </script>
 
 <template>

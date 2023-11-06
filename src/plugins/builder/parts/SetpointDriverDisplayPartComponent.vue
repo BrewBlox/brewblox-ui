@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { useSparkStore } from '@/plugins/spark/store';
-import { userUnits } from '@/user-settings';
-import { fixedNumber, prettyUnit } from '@/utils/quantity';
-import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -12,6 +7,11 @@ import {
 import { usePart, useSettingsBlock } from '../composables';
 import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
 import { liquidBorderColor } from '../utils';
+import { useSparkStore } from '@/plugins/spark/store';
+import { userUnits } from '@/user-settings';
+import { fixedNumber, prettyUnit } from '@/utils/quantity';
+import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 
 const sparkStore = useSparkStore();
 const { flows, width, height, bordered, passthrough, placeholder } =

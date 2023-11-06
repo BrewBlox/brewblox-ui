@@ -1,4 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
+import { QuickstartConfig } from '../types';
 import { useSparkStore } from '@/plugins/spark/store';
 import { discoverBlocks } from '@/plugins/spark/utils/actions';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
@@ -18,99 +20,77 @@ import {
   OneWireGpioModuleBlock,
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent, onBeforeMount, PropType } from 'vue';
-import { QuickstartConfig } from '../types';
+import { computed, onBeforeMount } from 'vue';
 
-export default defineComponent({
-  name: 'QuickstartDiscoveryTask',
-  props: {
-    config: {
-      type: Object as PropType<QuickstartConfig>,
-      required: true,
+const props = defineProps<UseTaskProps<QuickstartConfig>>();
+
+defineEmits<UseTaskEmits<QuickstartConfig>>();
+
+const serviceId = computed<string>(() => props.config.serviceId);
+const sparkStore = useSparkStore();
+const featureStore = useFeatureStore();
+
+const discoveredBlocks = computed<Block[]>(
+  () =>
+    sparkStore
+      .blocksByService(serviceId.value)
+      .filter((block) =>
+        isCompatible(block.type, [
+          BlockIntfType.OneWireDeviceInterface,
+          BlockType.OneWireGpioModule,
+        ]),
+      )
+      .sort(makeObjectSorter('id')) ?? [],
+);
+
+function about(block: Block): string {
+  if (matchesType<TempSensorOneWireBlock>(BlockType.TempSensorOneWire, block)) {
+    return prettyQty(block.data.value);
+  }
+
+  if (matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)) {
+    return `Position ${block.data.modulePosition}`;
+  }
+
+  if (isCompatible(block.type, [BlockType.DS2408, BlockType.DS2413])) {
+    const typed = block as DS2408Block | DS2413Block;
+    return typed.data.connected ? '' : 'disconnected';
+  }
+
+  return '';
+}
+
+function widgetTitle(block: Block): string {
+  return featureStore.widgetTitle(block.type);
+}
+
+async function discover(): Promise<void> {
+  const discovered = await discoverBlocks(serviceId.value);
+  if (discovered.length) {
+    await sparkStore.fetchBlocks(serviceId.value);
+  }
+}
+
+function show(block: Block): void {
+  createBlockDialog(block);
+}
+
+function rename(block: Block): void {
+  createDialog({
+    component: 'TextDialog',
+    componentProps: {
+      title: 'Change block name',
+      message: `Choose a new name for '${block.id}'`,
+      rules: makeBlockIdRules(serviceId.value),
+      clearable: false,
+      modelValue: block.id,
     },
-  },
-  emits: ['back', 'next'],
-  setup(props) {
-    const serviceId = computed<string>(() => props.config.serviceId);
-    const sparkStore = useSparkStore();
-    const featureStore = useFeatureStore();
+  }).onOk((newId: string) => {
+    sparkStore.renameBlock(block.serviceId, block.id, newId);
+  });
+}
 
-    const discoveredBlocks = computed<Block[]>(
-      () =>
-        sparkStore
-          .blocksByService(serviceId.value)
-          .filter((block) =>
-            isCompatible(block.type, [
-              BlockIntfType.OneWireDeviceInterface,
-              BlockType.OneWireGpioModule,
-            ]),
-          )
-          .sort(makeObjectSorter('id')) ?? [],
-    );
-
-    function about(block: Block): string {
-      if (
-        matchesType<TempSensorOneWireBlock>(BlockType.TempSensorOneWire, block)
-      ) {
-        return prettyQty(block.data.value);
-      }
-
-      if (
-        matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)
-      ) {
-        return `Position ${block.data.modulePosition}`;
-      }
-
-      if (isCompatible(block.type, [BlockType.DS2408, BlockType.DS2413])) {
-        const typed = block as DS2408Block | DS2413Block;
-        return typed.data.connected ? '' : 'disconnected';
-      }
-
-      return '';
-    }
-
-    function widgetTitle(block: Block): string {
-      return featureStore.widgetTitle(block.type);
-    }
-
-    async function discover(): Promise<void> {
-      const discovered = await discoverBlocks(serviceId.value);
-      if (discovered.length) {
-        await sparkStore.fetchBlocks(serviceId.value);
-      }
-    }
-
-    function show(block: Block): void {
-      createBlockDialog(block);
-    }
-
-    function rename(block: Block): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          title: 'Change block name',
-          message: `Choose a new name for '${block.id}'`,
-          rules: makeBlockIdRules(serviceId.value),
-          clearable: false,
-          modelValue: block.id,
-        },
-      }).onOk((newId: string) => {
-        sparkStore.renameBlock(block.serviceId, block.id, newId);
-      });
-    }
-
-    onBeforeMount(() => discover());
-
-    return {
-      discover,
-      discoveredBlocks,
-      about,
-      widgetTitle,
-      show,
-      rename,
-    };
-  },
-});
+onBeforeMount(() => discover());
 </script>
 
 <template>

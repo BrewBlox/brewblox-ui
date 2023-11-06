@@ -1,45 +1,33 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import cloneDeep from 'lodash/cloneDeep';
-import defaults from 'lodash/defaults';
-import { defineComponent, PropType, ref } from 'vue';
+<script setup lang="ts">
 import { MetricsConfig } from '../types';
 import { emptyMetricsConfig } from '../utils';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import cloneDeep from 'lodash/cloneDeep';
+import defaults from 'lodash/defaults';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'MetricsEditorDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<MetricsConfig>,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: MetricsConfig;
+}
 
-    const local = ref<MetricsConfig>(
-      defaults(cloneDeep(props.modelValue), emptyMetricsConfig()),
-    );
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogOK,
-      onDialogHide,
-      onDialogCancel,
-      local,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<MetricsConfig>();
+
+const local = ref<MetricsConfig>(
+  defaults(cloneDeep(props.modelValue), emptyMetricsConfig()),
+);
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="onDialogOK(local)"
   >

@@ -1,5 +1,5 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { useSparkStore } from '@/plugins/spark/store';
@@ -9,131 +9,107 @@ import {
   SparkServiceDescription,
   SparkStatusDescription,
 } from 'brewblox-proto/ts';
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  onBeforeUnmount,
-  reactive,
-  ref,
-} from 'vue';
+import { computed, onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue';
 
 type UpdateProgress = 'Pending' | 'Busy' | 'Done';
 
-export default defineComponent({
-  name: 'FirmwareUpdateDialog',
-  props: {
-    ...useDialog.props,
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
+interface Props extends UseDialogProps {
+  serviceId: string;
+}
 
-    const progress = ref<UpdateProgress>('Pending');
-    const error = ref<string>('');
-    const listenerId = ref<string>('');
-    const messages = reactive<string[]>([]);
-
-    onBeforeMount(() => {
-      listenerId.value = eventbus.addListener(
-        `${STATE_TOPIC}/${props.serviceId}/update`,
-        (_, evt) => {
-          if (isSparkUpdate(evt)) {
-            evt.data.log.forEach((v) => messages.push(v));
-          }
-        },
-      );
-    });
-
-    onBeforeUnmount(() => {
-      eventbus.removeListener(listenerId.value);
-    });
-
-    const status = computed<SparkStatusDescription | null>(() =>
-      sparkStore.statusByService(props.serviceId),
-    );
-
-    const updateAvailableText = computed<string>(() => {
-      if (!status.value) {
-        return 'The service is not connected: firmware status is unknown.';
-      }
-
-      const { firmware_error, controller, service } = status.value;
-      if (controller == null) {
-        return 'The service is not connected to a controller.';
-      }
-
-      if (firmware_error == null) {
-        return "You're using the latest firmware.";
-      }
-
-      if (controller.firmware.firmware_date > service.firmware.firmware_date) {
-        return 'The controller firmware is newer than the service firmware.';
-      }
-
-      return 'A firmware update is available';
-    });
-
-    const ready = computed<boolean>(() => {
-      const cs = status.value?.connection_status;
-      return cs != null && (cs === 'ACKNOWLEDGED' || cs === 'SYNCHRONIZED');
-    });
-
-    function firmwareText(
-      arg: SparkServiceDescription | SparkControllerDescription | null,
-    ): string {
-      return arg
-        ? `${arg.firmware.firmware_version} (${arg.firmware.firmware_date})`
-        : 'Unknown';
-    }
-
-    function updateFirmware(): void {
-      if (progress.value === 'Busy' || !ready.value) {
-        return;
-      }
-      progress.value = 'Busy';
-      error.value = '';
-      messages.length = 0;
-
-      sparkStore
-        .flashFirmware(props.serviceId)
-        .catch((e) => {
-          error.value = e.message;
-        })
-        // There will be some time before the service propagates the restarting state
-        .finally(() =>
-          setTimeout(() => {
-            progress.value = 'Done';
-          }, 5000),
-        );
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      status,
-      progress,
-      error,
-      messages,
-      updateAvailableText,
-      ready,
-      firmwareText,
-      updateFirmware,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
+
+defineEmits<UseDialogEmits>();
+
+const sparkStore = useSparkStore();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
+
+const progress = ref<UpdateProgress>('Pending');
+const error = ref<string>('');
+const listenerId = ref<string>('');
+const messages = reactive<string[]>([]);
+
+onBeforeMount(() => {
+  listenerId.value = eventbus.addListener(
+    `${STATE_TOPIC}/${props.serviceId}/update`,
+    (_, evt) => {
+      if (isSparkUpdate(evt)) {
+        evt.data.log.forEach((v) => messages.push(v));
+      }
+    },
+  );
+});
+
+onBeforeUnmount(() => {
+  eventbus.removeListener(listenerId.value);
+});
+
+const status = computed<SparkStatusDescription | null>(() =>
+  sparkStore.statusByService(props.serviceId),
+);
+
+const updateAvailableText = computed<string>(() => {
+  if (!status.value) {
+    return 'The service is not connected: firmware status is unknown.';
+  }
+
+  const { firmware_error, controller, service } = status.value;
+  if (controller == null) {
+    return 'The service is not connected to a controller.';
+  }
+
+  if (firmware_error == null) {
+    return "You're using the latest firmware.";
+  }
+
+  if (controller.firmware.firmware_date > service.firmware.firmware_date) {
+    return 'The controller firmware is newer than the service firmware.';
+  }
+
+  return 'A firmware update is available';
+});
+
+const ready = computed<boolean>(() => {
+  const cs = status.value?.connection_status;
+  return cs != null && (cs === 'ACKNOWLEDGED' || cs === 'SYNCHRONIZED');
+});
+
+function firmwareText(
+  arg: SparkServiceDescription | SparkControllerDescription | null,
+): string {
+  return arg
+    ? `${arg.firmware.firmware_version} (${arg.firmware.firmware_date})`
+    : 'Unknown';
+}
+
+function updateFirmware(): void {
+  if (progress.value === 'Busy' || !ready.value) {
+    return;
+  }
+  progress.value = 'Busy';
+  error.value = '';
+  messages.length = 0;
+
+  sparkStore
+    .flashFirmware(props.serviceId)
+    .catch((e) => {
+      error.value = e.message;
+    })
+    // There will be some time before the service propagates the restarting state
+    .finally(() =>
+      setTimeout(() => {
+        progress.value = 'Done';
+      }, 5000),
+    );
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="updateFirmware"
   >

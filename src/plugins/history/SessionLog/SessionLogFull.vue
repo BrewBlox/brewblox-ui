@@ -1,11 +1,4 @@
-<script lang="ts">
-import { useGlobals, useWidget } from '@/composables';
-import { spliceById } from '@/utils/collections';
-import { createDialog } from '@/utils/dialog';
-import clamp from 'lodash/clamp';
-import { nanoid } from 'nanoid';
-import { dom } from 'quasar';
-import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue';
+<script setup lang="ts">
 import { useHistoryStore } from '../store';
 import {
   LoggedSession,
@@ -16,172 +9,159 @@ import {
 import { emptyGraphConfig, sharedWidgetConfigs } from '../utils';
 import SessionHeaderField from './SessionHeaderField.vue';
 import { SessionLogWidget } from './types';
+import { useGlobals, useWidget } from '@/composables';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
+import clamp from 'lodash/clamp';
+import isString from 'lodash/isString';
+import { nanoid } from 'nanoid';
+import { TouchPanValue, dom } from 'quasar';
+import { ComponentPublicInstance, computed, ref } from 'vue';
 
 const { width } = dom;
 
-export default defineComponent({
-  name: 'SessionLogFull',
-  components: {
-    SessionHeaderField,
-  },
-  setup() {
-    const historyStore = useHistoryStore();
-    const { dense } = useGlobals.setup();
-    const { config } = useWidget.setup<SessionLogWidget>();
+const historyStore = useHistoryStore();
+const { dense } = useGlobals.setup();
+const { config } = useWidget.setup<SessionLogWidget>();
 
-    const initialCol = ref<number>(0);
-    const colDistance = ref<number>(0);
-    const noteboxRef = ref<ComponentPublicInstance>();
+const initialCol = ref<number>(0);
+const colDistance = ref<number>(0);
+const noteboxRef = ref<ComponentPublicInstance>();
 
-    const session = computed<LoggedSession | null>(() =>
-      historyStore.sessionById(config.value.currentSession),
-    );
+const session = computed<LoggedSession | null>(() =>
+  historyStore.sessionById(config.value.currentSession),
+);
 
-    function saveSession(sess: LoggedSession | null = session.value): void {
-      if (sess != null) {
-        historyStore.saveSession(sess);
-      }
-    }
+function saveSession(sess: LoggedSession | null = session.value): void {
+  if (sess != null) {
+    historyStore.saveSession(sess);
+  }
+}
 
-    const notes = computed<SessionNote[]>({
-      get: () => session.value?.notes ?? [],
-      set: (notes) => {
-        if (session.value) {
-          session.value.notes = notes;
-          saveSession();
-        }
-      },
-    });
-
-    function sharedConfigs(excluded: string[]): SharedGraphConfig[] {
-      return [
-        ...sharedWidgetConfigs(excluded),
-        ...notes.value
-          .filter(
-            (note) => note.type === 'Graph' && !excluded.includes(note.id),
-          )
-          .map((note) => {
-            const { id, title, config } = note as SessionGraphNote;
-            return { id, title: `(Note) ${title}`, config };
-          }),
-      ];
-    }
-
-    function saveTitle(note: SessionNote, title: string): void {
-      if (title !== note.title) {
-        note.title = title;
-        saveSession();
-      }
-    }
-
-    function clearNote(note: SessionNote): void {
-      if (note.type === 'Text') {
-        note.value = '';
-      }
-      if (note.type === 'Graph') {
-        note.start = null;
-        note.end = null;
-      }
+const notes = computed<SessionNote[]>({
+  get: () => session.value?.notes ?? [],
+  set: (notes) => {
+    if (session.value) {
+      session.value.notes = notes;
       saveSession();
     }
-
-    function removeNote(note: SessionNote): void {
-      spliceById(notes.value, note, false);
-      saveSession();
-    }
-
-    function addTextNote(): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: 'New text note',
-          title: 'Add note',
-          label: 'Name',
-        },
-      }).onOk((title) => {
-        notes.value.push({
-          id: nanoid(),
-          type: 'Text',
-          title,
-          value: '',
-          col: 12,
-        });
-        saveSession();
-      });
-    }
-
-    function addGraphNote(): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: 'New graph',
-          title: 'Add graph',
-          label: 'Name',
-        },
-      }).onOk((title) => {
-        notes.value.push({
-          id: nanoid(),
-          type: 'Graph',
-          title,
-          start: null,
-          end: null,
-          config: emptyGraphConfig(),
-          col: 12,
-        });
-        saveSession();
-      });
-    }
-
-    function editGraph(note: SessionGraphNote): void {
-      createDialog({
-        component: 'GraphEditorDialog',
-        componentProps: {
-          title: note.title,
-          config: note.config,
-          noPeriod: true,
-          shared: sharedConfigs([note.id]),
-        },
-      }).onOk((config) => {
-        const actual = notes.value.find((n) => n.id === note.id);
-        if (actual?.type === 'Graph') {
-          actual.config = config;
-          saveSession();
-        }
-      });
-    }
-
-    function onSwipe(args: PanArguments, note: SessionNote): void {
-      if (args.isFirst) {
-        initialCol.value = note.col;
-        colDistance.value =
-          noteboxRef.value !== undefined
-            ? (width(noteboxRef.value.$el) || 600) / 12
-            : 50;
-      }
-
-      const delta = Math.round(args.offset.x / colDistance.value);
-      note.col = clamp(initialCol.value + delta, 3, 12);
-
-      if (args.isFinal && note.col !== initialCol.value) {
-        saveSession();
-      }
-    }
-
-    return {
-      dense,
-      session,
-      saveSession,
-      notes,
-      onSwipe,
-      saveTitle,
-      editGraph,
-      clearNote,
-      removeNote,
-      addTextNote,
-      addGraphNote,
-    };
   },
 });
+
+function sharedConfigs(excluded: string[]): SharedGraphConfig[] {
+  return [
+    ...sharedWidgetConfigs(excluded),
+    ...notes.value
+      .filter((note) => note.type === 'Graph' && !excluded.includes(note.id))
+      .map((note) => {
+        const { id, title, config } = note as SessionGraphNote;
+        return { id, title: `(Note) ${title}`, config };
+      }),
+  ];
+}
+
+function saveTitle(note: SessionNote, title: string): void {
+  if (title !== note.title) {
+    note.title = title;
+    saveSession();
+  }
+}
+
+function clearNote(note: SessionNote): void {
+  if (note.type === 'Text') {
+    note.value = '';
+  }
+  if (note.type === 'Graph') {
+    note.start = null;
+    note.end = null;
+  }
+  saveSession();
+}
+
+function removeNote(note: SessionNote): void {
+  spliceById(notes.value, note, false);
+  saveSession();
+}
+
+function addTextNote(): void {
+  createDialog({
+    component: 'TextDialog',
+    componentProps: {
+      modelValue: 'New text note',
+      title: 'Add note',
+      label: 'Name',
+    },
+  }).onOk((title) => {
+    notes.value.push({
+      id: nanoid(),
+      type: 'Text',
+      title,
+      value: '',
+      col: 12,
+    });
+    saveSession();
+  });
+}
+
+function addGraphNote(): void {
+  createDialog({
+    component: 'TextDialog',
+    componentProps: {
+      modelValue: 'New graph',
+      title: 'Add graph',
+      label: 'Name',
+    },
+  }).onOk((title) => {
+    notes.value.push({
+      id: nanoid(),
+      type: 'Graph',
+      title,
+      start: null,
+      end: null,
+      config: emptyGraphConfig(),
+      col: 12,
+    });
+    saveSession();
+  });
+}
+
+function editGraph(note: SessionGraphNote): void {
+  createDialog({
+    component: 'GraphEditorDialog',
+    componentProps: {
+      title: note.title,
+      config: note.config,
+      noPeriod: true,
+      shared: sharedConfigs([note.id]),
+    },
+  }).onOk((config) => {
+    const actual = notes.value.find((n) => n.id === note.id);
+    if (actual?.type === 'Graph') {
+      actual.config = config;
+      saveSession();
+    }
+  });
+}
+
+function onSwipe(
+  args: Parameters<NonNullable<TouchPanValue>>[0],
+  note: SessionNote,
+): void {
+  if (args.isFirst) {
+    initialCol.value = note.col;
+    colDistance.value =
+      noteboxRef.value !== undefined
+        ? (width(noteboxRef.value.$el) || 600) / 12
+        : 50;
+  }
+
+  const delta = Math.round((args.offset?.x ?? 0) / colDistance.value);
+  note.col = clamp(initialCol.value + delta, 3, 12);
+
+  if (args.isFinal && note.col !== initialCol.value) {
+    saveSession();
+  }
+}
 </script>
 
 <template>
@@ -216,7 +196,7 @@ export default defineComponent({
                 class="move-border"
               />
               <div class="row q-gutter-x-xs q-pa-xs">
-                <InputField
+                <TextField
                   :model-value="element.title"
                   title="Name"
                   label="Name"
@@ -224,7 +204,9 @@ export default defineComponent({
                   tag-class="ellipsis-3-lines text-secondary"
                   style="max-width: 100%"
                   class="col q-pb-xs"
-                  @update:model-value="(v) => saveTitle(element, v)"
+                  @update:model-value="
+                    (v) => isString(v) && saveTitle(element, v)
+                  "
                 >
                   <template #before>
                     <q-icon
@@ -238,7 +220,7 @@ export default defineComponent({
                       color="secondary"
                     />
                   </template>
-                </InputField>
+                </TextField>
                 <div
                   v-if="element.type === 'Graph'"
                   class="col-auto row"

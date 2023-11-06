@@ -3,31 +3,25 @@ import format from 'date-fns/format';
 import isEqual from 'date-fns/isEqual';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
-import { computed, PropType, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 type DateFormatType = 'date' | 'number' | 'string';
 
-const props = defineProps({
-  modelValue: {
-    type: null as unknown as PropType<Date | number | string | null>,
-    default: null,
-  },
-  output: {
-    type: String as PropType<DateFormatType>,
-    default: 'date',
-  },
-  dateAttrs: {
-    type: Object as PropType<AnyDict>,
-    default: () => ({}),
-  },
-  timeAttrs: {
-    type: Object as PropType<AnyDict>,
-    default: () => ({}),
-  },
+interface Props {
+  modelValue: Date | number | string | null;
+  output?: DateFormatType;
+  dateAttrs?: AnyDict;
+  timeAttrs?: AnyDict;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  output: 'date',
+  dateAttrs: () => ({}),
+  timeAttrs: () => ({}),
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: Date | number | string | null): void;
+  'update:modelValue': [payload: Date | number | string | null];
 }>();
 
 function asDate(v: Date | number | string | null): Date | null {

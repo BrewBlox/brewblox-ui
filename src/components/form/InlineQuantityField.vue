@@ -1,30 +1,23 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { isQuantity } from '@/utils/identity';
 import { prettyQty } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: Object as PropType<Quantity>,
-    required: true,
-    validator: isQuantity,
-  },
-  label: {
-    type: String,
-    default: '',
-  },
-  decimals: {
-    type: Number,
-    default: 2,
-  },
+interface Props extends UseFieldProps {
+  modelValue: Quantity;
+  decimals?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  label: '',
+  decimals: 2,
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: Quantity): void;
+  'update:modelValue': [payload: Quantity];
 }>();
 
 const displayValue = computed<string>(() =>

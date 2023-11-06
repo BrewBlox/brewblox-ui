@@ -1,18 +1,17 @@
 <script setup lang="ts">
+import ProfileSnippetDialog from './ProfileSnippetDialog.vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createComponentDialog } from '@/utils/dialog';
 import { SetpointProfileBlock } from 'brewblox-proto/ts';
-import ProfileSnippetDialog from './ProfileSnippetDialog.vue';
 
-defineProps({
-  icon: {
-    type: String,
-    default: 'mdi-file',
-  },
-  label: {
-    type: String,
-    default: 'Load/Save profile',
-  },
+interface Props {
+  icon?: string;
+  label?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  icon: 'mdi-file',
+  label: 'Load/Save profile',
 });
 
 const { block } = useBlockWidget.setup<SetpointProfileBlock>();

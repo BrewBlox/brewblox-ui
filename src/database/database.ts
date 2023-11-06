@@ -1,3 +1,4 @@
+import { BrewbloxDatabase, EventHandler } from './types';
 import { STORE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { http, parseHttpError } from '@/utils/http';
@@ -5,7 +6,6 @@ import { notify } from '@/utils/notify';
 import { AxiosError, AxiosResponse } from 'axios';
 import { DatastoreEvent, StoreObject } from 'brewblox-proto/ts';
 import isObjectLike from 'lodash/isObjectLike';
-import { BrewbloxDatabase, EventHandler } from './types';
 
 interface SingleQueryArgs {
   namespace: string;

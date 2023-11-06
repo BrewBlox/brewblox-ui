@@ -1,3 +1,4 @@
+import widget from './MutexWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
@@ -6,7 +7,6 @@ import { cref } from '@/utils/component-ref';
 import { bloxQty } from '@/utils/quantity';
 import { BlockType, MutexBlock } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './MutexWidget.vue';
 
 const type = BlockType.Mutex;
 const title = 'Mutex';

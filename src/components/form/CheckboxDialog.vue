@@ -1,31 +1,24 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
-import { computed, PropType, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Array,
-    default: () => [],
-  },
-  selectOptions: {
-    type: Array as PropType<SelectOption[]>,
-    required: true,
-  },
-  ok: {
-    type: String,
-    default: 'OK',
-  },
-  cancel: {
-    type: [String, Boolean],
-    default: true,
-  },
+interface Props extends UseDialogProps {
+  modelValue: any[];
+  selectOptions: SelectOption[];
+  ok?: string;
+  cancel?: string | boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  ok: 'OK',
+  cancel: true,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<any[]>();
 const local = ref<any[]>([...props.modelValue]);
 
 const cancelLabel = computed<string>(() =>
@@ -40,7 +33,7 @@ function save(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

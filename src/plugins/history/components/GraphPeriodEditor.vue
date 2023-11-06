@@ -1,17 +1,29 @@
-<script lang="ts">
-import { durationString, parseDate } from '@/utils/quantity';
+<script setup lang="ts" generic="T extends QueryConfig">
+import { QueryConfig, QueryParams } from '../types';
+import { bloxQty, durationString, parseDate } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import find from 'lodash/find';
 import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
 import { date as dateUtil } from 'quasar';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
-import { QueryConfig, QueryParams } from '../types';
+import { computed, ref, watch } from 'vue';
 
 interface PeriodDisplay {
   start: boolean;
   duration: boolean;
   end: boolean;
 }
+
+interface Props {
+  config: T;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:config': [payload: T];
+}>();
 
 const periodOptions: SelectOption[] = [
   {
@@ -42,93 +54,67 @@ const paramDefaults = (): QueryParams => ({
   end: new Date().toISOString(),
 });
 
-export default defineComponent({
-  name: 'GraphPeriodEditor',
-  props: {
-    config: {
-      type: Object as PropType<QueryConfig>,
-      required: true,
-    },
+const local = ref<T>(cloneDeep(props.config));
+const period = ref(makePeriod(props.config.params));
+
+watch(
+  () => props.config.params,
+  (params) => {
+    period.value = makePeriod(params);
   },
-  emits: ['update:config'],
-  setup(props, { emit }) {
-    const local = ref({ ...props.config });
-    const period = ref(makePeriod(props.config.params));
+);
 
-    watch(
-      () => props.config.params,
-      (params) => {
-        period.value = makePeriod(params);
-      },
-    );
+function makePeriod(params: QueryParams): PeriodDisplay {
+  const period: PeriodDisplay = {
+    start: params?.start !== undefined,
+    duration: params?.duration !== undefined,
+    end: params?.end !== undefined,
+  };
+  const opts = periodOptions.map((opt) => opt.value);
+  const matching = opts.some((v) => isEqual(v, period));
+  return matching ? period : opts[0];
+}
 
-    function makePeriod(params: QueryParams): PeriodDisplay {
-      const period: PeriodDisplay = {
-        start: params?.start !== undefined,
-        duration: params?.duration !== undefined,
-        end: params?.end !== undefined,
-      };
-      const opts = periodOptions.map((opt) => opt.value);
-      const matching = opts.some((v) => isEqual(v, period));
-      return matching ? period : opts[0];
-    }
+function saveSanitized(period: PeriodDisplay): void {
+  const defaults = paramDefaults();
+  const { params } = local.value;
+  local.value.params = {
+    ...params,
+    start: !period.start ? undefined : params.start ?? defaults.start,
+    duration: !period.duration
+      ? undefined
+      : params.duration ?? defaults.duration,
+    end: !period.end ? undefined : params.end ?? defaults.end,
+  };
+  emit('update:config', local.value as T);
+}
 
-    function saveConfig(config: QueryConfig): void {
-      emit('update:config', config);
-    }
+const isLive = computed<boolean>(() => {
+  const opt = find(periodOptions, matches({ value: period.value }));
+  return opt !== undefined && opt.label.startsWith('Live');
+});
 
-    function saveSanitized(period: PeriodDisplay): void {
-      const defaults = paramDefaults();
-      const { params } = local.value;
-      local.value.params = {
-        ...params,
-        start: !period.start ? undefined : params.start ?? defaults.start,
-        duration: !period.duration
-          ? undefined
-          : params.duration ?? defaults.duration,
-        end: !period.end ? undefined : params.end ?? defaults.end,
-      };
-      saveConfig(local.value);
-    }
+const start = computed<Date | null>({
+  get: () => parseDate(props.config.params.start),
+  set: (v) => {
+    local.value.params.start = v ? v.toISOString() : undefined;
+    saveSanitized(period.value);
+  },
+});
 
-    const isLive = computed<boolean>(() => {
-      const opt = find(periodOptions, matches({ value: period.value }));
-      return opt !== undefined && opt.label.startsWith('Live');
-    });
+const duration = computed<Quantity>({
+  get: () => bloxQty(props.config.params.duration ?? ''),
+  set: (v) => {
+    local.value.params.duration = durationString(v || '10m');
+    saveSanitized(period.value);
+  },
+});
 
-    const start = computed<Date | null>({
-      get: () => parseDate(props.config.params.start),
-      set: (v) => {
-        local.value.params.start = v ? v.toISOString() : undefined;
-        saveSanitized(period.value);
-      },
-    });
-
-    const duration = computed<string>({
-      get: () => props.config.params.duration ?? '',
-      set: (v) => {
-        local.value.params.duration = durationString(v || '10m');
-        saveSanitized(period.value);
-      },
-    });
-
-    const end = computed<Date | null>({
-      get: () => parseDate(props.config.params.end),
-      set: (v) => {
-        local.value.params.end = v ? v.toISOString() : undefined;
-        saveSanitized(period.value);
-      },
-    });
-
-    return {
-      periodOptions,
-      period,
-      isLive,
-      start,
-      duration,
-      end,
-      saveSanitized,
-    };
+const end = computed<Date | null>({
+  get: () => parseDate(props.config.params.end),
+  set: (v) => {
+    local.value.params.end = v ? v.toISOString() : undefined;
+    saveSanitized(period.value);
   },
 });
 </script>

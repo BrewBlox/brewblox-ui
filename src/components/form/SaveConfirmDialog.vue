@@ -1,32 +1,27 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 
-defineProps({
-  ...useDialog.props,
-  title: {
-    type: String,
-    default: 'Unsaved changes',
-  },
-  message: {
-    type: String,
-    default: 'Do you want to save your changes before closing?',
-  },
+interface Props extends UseDialogProps {
+  title?: string;
+  message?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Unsaved changes',
+  message: 'Do you want to save your changes before closing?',
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
-
-async function done(save: boolean): Promise<void> {
-  onDialogOK(save);
-}
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<boolean>();
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     no-esc-dismiss
     @hide="onDialogHide"
   >
@@ -42,13 +37,13 @@ async function done(save: boolean): Promise<void> {
           flat
           label="No"
           color="primary"
-          @click="done(false)"
+          @click="onDialogOK(false)"
         />
         <q-btn
           flat
           label="Yes"
           color="primary"
-          @click="done(true)"
+          @click="onDialogOK(true)"
         />
       </template>
     </DialogCard>

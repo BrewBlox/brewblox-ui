@@ -1,15 +1,5 @@
-<script lang="ts">
+<script setup lang="ts">
 import { startupDone } from '@/user-settings';
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'PageError',
-  setup() {
-    return {
-      startupDone,
-    };
-  },
-});
 </script>
 
 <template>

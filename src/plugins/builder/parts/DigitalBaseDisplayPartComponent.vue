@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { DigitalState } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -14,6 +12,8 @@ import {
   LABEL_KEY,
 } from '../const';
 import { liquidBorderColor, textTransformation } from '../utils';
+import { DigitalState } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 
 const {
   part,

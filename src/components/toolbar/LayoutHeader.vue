@@ -1,22 +1,13 @@
-<script lang="ts">
+<script setup lang="ts">
 import brewbloxLogoSvg from '@/assets/logo-wordmark-dark.svg';
 import brewbloxIconSvg from '@/assets/logo-x.svg';
 import { useGlobals } from '@/composables';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'LayoutHeader',
-  emits: ['menu'],
-  setup() {
-    const { dense } = useGlobals.setup();
+defineEmits<{
+  menu: [];
+}>();
 
-    return {
-      brewbloxLogoSvg,
-      brewbloxIconSvg,
-      dense,
-    };
-  },
-});
+const { dense } = useGlobals.setup();
 </script>
 
 <template>

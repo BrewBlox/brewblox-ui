@@ -1,56 +1,36 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { UseFieldProps, useField } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { ComparedBlockType } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { bloxLink } from '@/utils/link';
 import { Block, Link } from 'brewblox-proto/ts';
 import truncate from 'lodash/truncate';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: Object as PropType<Link>,
-    default: () => bloxLink(null),
-  },
-  serviceId: {
-    type: String,
-    required: true,
-  },
-  label: {
-    type: String,
-    default: 'Link',
-  },
-  compatible: {
-    type: [String, Array] as PropType<ComparedBlockType>,
-    default: null,
-  },
-  blockFilter: {
-    type: Function as PropType<(block: Block) => boolean>,
-    default: () => true,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  creatable: {
-    type: Boolean,
-    default: true,
-  },
-  configurable: {
-    type: Boolean,
-    default: true,
-  },
-  show: {
-    type: Boolean,
-    default: true,
-  },
+interface Props extends UseFieldProps {
+  modelValue: Link;
+  serviceId: string;
+  compatible?: ComparedBlockType;
+  blockFilter?: (block: Block) => boolean;
+  clearable?: boolean;
+  creatable?: boolean;
+  configurable?: boolean;
+  show?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  label: 'Link',
+  compatible: null,
+  blockFilter: () => true,
+  clearable: true,
+  creatable: true,
+  configurable: true,
+  show: true,
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: Link): void;
+  'update:modelValue': [payload: Link];
 }>();
 
 const { activeSlots } = useField.setup();

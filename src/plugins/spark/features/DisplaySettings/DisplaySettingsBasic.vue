@@ -1,51 +1,37 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { DisplaySettingsBlock, DisplaySlot } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { CSSProperties, computed } from 'vue';
 
 const footerRules: InputRule[] = [
   (v) => !v || v.length <= 40 || 'Footer text can only be 40 characters',
 ];
 
-export default defineComponent({
-  name: 'DisplaySettingsBasic',
-  setup() {
-    const { block, patchBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
+const { block, patchBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
 
-    const slots = computed<(DisplaySlot | null)[]>(() => {
-      const slots = Array(6).fill(null);
-      block.value.data.widgets.forEach((w) => {
-        slots[w.pos - 1] = w;
-      });
-      return slots;
-    });
-
-    function slotStyle(slot: DisplaySlot | null): AnyDict {
-      return slot
-        ? {
-            gridColumnEnd: 'span 1',
-            borderColor: slot ? `#${slot.color} !important` : '',
-            borderStyle: 'solid',
-            borderWidth: slot ? '1px' : '0px',
-          }
-        : {};
-    }
-
-    function showDialog(): void {
-      createBlockDialog(block.value);
-    }
-
-    return {
-      footerRules,
-      block,
-      patchBlock,
-      slots,
-      slotStyle,
-      showDialog,
-    };
-  },
+const slots = computed<(DisplaySlot | null)[]>(() => {
+  const slots = Array(6).fill(null);
+  block.value.data.widgets.forEach((w) => {
+    slots[w.pos - 1] = w;
+  });
+  return slots;
 });
+
+function slotStyle(slot: DisplaySlot | null): CSSProperties {
+  return slot
+    ? {
+        gridColumnEnd: 'span 1',
+        borderColor: slot ? `#${slot.color} !important` : '',
+        borderStyle: 'solid',
+        borderWidth: slot ? '1px' : '0px',
+      }
+    : {};
+}
+
+function showDialog(): void {
+  createBlockDialog(block.value);
+}
 </script>
 
 <template>
@@ -77,12 +63,12 @@ export default defineComponent({
         </div>
       </div>
 
-      <InputField
+      <TextField
         :model-value="block.data.name"
         :rules="footerRules"
         label="Footer text"
         title="footer text"
-        @update:model-value="(v) => patchBlock({ name: v })"
+        @update:model-value="(v) => patchBlock({ name: v! })"
       />
     </div>
   </div>

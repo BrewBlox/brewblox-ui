@@ -1,6 +1,6 @@
 import { IoChannelAddress, QuickstartConfig } from '../types';
 
-export interface RimsBlockNames {
+export type RimsBlockNames = {
   kettleSensor: string;
   kettleSetpoint: string;
   kettlePid: string;
@@ -13,7 +13,7 @@ export interface RimsBlockNames {
   tubeAct: string;
 
   pumpAct: string;
-}
+};
 
 export interface RimsConfig extends QuickstartConfig {
   names: RimsBlockNames;

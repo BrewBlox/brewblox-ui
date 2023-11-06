@@ -1,13 +1,8 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'InvalidWidget',
-  props: {
-    error: {
-      type: String,
-      default: 'Unknown error',
-    },
+<script setup lang="ts">
+defineProps({
+  error: {
+    type: String,
+    default: 'Unknown error',
   },
 });
 </script>

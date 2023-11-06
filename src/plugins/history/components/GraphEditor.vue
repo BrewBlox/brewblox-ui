@@ -1,46 +1,36 @@
-<script lang="ts">
-import { createDialog } from '@/utils/dialog';
-import { QTreeNode } from 'quasar';
-import { defineComponent, PropType } from 'vue';
+<script setup lang="ts">
 import { DEFAULT_GRAPH_DECIMALS } from '../const';
 import { GraphConfig } from '../types';
+import { createDialog } from '@/utils/dialog';
+import { QTreeNode } from 'quasar';
 
-export default defineComponent({
-  name: 'GraphEditor',
-  props: {
-    noPeriod: {
-      type: Boolean,
-      default: false,
-    },
-    config: {
-      type: Object as PropType<GraphConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config'],
-  setup(props, { emit }) {
-    function saveConfig(config: GraphConfig): void {
-      emit('update:config', config);
-    }
+interface Props {
+  config: GraphConfig;
+  noPeriod?: boolean;
+}
 
-    function editLeaf(node: QTreeNode): void {
-      createDialog({
-        component: 'GraphDisplayDialog',
-        componentProps: {
-          config: props.config,
-          field: node.value,
-          title: node.value,
-        },
-      }).onOk((config) => saveConfig(config));
-    }
-
-    return {
-      DEFAULT_GRAPH_DECIMALS,
-      saveConfig,
-      editLeaf,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  noPeriod: false,
 });
+
+const emit = defineEmits<{
+  'update:config': [payload: GraphConfig];
+}>();
+
+function saveConfig(config: GraphConfig): void {
+  emit('update:config', config);
+}
+
+function editLeaf(node: QTreeNode): void {
+  createDialog({
+    component: 'GraphDisplayDialog',
+    componentProps: {
+      config: props.config,
+      field: node.value,
+      title: node.value,
+    },
+  }).onOk((config) => saveConfig(config));
+}
 </script>
 
 <template>

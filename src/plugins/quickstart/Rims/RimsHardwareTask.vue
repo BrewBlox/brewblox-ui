@@ -1,117 +1,85 @@
-<script lang="ts">
-import { useSparkStore } from '@/plugins/spark/store';
-import { createDialog } from '@/utils/dialog';
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  PropType,
-  reactive,
-  ref,
-} from 'vue';
-import { GpioChange, IoChannelAddress, QuickstartAction } from '../types';
+<script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
+import { GpioChange, IoChannelAddress } from '../types';
 import { hasShared, resetGpioChanges } from '../utils';
 import { RimsConfig } from './types';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
+import { computed, onBeforeMount, reactive, ref } from 'vue';
 
-export default defineComponent({
-  name: 'RimsHardwareTask',
-  props: {
-    config: {
-      type: Object as PropType<RimsConfig>,
-      required: true,
+const props = defineProps<UseTaskProps<RimsConfig>>();
+
+const emit = defineEmits<UseTaskEmits<RimsConfig>>();
+
+const sparkStore = useSparkStore();
+
+const tubeChannel = ref<IoChannelAddress | null>(
+  props.config.tubeChannel ?? null,
+);
+const pumpChannel = ref<IoChannelAddress | null>(
+  props.config.pumpChannel ?? null,
+);
+const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
+const tubeSensor = ref<string | null>(props.config.tubeSensor ?? null);
+const changedGpio = reactive<GpioChange[]>(
+  props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
+);
+
+const channelSame = computed<boolean>(() =>
+  hasShared([tubeChannel.value, pumpChannel.value]),
+);
+
+const sensorSame = computed<boolean>(() =>
+  hasShared([kettleSensor.value, tubeSensor.value]),
+);
+
+const valuesOk = computed<boolean>(() =>
+  [
+    tubeChannel.value,
+    pumpChannel.value,
+    !channelSame.value,
+    kettleSensor.value,
+    tubeSensor.value,
+    !sensorSame.value,
+  ].every(Boolean),
+);
+
+function discover(): void {
+  sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
+}
+
+function startBlockWizard(): void {
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: props.config.serviceId,
     },
-    actions: {
-      type: Array as PropType<QuickstartAction[]>,
-      required: true,
+  });
+}
+
+function taskDone(): void {
+  if (!valuesOk.value) {
+    return;
+  }
+
+  const updatedConfig: RimsConfig = {
+    ...props.config,
+    changedGpio,
+    pumpChannel: pumpChannel.value!,
+    tubeChannel: tubeChannel.value!,
+    kettleSensor: kettleSensor.value!,
+    tubeSensor: tubeSensor.value!,
+    renamedBlocks: {
+      [kettleSensor.value!]: props.config.names.kettleSensor,
+      [tubeSensor.value!]: props.config.names.tubeSensor,
     },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const sparkStore = useSparkStore();
+  };
 
-    const tubeChannel = ref<IoChannelAddress | null>(
-      props.config.tubeChannel ?? null,
-    );
-    const pumpChannel = ref<IoChannelAddress | null>(
-      props.config.pumpChannel ?? null,
-    );
-    const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
-    const tubeSensor = ref<string | null>(props.config.tubeSensor ?? null);
-    const changedGpio = reactive<GpioChange[]>(
-      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
-    );
+  emit('update:config', updatedConfig);
+  emit('next');
+}
 
-    const channelSame = computed<boolean>(() =>
-      hasShared([tubeChannel.value, pumpChannel.value]),
-    );
-
-    const sensorSame = computed<boolean>(() =>
-      hasShared([kettleSensor.value, tubeSensor.value]),
-    );
-
-    const valuesOk = computed<boolean>(() =>
-      [
-        tubeChannel.value,
-        pumpChannel.value,
-        !channelSame.value,
-        kettleSensor.value,
-        tubeSensor.value,
-        !sensorSame.value,
-      ].every(Boolean),
-    );
-
-    function discover(): void {
-      sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
-    }
-
-    function startBlockWizard(): void {
-      createDialog({
-        component: 'BlockWizardDialog',
-        componentProps: {
-          serviceId: props.config.serviceId,
-        },
-      });
-    }
-
-    function taskDone(): void {
-      if (!valuesOk.value) {
-        return;
-      }
-
-      const updatedConfig: RimsConfig = {
-        ...props.config,
-        changedGpio,
-        pumpChannel: pumpChannel.value!,
-        tubeChannel: tubeChannel.value!,
-        kettleSensor: kettleSensor.value!,
-        tubeSensor: tubeSensor.value!,
-        renamedBlocks: {
-          [kettleSensor.value!]: props.config.names.kettleSensor,
-          [tubeSensor.value!]: props.config.names.tubeSensor,
-        },
-      };
-
-      emit('update:config', updatedConfig);
-      emit('next');
-    }
-
-    onBeforeMount(() => discover());
-
-    return {
-      tubeChannel,
-      pumpChannel,
-      kettleSensor,
-      tubeSensor,
-      changedGpio,
-      channelSame,
-      sensorSame,
-      valuesOk,
-      discover,
-      startBlockWizard,
-      taskDone,
-    };
-  },
-});
+onBeforeMount(() => discover());
 </script>
 
 <template>

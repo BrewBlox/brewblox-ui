@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { createDialog } from './utils/dialog';
 import { authRefresh } from '@/auth';
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
-import { createDialog } from './utils/dialog';
 
 /**
  * Order of startup is important here.

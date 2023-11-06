@@ -1,29 +1,19 @@
 <script setup lang="ts">
 import { Widget } from '@/store/widgets';
-import { computed, onMounted, PropType } from 'vue';
+import { computed, onMounted } from 'vue';
 
-const props = defineProps({
-  widget: {
-    type: Object as PropType<Widget>,
-    required: true,
-  },
-  valid: {
-    type: Boolean,
-    required: true,
-  },
-  featureType: {
-    type: String,
-    required: true,
-  },
-  featureTitle: {
-    type: String,
-    required: true,
-  },
-});
+interface Props {
+  widget: Widget;
+  valid: boolean;
+  featureType: string;
+  featureTitle: string;
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: 'update:widget', value: Widget);
-  (e: 'update:valid', value: boolean);
+  'update:widget': [payload: Widget];
+  'update:valid': [payload: boolean];
 }>();
 
 const title = computed<string>({

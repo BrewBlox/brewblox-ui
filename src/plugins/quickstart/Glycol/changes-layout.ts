@@ -1,3 +1,5 @@
+import { withPrefix } from '../utils';
+import { GlycolConfig } from './types';
 import { KETTLE_FILL_PCT_KEY } from '@/plugins/builder/blueprints/Kettle';
 import {
   BORDER_KEY,
@@ -12,8 +14,6 @@ import { BuilderLayout, BuilderPart } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
 import { nanoid } from 'nanoid';
-import { withPrefix } from '../utils';
-import { GlycolConfig } from './types';
 
 export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
   const { serviceId, names } = config;

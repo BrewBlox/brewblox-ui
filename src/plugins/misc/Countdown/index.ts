@@ -1,8 +1,8 @@
+import widget from './CountdownWidget.vue';
+import { CountdownConfig } from './types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { Plugin } from 'vue';
-import widget from './CountdownWidget.vue';
-import { CountdownConfig } from './types';
 
 const plugin: Plugin = {
   install(app) {

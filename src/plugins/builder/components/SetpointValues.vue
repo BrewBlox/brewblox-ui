@@ -1,41 +1,32 @@
 <script setup lang="ts">
+import { usePart, useSettingsBlock } from '../composables';
+import { SetpointBlockT, SETPOINT_KEY, SETPOINT_TYPES } from '../const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { makeTypeFilter } from '@/utils/functional';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
 import { BlockType, PidBlock } from 'brewblox-proto/ts';
 import { computed } from 'vue';
-import { usePart, useSettingsBlock } from '../composables';
-import { SetpointBlockT, SETPOINT_KEY, SETPOINT_TYPES } from '../const';
+
+interface Props {
+  width?: number;
+  height?: number;
+  settingsKey?: string;
+  x?: number;
+  y?: number;
+  always?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  width: 100,
+  height: 50,
+  settingsKey: SETPOINT_KEY,
+  x: 0,
+  y: 0,
+  always: false,
+});
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
-
-const props = defineProps({
-  width: {
-    type: Number,
-    default: 100,
-  },
-  height: {
-    type: Number,
-    default: 50,
-  },
-  settingsKey: {
-    type: String,
-    default: SETPOINT_KEY,
-  },
-  x: {
-    type: Number,
-    default: 0,
-  },
-  y: {
-    type: Number,
-    default: 0,
-  },
-  always: {
-    type: Boolean,
-    default: false,
-  },
-});
 
 const sparkStore = useSparkStore();
 const { placeholder } = usePart.setup();

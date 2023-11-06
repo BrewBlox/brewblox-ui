@@ -1,49 +1,33 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import { computed, defineComponent, ref } from 'vue';
+<script setup lang="ts">
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'SessionLoadDialog',
-  components: {
-    SessionSelectField,
-  },
-  props: {
-    ...useDialog.props,
-  },
-  emits: [...useDialog.emits],
-  setup() {
-    const historyStore = useHistoryStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-
-    const local = ref<LoggedSession | null>(null);
-
-    const sessions = computed<LoggedSession[]>(() => historyStore.sessions);
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      sessions,
-      save,
-    };
-  },
+withDefaults(defineProps<UseDialogProps>(), {
+  ...useDialog.defaultProps,
 });
+
+defineEmits<UseDialogEmits>();
+
+const historyStore = useHistoryStore();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const local = ref<LoggedSession | null>(null);
+
+const sessions = computed<LoggedSession[]>(() => historyStore.sessions);
+
+function save(): void {
+  onDialogOK(local.value);
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

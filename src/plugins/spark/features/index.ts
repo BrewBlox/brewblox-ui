@@ -1,15 +1,14 @@
-import { Plugin } from 'vue';
 import ActuatorAnalogMock from './ActuatorAnalogMock';
 import ActuatorLogic from './ActuatorLogic';
 import ActuatorOffset from './ActuatorOffset';
 import ActuatorPwm from './ActuatorPwm';
 import Balancer from './Balancer';
+import DS2408 from './DS2408';
+import DS2413 from './DS2413';
 import DeprecatedObject from './DeprecatedObject';
 import DigitalActuator from './DigitalActuator';
 import DigitalInput from './DigitalInput';
 import DisplaySettings from './DisplaySettings';
-import DS2408 from './DS2408';
-import DS2413 from './DS2413';
 import FastPwm from './FastPwm';
 import InactiveObject from './InactiveObject';
 import MockPins from './MockPins';
@@ -30,6 +29,7 @@ import TempSensorCombi from './TempSensorCombi';
 import TempSensorExternal from './TempSensorExternal';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
+import { Plugin } from 'vue';
 
 const plugins: Plugin[] = [
   ActuatorAnalogMock,

@@ -1,4 +1,5 @@
-<script lang="ts">
+<script setup lang="ts">
+import { startChangeBlockId } from '../../utils/actions';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockKey } from '@/plugins/spark/symbols';
 import { BlockWidget } from '@/plugins/spark/types';
@@ -14,7 +15,6 @@ import { Block } from 'brewblox-proto/ts';
 import {
   computed,
   ComputedRef,
-  defineComponent,
   inject,
   onErrorCaptured,
   provide,
@@ -22,72 +22,59 @@ import {
   ref,
   watch,
 } from 'vue';
-import { startChangeBlockId } from '../../utils/actions';
 
-export default defineComponent({
-  name: 'BlockWidgetWrapper',
-  setup() {
-    const sparkStore = useSparkStore();
-    const featureStore = useFeatureStore();
-    const widget = inject<ComputedRef<BlockWidget>>(WidgetKey)!;
-    const context = inject(ContextKey)!;
-    const invalidate = inject(InvalidateKey)!;
-    const error = ref<string | null>('Waiting for block...');
+const sparkStore = useSparkStore();
+const featureStore = useFeatureStore();
+const widget = inject<ComputedRef<BlockWidget>>(WidgetKey)!;
+const context = inject(ContextKey)!;
+const invalidate = inject(InvalidateKey)!;
+const error = ref<string | null>('Waiting for block...');
 
-    const serviceId = computed<string>(() => widget.value.config.serviceId);
-    const blockId = computed<string>(() => widget.value.config.blockId);
+const serviceId = computed<string>(() => widget.value.config.serviceId);
+const blockId = computed<string>(() => widget.value.config.blockId);
 
-    const feature = featureStore.widgetById(widget.value.feature);
-    const widgetComponent = feature?.component ?? null;
+const feature = featureStore.widgetById(widget.value.feature);
+const widgetComponent = feature?.component ?? null;
 
-    const block = ref<Block>();
-    const storeBlock = computed<Block | null>(() =>
-      sparkStore.blockById(serviceId.value, blockId.value),
-    );
+const block = ref<Block>();
+const storeBlock = computed<Block | null>(() =>
+  sparkStore.blockById(serviceId.value, blockId.value),
+);
 
-    function assignBlock(): void {
-      if (storeBlock.value) {
-        if (storeBlock.value.type === widget.value.feature) {
-          error.value = null;
-          block.value = reactive(storeBlock.value);
-        } else {
-          error.value = `Invalid block type: '${storeBlock.value.type}'`;
-        }
-      } else {
-        error.value = `Waiting for block: '${serviceId.value}/${blockId.value}'`;
-      }
-
-      // We don't recover errors in dialogs
-      if (error.value && context?.container === 'Dialog') {
-        invalidate(error.value);
-      }
+function assignBlock(): void {
+  if (storeBlock.value) {
+    if (storeBlock.value.type === widget.value.feature) {
+      error.value = null;
+      block.value = reactive(storeBlock.value);
+    } else {
+      error.value = `Invalid block type: '${storeBlock.value.type}'`;
     }
+  } else {
+    error.value = `Waiting for block: '${serviceId.value}/${blockId.value}'`;
+  }
 
-    // We handle checking up here to guarantee block.value
-    // is never undefined in render components
-    provide(BlockKey, block as ComputedRef<Block>);
+  // We don't recover errors in dialogs
+  if (error.value && context?.container === 'Dialog') {
+    invalidate(error.value);
+  }
+}
 
-    // Override the function provided in WidgetWrapper
-    provide(ChangeWidgetTitleKey, () => startChangeBlockId(block.value));
+// We handle checking up here to guarantee block.value
+// is never undefined in render components
+provide(BlockKey, block as ComputedRef<Block>);
 
-    watch(
-      () => storeBlock,
-      () => assignBlock(),
-      { immediate: true, deep: true },
-    );
+// Override the function provided in WidgetWrapper
+provide(ChangeWidgetTitleKey, () => startChangeBlockId(block.value));
 
-    onErrorCaptured((err: Error) => {
-      error.value = err.message;
-      return false;
-    });
+watch(
+  () => storeBlock,
+  () => assignBlock(),
+  { immediate: true, deep: true },
+);
 
-    return {
-      widget,
-      error,
-      widgetComponent,
-      startRemoveWidget,
-    };
-  },
+onErrorCaptured((err: Error) => {
+  error.value = err.message;
+  return false;
 });
 </script>
 

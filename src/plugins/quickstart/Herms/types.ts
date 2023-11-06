@@ -1,7 +1,7 @@
-import { Quantity } from 'brewblox-proto/ts';
 import { IoChannelAddress, QuickstartConfig } from '../types';
+import { Quantity } from 'brewblox-proto/ts';
 
-export interface HermsBlockNames {
+export type HermsBlockNames = {
   hltSensor: string;
   hltDriver: string;
   hltSetpoint: string;
@@ -21,7 +21,7 @@ export interface HermsBlockNames {
 
   mutex: string;
   balancer: string;
-}
+};
 
 export interface HermsOpts {
   hltKp: Quantity;

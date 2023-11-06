@@ -1,5 +1,13 @@
+import { calculateNormalizedFlows } from '../calculateFlows';
+import { FlowsKey } from '../symbols';
+import {
+  BuilderLayout,
+  BuilderPart,
+  PartFlows,
+  PartTransitions,
+} from '../types';
 import { useBuilderStore } from '@/plugins/builder/store';
-import produce from 'immer';
+import { produce } from 'immer';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import keyBy from 'lodash/keyBy';
@@ -13,14 +21,6 @@ import {
   toRaw,
   watch,
 } from 'vue';
-import { calculateNormalizedFlows } from '../calculateFlows';
-import { FlowsKey } from '../symbols';
-import {
-  BuilderLayout,
-  BuilderPart,
-  PartFlows,
-  PartTransitions,
-} from '../types';
 
 export type UpdateLayoutFunc = (draft: BuilderLayout) => void | BuilderLayout;
 export type UpdatePartsFunc = (

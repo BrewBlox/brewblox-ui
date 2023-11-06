@@ -1,56 +1,28 @@
-<script lang="ts">
-import { useContext, useGlobals, useWidget } from '@/composables';
-import { computed, defineComponent, ref } from 'vue';
+<script setup lang="ts">
 import Toolbar from './Toolbar.vue';
+import { useContext, useWidget } from '@/composables';
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  name: 'WidgetToolbar',
-  components: {
-    Toolbar,
-  },
-  props: {
-    hasModeToggle: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup() {
-    const { dense } = useGlobals.setup();
-    const { inDialog, context, toggleMode } = useContext.setup();
-    const {
-      widget,
-      featureTitle,
-      isVolatileWidget,
-      widgetComponent,
-      changeWidgetTitle,
-    } = useWidget.setup();
-    const dialogActive = ref(false);
-
-    const toggleBtnIcon = computed<string>(() =>
-      context.mode === 'Basic'
-        ? 'mdi-unfold-more-horizontal'
-        : 'mdi-unfold-less-horizontal',
-    );
-
-    const toggleBtnTooltip = computed<string>(() =>
-      context.mode === 'Basic' ? 'Show full widget' : 'Show basic widget',
-    );
-
-    return {
-      dense,
-      dialogActive,
-      inDialog,
-      widget,
-      isVolatileWidget,
-      widgetComponent,
-      featureTitle,
-      toggleBtnIcon,
-      toggleBtnTooltip,
-      toggleMode,
-      changeWidgetTitle,
-    };
+defineProps({
+  hasModeToggle: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const { inDialog, context, toggleMode } = useContext.setup();
+const { widget, featureTitle, changeWidgetTitle } = useWidget.setup();
+const dialogActive = ref(false);
+
+const toggleBtnIcon = computed<string>(() =>
+  context.mode === 'Basic'
+    ? 'mdi-unfold-more-horizontal'
+    : 'mdi-unfold-less-horizontal',
+);
+
+const toggleBtnTooltip = computed<string>(() =>
+  context.mode === 'Basic' ? 'Show full widget' : 'Show basic widget',
+);
 </script>
 
 <template>

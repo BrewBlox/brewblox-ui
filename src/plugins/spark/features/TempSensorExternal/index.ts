@@ -1,3 +1,4 @@
+import widget from './TempSensorExternalWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -6,7 +7,6 @@ import { cref } from '@/utils/component-ref';
 import { bloxQty, durationString, tempQty } from '@/utils/quantity';
 import { BlockType, TempSensorExternalBlock } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './TempSensorExternalWidget.vue';
 
 const type = BlockType.TempSensorExternal;
 const title = 'Temp Sensor (External)';

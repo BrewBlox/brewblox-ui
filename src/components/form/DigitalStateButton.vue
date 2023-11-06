@@ -1,7 +1,24 @@
 <script setup lang="ts">
 import { DigitalState } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
+
+interface Props {
+  modelValue: DigitalState | number | null;
+  pending?: boolean;
+  pendingReason?: string | null;
+  disable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  pending: false,
+  pendingReason: null,
+  disable: false,
+});
+
+const emit = defineEmits<{
+  'update:modelValue': [payload: DigitalState];
+}>();
 
 const alternatives: Record<number | string, DigitalState> = {
   0: DigitalState.STATE_INACTIVE,
@@ -31,29 +48,6 @@ const options = [
     slot: 'on',
   },
 ];
-
-const props = defineProps({
-  modelValue: {
-    type: null as unknown as PropType<DigitalState | number | null>,
-    required: true,
-  },
-  pending: {
-    type: Boolean,
-    default: () => false,
-  },
-  pendingReason: {
-    type: null as unknown as PropType<string | null>,
-    default: () => null,
-  },
-  disable: {
-    type: Boolean,
-    default: () => false,
-  },
-});
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', data: DigitalState | number | null): void;
-}>();
 
 const on = DigitalState.STATE_ACTIVE;
 const off = DigitalState.STATE_INACTIVE;

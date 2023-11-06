@@ -1,3 +1,4 @@
+import { isBlockCompatible } from './info';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
@@ -35,8 +36,6 @@ import defaults from 'lodash/defaults';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
-import { isBlockCompatible } from './info';
-
 import { Enum } from 'typescript-string-enums';
 
 export const asBlockAddress = (block: Block): BlockAddress =>

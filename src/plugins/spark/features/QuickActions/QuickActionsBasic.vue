@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import { BlockPatchArgs } from '../../types';
+import {
+  BlockChange,
+  ChangeAction,
+  EditableBlockField,
+  QuickActionsWidget,
+} from './types';
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { findById } from '@/utils/collections';
@@ -11,13 +18,6 @@ import type { Block } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, ref } from 'vue';
-import { BlockPatchArgs } from '../../types';
-import {
-  BlockChange,
-  ChangeAction,
-  EditableBlockField,
-  QuickActionsWidget,
-} from './types';
 
 interface FieldDiff {
   key: string;
@@ -112,8 +112,8 @@ function confirmActionChange(
         html: true,
         message: `
           Please confirm the <b>${specField.title}</b> value in <i>${
-          block.id
-        }</i>.
+            block.id
+          }</i>.
           Current value is '${pretty(block.data[key])}'.
           `,
       },
@@ -197,7 +197,7 @@ function showActionDialog(action: ChangeAction): void {
     componentProps: {
       widgetId,
       mode: 'Full',
-      getProps: () => ({ active: action.id }),
+      widgetProps: { activeId: action.id },
     },
   });
 }

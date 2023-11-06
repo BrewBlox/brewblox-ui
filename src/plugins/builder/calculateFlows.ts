@@ -1,10 +1,3 @@
-import { Coordinates } from '@/utils/coordinates';
-import get from 'lodash/get';
-import has from 'lodash/has';
-import mapKeys from 'lodash/mapKeys';
-import mapValues from 'lodash/mapValues';
-import pickBy from 'lodash/pickBy';
-import set from 'lodash/set';
 import { FlowPart, FlowSegment, mergeOverlappingSplits } from './FlowSegment';
 import {
   BuilderPart,
@@ -13,6 +6,13 @@ import {
   PartFlows,
   PartTransitions,
 } from './types';
+import { Coordinates } from '@/utils/coordinates';
+import get from 'lodash/get';
+import has from 'lodash/has';
+import mapKeys from 'lodash/mapKeys';
+import mapValues from 'lodash/mapValues';
+import pickBy from 'lodash/pickBy';
+import set from 'lodash/set';
 
 const adjacentPart = (
   allParts: FlowPart[],

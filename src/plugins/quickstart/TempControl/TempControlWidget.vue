@@ -1,23 +1,14 @@
-<script lang="ts">
-import { useContext } from '@/composables';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import TempControlBasic from './TempControlBasic.vue';
 import TempControlFull from './TempControlFull.vue';
+import { useContext } from '@/composables';
 
-export default defineComponent({
-  name: 'TempControlWidget',
-  components: {
-    Basic: TempControlBasic,
-    Full: TempControlFull,
-  },
-  setup() {
-    const { context } = useContext.setup();
+const modes = {
+  Basic: TempControlBasic,
+  Full: TempControlFull,
+} as const;
 
-    return {
-      context,
-    };
-  },
-});
+const { context } = useContext.setup();
 </script>
 
 <template>
@@ -26,6 +17,6 @@ export default defineComponent({
       <WidgetToolbar has-mode-toggle />
     </template>
 
-    <component :is="context.mode" />
+    <component :is="modes[context.mode]" />
   </Card>
 </template>

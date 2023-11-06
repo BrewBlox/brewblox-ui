@@ -1,32 +1,26 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { PropType, ref } from 'vue';
+import { ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: String,
-    required: true,
-  },
-  autogrow: {
-    type: Boolean,
-    default: true,
-  },
-  rules: {
-    type: Array as PropType<InputRule[]>,
-    default: () => [],
-  },
-  label: {
-    type: String,
-    default: 'Value',
-  },
+interface Props extends UseDialogProps {
+  modelValue: string;
+  autogrow?: boolean;
+  rules?: InputRule[];
+  label?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  autogrow: true,
+  rules: () => [],
+  label: 'Value',
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<string>();
 
 const local = ref<string>(props.modelValue ?? '');
 
@@ -48,7 +42,7 @@ function showKeyboard(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

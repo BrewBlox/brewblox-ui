@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useField } from '@/composables';
+import { UseFieldProps, useField } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockFieldAddress,
@@ -10,58 +10,36 @@ import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { prettyAny } from '@/utils/quantity';
 import { Block } from 'brewblox-proto/ts';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  ...useField.props,
-  modelValue: {
-    type: Object as PropType<BlockFieldAddress>,
-    required: true,
-  },
-  title: {
-    type: String,
-    default: 'Choose field',
-  },
-  label: {
-    type: String,
-    default: 'Field',
-  },
-  services: {
-    type: null as unknown as PropType<string[] | null>,
-    default: null,
-  },
-  compatible: {
-    type: null as unknown as PropType<ComparedBlockType>,
-    default: null,
-  },
-  blockFilter: {
-    type: Function as PropType<(block: Block) => boolean>,
-    default: () => true,
-  },
-  fieldFilter: {
-    type: Function as PropType<(field: BlockFieldSpec) => boolean>,
-    default: () => true,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  configurable: {
-    type: Boolean,
-    default: true,
-  },
-  show: {
-    type: Boolean,
-    default: true,
-  },
-  showValue: {
-    type: Boolean,
-    default: false,
-  },
+interface Props extends UseFieldProps {
+  modelValue: BlockFieldAddress;
+  services?: string[] | null;
+  compatible?: ComparedBlockType;
+  blockFilter?: (block: Block) => boolean;
+  fieldFilter?: (field: BlockFieldSpec) => boolean;
+  clearable?: boolean;
+  configurable?: boolean;
+  show?: boolean;
+  showValue?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  title: 'Choose field',
+  label: 'Field',
+  services: null,
+  compatible: null,
+  blockFilter: () => true,
+  fieldFilter: () => true,
+  clearable: true,
+  configurable: true,
+  show: true,
+  showValue: false,
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: BlockFieldAddress): void;
+  'update:modelValue': [payload: BlockFieldAddress];
 }>();
 
 const { activeSlots } = useField.setup();

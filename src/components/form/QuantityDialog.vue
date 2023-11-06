@@ -1,33 +1,27 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { isQuantity } from '@/utils/identity';
 import { bloxQty, prettyUnit } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import round from 'lodash/round';
-import { computed, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: Object as PropType<Quantity>,
-    required: true,
-    validator: isQuantity,
-  },
-  decimals: {
-    type: Number,
-    default: 2,
-  },
-  label: {
-    type: String,
-    default: 'Value',
-  },
+interface Props extends UseDialogProps {
+  modelValue: Quantity;
+  decimals?: number;
+  label?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  decimals: 2,
+  label: 'Value',
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<Quantity>();
 
 const local = ref<number | null>(
   props.modelValue.value !== null
@@ -56,7 +50,7 @@ function showKeyboard(): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

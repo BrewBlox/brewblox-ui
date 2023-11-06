@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { usePart, useSettingsBlock } from '../composables';
 import {
   UP,
   ValveBlockT,
@@ -9,7 +10,6 @@ import {
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { DigitalState } from 'brewblox-proto/ts';
 import { computed, watch } from 'vue';
-import { usePart, useSettingsBlock } from '../composables';
 
 const paths = {
   bigEnclosure: `

@@ -6,30 +6,22 @@ import cloneDeep from 'lodash/cloneDeep';
 import isObject from 'lodash/isObject';
 import isString from 'lodash/isString';
 import { Layout } from 'plotly.js';
-import { computed, PropType, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-const props = defineProps({
-  modal: {
-    type: Boolean,
-    required: true,
-  },
-  id: {
-    type: String,
-    required: true,
-  },
-  config: {
-    type: Object as PropType<Partial<GraphConfig>>,
-    required: true,
-  },
-  noDuration: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  modal: boolean;
+  id: string;
+  config: Partial<GraphConfig>;
+  noDuration?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  noDuration: false,
 });
 
 const emit = defineEmits<{
-  (e: 'update:modal', data: boolean): void;
-  (e: 'update:config', data: Partial<GraphConfig>): void;
+  'update:modal': [payload: boolean];
+  'update:config': [payload: Partial<GraphConfig>];
 }>();
 
 const sourceRevision = ref<Date>(new Date());

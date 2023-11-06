@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import QuickActionsBasic from './QuickActionsBasic.vue';
+import QuickActionsFull from './QuickActionsFull.vue';
+import { ChangeAction, QuickActionsWidget } from './types';
 import { useContext, useWidget } from '@/composables';
-import { WidgetModeComponents } from '@/store/features';
 import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
@@ -10,14 +12,11 @@ import { bloxQty, prettyUnit } from '@/utils/quantity';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed } from 'vue';
-import QuickActionsBasic from './QuickActionsBasic.vue';
-import QuickActionsFull from './QuickActionsFull.vue';
-import { ChangeAction, QuickActionsWidget } from './types';
 
-const modes: WidgetModeComponents = {
+const modes = {
   Basic: QuickActionsBasic,
   Full: QuickActionsFull,
-};
+} as const;
 
 defineProps({
   activeId: {
@@ -35,7 +34,7 @@ const actions = computed<ChangeAction[]>(() =>
 
 function addAction(): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Add an action',
       message:

@@ -1,3 +1,4 @@
+import widget from './ActuatorAnalogMockWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -11,7 +12,6 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './ActuatorAnalogMockWidget.vue';
 
 const type = BlockType.ActuatorAnalogMock;
 const title = 'Analog Actuator (Mock)';

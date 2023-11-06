@@ -1,53 +1,37 @@
-<script lang="ts">
+<script setup lang="ts">
 import { usePart } from '@/plugins/builder/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'SizeMenuContent',
-  props: {
-    min: {
-      type: Object as PropType<AreaSize>,
-      required: true,
+interface Props {
+  min: AreaSize;
+  max: AreaSize;
+  default: AreaSize;
+}
+
+const props = defineProps<Props>();
+
+const { part, patchPart } = usePart.setup();
+
+const size = computed<AreaSize>(() => ({
+  width: part.value.width ?? props.default.width,
+  height: part.value.height ?? props.default.height,
+}));
+
+function showSizeDialog(): void {
+  createDialog({
+    component: 'AreaSizeDialog',
+    componentProps: {
+      title: 'Part size',
+      message: 'The part is scaled to fit the new dimensions.',
+      modelValue: size.value,
+      min: props.min,
+      max: props.max,
     },
-    max: {
-      type: Object as PropType<AreaSize>,
-      required: true,
-    },
-    default: {
-      type: Object as PropType<AreaSize>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const { part, patchPart } = usePart.setup();
-
-    const size = computed<AreaSize>(() => ({
-      width: part.value.width ?? props.default.width,
-      height: part.value.height ?? props.default.height,
-    }));
-
-    function showSizeDialog(): void {
-      createDialog({
-        component: 'AreaSizeDialog',
-        componentProps: {
-          title: 'Part size',
-          message: 'The part is scaled to fit the new dimensions.',
-          modelValue: size.value,
-          min: props.min,
-          max: props.max,
-        },
-      }).onOk(({ width, height }: AreaSize) => {
-        patchPart({ width, height });
-      });
-    }
-
-    return {
-      size,
-      showSizeDialog,
-    };
-  },
-});
+  }).onOk(({ width, height }: AreaSize) => {
+    patchPart({ width, height });
+  });
+}
 </script>
 
 <template>

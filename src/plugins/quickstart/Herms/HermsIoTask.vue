@@ -1,31 +1,19 @@
-<script lang="ts">
-import { defineComponent, PropType, reactive } from 'vue';
+<script setup lang="ts">
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange } from '../types';
 import { HermsConfig } from './types';
+import { reactive } from 'vue';
 
-export default defineComponent({
-  name: 'HermsIoTask',
-  props: {
-    config: {
-      type: Object as PropType<HermsConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const changedGpio = reactive<GpioChange[]>(props.config.changedGpio);
+const props = defineProps<UseTaskProps<HermsConfig>>();
 
-    function taskDone(): void {
-      emit('update:config', { ...props.config, changedGpio });
-      emit('next');
-    }
+const emit = defineEmits<UseTaskEmits<HermsConfig>>();
 
-    return {
-      changedGpio,
-      taskDone,
-    };
-  },
-});
+const changedGpio = reactive<GpioChange[]>(props.config.changedGpio);
+
+function taskDone(): void {
+  emit('update:config', { ...props.config, changedGpio });
+  emit('next');
+}
 </script>
 
 <template>

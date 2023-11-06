@@ -1,28 +1,23 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
+import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import { QTreeNode } from 'quasar';
-import { PropType, ref } from 'vue';
+import { ref } from 'vue';
 
-const props = defineProps({
-  ...useDialog.props,
-  modelValue: {
-    type: String,
-    default: null,
-  },
-  nodes: {
-    type: Array as PropType<QTreeNode[]>,
-    required: true,
-  },
-  clearable: {
-    type: Boolean,
-    default: false,
-  },
+interface Props extends UseDialogProps {
+  modelValue: string | null;
+  nodes: QTreeNode[];
+  clearable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  clearable: false,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<string | null>();
 
 const selected = ref<string | null>(props.modelValue);
 const expanded = ref<string[]>([]);
@@ -37,7 +32,7 @@ function save(value: string | null): void {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save(selected)"
   >

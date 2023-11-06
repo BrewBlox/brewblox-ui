@@ -1,63 +1,49 @@
-<script lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+<script setup lang="ts">
+import {
+  UseDialogEmits,
+  UseDialogProps,
+  useDialog,
+  useGlobals,
+} from '@/composables';
 import { WidgetContext, WidgetMode } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'WidgetDialog',
-  props: {
-    ...useDialog.props,
-    widgetId: {
-      type: String,
-      required: true,
-    },
-    mode: {
-      type: String as PropType<WidgetMode>,
-      default: 'Full',
-    },
-    getProps: {
-      type: Function as PropType<() => AnyDict>,
-      default: () => ({}),
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const widgetStore = useWidgetStore();
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
-    const { dense } = useGlobals.setup();
+interface Props extends UseDialogProps {
+  widgetId: string;
+  mode?: WidgetMode;
+  widgetProps?: AnyDict;
+}
 
-    const widget = computed<Widget | null>({
-      get: () => widgetStore.widgetById(props.widgetId),
-      set: (v) => v && widgetStore.saveWidget(v),
-    });
-
-    const context = computed<WidgetContext>(() => ({
-      container: 'Dialog',
-      mode: props.mode,
-      size: 'Fixed',
-    }));
-
-    const widgetProps = computed<AnyDict>(() => props.getProps() ?? {});
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      dense,
-      context,
-      widget,
-      widgetProps,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  mode: 'Full',
+  widgetProps: () => ({}),
 });
+
+defineEmits<UseDialogEmits>();
+
+const widgetStore = useWidgetStore();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
+const { dense } = useGlobals.setup();
+
+const widget = computed<Widget | null>({
+  get: () => widgetStore.widgetById(props.widgetId),
+  set: (v) => v && widgetStore.saveWidget(v),
+});
+
+const context = computed<WidgetContext>(() => ({
+  container: 'Dialog',
+  mode: props.mode,
+  size: 'Fixed',
+}));
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     class="row"
     transition-show="fade"
     @hide="onDialogHide"
@@ -66,6 +52,7 @@ export default defineComponent({
       v-if="widget"
       v-model:widget="widget"
       :context="context"
+      v-bind="widgetProps"
     />
   </q-dialog>
 </template>

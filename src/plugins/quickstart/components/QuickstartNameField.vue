@@ -1,41 +1,34 @@
-<script lang="ts">
+<script setup lang="ts">
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'QuickstartNameField',
-  props: {
-    modelValue: {
-      type: String,
-      required: true,
-    },
-    optional: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['update:modelValue', 'clear'],
-  setup(props, { emit }) {
-    const local = computed<string>({
-      get: () => props.modelValue,
-      set: (v) => emit('update:modelValue', v),
-    });
+interface Props {
+  modelValue: string;
+  optional?: boolean;
+}
 
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-        },
-      }).onOk((v) => (local.value = v));
-    }
-
-    return {
-      local,
-      showKeyboard,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  optional: false,
 });
+
+const emit = defineEmits<{
+  'update:modelValue': [payload: string];
+  clear: [];
+}>();
+
+const local = computed<string>({
+  get: () => props.modelValue,
+  set: (v) => emit('update:modelValue', v),
+});
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+    },
+  }).onOk((v) => (local.value = v));
+}
 </script>
 
 <template>

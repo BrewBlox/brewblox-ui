@@ -1,27 +1,4 @@
 <script setup lang="ts">
-import { useGlobals, UseUndoRedo } from '@/composables';
-import { startupDone } from '@/user-settings';
-import { rotatedSize } from '@/utils/coordinates';
-import { createDialog } from '@/utils/dialog';
-import { keyEventString } from '@/utils/events';
-import { uniqueFilter } from '@/utils/functional';
-import { notify } from '@/utils/notify';
-import { clampRotation } from '@/utils/quantity';
-import * as d3 from 'd3';
-import cloneDeep from 'lodash/cloneDeep';
-import isEqual from 'lodash/isEqual';
-import throttle from 'lodash/throttle';
-import { nanoid } from 'nanoid';
-import {
-  computed,
-  nextTick,
-  onBeforeMount,
-  onBeforeUnmount,
-  provide,
-  ref,
-  watch,
-} from 'vue';
-import { useRouter } from 'vue-router';
 import {
   normalizeSelectArea,
   useDragSelect,
@@ -47,6 +24,29 @@ import {
   startCreateLayout,
   startImportLayout,
 } from './utils';
+import { useGlobals, UseUndoRedo } from '@/composables';
+import { startupDone } from '@/user-settings';
+import { rotatedSize } from '@/utils/coordinates';
+import { createDialog } from '@/utils/dialog';
+import { keyEventString } from '@/utils/events';
+import { uniqueFilter } from '@/utils/functional';
+import { notify } from '@/utils/notify';
+import { clampRotation } from '@/utils/quantity';
+import * as d3 from 'd3';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
+import throttle from 'lodash/throttle';
+import { nanoid } from 'nanoid';
+import {
+  computed,
+  nextTick,
+  onBeforeMount,
+  onBeforeUnmount,
+  provide,
+  ref,
+  watch,
+} from 'vue';
+import { useRouter } from 'vue-router';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>;
 type SVGDragEvent = d3.D3DragEvent<SVGElement, unknown, unknown>;

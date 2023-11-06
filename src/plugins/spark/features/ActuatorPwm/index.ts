@@ -1,3 +1,4 @@
+import widget from './ActuatorPwmWidget.vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -13,7 +14,6 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
-import widget from './ActuatorPwmWidget.vue';
 
 const type = BlockType.ActuatorPwm;
 const title = 'PWM';

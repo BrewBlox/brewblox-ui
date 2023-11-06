@@ -1,12 +1,12 @@
+import { createDialog } from './dialog';
+import { notify } from './notify';
+import { makeRuleValidator, suggestId } from './rules';
+import { isUrlSafe, makeUrlSafe } from './url';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { useWidgetStore } from '@/store/widgets';
 import { userUISettings } from '@/user-settings';
 import { Router } from 'vue-router';
-import { createDialog } from './dialog';
-import { notify } from './notify';
-import { makeRuleValidator, suggestId } from './rules';
-import { isUrlSafe, makeUrlSafe } from './url';
 
 export const makeDashboardIdRules = (): InputRule[] => [
   (v) => !!v || 'Value is required',
@@ -54,7 +54,7 @@ export function startChangeDashboardId(
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: dashboard.id,
       title: 'Edit dashboard URL',
@@ -77,7 +77,7 @@ export function startChangeDashboardTitle(
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Edit dashboard name',
       message:
@@ -121,7 +121,7 @@ export function startChangeDashboardTitle(
 
 export function startCreateDashboard(router: Router | null): void {
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: '',
       title: 'Add dashboard',

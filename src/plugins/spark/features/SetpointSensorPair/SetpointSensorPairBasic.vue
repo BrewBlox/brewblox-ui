@@ -1,41 +1,27 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/quantity';
 import { SetpointSensorPairBlock } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'SetpointSensorPairBasic',
-  setup() {
-    const { serviceId, block, patchBlock, isClaimed } =
-      useBlockWidget.setup<SetpointSensorPairBlock>();
+const { serviceId, block, patchBlock, isClaimed } =
+  useBlockWidget.setup<SetpointSensorPairBlock>();
 
-    function editSetting(): void {
-      if (isClaimed.value) {
-        return;
-      }
-      createDialog({
-        component: 'QuantityDialog',
-        componentProps: {
-          title: 'Setting',
-          label: 'Setting',
-          modelValue: block.value.data.storedSetting,
-        },
-      }).onOk((v) => {
-        patchBlock({ storedSetting: v });
-      });
-    }
-
-    return {
-      prettyQty,
-      serviceId,
-      block,
-      isClaimed,
-      editSetting,
-    };
-  },
-});
+function editSetting(): void {
+  if (isClaimed.value) {
+    return;
+  }
+  createDialog({
+    component: 'QuantityDialog',
+    componentProps: {
+      title: 'Setting',
+      label: 'Setting',
+      modelValue: block.value.data.storedSetting,
+    },
+  }).onOk((v) => {
+    patchBlock({ storedSetting: v });
+  });
+}
 </script>
 
 <template>

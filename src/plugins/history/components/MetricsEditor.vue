@@ -1,65 +1,50 @@
-<script lang="ts">
+<script setup lang="ts">
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { MetricsConfig } from '../types';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/quantity';
 import { QTreeNode } from 'quasar';
-import { defineComponent, PropType } from 'vue';
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
-import { MetricsConfig } from '../types';
 
-export default defineComponent({
-  name: 'MetricsEditor',
-  props: {
-    config: {
-      type: Object as PropType<MetricsConfig>,
-      required: true,
+interface Props {
+  config: MetricsConfig;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:config': [payload: MetricsConfig];
+}>();
+
+function editLeaf(node: QTreeNode): void {
+  createDialog({
+    component: 'MetricsDisplayDialog',
+    componentProps: {
+      config: props.config,
+      title: node.value,
+      field: node.value,
     },
-  },
-  emits: ['update:config'],
-  setup(props, { emit }) {
-    function saveConfig(config: MetricsConfig): void {
-      emit('update:config', config);
-    }
+  }).onOk((config) => emit('update:config', config));
+}
 
-    function editLeaf(node: QTreeNode): void {
-      createDialog({
-        component: 'MetricsDisplayDialog',
-        componentProps: {
-          config: props.config,
-          title: node.value,
-          field: node.value,
-        },
-      }).onOk((config) => saveConfig(config));
-    }
+function renamed(node: QTreeNode): string {
+  return props.config.renames[node.value] || node.title;
+}
 
-    function renamed(node: QTreeNode): string {
-      return props.config.renames[node.value] || node.title;
-    }
+function freshDuration(node: QTreeNode): string {
+  return durationString(
+    props.config.freshDuration[node.value] ?? DEFAULT_METRICS_EXPIRY,
+  );
+}
 
-    function freshDuration(node: QTreeNode): string {
-      return durationString(
-        props.config.freshDuration[node.value] ?? DEFAULT_METRICS_EXPIRY,
-      );
-    }
-
-    function decimals(node: QTreeNode): number {
-      return props.config.decimals[node.value] ?? DEFAULT_METRICS_DECIMALS;
-    }
-
-    return {
-      saveConfig,
-      editLeaf,
-      renamed,
-      freshDuration,
-      decimals,
-    };
-  },
-});
+function decimals(node: QTreeNode): number {
+  return props.config.decimals[node.value] ?? DEFAULT_METRICS_DECIMALS;
+}
 </script>
 
 <template>
   <QueryEditor
     :config="config"
-    @update:config="saveConfig"
+    @update:config="(config) => emit('update:config', config)"
   >
     <template #leaf="{ node }">
       <div @click="editLeaf(node)">

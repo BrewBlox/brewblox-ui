@@ -1,3 +1,12 @@
+import { DisplayBlock, QuickstartPatch } from '../types';
+import {
+  changedIoModules,
+  pidDefaults,
+  unlinkedActuators,
+  withoutPrefix,
+  withPrefix,
+} from '../utils';
+import { HermsConfig } from './types';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import {
@@ -29,15 +38,6 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { DisplayBlock, QuickstartPatch } from '../types';
-import {
-  changedIoModules,
-  pidDefaults,
-  unlinkedActuators,
-  withoutPrefix,
-  withPrefix,
-} from '../utils';
-import { HermsConfig } from './types';
 
 export function defineChangedBlocks(
   config: HermsConfig,

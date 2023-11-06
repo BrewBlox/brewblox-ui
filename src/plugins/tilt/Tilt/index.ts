@@ -1,8 +1,8 @@
+import widget from './TiltWidget.vue';
+import { TiltWidgetConfig } from './types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { Plugin } from 'vue';
-import widget from './TiltWidget.vue';
-import { TiltWidgetConfig } from './types';
 
 const plugin: Plugin = {
   install(app) {

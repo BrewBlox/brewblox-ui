@@ -1,22 +1,9 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'BlockWidgetToolbar',
-  setup() {
-    const { widgetId, block, hasGraph, graphConfig } = useBlockWidget.setup();
-    const graphModalOpen = ref(false);
-
-    return {
-      widgetId,
-      block,
-      hasGraph,
-      graphConfig,
-      graphModalOpen,
-    };
-  },
-});
+const { widgetId, hasGraph, graphConfig } = useBlockWidget.setup();
+const graphModalOpen = ref(false);
 </script>
 
 <template>

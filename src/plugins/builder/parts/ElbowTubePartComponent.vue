@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { usePart } from '../composables';
 import { RIGHT } from '@/plugins/builder/const';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { computed } from 'vue';
-import { usePart } from '../composables';
 
 const paths = {
   borders: [
