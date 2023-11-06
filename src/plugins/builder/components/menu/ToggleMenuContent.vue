@@ -7,7 +7,7 @@ interface Props {
 defineProps<Props>();
 
 defineEmits<{
-  'update:modelValue': [data: boolean];
+  'update:modelValue': [payload: boolean];
 }>();
 </script>
 

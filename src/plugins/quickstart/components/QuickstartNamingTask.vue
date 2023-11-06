@@ -18,7 +18,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:config': [data: QuickstartConfig];
+  'update:config': [payload: QuickstartConfig];
   back: [];
   next: [];
 }>();

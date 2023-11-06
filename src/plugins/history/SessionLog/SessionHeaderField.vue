@@ -12,7 +12,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:session': [data: LoggedSession];
+  'update:session': [payload: LoggedSession];
 }>();
 
 const tags = computed<string[]>(() => props.session.tags ?? []);

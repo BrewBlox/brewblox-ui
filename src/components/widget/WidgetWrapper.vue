@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:widget': [data: Widget];
+  'update:widget': [payload: Widget];
 }>();
 
 const featureStore = useFeatureStore();

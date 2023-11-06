@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  annotations: [data: GraphAnnotation[]];
+  annotations: [payload: GraphAnnotation[]];
 }>();
 
 const layoutDefaults = (): Partial<Layout> => ({

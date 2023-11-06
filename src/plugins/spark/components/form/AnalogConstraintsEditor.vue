@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: AnalogConstraints];
+  'update:modelValue': [payload: AnalogConstraints];
 }>();
 
 const constraints = computed<DNNAnalogConstraints>(() =>

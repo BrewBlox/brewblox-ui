@@ -21,14 +21,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', data: Date): void;
+  'update:modelValue': [payload: Date];
 }>();
 
 const { activeSlots } = useField.setup();
-
-function save(v: Date): void {
-  emit('update:modelValue', v);
-}
 
 const displayValue = computed<string>(() =>
   props.short
@@ -61,7 +57,7 @@ function openDialog(): void {
       resetIcon: props.resetIcon,
       rules: props.rules,
     },
-  }).onOk(save);
+  }).onOk((v: Date) => emit('update:modelValue', v));
 }
 </script>
 

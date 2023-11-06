@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: any[]];
+  'update:modelValue': [payload: any[]];
 }>();
 
 function matches(val: any): boolean {

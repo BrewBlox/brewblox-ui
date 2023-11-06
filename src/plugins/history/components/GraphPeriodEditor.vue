@@ -22,7 +22,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:config': [data: T];
+  'update:config': [payload: T];
 }>();
 
 const periodOptions: SelectOption[] = [

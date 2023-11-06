@@ -13,7 +13,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:modelValue': [data: string];
+  'update:modelValue': [payload: string];
 }>();
 
 const sensorFilter = (block: Block): boolean =>

@@ -12,8 +12,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:widget': [data: Widget];
-  'update:valid': [data: boolean];
+  'update:widget': [payload: Widget];
+  'update:valid': [payload: boolean];
 }>();
 
 const title = computed<string>({

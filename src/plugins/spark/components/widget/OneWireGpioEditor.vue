@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:channels': [data: GpioModuleChannel[]];
+  'update:channels': [payload: GpioModuleChannel[]];
 }>();
 
 function startBit(n: number): number {

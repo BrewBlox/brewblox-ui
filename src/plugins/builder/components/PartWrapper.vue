@@ -52,8 +52,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'patch:part': [data: Partial<BuilderPart>];
-  'patch:settings': [data: Partial<BuilderPart['settings']>];
+  'patch:part': [payload: Partial<BuilderPart>];
+  'patch:settings': [payload: Partial<BuilderPart['settings']>];
   preselect: [];
   reflow: [];
 }>();

@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: Quantity];
+  'update:modelValue': [payload: Quantity];
 }>();
 
 const { activeSlots } = useField.setup();

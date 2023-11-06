@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 defineEmits<{
-  'update:modelValue': [data: boolean];
+  'update:modelValue': [payload: boolean];
 }>();
 
 const icon = computed<string>(() =>

@@ -18,8 +18,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 defineEmits<{
-  'update:layout': [data: Partial<Layout>];
-  'update:params': [data: QueryParams];
+  'update:layout': [payload: Partial<Layout>];
+  'update:params': [payload: QueryParams];
 }>();
 
 const presets = defaultPresets();

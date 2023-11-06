@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: Quantity];
+  'update:modelValue': [payload: Quantity];
 }>();
 
 const displayValue = computed<string>(() =>

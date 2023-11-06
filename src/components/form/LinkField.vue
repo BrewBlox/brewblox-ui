@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: Link];
+  'update:modelValue': [payload: Link];
 }>();
 
 const { activeSlots } = useField.setup();

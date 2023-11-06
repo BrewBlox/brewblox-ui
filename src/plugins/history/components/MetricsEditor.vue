@@ -12,7 +12,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:config': [data: MetricsConfig];
+  'update:config': [payload: MetricsConfig];
 }>();
 
 function editLeaf(node: QTreeNode): void {

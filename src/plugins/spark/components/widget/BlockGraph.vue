@@ -20,8 +20,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modal': [data: boolean];
-  'update:config': [data: Partial<GraphConfig>];
+  'update:modal': [payload: boolean];
+  'update:config': [payload: Partial<GraphConfig>];
 }>();
 
 const sourceRevision = ref<Date>(new Date());

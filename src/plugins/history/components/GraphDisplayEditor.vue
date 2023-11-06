@@ -10,7 +10,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:config': [data: GraphConfig];
+  'update:config': [payload: GraphConfig];
 }>();
 
 const axisOpts: SelectOption<GraphAxis>[] = [

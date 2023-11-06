@@ -25,7 +25,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:modelValue': [data: IoChannelAddress | null];
+  'update:modelValue': [payload: IoChannelAddress | null];
 }>();
 
 function unusedId(change: GpioChange): number {

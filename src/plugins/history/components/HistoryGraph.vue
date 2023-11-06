@@ -34,8 +34,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  params: [data: QueryParams];
-  layout: [data: Partial<Layout>];
+  params: [payload: QueryParams];
+  layout: [payload: Partial<Layout>];
 }>();
 
 const historyStore = useHistoryStore();

@@ -27,7 +27,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:modelValue': [data: BlockChange];
+  'update:modelValue': [payload: BlockChange];
   remove: [];
   switch: [];
 }>();

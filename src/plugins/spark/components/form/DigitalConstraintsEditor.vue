@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: DigitalConstraints];
+  'update:modelValue': [payload: DigitalConstraints];
 }>();
 
 const constraints = computed<DNNDigitalConstraints>(() =>

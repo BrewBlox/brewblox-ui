@@ -12,7 +12,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: string];
+  'update:modelValue': [payload: string];
   clear: [];
 }>();
 

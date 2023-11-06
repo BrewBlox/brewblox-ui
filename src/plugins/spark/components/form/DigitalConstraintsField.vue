@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 defineEmits<{
-  'update:modelValue': [data: DigitalConstraints];
+  'update:modelValue': [payload: DigitalConstraints];
 }>();
 
 const isConstrained = computed<boolean>(() => {

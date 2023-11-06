@@ -6,8 +6,8 @@ export interface UseTaskProps<ConfigT extends QuickstartConfig> {
 }
 
 export type UseTaskEmits<ConfigT extends QuickstartConfig> = {
-  'update:config': [data: ConfigT];
-  'update:actions': [data: QuickstartAction[]];
+  'update:config': [payload: ConfigT];
+  'update:actions': [payload: QuickstartAction[]];
   back: [];
   next: [];
   close: [];

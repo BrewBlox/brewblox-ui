@@ -10,7 +10,7 @@ export interface UseValEditProps<T> {
 }
 
 export type UseValEditEmits<T> = {
-  'update:modelValue': [data: T];
+  'update:modelValue': [payload: T];
   edit: [];
 };
 

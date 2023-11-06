@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: string | null];
+  'update:modelValue': [payload: string | null];
 }>();
 
 const dashboardStore = useDashboardStore();

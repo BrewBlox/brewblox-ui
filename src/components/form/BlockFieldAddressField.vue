@@ -39,7 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: BlockFieldAddress];
+  'update:modelValue': [payload: BlockFieldAddress];
 }>();
 
 const { activeSlots } = useField.setup();

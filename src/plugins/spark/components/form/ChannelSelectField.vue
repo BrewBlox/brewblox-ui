@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: ChannelAddress];
+  'update:modelValue': [payload: ChannelAddress];
 }>();
 
 const sparkStore = useSparkStore();

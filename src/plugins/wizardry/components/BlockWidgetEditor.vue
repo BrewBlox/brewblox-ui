@@ -20,8 +20,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:widget': [data: BlockWidget];
-  'update:valid': [data: boolean];
+  'update:widget': [payload: BlockWidget];
+  'update:valid': [payload: boolean];
 }>();
 
 const sparkStore = useSparkStore();

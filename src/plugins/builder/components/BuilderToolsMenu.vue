@@ -15,8 +15,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:expanded': [data: boolean];
-  use: [data: BuilderToolName];
+  'update:expanded': [payload: boolean];
+  use: [payload: BuilderToolName];
 }>();
 
 const { dense } = useGlobals.setup();

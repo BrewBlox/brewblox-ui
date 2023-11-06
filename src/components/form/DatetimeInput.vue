@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: Date | number | string | null];
+  'update:modelValue': [payload: Date | number | string | null];
 }>();
 
 function asDate(v: Date | number | string | null): Date | null {

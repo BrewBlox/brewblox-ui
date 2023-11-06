@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:config': [data: GraphConfig];
+  'update:config': [payload: GraphConfig];
 }>();
 
 function saveConfig(config: GraphConfig): void {

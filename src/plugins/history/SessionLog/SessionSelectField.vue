@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [data: LoggedSession | null];
+  'update:modelValue': [payload: LoggedSession | null];
 }>();
 
 function asOpt(session: LoggedSession): SessionOpt {
