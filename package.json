@@ -96,12 +96,11 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-quasar": "^1.1.0",
     "eslint-plugin-vue": "^9.18.1",
-    "fibers": "^5.0.0",
     "jsdom": "^22.1.0",
     "minimist": "^1.2.5",
     "prettier": "^3.0.3",
     "rollup": "^4.2.0",
-    "rollup-plugin-visualizer": "^5.9.0",
+    "rollup-plugin-visualizer": "^5.9.2",
     "sass": "1.32.12",
     "svgpath": "^2.3.1",
     "typescript": "^5.2.2",
@@ -112,11 +111,11 @@
     "vue-tsc": "^1.8.22"
   },
   "engines": {
-    "node": ">= 18",
-    "npm": ">= 6.4.1"
+    "node": ">= 18"
   },
   "browserslist": [
     "defaults",
     "not IE > 0"
-  ]
+  ],
+  "packageManager": "yarn@4.0.1"
 }
