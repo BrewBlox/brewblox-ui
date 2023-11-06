@@ -45,7 +45,7 @@ const basicRules: Record<BoardType, InputRule[]> = {
 };
 
 const { dialogOpts, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<string | number>();
 
 const keyboardElementRef = ref<HTMLElement | null>(null);
 const keyboard = ref<Keyboard | null>(null);

@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
 const { dense } = useGlobals.setup();
 const widgetId = nanoid();
 const sparkStore = useSparkStore();

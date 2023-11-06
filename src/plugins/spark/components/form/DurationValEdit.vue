@@ -18,7 +18,7 @@ withDefaults(defineProps<UseValEditProps<VT>>(), {
 
 defineEmits<UseValEditEmits<VT>>();
 
-const { field, startEdit } = useValEdit.setup<Quantity | string>();
+const { field, startEdit } = useValEdit.setup<VT>();
 const local = ref<string>(durationString(field.value));
 
 function findUnit(s: string | null): string {

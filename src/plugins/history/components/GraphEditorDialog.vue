@@ -22,14 +22,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 defineEmits<UseDialogEmits>();
 
-function withGraphConfigDefaults(cfg: GraphConfig): GraphConfig {
+function withEmpty(cfg: GraphConfig): GraphConfig {
   return defaults(cloneDeep(cfg), emptyGraphConfig());
 }
 
-const { dialogRef, dialogOpts, onDialogOK, onDialogCancel } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogOK, onDialogCancel } =
+  useDialog.setup<GraphConfig>();
 
-const initial = ref<GraphConfig>(withGraphConfigDefaults(props.config));
-const local = ref<GraphConfig>(withGraphConfigDefaults(props.config));
+const initial = ref<GraphConfig>(withEmpty(props.config));
+const local = ref<GraphConfig>(withEmpty(props.config));
 
 const dirty = computed<boolean>(() => !isEqual(initial.value, local.value));
 
@@ -49,7 +50,7 @@ function loadShared(): void {
   } as any).onOk((id) => {
     const shared = props.shared.find((s) => s.id === id);
     if (shared) {
-      local.value = withGraphConfigDefaults(shared.config);
+      local.value = withEmpty(shared.config);
     }
   });
 }

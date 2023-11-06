@@ -2,7 +2,7 @@
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { DisplaySettingsBlock, DisplaySlot } from 'brewblox-proto/ts';
-import { computed } from 'vue';
+import { CSSProperties, computed } from 'vue';
 
 const footerRules: InputRule[] = [
   (v) => !v || v.length <= 40 || 'Footer text can only be 40 characters',
@@ -18,7 +18,7 @@ const slots = computed<(DisplaySlot | null)[]>(() => {
   return slots;
 });
 
-function slotStyle(slot: DisplaySlot | null): AnyDict {
+function slotStyle(slot: DisplaySlot | null): CSSProperties {
   return slot
     ? {
         gridColumnEnd: 'span 1',

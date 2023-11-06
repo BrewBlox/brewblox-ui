@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<Date>();
 const tab = ref<'date' | 'time'>('date');
 const stringValue = ref<string>(
   qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'),

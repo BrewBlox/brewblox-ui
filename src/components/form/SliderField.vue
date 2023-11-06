@@ -6,8 +6,6 @@ import { computed } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: number;
-  tagClass?: string | string[] | AnyDict;
-  label?: string;
   suffix?: string;
   min?: number;
   max?: number;
@@ -18,7 +16,6 @@ interface Props extends UseFieldProps {
 
 const props = withDefaults(defineProps<Props>(), {
   ...useField.defaultProps,
-  tagClass: '',
   label: 'value',
   suffix: '',
   min: 0,

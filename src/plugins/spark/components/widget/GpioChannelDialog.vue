@@ -156,7 +156,7 @@ function inferChannelWidth({ mode, multiply }: EditingChannel): number {
 }
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<GpioModuleChannel>();
 
 const local = reactive<EditingChannel>({
   name: props.channel.name,

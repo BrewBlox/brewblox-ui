@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<Date>();
 const local = ref<Date>(props.modelValue);
 
 const valid = computed<boolean>(() =>

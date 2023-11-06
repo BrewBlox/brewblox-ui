@@ -34,14 +34,14 @@ const sessionOpts = computed<SessionOpt[]>(() => props.sessions.map(asOpt));
 
 const filteredOpts = ref<SessionOpt[]>(sessionOpts.value);
 
-function filterFn(val, update): void {
-  if (val === '') {
+function filterFn(inputValue: string, update: (cb: () => void) => void): void {
+  if (inputValue === '') {
     update(() => (filteredOpts.value = sessionOpts.value));
     return;
   }
 
   update(() => {
-    const needle = escapeRegExp(val.toLowerCase());
+    const needle = escapeRegExp(inputValue.toLowerCase());
     filteredOpts.value = sessionOpts.value.filter(
       (opt) =>
         opt.label.toLowerCase().match(needle) ||

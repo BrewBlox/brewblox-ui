@@ -25,7 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
 
 const sourceRevision = ref<Date>(new Date());
 

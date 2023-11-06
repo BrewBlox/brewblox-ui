@@ -28,7 +28,7 @@ function openDialog(): void {
   createDialog({
     component: 'DurationQuantityDialog',
     componentProps: {
-      modelValue: bloxQty(props.modelValue ?? ''),
+      modelValue: bloxQty(props.modelValue ?? '0s'),
       title: props.title,
       message: props.message,
       html: props.html,

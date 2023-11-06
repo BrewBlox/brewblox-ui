@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogOpts, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<GraphConfig>();
 
 const local = reactive(cloneDeep(props.config));
 const axisOpts: SelectOption<GraphAxis>[] = [

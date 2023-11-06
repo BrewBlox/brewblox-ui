@@ -2,13 +2,13 @@
 import { usePart } from '../../composables';
 import { BEER, COLD_WATER, HOT_WATER, WORT } from '../../const';
 import { createDialog } from '@/utils/dialog';
-import { computed } from 'vue';
+import { CSSProperties, computed } from 'vue';
 
 const presetColors: string[] = [COLD_WATER, HOT_WATER, BEER, WORT];
 
 const { color } = usePart.setup();
 
-const indicatorStyle = computed<Mapped<string | undefined>>(() => ({
+const indicatorStyle = computed<CSSProperties>(() => ({
   backgroundColor: color.value,
   border: `1px ${color.value ? 'solid' : 'dashed'} white`,
   borderRadius: '50%',

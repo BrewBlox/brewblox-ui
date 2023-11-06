@@ -7,7 +7,6 @@ import { computed } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: Quantity;
-  label?: string;
   decimals?: number;
 }
 

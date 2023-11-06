@@ -8,7 +8,7 @@ import {
 type VT = string;
 
 interface Props extends UseValEditProps<VT> {
-  options: SelectOption[];
+  options: SelectOption<VT>[];
   selectProps?: AnyDict;
 }
 

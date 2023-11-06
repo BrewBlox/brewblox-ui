@@ -14,8 +14,6 @@ import { computed } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: BlockFieldAddress;
-  title?: string;
-  label?: string;
   services?: string[] | null;
   compatible?: ComparedBlockType;
   blockFilter?: (block: Block) => boolean;
@@ -94,7 +92,7 @@ function openDialog(): void {
       compatible: props.compatible,
       blockFilter: props.blockFilter,
       fieldFilter: props.fieldFilter,
-      ...props.editorProps,
+      ...props.dialogProps,
     },
   }).onOk(save);
 }

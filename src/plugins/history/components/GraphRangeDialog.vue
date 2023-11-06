@@ -3,8 +3,10 @@ import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { computed, ref } from 'vue';
 
+type Range = [min: number | null, max: number | null];
+
 interface Props extends UseDialogProps {
-  value?: [min: number | null, max: number | null];
+  value?: Range;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<Range | null>();
 
 const minV = ref(props.value[0] ?? -10);
 const maxV = ref(props.value[1] ?? 20);

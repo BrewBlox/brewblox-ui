@@ -8,7 +8,6 @@ interface Props extends UseFieldProps {
   modelValue: Date | null;
   short?: boolean;
   resetIcon?: string;
-  label?: string;
   clearLabel?: string;
   defaultNow?: boolean;
 }

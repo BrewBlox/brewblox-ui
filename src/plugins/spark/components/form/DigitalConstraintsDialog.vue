@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<DigitalConstraints>();
 
 const local = ref<DigitalConstraints>(cloneDeep(props.modelValue));
 

@@ -23,7 +23,7 @@ defineEmits<UseDialogEmits>();
 const sparkStore = useSparkStore();
 const snippetStore = useBlockSnippetStore();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<never>();
 
 const selected = ref<SelectOption | null>(null);
 const block = ref<SetpointProfileBlock>(cloneDeep(props.block));

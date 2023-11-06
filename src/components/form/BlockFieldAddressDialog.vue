@@ -38,7 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<BlockFieldAddress>();
 const sparkStore = useSparkStore();
 const specStore = useBlockSpecStore();
 
@@ -133,8 +133,6 @@ const localAddress = computed<BlockFieldAddress | null>(() => {
   };
 });
 
-const localOk = computed<boolean>(() => localAddress.value !== null);
-
 function configureBlock(): void {
   createBlockDialog(block.value);
 }
@@ -156,7 +154,7 @@ function createBlock(): void {
 }
 
 function save(): void {
-  if (localOk.value) {
+  if (localAddress.value != null) {
     onDialogOK(localAddress.value);
   }
 }
@@ -234,7 +232,7 @@ function save(): void {
           @click="onDialogCancel"
         />
         <q-btn
-          :disable="!localOk"
+          :disable="localAddress == null"
           flat
           label="OK"
           color="primary"

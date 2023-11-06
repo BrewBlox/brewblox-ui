@@ -11,7 +11,6 @@ import { computed } from 'vue';
 interface Props extends UseFieldProps {
   modelValue: Link;
   serviceId: string;
-  label?: string;
   compatible?: ComparedBlockType;
   blockFilter?: (block: Block) => boolean;
   clearable?: boolean;
@@ -76,7 +75,7 @@ function openDialog(): void {
       clearable: props.clearable,
       creatable: props.creatable,
       configurable: props.configurable,
-      ...props.editorProps,
+      ...props.dialogProps,
     },
   }).onOk(save);
 }

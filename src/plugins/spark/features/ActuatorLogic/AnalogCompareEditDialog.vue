@@ -24,7 +24,7 @@ const operatorOpts = selectable(ENUM_LABELS_ANALOG_OP);
 
 const sparkStore = useSparkStore();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<AnalogCompare>();
 const local = ref<AnalogCompare>(cloneDeep(props.modelValue));
 
 const isTemp = computed<boolean>(() =>

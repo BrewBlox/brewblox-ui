@@ -18,7 +18,7 @@ defineEmits<UseDialogEmits>();
 
 const builderStore = useBuilderStore();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<string | null>();
 const local = ref<BuilderLayout | null>(
   builderStore.layoutById(props.modelValue),
 );

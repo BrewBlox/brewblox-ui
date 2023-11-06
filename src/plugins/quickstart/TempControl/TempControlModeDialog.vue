@@ -43,7 +43,7 @@ const durationRules: InputRule[] = [
 
 const { dense } = useGlobals.setup();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<TempControlMode>();
 const tempMode = reactive<TempControlMode>(cloneDeep(props.modelValue));
 const sparkStore = useSparkStore();
 
@@ -124,7 +124,7 @@ function addHeatConfig(): void {
           title="Mode name"
           class="col-grow"
           @update:model-value="
-            (v) => {
+            (v: string | null) => {
               tempMode.title = v!;
               save();
             }

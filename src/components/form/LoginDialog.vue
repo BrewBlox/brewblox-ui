@@ -17,7 +17,7 @@ withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<never>();
 
 const username = ref<string>('');
 const password = ref<string>('');

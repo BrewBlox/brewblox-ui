@@ -25,7 +25,7 @@ defineEmits<UseDialogEmits>();
 
 const sparkStore = useSparkStore();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<never>();
 
 const leftAddr = ref<BlockAddress>({
   id: props.leftId,

@@ -20,7 +20,7 @@ defineEmits<UseDialogEmits>();
 const operatorOpts = selectable(ENUM_LABELS_DIGITAL_OP);
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<DigitalCompare>();
 const local = ref<DigitalCompare>(cloneDeep(props.modelValue));
 
 function save(): void {

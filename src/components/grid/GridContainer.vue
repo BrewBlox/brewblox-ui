@@ -4,7 +4,7 @@ import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import { WidgetContext } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { nullFilter } from '@/utils/functional';
-import { computed, ref } from 'vue';
+import { CSSProperties, computed, ref } from 'vue';
 
 interface Props {
   widgets: Widget[];
@@ -30,7 +30,7 @@ const minWidth = computed<number>(() =>
   }, 0),
 );
 
-const gridStyle = computed<Mapped<string>>(() => {
+const gridStyle = computed<CSSProperties>(() => {
   return {
     minHeight: props.editable ? '3000px' : '0px',
     minWidth: `${minWidth.value}px`,

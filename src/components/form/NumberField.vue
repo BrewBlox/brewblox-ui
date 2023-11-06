@@ -51,7 +51,7 @@ function openDialog(): void {
       clearable: props.clearable,
       autogrow: props.autogrow,
       suffix: props.suffix,
-      ...props.editorProps,
+      ...props.dialogProps,
     },
   }).onOk((v) => emit('update:modelValue', v));
 }

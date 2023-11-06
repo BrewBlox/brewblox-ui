@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<AreaSize>();
 
 const local = ref<AreaSize>({
   width: Number(props.modelValue.width) ?? 0,

@@ -1,8 +1,7 @@
 import { ContextKey, InvalidateKey } from '@/symbols';
 import { nanoid } from 'nanoid';
-import { QDialog, QDialogOptions } from 'quasar';
+import { QDialog, QDialogOptions, useDialogPluginComponent } from 'quasar';
 import {
-  getCurrentInstance,
   nextTick,
   onBeforeUnmount,
   onMounted,
@@ -25,17 +24,17 @@ export type UseDialogEmits = {
   hide: [];
 };
 
-export interface UseDialogComponent {
-  dialogRef: Ref<QDialog | null>;
+export interface UseDialogComponent<T> {
+  dialogRef: Ref<QDialog | undefined>;
   onDialogHide: () => void;
-  onDialogOK: (payload?: any) => void;
+  onDialogOK: (payload?: T) => void;
   onDialogCancel: () => void;
   dialogOpts: Partial<QDialogOptions>;
 }
 
 export interface UseDialogComposable {
   defaultProps: InferDefaults<UseDialogProps>;
-  setup(): UseDialogComponent;
+  setup<T = any>(): UseDialogComponent<T>;
 }
 
 export const useDialog: UseDialogComposable = {
@@ -44,33 +43,12 @@ export const useDialog: UseDialogComposable = {
     message: '',
     html: false,
   },
-  setup(): UseDialogComponent {
-    const instance = getCurrentInstance()!;
+  setup<T = any>(): UseDialogComponent<T> {
+    const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialogPluginComponent<T>();
 
     const hashId = `.${nanoid(6)}.`;
-    const dialogRef = ref<QDialog | null>(null);
     const cancelWatcher = ref<() => void>(() => {});
-
-    function show(): void {
-      dialogRef.value?.show();
-    }
-
-    function hide(): void {
-      dialogRef.value?.hide();
-    }
-
-    function onDialogHide(): void {
-      instance.emit('hide');
-    }
-
-    function onDialogCancel(): void {
-      hide();
-    }
-
-    function onDialogOK(payload: unknown): void {
-      instance.emit('ok', payload);
-      hide();
-    }
 
     // Will be overridden if this dialog is showing a widget
     // Used for all other menus and edit dialogs
@@ -84,10 +62,7 @@ export const useDialog: UseDialogComposable = {
     );
 
     // Lets all nested elements declare that the dialog should be closed immediately
-    provide(InvalidateKey, hide);
-
-    // expose public methods required by Dialog plugin
-    Object.assign(instance.proxy as any, { show, hide });
+    provide(InvalidateKey, onDialogHide);
 
     // We want the dialog to be part of the navigation stack.
     // This lets mobile users close dialogs by using the back button.
@@ -108,7 +83,7 @@ export const useDialog: UseDialogComposable = {
             (newRoute) => {
               if (!newRoute.hash.includes(hashId)) {
                 cancelWatcher.value();
-                hide();
+                onDialogHide();
               }
             },
           );

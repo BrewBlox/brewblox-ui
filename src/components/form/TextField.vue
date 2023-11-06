@@ -6,6 +6,7 @@ import { computed } from 'vue';
 export interface Props extends UseFieldProps {
   modelValue: string | null;
   clearable?: boolean;
+  nullable?: boolean;
   autogrow?: boolean;
   suffix?: string;
 }
@@ -13,6 +14,7 @@ export interface Props extends UseFieldProps {
 const props = withDefaults(defineProps<Props>(), {
   ...useField.defaultProps,
   clearable: true,
+  nullable: false,
   autogrow: false,
   suffix: '',
 });
@@ -45,9 +47,10 @@ function openDialog(): void {
       label: props.label,
       rules: props.rules,
       clearable: props.clearable,
+      nullable: props.nullable,
       autogrow: props.autogrow,
       suffix: props.suffix,
-      ...props.editorProps,
+      ...props.dialogProps,
     },
   }).onOk((v) => emit('update:modelValue', v));
 }

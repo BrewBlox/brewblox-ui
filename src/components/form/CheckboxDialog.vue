@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<any[]>();
 const local = ref<any[]>([...props.modelValue]);
 
 const cancelLabel = computed<string>(() =>

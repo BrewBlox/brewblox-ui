@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const sparkStore = useSparkStore();
-const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
 
 const progress = ref<UpdateProgress>('Pending');
 const error = ref<string>('');

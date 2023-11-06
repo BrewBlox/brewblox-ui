@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const sparkStore = useSparkStore();
-const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
 
 const block = computed<Block | null>(() =>
   sparkStore.blockByAddress(props.address),

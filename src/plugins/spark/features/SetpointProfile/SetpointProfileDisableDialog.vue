@@ -27,7 +27,7 @@ defineEmits<UseDialogEmits>();
 
 const sparkStore = useSparkStore();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<never>();
 const profile: SetpointProfileBlock = cloneDeep(props.block);
 const setpoint: SetpointSensorPairBlock | null = sparkStore.blockByLink(
   profile.serviceId,

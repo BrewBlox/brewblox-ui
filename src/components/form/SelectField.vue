@@ -7,7 +7,6 @@ import { computed } from 'vue';
 interface Props extends UseFieldProps {
   modelValue: any;
   options: any[];
-  label?: string;
   optionValue?: string;
   optionLabel?: string;
   clearable?: boolean;

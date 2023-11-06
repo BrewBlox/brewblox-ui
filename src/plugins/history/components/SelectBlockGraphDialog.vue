@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<GraphConfig>();
 const serviceStore = useServiceStore();
 const sparkStore = useSparkStore();
 const specStore = useBlockSpecStore();

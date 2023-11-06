@@ -32,7 +32,8 @@ defineEmits<UseDialogEmits>();
 
 const builderStore = useBuilderStore();
 const { dense } = useGlobals.setup();
-const { dialogRef, dialogOpts, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } =
+  useDialog.setup<BuilderPart>();
 
 // Rendered parts should display dummy values instead of errors
 provide(PlaceholderKey, true);

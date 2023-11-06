@@ -21,7 +21,7 @@ defineEmits<UseDialogEmits>();
 
 const { dense } = useGlobals.setup();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<string>();
 
 const local = ref<string>(props.modelValue);
 const editorRef = ref<QInput>();

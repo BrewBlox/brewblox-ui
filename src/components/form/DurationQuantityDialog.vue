@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<Quantity>();
 const local = ref<string | null>(durationString(props.modelValue));
 
 function findUnit(s: string): string {

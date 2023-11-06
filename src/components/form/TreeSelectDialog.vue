@@ -4,7 +4,7 @@ import { QTreeNode } from 'quasar';
 import { ref } from 'vue';
 
 interface Props extends UseDialogProps {
-  modelValue: string;
+  modelValue: string | null;
   nodes: QTreeNode[];
   clearable?: boolean;
 }
@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<string | null>();
 
 const selected = ref<string | null>(props.modelValue);
 const expanded = ref<string[]>([]);

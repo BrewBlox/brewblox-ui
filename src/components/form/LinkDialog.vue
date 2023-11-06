@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<Link>();
 const sparkStore = useSparkStore();
 const featureStore = useFeatureStore();
 

@@ -23,7 +23,7 @@ defineEmits<UseDialogEmits>();
 
 const historyStore = useHistoryStore();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<LoggedSession>();
 
 const sessionTitle = ref<string>('New Session');
 const tags = ref<string[]>([]);

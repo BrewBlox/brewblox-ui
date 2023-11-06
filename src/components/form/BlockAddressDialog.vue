@@ -43,7 +43,7 @@ const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
 });
 
 const { dialogRef, dialogOpts, onDialogCancel, onDialogHide, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<BlockAddress>();
 const sparkStore = useSparkStore();
 const featureStore = useFeatureStore();
 
@@ -95,9 +95,7 @@ const tooltip = computed<string | null>(() =>
   block.value ? featureStore.widgetTitle(block.value.type) : null,
 );
 
-const localOk = computed<boolean>(
-  () => block.value !== null || props.clearable,
-);
+const localOk = computed<boolean>(() => block.value != null || props.clearable);
 
 function configureBlock(): void {
   createBlockDialog(local.value);

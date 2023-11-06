@@ -88,7 +88,7 @@ function openDialog(): void {
       compatible: props.compatible,
       blockFilter: props.blockFilter,
       showCreated: props.showCreated,
-      ...props.editorProps,
+      ...props.dialogProps,
     },
   }).onOk(save);
 }

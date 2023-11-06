@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const widgetStore = useWidgetStore();
-const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
 const { dense } = useGlobals.setup();
 
 const widget = computed<Widget | null>({

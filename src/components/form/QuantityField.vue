@@ -3,14 +3,14 @@ import { UseFieldProps, useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
+import { VueClassProp } from 'quasar';
 import { computed } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: Quantity;
   backupValue?: Quantity | null;
-  label?: string;
   noLabel?: boolean;
-  tagClass?: string | string[] | AnyDict;
+  tagClass?: VueClassProp;
   decimals?: number;
   unitTag?: string;
 }

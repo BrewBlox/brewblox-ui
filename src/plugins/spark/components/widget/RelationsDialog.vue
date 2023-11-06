@@ -20,7 +20,7 @@ withDefaults(defineProps<Props>(), {
 
 defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
 </script>
 
 <template>

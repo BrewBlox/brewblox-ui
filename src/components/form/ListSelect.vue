@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import isObject from 'lodash/isObject';
+import { VueClassProp } from 'quasar';
 import { computed } from 'vue';
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
   options: any[];
   optionValue?: string;
   optionLabel?: string;
-  optionClass?: string | string[] | AnyDict;
+  optionClass?: VueClassProp;
   emitValue?: boolean;
   dense?: boolean;
 }

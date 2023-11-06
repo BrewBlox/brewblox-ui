@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<MetricsConfig>();
 
 const local = ref<MetricsConfig>(
   defaults(cloneDeep(props.modelValue), emptyMetricsConfig()),

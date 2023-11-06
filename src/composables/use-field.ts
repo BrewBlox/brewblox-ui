@@ -1,4 +1,5 @@
-import { computed, ComputedRef, getCurrentInstance, StyleValue } from 'vue';
+import { VueClassProp, VueStyleProp } from 'quasar';
+import { computed, ComputedRef, getCurrentInstance } from 'vue';
 
 export interface UseFieldProps {
   tag?: string;
@@ -8,11 +9,11 @@ export interface UseFieldProps {
   html?: boolean;
   tooltip?: string;
   readonly?: boolean;
-  editorProps?: AnyDict;
-  tagProps?: AnyDict;
-  tagClass?: string | string[] | AnyDict;
-  tagStyle?: StyleValue;
   rules?: InputRule[];
+  tagProps?: AnyDict;
+  tagClass?: VueClassProp;
+  tagStyle?: VueStyleProp;
+  dialogProps?: AnyDict;
 }
 
 export interface UseFieldComponent {
@@ -45,11 +46,11 @@ export const useField: UseFieldComposable = {
     html: false,
     tooltip: '',
     readonly: false,
-    editorProps: () => ({}),
+    rules: () => [],
     tagProps: () => ({}),
     tagClass: '',
     tagStyle: '',
-    rules: () => [],
+    dialogProps: () => ({}),
   },
   setup() {
     const instance = getCurrentInstance()!;

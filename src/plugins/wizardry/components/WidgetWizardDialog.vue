@@ -44,7 +44,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogOpts, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } =
+  useDialog.setup<Widget | null>();
 const { dense } = useGlobals.setup();
 const { activeDashboardId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();

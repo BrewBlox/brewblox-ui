@@ -22,7 +22,7 @@ defineEmits<UseDialogEmits>();
 
 const sparkStore = useSparkStore();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<never>();
 
 const block = ifCompatible<SetpointSensorPairBlock>(
   sparkStore.blockByAddress(props.address),

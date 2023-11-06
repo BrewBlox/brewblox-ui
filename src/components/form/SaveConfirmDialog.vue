@@ -15,11 +15,7 @@ withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
-
-async function done(save: boolean): Promise<void> {
-  onDialogOK(save);
-}
+  useDialog.setup<boolean>();
 </script>
 
 <template>
@@ -41,13 +37,13 @@ async function done(save: boolean): Promise<void> {
           flat
           label="No"
           color="primary"
-          @click="done(false)"
+          @click="onDialogOK(false)"
         />
         <q-btn
           flat
           label="Yes"
           color="primary"
-          @click="done(true)"
+          @click="onDialogOK(true)"
         />
       </template>
     </DialogCard>

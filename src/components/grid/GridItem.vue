@@ -5,7 +5,7 @@ import clamp from 'lodash/clamp';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import { TouchPanValue } from 'quasar';
-import { computed, ref, watch } from 'vue';
+import { CSSProperties, computed, ref, watch } from 'vue';
 
 interface Props {
   widgetId: string;
@@ -76,7 +76,7 @@ const resizePos = ref<XYPosition>(zeroPos());
 const containerRef = ref<Element | null>(null);
 const dragOverlayRef = ref<Element | null>(null);
 
-const style = computed<Mapped<string>>(() => {
+const style = computed<CSSProperties>(() => {
   const { pinnedPosition, cols, rows } = localWidget.value;
   const pinned = pinnedPosition || zeroPos();
 
@@ -93,7 +93,7 @@ const style = computed<Mapped<string>>(() => {
   };
 });
 
-const dragStyle = computed<Mapped<string>>(() => ({
+const dragStyle = computed<CSSProperties>(() => ({
   width: `${dragWidth.value}px`,
   height: `${dragHeight.value}px`,
 }));

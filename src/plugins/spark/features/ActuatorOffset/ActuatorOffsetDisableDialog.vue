@@ -26,7 +26,7 @@ defineEmits<UseDialogEmits>();
 
 const sparkStore = useSparkStore();
 const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+  useDialog.setup<never>();
 const driver: ActuatorOffsetBlock = cloneDeep(props.block);
 const setpoint: SetpointSensorPairBlock | null = sparkStore.blockByLink(
   driver.serviceId,

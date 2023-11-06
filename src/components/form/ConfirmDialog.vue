@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<boolean>();
 
 const cancelLabel = computed<string>(() =>
   typeof props.cancel === 'string' ? props.cancel : 'Cancel',

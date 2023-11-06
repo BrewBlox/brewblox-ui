@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup();
+  useDialog.setup<number | null>();
 
 const local = ref<string | null>(
   fixedNumber(Number(props.modelValue), props.decimals),
