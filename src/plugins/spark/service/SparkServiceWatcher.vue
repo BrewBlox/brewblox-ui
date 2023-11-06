@@ -112,4 +112,10 @@ watch(
     });
   },
 );
+
+const render = (): null => null;
 </script>
+
+<template>
+  <render />
+</template>

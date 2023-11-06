@@ -197,7 +197,7 @@ function showActionDialog(action: ChangeAction): void {
     componentProps: {
       widgetId,
       mode: 'Full',
-      widgetProps: { active: action.id },
+      widgetProps: { activeId: action.id },
     },
   });
 }

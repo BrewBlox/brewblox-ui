@@ -18,7 +18,6 @@ const props = withDefaults(defineProps<Props>(), {
   clearable: true,
   autogrow: false,
   suffix: '',
-  f: '',
 });
 
 const emit = defineEmits<{
