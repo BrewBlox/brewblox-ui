@@ -33,6 +33,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - run: corepack enable
       - run: yarn ci
       - run: yarn build
         env:
