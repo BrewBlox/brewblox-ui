@@ -6,7 +6,7 @@
   "repository": "https://github.com/BrewBlox/brewblox-ui",
   "license": "GPL-3.0",
   "scripts": {
-    "ci": "rm -rf node_modules; yarn install --immutable",
+    "ci": "yarn install --immutable",
     "makecert": "bash dev/makecert.sh",
     "initdev": "bash dev/initdev.sh",
     "redis:load": "node dev/redis_load.mjs",
