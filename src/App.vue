@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { createDialog } from './utils/dialog';
+import { AUTH_REFRESH_INTERVAL_MS } from './const';
+import { createDialogPromise } from './utils/dialog';
 import { authRefresh } from '@/auth';
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
@@ -14,8 +15,10 @@ import { startup } from '@/startup';
  */
 async function onAppSetup(): Promise<void> {
   if (!(await authRefresh())) {
-    createDialog({ component: 'LoginDialog' });
+    await createDialogPromise({ component: 'LoginDialog' });
   }
+  setInterval(() => authRefresh().catch(), AUTH_REFRESH_INTERVAL_MS);
+
   await database.connect();
   await startup.start();
   await eventbus.connect();

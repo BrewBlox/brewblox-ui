@@ -42,3 +42,5 @@ export const IS_IOS =
     ? /iPad|iPhone|iPod/.test(platform) ||
       (platform === 'MacIntel' && maxTouchPoints > 1)
     : false;
+
+export const AUTH_REFRESH_INTERVAL_MS = 10 * 60 * 1000;
