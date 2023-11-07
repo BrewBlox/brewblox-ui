@@ -38,6 +38,7 @@ interface Props extends UseDialogProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
   filter: () => true,
   showCreated: true,
 });

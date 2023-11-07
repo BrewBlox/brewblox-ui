@@ -54,6 +54,7 @@ interface Props extends UseDialogProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
   compatible: null,
   filter: () => true,
   serviceId: null,

@@ -13,6 +13,7 @@ interface Props extends UseDialogProps {
 }
 
 withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
   title: 'Block relations',
   hideUnrelated: false,
   canCreate: false,

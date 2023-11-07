@@ -5,6 +5,7 @@ import { computed, CSSProperties } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: string | null;
+  clearable?: boolean;
   nullText?: string;
   presets: string[];
 }

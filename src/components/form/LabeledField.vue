@@ -13,6 +13,7 @@ interface Props extends UseFieldProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
   modelValue: null,
   number: false,
   suffix: '',

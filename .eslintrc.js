@@ -20,7 +20,7 @@ module.exports = {
     'import/prefer-default-export': 0,
     'object-curly-newline': 0,
     'no-param-reassign': 0,
-    'no-console': 'warn',
+    'no-console': ['warn', { allow: ['assert'] }],
     'no-debugger': 'warn',
     'no-multiple-empty-lines': 'error',
     'comma-dangle': ['error', 'always-multiline'],

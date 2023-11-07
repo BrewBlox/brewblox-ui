@@ -13,6 +13,7 @@ interface Props extends UseFieldProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
   short: false,
   resetIcon: 'restore',
   label: 'Date and time',

@@ -16,7 +16,9 @@ interface Props extends UseDialogProps {
   address: BlockAddress;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+});
 
 defineEmits<UseDialogEmits>();
 

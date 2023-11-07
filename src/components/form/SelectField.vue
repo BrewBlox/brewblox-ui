@@ -15,6 +15,7 @@ interface Props extends UseFieldProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
   label: 'value',
   optionValue: 'value',
   optionLabel: 'label',

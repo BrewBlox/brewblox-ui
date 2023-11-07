@@ -55,6 +55,13 @@ export const useField: UseFieldComposable = {
   setup() {
     const instance = getCurrentInstance()!;
 
+    // Forgetting to set default props will not result in a type error
+    // We can do a static assert here to nag the dev
+    console.assert(
+      instance.props.tag !== undefined,
+      '`tag` prop undefined. Did you forget to use `useField.defaultProps`?',
+    );
+
     const activeSlots = computed<string[]>(() =>
       Object.keys(instance.slots).filter((s) => fieldSlots.includes(s)),
     );

@@ -20,6 +20,7 @@ interface Props extends UseFieldProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
   label: 'Link',
   compatible: null,
   blockFilter: () => true,

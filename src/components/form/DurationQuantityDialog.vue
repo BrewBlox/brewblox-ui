@@ -13,6 +13,7 @@ interface Props extends UseDialogProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
   label: 'Value',
   rules: () => [],
 });
