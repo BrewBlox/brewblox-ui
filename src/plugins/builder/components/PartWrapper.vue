@@ -11,7 +11,8 @@ import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
-import { computed, provide } from 'vue';
+import { notify } from '@/utils/notify';
+import { computed, onErrorCaptured, provide, ref } from 'vue';
 
 interface Props {
   part: BuilderPart;
@@ -74,6 +75,8 @@ provide(
 provide(PatchPartKey, (patch) => emit('patch:part', patch));
 provide(PatchSettingsKey, (patch) => emit('patch:settings', patch));
 
+const error = ref<string>();
+
 const dimensions = computed(() => ({
   width: coord2grid(props.part.width),
   height: coord2grid(props.part.height),
@@ -104,10 +107,20 @@ const flipTransform = computed<string>(() => {
   }
   return '';
 });
+
+onErrorCaptured((err: Error) => {
+  error.value = err.message;
+  const { type, x, y } = props.part;
+  notify.error(`${type} (${x},${y}) :${err.message}`);
+  return false;
+});
 </script>
 
 <template>
-  <g :transform="positionTransform">
+  <g
+    v-if="!error"
+    :transform="positionTransform"
+  >
     <g :transform="`${rotateTransform} ${flipTransform}`">
       <g
         :class="[
