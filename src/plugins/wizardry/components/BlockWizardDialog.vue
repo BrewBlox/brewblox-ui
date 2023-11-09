@@ -76,7 +76,7 @@ const blockSpecStore = useBlockSpecStore();
 const serviceStore = useServiceStore();
 
 const step = ref<WizardStep>('block');
-const search = ref<string | null>('');
+const search = ref<string>('');
 const selectedBlockOpt = ref<BlockOption | null>(null);
 const selectedServiceOpt = ref<ServiceOption | null>(null);
 const selectedDashboardOpt = ref<DashboardOption | null>(null);
@@ -108,7 +108,7 @@ const allBlockOpts = computed<BlockOption[]>(() =>
 );
 
 const blockOpts = computed<BlockOption[]>(() => {
-  const exp = new RegExp(search.value ?? '', 'i');
+  const exp = new RegExp(search.value, 'i');
   return allBlockOpts.value.filter((opt) =>
     exp.test(`${opt.value} ${opt.label}`),
   );
@@ -341,6 +341,7 @@ onMounted(() => {
             clearable
             autofocus
             class="q-mb-md"
+            @clear="search = ''"
           >
             <template #append>
               <KeyboardButton @click="showSearchKeyboard" />

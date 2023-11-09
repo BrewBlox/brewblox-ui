@@ -55,7 +55,7 @@ const labelSorter = makeObjectSorter('label');
 
 const id = nanoid();
 const step = ref<WizardStep>('widget');
-const search = ref<string | null>('');
+const search = ref<string>('');
 const selectedFeatureOpt = ref<FeatureOption | null>(null);
 const selectedDashboardOpt = ref<DashboardOption | null>(null);
 const widget = ref<Widget | null>(null);
@@ -85,7 +85,7 @@ const allFeatureOpts = computed<FeatureOption[]>(() =>
 );
 
 const featureOpts = computed<FeatureOption[]>(() => {
-  const exp = new RegExp(search.value ?? '', 'i');
+  const exp = new RegExp(search.value, 'i');
   return allFeatureOpts.value.filter((opt) =>
     exp.test(`${opt.value} ${opt.label}`),
   );
@@ -249,6 +249,7 @@ onMounted(() => {
             clearable
             autofocus
             class="q-mb-md"
+            @clear="search = ''"
           >
             <template #append>
               <KeyboardButton @click="showSearchKeyboard" />
