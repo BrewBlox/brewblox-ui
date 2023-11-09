@@ -67,7 +67,7 @@ function showKeyboard(): void {
 
 function save(): void {
   if (valueOk.value) {
-    onDialogOK(bloxQty(local.value ?? '0s'));
+    onDialogOK(bloxQty(local.value || '0s'));
   }
 }
 </script>
@@ -86,6 +86,7 @@ function save(): void {
         :suffix="defaultUnit"
         :error="!!error"
         :error-message="error"
+        placeholder="0"
         autofocus
         item-aligned
         @change="normalize"

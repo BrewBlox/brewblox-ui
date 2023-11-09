@@ -5,7 +5,7 @@ import { fixedNumber } from '@/utils/quantity';
 import { computed } from 'vue';
 
 export interface Props extends UseFieldProps {
-  modelValue: number | null;
+  modelValue: number;
   decimals?: number;
   clearable?: boolean;
   autogrow?: boolean;
@@ -21,17 +21,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [payload: number | null];
+  'update:modelValue': [payload: number];
 }>();
 
 const { activeSlots } = useField.setup();
 
-const displayValue = computed<string>(() => {
-  if (props.modelValue == null) {
-    return '<not set>';
-  }
-  return fixedNumber(props.modelValue, props.decimals);
-});
+const displayValue = computed<string>(() =>
+  fixedNumber(props.modelValue, props.decimals),
+);
 
 function openDialog(): void {
   if (props.readonly) {

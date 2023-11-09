@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
 import { MetricsWidget } from './types';
 import { useContext, useWidget } from '@/composables';
 import { defaultLabel } from '@/plugins/history/nodes';
@@ -42,7 +42,7 @@ const source = computed<MetricsSource | null>(() =>
 );
 
 function fieldFreshDuration(field: string): number {
-  return config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
+  return config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY_MS;
 }
 
 function fieldDecimals(field: string): number {

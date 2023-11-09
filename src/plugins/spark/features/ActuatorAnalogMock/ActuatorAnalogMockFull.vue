@@ -18,7 +18,7 @@ const { serviceId, block, patchBlock, isClaimed } =
         title="Target"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ storedSetting: v! })"
+        @update:model-value="(v) => patchBlock({ storedSetting: v })"
       />
       <NumberField
         :model-value="block.data.minSetting"
@@ -26,7 +26,7 @@ const { serviceId, block, patchBlock, isClaimed } =
         label="Clip to min"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ minSetting: v! })"
+        @update:model-value="(v) => patchBlock({ minSetting: v })"
       />
       <NumberField
         :model-value="block.data.maxSetting"
@@ -34,7 +34,7 @@ const { serviceId, block, patchBlock, isClaimed } =
         label="Clip to max"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ maxSetting: v! })"
+        @update:model-value="(v) => patchBlock({ maxSetting: v })"
       />
 
       <div class="col-break" />
@@ -52,7 +52,7 @@ const { serviceId, block, patchBlock, isClaimed } =
         label="Clip to min"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ minValue: v! })"
+        @update:model-value="(v) => patchBlock({ minValue: v })"
       />
       <NumberField
         :model-value="block.data.maxValue"
@@ -60,7 +60,7 @@ const { serviceId, block, patchBlock, isClaimed } =
         label="Clip to max"
         tag="big"
         class="col-grow"
-        @update:model-value="(v) => patchBlock({ maxValue: v! })"
+        @update:model-value="(v) => patchBlock({ maxValue: v })"
       />
 
       <div class="col-break" />

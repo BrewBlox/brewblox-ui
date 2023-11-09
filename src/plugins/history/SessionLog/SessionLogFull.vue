@@ -13,7 +13,6 @@ import { useGlobals, useWidget } from '@/composables';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import clamp from 'lodash/clamp';
-import isString from 'lodash/isString';
 import { nanoid } from 'nanoid';
 import { TouchPanValue, dom } from 'quasar';
 import { ComponentPublicInstance, computed, ref } from 'vue';
@@ -204,9 +203,7 @@ function onSwipe(
                   tag-class="ellipsis-3-lines text-secondary"
                   style="max-width: 100%"
                   class="col q-pb-xs"
-                  @update:model-value="
-                    (v) => isString(v) && saveTitle(element, v)
-                  "
+                  @update:model-value="(v) => saveTitle(element, v)"
                 >
                   <template #before>
                     <q-icon

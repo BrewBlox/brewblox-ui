@@ -68,7 +68,7 @@ function showDialog(): void {
         :rules="footerRules"
         label="Footer text"
         title="footer text"
-        @update:model-value="(v) => patchBlock({ name: v! })"
+        @update:model-value="(v) => patchBlock({ name: v })"
       />
     </div>
   </div>

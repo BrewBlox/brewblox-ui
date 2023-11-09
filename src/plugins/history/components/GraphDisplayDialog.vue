@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DEFAULT_GRAPH_DECIMALS, DEFAULT_GRAPH_AXIS } from '../const';
 import { defaultLabel } from '../nodes';
 import { GraphAxis, GraphConfig } from '../types';
 import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
@@ -33,10 +34,10 @@ const axisOpts: SelectOption<GraphAxis>[] = [
 
 const label = computed<string>(() => defaultLabel(props.field));
 
-const rename = computed<string | null>({
-  get: () => local.renames[props.field] ?? label.value,
+const rename = computed<string>({
+  get: () => local.renames[props.field] || label.value,
   set: (v) => {
-    if (v) {
+    if (v && v !== label.value) {
       local.renames[props.field] = v;
     } else {
       delete local.renames[props.field];
@@ -45,18 +46,36 @@ const rename = computed<string | null>({
 });
 
 const axis = computed<GraphAxis>({
-  get: () => local.axes[props.field] || 'y',
-  set: (v) => (local.axes[props.field] = v),
+  get: () => local.axes[props.field] || DEFAULT_GRAPH_AXIS,
+  set: (v) => {
+    if (v && v !== DEFAULT_GRAPH_AXIS) {
+      local.axes[props.field] = v;
+    } else {
+      delete local.axes[props.field];
+    }
+  },
 });
 
 const color = computed<string>({
   get: () => local.colors[props.field] || '',
-  set: (v) => (local.colors[props.field] = v),
+  set: (v) => {
+    if (v) {
+      local.colors[props.field] = v;
+    } else {
+      delete local.colors[props.field];
+    }
+  },
 });
 
 const precision = computed<number>({
-  get: () => local.precision[props.field] ?? 2,
-  set: (v) => (local.precision[props.field] = v),
+  get: () => local.precision[props.field] ?? DEFAULT_GRAPH_DECIMALS,
+  set: (v) => {
+    if (v != null && v !== DEFAULT_GRAPH_DECIMALS) {
+      local.precision[props.field] = v;
+    } else {
+      delete local.precision[props.field];
+    }
+  },
 });
 
 function save(): void {
@@ -75,6 +94,7 @@ function save(): void {
       <div class="column q-gutter-xs">
         <TextField
           v-model="rename"
+          :placeholder="label"
           title="Label"
           label="Label"
         />

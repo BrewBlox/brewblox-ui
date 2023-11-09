@@ -50,9 +50,7 @@ function update(
       :model-value="constraints.min.value"
       label="Value"
       class="col-auto min-width-md"
-      @update:model-value="
-        (v) => update((draft) => void (draft.min.value = v!))
-      "
+      @update:model-value="(v) => update((draft) => void (draft.min.value = v))"
     />
 
     <div class="col-break" />
@@ -73,9 +71,7 @@ function update(
       :model-value="constraints.max.value"
       label="Value"
       class="col-auto min-width-md"
-      @update:model-value="
-        (v) => update((draft) => void (draft.max.value = v!))
-      "
+      @update:model-value="(v) => update((draft) => void (draft.max.value = v))"
     />
 
     <div class="col-break" />

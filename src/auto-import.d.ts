@@ -70,7 +70,6 @@ declare module '@vue/runtime-core' {
     GraphPeriodEditor: typeof import('src/plugins/history/components/GraphPeriodEditor.vue').default;
     GraphEditorDialog: typeof import('src/plugins/history/components/GraphEditorDialog.vue').default;
     GraphEditor: typeof import('src/plugins/history/components/GraphEditor.vue').default;
-    GraphDisplayEditor: typeof import('src/plugins/history/components/GraphDisplayEditor.vue').default;
     GraphDisplayDialog: typeof import('src/plugins/history/components/GraphDisplayDialog.vue').default;
     GraphDialog: typeof import('src/plugins/history/components/GraphDialog.vue').default;
     ExportGraphAction: typeof import('src/plugins/history/components/ExportGraphAction.vue').default;
@@ -170,7 +169,7 @@ declare module '@vue/runtime-core' {
     KeyboardDialog: typeof import('src/components/form/KeyboardDialog.vue').default;
     KeyboardButton: typeof import('src/components/form/KeyboardButton.vue').default;
     InlineQuantityField: typeof import('src/components/form/InlineQuantityField.vue').default;
-    DurationQuantityDialog: typeof import('src/components/form/DurationQuantityDialog.vue').default;
+    DurationDialog: typeof import('src/components/form/DurationDialog.vue').default;
     DurationField: typeof import('src/components/form/DurationField.vue').default;
     DigitalStateButton: typeof import('src/components/form/DigitalStateButton.vue').default;
     DialogCard: typeof import('src/components/form/DialogCard.vue').default;

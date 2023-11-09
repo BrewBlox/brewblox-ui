@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
 import { defaultLabel } from '../nodes';
 import { MetricsConfig } from '../types';
 import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { durationMs, durationString } from '@/utils/quantity';
+import { bloxQty, durationMs } from '@/utils/quantity';
+import { Quantity } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, reactive } from 'vue';
 
@@ -25,23 +26,39 @@ const local = reactive(cloneDeep(props.config));
 
 const rename = computed<string>({
   get: () => local.renames[props.field] ?? defaultLabel(props.field),
-  set: (v) => (local.renames[props.field] = v ?? defaultLabel(props.field)),
+  set: (v) => {
+    if (v && v !== defaultLabel(props.field)) {
+      local.renames[props.field] = v;
+    } else {
+      delete local.renames[props.field];
+    }
+  },
 });
 
-const fresh = computed<string>({
+const fresh = computed<Quantity>({
   get: () =>
-    durationString(local.freshDuration[props.field] ?? DEFAULT_METRICS_EXPIRY),
+    bloxQty(
+      local.freshDuration[props.field] ?? DEFAULT_METRICS_EXPIRY_MS,
+      'ms',
+    ),
   set: (val) => {
-    const ms = durationMs(val) ?? DEFAULT_METRICS_EXPIRY;
-    local.freshDuration[props.field] = ms;
+    const ms = durationMs(val);
+    if (ms != DEFAULT_METRICS_EXPIRY_MS) {
+      local.freshDuration[props.field] = ms;
+    } else {
+      delete local.freshDuration[props.field];
+    }
   },
 });
 
 const decimals = computed<number>({
   get: () => local.decimals[props.field] ?? DEFAULT_METRICS_DECIMALS,
   set: (v) => {
-    const numV = v !== null ? v : DEFAULT_METRICS_DECIMALS;
-    local.decimals[props.field] = numV;
+    if (v != null && v !== DEFAULT_METRICS_DECIMALS) {
+      local.decimals[props.field] = v;
+    } else {
+      delete local.decimals[props.field];
+    }
   },
 });
 
@@ -61,10 +78,11 @@ function save(): void {
       <div class="column q-gutter-xs">
         <TextField
           v-model="rename"
+          :placeholder="defaultLabel(props.field)"
           title="Label"
           label="Label"
         />
-        <TextField
+        <DurationField
           v-model="fresh"
           title="Warn when older than"
           label="Warn when older than"

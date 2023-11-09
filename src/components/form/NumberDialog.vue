@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { fixedNumber } from '@/utils/quantity';
+import { roundedNumber } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
 import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
-  modelValue: number | null;
+  modelValue: number;
   decimals?: number;
   label?: string;
   rules?: InputRule[];
@@ -32,24 +32,25 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup<number | null>();
+  useDialog.setup<number>();
 
-const local = ref<string | null>(
-  fixedNumber(Number(props.modelValue), props.decimals),
+function parse(v: Maybe<string | number>): number | null {
+  return roundedNumber(Number(v), props.decimals);
+}
+
+const local = ref<string | number>(parse(props.modelValue) ?? '');
+
+const parsed = computed<number>(() => parse(local.value) ?? 0);
+
+const validator = computed<(val: any) => boolean>(() =>
+  makeRuleValidator(props.rules),
 );
 
-const isValid = computed<boolean>(() =>
-  makeRuleValidator(props.rules)(local.value),
-);
+const isValid = computed<boolean>(() => validator.value(parsed.value));
 
 function save(): void {
-  if (!isValid.value) {
-    return;
-  }
-  if (local.value != null) {
-    onDialogOK(parseFloat(local.value));
-  } else if (props.clearable) {
-    onDialogOK(null);
+  if (isValid.value) {
+    onDialogOK(parsed.value);
   }
 }
 
@@ -74,18 +75,20 @@ function showKeyboard(): void {
   >
     <DialogCard v-bind="{ title, message, html }">
       <q-input
-        v-model="local"
+        v-model.number="local"
         v-bind="{
-          rules,
           clearable,
           label,
           autogrow,
           suffix,
           placeholder,
+          rules,
         }"
         :input-style="{ fontSize }"
+        :hint="`${parsed}`"
+        type="number"
+        step="any"
         inputmode="numeric"
-        pattern="[0-9\.]*"
         autofocus
       >
         <template #append>

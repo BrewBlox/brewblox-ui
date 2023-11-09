@@ -11,7 +11,7 @@ import { computed, ref, watch } from 'vue';
 type BoardType = 'text' | 'number' | 'duration';
 
 interface Props extends UseDialogProps {
-  modelValue: string | number | null;
+  modelValue: string | number;
   suffix?: string;
   type?: BoardType;
   password?: boolean;

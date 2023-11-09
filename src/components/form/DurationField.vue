@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { UseFieldProps, useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { bloxQty, durationString } from '@/utils/quantity';
+import { durationString } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 
@@ -26,9 +26,9 @@ function openDialog(): void {
     return;
   }
   createDialog({
-    component: 'DurationQuantityDialog',
+    component: 'DurationDialog',
     componentProps: {
-      modelValue: bloxQty(props.modelValue ?? '0s'),
+      modelValue: props.modelValue,
       title: props.title,
       message: props.message,
       html: props.html,

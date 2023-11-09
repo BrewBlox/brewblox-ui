@@ -20,7 +20,7 @@ const emit = defineEmits<{
 }>();
 
 const historyStore = useHistoryStore();
-const selectFilter = ref<string>();
+const selectFilter = ref<string>('');
 const expandedKeys = ref<string[]>([]);
 const treeRef = ref<QTree>();
 
@@ -29,7 +29,7 @@ onMounted(() => expand());
 
 watch(
   () => selectFilter.value,
-  (filter: string | undefined) => {
+  (filter: string) => {
     if (filter) {
       expandedKeys.value = filteredNodes(nodes.value, filter);
     }
@@ -40,7 +40,7 @@ function showSearchKeyboard(): void {
   createDialog({
     component: 'KeyboardDialog',
     componentProps: {
-      modelValue: selectFilter.value ?? null,
+      modelValue: selectFilter.value,
     },
   }).onOk((v) => (selectFilter.value = v));
 }
@@ -105,7 +105,7 @@ function nodeHandler(node: QTreeNode): void {
 }
 
 function nodeFilter(node: QTreeNode, filter: string): boolean {
-  return node?.value?.toLowerCase().match(filter.toLowerCase()) !== undefined;
+  return new RegExp(filter, 'i').test(node?.value);
 }
 
 const fieldsDuration = computed<Quantity>({
@@ -147,6 +147,7 @@ const ticked = computed<string[]>({
       clearable
       autofocus
       class="col-grow"
+      @clear="selectFilter = ''"
     >
       <template #append>
         <KeyboardButton @click="showSearchKeyboard" />

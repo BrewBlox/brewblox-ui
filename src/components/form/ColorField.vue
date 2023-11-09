@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useField, UseFieldProps } from '@/composables';
+import { parseColor } from '@/utils/colors';
 import { createDialog } from '@/utils/dialog';
 import { computed, CSSProperties } from 'vue';
 
 interface Props extends UseFieldProps {
-  modelValue: string | null;
+  modelValue: string;
   clearable?: boolean;
   nullText?: string;
-  presets: string[];
+  presets?: string[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,15 +19,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [payload: string | null];
+  'update:modelValue': [payload: string];
 }>();
 
 const { activeSlots } = useField.setup();
 
-const color = computed<string>(() => {
-  const c = props.modelValue || '#ffffff';
-  return c.startsWith('#') ? c : `#${c}`;
-});
+const color = computed<string>(() => parseColor(props.modelValue) ?? '#ffffff');
 
 const colorDesc = computed<string>(() =>
   !!props.modelValue ? color.value : props.nullText,
@@ -41,10 +39,6 @@ const colorStyle = computed<CSSProperties>(() => ({
   width: '20px',
   display: 'inline-block',
 }));
-
-function change(c: string | null): void {
-  emit('update:modelValue', c?.replace('#', '') ?? props.clearable ? null : '');
-}
 
 function openDialog(): void {
   if (props.readonly) {
@@ -61,7 +55,7 @@ function openDialog(): void {
       clearable: props.clearable,
       presets: props.presets,
     },
-  }).onOk(change);
+  }).onOk((v: string) => emit('update:modelValue', v));
 }
 </script>
 

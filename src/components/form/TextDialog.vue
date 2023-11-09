@@ -5,11 +5,10 @@ import { makeRuleValidator } from '@/utils/rules';
 import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
-  modelValue: string | null;
+  modelValue: string;
   label?: string;
   rules?: InputRule[];
   clearable?: boolean;
-  nullable?: boolean;
   autogrow?: boolean;
   fontSize?: string;
   suffix?: string;
@@ -21,7 +20,6 @@ const props = withDefaults(defineProps<Props>(), {
   label: '',
   rules: () => [],
   clearable: true,
-  nullable: false,
   autogrow: false,
   fontSize: '170%',
   suffix: '',
@@ -31,9 +29,9 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup<string | null>();
+  useDialog.setup<string>();
 
-const local = ref<string | null>(props.modelValue);
+const local = ref<string>(`${props.modelValue}`);
 
 const isValid = computed<boolean>(() =>
   makeRuleValidator(props.rules)(local.value),
@@ -44,6 +42,10 @@ function save(): void {
     return;
   }
   onDialogOK(local.value);
+}
+
+function clear(): void {
+  local.value = '';
 }
 
 function showKeyboard(): void {
@@ -78,6 +80,7 @@ function showKeyboard(): void {
         }"
         :input-style="{ fontSize }"
         autofocus
+        @clear="clear"
       >
         <template #append>
           <KeyboardButton @click="showKeyboard" />

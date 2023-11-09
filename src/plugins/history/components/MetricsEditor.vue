@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
 import { MetricsConfig } from '../types';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/quantity';
@@ -32,7 +32,7 @@ function renamed(node: QTreeNode): string {
 
 function freshDuration(node: QTreeNode): string {
   return durationString(
-    props.config.freshDuration[node.value] ?? DEFAULT_METRICS_EXPIRY,
+    props.config.freshDuration[node.value] ?? DEFAULT_METRICS_EXPIRY_MS,
   );
 }
 

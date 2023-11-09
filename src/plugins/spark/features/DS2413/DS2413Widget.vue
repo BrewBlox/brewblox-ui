@@ -33,7 +33,7 @@ const { block, patchBlock } = useBlockWidget.setup<DS2413Block>();
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="(v) => patchBlock({ address: v! })"
+            @update:model-value="(v) => patchBlock({ address: v })"
           />
         </div>
       </template>

@@ -63,7 +63,7 @@ function saveLayout(layout: Partial<Layout>): void {
 function chooseDuration(): void {
   const current = config.value.params.duration ?? '1h';
   createDialog({
-    component: 'DurationQuantityDialog',
+    component: 'DurationDialog',
     componentProps: {
       modelValue: bloxQty(current),
       title: 'Custom graph duration',
