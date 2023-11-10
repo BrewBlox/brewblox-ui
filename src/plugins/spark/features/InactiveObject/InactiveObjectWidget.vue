@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { useFeatureStore } from '@/store/features';
 import { InactiveObjectBlock } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { useFeatureStore } from '@/store/features';
 
 const featureStore = useFeatureStore();
 const { block } = useBlockWidget.setup<InactiveObjectBlock>();

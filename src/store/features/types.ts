@@ -1,6 +1,6 @@
+import { GlobalComponents } from 'vue';
 import { Service, ServiceStub } from '@/store/services/types';
 import { Widget } from '@/store/widgets/types';
-import { GlobalComponents } from 'vue';
 
 export type ComponentName = keyof GlobalComponents & string;
 

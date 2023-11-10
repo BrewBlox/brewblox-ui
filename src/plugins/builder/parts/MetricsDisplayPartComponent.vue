@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/MetricsDisplay';
-import { usePart } from '../composables';
-import { useMetrics } from '../composables/use-metrics';
-import { liquidBorderColor } from '../utils';
+import { computed } from 'vue';
 import {
   DEFAULT_METRICS_DECIMALS,
   DEFAULT_METRICS_EXPIRY_MS,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { fixedNumber, shortDateString } from '@/utils/quantity';
-import { computed } from 'vue';
+import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/MetricsDisplay';
+import { usePart } from '../composables';
+import { useMetrics } from '../composables/use-metrics';
+import { liquidBorderColor } from '../utils';
 
 interface MetricDisplay {
   field: string;

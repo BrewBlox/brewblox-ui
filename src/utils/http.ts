@@ -1,7 +1,7 @@
-import { notify } from './notify';
-import { HOST, PROTOCOL } from '@/const';
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import get from 'lodash/get';
+import { HOST, PROTOCOL } from '@/const';
+import { notify } from './notify';
 
 export const http = axios.create({ baseURL: HOST });
 

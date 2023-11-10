@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import SparkListView from './SparkListView.vue';
-import SparkTroubleshooter from './SparkTroubleshooter.vue';
+import {
+  BlockRelation,
+  BlockType,
+  SparkStatusDescription,
+} from 'brewblox-proto/ts';
+import { computed, watch } from 'vue';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type {
   BlockRelationNode,
@@ -11,12 +15,8 @@ import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
-import {
-  BlockRelation,
-  BlockType,
-  SparkStatusDescription,
-} from 'brewblox-proto/ts';
-import { computed, watch } from 'vue';
+import SparkListView from './SparkListView.vue';
+import SparkTroubleshooter from './SparkTroubleshooter.vue';
 
 interface Props {
   serviceId: string;

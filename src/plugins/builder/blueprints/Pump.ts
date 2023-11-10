@@ -1,21 +1,21 @@
+import { DigitalState } from 'brewblox-proto/ts';
 import {
   DEFAULT_PUMP_PRESSURE,
-  DigitalBlockT,
   DIGITAL_TYPES,
+  DigitalBlockT,
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
   LEFT,
-  PumpBlockT,
   PUMP_KEY,
   PUMP_TYPES,
-  PwmBlockT,
+  PumpBlockT,
   PWM_TYPES,
+  PwmBlockT,
   RIGHT,
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
-import { DigitalState } from 'brewblox-proto/ts';
 
 export type OnInteractBehavior = 'toggle' | 'dialog';
 

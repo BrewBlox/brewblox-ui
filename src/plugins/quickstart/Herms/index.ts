@@ -1,12 +1,12 @@
+import { Plugin } from 'vue';
+import { QuickstartFeature, useFeatureStore } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import HermsCompletionTask from './HermsCompletionTask.vue';
 import HermsHardwareTask from './HermsHardwareTask.vue';
 import HermsIoTask from './HermsIoTask.vue';
 import HermsMutexTask from './HermsMutexTask.vue';
 import HermsNamingTask from './HermsNamingTask.vue';
 import HermsSettingsTask from './HermsSettingsTask.vue';
-import { QuickstartFeature, useFeatureStore } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { Plugin } from 'vue';
 
 const plugin: Plugin = {
   install(app) {

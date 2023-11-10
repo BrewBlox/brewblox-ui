@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { createDialog } from '@/utils/dialog';
-import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
   Quantity,
@@ -11,6 +7,10 @@ import {
 } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
+import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 
 interface Props extends UseDialogProps {
   block: ActuatorOffsetBlock;

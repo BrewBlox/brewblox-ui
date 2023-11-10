@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorAnalogMockBlock } from 'brewblox-proto/ts';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
 const { serviceId, block, isClaimed, patchBlock } =
   useBlockWidget.setup<ActuatorAnalogMockBlock>();

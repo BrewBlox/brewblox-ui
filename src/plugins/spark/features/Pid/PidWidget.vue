@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import PidBasic from './PidBasic.vue';
-import PidFull from './PidFull.vue';
-import { startRelationsDialog } from './relations';
+import { Link, PidBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { prettyLink } from '@/utils/quantity';
-import { Link, PidBlock } from 'brewblox-proto/ts';
-import { computed } from 'vue';
+import PidBasic from './PidBasic.vue';
+import PidFull from './PidFull.vue';
+import { startRelationsDialog } from './relations';
 
 const modes = {
   Basic: PidBasic,

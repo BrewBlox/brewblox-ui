@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { MetricsConfig } from '../types';
-import { emptyMetricsConfig } from '../utils';
-import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { MetricsConfig } from '../types';
+import { emptyMetricsConfig } from '../utils';
 
 interface Props extends UseDialogProps {
   modelValue: MetricsConfig;

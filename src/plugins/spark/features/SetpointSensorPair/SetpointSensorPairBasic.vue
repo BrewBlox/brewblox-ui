@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/quantity';
-import { SetpointSensorPairBlock } from 'brewblox-proto/ts';
 
 const { serviceId, block, patchBlock, isClaimed } =
   useBlockWidget.setup<SetpointSensorPairBlock>();

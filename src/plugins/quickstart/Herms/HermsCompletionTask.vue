@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { UseTaskEmits, UseTaskProps } from '../composables';
 import { createOutputActions, executeActions } from '../utils';
 import {
@@ -9,8 +11,6 @@ import {
 } from './changes';
 import { defineLayouts } from './changes-layout';
 import { HermsConfig } from './types';
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 const props = defineProps<UseTaskProps<HermsConfig>>();
 

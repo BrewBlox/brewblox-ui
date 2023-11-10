@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { UseFieldProps, useField } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { fixedNumber, prettyUnit } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import { VueClassProp } from 'quasar';
 import { computed } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { fixedNumber, prettyUnit } from '@/utils/quantity';
 
 interface Props extends UseFieldProps {
   modelValue: Quantity;

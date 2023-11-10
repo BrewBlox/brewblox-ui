@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { createDialogPromise } from '@/utils/dialog';
 import {
   GpioModuleChannel,
   GpioModuleStatus,
@@ -9,6 +6,9 @@ import {
   OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { createDialogPromise } from '@/utils/dialog';
 
 /**
  * Converts GpioPins bitmask to list of 1-indexed pin numbers

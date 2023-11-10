@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { GraphConfig, SharedGraphConfig } from '../types';
-import { emptyGraphConfig } from '../utils';
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { createDialog } from '@/utils/dialog';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import isEqual from 'lodash/isEqual';
 import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { GraphConfig, SharedGraphConfig } from '../types';
+import { emptyGraphConfig } from '../utils';
 
 interface Props extends UseDialogProps {
   config: GraphConfig;

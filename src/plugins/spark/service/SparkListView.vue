@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { useBlockSpecStore, useSparkStore } from '../store';
-import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';
-import { ListRenderAddress } from './types';
+import { Block, BlockType } from 'brewblox-proto/ts';
+import capitalize from 'lodash/capitalize';
+import { computed, nextTick, ref } from 'vue';
 import { useElementRefs, useGlobals } from '@/composables';
 import { useFeatureStore, WidgetRole } from '@/store/features';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { Block, BlockType } from 'brewblox-proto/ts';
-import capitalize from 'lodash/capitalize';
-import { computed, nextTick, ref } from 'vue';
+import { useBlockSpecStore, useSparkStore } from '../store';
+import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';
+import { ListRenderAddress } from './types';
 
 type ItemSortFunction = (a: ListRenderAddress, b: ListRenderAddress) => number;
 

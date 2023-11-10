@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_FILTER_CHOICE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { selectable } from '@/utils/collections';
-import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 
 const filterOpts = selectable(ENUM_LABELS_FILTER_CHOICE);
 

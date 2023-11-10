@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { TouchSwipeValue } from 'quasar';
+import { useGlobals } from '@/composables';
 import { builderTools } from '../const';
 import { BuilderToolName } from '../types';
-import { useGlobals } from '@/composables';
-import { TouchSwipeValue } from 'quasar';
 
 interface Props {
   expanded: boolean;

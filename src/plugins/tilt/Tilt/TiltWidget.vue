@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useContext, useWidget } from '@/composables';
+import { findById } from '@/utils/collections';
 import { fieldLabels } from '../const';
 import { useTiltStore } from '../store';
 import { TiltStateValue } from '../types';
 import { makeTiltId, splitTiltId } from '../utils';
 import { TiltWidget } from './types';
-import { useContext, useWidget } from '@/composables';
-import { findById } from '@/utils/collections';
-import { computed } from 'vue';
 
 const tiltStore = useTiltStore();
 const { context } = useContext.setup();

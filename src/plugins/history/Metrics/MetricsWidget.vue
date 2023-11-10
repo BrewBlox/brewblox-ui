@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import { useContext } from '@/composables';
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
-import { useContext } from '@/composables';
-import { ref } from 'vue';
 
 const modes = {
   Basic: MetricsBasic,

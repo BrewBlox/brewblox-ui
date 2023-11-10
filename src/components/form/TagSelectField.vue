@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { UseFieldProps, useField } from '@/composables';
 import { ref } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
 
 interface Props extends UseFieldProps {
   modelValue: string[];

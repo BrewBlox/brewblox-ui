@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
+  useValEdit,
   UseValEditEmits,
   UseValEditProps,
-  useValEdit,
 } from '@/plugins/spark/composables';
 
 withDefaults(defineProps<UseValEditProps<boolean>>(), {

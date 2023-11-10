@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
   startAddBlockToDisplay,
@@ -14,7 +15,6 @@ import {
 import { useServiceStore } from '@/store/services';
 import { saveFile } from '@/utils/import-export';
 import { startCopyWidget } from '@/utils/widgets';
-import { computed } from 'vue';
 
 const serviceStore = useServiceStore();
 const { serviceId, widget, block, isVolatileWidget, hasGraph } =

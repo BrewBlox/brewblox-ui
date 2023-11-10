@@ -1,8 +1,8 @@
+import { AxiosResponse } from 'axios';
+import { Block, SparkStatusDescription } from 'brewblox-proto/ts';
 import { BlockIds, BlockPatchArgs, SparkBackup } from '@/plugins/spark/types';
 import { http, intercept } from '@/utils/http';
 import { notify } from '@/utils/notify';
-import { AxiosResponse } from 'axios';
-import { Block, SparkStatusDescription } from 'brewblox-proto/ts';
 
 export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
   http

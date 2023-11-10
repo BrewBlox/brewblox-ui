@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { parseColor } from '@/utils/colors';
-import { ref } from 'vue';
 
 interface Props extends UseDialogProps {
   modelValue: string;

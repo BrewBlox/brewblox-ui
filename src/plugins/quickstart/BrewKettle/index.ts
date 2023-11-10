@@ -1,11 +1,11 @@
+import { Plugin } from 'vue';
+import { QuickstartFeature, useFeatureStore } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import BrewKettleCompletionTask from './BrewKettleCompletionTask.vue';
 import BrewKettleHardwareTask from './BrewKettleHardwareTask.vue';
 import BrewKettleIoTask from './BrewKettleIoTask.vue';
 import BrewKettleNamingTask from './BrewKettleNamingTask.vue';
 import BrewKettleSettingsTask from './BrewKettleSettingsTask.vue';
-import { QuickstartFeature, useFeatureStore } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { Plugin } from 'vue';
 
 const plugin: Plugin = {
   install(app) {

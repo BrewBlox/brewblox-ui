@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 
 interface Props extends UseDialogProps {
   title?: string;

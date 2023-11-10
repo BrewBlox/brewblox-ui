@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import isArray from 'lodash/isArray';
+import { QTreeNode, useQuasar } from 'quasar';
+import { computed, onBeforeMount, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import {
   DASHBOARD_NAMESPACE,
   LAYOUT_NAMESPACE,
@@ -29,10 +33,6 @@ import {
   startCreateService,
   startRemoveService,
 } from '@/utils/services';
-import isArray from 'lodash/isArray';
-import { QTreeNode, useQuasar } from 'quasar';
-import { computed, onBeforeMount, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 
 type SidebarObject = Dashboard | Service | BuilderLayout;
 

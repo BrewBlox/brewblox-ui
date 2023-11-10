@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { DigitalConstraints } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 
 interface Props extends UseDialogProps {
   modelValue: DigitalConstraints;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useField, UseFieldProps } from '@/composables';
-import { fixedNumber } from '@/utils/quantity';
 import { QField } from 'quasar';
 import { computed, onMounted, ref, useSlots } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
+import { fixedNumber } from '@/utils/quantity';
 
 interface Props extends UseFieldProps {
   modelValue?: any;

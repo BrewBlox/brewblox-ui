@@ -67,10 +67,10 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
     "@quasar/quasar-app-extension-testing-unit-vitest": "^0.4.0",
     "@quasar/vite-plugin": "^1.0.10",
     "@rollup/plugin-inject": "^5.0.1",
-    "@trivago/prettier-plugin-sort-imports": "^4.2.1",
     "@types/d3": "^7.0.0",
     "@types/dompurify": "^3.0.4",
     "@types/js-quantities": "^1.6.2",

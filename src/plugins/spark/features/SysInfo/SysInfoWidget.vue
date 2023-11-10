@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { SysInfoBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import {
@@ -7,8 +9,6 @@ import {
   roundedNumber,
   shortDateString,
 } from '@/utils/quantity';
-import { SysInfoBlock } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 
 const sparkStore = useSparkStore();
 const { block, serviceId } = useBlockWidget.setup<SysInfoBlock>();

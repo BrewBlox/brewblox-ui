@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import formatDate from 'date-fns/format';
+import { QInput } from 'quasar';
+import { nextTick, ref } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
 } from '@/composables';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
-import formatDate from 'date-fns/format';
-import { QInput } from 'quasar';
-import { nextTick, ref } from 'vue';
 
 interface Props extends UseDialogProps {
   modelValue: string;

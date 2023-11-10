@@ -1,6 +1,6 @@
-import { BuilderPart, PartFlows } from './types';
 import type { ZoomTransform } from 'd3';
-import { InjectionKey, ShallowRef, Ref, DeepReadonly } from 'vue';
+import { DeepReadonly, InjectionKey, Ref, ShallowRef } from 'vue';
+import { BuilderPart, PartFlows } from './types';
 
 export const PartKey: InjectionKey<DeepReadonly<Ref<BuilderPart>>> = Symbol();
 export const PatchPartKey: InjectionKey<(patch: Partial<BuilderPart>) => void> =

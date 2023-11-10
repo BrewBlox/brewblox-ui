@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/HeatingElement';
 import { usePart } from '../composables';
-import { computed } from 'vue';
 
 const { bordered, width, height } = usePart.setup();
 

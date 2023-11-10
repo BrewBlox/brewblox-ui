@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
 } from '@/composables';
 import { WidgetContext, WidgetMode } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
-import { computed } from 'vue';
 
 interface Props extends UseDialogProps {
   widgetId: string;

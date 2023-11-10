@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { UseFieldProps, useField } from '@/composables';
+import { Block, Link } from 'brewblox-proto/ts';
+import truncate from 'lodash/truncate';
+import { computed } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { ComparedBlockType } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { Block, Link } from 'brewblox-proto/ts';
-import truncate from 'lodash/truncate';
-import { computed } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: Link;

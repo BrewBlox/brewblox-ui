@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
 } from '@/composables';
 import { QuickstartFeature, useFeatureStore } from '@/store/features';
-import { computed, ref } from 'vue';
 
 defineProps<UseDialogProps>();
 

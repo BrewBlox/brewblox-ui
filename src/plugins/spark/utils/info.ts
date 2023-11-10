@@ -1,6 +1,3 @@
-import { BlockAddress, ComparedBlockType } from '../types';
-import { useFeatureStore } from '@/store/features';
-import { isLink } from '@/utils/identity';
 import {
   Block,
   BlockClaim,
@@ -16,6 +13,9 @@ import {
 import isArray from 'lodash/isArray';
 import isString from 'lodash/isString';
 import { Enum } from 'typescript-string-enums';
+import { useFeatureStore } from '@/store/features';
+import { isLink } from '@/utils/identity';
+import { BlockAddress, ComparedBlockType } from '../types';
 
 export function isCompatible(
   type: Maybe<string>,

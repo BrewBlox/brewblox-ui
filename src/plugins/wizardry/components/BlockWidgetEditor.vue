@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Block, BlockType } from 'brewblox-proto/ts';
+import { computed, onMounted } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockWidget } from '@/plugins/spark/types';
 import { discoverBlocks } from '@/plugins/spark/utils/actions';
@@ -7,8 +9,6 @@ import {
   isSystemBlockType,
 } from '@/plugins/spark/utils/info';
 import { createDialogPromise } from '@/utils/dialog';
-import { Block, BlockType } from 'brewblox-proto/ts';
-import { computed, onMounted } from 'vue';
 
 interface Props {
   widget: BlockWidget;

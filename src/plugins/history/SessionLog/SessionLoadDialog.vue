@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { computed, ref } from 'vue';
 
 withDefaults(defineProps<UseDialogProps>(), {
   ...useDialog.defaultProps,

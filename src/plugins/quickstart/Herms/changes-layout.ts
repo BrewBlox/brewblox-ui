@@ -1,5 +1,4 @@
-import { withPrefix } from '../utils';
-import { HermsConfig } from './types';
+import { nanoid } from 'nanoid';
 import {
   BORDER_KEY,
   COLD_WATER,
@@ -15,7 +14,8 @@ import {
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { nanoid } from 'nanoid';
+import { withPrefix } from '../utils';
+import { HermsConfig } from './types';
 
 export function defineLayouts(config: HermsConfig): BuilderLayout[] {
   const { serviceId, names } = config;

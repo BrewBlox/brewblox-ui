@@ -1,24 +1,3 @@
-import { DisplayBlock, QuickstartPatch } from '../types';
-import {
-  changedIoModules,
-  pidDefaults,
-  unlinkedActuators,
-  withoutPrefix,
-  withPrefix,
-} from '../utils';
-import { HermsConfig } from './types';
-import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
-import { GraphConfig } from '@/plugins/history/types';
-import {
-  BlockChange,
-  QuickActionsConfig,
-} from '@/plugins/spark/features/QuickActions/types';
-import { useFeatureStore } from '@/store/features';
-import { Widget } from '@/store/widgets';
-import { userUnits } from '@/user-settings';
-import { bloxLink } from '@/utils/link';
-import { typed } from '@/utils/misc';
-import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -38,6 +17,27 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
+import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { GraphConfig } from '@/plugins/history/types';
+import {
+  BlockChange,
+  QuickActionsConfig,
+} from '@/plugins/spark/features/QuickActions/types';
+import { useFeatureStore } from '@/store/features';
+import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
+import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
+import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
+import { DisplayBlock, QuickstartPatch } from '../types';
+import {
+  changedIoModules,
+  pidDefaults,
+  unlinkedActuators,
+  withoutPrefix,
+  withPrefix,
+} from '../utils';
+import { HermsConfig } from './types';
 
 export function defineChangedBlocks(
   config: HermsConfig,

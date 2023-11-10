@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
-import { Quantity } from 'brewblox-proto/ts';
-import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
   modelValue: Quantity;

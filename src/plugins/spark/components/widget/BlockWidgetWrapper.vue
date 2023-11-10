@@ -1,16 +1,4 @@
 <script setup lang="ts">
-import { startChangeBlockId } from '../../utils/actions';
-import { useSparkStore } from '@/plugins/spark/store';
-import { BlockKey } from '@/plugins/spark/symbols';
-import { BlockWidget } from '@/plugins/spark/types';
-import { useFeatureStore } from '@/store/features';
-import {
-  ChangeWidgetTitleKey,
-  ContextKey,
-  InvalidateKey,
-  WidgetKey,
-} from '@/symbols';
-import { startRemoveWidget } from '@/utils/widgets';
 import { Block } from 'brewblox-proto/ts';
 import {
   computed,
@@ -22,6 +10,18 @@ import {
   ref,
   watch,
 } from 'vue';
+import { useSparkStore } from '@/plugins/spark/store';
+import { BlockKey } from '@/plugins/spark/symbols';
+import { BlockWidget } from '@/plugins/spark/types';
+import { useFeatureStore } from '@/store/features';
+import {
+  ChangeWidgetTitleKey,
+  ContextKey,
+  InvalidateKey,
+  WidgetKey,
+} from '@/symbols';
+import { startRemoveWidget } from '@/utils/widgets';
+import { startChangeBlockId } from '../../utils/actions';
 
 const sparkStore = useSparkStore();
 const featureStore = useFeatureStore();

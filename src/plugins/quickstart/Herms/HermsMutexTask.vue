@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { UseTaskEmits, UseTaskProps } from '../composables';
 import { HermsConfig } from './types';
-import { ref } from 'vue';
 
 const props = defineProps<UseTaskProps<HermsConfig>>();
 

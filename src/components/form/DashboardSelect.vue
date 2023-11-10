@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useDashboardStore } from '@/store/dashboards';
 import { computed, onBeforeMount } from 'vue';
+import { useDashboardStore } from '@/store/dashboards';
 
 interface Props {
   modelValue: string | null;

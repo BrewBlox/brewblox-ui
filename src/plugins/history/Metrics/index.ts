@@ -1,10 +1,10 @@
-import { MetricsConfig } from '../types';
-import { emptyMetricsConfig, upgradeMetricsConfig } from '../utils';
-import widget from './MetricsWidget.vue';
+import { Plugin } from 'vue';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { cref } from '@/utils/component-ref';
-import { Plugin } from 'vue';
+import { MetricsConfig } from '../types';
+import { emptyMetricsConfig, upgradeMetricsConfig } from '../utils';
+import widget from './MetricsWidget.vue';
 
 const plugin: Plugin = {
   install(app) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useFeatureStore, WatcherFeature } from '@/store/features';
 import { computed } from 'vue';
+import { useFeatureStore, WatcherFeature } from '@/store/features';
 
 const featureStore = useFeatureStore();
 const watchers = computed<WatcherFeature[]>(() => featureStore.watchers);

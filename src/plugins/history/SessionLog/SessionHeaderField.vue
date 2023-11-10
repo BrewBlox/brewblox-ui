@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { LoggedSession } from '../types';
-import SessionHeaderDialog from './SessionHeaderDialog.vue';
+import { computed } from 'vue';
 import { createComponentDialog } from '@/utils/dialog';
 import { dateString } from '@/utils/quantity';
-import { computed } from 'vue';
+import { LoggedSession } from '../types';
+import SessionHeaderDialog from './SessionHeaderDialog.vue';
 
 interface Props {
   session: LoggedSession;

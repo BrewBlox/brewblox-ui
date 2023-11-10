@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useHistoryStore } from '../store';
-import { LoggedSession } from '../types';
-import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
-import { parseDate } from '@/utils/quantity';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { parseDate } from '@/utils/quantity';
+import { useHistoryStore } from '../store';
+import { LoggedSession } from '../types';
 
 interface Props extends UseDialogProps {
   modelValue: LoggedSession;

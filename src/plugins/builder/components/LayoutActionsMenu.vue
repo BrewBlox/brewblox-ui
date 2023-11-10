@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { nanoid } from 'nanoid';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import {
@@ -13,9 +16,6 @@ import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
-import { nanoid } from 'nanoid';
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
 
 interface Props {
   layout?: BuilderLayout | null;

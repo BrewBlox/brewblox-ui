@@ -1,6 +1,6 @@
-import { LogLevel, useLoggingStore } from '@/store/logging';
 import isString from 'lodash/isString';
 import { Notify } from 'quasar';
+import { LogLevel, useLoggingStore } from '@/store/logging';
 
 type NotifyFunc = (message: QNotifyArgs, options?: Partial<RecordOpts>) => void;
 

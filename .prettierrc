@@ -6,6 +6,12 @@
   "singleAttributePerLine": true,
   "bracketSameLine": false,
   "plugins": [
-    "@trivago/prettier-plugin-sort-imports"
+    "@ianvs/prettier-plugin-sort-imports"
+  ],
+  "importOrder": [
+    "<BUILTIN_MODULES>",
+    "<THIRD_PARTY_MODULES>",
+    "^@/(.*)$",
+    "^[.]"
   ]
 }

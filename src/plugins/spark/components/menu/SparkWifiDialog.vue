@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import SparkEspWifiCard from './SparkEspWifiCard.vue';
-import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
+import { computed } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
 } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { computed } from 'vue';
+import SparkEspWifiCard from './SparkEspWifiCard.vue';
+import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
 
 interface Props extends UseDialogProps {
   serviceId: string;

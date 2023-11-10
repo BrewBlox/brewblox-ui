@@ -1,11 +1,12 @@
-import { isSparkPatch, isSparkState } from '../utils/info';
-import * as sparkApi from './spark-api';
 import {
-  asServiceStatus,
-  findBlockByAddress,
-  findBlockById,
-  findBlockFieldByAddress,
-} from './utils';
+  Block,
+  BlockClaim,
+  BlockRelation,
+  Link,
+  SparkPatchEvent,
+  SparkStatusDescription,
+} from 'brewblox-proto/ts';
+import { defineStore } from 'pinia';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import type {
@@ -20,15 +21,14 @@ import { useWidgetStore } from '@/store/widgets';
 import { concatById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { deserialize } from '@/utils/parsing';
+import { isSparkPatch, isSparkState } from '../utils/info';
+import * as sparkApi from './spark-api';
 import {
-  Block,
-  BlockClaim,
-  BlockRelation,
-  Link,
-  SparkPatchEvent,
-  SparkStatusDescription,
-} from 'brewblox-proto/ts';
-import { defineStore } from 'pinia';
+  asServiceStatus,
+  findBlockByAddress,
+  findBlockById,
+  findBlockFieldByAddress,
+} from './utils';
 
 const defaultSessionConfig = (): SparkSessionConfig => ({
   pageMode: 'Relations',

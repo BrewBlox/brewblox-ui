@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { BlockPatchArgs } from '../../types';
-import {
-  BlockChange,
-  ChangeAction,
-  EditableBlockField,
-  QuickActionsWidget,
-} from './types';
+import type { Block } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
+import { nanoid } from 'nanoid';
+import { computed, ref } from 'vue';
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { findById } from '@/utils/collections';
@@ -14,10 +11,13 @@ import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { deserialize } from '@/utils/parsing';
 import { prettyAny } from '@/utils/quantity';
-import type { Block } from 'brewblox-proto/ts';
-import cloneDeep from 'lodash/cloneDeep';
-import { nanoid } from 'nanoid';
-import { computed, ref } from 'vue';
+import { BlockPatchArgs } from '../../types';
+import {
+  BlockChange,
+  ChangeAction,
+  EditableBlockField,
+  QuickActionsWidget,
+} from './types';
 
 interface FieldDiff {
   key: string;

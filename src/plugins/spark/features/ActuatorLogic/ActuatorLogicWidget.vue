@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
-import ActuatorLogicFull from './ActuatorLogicFull.vue';
+import { ActuatorLogicBlock, Link } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { prettyLink } from '@/utils/quantity';
-import { ActuatorLogicBlock, Link } from 'brewblox-proto/ts';
-import { computed } from 'vue';
+import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
+import ActuatorLogicFull from './ActuatorLogicFull.vue';
 
 const modes = {
   Basic: ActuatorLogicBasic,

@@ -1,6 +1,6 @@
+import { BlockOrIntfType, Link } from 'brewblox-proto/ts';
 import { isLink } from './identity';
 import { prettyLink } from './quantity';
-import { BlockOrIntfType, Link } from 'brewblox-proto/ts';
 
 export function rawLink(id: string | null, type?: BlockOrIntfType | null): Link;
 export function rawLink(other: Link): Link;

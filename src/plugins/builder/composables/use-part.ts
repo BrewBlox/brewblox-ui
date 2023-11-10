@@ -1,3 +1,14 @@
+import {
+  computed,
+  ComputedRef,
+  DeepReadonly,
+  inject,
+  Ref,
+  shallowRef,
+  WritableComputedRef,
+} from 'vue';
+import { MetricsConfig } from '@/plugins/history/types';
+import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { BORDER_KEY, COLOR_KEY, PASSTHROUGH_KEY } from '../const';
 import {
   EditableKey,
@@ -11,17 +22,6 @@ import {
 } from '../symbols';
 import { BuilderPart, PartFlows } from '../types';
 import { colorString, coord2grid } from '../utils';
-import { MetricsConfig } from '@/plugins/history/types';
-import { emptyMetricsConfig } from '@/plugins/history/utils';
-import {
-  computed,
-  ComputedRef,
-  inject,
-  shallowRef,
-  WritableComputedRef,
-  DeepReadonly,
-  Ref,
-} from 'vue';
 
 export interface UsePartComponent {
   /**

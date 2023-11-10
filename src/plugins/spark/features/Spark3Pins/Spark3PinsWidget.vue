@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { Spark3PinsBlock } from 'brewblox-proto/ts';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { fixedNumber } from '@/utils/quantity';
-import { Spark3PinsBlock } from 'brewblox-proto/ts';
 
 const { context } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<Spark3PinsBlock>();

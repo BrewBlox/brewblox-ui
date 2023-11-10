@@ -1,4 +1,10 @@
-import widget from './PidWidget.vue';
+import {
+  BlockIntfType,
+  BlockType,
+  FilterChoice,
+  PidBlock,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -12,13 +18,7 @@ import {
   inverseTempQty,
   tempQty,
 } from '@/utils/quantity';
-import {
-  BlockIntfType,
-  BlockType,
-  FilterChoice,
-  PidBlock,
-} from 'brewblox-proto/ts';
-import { Plugin } from 'vue';
+import widget from './PidWidget.vue';
 
 const type = BlockType.Pid;
 const title = 'PID';

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { AUTH_REFRESH_INTERVAL_MS } from './const';
-import { createDialogPromise } from './utils/dialog';
 import { authRefresh } from '@/auth';
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
+import { AUTH_REFRESH_INTERVAL_MS } from './const';
+import { createDialogPromise } from './utils/dialog';
 
 /**
  * Order of startup is important here.

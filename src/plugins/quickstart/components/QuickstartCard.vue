@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { QuickstartCardTitleKey } from '../symbols';
 import { inject, ref } from 'vue';
+import { QuickstartCardTitleKey } from '../symbols';
 
 const title = inject(QuickstartCardTitleKey, ref('Wizard'));
 </script>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createDialog } from '@/utils/dialog';
 import { computed } from 'vue';
+import { createDialog } from '@/utils/dialog';
 
 interface Props {
   modelValue: string;

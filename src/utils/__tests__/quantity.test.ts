@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { isDurationString, isQuantity } from '../identity';
 import {
   bloxQty,
@@ -7,7 +8,6 @@ import {
   prettyUnit,
   rawQty,
 } from '../quantity';
-import { describe, expect, it } from 'vitest';
 
 describe('Type checking', () => {
   it('Should recognize Quantity', () => {

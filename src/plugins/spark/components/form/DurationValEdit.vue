@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, ref } from 'vue';
 import {
+  useValEdit,
   UseValEditEmits,
   UseValEditProps,
-  useValEdit,
 } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
-import { Quantity } from 'brewblox-proto/ts';
-import { computed, ref } from 'vue';
 
 type VT = Quantity | string;
 

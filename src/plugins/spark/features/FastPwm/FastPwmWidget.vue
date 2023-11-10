@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import {
+  ChannelCapabilities,
+  FastPwmBlock,
+  IoArrayInterfaceBlock,
+  TransitionDurationPreset,
+} from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
@@ -11,13 +18,6 @@ import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration
 import { channelName, prettyBlock } from '@/plugins/spark/utils/formatting';
 import { selectable } from '@/utils/collections';
 import { fixedNumber, prettyQty, roundedNumber } from '@/utils/quantity';
-import {
-  ChannelCapabilities,
-  FastPwmBlock,
-  IoArrayInterfaceBlock,
-  TransitionDurationPreset,
-} from 'brewblox-proto/ts';
-import { computed } from 'vue';
 
 const frequencyOpts = selectable(ENUM_LABELS_PWM_FREQUENCY);
 const transitionPresetOpts = selectable(ENUM_LABELS_TRANSITION_PRESET);

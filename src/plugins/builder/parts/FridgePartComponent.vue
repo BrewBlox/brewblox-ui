@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import {
   DEFAULT_SHELF_Y,
   DEFAULT_SIZE,
@@ -9,7 +10,6 @@ import {
 import { usePart } from '../composables';
 import { LABEL_KEY } from '../const';
 import { coord2grid } from '../utils';
-import { computed } from 'vue';
 
 const { settings, width, height } = usePart.setup();
 

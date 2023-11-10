@@ -1,6 +1,6 @@
-import { durationMs, parseDate } from '@/utils/quantity';
 import { SetpointProfileBlock } from 'brewblox-proto/ts';
 import { Layout, PlotData } from 'plotly.js';
+import { durationMs, parseDate } from '@/utils/quantity';
 
 export interface GraphProps {
   data: Partial<PlotData>[];

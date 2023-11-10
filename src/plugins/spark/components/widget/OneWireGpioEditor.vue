@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { createDialog } from '@/utils/dialog';
-import { bloxLink } from '@/utils/link';
 import {
   ChannelCapabilities,
   GpioDeviceType,
@@ -8,6 +6,8 @@ import {
   GpioPins,
 } from 'brewblox-proto/ts';
 import { computed, ref } from 'vue';
+import { createDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
 
 interface DeviceSlot extends GpioModuleChannel {
   start: number;

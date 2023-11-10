@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import ActuatorOffsetDisableDialog from './ActuatorOffsetDisableDialog.vue';
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { createComponentDialog } from '@/utils/dialog';
-import { fixedNumber, prettyLink } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
   AnalogConstraints,
@@ -12,6 +7,11 @@ import {
   ReferenceKind,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { createComponentDialog } from '@/utils/dialog';
+import { fixedNumber, prettyLink } from '@/utils/quantity';
+import ActuatorOffsetDisableDialog from './ActuatorOffsetDisableDialog.vue';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
   { label: 'Setting', value: ReferenceKind.REF_SETTING },

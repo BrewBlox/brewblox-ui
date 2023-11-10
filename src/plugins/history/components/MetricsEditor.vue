@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
-import { MetricsConfig } from '../types';
+import { QTreeNode } from 'quasar';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/quantity';
-import { QTreeNode } from 'quasar';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
+import { MetricsConfig } from '../types';
 
 interface Props {
   config: MetricsConfig;

@@ -1,16 +1,30 @@
+import { Block } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
+import isObject from 'lodash/isObject';
+import range from 'lodash/range';
+import reduce from 'lodash/reduce';
+import { nanoid } from 'nanoid';
+import { DeepReadonly } from 'vue';
+import { Router } from 'vue-router';
+import { useSparkStore } from '@/plugins/spark/store';
+import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
+import { createDialog, createDialogPromise } from '@/utils/dialog';
+import { loadFile } from '@/utils/import-export';
 import { upgradeGraphConfig, upgradeMetricsConfig } from '../history/utils';
 import {
   CENTER,
   COLOR_KEY,
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
-  deprecatedTypes,
   DEPRECATED_HEIGHT_KEY,
   DEPRECATED_IO_LIQUIDS_KEY,
   DEPRECATED_IO_PRESSURE_KEY,
   DEPRECATED_PUMP_KEY,
   DEPRECATED_SCALE_KEY,
   DEPRECATED_WIDTH_KEY,
+  deprecatedTypes,
   GRAPH_CONFIG_KEY,
   IO_ENABLED_KEY,
   PASSTHROUGH_KEY,
@@ -24,20 +38,6 @@ import {
   PartFlows,
   PartTransitions,
 } from './types';
-import { useSparkStore } from '@/plugins/spark/store';
-import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
-import { createDialog, createDialogPromise } from '@/utils/dialog';
-import { loadFile } from '@/utils/import-export';
-import { Block } from 'brewblox-proto/ts';
-import cloneDeep from 'lodash/cloneDeep';
-import isObject from 'lodash/isObject';
-import range from 'lodash/range';
-import reduce from 'lodash/reduce';
-import { nanoid } from 'nanoid';
-import { DeepReadonly } from 'vue';
-import { Router } from 'vue-router';
 
 export function settingsProp<T = any>(
   settings: Mapped<any>,

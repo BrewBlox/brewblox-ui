@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import {
+  ActuatorOffsetBlock,
+  Block,
+  BlockType,
+  PidBlock,
+  Quantity,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
@@ -14,15 +23,6 @@ import {
   prettyQty,
   tempQty,
 } from '@/utils/quantity';
-import {
-  ActuatorOffsetBlock,
-  Block,
-  BlockType,
-  PidBlock,
-  Quantity,
-  SetpointSensorPairBlock,
-} from 'brewblox-proto/ts';
-import { computed } from 'vue';
 
 const sparkStore = useSparkStore();
 const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();

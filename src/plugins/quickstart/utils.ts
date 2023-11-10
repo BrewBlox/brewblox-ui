@@ -1,11 +1,10 @@
 import {
-  GpioChange,
-  IoChannelAddress,
-  PidConfig,
-  QuickstartAction,
-  QuickstartConfig,
-  QuickstartPatch,
-} from './types';
+  BlockType,
+  DigitalActuatorBlock,
+  OneWireGpioModuleBlock,
+  PidBlock,
+} from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { startAddBlockToDisplay } from '@/plugins/spark/utils/actions';
@@ -15,12 +14,13 @@ import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
 import {
-  BlockType,
-  DigitalActuatorBlock,
-  OneWireGpioModuleBlock,
-  PidBlock,
-} from 'brewblox-proto/ts';
-import cloneDeep from 'lodash/cloneDeep';
+  GpioChange,
+  IoChannelAddress,
+  PidConfig,
+  QuickstartAction,
+  QuickstartConfig,
+  QuickstartPatch,
+} from './types';
 
 const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
   BlockType.DigitalActuator,

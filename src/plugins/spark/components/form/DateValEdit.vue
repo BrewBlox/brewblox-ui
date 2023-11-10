@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {
-  UseValEditEmits,
-  UseValEditProps,
-  useValEdit,
-} from '@/plugins/spark/composables';
-import { parseDate, shortDateString } from '@/utils/quantity';
 import { DateString } from 'brewblox-proto/ts';
 import { computed, onMounted } from 'vue';
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
+import { parseDate, shortDateString } from '@/utils/quantity';
 
 type VT = DateString | null;
 

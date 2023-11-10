@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useField, UseFieldProps } from '@/composables';
-import { createDialog } from '@/utils/dialog';
 import isArray from 'lodash/isArray';
 import { computed } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
+import { createDialog } from '@/utils/dialog';
 
 interface Props extends UseFieldProps {
   modelValue: any;

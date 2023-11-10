@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue';
+import { useFeatureStore, WidgetContext } from '@/store/features';
 import { BlockWidget } from '../types';
 import { ListRenderAddress } from './types';
-import { useFeatureStore, WidgetContext } from '@/store/features';
-import { computed, ref } from 'vue';
 
 interface Props {
   address: ListRenderAddress;

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { emptyGraphConfig } from '@/plugins/history/utils';
-import { useWidgetStore, Widget } from '@/store/widgets';
-import { isJsonEqual } from '@/utils/objects';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
 import { computed, nextTick, ref, watch } from 'vue';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { emptyGraphConfig } from '@/plugins/history/utils';
+import { useWidgetStore, Widget } from '@/store/widgets';
+import { isJsonEqual } from '@/utils/objects';
 
 const props = defineProps({
   routeId: {

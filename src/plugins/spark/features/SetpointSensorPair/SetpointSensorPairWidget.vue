@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
-import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
+import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
-import { computed } from 'vue';
+import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
+import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
 
 const modes = {
   Basic: SetpointSensorPairBasic,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { UseTaskEmits, UseTaskProps } from '../composables';
 import { BrewKettleBlockNames, BrewKettleConfig } from './types';
-import { computed } from 'vue';
 
 const defaultNames: BrewKettleBlockNames = {
   kettleSensor: 'Sensor',

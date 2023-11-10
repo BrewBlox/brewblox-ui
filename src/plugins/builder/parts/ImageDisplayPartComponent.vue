@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/ImageDisplay';
 import { usePart } from '../composables';
 import { URL_KEY } from '../const';
-import { computed } from 'vue';
 
 const { settings, width, height, passthrough } = usePart.setup();
 

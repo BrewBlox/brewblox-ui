@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { TempSensorExternalBlock } from 'brewblox-proto/ts';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty, shortDateString } from '@/utils/quantity';
-import { TempSensorExternalBlock } from 'brewblox-proto/ts';
 
 const { context, inDialog } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<TempSensorExternalBlock>();

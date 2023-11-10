@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
 import { EnablerInterfaceBlock } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
 interface Props {
   hideEnabled?: boolean;

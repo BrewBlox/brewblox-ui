@@ -1,12 +1,3 @@
-import widget from './DigitalActuatorWidget.vue';
-import { genericBlockFeature } from '@/plugins/spark/generic';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { enumHint, prettyConstraints } from '@/plugins/spark/utils/formatting';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { bloxLink } from '@/utils/link';
-import { bloxQty } from '@/utils/quantity';
 import {
   BlockIntfType,
   BlockType,
@@ -16,6 +7,15 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { enumHint, prettyConstraints } from '@/plugins/spark/utils/formatting';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { bloxLink } from '@/utils/link';
+import { bloxQty } from '@/utils/quantity';
+import widget from './DigitalActuatorWidget.vue';
 
 const type = BlockType.DigitalActuator;
 const title = 'Digital Actuator';

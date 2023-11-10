@@ -1,26 +1,3 @@
-import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
-import {
-  changedIoModules,
-  pidDefaults,
-  unlinkedActuators,
-  withoutPrefix,
-  withPrefix,
-} from '../utils';
-import { GlycolConfig } from './types';
-import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
-import { GraphConfig } from '@/plugins/history/types';
-import { useFeatureStore } from '@/store/features';
-import { Widget } from '@/store/widgets';
-import { userUnits } from '@/user-settings';
-import { bloxLink } from '@/utils/link';
-import { typed } from '@/utils/misc';
-import {
-  bloxQty,
-  deltaTempQty,
-  inverseTempQty,
-  tempQty,
-} from '@/utils/quantity';
 import {
   ActuatorPwmBlock,
   Block,
@@ -36,6 +13,29 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
+import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { GraphConfig } from '@/plugins/history/types';
+import { useFeatureStore } from '@/store/features';
+import { Widget } from '@/store/widgets';
+import { userUnits } from '@/user-settings';
+import { bloxLink } from '@/utils/link';
+import { typed } from '@/utils/misc';
+import {
+  bloxQty,
+  deltaTempQty,
+  inverseTempQty,
+  tempQty,
+} from '@/utils/quantity';
+import { TempControlWidget } from '../TempControl/types';
+import { DisplayBlock, PidConfig, QuickstartPatch } from '../types';
+import {
+  changedIoModules,
+  pidDefaults,
+  unlinkedActuators,
+  withoutPrefix,
+  withPrefix,
+} from '../utils';
+import { GlycolConfig } from './types';
 
 const makeGlycolBeerCoolConfig = (): PidConfig => ({
   kp: inverseTempQty(-20),

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useSystemStore } from '@/store/system';
-import { userUnitsDefined } from '@/user-settings';
 import { Notify } from 'quasar';
 import { ref, watch } from 'vue';
+import { useSystemStore } from '@/store/system';
+import { userUnitsDefined } from '@/user-settings';
 
 const systemStore = useSystemStore();
 const notifyHandle = ref<(() => unknown) | null>(null);

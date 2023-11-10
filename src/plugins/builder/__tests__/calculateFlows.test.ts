@@ -1,4 +1,6 @@
-import { FlowPart, FlowSegment } from '@/plugins/builder/FlowSegment';
+import get from 'lodash/get';
+import set from 'lodash/set';
+import { describe, expect, it } from 'vitest';
 import blueprints from '@/plugins/builder/blueprints';
 import {
   asFlowParts,
@@ -13,14 +15,12 @@ import {
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
 } from '@/plugins/builder/const';
+import { FlowPart, FlowSegment } from '@/plugins/builder/FlowSegment';
 import {
   BuilderPart,
   FlowRoute,
   PartTransitions,
 } from '@/plugins/builder/types';
-import get from 'lodash/get';
-import set from 'lodash/set';
-import { describe, expect, it } from 'vitest';
 
 const makeTransitions = (part: BuilderPart): Maybe<PartTransitions> =>
   blueprints[part.type].transitions(part);

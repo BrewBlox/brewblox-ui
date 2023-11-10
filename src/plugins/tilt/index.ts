@@ -1,13 +1,13 @@
-import TiltWidget from './Tilt';
-import { useTiltStore } from './store';
-import { TiltService } from './types';
-import { isTiltServiceState, isTiltState } from './utils';
+import { Plugin } from 'vue';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { globRegister } from '@/utils/component-ref';
-import { Plugin } from 'vue';
+import { useTiltStore } from './store';
+import TiltWidget from './Tilt';
+import { TiltService } from './types';
+import { isTiltServiceState, isTiltState } from './utils';
 
 const plugin: Plugin = {
   install(app) {

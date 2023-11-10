@@ -1,3 +1,5 @@
+import { produce } from 'immer';
+import { computed, ComputedRef, inject, toRaw } from 'vue';
 import { useFeatureStore } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import {
@@ -7,8 +9,6 @@ import {
   VolatileKey,
   WidgetKey,
 } from '@/symbols';
-import { produce } from 'immer';
-import { computed, ComputedRef, inject, toRaw } from 'vue';
 
 export interface UseWidgetComponent<WidgetT extends Widget> {
   widgetId: string;

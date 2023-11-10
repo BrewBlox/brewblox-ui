@@ -1,5 +1,5 @@
-import { IoChannelAddress, QuickstartConfig } from '../types';
 import { Quantity } from 'brewblox-proto/ts';
+import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export type HermsBlockNames = {
   hltSensor: string;

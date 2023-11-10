@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import GridItem from './GridItem.vue';
-import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
+import { computed, CSSProperties, ref } from 'vue';
 import { WidgetContext } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { nullFilter } from '@/utils/functional';
-import { CSSProperties, computed, ref } from 'vue';
+import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
+import GridItem from './GridItem.vue';
 
 interface Props {
   widgets: Widget[];

@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { provide, ref } from 'vue';
 import { QuickstartCardTitleKey } from '../symbols';
 import { QuickstartAction } from '../types';
-import { provide, ref } from 'vue';
 
 interface Props {
   tasks: string[];

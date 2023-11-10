@@ -1,7 +1,7 @@
-import ConfigWatcher from './ConfigWatcher.vue';
+import { Plugin } from 'vue';
 import { useFeatureStore, WatcherFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
-import { Plugin } from 'vue';
+import ConfigWatcher from './ConfigWatcher.vue';
 
 const plugin: Plugin = {
   install(app) {

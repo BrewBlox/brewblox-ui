@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { useContext } from '@/composables';
 import TempControlBasic from './TempControlBasic.vue';
 import TempControlFull from './TempControlFull.vue';
-import { useContext } from '@/composables';
 
 const modes = {
   Basic: TempControlBasic,

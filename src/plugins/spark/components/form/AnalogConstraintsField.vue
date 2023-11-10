@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { prettyLink } from '@/utils/quantity';
 import { AnalogConstraintBase, AnalogConstraints } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { prettyLink } from '@/utils/quantity';
 
 interface Props {
   modelValue?: AnalogConstraints;

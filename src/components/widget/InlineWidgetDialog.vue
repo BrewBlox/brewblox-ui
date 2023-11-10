@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed, provide, reactive } from 'vue';
 import { useGlobals, useWidget } from '@/composables';
 import { WidgetContext, WidgetMode } from '@/store/features';
 import { ContextKey } from '@/symbols';
-import { computed, provide, reactive } from 'vue';
 
 interface Props {
   active: boolean;

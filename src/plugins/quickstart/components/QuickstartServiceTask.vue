@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { UseTaskEmits, UseTaskProps } from '../composables';
-import { QuickstartConfig } from '../types';
+import { BlockType } from 'brewblox-proto/ts';
+import { computed, ref } from 'vue';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Service, ServiceStub, useServiceStore } from '@/store/services';
 import { makeTypeFilter } from '@/utils/functional';
 import { startCreateService } from '@/utils/services';
-import { BlockType } from 'brewblox-proto/ts';
-import { computed, ref } from 'vue';
+import { UseTaskEmits, UseTaskProps } from '../composables';
+import { QuickstartConfig } from '../types';
 
 const props = defineProps<UseTaskProps<QuickstartConfig>>();
 

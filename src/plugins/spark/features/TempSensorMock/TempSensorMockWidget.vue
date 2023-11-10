@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { Fluctuation, TempSensorMockBlock } from 'brewblox-proto/ts';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty, deltaTempQty, prettyQty } from '@/utils/quantity';
-import { Fluctuation, TempSensorMockBlock } from 'brewblox-proto/ts';
 
 const { context, inDialog } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<TempSensorMockBlock>();

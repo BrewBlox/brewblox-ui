@@ -1,3 +1,6 @@
+import { writeFileSync } from 'fs';
+import axios from 'axios';
+import get from 'lodash/get.js';
 import {
   databases,
   datastore,
@@ -5,9 +8,6 @@ import {
   objectSorter,
   retry,
 } from './utils.mjs';
-import axios from 'axios';
-import { writeFileSync } from 'fs';
-import get from 'lodash/get.js';
 
 async function run() {
   await retry('Waiting for datastore', () => axios.get(`${datastore}/ping`));

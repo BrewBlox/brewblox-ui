@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { eventbus } from '@/eventbus';
 import { useHistoryStore } from '@/plugins/history/store';
 import { useLoggingStore } from '@/store/logging';
 import { createDialog } from '@/utils/dialog';
 import { notifyColors, notifyIcons } from '@/utils/notify';
 import { shortDateString } from '@/utils/quantity';
-import { computed } from 'vue';
 
 interface LogEntryDisplay {
   message: string;

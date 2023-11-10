@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { durationString } from '@/utils/quantity';
 import {
   DigitalConstraintBase,
   DigitalConstraints,
@@ -7,6 +6,7 @@ import {
   MutexedConstraint,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { durationString } from '@/utils/quantity';
 
 interface Props {
   modelValue?: DigitalConstraints;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { createDialog } from '@/utils/dialog';
 import cloneDeep from 'lodash/cloneDeep';
 import { Layout } from 'plotly.js';
+import { createDialog } from '@/utils/dialog';
 
 interface Props {
   layout: Partial<Layout>;

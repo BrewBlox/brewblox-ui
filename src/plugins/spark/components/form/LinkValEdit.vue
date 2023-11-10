@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { Link } from 'brewblox-proto/ts';
+import { computed, ref } from 'vue';
 import {
+  useValEdit,
   UseValEditEmits,
   UseValEditProps,
-  useValEdit,
 } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
-import { Link } from 'brewblox-proto/ts';
-import { computed, ref } from 'vue';
 
 type VT = Link;
 

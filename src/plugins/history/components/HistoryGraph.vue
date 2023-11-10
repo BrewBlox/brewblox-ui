@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { addSource } from '@/plugins/history/sources/graph';
-import { useHistoryStore } from '@/plugins/history/store';
-import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 import debounce from 'lodash/debounce';
 import { Layout, PlotData } from 'plotly.js';
 import {
@@ -12,6 +9,9 @@ import {
   ref,
   watch,
 } from 'vue';
+import { addSource } from '@/plugins/history/sources/graph';
+import { useHistoryStore } from '@/plugins/history/store';
+import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 
 interface Props {
   graphId: string;

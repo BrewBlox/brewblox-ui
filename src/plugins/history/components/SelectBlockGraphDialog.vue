@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { GraphConfig } from '../types';
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { Block, BlockType } from 'brewblox-proto/ts';
+import mapValues from 'lodash/mapValues';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
@@ -12,9 +14,7 @@ import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import { useServiceStore } from '@/store/services';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { makeTypeFilter } from '@/utils/functional';
-import { Block, BlockType } from 'brewblox-proto/ts';
-import mapValues from 'lodash/mapValues';
-import { computed, ref } from 'vue';
+import { GraphConfig } from '../types';
 
 interface Props extends UseDialogProps {
   address?: BlockAddress | null;

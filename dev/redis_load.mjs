@@ -1,7 +1,7 @@
-import { databases, datastore, fileDir, retry } from './utils.mjs';
-import axios from 'axios';
 import { readFileSync } from 'fs';
+import axios from 'axios';
 import get from 'lodash/get.js';
+import { databases, datastore, fileDir, retry } from './utils.mjs';
 
 async function run() {
   await retry('Waiting for redis', () => axios.get(`${datastore}/ping`));

@@ -1,7 +1,7 @@
-import { fileDir, host, objectSorter, sparks } from './utils.mjs';
-import axios from 'axios';
 import { writeFileSync } from 'fs';
+import axios from 'axios';
 import Minimist from 'minimist';
+import { fileDir, host, objectSorter, sparks } from './utils.mjs';
 
 // Save all services if not further specified
 const args = Minimist(process.argv.slice(2))._;

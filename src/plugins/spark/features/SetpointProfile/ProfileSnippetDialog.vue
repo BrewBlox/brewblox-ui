@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';
-import { createDialog } from '@/utils/dialog';
-import { deserialize } from '@/utils/parsing';
 import { BlockType, SetpointProfileBlock } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { useBlockSnippetStore, useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
+import { deserialize } from '@/utils/parsing';
 
 const typeName = BlockType.SetpointProfile;
 

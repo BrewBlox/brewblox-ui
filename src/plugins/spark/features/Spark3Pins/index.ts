@@ -1,11 +1,11 @@
-import widget from './Spark3PinsWidget.vue';
+import { BlockType, Spark3PinsBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
-import { BlockType, Spark3PinsBlock } from 'brewblox-proto/ts';
-import { Plugin } from 'vue';
+import widget from './Spark3PinsWidget.vue';
 
 const type = BlockType.Spark3Pins;
 const title = 'Spark 3 Pins';

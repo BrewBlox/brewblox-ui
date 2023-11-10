@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { authLogin } from '@/auth';
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
-import { ref } from 'vue';
 
 interface Props extends UseDialogProps {
   title?: string;

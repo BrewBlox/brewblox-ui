@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { bloxLink } from '@/utils/link';
 import {
   ChannelCapabilities,
   GpioDeviceType,
@@ -9,6 +7,8 @@ import {
 } from 'brewblox-proto/ts';
 import clamp from 'lodash/clamp';
 import { computed, reactive, watch } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { bloxLink } from '@/utils/link';
 
 type EditingKind =
   | 'UNKNOWN'

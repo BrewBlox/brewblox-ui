@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import debounce from 'lodash/debounce';
+import { computed, inject, nextTick, ref, watch } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
@@ -8,8 +10,6 @@ import {
 import { usePart } from '../composables';
 import { SQUARE_SIZE, URL_KEY } from '../const';
 import { PortalIdKey, ZoomTransformKey } from '../symbols';
-import debounce from 'lodash/debounce';
-import { computed, inject, nextTick, ref, watch } from 'vue';
 
 const { settings, width, height, editable, placeholder, interactable } =
   usePart.setup();

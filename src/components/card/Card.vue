@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useContext, useGlobals } from '@/composables';
 import { computed, PropType } from 'vue';
+import { useContext, useGlobals } from '@/composables';
 
 const props = defineProps({
   noScroll: {

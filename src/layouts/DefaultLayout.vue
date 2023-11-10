@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { useQuasar } from 'quasar';
+import { computed, ref } from 'vue';
 import brewbloxLogoSvg from '@/assets/logo-wordmark-dark.svg';
 import { useGlobals, useKiosk } from '@/composables';
 import { startCreateLayout } from '@/plugins/builder/utils';
 import { startCreateFolder } from '@/store/sidebar/utils';
 import { startCreateDashboard } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
-import { useQuasar } from 'quasar';
-import { computed, ref } from 'vue';
 
 const { localStorage } = useQuasar();
 const { dense } = useGlobals.setup();

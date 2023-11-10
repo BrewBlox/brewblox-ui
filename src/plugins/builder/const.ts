@@ -1,4 +1,3 @@
-import { BuilderTool } from './types';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -16,6 +15,7 @@ import {
   TempSensorMockBlock,
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
+import { BuilderTool } from './types';
 
 export const DEFAULT_LAYOUT_WIDTH = 20;
 export const DEFAULT_LAYOUT_HEIGHT = 15;

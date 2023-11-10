@@ -1,3 +1,5 @@
+import { Plugin } from 'vue';
+import { globRegister } from '@/utils/component-ref';
 import BrewKettle from './BrewKettle';
 import Ferment from './Ferment';
 import Fridge from './Fridge';
@@ -5,8 +7,6 @@ import Glycol from './Glycol';
 import Herms from './Herms';
 import Rims from './Rims';
 import TempControl from './TempControl';
-import { globRegister } from '@/utils/component-ref';
-import { Plugin } from 'vue';
 
 const plugin: Plugin = {
   install(app) {

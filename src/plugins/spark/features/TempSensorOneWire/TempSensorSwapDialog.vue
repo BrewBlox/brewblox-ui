@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { BlockAddress } from '@/plugins/spark/types';
 import { BlockType, TempSensorOneWireBlock } from 'brewblox-proto/ts';
 import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
 
 interface Props extends UseDialogProps {
   serviceId: string;

@@ -1,3 +1,8 @@
+import { nanoid } from 'nanoid';
+import { Plugin } from 'vue';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { Widget } from '@/store/widgets';
+import { cref } from '@/utils/component-ref';
 import {
   convertDeprecatedAnalogConstraints,
   convertDeprecatedDigitalConstraints,
@@ -6,11 +11,6 @@ import {
 } from '../../utils/configuration';
 import widget from './QuickActionsWidget.vue';
 import { QuickActionsConfig, QuickActionsConfigOld } from './types';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { Widget } from '@/store/widgets';
-import { cref } from '@/utils/component-ref';
-import { nanoid } from 'nanoid';
-import { Plugin } from 'vue';
 
 const plugin: Plugin = {
   install(app) {

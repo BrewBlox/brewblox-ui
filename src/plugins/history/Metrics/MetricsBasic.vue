@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
-import { MetricsWidget } from './types';
+import defaults from 'lodash/defaults';
+import { nanoid } from 'nanoid';
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { addSource } from '@/plugins/history/sources/metrics';
@@ -13,9 +14,8 @@ import {
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { isJsonEqual } from '@/utils/objects';
 import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
-import defaults from 'lodash/defaults';
-import { nanoid } from 'nanoid';
-import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
+import { MetricsWidget } from './types';
 
 interface CurrentValue extends MetricValue {
   name: string;

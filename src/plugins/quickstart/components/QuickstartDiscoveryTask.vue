@@ -1,16 +1,4 @@
 <script setup lang="ts">
-import { UseTaskEmits, UseTaskProps } from '../composables';
-import { QuickstartConfig } from '../types';
-import { useSparkStore } from '@/plugins/spark/store';
-import { discoverBlocks } from '@/plugins/spark/utils/actions';
-import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { useFeatureStore } from '@/store/features';
-import { createBlockDialog } from '@/utils/block-dialog';
-import { createDialog } from '@/utils/dialog';
-import { makeObjectSorter } from '@/utils/functional';
-import { matchesType } from '@/utils/objects';
-import { prettyQty } from '@/utils/quantity';
 import {
   Block,
   BlockIntfType,
@@ -21,6 +9,18 @@ import {
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
 import { computed, onBeforeMount } from 'vue';
+import { useSparkStore } from '@/plugins/spark/store';
+import { discoverBlocks } from '@/plugins/spark/utils/actions';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { useFeatureStore } from '@/store/features';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
+import { prettyQty } from '@/utils/quantity';
+import { UseTaskEmits, UseTaskProps } from '../composables';
+import { QuickstartConfig } from '../types';
 
 const props = defineProps<UseTaskProps<QuickstartConfig>>();
 

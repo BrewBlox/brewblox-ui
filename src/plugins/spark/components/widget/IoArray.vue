@@ -1,15 +1,4 @@
 <script setup lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
-import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
-import {
-  channelName,
-  prettyLimitations,
-} from '@/plugins/spark/utils/formatting';
-import { ifCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
-import { bloxLink } from '@/utils/link';
 import {
   Block,
   BlockIntfType,
@@ -24,6 +13,17 @@ import {
   Link,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import {
+  channelName,
+  prettyLimitations,
+} from '@/plugins/spark/utils/formatting';
+import { ifCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
 
 interface EditableChannel extends IoChannel {
   name: string;

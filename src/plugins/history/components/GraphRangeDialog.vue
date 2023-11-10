@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed, ref } from 'vue';
 
 type Range = [min: number | null, max: number | null];
 

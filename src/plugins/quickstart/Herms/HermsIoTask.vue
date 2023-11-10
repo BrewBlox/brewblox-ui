@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
 import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange } from '../types';
 import { HermsConfig } from './types';
-import { reactive } from 'vue';
 
 const props = defineProps<UseTaskProps<HermsConfig>>();
 

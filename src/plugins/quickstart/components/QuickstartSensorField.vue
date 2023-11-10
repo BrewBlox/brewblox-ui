@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { Block, BlockIntfType } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { prettyQty } from '@/utils/quantity';
-import { Block, BlockIntfType } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 
 interface Props {
   modelValue: string | null;

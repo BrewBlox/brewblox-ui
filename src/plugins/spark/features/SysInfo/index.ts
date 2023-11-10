@@ -1,10 +1,3 @@
-import widget from './SysInfoWidget.vue';
-import { systemBlockFeature } from '@/plugins/spark/generic';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockSpec } from '@/plugins/spark/types';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { bloxQty } from '@/utils/quantity';
 import {
   BlockType,
   DisplayTempUnit,
@@ -12,6 +5,13 @@ import {
   SysInfoBlock,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { systemBlockFeature } from '@/plugins/spark/generic';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockSpec } from '@/plugins/spark/types';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { bloxQty } from '@/utils/quantity';
+import widget from './SysInfoWidget.vue';
 
 const type = BlockType.SysInfo;
 const title = 'Spark System Info';

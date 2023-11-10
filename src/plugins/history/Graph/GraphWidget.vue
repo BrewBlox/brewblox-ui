@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import { addBlockGraph, selectSessionGraph } from './utils';
-import { useContext, useGlobals, useWidget } from '@/composables';
-import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
-import { Widget } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
-import { isJsonEqual } from '@/utils/objects';
-import { bloxQty, durationString } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
@@ -14,6 +6,14 @@ import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
 import { nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useContext, useGlobals, useWidget } from '@/composables';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { defaultPresets, emptyGraphConfig } from '@/plugins/history/utils';
+import { Widget } from '@/store/widgets';
+import { createDialog } from '@/utils/dialog';
+import { isJsonEqual } from '@/utils/objects';
+import { bloxQty, durationString } from '@/utils/quantity';
+import { addBlockGraph, selectSessionGraph } from './utils';
 
 const router = useRouter();
 const { dense } = useGlobals.setup();

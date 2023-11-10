@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { prettyConstraints } from '../../utils/formatting';
-import {
-  UseValEditEmits,
-  UseValEditProps,
-  useValEdit,
-} from '@/plugins/spark/composables';
 import { AnalogConstraints } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
+import { prettyConstraints } from '../../utils/formatting';
 
 type VT = AnalogConstraints;
 

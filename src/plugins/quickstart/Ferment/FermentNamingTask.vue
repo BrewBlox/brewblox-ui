@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { UseTaskEmits, UseTaskProps } from '../composables';
 import { FermentBlockNames, FermentConfig } from './types';
-import { computed } from 'vue';
 
 const props = defineProps<UseTaskProps<FermentConfig>>();
 

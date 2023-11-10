@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { usePart } from '@/plugins/builder/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed } from 'vue';
 
 interface Props {
   min: AreaSize;

@@ -1,4 +1,10 @@
-import { configApi, globalApi } from './api';
+import { StoreObject, StoreObjectImpl } from 'brewblox-proto/ts';
+import formatDate from 'date-fns/format';
+import defaults from 'lodash/defaults';
+import omit from 'lodash/omit';
+import { defineStore } from 'pinia';
+import { DialogChainObject } from 'quasar';
+import KeyboardLayouts from 'simple-keyboard-layouts';
 import timezones from '@/assets/timezones.json';
 import {
   defaultUserTimeZone,
@@ -13,13 +19,7 @@ import {
   userUnitsDefined,
 } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
-import { StoreObject, StoreObjectImpl } from 'brewblox-proto/ts';
-import formatDate from 'date-fns/format';
-import defaults from 'lodash/defaults';
-import omit from 'lodash/omit';
-import { defineStore } from 'pinia';
-import { DialogChainObject } from 'quasar';
-import KeyboardLayouts from 'simple-keyboard-layouts';
+import { configApi, globalApi } from './api';
 
 const UI_SETTINGS_STORE_ID = 'default';
 const USER_UNITS_STORE_ID = 'units';

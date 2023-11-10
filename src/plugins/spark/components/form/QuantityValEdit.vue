@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import {
-  UseValEditEmits,
-  UseValEditProps,
-  useValEdit,
-} from '@/plugins/spark/composables';
-import { createDialog } from '@/utils/dialog';
-import { prettyQty, prettyUnit, roundedNumber } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import isFinite from 'lodash/isFinite';
 import { computed, ref } from 'vue';
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
+import { createDialog } from '@/utils/dialog';
+import { prettyQty, prettyUnit, roundedNumber } from '@/utils/quantity';
 
 type VT = Quantity;
 

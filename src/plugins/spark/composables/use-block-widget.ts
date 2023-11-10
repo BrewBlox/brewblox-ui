@@ -1,3 +1,5 @@
+import { Block } from 'brewblox-proto/ts';
+import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
 import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { emptyGraphConfig } from '@/plugins/history/utils';
@@ -7,8 +9,6 @@ import { BlockConfig, BlockSpec, BlockWidget } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import { prettyLimitations } from '@/plugins/spark/utils/formatting';
 import { useWidgetStore } from '@/store/widgets';
-import { Block } from 'brewblox-proto/ts';
-import { computed, ComputedRef, inject, WritableComputedRef } from 'vue';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {

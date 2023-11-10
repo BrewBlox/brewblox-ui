@@ -1,26 +1,4 @@
 <script setup lang="ts">
-import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
-import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
-import { characterTitles, nonErrorResults } from './const';
-import { ExpressionError } from './types';
-import {
-  analogIdx,
-  analogKey,
-  comparisonCheck,
-  digitalIdx,
-  digitalKey,
-  prettyAnalog,
-  prettyDigital,
-  shiftRemainingComparisons,
-  syntaxCheck,
-} from './utils';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { ENUM_LABELS_LOGIC_RESULT } from '@/plugins/spark/const';
-import { useSparkStore } from '@/plugins/spark/store';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { createComponentDialog } from '@/utils/dialog';
-import { bloxLink } from '@/utils/link';
-import { nonNullString, prettyLink } from '@/utils/quantity';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
@@ -33,6 +11,28 @@ import {
   LogicResult,
 } from 'brewblox-proto/ts';
 import { computed, onBeforeUnmount, ref } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_LOGIC_RESULT } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { createComponentDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
+import { nonNullString, prettyLink } from '@/utils/quantity';
+import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
+import { characterTitles, nonErrorResults } from './const';
+import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
+import { ExpressionError } from './types';
+import {
+  analogIdx,
+  analogKey,
+  comparisonCheck,
+  digitalIdx,
+  digitalKey,
+  prettyAnalog,
+  prettyDigital,
+  shiftRemainingComparisons,
+  syntaxCheck,
+} from './utils';
 
 const validTypes: BlockIntfType[] = [
   BlockIntfType.DigitalInterface,

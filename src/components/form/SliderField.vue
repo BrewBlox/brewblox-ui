@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/quantity';
-import { computed } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: number;

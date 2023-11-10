@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useWidget } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockWidget } from '@/plugins/spark/types';
-import { computed } from 'vue';
 
 interface AbsenceReason {
   message: string;

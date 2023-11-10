@@ -1,3 +1,4 @@
+import { BuilderBlueprint, BuilderType } from '@/plugins/builder/types';
 import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
 import BuilderLabel from './BuilderLabel';
@@ -20,8 +21,8 @@ import ImageDisplay from './ImageDisplay';
 import ImmersionCoil from './ImmersionCoil';
 import Keg from './Keg';
 import Kettle from './Kettle';
-import LValve from './LValve';
 import Lauterhexe from './Lauterhexe';
+import LValve from './LValve';
 import MetricsDisplay from './MetricsDisplay';
 import PidDisplay from './PidDisplay';
 import ProfileDisplay from './ProfileDisplay';
@@ -42,7 +43,6 @@ import UrlDisplay from './UrlDisplay';
 import Valve from './Valve';
 import WebframeDisplay from './WebframeDisplay';
 import WhirlpoolInlet from './WhirlpoolInlet';
-import { BuilderBlueprint, BuilderType } from '@/plugins/builder/types';
 
 const blueprints: Record<BuilderType, BuilderBlueprint> = {
   BeerBottle,

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { GRID_GAP_SIZE, GRID_SQUARE_SIZE, MIN_COLS, MIN_ROWS } from './const';
-import { useWidgetStore, Widget } from '@/store/widgets';
 import clamp from 'lodash/clamp';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import { TouchPanValue } from 'quasar';
-import { CSSProperties, computed, ref, watch } from 'vue';
+import { computed, CSSProperties, ref, watch } from 'vue';
+import { useWidgetStore, Widget } from '@/store/widgets';
+import { GRID_GAP_SIZE, GRID_SQUARE_SIZE, MIN_COLS, MIN_ROWS } from './const';
 
 interface Props {
   widgetId: string;

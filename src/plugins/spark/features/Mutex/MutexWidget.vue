@@ -1,11 +1,4 @@
 <script setup lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { isBlockCompatible } from '@/plugins/spark/utils/info';
-import { createBlockDialog } from '@/utils/block-dialog';
-import { createDialog } from '@/utils/dialog';
-import { prettyLink, prettyQty } from '@/utils/quantity';
 import {
   Block,
   BlockIntfType,
@@ -16,6 +9,13 @@ import {
 } from 'brewblox-proto/ts';
 import { QTableColumn } from 'quasar';
 import { computed } from 'vue';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { prettyLink, prettyQty } from '@/utils/quantity';
 
 interface DigitalConstrainedBlock extends Block {
   data: {

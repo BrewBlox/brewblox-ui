@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { Quantity, Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
+import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { bloxQty, durationMs, tempQty } from '@/utils/quantity';
-import { Quantity, Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
-import cloneDeep from 'lodash/cloneDeep';
-import { computed } from 'vue';
 
 interface DisplaySetpoint {
   datetime: Date;

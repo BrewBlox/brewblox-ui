@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { DS2413Block } from 'brewblox-proto/ts';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DS2413Block } from 'brewblox-proto/ts';
 
 const { context } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<DS2413Block>();

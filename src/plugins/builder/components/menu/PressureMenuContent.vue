@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { usePart } from '../../composables';
-import { createDialog } from '@/utils/dialog';
 import { computed } from 'vue';
+import { createDialog } from '@/utils/dialog';
+import { usePart } from '../../composables';
 
 interface Props {
   settingsKey: string;

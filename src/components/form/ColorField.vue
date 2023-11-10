@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed, CSSProperties } from 'vue';
 import { useField, UseFieldProps } from '@/composables';
 import { parseColor } from '@/utils/colors';
 import { createDialog } from '@/utils/dialog';
-import { computed, CSSProperties } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: string;

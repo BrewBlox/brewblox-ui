@@ -1,8 +1,8 @@
+import { describe, expect, it } from 'vitest';
 import { isLink, isQuantity } from '../identity';
 import { JSLink } from '../link';
 import { deserialize, serialize } from '../parsing';
 import { bloxQty } from '../quantity';
-import { describe, expect, it } from 'vitest';
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {

@@ -1,16 +1,4 @@
 <script setup lang="ts">
-import { PidConfig } from '../types';
-import { TempControlMode } from './types';
-import {
-  UseDialogEmits,
-  UseDialogProps,
-  useDialog,
-  useGlobals,
-} from '@/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { createDialog } from '@/utils/dialog';
-import { makeTypeFilter } from '@/utils/functional';
-import { bloxQty, inverseTempQty } from '@/utils/quantity';
 import {
   BlockType,
   Link,
@@ -19,6 +7,18 @@ import {
 } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, reactive } from 'vue';
+import {
+  useDialog,
+  UseDialogEmits,
+  UseDialogProps,
+  useGlobals,
+} from '@/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
+import { bloxQty, inverseTempQty } from '@/utils/quantity';
+import { PidConfig } from '../types';
+import { TempControlMode } from './types';
 
 interface Props extends UseDialogProps {
   modelValue: TempControlMode;

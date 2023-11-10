@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Widget } from '@/store/widgets';
 import { computed, onMounted } from 'vue';
+import { Widget } from '@/store/widgets';
 
 interface Props {
   widget: Widget;

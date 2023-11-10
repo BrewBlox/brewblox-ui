@@ -1,6 +1,6 @@
-import { defaultLabel, nodeBuilder } from '../nodes';
 import { QTreeNode } from 'quasar';
 import { describe, expect, it } from 'vitest';
+import { defaultLabel, nodeBuilder } from '../nodes';
 
 const groupedFields = (): Mapped<string[]> => ({
   sparkey: ['actuator-pwm-1/setting', 'actuator-pwm-1/value'],

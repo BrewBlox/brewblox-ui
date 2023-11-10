@@ -1,11 +1,4 @@
 import {
-  comparisonCheck,
-  sanitize,
-  shiftRemainingComparisons,
-  syntaxCheck,
-} from '../utils';
-import { bloxLink } from '@/utils/link';
-import {
   ActuatorLogicBlock,
   AnalogCompare,
   AnalogCompareOp,
@@ -15,6 +8,13 @@ import {
   LogicResult,
 } from 'brewblox-proto/ts';
 import { describe, expect, it } from 'vitest';
+import { bloxLink } from '@/utils/link';
+import {
+  comparisonCheck,
+  sanitize,
+  shiftRemainingComparisons,
+  syntaxCheck,
+} from '../utils';
 
 describe('Sanitize expression strings', () => {
   it('should remove invalid characters', () => {

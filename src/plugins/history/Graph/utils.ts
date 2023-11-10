@@ -1,13 +1,13 @@
+import cloneDeep from 'lodash/cloneDeep';
+import isArray from 'lodash/isArray';
+import mergeWith from 'lodash/mergeWith';
+import uniq from 'lodash/uniq';
 import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig, QueryTarget } from '@/plugins/history/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
-import cloneDeep from 'lodash/cloneDeep';
-import isArray from 'lodash/isArray';
-import mergeWith from 'lodash/mergeWith';
-import uniq from 'lodash/uniq';
 
 export function mergeTargets(
   a: QueryTarget[],

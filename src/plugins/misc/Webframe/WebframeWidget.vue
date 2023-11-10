@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { WebframeWidget } from './types';
-import { useContext, useWidget } from '@/composables';
 import { computed } from 'vue';
+import { useContext, useWidget } from '@/composables';
+import { WebframeWidget } from './types';
 
 const { config, patchConfig } = useWidget.setup<WebframeWidget>();
 const { context } = useContext.setup();

@@ -1,3 +1,7 @@
+import defaults from 'lodash/defaults';
+import { useDashboardStore } from '@/store/dashboards';
+import { useWidgetStore, Widget } from '@/store/widgets';
+import { createDialogPromise } from '@/utils/dialog';
 import { typeName as graphType } from './Graph/const';
 import {
   CsvPrecision,
@@ -7,10 +11,6 @@ import {
   QueryTarget,
   SharedGraphConfig,
 } from './types';
-import { useDashboardStore } from '@/store/dashboards';
-import { useWidgetStore, Widget } from '@/store/widgets';
-import { createDialogPromise } from '@/utils/dialog';
-import defaults from 'lodash/defaults';
 
 export const defaultPresets = (): QueryParams[] => [
   { duration: '10m' },

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getNumDialogs } from '@/utils/dialog';
 import { computed, ref } from 'vue';
+import { getNumDialogs } from '@/utils/dialog';
 
 interface Props {
   title: string;

@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import { computed, onErrorCaptured, provide, ref } from 'vue';
+import { useBuilderStore } from '@/plugins/builder/store';
+import { BuilderPart } from '@/plugins/builder/types';
+import { coord2grid, coord2translate } from '@/plugins/builder/utils';
+import { Coordinates, rotatedSize } from '@/utils/coordinates';
+import { notify } from '@/utils/notify';
 import parts from '../parts';
 import {
   InteractableKey,
@@ -7,12 +13,6 @@ import {
   PatchSettingsKey,
   ReflowKey,
 } from '../symbols';
-import { useBuilderStore } from '@/plugins/builder/store';
-import { BuilderPart } from '@/plugins/builder/types';
-import { coord2grid, coord2translate } from '@/plugins/builder/utils';
-import { Coordinates, rotatedSize } from '@/utils/coordinates';
-import { notify } from '@/utils/notify';
-import { computed, onErrorCaptured, provide, ref } from 'vue';
 
 interface Props {
   part: BuilderPart;

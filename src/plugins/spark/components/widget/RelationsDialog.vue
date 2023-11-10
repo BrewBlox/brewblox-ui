@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { BlockRelation } from 'brewblox-proto/ts';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { BlockRelationNode } from '@/plugins/spark/types';
-import { BlockRelation } from 'brewblox-proto/ts';
 
 interface Props extends UseDialogProps {
   serviceId: string;

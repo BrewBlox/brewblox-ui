@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { LoggedSession } from '../types';
-import { useField, UseFieldProps } from '@/composables';
-import { dateString } from '@/utils/quantity';
 import escapeRegExp from 'lodash/escapeRegExp';
 import { computed, ref } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
+import { dateString } from '@/utils/quantity';
+import { LoggedSession } from '../types';
 
 interface SessionOpt extends SelectOption {
   session: LoggedSession;

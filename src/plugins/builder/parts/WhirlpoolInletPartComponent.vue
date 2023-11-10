@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { LEFT } from '@/plugins/builder/const';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
-import { LEFT } from '@/plugins/builder/const';
-import { computed } from 'vue';
 
 const { part, flows, width, height } = usePart.setup();
 

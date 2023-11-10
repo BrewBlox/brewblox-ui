@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import Keyboard from 'simple-keyboard';
+import KeyboardLayouts from 'simple-keyboard-layouts';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { userUISettings } from '@/user-settings';
 import { isDurationString } from '@/utils/identity';
 import { makeRuleValidator } from '@/utils/rules';
-import Keyboard from 'simple-keyboard';
-import KeyboardLayouts from 'simple-keyboard-layouts';
 import 'simple-keyboard/build/css/index.css';
 import { computed, ref, watch } from 'vue';
 

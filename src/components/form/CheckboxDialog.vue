@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 
 interface Props extends UseDialogProps {
   modelValue: any[];

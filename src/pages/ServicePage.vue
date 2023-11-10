@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useFeatureStore } from '@/store/features';
 import { Service, useServiceStore } from '@/store/services';
-import { computed } from 'vue';
 
 const props = defineProps({
   routeId: {

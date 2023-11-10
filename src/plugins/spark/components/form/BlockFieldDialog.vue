@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
 import cloneDeep from 'lodash/cloneDeep';
 import { onBeforeMount, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
 
 interface Props extends UseDialogProps {
   modelValue: any;

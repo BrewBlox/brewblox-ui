@@ -1,7 +1,7 @@
+import { defineStore } from 'pinia';
+import { concatById, filterById, findById } from '@/utils/collections';
 import api from './api';
 import type { SidebarFolder } from './types';
-import { concatById, filterById, findById } from '@/utils/collections';
-import { defineStore } from 'pinia';
 
 export * from './types';
 

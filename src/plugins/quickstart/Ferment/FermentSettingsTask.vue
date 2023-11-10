@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { reactive } from 'vue';
+import { tempQty } from '@/utils/quantity';
 import { UseTaskEmits, UseTaskProps } from '../composables';
 import { FermentConfig, FermentMode, FermentOpts } from './types';
-import { tempQty } from '@/utils/quantity';
-import { reactive } from 'vue';
 
 const props = defineProps<UseTaskProps<FermentConfig>>();
 

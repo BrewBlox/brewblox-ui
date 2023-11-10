@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { usePart, useSettingsBlock } from '../composables';
-import { PwmBlockT, PWM_KEY, PWM_TYPES } from '../const';
+import { computed } from 'vue';
 import { textTransformation } from '@/plugins/builder/utils';
 import { preciseNumber } from '@/utils/quantity';
-import { computed } from 'vue';
+import { usePart, useSettingsBlock } from '../composables';
+import { PWM_KEY, PWM_TYPES, PwmBlockT } from '../const';
 
 interface Props {
   width?: number;

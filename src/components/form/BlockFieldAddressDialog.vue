@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { Block, BlockOrIntfType } from 'brewblox-proto/ts';
+import { computed, onBeforeMount, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockFieldAddress,
@@ -10,8 +12,6 @@ import {
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { Block, BlockOrIntfType } from 'brewblox-proto/ts';
-import { computed, onBeforeMount, ref } from 'vue';
 
 interface Props extends UseDialogProps {
   modelValue: BlockFieldAddress;

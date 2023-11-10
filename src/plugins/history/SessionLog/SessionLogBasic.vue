@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useWidget } from '@/composables';
+import { spliceById } from '@/utils/collections';
+import { createComponentDialog, createDialog } from '@/utils/dialog';
+import { shortDateString } from '@/utils/quantity';
 import { useHistoryStore } from '../store';
 import {
   GraphAnnotation,
@@ -10,11 +15,6 @@ import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
 import SessionHeaderField from './SessionHeaderField.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
 import { SessionLogWidget } from './types';
-import { useWidget } from '@/composables';
-import { spliceById } from '@/utils/collections';
-import { createComponentDialog, createDialog } from '@/utils/dialog';
-import { shortDateString } from '@/utils/quantity';
-import { computed } from 'vue';
 
 const historyStore = useHistoryStore();
 const { config } = useWidget.setup<SessionLogWidget>();

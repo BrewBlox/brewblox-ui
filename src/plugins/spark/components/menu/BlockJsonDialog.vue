@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useSparkStore } from '../../store';
-import { BlockAddress } from '../../types';
-import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
-import { notify } from '@/utils/notify';
 import { Block } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { notify } from '@/utils/notify';
+import { useSparkStore } from '../../store';
+import { BlockAddress } from '../../types';
 
 interface Props extends UseDialogProps {
   address: BlockAddress;

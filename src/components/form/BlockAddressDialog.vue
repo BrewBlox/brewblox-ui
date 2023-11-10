@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { Block } from 'brewblox-proto/ts';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
@@ -7,8 +9,6 @@ import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { Block } from 'brewblox-proto/ts';
-import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
   modelValue: BlockAddress | null;

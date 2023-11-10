@@ -1,11 +1,12 @@
+import { DigitalState } from 'brewblox-proto/ts';
 import {
   LEFT,
   RIGHT,
   UP,
-  ValveBlockT,
   VALVE_CLOSED_KEY,
   VALVE_KEY,
   VALVE_TYPES,
+  ValveBlockT,
 } from '@/plugins/builder/const';
 import {
   BuilderBlueprint,
@@ -13,7 +14,6 @@ import {
   PartTransitions,
 } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
-import { DigitalState } from 'brewblox-proto/ts';
 
 const blueprint: BuilderBlueprint = {
   type: 'LValve',

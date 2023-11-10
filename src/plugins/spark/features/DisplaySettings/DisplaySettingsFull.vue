@@ -1,11 +1,4 @@
 <script setup lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
-import { makeTypeFilter } from '@/utils/functional';
-import { isLink } from '@/utils/identity';
-import { bloxLink } from '@/utils/link';
 import {
   BlockIntfType,
   BlockOrIntfType,
@@ -16,6 +9,13 @@ import {
   SysInfoBlock,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
+import { isLink } from '@/utils/identity';
+import { bloxLink } from '@/utils/link';
 
 const slotNameRules: InputRule[] = [
   (v) => !v || v.length <= 15 || 'Name can only be 15 characters',

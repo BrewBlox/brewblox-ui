@@ -1,9 +1,9 @@
+import { BlockRelation, Link, PidBlock } from 'brewblox-proto/ts';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockRelationNode } from '@/plugins/spark/types';
 import { useFeatureStore } from '@/store/features';
 import { createDialog } from '@/utils/dialog';
 import { isLink } from '@/utils/identity';
-import { BlockRelation, Link, PidBlock } from 'brewblox-proto/ts';
 
 function findLinks(serviceId: string, id: string | null): BlockRelation[] {
   const block = useSparkStore().blockById(serviceId, id);

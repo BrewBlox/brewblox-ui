@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { emptyDigitalConstraints } from '@/plugins/spark/utils/configuration';
 import { DigitalConstraints } from 'brewblox-proto/ts';
 import { produce } from 'immer';
 import defaults from 'lodash/defaults';
 import { computed, toRaw } from 'vue';
+import { emptyDigitalConstraints } from '@/plugins/spark/utils/configuration';
 
 type DNNDigitalConstraints = DeepNonNullable<DigitalConstraints>;
 

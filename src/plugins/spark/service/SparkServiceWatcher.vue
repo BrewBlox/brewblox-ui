@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import type { SparkStatusDescription } from 'brewblox-proto/ts';
+import { useQuasar } from 'quasar';
+import { computed, inject, ref, watch } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { SparkService } from '@/plugins/spark/types';
 import { NowKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { durationMs } from '@/utils/quantity';
-import type { SparkStatusDescription } from 'brewblox-proto/ts';
-import { useQuasar } from 'quasar';
-import { computed, inject, ref, watch } from 'vue';
 
 interface Props {
   service: SparkService;

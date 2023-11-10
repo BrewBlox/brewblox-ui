@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { SparkStatusDescription } from 'brewblox-proto/ts';
+import { computed, provide, reactive } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { WidgetContext } from '@/store/features';
 import { ContextKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { shortDateString } from '@/utils/quantity';
-import { SparkStatusDescription } from 'brewblox-proto/ts';
-import { computed, provide, reactive } from 'vue';
 
 type ConnectStatus = SparkStatusDescription['connection_status'];
 

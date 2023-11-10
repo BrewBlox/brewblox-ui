@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useWidget } from '@/composables';
 import { MetricsConfig } from '../types';
 import { MetricsWidget } from './types';
-import { useWidget } from '@/composables';
-import { computed } from 'vue';
 
 const { widget, saveConfig } = useWidget.setup<MetricsWidget>();
 

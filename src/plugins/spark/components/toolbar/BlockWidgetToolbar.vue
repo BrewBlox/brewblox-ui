@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
 import { ref } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
 const { widgetId, hasGraph, graphConfig } = useBlockWidget.setup();
 const graphModalOpen = ref(false);

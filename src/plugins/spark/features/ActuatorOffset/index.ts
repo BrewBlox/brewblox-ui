@@ -1,12 +1,3 @@
-import widget from './ActuatorOffsetWidget.vue';
-import { genericBlockFeature } from '@/plugins/spark/generic';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { prettyConstraints } from '@/plugins/spark/utils/formatting';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { bloxLink } from '@/utils/link';
-import { deltaTempQty } from '@/utils/quantity';
 import {
   ActuatorOffsetBlock,
   BlockIntfType,
@@ -15,6 +6,15 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { prettyConstraints } from '@/plugins/spark/utils/formatting';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { bloxLink } from '@/utils/link';
+import { deltaTempQty } from '@/utils/quantity';
+import widget from './ActuatorOffsetWidget.vue';
 
 const type = BlockType.ActuatorOffset;
 const title = 'Setpoint Driver';

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { QTreeNode } from 'quasar';
+import { createDialog } from '@/utils/dialog';
 import { DEFAULT_GRAPH_DECIMALS } from '../const';
 import { GraphConfig } from '../types';
-import { createDialog } from '@/utils/dialog';
-import { QTreeNode } from 'quasar';
 
 interface Props {
   config: GraphConfig;

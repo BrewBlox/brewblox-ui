@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { QueryParams } from '@/plugins/history/types';
-import { useBlockWidget } from '@/plugins/spark/composables';
 import { Layout } from 'plotly.js';
 import { nextTick, ref } from 'vue';
+import { QueryParams } from '@/plugins/history/types';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
 const { widgetId, graphConfig } = useBlockWidget.setup();
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { UseTaskEmits, UseTaskProps } from '../composables';
-import { HermsConfig, HermsOpts } from './types';
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, ref } from 'vue';
 import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import {
@@ -10,8 +10,8 @@ import {
   prettyUnit,
   tempQty,
 } from '@/utils/quantity';
-import { Quantity } from 'brewblox-proto/ts';
-import { computed, ref } from 'vue';
+import { UseTaskEmits, UseTaskProps } from '../composables';
+import { HermsConfig, HermsOpts } from './types';
 
 const props = defineProps<UseTaskProps<HermsConfig>>();
 

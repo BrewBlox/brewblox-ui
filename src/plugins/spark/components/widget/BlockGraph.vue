@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { emptyGraphConfig } from '@/plugins/history/utils';
-import { isJsonEqual } from '@/utils/objects';
 import cloneDeep from 'lodash/cloneDeep';
 import isObject from 'lodash/isObject';
 import isString from 'lodash/isString';
 import { Layout } from 'plotly.js';
 import { computed, ref, watch } from 'vue';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { emptyGraphConfig } from '@/plugins/history/utils';
+import { isJsonEqual } from '@/utils/objects';
 
 interface Props {
   modal: boolean;

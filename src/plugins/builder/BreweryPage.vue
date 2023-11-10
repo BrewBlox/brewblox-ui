@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { nanoid } from 'nanoid';
+import { useQuasar } from 'quasar';
+import { computed, provide, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { startupDone } from '@/user-settings';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { usePreselect } from './composables/use-preselect';
@@ -10,11 +15,6 @@ import {
   startCreateLayout,
   startImportLayout,
 } from './utils';
-import { startupDone } from '@/user-settings';
-import { nanoid } from 'nanoid';
-import { useQuasar } from 'quasar';
-import { computed, provide, watch } from 'vue';
-import { useRouter } from 'vue-router';
 
 const props = defineProps({
   routeId: {

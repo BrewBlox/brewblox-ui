@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
 import { reactive, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
 interface Props extends UseDialogProps {
   graphId: string;

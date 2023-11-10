@@ -1,3 +1,4 @@
+import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 import {
   CENTER,
   DEFAULT_IO_PRESSURE,
@@ -7,7 +8,6 @@ import {
   MIN_IO_PRESSURE,
   UP,
 } from '../const';
-import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 
 export const MIN_OUTLET_PRESSURE = MIN_IO_PRESSURE;
 export const MAX_OUTLET_PRESSURE = MAX_IO_PRESSURE;

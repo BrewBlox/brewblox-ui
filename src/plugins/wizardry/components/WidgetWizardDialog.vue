@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { tryCreateWidget } from '../utils';
+import { nanoid } from 'nanoid';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
   useRouteId,
 } from '@/composables';
@@ -18,8 +19,7 @@ import { userUISettings } from '@/user-settings';
 import { startCreateDashboard } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { nanoid } from 'nanoid';
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { tryCreateWidget } from '../utils';
 
 interface FeatureOption extends SelectOption<string> {
   editor: ComponentName;

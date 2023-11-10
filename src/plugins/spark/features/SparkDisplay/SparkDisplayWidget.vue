@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { SparkDisplayWidget } from './types';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { WS_HOST } from '@/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { SparkDisplayWidget } from './types';
 
 // Values are also defined in style section
 const WIDTH = 480;

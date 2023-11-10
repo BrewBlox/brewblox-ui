@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { tryCreateBlock } from '../utils';
+import { Block, BlockType } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
   useRouteId,
 } from '@/composables';
@@ -30,9 +32,7 @@ import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { typed } from '@/utils/misc';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
-import { Block, BlockType } from 'brewblox-proto/ts';
-import { nanoid } from 'nanoid';
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { tryCreateBlock } from '../utils';
 
 interface BlockOption extends SelectOption<BlockType> {
   generate: BlockSpec['generate'];

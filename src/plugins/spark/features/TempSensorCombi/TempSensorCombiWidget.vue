@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { BlockIntfType, Link, TempSensorCombiBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_COMBINE_FUNC } from '@/plugins/spark/const';
@@ -7,8 +9,6 @@ import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { prettyQty } from '@/utils/quantity';
-import { BlockIntfType, Link, TempSensorCombiBlock } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 
 const combineFuncOpts = selectable(ENUM_LABELS_COMBINE_FUNC);
 

@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { Y2_COLOR } from '@/plugins/history/const';
-import { GraphAnnotation } from '@/plugins/history/types';
-import { createDialog } from '@/utils/dialog';
-import { notify } from '@/utils/notify';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
@@ -15,6 +11,10 @@ import Plotly, {
   PlotMouseEvent,
 } from 'plotly.js';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Y2_COLOR } from '@/plugins/history/const';
+import { GraphAnnotation } from '@/plugins/history/types';
+import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
 
 interface Props {
   data?: Partial<PlotData>[];

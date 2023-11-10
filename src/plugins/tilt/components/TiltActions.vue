@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { TiltService } from '@/plugins/tilt/types';
 import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
-import { computed } from 'vue';
 
 interface Props {
   serviceId: string;

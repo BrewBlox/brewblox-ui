@@ -1,12 +1,18 @@
-import { DisplayBlock, QuickstartPatch } from '../types';
 import {
-  changedIoModules,
-  pidDefaults,
-  unlinkedActuators,
-  withoutPrefix,
-  withPrefix,
-} from '../utils';
-import { RimsConfig } from './types';
+  ActuatorOffsetBlock,
+  ActuatorPwmBlock,
+  Block,
+  BlockType,
+  DigitalActuatorBlock,
+  DigitalState,
+  FilterChoice,
+  PidBlock,
+  ReferenceKind,
+  SetpointSensorPairBlock,
+  SettingMode,
+  TransitionDurationPreset,
+} from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import {
@@ -24,21 +30,15 @@ import {
   inverseTempQty,
   tempQty,
 } from '@/utils/quantity';
+import { DisplayBlock, QuickstartPatch } from '../types';
 import {
-  ActuatorOffsetBlock,
-  ActuatorPwmBlock,
-  Block,
-  BlockType,
-  DigitalActuatorBlock,
-  DigitalState,
-  FilterChoice,
-  PidBlock,
-  ReferenceKind,
-  SetpointSensorPairBlock,
-  SettingMode,
-  TransitionDurationPreset,
-} from 'brewblox-proto/ts';
-import { nanoid } from 'nanoid';
+  changedIoModules,
+  pidDefaults,
+  unlinkedActuators,
+  withoutPrefix,
+  withPrefix,
+} from '../utils';
+import { RimsConfig } from './types';
 
 export function defineChangedBlocks(
   config: RimsConfig,

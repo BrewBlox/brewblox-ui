@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
@@ -8,8 +10,6 @@ import {
   startRemoveDashboard,
 } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
 
 interface Props {
   dashboardId: string;

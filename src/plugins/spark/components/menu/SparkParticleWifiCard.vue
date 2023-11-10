@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useSparkStore } from '@/plugins/spark/store';
-import { getWiFiSettingsBlock } from '@/plugins/spark/utils/system';
-import { createDialog } from '@/utils/dialog';
-import { notify } from '@/utils/notify';
 import {
   WifiCipherType,
   WifiSecurityType,
   WiFiSettingsBlock,
 } from 'brewblox-proto/ts';
 import { computed, reactive, ref } from 'vue';
+import { useSparkStore } from '@/plugins/spark/store';
+import { getWiFiSettingsBlock } from '@/plugins/spark/utils/system';
+import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
 
 interface Props {
   serviceId: string;

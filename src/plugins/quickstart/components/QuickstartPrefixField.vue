@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { makeRuleValidator } from '@/utils/rules';
 import { computed, ref } from 'vue';
+import { makeRuleValidator } from '@/utils/rules';
 
 interface Props {
   modelValue: string;

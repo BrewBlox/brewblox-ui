@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { useSparkStore } from '@/plugins/spark/store';
 import { Block, DeprecatedObjectBlock } from 'brewblox-proto/ts';
 import { onBeforeMount, ref } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 
 const sparkStore = useSparkStore();
 const { serviceId, widget, featureTitle, block } =

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { UseFieldProps, useField } from '@/composables';
+import { Block } from 'brewblox-proto/ts';
+import { computed } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockFieldAddress,
@@ -9,8 +11,6 @@ import {
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { prettyAny } from '@/utils/quantity';
-import { Block } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 
 interface Props extends UseFieldProps {
   modelValue: BlockFieldAddress;

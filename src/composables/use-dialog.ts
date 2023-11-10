@@ -1,4 +1,3 @@
-import { ContextKey, InvalidateKey } from '@/symbols';
 import { nanoid } from 'nanoid';
 import { QDialog, QDialogOptions, useDialogPluginComponent } from 'quasar';
 import {
@@ -12,6 +11,7 @@ import {
   watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
+import { ContextKey, InvalidateKey } from '@/symbols';
 
 export interface UseDialogProps {
   title?: string;

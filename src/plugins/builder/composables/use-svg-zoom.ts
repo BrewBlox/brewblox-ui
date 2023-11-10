@@ -1,10 +1,10 @@
-import { ZoomTransformKey } from '../symbols';
 import * as d3 from 'd3';
 import defaults from 'lodash/defaults';
 import isEqual from 'lodash/isEqual';
 import isFinite from 'lodash/isFinite';
 import toFinite from 'lodash/toFinite';
 import { provide, Ref, ref, watch } from 'vue';
+import { ZoomTransformKey } from '../symbols';
 
 export interface UseSvgZoomDimensions {
   width: number;

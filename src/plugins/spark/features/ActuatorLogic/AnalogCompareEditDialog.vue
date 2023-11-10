@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
+import { AnalogCompare, BlockType, Quantity } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { ENUM_LABELS_ANALOG_OP } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { selectable } from '@/utils/collections';
 import { bloxQty, tempQty } from '@/utils/quantity';
-import { AnalogCompare, BlockType, Quantity } from 'brewblox-proto/ts';
-import cloneDeep from 'lodash/cloneDeep';
-import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
   modelValue: AnalogCompare;

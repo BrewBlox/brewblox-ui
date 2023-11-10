@@ -1,4 +1,14 @@
 <script setup lang="ts">
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
+import { computed } from 'vue';
+import { useContext, useWidget } from '@/composables';
+import { useDashboardStore } from '@/store/dashboards';
+import { createComponentDialog, createDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
+import { saveFile } from '@/utils/import-export';
+import { notify } from '@/utils/notify';
+import { dateString } from '@/utils/quantity';
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import { selectGraphPrecision } from '../utils';
@@ -7,16 +17,6 @@ import SessionLoadDialog from './SessionLoadDialog.vue';
 import SessionLogBasic from './SessionLogBasic.vue';
 import SessionLogFull from './SessionLogFull.vue';
 import { SessionLogWidget } from './types';
-import { useContext, useWidget } from '@/composables';
-import { useDashboardStore } from '@/store/dashboards';
-import { createComponentDialog, createDialog } from '@/utils/dialog';
-import { makeTypeFilter } from '@/utils/functional';
-import { saveFile } from '@/utils/import-export';
-import { notify } from '@/utils/notify';
-import { dateString } from '@/utils/quantity';
-import DOMPurify from 'dompurify';
-import { marked } from 'marked';
-import { computed } from 'vue';
 
 const modes = {
   Basic: SessionLogBasic,

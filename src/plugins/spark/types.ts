@@ -1,12 +1,4 @@
 import {
-  GraphAxis,
-  GraphValueAxes,
-  QueryParams,
-} from '@/plugins/history/types';
-import { WidgetFeature } from '@/store/features';
-import { Service } from '@/store/services';
-import { Widget } from '@/store/widgets';
-import {
   AnyConstraintKey,
   Block,
   BlockOrIntfType,
@@ -17,6 +9,14 @@ import {
   StoreObject,
 } from 'brewblox-proto/ts';
 import { Layout } from 'plotly.js';
+import {
+  GraphAxis,
+  GraphValueAxes,
+  QueryParams,
+} from '@/plugins/history/types';
+import { WidgetFeature } from '@/store/features';
+import { Service } from '@/store/services';
+import { Widget } from '@/store/widgets';
 
 export type ComparedBlockType =
   | BlockOrIntfType

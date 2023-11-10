@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { UseTaskEmits, UseTaskProps } from '../composables';
-import { FridgeConfig, FridgeOpts } from './types';
-import { tempQty } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import { ref } from 'vue';
+import { tempQty } from '@/utils/quantity';
+import { UseTaskEmits, UseTaskProps } from '../composables';
+import { FridgeConfig, FridgeOpts } from './types';
 
 const props = defineProps<UseTaskProps<FridgeConfig>>();
 

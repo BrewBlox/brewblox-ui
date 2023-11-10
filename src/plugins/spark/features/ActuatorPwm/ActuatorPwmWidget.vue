@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { ActuatorPwmBlock, Link } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
-import { ActuatorPwmBlock, Link } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 
 const { context, inDialog } = useContext.setup();
 

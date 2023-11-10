@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
   modelValue: string | null;

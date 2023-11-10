@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
-import { ENUM_LABELS_DIGITAL_OP } from '@/plugins/spark/const';
-import { selectable } from '@/utils/collections';
 import { DigitalCompare } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { ENUM_LABELS_DIGITAL_OP } from '@/plugins/spark/const';
+import { selectable } from '@/utils/collections';
 
 interface Props extends UseDialogProps {
   modelValue: DigitalCompare;

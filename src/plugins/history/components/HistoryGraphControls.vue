@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { QueryParams } from '../types';
-import { defaultPresets } from '../utils';
-import { isJsonEqual } from '@/utils/objects';
 import cloneDeep from 'lodash/cloneDeep';
 import { Layout } from 'plotly.js';
+import { isJsonEqual } from '@/utils/objects';
+import { QueryParams } from '../types';
+import { defaultPresets } from '../utils';
 
 interface Props {
   layout: Partial<Layout>;

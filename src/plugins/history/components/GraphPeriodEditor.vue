@@ -1,16 +1,16 @@
 <script setup lang="ts" generic="T extends QueryConfig">
-import { QueryConfig, QueryParams } from '../types';
+import { Quantity } from 'brewblox-proto/ts';
+import { produce } from 'immer';
+import isEqual from 'lodash/isEqual';
+import { date as dateUtil } from 'quasar';
+import { computed, toRaw } from 'vue';
 import {
   bloxQty,
   durationMs,
   durationString,
   parseDate,
 } from '@/utils/quantity';
-import { Quantity } from 'brewblox-proto/ts';
-import { produce } from 'immer';
-import isEqual from 'lodash/isEqual';
-import { date as dateUtil } from 'quasar';
-import { computed, toRaw } from 'vue';
+import { QueryConfig, QueryParams } from '../types';
 
 interface Props {
   config: T;

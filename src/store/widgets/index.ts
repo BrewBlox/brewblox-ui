@@ -1,8 +1,8 @@
+import { defineStore } from 'pinia';
+import { concatById, filterById, findById } from '@/utils/collections';
 import { useFeatureStore } from '../features';
 import api from './api';
 import type { Widget } from './types';
-import { concatById, filterById, findById } from '@/utils/collections';
-import { defineStore } from 'pinia';
 
 export * from './types';
 

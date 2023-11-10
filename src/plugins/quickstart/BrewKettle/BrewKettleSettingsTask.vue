@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { UseTaskEmits, UseTaskProps } from '../composables';
-import { BrewKettleConfig, BrewKettleOpts } from './types';
-import { userUnits } from '@/user-settings';
-import { bloxQty, deltaTempQty } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import { computed, ref } from 'vue';
+import { userUnits } from '@/user-settings';
+import { bloxQty, deltaTempQty } from '@/utils/quantity';
+import { UseTaskEmits, UseTaskProps } from '../composables';
+import { BrewKettleConfig, BrewKettleOpts } from './types';
 
 const props = defineProps<UseTaskProps<BrewKettleConfig>>();
 

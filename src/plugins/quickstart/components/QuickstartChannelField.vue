@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { GpioChange, IoChannelAddress } from '../types';
-import { useSparkStore } from '@/plugins/spark/store';
-import { channelName } from '@/plugins/spark/utils/formatting';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { bloxLink } from '@/utils/link';
 import {
   BlockIntfType,
   BlockType,
@@ -14,6 +9,11 @@ import {
   IoChannel,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useSparkStore } from '@/plugins/spark/store';
+import { channelName } from '@/plugins/spark/utils/formatting';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { bloxLink } from '@/utils/link';
+import { GpioChange, IoChannelAddress } from '../types';
 
 interface Props {
   modelValue: IoChannelAddress | null;

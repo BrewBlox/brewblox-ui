@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { computed, onBeforeMount, reactive, ref } from 'vue';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
 import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange, IoChannelAddress } from '../types';
 import { hasShared, resetGpioChanges } from '../utils';
 import { HermsConfig } from './types';
-import { useSparkStore } from '@/plugins/spark/store';
-import { createDialog } from '@/utils/dialog';
-import { computed, onBeforeMount, reactive, ref } from 'vue';
 
 const props = defineProps<UseTaskProps<HermsConfig>>();
 

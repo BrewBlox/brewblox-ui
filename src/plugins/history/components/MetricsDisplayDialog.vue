@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
-import { defaultLabel } from '../nodes';
-import { MetricsConfig } from '../types';
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { bloxQty, durationMs } from '@/utils/quantity';
 import { Quantity } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, reactive } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { bloxQty, durationMs } from '@/utils/quantity';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
+import { defaultLabel } from '../nodes';
+import { MetricsConfig } from '../types';
 
 interface Props extends UseDialogProps {
   config: MetricsConfig;

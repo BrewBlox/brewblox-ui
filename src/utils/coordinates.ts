@@ -1,6 +1,6 @@
-import { clampRotation } from './quantity';
 import isFinite from 'lodash/isFinite';
 import round from 'lodash/round';
+import { clampRotation } from './quantity';
 
 export type CoordinatesParam =
   | string

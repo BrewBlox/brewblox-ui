@@ -1,5 +1,4 @@
-import { withPrefix } from '../utils';
-import { FermentConfig } from './types';
+import { nanoid } from 'nanoid';
 import {
   BORDER_KEY,
   COLOR_KEY,
@@ -12,7 +11,8 @@ import {
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { nanoid } from 'nanoid';
+import { withPrefix } from '../utils';
+import { FermentConfig } from './types';
 
 export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
   const serviceId = config.serviceId;

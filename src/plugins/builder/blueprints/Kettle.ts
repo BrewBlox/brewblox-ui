@@ -1,6 +1,6 @@
-import { COLOR_KEY } from '../const';
 import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
 import { containerTransitions } from '@/plugins/builder/utils';
+import { COLOR_KEY } from '../const';
 
 export const KETTLE_FILL_PCT_KEY = 'fillPct';
 export const DEFAULT_KETTLE_FILL_PCT = 85;

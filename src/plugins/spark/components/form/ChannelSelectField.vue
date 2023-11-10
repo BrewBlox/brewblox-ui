@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { useSparkStore } from '@/plugins/spark/store';
-import { channelName } from '@/plugins/spark/utils/formatting';
-import { isBlockCompatible } from '@/plugins/spark/utils/info';
-import { bloxLink } from '@/utils/link';
-import { prettyLink } from '@/utils/quantity';
 import {
   BlockIntfType,
   ChannelCapabilities,
@@ -11,6 +6,11 @@ import {
   Link,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useSparkStore } from '@/plugins/spark/store';
+import { channelName } from '@/plugins/spark/utils/formatting';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { bloxLink } from '@/utils/link';
+import { prettyLink } from '@/utils/quantity';
 
 interface ChannelAddress {
   hwDevice: Link;

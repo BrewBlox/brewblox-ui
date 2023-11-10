@@ -1,10 +1,4 @@
 <script setup lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { ENUM_LABELS_VALVE_STATE } from '@/plugins/spark/const';
-import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
-import { getSpark3PinsBlock } from '@/plugins/spark/utils/system';
 import {
   ChannelCapabilities,
   MotorValveBlock,
@@ -12,6 +6,12 @@ import {
   ValveState,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_VALVE_STATE } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { getSpark3PinsBlock } from '@/plugins/spark/utils/system';
 
 const sparkStore = useSparkStore();
 const { context, inDialog } = useContext.setup();

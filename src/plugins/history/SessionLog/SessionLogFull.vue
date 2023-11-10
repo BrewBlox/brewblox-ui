@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import clamp from 'lodash/clamp';
+import { nanoid } from 'nanoid';
+import { dom, TouchPanValue } from 'quasar';
+import { ComponentPublicInstance, computed, ref } from 'vue';
+import { useGlobals, useWidget } from '@/composables';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
 import { useHistoryStore } from '../store';
 import {
   LoggedSession,
@@ -9,13 +16,6 @@ import {
 import { emptyGraphConfig, sharedWidgetConfigs } from '../utils';
 import SessionHeaderField from './SessionHeaderField.vue';
 import { SessionLogWidget } from './types';
-import { useGlobals, useWidget } from '@/composables';
-import { spliceById } from '@/utils/collections';
-import { createDialog } from '@/utils/dialog';
-import clamp from 'lodash/clamp';
-import { nanoid } from 'nanoid';
-import { TouchPanValue, dom } from 'quasar';
-import { ComponentPublicInstance, computed, ref } from 'vue';
 
 const { width } = dom;
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { InteractableKey, PlaceholderKey } from '../symbols';
 import { computed, CSSProperties, inject } from 'vue';
+import { InteractableKey, PlaceholderKey } from '../symbols';
 
 interface Props {
   width?: number;

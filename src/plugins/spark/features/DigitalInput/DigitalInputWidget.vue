@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 import {
   ChannelCapabilities,
   DigitalInputBlock,
   ToggleBehavior,
 } from 'brewblox-proto/ts';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
 
 const behaviorOpts: SelectOption<ToggleBehavior>[] = [
   { value: ToggleBehavior.DIRECT, label: 'Direct' },

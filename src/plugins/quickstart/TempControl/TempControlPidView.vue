@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { PidConfig } from '../types';
-import { prettyQty } from '@/utils/quantity';
 import { computed } from 'vue';
+import { prettyQty } from '@/utils/quantity';
+import { PidConfig } from '../types';
 
 interface Props {
   modelValue: PidConfig;

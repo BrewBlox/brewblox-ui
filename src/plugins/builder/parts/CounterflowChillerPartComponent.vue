@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import {
   CFC_BOTTOM_LEFT,
   CFC_TOP_RIGHT,
 } from '../blueprints/CounterflowChiller';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
-import { computed } from 'vue';
 
 const paths = {
   borders: [

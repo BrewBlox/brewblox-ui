@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { STATE_TOPIC } from '@/const';
-import { eventbus } from '@/eventbus';
-import { useSparkStore } from '@/plugins/spark/store';
-import { isSparkUpdate } from '@/plugins/spark/utils/info';
 import {
   SparkControllerDescription,
   SparkServiceDescription,
   SparkStatusDescription,
 } from 'brewblox-proto/ts';
 import { computed, onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { STATE_TOPIC } from '@/const';
+import { eventbus } from '@/eventbus';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isSparkUpdate } from '@/plugins/spark/utils/info';
 
 type UpdateProgress = 'Pending' | 'Busy' | 'Done';
 

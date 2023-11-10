@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { PlaceholderKey } from '../symbols';
-import { BuilderBlueprint, BuilderPart } from '../types';
-import { coord2grid } from '../utils';
+import { nanoid } from 'nanoid';
+import { computed, provide, ref } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
 } from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { nanoid } from 'nanoid';
-import { computed, provide, ref } from 'vue';
+import { PlaceholderKey } from '../symbols';
+import { BuilderBlueprint, BuilderPart } from '../types';
+import { coord2grid } from '../utils';
 
 interface PartDisplay {
   part: BuilderPart;

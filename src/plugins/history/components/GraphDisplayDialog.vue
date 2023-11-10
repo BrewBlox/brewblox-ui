@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { DEFAULT_GRAPH_DECIMALS, DEFAULT_GRAPH_AXIS } from '../const';
-import { defaultLabel } from '../nodes';
-import { GraphAxis, GraphConfig } from '../types';
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed, reactive } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { DEFAULT_GRAPH_AXIS, DEFAULT_GRAPH_DECIMALS } from '../const';
+import { defaultLabel } from '../nodes';
+import { GraphAxis, GraphConfig } from '../types';
 
 interface Props extends UseDialogProps {
   config: GraphConfig;

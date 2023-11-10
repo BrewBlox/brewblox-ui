@@ -1,11 +1,4 @@
 <script setup lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { ENUM_LABELS_TRANSITION_PRESET } from '@/plugins/spark/const';
-import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
-import { selectable } from '@/utils/collections';
-import { prettyQty } from '@/utils/quantity';
 import {
   ChannelCapabilities,
   DigitalActuatorBlock,
@@ -13,6 +6,13 @@ import {
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_TRANSITION_PRESET } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { selectable } from '@/utils/collections';
+import { prettyQty } from '@/utils/quantity';
 
 const transitionPresetOpts = selectable(ENUM_LABELS_TRANSITION_PRESET);
 

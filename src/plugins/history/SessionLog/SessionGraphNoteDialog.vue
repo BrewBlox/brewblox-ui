@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { SessionGraphNote } from '../types';
-import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { SessionGraphNote } from '../types';
 
 type NoteDates = Pick<SessionGraphNote, 'start' | 'end'>;
 

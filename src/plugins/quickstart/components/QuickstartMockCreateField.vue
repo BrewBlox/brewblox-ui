@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
-import { notify } from '@/utils/notify';
-import { makeRuleValidator, suggestId } from '@/utils/rules';
 import {
   BlockType,
   MockPinsBlock,
@@ -10,6 +6,10 @@ import {
   TempSensorMockBlock,
 } from 'brewblox-proto/ts';
 import { computed, ref } from 'vue';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
+import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
+import { notify } from '@/utils/notify';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
 
 interface Props {
   serviceId: string;

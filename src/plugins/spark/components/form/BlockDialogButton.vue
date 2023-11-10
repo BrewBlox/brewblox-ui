@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useSparkStore } from '@/plugins/spark/store';
-import { createBlockDialog } from '@/utils/block-dialog';
 import { Block } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createBlockDialog } from '@/utils/block-dialog';
 
 interface Props {
   blockId?: string | null;

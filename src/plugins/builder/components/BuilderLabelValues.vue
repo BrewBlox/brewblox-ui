@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import {
   LABEL_FONT_SIZE_DEFAULT,
   LABEL_FONT_SIZE_KEY,
@@ -6,7 +7,6 @@ import {
 import { usePart } from '../composables';
 import { LABEL_KEY } from '../const';
 import { textTransformation } from '../utils';
-import { computed } from 'vue';
 
 interface Props {
   width: number;

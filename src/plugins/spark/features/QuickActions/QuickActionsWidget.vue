@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import QuickActionsBasic from './QuickActionsBasic.vue';
-import QuickActionsFull from './QuickActionsFull.vue';
-import { ChangeAction, QuickActionsWidget } from './types';
+import cloneDeep from 'lodash/cloneDeep';
+import { nanoid } from 'nanoid';
+import { computed } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { userUnits } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
@@ -9,9 +9,9 @@ import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
 import { deserialize } from '@/utils/parsing';
 import { bloxQty, prettyUnit } from '@/utils/quantity';
-import cloneDeep from 'lodash/cloneDeep';
-import { nanoid } from 'nanoid';
-import { computed } from 'vue';
+import QuickActionsBasic from './QuickActionsBasic.vue';
+import QuickActionsFull from './QuickActionsFull.vue';
+import { ChangeAction, QuickActionsWidget } from './types';
 
 const modes = {
   Basic: QuickActionsBasic,

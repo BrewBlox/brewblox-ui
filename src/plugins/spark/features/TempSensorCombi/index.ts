@@ -1,4 +1,9 @@
-import widget from './TempSensorCombiWidget.vue';
+import {
+  BlockType,
+  SensorCombiFunc,
+  TempSensorCombiBlock,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -6,12 +11,7 @@ import { enumHint } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { tempQty } from '@/utils/quantity';
-import {
-  BlockType,
-  SensorCombiFunc,
-  TempSensorCombiBlock,
-} from 'brewblox-proto/ts';
-import { Plugin } from 'vue';
+import widget from './TempSensorCombiWidget.vue';
 
 const type = BlockType.TempSensorCombi;
 const title = 'Temp Sensor (Combined)';

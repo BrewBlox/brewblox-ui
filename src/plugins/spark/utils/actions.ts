@@ -1,11 +1,11 @@
-import { asBlockAddress, makeBlockIdRules } from './configuration';
 import {
-  isBlockCompatible,
-  isBlockDisplayed,
-  isBlockDisplayReady,
-  isCompatible,
-} from './info';
-import { getDisplaySettingsBlock } from './system';
+  Block,
+  BlockIntfType,
+  BlockType,
+  DisplaySlot,
+} from 'brewblox-proto/ts';
+import isMatch from 'lodash/isMatch';
+import range from 'lodash/range';
 import { typeName as graphType } from '@/plugins/history/Graph/const';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
 import { useSparkStore } from '@/plugins/spark/store';
@@ -16,14 +16,14 @@ import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { notify } from '@/utils/notify';
+import { asBlockAddress, makeBlockIdRules } from './configuration';
 import {
-  Block,
-  BlockIntfType,
-  BlockType,
-  DisplaySlot,
-} from 'brewblox-proto/ts';
-import isMatch from 'lodash/isMatch';
-import range from 'lodash/range';
+  isBlockCompatible,
+  isBlockDisplayed,
+  isBlockDisplayReady,
+  isCompatible,
+} from './info';
+import { getDisplaySettingsBlock } from './system';
 
 export async function discoverBlocks(
   serviceId: string | null,

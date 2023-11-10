@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import cloneDeep from 'lodash/cloneDeep';
+import { nanoid } from 'nanoid';
+import { computed, ref, watch } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { createDialog } from '@/utils/dialog';
 import { useHistoryStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import { emptyGraphConfig } from '../utils';
 import SessionSelectField from './SessionSelectField.vue';
-import { UseDialogEmits, UseDialogProps, useDialog } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import cloneDeep from 'lodash/cloneDeep';
-import { nanoid } from 'nanoid';
-import { computed, ref, watch } from 'vue';
 
 interface Props extends UseDialogProps {
   widgetTags: string[];

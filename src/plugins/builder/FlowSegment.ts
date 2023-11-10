@@ -1,3 +1,4 @@
+import { Notify } from 'quasar';
 import { DEFAULT_FRICTION } from './const';
 import {
   BuilderPart,
@@ -6,7 +7,6 @@ import {
   PartTransitions,
   PathFriction,
 } from './types';
-import { Notify } from 'quasar';
 
 export interface FlowPart extends BuilderPart {
   transitions: PartTransitions;

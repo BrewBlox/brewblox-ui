@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { DigitalState } from 'brewblox-proto/ts';
 import {
+  useValEdit,
   UseValEditEmits,
   UseValEditProps,
-  useValEdit,
 } from '@/plugins/spark/composables';
-import { DigitalState } from 'brewblox-proto/ts';
 
 type VT = DigitalState;
 

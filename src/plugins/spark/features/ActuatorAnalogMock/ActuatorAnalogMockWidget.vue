@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { useContext } from '@/composables';
 import BlockEnableToggle from '../../components/form/BlockEnableToggle.vue';
 import ActuatorAnalogMockBasic from './ActuatorAnalogMockBasic.vue';
 import ActuatorAnalogMockFull from './ActuatorAnalogMockFull.vue';
-import { useContext } from '@/composables';
 
 const modes = {
   Basic: ActuatorAnalogMockBasic,

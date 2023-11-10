@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { usePart } from '../../composables';
+import defaults from 'lodash/defaults';
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { createDialog } from '@/utils/dialog';
-import defaults from 'lodash/defaults';
+import { usePart } from '../../composables';
 
 const { part, patchPart } = usePart.setup();
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed, CSSProperties } from 'vue';
+import { createDialog } from '@/utils/dialog';
 import { usePart } from '../../composables';
 import { BEER, COLD_WATER, HOT_WATER, WORT } from '../../const';
-import { createDialog } from '@/utils/dialog';
-import { CSSProperties, computed } from 'vue';
 
 const presetColors: string[] = [COLD_WATER, HOT_WATER, BEER, WORT];
 

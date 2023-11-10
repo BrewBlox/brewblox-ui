@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { startCreateLayout, startImportLayout } from '../utils';
-import { BuilderLayout } from '@/plugins/builder/types';
 import { useRouter } from 'vue-router';
+import { BuilderLayout } from '@/plugins/builder/types';
+import { startCreateLayout, startImportLayout } from '../utils';
 
 interface Props {
   layout?: BuilderLayout | null;

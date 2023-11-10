@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { usePart, useSettingsBlock } from '../composables';
-import { flowOnCoord, liquidOnCoord } from '../utils';
+import { DigitalState } from 'brewblox-proto/ts';
+import { computed, watch } from 'vue';
 import {
   RIGHT,
-  ValveBlockT,
   VALVE_CLOSED_KEY,
   VALVE_KEY,
   VALVE_TYPES,
+  ValveBlockT,
 } from '@/plugins/builder/const';
-import { DigitalState } from 'brewblox-proto/ts';
-import { computed, watch } from 'vue';
+import { usePart, useSettingsBlock } from '../composables';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   outerValve: [

@@ -1,10 +1,4 @@
 <script setup lang="ts">
-import { isBlockCompatible } from '../../utils/info';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { userUnits } from '@/user-settings';
-import { createBlockDialog } from '@/utils/block-dialog';
-import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
 import {
   Block,
   BlockType,
@@ -12,6 +6,12 @@ import {
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { userUnits } from '@/user-settings';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { fixedNumber, prettyQty, prettyUnit } from '@/utils/quantity';
+import { isBlockCompatible } from '../../utils/info';
 
 const sparkStore = useSparkStore();
 const { serviceId, block } = useBlockWidget.setup<PidBlock>();

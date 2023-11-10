@@ -1,8 +1,3 @@
-import { useBuilderStore } from '../store';
-import { BuilderLayout } from '../types';
-import { addSource } from '@/plugins/history/sources/metrics';
-import { useHistoryStore } from '@/plugins/history/store';
-import { MetricsSource } from '@/plugins/history/types';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import { nanoid } from 'nanoid';
@@ -16,6 +11,11 @@ import {
   Ref,
   watch,
 } from 'vue';
+import { addSource } from '@/plugins/history/sources/metrics';
+import { useHistoryStore } from '@/plugins/history/store';
+import { MetricsSource } from '@/plugins/history/types';
+import { useBuilderStore } from '../store';
+import { BuilderLayout } from '../types';
 
 const sourceIdKey: InjectionKey<string> = Symbol('$builderMetricSourceId');
 

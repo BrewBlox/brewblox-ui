@@ -1,16 +1,16 @@
 <script setup lang="ts">
+import type { Block } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, ref } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
 } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockWidget } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetContext, WidgetMode } from '@/store/features';
-import type { Block } from 'brewblox-proto/ts';
-import { nanoid } from 'nanoid';
-import { computed, ref } from 'vue';
 
 interface Props extends UseDialogProps {
   serviceId: string;

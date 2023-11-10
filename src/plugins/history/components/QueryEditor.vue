@@ -1,13 +1,13 @@
 <script setup lang="ts" generic="T extends QueryConfig">
+import { Quantity } from 'brewblox-proto/ts';
+import isEqual from 'lodash/isEqual';
+import { QTree, QTreeNode } from 'quasar';
+import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { filteredNodes, nodeBuilder } from '@/plugins/history/nodes';
 import { useHistoryStore } from '@/plugins/history/store';
 import type { QueryConfig } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty } from '@/utils/quantity';
-import { Quantity } from 'brewblox-proto/ts';
-import isEqual from 'lodash/isEqual';
-import { QTree, QTreeNode } from 'quasar';
-import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 
 interface Props {
   config: T;

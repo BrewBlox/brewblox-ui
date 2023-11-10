@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { QInput } from 'quasar';
+import { ref } from 'vue';
 import {
+  useDialog,
   UseDialogEmits,
   UseDialogProps,
-  useDialog,
   useGlobals,
 } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { QInput } from 'quasar';
-import { ref } from 'vue';
 
 interface Props extends UseDialogProps {
   modelValue: string;

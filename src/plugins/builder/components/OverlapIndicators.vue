@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { Coordinates } from '@/utils/coordinates';
 import { BuilderPart } from '../types';
 import { coord2grid } from '../utils';
-import { Coordinates } from '@/utils/coordinates';
-import { computed } from 'vue';
 
 interface Props {
   parts: BuilderPart[];

@@ -1,6 +1,6 @@
-import { deserialize, serialize } from './parsing';
 import get from 'lodash/get';
 import { exportFile } from 'quasar';
+import { deserialize, serialize } from './parsing';
 
 /**
  * Show browser dialog to save `exported` as UTF-8 file.

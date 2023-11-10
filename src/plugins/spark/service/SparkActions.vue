@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { SparkService } from '@/plugins/spark/types';
 import {
@@ -11,7 +12,6 @@ import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
 import { createDialog, GlobalDialogName } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
-import { computed } from 'vue';
 
 interface Props {
   serviceId: string;

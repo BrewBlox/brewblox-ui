@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import {
+  useValEdit,
   UseValEditEmits,
   UseValEditProps,
-  useValEdit,
 } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
-import { ref } from 'vue';
 
 type VT = number;
 

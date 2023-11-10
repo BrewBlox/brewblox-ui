@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { usePart, useSettingsBlock } from '../composables';
-import { SetpointBlockT, SETPOINT_KEY, SETPOINT_TYPES } from '../const';
+import { BlockType, PidBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { makeTypeFilter } from '@/utils/functional';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
-import { BlockType, PidBlock } from 'brewblox-proto/ts';
-import { computed } from 'vue';
+import { usePart, useSettingsBlock } from '../composables';
+import { SETPOINT_KEY, SETPOINT_TYPES, SetpointBlockT } from '../const';
 
 interface Props {
   width?: number;

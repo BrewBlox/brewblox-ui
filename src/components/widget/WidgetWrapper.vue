@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import cloneDeep from 'lodash/cloneDeep';
+import { computed, inject, onErrorCaptured, provide, reactive, ref } from 'vue';
 import { useFeatureStore, WidgetContext } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import {
@@ -10,8 +12,6 @@ import {
   WidgetKey,
 } from '@/symbols';
 import { startChangeWidgetTitle, startRemoveWidget } from '@/utils/widgets';
-import cloneDeep from 'lodash/cloneDeep';
-import { computed, inject, onErrorCaptured, provide, reactive, ref } from 'vue';
 
 interface Props {
   widget: Widget;
