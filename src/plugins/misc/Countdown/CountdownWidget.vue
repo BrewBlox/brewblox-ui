@@ -122,7 +122,7 @@ function pause(): void {
 
 function reset(): void {
   createDialog({
-    component: 'DurationQuantityDialog',
+    component: 'DurationDialog',
     componentProps: {
       modelValue: bloxQty(baseDuration.value, 'ms'),
       title: 'Reset countdown',

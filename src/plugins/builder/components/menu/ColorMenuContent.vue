@@ -26,7 +26,7 @@ function editColor(): void {
       clearable: true,
       presets: presetColors,
     },
-  }).onOk((v) => {
+  }).onOk((v: string) => {
     color.value = v;
   });
 }

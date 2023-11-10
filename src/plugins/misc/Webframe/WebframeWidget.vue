@@ -73,7 +73,7 @@ const url = computed<string>({
         class="col-grow"
         suffix="%"
         :decimals="0"
-        :rules="[(v) => v === null || v > 0 || 'Value must be > 0']"
+        :rules="[(v) => v == null || v > 0 || 'Value must be > 0']"
       />
     </div>
   </Card>

@@ -82,7 +82,7 @@ function startSwap(): void {
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="(v) => patchBlock({ address: v! })"
+            @update:model-value="(v) => patchBlock({ address: v })"
           />
         </div>
       </template>

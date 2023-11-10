@@ -5,7 +5,7 @@ import { useMetrics } from '../composables/use-metrics';
 import { liquidBorderColor } from '../utils';
 import {
   DEFAULT_METRICS_DECIMALS,
-  DEFAULT_METRICS_EXPIRY,
+  DEFAULT_METRICS_EXPIRY_MS,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { fixedNumber, shortDateString } from '@/utils/quantity';
@@ -26,7 +26,7 @@ const { source } = useMetrics.setupConsumer();
 const color = computed<string>(() => liquidBorderColor(flows.value));
 
 function fieldFreshDuration(field: string): number {
-  return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
+  return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY_MS;
 }
 
 const values = computed<MetricDisplay[]>(() => {

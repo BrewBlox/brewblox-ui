@@ -166,14 +166,14 @@ function updateSlotColor(idx: number, color: string): void {
               label="Label text"
               title="Label text"
               message="Choose the LCD display label text for this block"
-              @update:model-value="(v) => updateSlotName(idx, v!)"
+              @update:model-value="(v) => updateSlotName(idx, v)"
             />
             <ColorField
               :model-value="slot.color"
               title="Color"
               label="Color"
               message="Choose the LCD display background color for this block"
-              @update:model-value="(v) => updateSlotColor(idx, v!)"
+              @update:model-value="(v) => updateSlotColor(idx, v)"
             />
           </template>
         </div>
@@ -186,7 +186,7 @@ function updateSlotColor(idx: number, color: string): void {
           class="col-grow"
           label="Footer text"
           title="footer text"
-          @update:model-value="(v) => patchBlock({ name: v! })"
+          @update:model-value="(v) => patchBlock({ name: v })"
         />
         <q-field
           label="Display brightness"

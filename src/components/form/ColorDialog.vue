@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { parseColor } from '@/utils/colors';
 import { ref } from 'vue';
 
 interface Props extends UseDialogProps {
@@ -18,7 +19,7 @@ defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup<string>();
-const local = ref<string>(props.modelValue);
+const local = ref<string>(parseColor(props.modelValue) ?? '#ffffff');
 
 function save(): void {
   onDialogOK(local.value);

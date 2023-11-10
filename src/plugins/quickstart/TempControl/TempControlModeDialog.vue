@@ -13,6 +13,7 @@ import { makeTypeFilter } from '@/utils/functional';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
 import {
   BlockType,
+  Link,
   Quantity,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
@@ -124,8 +125,8 @@ function addHeatConfig(): void {
           title="Mode name"
           class="col-grow"
           @update:model-value="
-            (v: string | null) => {
-              tempMode.title = v!;
+            (v: string) => {
+              tempMode.title = v;
               save();
             }
           "
@@ -140,7 +141,7 @@ function addHeatConfig(): void {
           label="PID input Setpoint"
           class="col-grow"
           @update:model-value="
-            (v) => {
+            (v: Link) => {
               tempMode.setpoint = v;
               save();
             }

@@ -1,36 +1,28 @@
 <script setup lang="ts">
 import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed } from 'vue';
 
 export interface Props extends UseFieldProps {
-  modelValue: string | null;
+  modelValue: string;
   clearable?: boolean;
-  nullable?: boolean;
   autogrow?: boolean;
   suffix?: string;
+  placeholder?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   ...useField.defaultProps,
   clearable: true,
-  nullable: false,
   autogrow: false,
   suffix: '',
+  placeholder: undefined,
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [payload: string | null];
+  'update:modelValue': [payload: string];
 }>();
 
 const { activeSlots } = useField.setup();
-
-const displayValue = computed<string>(() => {
-  if (props.modelValue == null || props.modelValue === '') {
-    return '<not set>';
-  }
-  return props.modelValue;
-});
 
 function openDialog(): void {
   if (props.readonly) {
@@ -47,12 +39,12 @@ function openDialog(): void {
       label: props.label,
       rules: props.rules,
       clearable: props.clearable,
-      nullable: props.nullable,
       autogrow: props.autogrow,
       suffix: props.suffix,
+      placeholder: props.placeholder,
       ...props.dialogProps,
     },
-  }).onOk((v) => emit('update:modelValue', v));
+  }).onOk((v: string) => emit('update:modelValue', v));
 }
 </script>
 
@@ -62,7 +54,7 @@ function openDialog(): void {
     @click="openDialog"
   >
     <slot name="value">
-      {{ displayValue }}
+      {{ modelValue }}
     </slot>
 
     <template
