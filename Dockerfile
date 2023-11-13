@@ -1,7 +1,12 @@
+FROM nginx:alpine
+
+COPY dist /var/www/ui
+
+COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
   listen 80 default_server;
 
-  root /usr/share/nginx/html;
+  root /var/www;
   index index.html;
 
   server_name brewblox;
@@ -18,7 +23,7 @@ server {
     text/css;
 
   # Add /ui prefix if missing
-  location ~* ^/(?!(ui)) {
+  location ~* ^/(?!(ui|static)) {
     rewrite ^/(.*)$ /ui/$1;
     try_files $uri $uri/ @rewrites;
   }
@@ -47,7 +52,7 @@ server {
   }
 
   # Basic cache-control for static files
-  location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?)$ {
+  location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?|pem)$ {
     sendfile on;
     tcp_nopush on;
     expires max;
@@ -55,3 +60,4 @@ server {
     add_header Cache-Control "public, must-revalidate, proxy-revalidate";
   }
 }
+EOF

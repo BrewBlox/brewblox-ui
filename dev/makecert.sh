@@ -15,3 +15,5 @@ if [ ! -f minica.pem ]; then
     --domains="brew.blox,$(hostname),$(hostname).local,$(hostname).home,localhost" \
     --ip-addresses="127.0.0.1,$(hostname -I | tr ' ' , | sed 's/,$//')"
 fi
+
+chmod +r "$PWD"/minica.pem
