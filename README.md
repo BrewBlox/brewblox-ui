@@ -22,10 +22,12 @@ sudo apt update
 sudo apt upgrade -y
 sudo apt install -y build-essential libssl-dev curl git python3-pip
 
-# Install Node Version Manager + Node.js + Yarn
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+# Install Node Version Manager + Node.js
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 nvm install --lts
-npm install -g yarn
+
+# Loads Yarn when used
+corepack enable
 
 # Install Docker
 curl -sL https://get.docker.com | bash
@@ -40,7 +42,7 @@ reboot
 After the reboot, run the following commands in the `brewblox-ui` directory:
 
 ``` bash
-yarn ci
+yarn install
 docker compose pull
 ```
 
@@ -90,7 +92,7 @@ For Chrome:
 * -> "Manage device certificates"
 * -> "Authorities" (tab)
 * -> "Import" (button)
-* Select the "brewblox-ui/dev/traefik/minica.pem" file
+* Select the "{REPO_ROOT}/dev/traefik/minica.pem" file
 * Select the "trust this CA to identify websites" option
 
 For Firefox:
@@ -100,7 +102,7 @@ For Firefox:
 * -> "View Certificates" (button, under *Certificates* header)
 * -> "Authorities" (tab)
 * -> "Import" (button)
-* Select the "brewblox-ui/dev/traefik/minica.pem" file
+* Select the "{REPO_ROOT}/dev/traefik/minica.pem" file
 * Select the "trust this CA to identify websites" option
 
 ## Common issues
