@@ -52,7 +52,7 @@ server {
   }
 
   # Basic cache-control for static files
-  location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?|pem)$ {
+  location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?|pem|der)$ {
     sendfile on;
     tcp_nopush on;
     expires max;

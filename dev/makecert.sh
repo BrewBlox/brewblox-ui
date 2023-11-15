@@ -16,4 +16,17 @@ if [ ! -f minica.pem ]; then
     --ip-addresses="127.0.0.1,$(hostname -I | tr ' ' , | sed 's/,$//')"
 fi
 
+if [ ! -f minica.der ]; then
+  docker run \
+    --rm \
+    --user="$(id -u):$(id -g)" \
+    --volume="$PWD":/cert \
+    alpine/openssl \
+    x509 \
+    -in /cert/minica.pem \
+    -inform PEM \
+    -out /cert/minica.der \
+    -outform DER
+fi
+
 chmod +r "$PWD"/minica.pem

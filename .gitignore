@@ -27,5 +27,6 @@ stats.html
 /.env
 /dev/.env
 /dev/traefik/**/*.pem
+/dev/traefik/**/*.der
 /dev/traefik/**/*.crt
 /dev/traefik/**/*.key
