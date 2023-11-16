@@ -26,6 +26,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<SetpointSensorPairBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): SetpointSensorPairBlock['data'] => ({
         sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
         storedSetting: tempQty(20),

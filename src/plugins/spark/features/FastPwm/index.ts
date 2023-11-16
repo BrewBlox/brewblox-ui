@@ -28,6 +28,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<FastPwmBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): FastPwmBlock['data'] => ({
         enabled: true,
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),

@@ -20,6 +20,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<TempSensorOneWireBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): TempSensorOneWireBlock['data'] => ({
         value: tempQty(20),
         offset: deltaTempQty(0),

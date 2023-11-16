@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { startRelationsDialog } from '@/plugins/spark/utils/relations';
 
-const { widgetId, hasGraph, graphConfig } = useBlockWidget.setup();
+const { block, widgetId, hasGraph, hasRelations, graphConfig } =
+  useBlockWidget.setup();
 const graphModalOpen = ref(false);
 </script>
 
@@ -18,7 +20,7 @@ const graphModalOpen = ref(false);
 
     <!-- Avoid the toolbar rendering an empty menu -->
     <template
-      v-if="hasGraph || $slots.actions"
+      v-if="hasGraph || hasRelations || $slots.actions"
       #actions
     >
       <ActionItem
@@ -26,6 +28,12 @@ const graphModalOpen = ref(false);
         icon="mdi-chart-line"
         label="Graph"
         @click="graphModalOpen = true"
+      />
+      <ActionItem
+        v-if="hasRelations"
+        icon="mdi-vector-line"
+        label="Relations"
+        @click="startRelationsDialog(block)"
       />
       <slot name="actions" />
     </template>

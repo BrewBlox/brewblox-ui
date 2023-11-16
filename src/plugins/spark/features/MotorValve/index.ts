@@ -27,6 +27,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<MotorValveBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): MotorValveBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,

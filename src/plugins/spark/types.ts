@@ -153,6 +153,7 @@ export interface BlockFieldSpec<T extends Block = Block> {
 export interface BlockSpec<T extends Block = Block> {
   type: T['type'];
   title: string;
+  hasRelations?: boolean;
   generate: () => T['data'];
   analyze: (block: T) => BlockStatus;
 }

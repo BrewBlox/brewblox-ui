@@ -19,6 +19,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<TempSensorMockBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): TempSensorMockBlock['data'] => ({
         value: tempQty(20),
         setting: tempQty(20),

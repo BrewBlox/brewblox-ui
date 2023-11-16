@@ -23,6 +23,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<OneWireGpioModuleBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): OneWireGpioModuleBlock['data'] => ({
         channels: [],
         modulePosition: 0,

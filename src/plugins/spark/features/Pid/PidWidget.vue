@@ -6,7 +6,6 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { prettyLink } from '@/utils/quantity';
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
-import { startRelationsDialog } from './relations';
 
 const modes = {
   Basic: PidBasic,
@@ -19,10 +18,6 @@ const { block } = useBlockWidget.setup<PidBlock>();
 const inputLink = computed<Link>(() => block.value.data.inputId);
 
 const outputLink = computed<Link>(() => block.value.data.outputId);
-
-function showRelations(): void {
-  startRelationsDialog(block.value);
-}
 </script>
 
 <template>
@@ -32,15 +27,7 @@ function showRelations(): void {
     </template>
 
     <template #toolbar>
-      <BlockWidgetToolbar has-mode-toggle>
-        <template #actions>
-          <ActionItem
-            icon="mdi-vector-line"
-            label="Relations"
-            @click="showRelations"
-          />
-        </template>
-      </BlockWidgetToolbar>
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
     <component :is="modes[context.mode]">

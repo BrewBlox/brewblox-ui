@@ -26,6 +26,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<ActuatorPwmBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): ActuatorPwmBlock['data'] => ({
         actuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
         period: bloxQty('4s'),

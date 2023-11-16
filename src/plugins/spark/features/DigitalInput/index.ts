@@ -27,6 +27,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<DigitalInputBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): DigitalInputBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,
