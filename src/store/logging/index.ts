@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export type LogLevel = 'DEBUG' | 'INFO' | 'DONE' | 'WARN' | 'ERROR';
 
@@ -8,17 +9,15 @@ export interface LogEntry {
   message: string;
 }
 
-interface LoggingStoreState {
-  entries: LogEntry[];
-}
+export const useLoggingStore = defineStore('loggingStore', () => {
+  const entries = ref<LogEntry[]>([]);
 
-export const useLoggingStore = defineStore('loggingStore', {
-  state: (): LoggingStoreState => ({
-    entries: [],
-  }),
-  actions: {
-    addEntry(entry: LogEntry): void {
-      this.entries.push({ ...entry });
-    },
-  },
+  function addEntry(entry: LogEntry): void {
+    entries.value.push({ ...entry });
+  }
+
+  return {
+    entries,
+    addEntry,
+  };
 });

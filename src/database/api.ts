@@ -9,6 +9,7 @@ export interface DatabaseApi<T extends StoreObject> {
   fetchById(id: string): Promise<T | null>;
   create(obj: T): Promise<T>;
   persist(obj: T): Promise<T>;
+  persistMult(objs: T[]): Promise<T[]>;
   remove(obj: T): Promise<T>;
 }
 
@@ -49,6 +50,10 @@ export function createApi<T extends StoreObject>(
     },
     async persist(val: T): Promise<T> {
       return hydrate(await database.persist(namespace, val));
+    },
+    async persistMult(vals: T[]): Promise<T[]> {
+      const result = await database.persistMult(namespace, vals);
+      return result.map(hydrate);
     },
     async remove(val: T): Promise<T> {
       return hydrate(await database.remove(namespace, val));

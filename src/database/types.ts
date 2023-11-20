@@ -58,6 +58,17 @@ export interface BrewbloxDatabase {
   persist<T extends StoreObject>(namespace: string, obj: T): Promise<T>;
 
   /**
+   * Save multiple documents
+   *
+   * @param namespace collection ID
+   * @param objs existing documents in the database
+   */
+  persistMult<T extends StoreObject>(
+    namespace: string,
+    objs: T[],
+  ): Promise<T[]>;
+
+  /**
    * Remove an existing document from the store.
    *
    * @param namespace collection ID.
