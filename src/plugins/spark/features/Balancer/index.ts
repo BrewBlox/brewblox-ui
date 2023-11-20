@@ -18,6 +18,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<BalancerBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): BalancerBlock['data'] => ({
         clients: [],
       }),

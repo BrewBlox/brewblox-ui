@@ -28,6 +28,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<DigitalActuatorBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): DigitalActuatorBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,

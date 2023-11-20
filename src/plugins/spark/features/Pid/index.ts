@@ -31,6 +31,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<PidBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): PidBlock['data'] => ({
         inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),

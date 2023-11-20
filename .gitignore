@@ -15,7 +15,7 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-.yarn/*
+.yarn
 .pnp.*
 
 # Build output

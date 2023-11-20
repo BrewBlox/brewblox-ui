@@ -24,6 +24,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<ActuatorAnalogMockBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): ActuatorAnalogMockBlock['data'] => ({
         enabled: true,
         storedSetting: 0,

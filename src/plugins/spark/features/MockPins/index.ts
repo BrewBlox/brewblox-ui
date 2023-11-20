@@ -18,6 +18,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<MockPinsBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): MockPinsBlock['data'] => ({
         channels: [],
       }),

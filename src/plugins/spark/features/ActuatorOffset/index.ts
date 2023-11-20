@@ -27,6 +27,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<ActuatorOffsetBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): ActuatorOffsetBlock['data'] => ({
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         referenceId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),

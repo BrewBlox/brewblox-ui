@@ -3,11 +3,12 @@ import { computed, ref } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import Toolbar from './Toolbar.vue';
 
-defineProps({
-  hasModeToggle: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  hasModeToggle?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  hasModeToggle: false,
 });
 
 const { inDialog, context, toggleMode } = useContext.setup();

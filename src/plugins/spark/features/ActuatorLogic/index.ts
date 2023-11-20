@@ -26,6 +26,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<ActuatorLogicBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): ActuatorLogicBlock['data'] => ({
         enabled: true,
         result: LogicResult.RESULT_EMPTY,

@@ -21,6 +21,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   patchBlock(data: Partial<BlockT['data']>): Promise<void>;
 
   hasGraph: boolean;
+  hasRelations: boolean;
   isClaimed: ComputedRef<boolean>;
   limitations: ComputedRef<string | null>;
 }
@@ -72,6 +73,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       (f) => f.type === block.value.type && f.graphed,
     );
 
+    const hasRelations: boolean = !!blockSpec.value.hasRelations;
+
     const graphConfig = computed<GraphConfig>({
       get: () =>
         hasGraph
@@ -107,6 +110,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       limitations,
       graphConfig,
       hasGraph,
+      hasRelations,
       isClaimed,
     };
   },

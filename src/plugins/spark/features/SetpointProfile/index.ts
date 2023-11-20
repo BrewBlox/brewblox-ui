@@ -25,6 +25,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<SetpointProfileBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): SetpointProfileBlock['data'] => ({
         start: new Date().toISOString(),
         points: [],
