@@ -28,7 +28,6 @@ import wizardry from '@/plugins/wizardry';
 import router from '@/router';
 import { startup } from '@/startup';
 import { useDashboardStore } from '@/store/dashboards';
-import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { useSidebarStore } from '@/store/sidebar';
 import { useSystemStore } from '@/store/system';
@@ -84,7 +83,6 @@ app.use(misc);
 globRegister(app, import.meta.glob('./components/**/*.vue', { eager: true }));
 
 // Register objects that require a post-startup callback
-startup.add(useFeatureStore());
 startup.add(useSystemStore());
 startup.add(useServiceStore());
 startup.add(useDashboardStore());

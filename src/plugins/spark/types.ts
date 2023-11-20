@@ -2,7 +2,6 @@ import {
   AnyConstraintKey,
   Block,
   BlockOrIntfType,
-  BlockType,
   DateString,
   Quantity,
   SparkDeviceDescription,
@@ -23,8 +22,6 @@ export type ComparedBlockType =
   | BlockOrIntfType
   | readonly BlockOrIntfType[]
   | null;
-
-export type SpecificBlock = Block & { type: BlockType };
 
 export type PageMode = 'Relations' | 'List';
 

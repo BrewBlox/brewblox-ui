@@ -6,7 +6,6 @@ import {
   BlockFieldAddress,
   BlockFieldSpec,
   BlockSpec,
-  SpecificBlock,
 } from '@/plugins/spark/types';
 import { findByKey } from '@/utils/collections';
 
@@ -21,9 +20,9 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
   function blockSpecByType<T extends Block>(
     type: BlockType & T['type'],
   ): BlockSpec<T> | null;
-  function blockSpecByType<T extends SpecificBlock>(
+  function blockSpecByType<T extends Block>(
     type: T['type'],
-  ): BlockSpec<SpecificBlock> | null {
+  ): BlockSpec<T> | null {
     return findByKey<BlockSpec<T>>(blockSpecs.value, 'type', type);
   }
 
@@ -35,7 +34,7 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
       : null;
   }
 
-  function addBlockSpec<T extends SpecificBlock>(spec: BlockSpec<T>): void {
+  function addBlockSpec<T extends Block>(spec: BlockSpec<T>): void {
     blockSpecs.value.push(spec as unknown as BlockSpec);
   }
 
@@ -53,10 +52,8 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
       : null;
   }
 
-  function addFieldSpecs<T extends SpecificBlock>(
-    specs: BlockFieldSpec<T>[],
-  ): void {
-    fieldSpecs.value.push(...specs);
+  function addFieldSpecs<T extends Block>(specs: BlockFieldSpec<T>[]): void {
+    fieldSpecs.value.push(...(specs as unknown as BlockFieldSpec[]));
   }
 
   return {
@@ -66,7 +63,6 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
     blockSpecByType,
     blockSpecByAddress,
     addBlockSpec,
-
     fieldSpecsByType,
     fieldSpecByFieldAddress,
     addFieldSpecs,

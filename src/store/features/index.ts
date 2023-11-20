@@ -102,13 +102,6 @@ export const useFeatureStore = defineStore('featureStore', () => {
     services.value.push(feature);
   }
 
-  async function start(): Promise<void> {
-    Object.freeze(widgets.value);
-    Object.freeze(quickStarts.value);
-    Object.freeze(watchers.value);
-    Object.freeze(services.value);
-  }
-
   return {
     widgets,
     quickStarts,
@@ -134,6 +127,5 @@ export const useFeatureStore = defineStore('featureStore', () => {
     addQuickstartFeature,
     addWatcherFeature,
     addServiceFeature,
-    start,
   };
 });
