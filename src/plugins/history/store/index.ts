@@ -1,20 +1,46 @@
 import { defineStore } from 'pinia';
 import { exportFile } from 'quasar';
-import { computed, reactive, ref } from 'vue';
+import {
+  computed,
+  ref,
+  shallowReactive,
+  ShallowRef,
+  shallowRef,
+  triggerRef,
+} from 'vue';
 import { concatById, filterById, findById } from '@/utils/collections';
 import { uniqueFilter } from '@/utils/functional';
+import { typed } from '@/utils/misc';
 import { notify } from '@/utils/notify';
 import { bloxQty, isoDateString, JSQuantity } from '@/utils/quantity';
 import type {
   ApiQuery,
   CsvPrecision,
+  DisplayNames,
   GraphConfig,
+  GraphSource,
+  GraphValueAxes,
   HistorySource,
+  LabelPrecision,
+  LineColors,
   LoggedSession,
+  MetricsSource,
   QueryParams,
 } from '../types';
 import { upgradeGraphConfig } from '../utils';
 import { historyApi, sessionApi } from './api';
+import {
+  graphSourceTransformer,
+  metricsSourceTransformer,
+} from './transformers';
+
+type SourcesContainer = {
+  [id: string]: ShallowRef<HistorySource>;
+};
+
+type FieldsContainer = {
+  [serviceId: string]: string[];
+};
 
 function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
   return {
@@ -28,8 +54,8 @@ function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
 export const useHistoryStore = defineStore('historyStore', () => {
   const sessions = ref<LoggedSession[]>([]);
   const fieldsDuration = ref<JSQuantity>(bloxQty('1d'));
-  const fields = ref<Mapped<string[]>>({});
-  const sources = reactive<Mapped<HistorySource>>({});
+  const fields = ref<FieldsContainer>({});
+  const sources = shallowReactive<SourcesContainer>({});
   const streamConnected = ref<boolean>(false);
   const stream = ref<WebSocket | null>(null);
 
@@ -39,8 +65,7 @@ export const useHistoryStore = defineStore('historyStore', () => {
       .filter(uniqueFilter),
   );
 
-  // private
-  function startQuery(src: HistorySource): void {
+  function _startQuery(src: HistorySource): void {
     if (stream.value?.readyState === WebSocket.OPEN) {
       stream.value.send(
         JSON.stringify({
@@ -52,32 +77,45 @@ export const useHistoryStore = defineStore('historyStore', () => {
     }
   }
 
-  // private
-  function endQuery(src: HistorySource): void {
-    stream.value?.send(
-      JSON.stringify({
-        id: src.id,
-        command: 'stop',
-      }),
-    );
+  function _endQuery(src: HistorySource): void {
+    if (stream.value?.readyState === WebSocket.OPEN) {
+      stream.value.send(
+        JSON.stringify({
+          id: src.id,
+          command: 'stop',
+        }),
+      );
+    }
   }
 
-  // private
-  function connect(): void {
+  function _transform({ id, data }: { id: string; data: any }): void {
+    const source = sources[id];
+    if (source != null) {
+      if (source.value.command === 'ranges') {
+        graphSourceTransformer(source.value as GraphSource, data);
+      }
+      if (source.value.command === 'metrics') {
+        metricsSourceTransformer(source.value as MetricsSource, data);
+      }
+      triggerRef(source);
+    }
+  }
+
+  function _connect(): void {
     stream.value = historyApi.openStream();
     stream.value.onopen = () => {
       streamConnected.value = true;
-      Object.values(sources).forEach((src) => startQuery(src));
+      Object.values(sources).forEach((src) => _startQuery(src.value));
     };
     stream.value.onmessage = (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       data.error
         ? notify.error(`History error: ${event.data}`)
-        : transform(data);
+        : _transform(data);
     };
     stream.value.onclose = () => {
       streamConnected.value = false;
-      setTimeout(() => connect(), 2000);
+      setTimeout(() => _connect(), 2000);
     };
     stream.value.onerror = () => {
       stream.value?.close();
@@ -85,26 +123,17 @@ export const useHistoryStore = defineStore('historyStore', () => {
     };
   }
 
-  function sessionById(id: string | null): LoggedSession | null {
+  function sessionById(id: Maybe<string>): LoggedSession | null {
     return findById(sessions.value, id);
   }
 
-  function sourceById<T extends HistorySource>(id: string | null): T | null {
+  function sourceById<T extends HistorySource>(
+    id: Maybe<string>,
+  ): ShallowRef<T> | null {
     if (id == null) {
       return null;
     }
-    return (sources[id] as T) ?? null;
-  }
-
-  function transform({ id, data }: { id: string; data: any }): void {
-    const source = sources[id];
-    if (source != null) {
-      sources[id] = source.transformer(source, data);
-    }
-  }
-
-  function setSource(source: HistorySource): void {
-    sources[source.id] = source;
+    return (sources[id] as ShallowRef<T>) ?? null;
   }
 
   async function createSession(session: LoggedSession): Promise<void> {
@@ -119,16 +148,69 @@ export const useHistoryStore = defineStore('historyStore', () => {
     await sessionApi.remove(session); // triggers callback
   }
 
-  async function addSource(source: HistorySource): Promise<void> {
-    setSource(source);
-    startQuery(source);
+  function removeSource(id: Maybe<string>): void {
+    if (id != null && id in sources) {
+      _endQuery(sources[id].value);
+      delete sources[id];
+    }
   }
 
-  async function removeSource(source: Maybe<HistorySource>): Promise<void> {
-    if (source) {
-      endQuery(source);
-      delete sources[source.id];
+  function _addSource(source: HistorySource): void {
+    removeSource(source.id);
+    _startQuery(source);
+    sources[source.id] = shallowRef(source);
+  }
+
+  async function createGraphSource(
+    id: string,
+    params: QueryParams,
+    renames: DisplayNames,
+    axes: GraphValueAxes,
+    colors: LineColors,
+    precision: LabelPrecision,
+    fields: string[],
+  ): Promise<void> {
+    const validFields = fields.filter((field) => !!field);
+    if (validFields.length === 0) {
+      return;
     }
+    _addSource(
+      typed<GraphSource>({
+        id,
+        params,
+        renames,
+        axes,
+        colors,
+        precision,
+        command: 'ranges',
+        fields: validFields,
+        values: {},
+        truncated: false,
+      }),
+    );
+  }
+
+  async function createMetricsSource(
+    id: string,
+    params: QueryParams,
+    renames: DisplayNames,
+    fields: string[],
+  ): Promise<void> {
+    const validFields = fields.filter((field) => !!field);
+    if (validFields.length === 0) {
+      return;
+    }
+    _addSource(
+      typed<MetricsSource>({
+        id,
+        params,
+        renames,
+        command: 'metrics',
+        fields: validFields,
+        updated: new Date(),
+        values: [],
+      }),
+    );
   }
 
   async function fetchFields(): Promise<void> {
@@ -204,7 +286,8 @@ export const useHistoryStore = defineStore('historyStore', () => {
         sessions.value = filterById(sessions.value, { id });
       },
     );
-    connect();
+
+    _connect();
   }
 
   return {
@@ -218,11 +301,11 @@ export const useHistoryStore = defineStore('historyStore', () => {
 
     sessionById,
     sourceById,
-    setSource,
     createSession,
     saveSession,
     removeSession,
-    addSource,
+    createGraphSource,
+    createMetricsSource,
     removeSource,
     fetchFields,
     downloadCsv,

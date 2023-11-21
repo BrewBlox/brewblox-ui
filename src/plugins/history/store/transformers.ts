@@ -7,14 +7,10 @@ import {
   Y2_COLOR,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
-import { useHistoryStore } from '@/plugins/history/store';
 import {
-  DisplayNames,
   GraphSource,
-  GraphValueAxes,
-  LabelPrecision,
-  LineColors,
-  QueryParams,
+  MetricsSource,
+  TimeSeriesMetricsResult,
   TimeSeriesRangesResult,
 } from '@/plugins/history/types';
 import { fixedNumber } from '@/utils/quantity';
@@ -51,7 +47,7 @@ function fieldLabel(
   return `<span ${prop}>${label}<br>${fixedNumber(value, precision)}</span>`;
 }
 
-function transformer(
+export function graphSourceTransformer(
   source: GraphSource,
   result: TimeSeriesRangesResult,
 ): GraphSource {
@@ -103,31 +99,17 @@ function transformer(
   return source;
 }
 
-export async function addSource(
-  id: string,
-  params: QueryParams,
-  renames: DisplayNames,
-  axes: GraphValueAxes,
-  colors: LineColors,
-  precision: LabelPrecision,
-  fields: string[],
-): Promise<void> {
-  const validFields = fields.filter((field) => !!field);
-  if (validFields.length === 0) {
-    return;
-  }
-  const source: GraphSource = {
-    id,
-    params,
-    renames,
-    axes,
-    colors,
-    precision,
-    transformer,
-    command: 'ranges',
-    fields: validFields,
-    values: {},
-    truncated: false,
+export function metricsSourceTransformer(
+  source: MetricsSource,
+  result: TimeSeriesMetricsResult,
+): MetricsSource {
+  return {
+    ...source,
+    updated: new Date(),
+    values: result.metrics.map((res) => ({
+      field: res.metric,
+      time: res.timestamp,
+      value: res.value,
+    })),
   };
-  await useHistoryStore().addSource(source);
 }
