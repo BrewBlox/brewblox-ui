@@ -9,7 +9,6 @@ import {
   ref,
   watch,
 } from 'vue';
-import { addSource } from '@/plugins/history/sources/graph';
 import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 
@@ -52,7 +51,7 @@ const layout = computed<Partial<Layout>>({
 });
 
 const source = computed<GraphSource | null>(
-  () => historyStore.sourceById(props.graphId) as GraphSource | null,
+  () => historyStore.sourceById<GraphSource>(props.graphId)?.value ?? null,
 );
 
 const error = computed<string | null>(() => {
@@ -72,7 +71,7 @@ const graphData = computed<Partial<PlotData>[]>(() =>
 );
 
 function createSource(): void {
-  addSource(
+  historyStore.createGraphSource(
     props.graphId,
     props.config.params,
     props.config.renames,
@@ -84,7 +83,7 @@ function createSource(): void {
 }
 
 function removeSource(): void {
-  historyStore.removeSource(source.value);
+  historyStore.removeSource(props.graphId);
 }
 
 const resetSource = debounce(
@@ -117,7 +116,6 @@ watch(
       resetSource();
     }
   },
-  { deep: true },
 );
 
 onMounted(() => {

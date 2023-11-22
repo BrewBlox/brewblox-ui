@@ -4,7 +4,6 @@ import { nanoid } from 'nanoid';
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { defaultLabel } from '@/plugins/history/nodes';
-import { addSource } from '@/plugins/history/sources/metrics';
 import { useHistoryStore } from '@/plugins/history/store';
 import {
   MetricsConfig,
@@ -37,8 +36,8 @@ const config = computed<MetricsConfig>(() =>
   defaults(widget.value.config, emptyMetricsConfig()),
 );
 
-const source = computed<MetricsSource | null>(() =>
-  historyStore.sourceById<MetricsSource>(metricsId),
+const source = computed<MetricsSource | null>(
+  () => historyStore.sourceById<MetricsSource>(metricsId)?.value ?? null,
 );
 
 function fieldFreshDuration(field: string): number {
@@ -67,7 +66,7 @@ const values = computed<CurrentValue[]>(() => {
 });
 
 function createSource(): void {
-  addSource(
+  historyStore.createMetricsSource(
     metricsId,
     config.value.params,
     config.value.renames,
@@ -76,7 +75,7 @@ function createSource(): void {
 }
 
 function removeSource(): void {
-  historyStore.removeSource(source.value);
+  historyStore.removeSource(metricsId);
 }
 
 function resetSource(): void {

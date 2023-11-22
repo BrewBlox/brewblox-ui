@@ -21,94 +21,128 @@ import {
 import { createDialog } from '@/utils/dialog';
 import { configApi, globalApi } from './api';
 
+type StoredUserUISettings = StoreObjectImpl<UserUISettings>;
+type StoredUserUnits = StoreObjectImpl<UserUnits>;
+type StoredUserTimeZone = StoreObjectImpl<UserTimeZone>;
+
 const UI_SETTINGS_STORE_ID = 'default';
 const USER_UNITS_STORE_ID = 'units';
 const USER_TIMEZONE_STORE_ID = 'timeZone';
 
-const unitsFilter = (v: StoreObject): v is StoreObjectImpl<UserUnits> =>
+const settingsPredicate = (v: StoreObject): v is StoredUserUISettings =>
+  v.id === UI_SETTINGS_STORE_ID;
+
+const unitsPredicate = (v: StoreObject): v is StoredUserUnits =>
   v.id === USER_UNITS_STORE_ID;
 
-const timeZoneFilter = (v: StoreObject): v is StoreObjectImpl<UserTimeZone> =>
+const timeZonePredicate = (v: StoreObject): v is StoredUserTimeZone =>
   v.id === USER_TIMEZONE_STORE_ID;
 
-export const useSystemStore = defineStore('systemStore', {
-  actions: {
-    updateUserUISettings(obj: Maybe<StoreObjectImpl<UserUISettings>>): void {
-      const settings = defaults(obj, defaultUserUISettings());
-      userUISettings.value = omit(settings, 'id', 'namespace');
-    },
+export const useSystemStore = defineStore('systemStore', () => {
+  function updateUserUISettings(obj: Maybe<StoredUserUISettings>): void {
+    const settings = defaults(obj, defaultUserUISettings());
+    userUISettings.value = omit(settings, 'id', 'namespace');
+  }
 
-    updateUserUnits(obj: Maybe<StoreObjectImpl<UserUnits>>): void {
-      const units = defaults(obj, defaultUserUnits());
-      userUnits.value = omit(units, 'id', 'namespace');
-      userUnitsDefined.value = obj != null;
-    },
+  function updateUserUnits(obj: Maybe<StoredUserUnits>): void {
+    const units = defaults(obj, defaultUserUnits());
+    userUnits.value = omit(units, 'id', 'namespace');
+    userUnitsDefined.value = obj != null;
+  }
 
-    updateUserTimeZone(obj: Maybe<StoreObjectImpl<UserTimeZone>>): void {
-      const timeZone = defaults(obj, defaultUserTimeZone());
-      userTimeZone.value = omit(timeZone, 'id', 'namespace');
-    },
+  function updateUserTimeZone(obj: Maybe<StoredUserTimeZone>): void {
+    const timeZone = defaults(obj, defaultUserTimeZone());
+    userTimeZone.value = omit(timeZone, 'id', 'namespace');
+  }
 
-    async patchUserUISettings(patch: Partial<UserUISettings>): Promise<void> {
-      // Triggers callback
-      await configApi.persist({
-        ...userUISettings.value,
-        ...patch,
-        id: UI_SETTINGS_STORE_ID,
-      });
-    },
+  async function patchUserUISettings(
+    patch: Partial<UserUISettings>,
+  ): Promise<void> {
+    // Triggers callback
+    await configApi.persist({
+      ...userUISettings.value,
+      ...patch,
+      id: UI_SETTINGS_STORE_ID,
+    });
+  }
 
-    async patchUserUnits(patch: Partial<UserUnits>): Promise<void> {
-      // Triggers callback
-      await globalApi.persist({
-        ...userUnits.value,
-        ...patch,
-        id: USER_UNITS_STORE_ID,
-      });
-    },
+  async function patchUserUnits(patch: Partial<UserUnits>): Promise<void> {
+    // Triggers callback
+    await globalApi.persist({
+      ...userUnits.value,
+      ...patch,
+      id: USER_UNITS_STORE_ID,
+    });
+  }
 
-    async patchUserTimeZone(patch: Partial<UserTimeZone>): Promise<void> {
-      // Triggers callback
-      await globalApi.persist({
-        ...userTimeZone.value,
-        ...patch,
-        id: USER_TIMEZONE_STORE_ID,
-      });
-    },
+  async function patchUserTimeZone(
+    patch: Partial<UserTimeZone>,
+  ): Promise<void> {
+    // Triggers callback
+    await globalApi.persist({
+      ...userTimeZone.value,
+      ...patch,
+      id: USER_TIMEZONE_STORE_ID,
+    });
+  }
 
-    async start(): Promise<void> {
-      this.updateUserUISettings(
-        await configApi.fetchById(UI_SETTINGS_STORE_ID),
-      );
-      const globalValues = await globalApi.fetch();
+  async function start(): Promise<void> {
+    updateUserUISettings(await configApi.fetchById(UI_SETTINGS_STORE_ID));
+    const globalValues = await globalApi.fetch();
 
-      this.updateUserUnits(globalValues.find(unitsFilter));
-      this.updateUserTimeZone(globalValues.find(timeZoneFilter));
+    updateUserUnits(globalValues.find(unitsPredicate));
+    updateUserTimeZone(globalValues.find(timeZonePredicate));
 
-      configApi.subscribe(
-        (obj) =>
-          obj.id === UI_SETTINGS_STORE_ID && this.updateUserUISettings(obj),
-        (id) => id === UI_SETTINGS_STORE_ID && this.updateUserUISettings(null),
-      );
+    configApi.subscribe(
+      (obj) => {
+        if (settingsPredicate(obj)) {
+          updateUserUISettings(obj);
+        }
+      },
+      (id) => {
+        switch (id) {
+          case UI_SETTINGS_STORE_ID:
+            updateUserUISettings(null);
+            break;
+          default:
+            break;
+        }
+      },
+    );
 
-      globalApi.subscribe(
-        (obj) => {
-          if (unitsFilter(obj)) {
-            this.updateUserUnits(obj);
-          } else if (timeZoneFilter(obj)) {
-            this.updateUserTimeZone(obj);
-          }
-        },
-        (id) => {
-          if (id === USER_UNITS_STORE_ID) {
-            this.updateUserUnits(null);
-          } else if (id === USER_TIMEZONE_STORE_ID) {
-            this.updateUserTimeZone(null);
-          }
-        },
-      );
-    },
-  },
+    globalApi.subscribe(
+      (obj) => {
+        if (unitsPredicate(obj)) {
+          updateUserUnits(obj);
+        }
+        if (timeZonePredicate(obj)) {
+          updateUserTimeZone(obj);
+        }
+      },
+      (id) => {
+        switch (id) {
+          case USER_UNITS_STORE_ID:
+            updateUserUnits(null);
+            break;
+          case USER_TIMEZONE_STORE_ID:
+            updateUserTimeZone(null);
+            break;
+          default:
+            break;
+        }
+      },
+    );
+  }
+
+  return {
+    updateUserUISettings,
+    updateUserUnits,
+    updateUserTimeZone,
+    patchUserUISettings,
+    patchUserUnits,
+    patchUserTimeZone,
+    start,
+  };
 });
 
 export function startChangeKeyboardLayout(): DialogChainObject {

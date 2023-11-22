@@ -2487,7 +2487,7 @@ __metadata:
     mqtt: "npm:^5.1.4"
     nanoid: "npm:^5.0.2"
     parse-duration: "npm:^1.0.0"
-    pinia: "npm:^2.0.0-rc.10"
+    pinia: "npm:^2.1.7"
     plotly.js: "npm:^2.4.1"
     portal-vue: "npm:^3.0.0-beta.0"
     prettier: "npm:^3.0.3"
@@ -7024,7 +7024,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pinia@npm:^2.0.0-rc.10":
+"pinia@npm:^2.1.7":
   version: 2.1.7
   resolution: "pinia@npm:2.1.7"
   dependencies:

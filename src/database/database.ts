@@ -164,6 +164,25 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
 
   public create = this.persist;
 
+  public async persistMult<T extends StoreObject>(
+    namespace: string,
+    objs: T[],
+  ): Promise<T[]> {
+    if (objs.length === 0) {
+      return [];
+    }
+
+    return http
+      .post<MultiValue<T>, AxiosResponse<MultiValue<T>>>(
+        '/history/datastore/mset',
+        {
+          values: objs.map((obj) => ({ ...obj, namespace })),
+        },
+      )
+      .then((resp) => resp.data.values)
+      .catch(intercept(`PersistMult '${objs.map((v) => v.id)}'`, namespace));
+  }
+
   public async remove<T extends StoreObject>(
     namespace: string,
     obj: T,

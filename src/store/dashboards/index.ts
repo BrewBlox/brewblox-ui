@@ -1,49 +1,55 @@
 import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
 import { concatById, filterById, findById } from '@/utils/collections';
 import api from './api';
 import type { Dashboard } from './types';
 
 export * from './types';
 
-interface DashboardStoreState {
-  dashboards: Dashboard[];
-}
+export const useDashboardStore = defineStore('dashboardStore', () => {
+  const dashboards = ref<Dashboard[]>([]);
 
-export const useDashboardStore = defineStore('dashboardStore', {
-  state: (): DashboardStoreState => ({
-    dashboards: [],
-  }),
-  getters: {
-    dashboardIds: (state): string[] => state.dashboards.map((v) => v.id),
-  },
-  actions: {
-    dashboardById(id: Maybe<string>): Dashboard | null {
-      return findById(this.dashboards, id);
-    },
+  const dashboardIds = computed<string[]>(() =>
+    dashboards.value.map((v) => v.id),
+  );
 
-    dashboardTitle(id: Maybe<string>): string {
-      return this.dashboardById(id)?.title ?? 'Unknown';
-    },
+  function dashboardById(id: Maybe<string>): Dashboard | null {
+    return findById(dashboards.value, id);
+  }
 
-    async createDashboard(dashboard: Dashboard): Promise<void> {
-      await api.create(dashboard); // triggers callback
-    },
+  function dashboardTitle(id: Maybe<string>): string {
+    return dashboardById(id)?.title ?? 'Unknown';
+  }
 
-    async saveDashboard(dashboard: Dashboard): Promise<void> {
-      await api.persist(dashboard); // triggers callback
-    },
+  async function createDashboard(dashboard: Dashboard): Promise<void> {
+    await api.create(dashboard); // triggers callback
+  }
 
-    async removeDashboard(dashboard: Dashboard): Promise<void> {
-      await api.remove(dashboard); // triggers callback
-    },
+  async function saveDashboard(dashboard: Dashboard): Promise<void> {
+    await api.persist(dashboard); // triggers callback
+  }
 
-    async start(): Promise<void> {
-      this.dashboards = await api.fetch();
-      api.subscribe(
-        (dashboard) =>
-          (this.dashboards = concatById(this.dashboards, dashboard)),
-        (id) => (this.dashboards = filterById(this.dashboards, { id })),
-      );
-    },
-  },
+  async function removeDashboard(dashboard: Dashboard): Promise<void> {
+    await api.remove(dashboard); // triggers callback
+  }
+
+  async function start(): Promise<void> {
+    dashboards.value = await api.fetch();
+    api.subscribe(
+      (dashboard) =>
+        (dashboards.value = concatById(dashboards.value, dashboard)),
+      (id) => (dashboards.value = filterById(dashboards.value, { id })),
+    );
+  }
+
+  return {
+    dashboards,
+    dashboardIds,
+    dashboardById,
+    dashboardTitle,
+    createDashboard,
+    saveDashboard,
+    removeDashboard,
+    start,
+  };
 });

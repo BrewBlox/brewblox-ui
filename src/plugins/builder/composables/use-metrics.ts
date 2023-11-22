@@ -11,7 +11,6 @@ import {
   Ref,
   watch,
 } from 'vue';
-import { addSource } from '@/plugins/history/sources/metrics';
 import { useHistoryStore } from '@/plugins/history/store';
 import { MetricsSource } from '@/plugins/history/types';
 import { useBuilderStore } from '../store';
@@ -35,14 +34,14 @@ export const useMetrics: UseMetricsComposable = {
     const sourceId = nanoid(6);
     let activeFields: Set<string> = new Set();
 
-    const source = computed<MetricsSource | null>(() =>
-      historyStore.sourceById<MetricsSource>(sourceId),
+    const source = computed<MetricsSource | null>(
+      () => historyStore.sourceById<MetricsSource>(sourceId)?.value ?? null,
     );
 
     const initMetrics = debounce(
       (layout: BuilderLayout | null) => {
         if (!layout) {
-          historyStore.removeSource(source.value);
+          historyStore.removeSource(sourceId);
           return;
         }
 
@@ -55,8 +54,8 @@ export const useMetrics: UseMetricsComposable = {
           return;
         }
 
-        historyStore.removeSource(source.value);
-        addSource(sourceId, {}, {}, [...fields]);
+        historyStore.removeSource(sourceId);
+        historyStore.createMetricsSource(sourceId, {}, {}, [...fields]);
         activeFields = fields;
       },
       500,
@@ -69,7 +68,7 @@ export const useMetrics: UseMetricsComposable = {
       { immediate: true },
     );
 
-    onBeforeUnmount(() => historyStore.removeSource(source.value));
+    onBeforeUnmount(() => historyStore.removeSource(sourceId));
     provide(sourceIdKey, sourceId);
 
     return {
@@ -80,8 +79,8 @@ export const useMetrics: UseMetricsComposable = {
     const historyStore = useHistoryStore();
     const sourceId = inject(sourceIdKey, null);
 
-    const source = computed<MetricsSource | null>(() =>
-      historyStore.sourceById<MetricsSource>(sourceId),
+    const source = computed<MetricsSource | null>(
+      () => historyStore.sourceById<MetricsSource>(sourceId)?.value ?? null,
     );
 
     return {
