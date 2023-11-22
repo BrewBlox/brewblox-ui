@@ -10,8 +10,8 @@ server {
   # index index.html;
   server_name brewblox;
 
-  # access_log off;
-  rewrite_log on;
+  access_log off;
+  # rewrite_log on;
   absolute_redirect off;
   sendfile on;
   tcp_nopush on;
