@@ -50,7 +50,7 @@ function fieldLabel(
 export function graphSourceTransformer(
   source: GraphSource,
   result: TimeSeriesRangesResult,
-): GraphSource {
+): void {
   if (result.ranges.length > 0) {
     if (result.initial) {
       source.values = {};
@@ -96,20 +96,16 @@ export function graphSourceTransformer(
       (vals) => vals.x.length === MAX_GRAPH_POINTS,
     );
   }
-  return source;
 }
 
 export function metricsSourceTransformer(
   source: MetricsSource,
   result: TimeSeriesMetricsResult,
-): MetricsSource {
-  return {
-    ...source,
-    updated: new Date(),
-    values: result.metrics.map((res) => ({
-      field: res.metric,
-      time: res.timestamp,
-      value: res.value,
-    })),
-  };
+): void {
+  source.updated = new Date();
+  source.values = result.metrics.map((res) => ({
+    field: res.metric,
+    time: new Date(res.timestamp),
+    value: res.value,
+  }));
 }

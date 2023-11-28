@@ -59,8 +59,8 @@ const values = computed<CurrentValue[]>(() => {
       ...result,
       name: config.value.renames[result.field] || defaultLabel(result.field),
       stale:
-        !!result.time &&
-        ((now - result.time) as number) > fieldFreshDuration(result.field),
+        result.time != null &&
+        now - result.time.getTime() > fieldFreshDuration(result.field),
     })) ?? []
   );
 });

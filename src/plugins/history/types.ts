@@ -71,7 +71,7 @@ export interface TimeSeriesRange {
 export interface TimeSeriesMetric {
   metric: string;
   value: number;
-  timestamp: number;
+  timestamp: DateString;
 }
 
 export interface TimeSeriesRangesResult {
@@ -95,7 +95,7 @@ export interface RangeValue extends PlotData {
 
 export interface MetricValue {
   field: string;
-  time: number;
+  time: Date;
   value: number | null;
 }
 
