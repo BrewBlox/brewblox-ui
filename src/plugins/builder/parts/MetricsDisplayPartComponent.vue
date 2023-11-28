@@ -45,7 +45,7 @@ const values = computed<MetricDisplay[]>(() => {
         metrics.value.decimals[v.field] ?? DEFAULT_METRICS_DECIMALS,
       ),
       stale:
-        !!v.time && ((now - v.time) as number) > fieldFreshDuration(v.field),
+        v.time != null && now - v.time.getTime() > fieldFreshDuration(v.field),
     }));
 });
 </script>
