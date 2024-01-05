@@ -82,3 +82,6 @@ services:
   #     - type: bind
   #       source: ../brewblox-auth/brewblox_auth
   #       target: /app/brewblox_auth
+  #     - type: bind
+  #       source: ../brewblox-auth/entrypoint.sh
+  #       target: /app/entrypoint.sh

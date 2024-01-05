@@ -235,7 +235,7 @@ function serviceReboot(): void {
         <ToggleButton
           flat
           :model-value="status.enabled"
-          label="Autoconnect"
+          label="Enabled"
           color="secondary"
           @update:model-value="setEnabled"
         />
