@@ -159,17 +159,17 @@ export const validateService = (serviceId: string): Promise<boolean> =>
     .then((resp) => resp.data.service != null)
     .catch(() => false);
 
-export const persistAutoconnecting = (
+export const persistEnabled = (
   serviceId: string,
   enabled: boolean,
 ): Promise<boolean> =>
   http
     .put<{ enabled: boolean }>(
-      `/${encodeURIComponent(serviceId)}/settings/autoconnecting`,
+      `/${encodeURIComponent(serviceId)}/settings/enabled`,
       { enabled },
     )
     .then((resp) => resp.data.enabled)
-    .catch(intercept(`Failed to persist autoconnecting flag on ${serviceId}`));
+    .catch(intercept(`Failed to persist enabled flag on ${serviceId}`));
 
 export const fetchSparkStatus = async (
   serviceId: string,

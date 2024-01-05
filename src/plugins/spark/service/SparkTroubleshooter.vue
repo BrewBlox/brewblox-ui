@@ -60,8 +60,8 @@ async function refresh(): Promise<void> {
   await sparkStore.fetchAll(props.serviceId);
 }
 
-async function setAutoconnect(enabled: boolean): Promise<void> {
-  await sparkStore.saveAutoConnecting(props.serviceId, enabled);
+async function setEnabled(enabled: boolean): Promise<void> {
+  await sparkStore.saveEnabled(props.serviceId, enabled);
   await refresh();
 }
 
@@ -237,7 +237,7 @@ function serviceReboot(): void {
           :model-value="status.enabled"
           label="Autoconnect"
           color="secondary"
-          @update:model-value="setAutoconnect"
+          @update:model-value="setEnabled"
         />
         <q-btn
           flat

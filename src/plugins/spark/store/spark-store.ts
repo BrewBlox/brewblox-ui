@@ -233,11 +233,11 @@ export const useSparkStore = defineStore('sparkStore', () => {
     lastBlocksAt.value[serviceId] = null;
   }
 
-  async function saveAutoConnecting(
+  async function saveEnabled(
     serviceId: string,
     enabled: boolean,
   ): Promise<void> {
-    await sparkApi.persistAutoconnecting(serviceId, enabled);
+    await sparkApi.persistEnabled(serviceId, enabled);
   }
 
   async function clearDiscoveredBlocks(serviceId: string): Promise<void> {
@@ -523,7 +523,7 @@ export const useSparkStore = defineStore('sparkStore', () => {
     renameBlock,
     clearBlocks,
     invalidateBlocks,
-    saveAutoConnecting,
+    saveEnabled,
     clearDiscoveredBlocks,
     cleanUnusedNames,
     fetchBlock,
