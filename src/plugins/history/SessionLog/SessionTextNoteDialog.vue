@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import formatDate from 'date-fns/format';
+import { format as formatDate } from 'date-fns/format';
 import { QInput } from 'quasar';
 import { nextTick, ref } from 'vue';
 import {

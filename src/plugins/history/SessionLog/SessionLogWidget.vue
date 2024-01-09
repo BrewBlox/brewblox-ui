@@ -94,7 +94,7 @@ function* sessionLines(): Generator<string, void, unknown> {
   }
 }
 
-function exportSession(): void {
+async function exportSession(): Promise<void> {
   if (session.value === null) {
     return;
   }
@@ -102,11 +102,8 @@ function exportSession(): void {
     session.value.date,
   )}`;
   const lines: string[] = [name, ...sessionLines()];
-  saveFile(
-    DOMPurify.sanitize(marked.parse(lines.join('\n'))),
-    `${name}.html`,
-    true,
-  );
+  const parsed = await marked.parse(lines.join('\n'));
+  saveFile(DOMPurify.sanitize(parsed), `${name}.html`, true);
 }
 
 async function exportSessionGraphs(): Promise<void> {

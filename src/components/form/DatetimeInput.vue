@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import format from 'date-fns/format';
-import isEqual from 'date-fns/isEqual';
-import isValid from 'date-fns/isValid';
-import parseISO from 'date-fns/parseISO';
+import { format } from 'date-fns/format';
+import { isEqual } from 'date-fns/isEqual';
+import { isValid } from 'date-fns/isValid';
+import { parseISO } from 'date-fns/parseISO';
 import { computed, ref, watch } from 'vue';
 
 type DateFormatType = 'date' | 'number' | 'string';

@@ -12,7 +12,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const rendered = computed<string>(() =>
-  DOMPurify.sanitize(marked.parse(props.text)),
+  DOMPurify.sanitize(marked.parse(props.text) as string),
 );
 </script>
 
