@@ -99,8 +99,8 @@ const allBlockOpts = computed<BlockOption[]>(() =>
         tooltip: discovered
           ? 'Discovered block'
           : sysBlock
-          ? 'System block'
-          : undefined,
+            ? 'System block'
+            : undefined,
         generate: spec.generate,
       };
     })

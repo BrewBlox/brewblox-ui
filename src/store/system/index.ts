@@ -1,5 +1,5 @@
 import { StoreObject, StoreObjectImpl } from 'brewblox-proto/ts';
-import formatDate from 'date-fns/format';
+import { format as formatDate } from 'date-fns/format';
 import defaults from 'lodash/defaults';
 import omit from 'lodash/omit';
 import { defineStore } from 'pinia';

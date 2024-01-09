@@ -1,5 +1,5 @@
 import { Link, Quantity, TempUnit } from 'brewblox-proto/ts';
-import formatDate from 'date-fns/format';
+import { format as formatDate } from 'date-fns/format';
 import isFinite from 'lodash/isFinite';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';

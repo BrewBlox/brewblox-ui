@@ -1,5 +1,4 @@
-// import mqtt from 'mqtt';
-import * as mqtt from 'mqtt/dist/mqtt.min';
+import mqtt from 'mqtt';
 import { nanoid } from 'nanoid';
 import { Ref, ref } from 'vue';
 import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';

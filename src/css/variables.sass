@@ -7,9 +7,9 @@ $h6: (size: 1rem, line-height: 1.25rem, letter-spacing: .025em, weight: 400)
 
 @function shade($c, $n)
   @if($n <= 7)
-    @return lighten($c, (7 - $n) / 7 * (100 - lightness($c)))
+    @return lighten($c, calc((7 - $n) / 7 * (100% - lightness($c))))
   @else
-    @return darken($c, ($n - 7) / 8 * lightness($c))
+    @return darken($c, calc(($n - 7) / 8 * lightness($c)))
 
 $red: #e44e55
 $pink: #e252a6
