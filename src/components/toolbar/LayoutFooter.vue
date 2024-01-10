@@ -35,11 +35,23 @@ const logEntries = computed<LogEntryDisplay[]>(() =>
 function showLogin(): void {
   createDialog({ component: 'LoginDialog' });
 }
+
+function showDownloadCert(): void {
+  createDialog({ component: 'SslCertDialog' });
+}
 </script>
 
 <template>
   <q-footer class="bg-dark">
     <q-bar class="bg-transparent q-px-none row justify-end">
+      <q-btn
+        flat
+        stretch
+        icon="mdi-shield-lock"
+        @click="showDownloadCert"
+      >
+        <q-tooltip>Download SSL certificate</q-tooltip>
+      </q-btn>
       <div
         v-if="!eventbusConnected"
         class="text-negative"
