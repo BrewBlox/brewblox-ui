@@ -1,15 +1,21 @@
 import { defineStore } from 'pinia';
-import { computed, ref, shallowRef } from 'vue';
+import { computed, reactive, ref, shallowRef } from 'vue';
 import type { BuilderBlueprint, BuilderLayout } from '@/plugins/builder/types';
-import { concatById, filterById, findById } from '@/utils/collections';
+import { makeObjectSorter } from '@/utils/functional';
 import { upgradeLayout } from '../utils';
 import api from './api';
+
+const sorter = makeObjectSorter<BuilderLayout>('id');
 
 export const useBuilderStore = defineStore('builderStore', () => {
   const blueprints = shallowRef<BuilderBlueprint[]>([]);
   const focusWarningEnabled = ref<boolean>(true);
   const lastLayoutId = ref<string | null>(null);
-  const layouts = ref<BuilderLayout[]>([]);
+  const layoutMap = reactive<Mapped<BuilderLayout>>({});
+
+  const layouts = computed<BuilderLayout[]>(() =>
+    Object.values(layoutMap).sort(sorter),
+  );
 
   const layoutIds = computed<string[]>(() => layouts.value.map((v) => v.id));
   const blueprintTypes = computed<string[]>(() =>
@@ -17,7 +23,7 @@ export const useBuilderStore = defineStore('builderStore', () => {
   );
 
   function layoutById(id: Maybe<string>): BuilderLayout | null {
-    return findById(layouts.value, id);
+    return layoutMap[id ?? ''] ?? null;
   }
 
   function blueprintByType(type: string): BuilderBlueprint | null {
@@ -49,25 +55,21 @@ export const useBuilderStore = defineStore('builderStore', () => {
 
   async function start(): Promise<void> {
     const storedLayouts: BuilderLayout[] = await api.fetch();
-    const upgradedLayouts: BuilderLayout[] = [];
 
-    storedLayouts.forEach((stored) => {
-      const changed = upgradeLayout(stored);
-      layouts.value.push(changed ?? stored);
-      if (changed) {
-        upgradedLayouts.push(changed);
-      }
-    });
+    const upgradedLayouts = storedLayouts
+      .map((stored) => {
+        const changed = upgradeLayout(stored);
+        const actual = changed ?? stored;
+        layoutMap[actual.id] = actual;
+        return changed;
+      })
+      .filter((v): v is BuilderLayout => v != null);
 
     api.persistMult(upgradedLayouts);
 
     api.subscribe(
-      (layout: BuilderLayout) => {
-        layouts.value = concatById(layouts.value, layout);
-      },
-      (id: string) => {
-        layouts.value = filterById(layouts.value, { id });
-      },
+      (layout: BuilderLayout) => (layoutMap[layout.id] = layout),
+      (id: string) => delete layoutMap[id],
     );
   }
 

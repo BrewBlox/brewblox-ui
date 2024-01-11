@@ -3,12 +3,16 @@ import debounce from 'lodash/debounce';
 import { Layout, PlotData } from 'plotly.js';
 import {
   computed,
-  nextTick,
   onBeforeUnmount,
   onMounted,
+  provide,
   ref,
+  shallowRef,
+  ShallowRef,
   watch,
+  watchEffect,
 } from 'vue';
+import { GraphDataKey } from '@/components/graph/symbols';
 import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 
@@ -39,6 +43,10 @@ const emit = defineEmits<{
 
 const historyStore = useHistoryStore();
 const revision = ref(new Date());
+const error = ref<string | null>(null);
+const graphData = shallowRef<Partial<PlotData>[]>([]);
+
+provide(GraphDataKey, graphData);
 
 const params = computed<QueryParams>({
   get: () => props.config.params ?? {},
@@ -50,24 +58,8 @@ const layout = computed<Partial<Layout>>({
   set: (v) => emit('layout', v),
 });
 
-const source = computed<GraphSource | null>(
-  () => historyStore.sourceById<GraphSource>(props.graphId)?.value ?? null,
-);
-
-const error = computed<string | null>(() => {
-  if (!source.value) {
-    return props.config.fields.length > 0
-      ? 'No data sources'
-      : 'No fields selected';
-  }
-  if (!graphData.value.some((data) => data.x && data.x.length > 0)) {
-    return 'No data (yet) for selected period';
-  }
-  return null;
-});
-
-const graphData = computed<Partial<PlotData>[]>(() =>
-  source.value ? Object.values(source.value.values) : [],
+const sourceRef = computed<ShallowRef<GraphSource> | null>(
+  () => historyStore.sourceById<GraphSource>(props.graphId) ?? null,
 );
 
 function createSource(): void {
@@ -109,28 +101,35 @@ watch(
   () => resetSource(),
 );
 
-watch(
-  () => source.value,
-  (newV: GraphSource | null) => {
-    if (newV?.truncated) {
-      resetSource();
-    }
-  },
-);
+watchEffect(() => {
+  // The computed returns a ref, so we need to unwrap twice
+  const source = sourceRef.value;
 
-onMounted(() => {
-  if (!props.sharedSources) {
-    createSource();
-  } else {
-    nextTick(refresh);
+  if (source == null) {
+    graphData.value = [];
+    error.value =
+      props.config.fields.length > 0 ? 'No data sources' : 'No fields selected';
+    return;
   }
+
+  // If the live streamed data is getting too much, we need to reset
+  // This will then yield lower-resolution data for the entire period
+  if (source.value.truncated) {
+    error.value = 'Reloading graph ...';
+    resetSource();
+    return;
+  }
+
+  graphData.value = Object.values(source.value.values);
+  error.value = graphData.value.some((data) => data.x && data.x.length > 0)
+    ? null
+    : 'No data (yet) for selected period';
 });
 
-onBeforeUnmount(() => {
-  if (!props.sharedSources) {
-    removeSource();
-  }
-});
+if (!props.sharedSources) {
+  onMounted(() => createSource());
+  onBeforeUnmount(() => removeSource());
+}
 </script>
 
 <template>
@@ -184,7 +183,6 @@ onBeforeUnmount(() => {
 
     <PlotlyGraph
       v-else
-      :data="graphData"
       :layout="layout"
       :revision="revision"
       class="col"
