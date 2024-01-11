@@ -1,18 +1,24 @@
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
-import { concatById, filterById, findById } from '@/utils/collections';
+import { computed, reactive } from 'vue';
+import { makeObjectSorter } from '@/utils/functional';
 import api from './api';
 import type { SidebarFolder } from './types';
 
 export * from './types';
 
+const sorter = makeObjectSorter<SidebarFolder>('id');
+
 export const useSidebarStore = defineStore('sidebarStore', () => {
-  const folders = ref<SidebarFolder[]>([]);
+  const folderMap = reactive<Mapped<SidebarFolder>>({});
+
+  const folders = computed<SidebarFolder[]>(() =>
+    Object.values(folderMap).sort(sorter),
+  );
 
   const folderIds = computed<string[]>(() => folders.value.map((v) => v.id));
 
   function folderById(id: Maybe<string>): SidebarFolder | null {
-    return findById(folders.value, id);
+    return folderMap[id ?? ''] ?? null;
   }
 
   function folderTitle(id: Maybe<string>): string {
@@ -32,10 +38,10 @@ export const useSidebarStore = defineStore('sidebarStore', () => {
   }
 
   async function start(): Promise<void> {
-    folders.value = await api.fetch();
+    (await api.fetch()).forEach((v) => (folderMap[v.id] = v));
     api.subscribe(
-      (folder) => (folders.value = concatById(folders.value, folder)),
-      (id) => (folders.value = filterById(folders.value, { id })),
+      (folder) => (folderMap[folder.id] = folder),
+      (id) => delete folderMap[id],
     );
   }
 

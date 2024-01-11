@@ -1,34 +1,38 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { computed, reactive } from 'vue';
 import { eventbus } from '@/eventbus';
 import { useServiceStore } from '@/store/services';
 import { userUnits } from '@/user-settings';
-import { concatById, findById } from '@/utils/collections';
+import { makeObjectSorter } from '@/utils/functional';
+import { typed } from '@/utils/misc';
 import { bloxQty, shortDateString } from '@/utils/quantity';
 import type { TiltStateEvent, TiltStateValue } from '../types';
 import { makeTiltId, splitTiltId } from '../utils';
 
-export const useTiltStore = defineStore('tiltStore', () => {
-  const values = ref<TiltStateValue[]>([]);
+const sorter = makeObjectSorter<TiltStateValue>('id');
 
-  function setValue(value: TiltStateValue): void {
-    values.value = concatById(values.value, value);
-  }
+export const useTiltStore = defineStore('tiltStore', () => {
+  const valueMap = reactive<Mapped<TiltStateValue>>({});
+
+  const values = computed<TiltStateValue[]>(() =>
+    Object.values(valueMap).sort(sorter),
+  );
 
   function saveDeviceName(id: string, name: string): void {
     const [serviceId, mac] = splitTiltId(id);
     eventbus.publish(`brewcast/tilt/${serviceId}/names`, {
       [mac]: name,
     });
-    const state = findById(values.value, id);
-    if (state) {
-      setValue({ ...state, name });
+    const existing = valueMap[id];
+    if (existing) {
+      existing.name = name;
     }
   }
 
   async function parseStateEvent(evt: TiltStateEvent): Promise<void> {
     const serviceStore = useServiceStore();
 
+    const id = makeTiltId(evt.key, evt.mac);
     const tempUnit = userUnits.value.temperature;
     const temp = evt.data[`temperature[${tempUnit}]`];
     const sg = evt.data['specificGravity'];
@@ -38,8 +42,8 @@ export const useTiltStore = defineStore('tiltStore', () => {
     const uncalSG = evt.data['uncalibratedSpecificGravity'] ?? null;
     const uncalPlato = evt.data['uncalibratedPlato[degP]'] ?? null;
 
-    setValue({
-      id: makeTiltId(evt.key, evt.mac),
+    valueMap[id] = typed<TiltStateValue>({
+      id,
       serviceId: evt.key,
       timestamp: new Date(evt.timestamp),
       color: evt.color,

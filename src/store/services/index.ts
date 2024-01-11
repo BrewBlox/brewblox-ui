@@ -1,12 +1,14 @@
 import isEqual from 'lodash/isEqual';
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed, reactive } from 'vue';
 import { ServiceHook, useFeatureStore } from '@/store/features';
-import { concatById, filterById, findById } from '@/utils/collections';
+import { makeObjectSorter } from '@/utils/functional';
 import api from './api';
 import type { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
+
+const sorter = makeObjectSorter<Service | ServiceStub | ServiceStatus>('id');
 
 const onStartService: ServiceHook = (service) =>
   useFeatureStore().serviceById(service.type)?.onStart?.(service);
@@ -15,36 +17,40 @@ const onRemoveService: ServiceHook = (service) =>
   useFeatureStore().serviceById(service.type)?.onRemove?.(service);
 
 export const useServiceStore = defineStore('serviceStore', () => {
-  const services = ref<Service[]>([]);
-  const stubs = ref<ServiceStub[]>([]);
-  const statuses = ref<ServiceStatus[]>([]);
+  const serviceMap = reactive<Mapped<Service>>({});
+  const stubMap = reactive<Mapped<ServiceStub>>({});
+  const statusMap = reactive<Mapped<ServiceStatus>>({});
+
+  const services = computed<Service[]>(() =>
+    Object.values(serviceMap).sort(sorter),
+  );
+  const stubs = computed<ServiceStub[]>(() =>
+    Object.values(stubMap).sort(sorter),
+  );
+  const statuses = computed<ServiceStatus[]>(() =>
+    Object.values(statusMap).sort(sorter),
+  );
 
   const serviceIds = computed<string[]>(() => services.value.map((v) => v.id));
   const stubIds = computed<string[]>(() => stubs.value.map((v) => v.id));
 
   function serviceById(id: Maybe<string>): Service | null {
-    return findById(services.value, id);
+    return serviceMap[id ?? ''] ?? null;
   }
 
   function setService(service: Service): void {
-    services.value = concatById(services.value, service);
-    stubs.value = filterById(stubs.value, service); // stubs have the same ID
-  }
-
-  function setAllServices(incoming: Service[]): void {
-    const ids = incoming.map((svc) => svc.id);
-    services.value = [...incoming];
-    stubs.value = stubs.value.filter((s) => !ids.includes(s.id));
+    serviceMap[service.id] = service;
+    delete stubMap[service.id];
   }
 
   function trySetStub(stub: ServiceStub): void {
-    if (!serviceById(stub.id)) {
-      stubs.value = concatById(stubs.value, stub);
+    if (serviceMap[stub.id] == null) {
+      stubMap[stub.id] = stub;
     }
   }
 
   function setStatus(status: ServiceStatus): void {
-    statuses.value = concatById(statuses.value, status);
+    statusMap[status.id] = status;
   }
 
   async function createService(service: Service): Promise<void> {
@@ -81,12 +87,12 @@ export const useServiceStore = defineStore('serviceStore', () => {
       const existing = serviceById(id);
       if (existing) {
         await onRemoveService(existing);
-        services.value = filterById(services.value, existing);
+        delete serviceMap[id];
       }
     };
 
     const initialServices = await api.fetch();
-    setAllServices(initialServices);
+    initialServices.forEach((v) => (serviceMap[v.id] = v));
     await Promise.all(initialServices.map(onStartService));
 
     api.subscribe(onChange, onDelete);
@@ -102,7 +108,6 @@ export const useServiceStore = defineStore('serviceStore', () => {
 
     serviceById,
     setService,
-    setAllServices,
     trySetStub,
     setStatus,
     createService,

@@ -1,20 +1,26 @@
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
-import { concatById, filterById, findById } from '@/utils/collections';
+import { computed, reactive } from 'vue';
+import { makeObjectSorter } from '@/utils/functional';
 import api from './api';
 import type { Dashboard } from './types';
 
 export * from './types';
 
+const sorter = makeObjectSorter<Dashboard>('id');
+
 export const useDashboardStore = defineStore('dashboardStore', () => {
-  const dashboards = ref<Dashboard[]>([]);
+  const dashboardMap = reactive<Mapped<Dashboard>>({});
+
+  const dashboards = computed<Dashboard[]>(() =>
+    Object.values(dashboardMap).sort(sorter),
+  );
 
   const dashboardIds = computed<string[]>(() =>
     dashboards.value.map((v) => v.id),
   );
 
   function dashboardById(id: Maybe<string>): Dashboard | null {
-    return findById(dashboards.value, id);
+    return dashboardMap[id ?? ''] ?? null;
   }
 
   function dashboardTitle(id: Maybe<string>): string {
@@ -34,11 +40,10 @@ export const useDashboardStore = defineStore('dashboardStore', () => {
   }
 
   async function start(): Promise<void> {
-    dashboards.value = await api.fetch();
+    (await api.fetch()).forEach((v) => (dashboardMap[v.id] = v));
     api.subscribe(
-      (dashboard) =>
-        (dashboards.value = concatById(dashboards.value, dashboard)),
-      (id) => (dashboards.value = filterById(dashboards.value, { id })),
+      (dashboard) => (dashboardMap[dashboard.id] = dashboard),
+      (id) => delete dashboardMap[id],
     );
   }
 
