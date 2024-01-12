@@ -5,6 +5,7 @@ import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';
 import { popById } from '@/utils/collections';
 import { mqttTopicExp } from '@/utils/misc';
 import { notify } from '@/utils/notify';
+import { createDialog } from './utils/dialog';
 
 export type EventCallback = (topic: string, evt: any) => unknown;
 
@@ -81,9 +82,9 @@ export class BrewbloxEventbus {
                 textColor: 'white',
               },
               {
-                label: 'Switch to HTTP',
+                label: 'Install SSL Cert',
                 textColor: 'white',
-                handler: () => (location.protocol = 'http:'),
+                handler: () => createDialog({ component: 'SslCertDialog' }),
               },
             ],
           }),

@@ -31,27 +31,11 @@ const logEntries = computed<LogEntryDisplay[]>(() =>
     }))
     .reverse(),
 );
-
-function showLogin(): void {
-  createDialog({ component: 'LoginDialog' });
-}
-
-function showDownloadCert(): void {
-  createDialog({ component: 'SslCertDialog' });
-}
 </script>
 
 <template>
   <q-footer class="bg-dark">
     <q-bar class="bg-transparent q-px-none row justify-end">
-      <q-btn
-        flat
-        stretch
-        icon="mdi-shield-lock"
-        @click="showDownloadCert"
-      >
-        <q-tooltip>Download SSL certificate</q-tooltip>
-      </q-btn>
       <div
         v-if="!eventbusConnected"
         class="text-negative"
@@ -100,8 +84,16 @@ function showDownloadCert(): void {
       <q-btn
         flat
         stretch
+        icon="mdi-shield-lock"
+        @click="createDialog({ component: 'SslCertDialog' })"
+      >
+        <q-tooltip>Install SSL certificate</q-tooltip>
+      </q-btn>
+      <q-btn
+        flat
+        stretch
         icon="mdi-account"
-        @click="showLogin"
+        @click="createDialog({ component: 'LoginDialog' })"
       >
         <q-tooltip>Login</q-tooltip>
       </q-btn>

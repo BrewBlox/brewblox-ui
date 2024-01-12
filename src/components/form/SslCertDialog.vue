@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { HOST, IS_FIREFOX, IS_IOS, IS_SAFARI } from '@/const';
 
-type BrowserKind = 'chrome' | 'firefox' | 'safari' | 'ios' | 'android';
+type BrowserKind = 'chrome' | 'firefox' | 'safari' | 'ios';
 
 withDefaults(defineProps<UseDialogProps>(), {
   ...useDialog.defaultProps,
@@ -36,9 +36,42 @@ if (IS_IOS) {
       <template #toolbar>
         <Toolbar
           icon="mdi-shield-lock"
-          title="Download SSL Certificate"
+          title="Install SSL Certificate"
         />
       </template>
+
+      <q-card-section>
+        <p>
+          HTTPS connections are encrypted using SSL certificates, signed by a
+          Certificate Authority (CA) to make them trustworthy. SSL certificates
+          are linked to a domain (eg. <b>brewblox.com</b>). Before signing a
+          certificate, a CA must validate that the certificate and the domain
+          are owned by the same person. By default, Brewblox is not accessible
+          from the internet. A CA can't validate a local network address it
+          can't reach.
+        </p>
+        <p>
+          To use HTTPS in a local network, Brewblox creates a
+          <b>self-signed certificate</b>. When a browser sees an unknown
+          self-signed certificate, it shows a warning page. On iOS devices, the
+          WebSockets used by Brewblox will not work at all.
+        </p>
+        <p>
+          To fix both problems, you can download and install your Brewblox
+          certificate. This will tell your browser to trust this specific
+          certificate. It will not trust certificates from other Brewblox
+          systems, just this one. Select your platform below, and follow the
+          instructions.
+        </p>
+        <p>
+          <b>
+            Android does not support the installation of self-signed
+            certificates.
+          </b>
+        </p>
+      </q-card-section>
+
+      <q-separator />
 
       <q-tabs
         v-model="activeTab"
@@ -64,12 +97,7 @@ if (IS_IOS) {
           name="ios"
           label="iOS"
         />
-        <q-tab
-          name="android"
-          label="Android"
-        />
       </q-tabs>
-      <q-separator />
       <q-tab-panels v-model="activeTab">
         <q-tab-panel name="chrome">
           <ul>
@@ -123,7 +151,7 @@ if (IS_IOS) {
             <li>Reload the Brewblox UI page</li>
           </ul>
         </q-tab-panel>
-        <q-tab-panel name="Safari">
+        <q-tab-panel name="safari">
           <ul>
             <li>
               <a
@@ -152,11 +180,38 @@ if (IS_IOS) {
           </ul>
         </q-tab-panel>
         <q-tab-panel name="ios">
-          TODO. Maybe
-          https://support.n4l.co.nz/s/article/Installing-an-SSL-Certificate-on-an-iOS-Device-Manually
-        </q-tab-panel>
-        <q-tab-panel name="android">
-          Sadly, Android does not support custom certificates.
+          <ul>
+            <li>
+              <a
+                outline
+                :href="`${HOST}/static/minica.der`"
+                target="_blank"
+                style="color: white"
+              >
+                Click here to download the <b>minica.der</b> file
+              </a>
+            </li>
+            <li>
+              Click "Allow" when prompted about downloading a configuration
+              profile
+            </li>
+            <li>Open the "Settings" app</li>
+            <li>Underneath the user details, tap "Profile Downloaded"</li>
+            <li>Tap the "Install" button</li>
+            <li>If prompted, enter your passcode</li>
+            <li>A warning is shown. Tap "Install"</li>
+            <li>A second prompt is shown. Tap "Install" again</li>
+            <li>Tap "Done"</li>
+            <li>Open the "Settings" app</li>
+            <li>Go to "General > About > Certificate Trust Settings"</li>
+            <li>
+              Under "Enable Full Trust for Root Certificates", find the new
+              certificate
+            </li>
+            <li>Enable the toggle button next to the certificate</li>
+            <li>Tap "Continue" when prompted</li>
+            <li>Reload the Brewblox UI page in your browser</li>
+          </ul>
         </q-tab-panel>
       </q-tab-panels>
     </Card>
