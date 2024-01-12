@@ -1,19 +1,25 @@
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
-import { concatById, filterById, findById } from '@/utils/collections';
+import { computed, reactive } from 'vue';
+import { makeObjectSorter } from '@/utils/functional';
 import { useFeatureStore } from '../features';
 import api from './api';
 import type { Widget } from './types';
 
 export * from './types';
 
+const sorter = makeObjectSorter<Widget>('id');
+
 export const useWidgetStore = defineStore('widgetStore', () => {
-  const widgets = ref<Widget[]>([]);
+  const widgetMap = reactive<Mapped<Widget>>({});
+
+  const widgets = computed<Widget[]>(() =>
+    Object.values(widgetMap).sort(sorter),
+  );
 
   const widgetIds = computed<string[]>(() => widgets.value.map((v) => v.id));
 
   function widgetById<T extends Widget>(id: Maybe<string>): T | null {
-    return findById(widgets.value, id) as T | null;
+    return (widgetMap[id ?? ''] as T) ?? null;
   }
 
   async function createWidget(widget: Widget): Promise<void> {
@@ -38,21 +44,21 @@ export const useWidgetStore = defineStore('widgetStore', () => {
     const featureStore = useFeatureStore();
 
     const storedWidgets: Widget[] = await api.fetch();
-    const upgradedWidgets: Widget[] = [];
 
-    storedWidgets.forEach((stored) => {
-      const changed = featureStore.upgradeWidget(stored);
-      widgets.value.push(changed ?? stored);
-      if (changed) {
-        upgradedWidgets.push(changed);
-      }
-    });
+    const upgradedWidgets = storedWidgets
+      .map((stored) => {
+        const changed = featureStore.upgradeWidget(stored);
+        const actual = changed ?? stored;
+        widgetMap[actual.id] = actual;
+        return changed;
+      })
+      .filter((v): v is Widget => v != null);
 
     api.persistMult(upgradedWidgets);
 
     api.subscribe(
-      (widget) => (widgets.value = concatById(widgets.value, widget)),
-      (id) => (widgets.value = filterById(widgets.value, { id })),
+      (widget) => (widgetMap[widget.id] = widget),
+      (id) => delete widgetMap[id],
     );
   }
 
