@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { HOST, IS_FIREFOX, IS_IOS, IS_SAFARI } from '@/const';
 
-type BrowserKind = 'chrome' | 'firefox' | 'safari' | 'ios';
+type BrowserKind = 'chrome' | 'firefox' | 'mac' | 'ios';
 
 withDefaults(defineProps<UseDialogProps>(), {
   ...useDialog.defaultProps,
@@ -19,7 +19,7 @@ const activeTab = ref<BrowserKind>('chrome');
 if (IS_IOS) {
   activeTab.value = 'ios';
 } else if (IS_SAFARI) {
-  activeTab.value = 'safari';
+  activeTab.value = 'mac';
 } else if (IS_FIREFOX) {
   activeTab.value = 'firefox';
 }
@@ -44,29 +44,27 @@ if (IS_IOS) {
         <p>
           HTTPS connections are encrypted using SSL certificates, signed by a
           Certificate Authority (CA) to make them trustworthy. SSL certificates
-          are linked to a domain (eg. <b>brewblox.com</b>). Before signing a
-          certificate, a CA must validate that the certificate and the domain
-          are owned by the same person. By default, Brewblox is not accessible
-          from the internet. A CA can't validate a local network address it
-          can't reach.
+          are linked to a domain name. Before signing a certificate, a public CA
+          will validate that the certificate and the domain are owned by the
+          same person. By default, Brewblox is not accessible from the internet.
+          A public CA can't validate a local network address it can't reach.
         </p>
         <p>
-          To use HTTPS in a local network, Brewblox creates a
-          <b>self-signed certificate</b>. When a browser sees an unknown
-          self-signed certificate, it shows a warning page. On iOS devices, the
-          WebSockets used by Brewblox will not work at all.
+          To use HTTPS in a local network, Brewblox creates its own CA for each
+          install. Because this CA is not yet known to the browser, a warning
+          page is shown for certificates signed by this CA. On iOS, a
+          long-standing bug will cause the UI to be non-functional even after
+          accepting the browser warning.
         </p>
         <p>
-          To fix both problems, you can download and install your Brewblox
-          certificate. This will tell your browser to trust this specific
-          certificate. It will not trust certificates from other Brewblox
-          systems, just this one. Select your platform below, and follow the
+          To fix both problems, you can download and install your Brewblox CA
+          certificate. This will tell your browser to trust the CA unique to
+          your Brewblox install. Select your platform below, and follow the
           instructions.
         </p>
         <p>
           <b>
-            Android does not support the installation of self-signed
-            certificates.
+            Android does not support installing additional CA certificates.
           </b>
         </p>
       </q-card-section>
@@ -90,8 +88,8 @@ if (IS_IOS) {
           label="Firefox"
         />
         <q-tab
-          name="safari"
-          label="Safari"
+          name="mac"
+          label="MacOS"
         />
         <q-tab
           name="ios"
@@ -151,7 +149,7 @@ if (IS_IOS) {
             <li>Reload the Brewblox UI page</li>
           </ul>
         </q-tab-panel>
-        <q-tab-panel name="safari">
+        <q-tab-panel name="mac">
           <ul>
             <li>
               <a

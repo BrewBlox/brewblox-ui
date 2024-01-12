@@ -84,14 +84,6 @@ const logEntries = computed<LogEntryDisplay[]>(() =>
       <q-btn
         flat
         stretch
-        icon="mdi-shield-lock"
-        @click="createDialog({ component: 'SslCertDialog' })"
-      >
-        <q-tooltip>Install SSL certificate</q-tooltip>
-      </q-btn>
-      <q-btn
-        flat
-        stretch
         icon="mdi-account"
         @click="createDialog({ component: 'LoginDialog' })"
       >

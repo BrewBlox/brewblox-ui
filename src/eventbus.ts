@@ -72,7 +72,7 @@ export class BrewbloxEventbus {
             target="_blank"
             style="color: white"
           >
-            This may be caused by an iOS bug.
+            Self-signed SSL certificates are a known problem on iOS.
           </a>
           `,
             html: true,
