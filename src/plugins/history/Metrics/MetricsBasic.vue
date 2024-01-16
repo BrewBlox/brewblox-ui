@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
-import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ShallowRef, watch } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { useHistoryStore } from '@/plugins/history/store';
@@ -16,9 +16,12 @@ import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
 import { MetricsWidget } from './types';
 
-interface CurrentValue extends MetricValue {
+interface DisplayValue extends MetricValue {
   name: string;
   stale: boolean;
+  decimals: number;
+  fixedValue: string;
+  freshDuration: number;
 }
 
 interface Props {
@@ -36,33 +39,36 @@ const config = computed<MetricsConfig>(() =>
   defaults(widget.value.config, emptyMetricsConfig()),
 );
 
-const source = computed<MetricsSource | null>(
-  () => historyStore.sourceById<MetricsSource>(metricsId)?.value ?? null,
+const sourceRef = computed<ShallowRef<MetricsSource> | null>(() =>
+  historyStore.sourceById<MetricsSource>(metricsId),
 );
 
-function fieldFreshDuration(field: string): number {
-  return config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY_MS;
-}
-
-function fieldDecimals(field: string): number {
-  return config.value.decimals[field] ?? DEFAULT_METRICS_DECIMALS;
-}
-
-function fixedValue(value: CurrentValue): string {
-  return fixedNumber(value.value, fieldDecimals(value.field));
-}
-
-const values = computed<CurrentValue[]>(() => {
+const values = computed<DisplayValue[]>(() => {
+  // The computed returns a ref, so we need to unwrap twice
+  const source = sourceRef.value;
   const now = new Date().getTime();
-  return (
-    source.value?.values.map((result) => ({
+
+  if (source == null) {
+    return [];
+  }
+
+  return source.value.values.map((result): DisplayValue => {
+    const name =
+      config.value.renames[result.field] || defaultLabel(result.field);
+    const decimals =
+      config.value.decimals[result.field] ?? DEFAULT_METRICS_DECIMALS;
+    const freshDuration =
+      config.value.freshDuration[result.field] ?? DEFAULT_METRICS_EXPIRY_MS;
+
+    return {
       ...result,
-      name: config.value.renames[result.field] || defaultLabel(result.field),
-      stale:
-        result.time != null &&
-        now - result.time.getTime() > fieldFreshDuration(result.field),
-    })) ?? []
-  );
+      name,
+      decimals,
+      freshDuration,
+      stale: result.time != null && now - result.time.getTime() > freshDuration,
+      fixedValue: fixedNumber(result.value, decimals),
+    };
+  });
 });
 
 function createSource(): void {
@@ -121,7 +127,7 @@ onBeforeUnmount(() => removeSource());
         tag-class="row items-center q-gutter-x-sm"
       >
         <div :class="['text-big col-auto', val.stale && 'darkened']">
-          {{ fixedValue(val) }}
+          {{ val.fixedValue }}
         </div>
         <div
           v-if="val.stale"
@@ -133,7 +139,7 @@ onBeforeUnmount(() => removeSource());
           />
           <q-tooltip>
             {{ val.name }} was updated more than
-            {{ durationString(fieldFreshDuration(val.field)) }} ago.
+            {{ durationString(val.freshDuration) }} ago.
             <br />
             Last update: {{ shortDateString(val.time) }}.
           </q-tooltip>

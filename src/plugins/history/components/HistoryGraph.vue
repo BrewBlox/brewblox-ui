@@ -58,8 +58,8 @@ const layout = computed<Partial<Layout>>({
   set: (v) => emit('layout', v),
 });
 
-const sourceRef = computed<ShallowRef<GraphSource> | null>(
-  () => historyStore.sourceById<GraphSource>(props.graphId) ?? null,
+const sourceRef = computed<ShallowRef<GraphSource> | null>(() =>
+  historyStore.sourceById<GraphSource>(props.graphId),
 );
 
 function createSource(): void {
