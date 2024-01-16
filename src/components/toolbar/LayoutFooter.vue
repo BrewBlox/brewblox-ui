@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { authEnabled } from '@/auth';
 import { eventbus } from '@/eventbus';
 import { useHistoryStore } from '@/plugins/history/store';
 import { useLoggingStore } from '@/store/logging';
@@ -32,8 +33,22 @@ const logEntries = computed<LogEntryDisplay[]>(() =>
     .reverse(),
 );
 
-function showLogin(): void {
-  createDialog({ component: 'LoginDialog' });
+function showAuthExplanation(): void {
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      html: true,
+      title: 'Authentication',
+      message: `
+      <p>
+        To enable password authentication, run:
+      </p>
+      <b/>
+      <p class="monospace">
+        brewblox-ctl auth init
+      </p>`,
+    },
+  });
 }
 </script>
 
@@ -86,12 +101,22 @@ function showLogin(): void {
         </q-menu>
       </q-btn>
       <q-btn
+        v-if="authEnabled"
         flat
         stretch
         icon="mdi-account"
-        @click="showLogin"
+        @click="createDialog({ component: 'LoginDialog' })"
       >
         <q-tooltip>Login</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-else
+        flat
+        stretch
+        icon="mdi-account"
+        @click="showAuthExplanation"
+      >
+        <q-tooltip>Authentication</q-tooltip>
       </q-btn>
     </q-bar>
   </q-footer>

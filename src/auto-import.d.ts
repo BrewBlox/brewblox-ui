@@ -148,6 +148,7 @@ declare module '@vue/runtime-core' {
     TextDialog: typeof import('src/components/form/TextDialog.vue').default;
     TextAreaDialog: typeof import('src/components/form/TextAreaDialog.vue').default;
     TagSelectField: typeof import('src/components/form/TagSelectField.vue').default;
+    SslCertDialog: typeof import('src/components/form/SslCertDialog.vue').default;
     SliderField: typeof import('src/components/form/SliderField.vue').default;
     SliderDialog: typeof import('src/components/form/SliderDialog.vue').default;
     SettingValueField: typeof import('src/components/form/SettingValueField.vue').default;
@@ -169,8 +170,8 @@ declare module '@vue/runtime-core' {
     KeyboardDialog: typeof import('src/components/form/KeyboardDialog.vue').default;
     KeyboardButton: typeof import('src/components/form/KeyboardButton.vue').default;
     InlineQuantityField: typeof import('src/components/form/InlineQuantityField.vue').default;
-    DurationDialog: typeof import('src/components/form/DurationDialog.vue').default;
     DurationField: typeof import('src/components/form/DurationField.vue').default;
+    DurationDialog: typeof import('src/components/form/DurationDialog.vue').default;
     DigitalStateButton: typeof import('src/components/form/DigitalStateButton.vue').default;
     DialogCard: typeof import('src/components/form/DialogCard.vue').default;
     DatetimeInput: typeof import('src/components/form/DatetimeInput.vue').default;

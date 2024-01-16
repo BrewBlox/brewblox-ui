@@ -124,6 +124,11 @@ const layouts = computed<BuilderLayout[]>(() =>
             label="Accidental touch prevention"
             @click="startEditBuilderTouchDelay"
           />
+          <ActionItem
+            icon="mdi-shield-lock"
+            label="Install SSL certificate"
+            @click="createDialog({ component: 'SslCertDialog' })"
+          />
         </ActionSubmenu>
       </q-expansion-item>
 
