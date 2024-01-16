@@ -21,7 +21,7 @@ interface MetricDisplay {
 
 const { flows, metrics, width, height, bordered, passthrough } =
   usePart.setup();
-const { source } = useMetrics.setupConsumer();
+const { sourceRef } = useMetrics.setupConsumer();
 
 const color = computed<string>(() => liquidBorderColor(flows.value));
 
@@ -30,10 +30,14 @@ function fieldFreshDuration(field: string): number {
 }
 
 const values = computed<MetricDisplay[]>(() => {
-  if (!source.value) {
+  // The computed returns a ref, so we need to unwrap twice
+  const source = sourceRef.value;
+  const now = new Date().getTime();
+
+  if (source == null) {
     return [];
   }
-  const now = new Date().getTime();
+
   return source.value.values
     .filter((v) => metrics.value.fields.includes(v.field))
     .map((v) => ({

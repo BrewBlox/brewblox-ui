@@ -10,7 +10,7 @@ function edit(): void {
   createDialog({
     component: 'MetricsEditorDialog',
     componentProps: {
-      modelValue: defaults(emptyMetricsConfig(), part.value.metrics),
+      modelValue: defaults(part.value.metrics, emptyMetricsConfig()),
     },
   }).onOk((metrics) => {
     patchPart({ metrics });

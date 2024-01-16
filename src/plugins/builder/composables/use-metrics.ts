@@ -9,6 +9,7 @@ import {
   onBeforeUnmount,
   provide,
   Ref,
+  ShallowRef,
   watch,
 } from 'vue';
 import { useHistoryStore } from '@/plugins/history/store';
@@ -19,7 +20,7 @@ import { BuilderLayout } from '../types';
 const sourceIdKey: InjectionKey<string> = Symbol('$builderMetricSourceId');
 
 export interface UseMetricsComponent {
-  source: ComputedRef<MetricsSource | null>;
+  sourceRef: ComputedRef<ShallowRef<MetricsSource> | null>;
 }
 
 export interface UseMetricsComposable {
@@ -34,8 +35,8 @@ export const useMetrics: UseMetricsComposable = {
     const sourceId = nanoid(6);
     let activeFields: Set<string> = new Set();
 
-    const source = computed<MetricsSource | null>(
-      () => historyStore.sourceById<MetricsSource>(sourceId)?.value ?? null,
+    const sourceRef = computed<ShallowRef<MetricsSource> | null>(() =>
+      historyStore.sourceById<MetricsSource>(sourceId),
     );
 
     const initMetrics = debounce(
@@ -72,19 +73,19 @@ export const useMetrics: UseMetricsComposable = {
     provide(sourceIdKey, sourceId);
 
     return {
-      source,
+      sourceRef,
     };
   },
   setupConsumer(): UseMetricsComponent {
     const historyStore = useHistoryStore();
     const sourceId = inject(sourceIdKey, null);
 
-    const source = computed<MetricsSource | null>(
-      () => historyStore.sourceById<MetricsSource>(sourceId)?.value ?? null,
+    const sourceRef = computed<ShallowRef<MetricsSource> | null>(() =>
+      historyStore.sourceById<MetricsSource>(sourceId),
     );
 
     return {
-      source,
+      sourceRef,
     };
   },
 };
