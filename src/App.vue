@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authRefresh } from '@/auth';
+import { authRefresh, checkAuthEnabled } from '@/auth';
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
@@ -14,6 +14,7 @@ import { createDialogPromise } from './utils/dialog';
  * they will miss the first (immediate) data push.
  */
 async function onAppSetup(): Promise<void> {
+  checkAuthEnabled(); // don't wait
   if (!(await authRefresh())) {
     await createDialogPromise({ component: 'LoginDialog' });
   }
