@@ -41,11 +41,12 @@ function showAuthExplanation(): void {
       title: 'Authentication',
       message: `
       <p>
-        To enable password authentication, run:
+        Password protection is disabled.
+        To enable it, run:
       </p>
       <b/>
       <p class="monospace">
-        brewblox-ctl auth init
+        brewblox-ctl auth enable
       </p>`,
     },
   });
