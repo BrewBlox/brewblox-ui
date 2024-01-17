@@ -1,37 +1,32 @@
 <script setup lang="ts">
+import { TouchSwipeValue } from 'quasar';
 import { useGlobals } from '@/composables';
-import { PropType } from 'vue';
 import { builderTools } from '../const';
 import { BuilderToolName } from '../types';
 
-const props = defineProps({
-  expanded: {
-    type: Boolean,
-    required: true,
-  },
-  activeTool: {
-    type: null as unknown as PropType<string | null>,
-    required: true,
-  },
-  disabledTools: {
-    type: Array as PropType<BuilderToolName[]>,
-    default: () => [],
-  },
+interface Props {
+  expanded: boolean;
+  activeTool: BuilderToolName | null;
+  disabledTools?: BuilderToolName[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  disabledTools: () => [],
 });
 
 const emit = defineEmits<{
-  (e: 'update:expanded', value: boolean): void;
-  (e: 'use', value: BuilderToolName);
+  'update:expanded': [payload: boolean];
+  use: [payload: BuilderToolName];
 }>();
 
 const { dense } = useGlobals.setup();
 
-function handleSwipe(args: SwipeArguments): void {
-  const desiredState = args.direction === 'left';
+const handleSwipe: TouchSwipeValue = (details) => {
+  const desiredState = details.direction === 'left';
   if (props.expanded !== desiredState) {
     emit('update:expanded', desiredState);
   }
-}
+};
 </script>
 
 <template>

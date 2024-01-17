@@ -1,7 +1,9 @@
-<script lang="ts">
+<script setup lang="ts">
+import defaults from 'lodash/defaults';
+import { nanoid } from 'nanoid';
+import { computed, onBeforeUnmount, onMounted, ShallowRef, watch } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { defaultLabel } from '@/plugins/history/nodes';
-import { addSource } from '@/plugins/history/sources/metrics';
 import { useHistoryStore } from '@/plugins/history/store';
 import {
   MetricsConfig,
@@ -11,119 +13,99 @@ import {
 import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { isJsonEqual } from '@/utils/objects';
 import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
-import defaults from 'lodash/defaults';
-import { nanoid } from 'nanoid';
-import {
-  computed,
-  defineComponent,
-  onBeforeUnmount,
-  onMounted,
-  watch,
-} from 'vue';
-import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY } from '../const';
+import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
 import { MetricsWidget } from './types';
 
-interface CurrentValue extends MetricValue {
+interface DisplayValue extends MetricValue {
   name: string;
   stale: boolean;
+  decimals: number;
+  fixedValue: string;
+  freshDuration: number;
 }
 
-export default defineComponent({
-  name: 'MetricsBasic',
-  props: {
-    revision: {
-      type: Date,
-      required: true,
-    },
-  },
-  setup(props) {
-    const historyStore = useHistoryStore();
-    const metricsId = nanoid();
-    const { context } = useContext.setup();
-    const { widget } = useWidget.setup<MetricsWidget>();
+interface Props {
+  revision: Date;
+}
 
-    const config = computed<MetricsConfig>(() =>
-      defaults(widget.value.config, emptyMetricsConfig()),
-    );
+const props = defineProps<Props>();
 
-    const source = computed<MetricsSource | null>(() =>
-      historyStore.sourceById<MetricsSource>(metricsId),
-    );
+const historyStore = useHistoryStore();
+const metricsId = nanoid();
+const { context } = useContext.setup();
+const { widget } = useWidget.setup<MetricsWidget>();
 
-    function fieldFreshDuration(field: string): number {
-      return config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
-    }
+const config = computed<MetricsConfig>(() =>
+  defaults(widget.value.config, emptyMetricsConfig()),
+);
 
-    function fieldDecimals(field: string): number {
-      return config.value.decimals[field] ?? DEFAULT_METRICS_DECIMALS;
-    }
+const sourceRef = computed<ShallowRef<MetricsSource> | null>(() =>
+  historyStore.sourceById<MetricsSource>(metricsId),
+);
 
-    function fixedValue(value: CurrentValue): string {
-      return fixedNumber(value.value, fieldDecimals(value.field));
-    }
+const values = computed<DisplayValue[]>(() => {
+  // The computed returns a ref, so we need to unwrap twice
+  const source = sourceRef.value;
+  const now = new Date().getTime();
 
-    const values = computed<CurrentValue[]>(() => {
-      const now = new Date().getTime();
-      return (
-        source.value?.values.map((result) => ({
-          ...result,
-          name:
-            config.value.renames[result.field] || defaultLabel(result.field),
-          stale:
-            !!result.time &&
-            ((now - result.time) as number) > fieldFreshDuration(result.field),
-        })) ?? []
-      );
-    });
+  if (source == null) {
+    return [];
+  }
 
-    function createSource(): void {
-      addSource(
-        metricsId,
-        config.value.params,
-        config.value.renames,
-        config.value.fields,
-      );
-    }
-
-    function removeSource(): void {
-      historyStore.removeSource(source.value);
-    }
-
-    function resetSource(): void {
-      removeSource();
-      createSource();
-    }
-
-    watch(
-      () => config.value,
-      (newV, oldV) => {
-        if (!isJsonEqual(newV, oldV)) {
-          resetSource();
-        }
-      },
-      { deep: true },
-    );
-
-    watch(
-      () => props.revision,
-      () => resetSource(),
-    );
-
-    onMounted(() => resetSource());
-    onBeforeUnmount(() => removeSource());
+  return source.value.values.map((result): DisplayValue => {
+    const name =
+      config.value.renames[result.field] || defaultLabel(result.field);
+    const decimals =
+      config.value.decimals[result.field] ?? DEFAULT_METRICS_DECIMALS;
+    const freshDuration =
+      config.value.freshDuration[result.field] ?? DEFAULT_METRICS_EXPIRY_MS;
 
     return {
-      shortDateString,
-      context,
-      metricsId,
-      config,
-      values,
-      fixedValue,
-      durationString,
-      fieldFreshDuration,
+      ...result,
+      name,
+      decimals,
+      freshDuration,
+      stale: result.time != null && now - result.time.getTime() > freshDuration,
+      fixedValue: fixedNumber(result.value, decimals),
     };
-  },
+  });
 });
+
+function createSource(): void {
+  historyStore.createMetricsSource(
+    metricsId,
+    config.value.params,
+    config.value.renames,
+    config.value.fields,
+  );
+}
+
+function removeSource(): void {
+  historyStore.removeSource(metricsId);
+}
+
+function resetSource(): void {
+  removeSource();
+  createSource();
+}
+
+watch(
+  () => config.value,
+  (newV, oldV) => {
+    if (!isJsonEqual(newV, oldV)) {
+      resetSource();
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  () => props.revision,
+  () => resetSource(),
+);
+
+onMounted(() => resetSource());
+onBeforeUnmount(() => removeSource());
 </script>
 
 <template>
@@ -145,7 +127,7 @@ export default defineComponent({
         tag-class="row items-center q-gutter-x-sm"
       >
         <div :class="['text-big col-auto', val.stale && 'darkened']">
-          {{ fixedValue(val) }}
+          {{ val.fixedValue }}
         </div>
         <div
           v-if="val.stale"
@@ -157,7 +139,7 @@ export default defineComponent({
           />
           <q-tooltip>
             {{ val.name }} was updated more than
-            {{ durationString(fieldFreshDuration(val.field)) }} ago.
+            {{ durationString(val.freshDuration) }} ago.
             <br />
             Last update: {{ shortDateString(val.time) }}.
           </q-tooltip>

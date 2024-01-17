@@ -1,11 +1,11 @@
+import { BlockType, TempSensorMockBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { tempQty } from '@/utils/quantity';
-import { BlockType, TempSensorMockBlock } from 'brewblox-proto/ts';
-import { Plugin } from 'vue';
 import widget from './TempSensorMockWidget.vue';
 
 const type = BlockType.TempSensorMock;
@@ -19,6 +19,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<TempSensorMockBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): TempSensorMockBlock['data'] => ({
         value: tempQty(20),
         setting: tempQty(20),

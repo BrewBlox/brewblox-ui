@@ -1,30 +1,25 @@
-<script lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
-import { defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
 
-export default defineComponent({
-  name: 'EnumValEdit',
-  props: {
-    ...useValEdit.props,
-    options: {
-      type: Array as PropType<SelectOption[]>,
-      required: true,
-    },
-    selectProps: {
-      type: Object as PropType<AnyDict>,
-      default: () => ({}),
-    },
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<string>();
+type VT = string;
 
-    return {
-      field,
-      startEdit,
-    };
-  },
+interface Props extends UseValEditProps<VT> {
+  options: SelectOption<VT>[];
+  selectProps?: AnyDict;
+}
+
+withDefaults(defineProps<Props>(), {
+  ...useValEdit.defaultProps<VT>(),
+  selectProps: () => ({}),
 });
+
+defineEmits<UseValEditEmits<VT>>();
+
+const { field, startEdit } = useValEdit.setup<string>();
 </script>
 
 <template>

@@ -1,23 +1,19 @@
+import forEach from 'lodash/forEach';
+import last from 'lodash/last';
+import parseDuration from 'parse-duration';
 import {
   DEFAULT_GRAPH_DECIMALS,
   MAX_GRAPH_POINTS,
   Y2_COLOR,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
-import { useHistoryStore } from '@/plugins/history/store';
 import {
-  DisplayNames,
   GraphSource,
-  GraphValueAxes,
-  LabelPrecision,
-  LineColors,
-  QueryParams,
+  MetricsSource,
+  TimeSeriesMetricsResult,
   TimeSeriesRangesResult,
 } from '@/plugins/history/types';
 import { fixedNumber } from '@/utils/quantity';
-import forEach from 'lodash/forEach';
-import last from 'lodash/last';
-import parseDuration from 'parse-duration';
 
 function boundedConcat(left: number[] = [], right: number[] = []): number[] {
   const sliced = Math.max(left.length + right.length - MAX_GRAPH_POINTS, 0);
@@ -51,10 +47,10 @@ function fieldLabel(
   return `<span ${prop}>${label}<br>${fixedNumber(value, precision)}</span>`;
 }
 
-function transformer(
+export function graphSourceTransformer(
   source: GraphSource,
   result: TimeSeriesRangesResult,
-): GraphSource {
+): void {
   if (result.ranges.length > 0) {
     if (result.initial) {
       source.values = {};
@@ -100,34 +96,16 @@ function transformer(
       (vals) => vals.x.length === MAX_GRAPH_POINTS,
     );
   }
-  return source;
 }
 
-export async function addSource(
-  id: string,
-  params: QueryParams,
-  renames: DisplayNames,
-  axes: GraphValueAxes,
-  colors: LineColors,
-  precision: LabelPrecision,
-  fields: string[],
-): Promise<void> {
-  const validFields = fields.filter((field) => !!field);
-  if (validFields.length === 0) {
-    return;
-  }
-  const source: GraphSource = {
-    id,
-    params,
-    renames,
-    axes,
-    colors,
-    precision,
-    transformer,
-    command: 'ranges',
-    fields: validFields,
-    values: {},
-    truncated: false,
-  };
-  await useHistoryStore().addSource(source);
+export function metricsSourceTransformer(
+  source: MetricsSource,
+  result: TimeSeriesMetricsResult,
+): void {
+  source.updated = new Date();
+  source.values = result.metrics.map((res) => ({
+    field: res.metric,
+    time: new Date(res.timestamp),
+    value: res.value,
+  }));
 }

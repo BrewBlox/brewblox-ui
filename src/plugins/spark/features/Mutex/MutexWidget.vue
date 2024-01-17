@@ -1,11 +1,4 @@
-<script lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { isBlockCompatible } from '@/plugins/spark/utils/info';
-import { createBlockDialog } from '@/utils/block-dialog';
-import { createDialog } from '@/utils/dialog';
-import { durationString, prettyLink, prettyQty } from '@/utils/quantity';
+<script setup lang="ts">
 import {
   Block,
   BlockIntfType,
@@ -15,7 +8,14 @@ import {
   Quantity,
 } from 'brewblox-proto/ts';
 import { QTableColumn } from 'quasar';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
+import { prettyLink, prettyQty } from '@/utils/quantity';
 
 interface DigitalConstrainedBlock extends Block {
   data: {
@@ -81,57 +81,53 @@ const COMPATIBLE_COLUMNS: QTableColumn<DigitalConstrainedBlock>[] = [
   },
 ];
 
-export default defineComponent({
-  name: 'MutexWidget',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { context } = useContext.setup();
-    const { serviceId, block } = useBlockWidget.setup<MutexBlock>();
+const sparkStore = useSparkStore();
+const { context } = useContext.setup();
+const { serviceId, block } = useBlockWidget.setup<MutexBlock>();
 
-    const compatibleBlocks = computed<DigitalConstrainedBlock[]>(() =>
-      sparkStore
-        .blocksByService(serviceId)
-        .filter((b) =>
-          isBlockCompatible(b, BlockIntfType.ActuatorDigitalInterface),
-        ),
-    );
+const compatibleBlocks = computed<DigitalConstrainedBlock[]>(() =>
+  sparkStore
+    .blocksByService(serviceId)
+    .filter((b) =>
+      isBlockCompatible(b, BlockIntfType.ActuatorDigitalInterface),
+    ),
+);
 
-    const mutexClients = computed<MutexClient[]>(() =>
-      compatibleBlocks.value
-        .filter((b) => {
-          const mutexed: MutexedConstraint | undefined =
-            b.data.constraints?.mutexed;
-          return mutexed?.enabled && mutexed?.mutexId.id === block.value.id;
-        })
-        .map((b) => ({
-          id: b.id,
-          constraint: b.data.constraints!.mutexed!,
-          remaining: b.data.constraints?.mutexed?.hasLock
-            ? block.value.data.waitRemaining
-            : undefined,
-        })),
-    );
+const mutexClients = computed<MutexClient[]>(() =>
+  compatibleBlocks.value
+    .filter((b) => {
+      const mutexed: MutexedConstraint | undefined =
+        b.data.constraints?.mutexed;
+      return mutexed?.enabled && mutexed?.mutexId.id === block.value.id;
+    })
+    .map((b) => ({
+      id: b.id,
+      constraint: b.data.constraints!.mutexed!,
+      remaining: b.data.constraints?.mutexed?.hasLock
+        ? block.value.data.waitRemaining
+        : undefined,
+    })),
+);
 
-    const nonClientBlocks = computed<DigitalConstrainedBlock[]>(() =>
-      compatibleBlocks.value.filter((b) => {
-        const mutexed: MutexedConstraint | undefined =
-          b.data.constraints?.mutexed;
-        return !mutexed?.enabled || mutexed?.mutexId.id !== block.value.id;
-      }),
-    );
+const nonClientBlocks = computed<DigitalConstrainedBlock[]>(() =>
+  compatibleBlocks.value.filter((b) => {
+    const mutexed: MutexedConstraint | undefined = b.data.constraints?.mutexed;
+    return !mutexed?.enabled || mutexed?.mutexId.id !== block.value.id;
+  }),
+);
 
-    function showBlockById(id: string): void {
-      createBlockDialog({ serviceId, id, type: null });
-    }
+function showBlockById(id: string): void {
+  createBlockDialog({ serviceId, id, type: null });
+}
 
-    function showHelpDialog(): void {
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: 'Mutex block',
-          html: true,
-          cancel: false,
-          message: `
+function showHelpDialog(): void {
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: 'Mutex block',
+      html: true,
+      cancel: false,
+      message: `
           <p>
             Mutex is short for
             <b>Mut</b>ually <b>Ex</b>clusive.
@@ -167,23 +163,9 @@ export default defineComponent({
             </a>.
           </p>
           `,
-        },
-      });
-    }
-
-    return {
-      durationString,
-      CLIENT_COLUMNS,
-      COMPATIBLE_COLUMNS,
-      context,
-      block,
-      mutexClients,
-      nonClientBlocks,
-      showBlockById,
-      showHelpDialog,
-    };
-  },
-});
+    },
+  });
+}
 </script>
 
 <template>

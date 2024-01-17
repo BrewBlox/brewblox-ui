@@ -1,14 +1,3 @@
-import { GraphAxis, GraphConfig } from '@/plugins/history/types';
-import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import {
-  BlockAddress,
-  BlockConfig,
-  BlockFieldSpec,
-  ProfileValues,
-} from '@/plugins/spark/types';
-import { isQuantity } from '@/utils/identity';
-import { bloxLink } from '@/utils/link';
-import { bloxQty, durationMs, parseDate, prettyUnit } from '@/utils/quantity';
 import {
   AnalogConstraintKey,
   AnalogConstraints,
@@ -35,9 +24,19 @@ import defaults from 'lodash/defaults';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
-import { isBlockCompatible } from './info';
-
 import { Enum } from 'typescript-string-enums';
+import { GraphAxis, GraphConfig } from '@/plugins/history/types';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
+import {
+  BlockAddress,
+  BlockConfig,
+  BlockFieldSpec,
+  ProfileValues,
+} from '@/plugins/spark/types';
+import { isQuantity } from '@/utils/identity';
+import { bloxLink } from '@/utils/link';
+import { bloxQty, durationMs, parseDate, prettyUnit } from '@/utils/quantity';
+import { isBlockCompatible } from './info';
 
 export const asBlockAddress = (block: Block): BlockAddress =>
   pick(block, ['id', 'serviceId', 'type']);

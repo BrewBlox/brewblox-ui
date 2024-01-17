@@ -1,60 +1,47 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed, PropType } from 'vue';
 import { useContext, useGlobals } from '@/composables';
-import { computed, defineComponent, PropType } from 'vue';
 
-export default defineComponent({
-  name: 'Card',
-  props: {
-    noScroll: {
-      type: Boolean,
-      default: false,
-    },
-    contentClass: {
-      type: [String, Array, Object],
-      default: '',
-    },
-    size: {
-      type: String as PropType<'sm' | 'md' | 'lg'>,
-      default: 'md',
-    },
+const props = defineProps({
+  noScroll: {
+    type: Boolean,
+    default: false,
   },
-  setup(props) {
-    const { dense } = useGlobals.setup();
-    const { context } = useContext.setup();
-
-    const scrollable = computed<boolean>(
-      () => !props.noScroll && context.size === 'Fixed',
-    );
-
-    const cardClass = computed<string>(() => {
-      const listed = [
-        `card__${context.container}`,
-        `card__${props.size}`,
-        'depth-2',
-      ];
-      if (dense.value) {
-        listed.push('card__dense');
-      }
-      if (props.noScroll) {
-        listed.push('card__no-scroll');
-      }
-      return listed.join(' ');
-    });
-
-    const toolbarClass = computed<string>(
-      () => `toolbar__${context.container}`,
-    );
-
-    const bodyClass = computed<string>(() => `content__${context.container}`);
-
-    return {
-      scrollable,
-      cardClass,
-      toolbarClass,
-      bodyClass,
-    };
+  contentClass: {
+    type: [String, Array, Object],
+    default: '',
+  },
+  size: {
+    type: String as PropType<'sm' | 'md' | 'lg'>,
+    default: 'md',
   },
 });
+
+const { dense } = useGlobals.setup();
+const { context } = useContext.setup();
+
+const scrollable = computed<boolean>(
+  () => !props.noScroll && context.size === 'Fixed',
+);
+
+const cardClass = computed<string>(() => {
+  const listed = [
+    `card__${context.container}`,
+    `card__${props.size}`,
+    'depth-2',
+  ];
+  if (dense.value) {
+    listed.push('card__dense');
+  }
+  if (props.noScroll) {
+    listed.push('card__no-scroll');
+  }
+  return listed.join(' ');
+});
+
+const toolbarClass = computed<string>(() => `toolbar__${context.container}`);
+
+const bodyClass = computed<string>(() => `content__${context.container}`);
 </script>
 
 <template>

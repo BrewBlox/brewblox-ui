@@ -1,5 +1,8 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
+import { Block, BlockType } from 'brewblox-proto/ts';
+import mapValues from 'lodash/mapValues';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
@@ -11,114 +14,89 @@ import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import { useServiceStore } from '@/store/services';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { makeTypeFilter } from '@/utils/functional';
-import { Block, BlockType } from 'brewblox-proto/ts';
-import mapValues from 'lodash/mapValues';
-import { computed, defineComponent, PropType, ref } from 'vue';
 import { GraphConfig } from '../types';
 
-export default defineComponent({
-  name: 'SelectBlockGraphDialog',
-  props: {
-    ...useDialog.props,
-    address: {
-      type: null as unknown as PropType<BlockAddress | null>,
-      default: null,
-    },
-    title: {
-      type: String,
-      default: 'Add block to graph',
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const serviceStore = useServiceStore();
-    const sparkStore = useSparkStore();
-    const specStore = useBlockSpecStore();
+interface Props extends UseDialogProps {
+  address?: BlockAddress | null;
+  title?: string;
+}
 
-    const services = computed<SparkService[]>(() =>
-      serviceStore.services.filter(
-        makeTypeFilter<SparkService>(SPARK_SERVICE_TYPE),
-      ),
-    );
-
-    const block = ref<Block | null>(sparkStore.blockByAddress(props.address));
-    const service = ref<SparkService | null>(
-      services.value.find((svc) => svc.id === props.address?.serviceId) ?? null,
-    );
-    const selectedFields = ref<BlockFieldSpec[]>([]);
-
-    const graphedTypes: BlockType[] = specStore.fieldSpecs
-      .filter((f) => f.graphed)
-      .map((s) => s.type);
-
-    const blocks = computed<Block[]>(() =>
-      sparkStore
-        .blocksByService(service.value?.id)
-        .filter((block) => graphedTypes.includes(block.type)),
-    );
-
-    const fields = computed<BlockFieldSpec[]>(() =>
-      specStore.fieldSpecsByType(block.value?.type).filter((f) => f.graphed),
-    );
-
-    function selectService(v: SparkService | null): void {
-      if (v?.id !== service.value?.id) {
-        selectBlock(null);
-      }
-      service.value = v;
-    }
-
-    function selectBlock(v: Block | null): void {
-      if (v?.id !== block.value?.id) {
-        selectedFields.value = [];
-      }
-      block.value = v;
-    }
-
-    function save(): void {
-      if (!block.value || !selectedFields.value.length) {
-        return;
-      }
-      const blockId = block.value.id;
-      const cfg = makeBlockGraphConfig(block.value, {}, (v) =>
-        selectedFields.value.some((f) => f.key === v.key),
-      );
-      const sanitized: GraphConfig = {
-        ...cfg,
-        layout: {},
-        params: {},
-        renames: mapValues(cfg.renames, (v) => `[${blockId}] ${v}`),
-      };
-      onDialogOK(sanitized);
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      services,
-      block,
-      service,
-      selectedFields,
-      graphedTypes,
-      blocks,
-      fields,
-      selectService,
-      selectBlock,
-      createBlockDialog,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  address: null,
+  title: 'Add block to graph',
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<GraphConfig>();
+const serviceStore = useServiceStore();
+const sparkStore = useSparkStore();
+const specStore = useBlockSpecStore();
+
+const services = computed<SparkService[]>(() =>
+  serviceStore.services.filter(
+    makeTypeFilter<SparkService>(SPARK_SERVICE_TYPE),
+  ),
+);
+
+const block = ref<Block | null>(sparkStore.blockByAddress(props.address));
+const service = ref<SparkService | null>(
+  services.value.find((svc) => svc.id === props.address?.serviceId) ?? null,
+);
+const selectedFields = ref<BlockFieldSpec[]>([]);
+
+const graphedTypes: BlockType[] = specStore.fieldSpecs
+  .filter((f) => f.graphed)
+  .map((s) => s.type);
+
+const blocks = computed<Block[]>(() =>
+  sparkStore
+    .blocksByService(service.value?.id)
+    .filter((block) => graphedTypes.includes(block.type)),
+);
+
+const fields = computed<BlockFieldSpec[]>(() =>
+  specStore.fieldSpecsByType(block.value?.type).filter((f) => f.graphed),
+);
+
+function selectService(v: SparkService | null): void {
+  if (v?.id !== service.value?.id) {
+    selectBlock(null);
+  }
+  service.value = v;
+}
+
+function selectBlock(v: Block | null): void {
+  if (v?.id !== block.value?.id) {
+    selectedFields.value = [];
+  }
+  block.value = v;
+}
+
+function save(): void {
+  if (!block.value || !selectedFields.value.length) {
+    return;
+  }
+  const blockId = block.value.id;
+  const cfg = makeBlockGraphConfig(block.value, {}, (v) =>
+    selectedFields.value.some((f) => f.key === v.key),
+  );
+  const sanitized: GraphConfig = {
+    ...cfg,
+    layout: {},
+    params: {},
+    renames: mapValues(cfg.renames, (v) => `[${blockId}] ${v}`),
+  };
+  onDialogOK(sanitized);
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

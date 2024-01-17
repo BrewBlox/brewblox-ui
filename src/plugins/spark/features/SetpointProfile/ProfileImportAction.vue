@@ -1,18 +1,17 @@
 <script setup lang="ts">
+import { SetpointProfileBlock } from 'brewblox-proto/ts';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { loadFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
-import { SetpointProfileBlock } from 'brewblox-proto/ts';
 
-defineProps({
-  icon: {
-    type: String,
-    default: 'mdi-file-import',
-  },
-  label: {
-    type: String,
-    default: 'Import profile from file',
-  },
+interface Props {
+  icon?: string;
+  label?: string;
+}
+
+withDefaults(defineProps<Props>(), {
+  icon: 'mdi-file-import',
+  label: 'Import profile from file',
 });
 
 const { patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();

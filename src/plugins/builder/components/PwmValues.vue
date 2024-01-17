@@ -1,31 +1,24 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { textTransformation } from '@/plugins/builder/utils';
 import { preciseNumber } from '@/utils/quantity';
-import { computed } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
-import { PwmBlockT, PWM_KEY, PWM_TYPES } from '../const';
+import { PWM_KEY, PWM_TYPES, PwmBlockT } from '../const';
 
-const props = defineProps({
-  width: {
-    type: Number,
-    default: 50,
-  },
-  height: {
-    type: Number,
-    default: 50,
-  },
-  settingsKey: {
-    type: String,
-    default: PWM_KEY,
-  },
-  x: {
-    type: Number,
-    default: 0,
-  },
-  y: {
-    type: Number,
-    default: 0,
-  },
+interface Props {
+  width?: number;
+  height?: number;
+  settingsKey?: string;
+  x?: number;
+  y?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  width: 50,
+  height: 50,
+  settingsKey: PWM_KEY,
+  x: 0,
+  y: 0,
 });
 
 const { part, placeholder } = usePart.setup();

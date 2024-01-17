@@ -1,54 +1,42 @@
-<script lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+<script setup lang="ts">
+import { computed } from 'vue';
+import {
+  useDialog,
+  UseDialogEmits,
+  UseDialogProps,
+  useGlobals,
+} from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { computed, defineComponent } from 'vue';
 import SparkEspWifiCard from './SparkEspWifiCard.vue';
 import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
 
-export default defineComponent({
-  name: 'SparkWifiDialog',
-  components: {
-    SparkEspWifiCard,
-    SparkParticleWifiCard,
-  },
-  props: {
-    ...useDialog.props,
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
-    const { dense } = useGlobals.setup();
+interface Props extends UseDialogProps {
+  serviceId: string;
+}
 
-    const platformVendor = computed<'esp' | 'particle' | 'sim' | 'unknown'>(
-      () => {
-        const status = sparkStore.statusByService(props.serviceId);
-        const platform = status?.controller?.platform;
-        if (platform === 'p1' || platform === 'photon') {
-          return 'particle';
-        }
-        if (platform === 'esp32') {
-          return 'esp';
-        }
-        if (platform === 'gcc') {
-          return 'sim';
-        }
-        return 'unknown';
-      },
-    );
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+});
 
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      dense,
-      platformVendor,
-    };
-  },
+defineEmits<UseDialogEmits>();
+
+const sparkStore = useSparkStore();
+const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
+const { dense } = useGlobals.setup();
+
+const platformVendor = computed<'esp' | 'particle' | 'sim' | 'unknown'>(() => {
+  const status = sparkStore.statusByService(props.serviceId);
+  const platform = status?.controller?.platform;
+  if (platform === 'p1' || platform === 'photon') {
+    return 'particle';
+  }
+  if (platform === 'esp32') {
+    return 'esp';
+  }
+  if (platform === 'gcc') {
+    return 'sim';
+  }
+  return 'unknown';
 });
 </script>
 
@@ -56,7 +44,7 @@ export default defineComponent({
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <SparkEspWifiCard

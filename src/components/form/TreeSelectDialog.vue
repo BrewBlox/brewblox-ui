@@ -1,56 +1,38 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
 import { QTreeNode } from 'quasar';
-import { defineComponent, PropType, ref } from 'vue';
+import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 
-export default defineComponent({
-  name: 'TreeSelectDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: String,
-      default: null,
-    },
-    nodes: {
-      type: Array as PropType<QTreeNode[]>,
-      required: true,
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: string | null;
+  nodes: QTreeNode[];
+  clearable?: boolean;
+}
 
-    const selected = ref<string | null>(props.modelValue);
-    const expanded = ref<string[]>([]);
-
-    function save(value: string | null): void {
-      if (value != null || props.clearable) {
-        onDialogOK(value);
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      selected,
-      expanded,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  clearable: false,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<string | null>();
+
+const selected = ref<string | null>(props.modelValue);
+const expanded = ref<string[]>([]);
+
+function save(value: string | null): void {
+  if (value != null || props.clearable) {
+    onDialogOK(value);
+  }
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save(selected)"
   >

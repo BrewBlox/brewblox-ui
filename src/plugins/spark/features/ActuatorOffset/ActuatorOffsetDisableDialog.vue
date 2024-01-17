@@ -1,8 +1,4 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { createDialog } from '@/utils/dialog';
-import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
+<script setup lang="ts">
 import {
   ActuatorOffsetBlock,
   Quantity,
@@ -10,86 +6,72 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, ref } from 'vue';
+import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
+import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 
-export default defineComponent({
-  name: 'ActuatorOffsetDisableDialog',
-  props: {
-    ...useDialog.props,
-    block: {
-      type: Object as PropType<ActuatorOffsetBlock>,
-      required: true,
-    },
-    title: {
-      type: String,
-      default: 'Desired Setpoint settings',
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const sparkStore = useSparkStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-    const driver: ActuatorOffsetBlock = cloneDeep(props.block);
-    const setpoint: SetpointSensorPairBlock | null = sparkStore.blockByLink(
-      driver.serviceId,
-      driver.data.targetId,
-    );
+interface Props extends UseDialogProps {
+  block: ActuatorOffsetBlock;
+  title?: string;
+}
 
-    if (!setpoint) {
-      sparkStore.patchBlock(driver, { enabled: false });
-      onDialogOK();
-    }
-
-    const setpointId = setpoint?.id ?? 'Unknown';
-    const setpointEnabled = ref<boolean>(true);
-    const setpointSetting = ref<Quantity>(
-      bloxQty(setpoint?.data.storedSetting ?? tempQty(20)).round(),
-    );
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: setpointSetting.value.value,
-          suffix: setpointSetting.value.unit,
-          type: 'number',
-        },
-      }).onOk((v) => (setpointSetting.value.value = v));
-    }
-
-    async function confirm(): Promise<void> {
-      await sparkStore.patchBlock(driver, {
-        enabled: false,
-      });
-      await sparkStore.patchBlock(setpoint, {
-        enabled: setpointEnabled.value,
-        storedSetting: setpointSetting.value,
-        settingMode: SettingMode.STORED,
-      });
-      onDialogOK();
-    }
-
-    return {
-      prettyUnit,
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      setpointId,
-      setpointEnabled,
-      setpointSetting,
-      showKeyboard,
-      confirm,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Desired Setpoint settings',
 });
+
+defineEmits<UseDialogEmits>();
+
+const sparkStore = useSparkStore();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<never>();
+const driver: ActuatorOffsetBlock = cloneDeep(props.block);
+const setpoint: SetpointSensorPairBlock | null = sparkStore.blockByLink(
+  driver.serviceId,
+  driver.data.targetId,
+);
+
+if (!setpoint) {
+  sparkStore.patchBlock(driver, { enabled: false });
+  onDialogOK();
+}
+
+const setpointId = setpoint?.id ?? 'Unknown';
+const setpointEnabled = ref<boolean>(true);
+const setpointSetting = ref<Quantity>(
+  bloxQty(setpoint?.data.storedSetting ?? tempQty(20)).round(),
+);
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: setpointSetting.value.value,
+      suffix: setpointSetting.value.unit,
+      type: 'number',
+    },
+  }).onOk((v) => (setpointSetting.value.value = v));
+}
+
+async function confirm(): Promise<void> {
+  await sparkStore.patchBlock(driver, {
+    enabled: false,
+  });
+  await sparkStore.patchBlock(setpoint, {
+    enabled: setpointEnabled.value,
+    storedSetting: setpointSetting.value,
+    settingMode: SettingMode.STORED,
+  });
+  onDialogOK();
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="confirm"
   >

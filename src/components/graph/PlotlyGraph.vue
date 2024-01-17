@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { Y2_COLOR } from '@/plugins/history/const';
-import { GraphAnnotation } from '@/plugins/history/types';
-import { createDialog } from '@/utils/dialog';
-import { notify } from '@/utils/notify';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
@@ -10,18 +6,35 @@ import Plotly, {
   ClickAnnotationEvent,
   Config,
   Layout,
-  PlotData,
   PlotlyHTMLElement,
   PlotMouseEvent,
 } from 'plotly.js';
-import {
-  computed,
-  onBeforeUnmount,
-  onMounted,
-  PropType,
-  ref,
-  watch,
-} from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Y2_COLOR } from '@/plugins/history/const';
+import { GraphAnnotation } from '@/plugins/history/types';
+import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
+import { GraphDataKey } from './symbols';
+
+interface Props {
+  layout?: Partial<Layout>;
+  config?: Partial<Config>;
+  annotated?: boolean;
+  revision?: Date;
+  static?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  layout: () => ({}),
+  config: () => ({}),
+  annotated: false,
+  revision: () => new Date(),
+  static: false,
+});
+
+const emit = defineEmits<{
+  annotations: [payload: GraphAnnotation[]];
+}>();
 
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
@@ -63,39 +76,13 @@ const layoutDefaults = (): Partial<Layout> => ({
   hovermode: 'closest',
 });
 
-const props = defineProps({
-  data: {
-    type: Array as PropType<Partial<PlotData>[]>,
-    default: () => [],
-  },
-  layout: {
-    type: Object as PropType<Partial<Layout>>,
-    default: () => ({}),
-  },
-  config: {
-    type: Object as PropType<Partial<Config>>,
-    default: () => ({}),
-  },
-  annotated: {
-    type: Boolean,
-    default: false,
-  },
-  revision: {
-    type: Date,
-    default: () => new Date(),
-  },
-  static: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits<{
-  (e: 'annotations', data: GraphAnnotation[]);
-}>();
-
 const plotlyElement = ref<PlotlyHTMLElement>();
 const containerSize = ref<AreaSize>({ width: 200, height: 200 });
+const graphData = inject(GraphDataKey)!;
+
+if (!graphData) {
+  throw new Error('No graph data ref injected');
+}
 
 let zoomed = false;
 let skippedRender = false;
@@ -171,7 +158,7 @@ function combinedLayout(): Partial<Layout> {
     props.layout,
     calcSize(),
     props.static ? { dragmode: false, hovermode: false } : {},
-    props.data.some((d) => d.yaxis === 'y2')
+    graphData.value.some((d) => d.yaxis === 'y2')
       ? { xaxis: { domain: [0, 0.89] }, yaxis: { position: 0.9 } }
       : { xaxis: { domain: [0, 0.94] }, yaxis: { position: 0.95 } },
   );
@@ -188,7 +175,7 @@ async function relayoutPlot(): Promise<void> {
 async function reactPlot(): Promise<void> {
   await Plotly.react(
     plotlyElement.value!,
-    props.data,
+    graphData.value,
     combinedLayout(),
     combinedConfig(),
   );
@@ -202,7 +189,7 @@ async function createPlot(): Promise<void> {
     // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
     await Plotly.newPlot(
       plotlyElement.value,
-      props.data,
+      graphData.value,
       combinedLayout(),
       combinedConfig(),
     );
@@ -237,7 +224,7 @@ function onClick(evt: PlotMouseEvent): void {
 
   const point = evt.points[0];
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: 'New annotation',
       title: 'Add annotation',
@@ -276,7 +263,7 @@ function onAnnotationClick(evt: ClickAnnotationEvent): void {
     component: 'GraphAnnotationDialog',
     componentProps: {
       title: 'Edit annotation',
-      modelValue: annotation.text,
+      modelValue: annotation.text ?? '',
     },
   }).onOk(({ text, remove }: { text: string; remove: boolean }) => {
     const updated = [...annotations.value];
@@ -297,7 +284,7 @@ const debouncedRender = debounce(renderPlot, 50);
 const debouncedRelayout = debounce(relayoutPlot, 100);
 
 watch(
-  () => [props.config, props.data, props.revision],
+  () => [props.config, props.revision, graphData.value],
   () => debouncedRender(false),
 );
 

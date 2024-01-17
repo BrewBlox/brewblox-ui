@@ -1,39 +1,31 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
 import { createComponentDialog } from '@/utils/dialog';
 import { dateString } from '@/utils/quantity';
-import { computed, defineComponent, PropType } from 'vue';
 import { LoggedSession } from '../types';
 import SessionHeaderDialog from './SessionHeaderDialog.vue';
 
-export default defineComponent({
-  name: 'SessionHeaderField',
-  props: {
-    session: {
-      type: Object as PropType<LoggedSession>,
-      required: true,
+interface Props {
+  session: LoggedSession;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:session': [payload: LoggedSession];
+}>();
+
+const tags = computed<string[]>(() => props.session.tags ?? []);
+
+function showDialog(): void {
+  createComponentDialog({
+    component: SessionHeaderDialog,
+    componentProps: {
+      modelValue: props.session,
+      title: 'Edit session',
     },
-  },
-  emits: ['update:session'],
-  setup(props, { emit }) {
-    const tags = computed<string[]>(() => props.session.tags ?? []);
-
-    function showDialog(): void {
-      createComponentDialog({
-        component: SessionHeaderDialog,
-        componentProps: {
-          modelValue: props.session,
-          title: 'Edit session',
-        },
-      }).onOk((v) => emit('update:session', v));
-    }
-
-    return {
-      dateString,
-      tags,
-      showDialog,
-    };
-  },
-});
+  }).onOk((v) => emit('update:session', v));
+}
 </script>
 
 <template>

@@ -1,8 +1,12 @@
-<script lang="ts">
+<script setup lang="ts">
+import { reactive } from 'vue';
 import { tempQty } from '@/utils/quantity';
-import { defineComponent, PropType, reactive } from 'vue';
-import { QuickstartAction } from '../types';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { FermentConfig, FermentMode, FermentOpts } from './types';
+
+const props = defineProps<UseTaskProps<FermentConfig>>();
+
+const emit = defineEmits<UseTaskEmits<FermentConfig>>();
 
 const targetOpts: SelectOption<FermentMode>[] = [
   {
@@ -15,40 +19,18 @@ const targetOpts: SelectOption<FermentMode>[] = [
   },
 ];
 
-export default defineComponent({
-  name: 'FermentSettingsTask',
-  props: {
-    config: {
-      type: Object as PropType<FermentConfig>,
-      required: true,
-    },
-    actions: {
-      type: Array as PropType<QuickstartAction[]>,
-      required: true,
-    },
+const fermentOpts = reactive<FermentOpts>(
+  props.config.fermentOpts ?? {
+    fridgeSetting: tempQty(20),
+    beerSetting: tempQty(20),
+    activeSetpoint: 'beer',
   },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const fermentOpts = reactive<FermentOpts>(
-      props.config.fermentOpts ?? {
-        fridgeSetting: tempQty(20),
-        beerSetting: tempQty(20),
-        activeSetpoint: 'beer',
-      },
-    );
+);
 
-    function done(): void {
-      emit('update:config', { ...props.config, fermentOpts });
-      emit('next');
-    }
-
-    return {
-      targetOpts,
-      fermentOpts,
-      done,
-    };
-  },
-});
+function done(): void {
+  emit('update:config', { ...props.config, fermentOpts });
+  emit('next');
+}
 </script>
 
 <template>

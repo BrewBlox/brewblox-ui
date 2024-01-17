@@ -1,6 +1,6 @@
+import { Plugin } from 'vue';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
-import { Plugin } from 'vue';
 import widget from './SparkDisplayWidget.vue';
 import { SparkDisplayConfig } from './types';
 

@@ -1,6 +1,3 @@
-import { addSource } from '@/plugins/history/sources/metrics';
-import { useHistoryStore } from '@/plugins/history/store';
-import { MetricsSource } from '@/plugins/history/types';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import { nanoid } from 'nanoid';
@@ -12,15 +9,18 @@ import {
   onBeforeUnmount,
   provide,
   Ref,
+  ShallowRef,
   watch,
 } from 'vue';
+import { useHistoryStore } from '@/plugins/history/store';
+import { MetricsSource } from '@/plugins/history/types';
 import { useBuilderStore } from '../store';
 import { BuilderLayout } from '../types';
 
 const sourceIdKey: InjectionKey<string> = Symbol('$builderMetricSourceId');
 
 export interface UseMetricsComponent {
-  source: ComputedRef<MetricsSource | null>;
+  sourceRef: ComputedRef<ShallowRef<MetricsSource> | null>;
 }
 
 export interface UseMetricsComposable {
@@ -35,14 +35,14 @@ export const useMetrics: UseMetricsComposable = {
     const sourceId = nanoid(6);
     let activeFields: Set<string> = new Set();
 
-    const source = computed<MetricsSource | null>(() =>
+    const sourceRef = computed<ShallowRef<MetricsSource> | null>(() =>
       historyStore.sourceById<MetricsSource>(sourceId),
     );
 
     const initMetrics = debounce(
       (layout: BuilderLayout | null) => {
         if (!layout) {
-          historyStore.removeSource(source.value);
+          historyStore.removeSource(sourceId);
           return;
         }
 
@@ -55,8 +55,8 @@ export const useMetrics: UseMetricsComposable = {
           return;
         }
 
-        historyStore.removeSource(source.value);
-        addSource(sourceId, {}, {}, [...fields]);
+        historyStore.removeSource(sourceId);
+        historyStore.createMetricsSource(sourceId, {}, {}, [...fields]);
         activeFields = fields;
       },
       500,
@@ -69,23 +69,23 @@ export const useMetrics: UseMetricsComposable = {
       { immediate: true },
     );
 
-    onBeforeUnmount(() => historyStore.removeSource(source.value));
+    onBeforeUnmount(() => historyStore.removeSource(sourceId));
     provide(sourceIdKey, sourceId);
 
     return {
-      source,
+      sourceRef,
     };
   },
   setupConsumer(): UseMetricsComponent {
     const historyStore = useHistoryStore();
     const sourceId = inject(sourceIdKey, null);
 
-    const source = computed<MetricsSource | null>(() =>
+    const sourceRef = computed<ShallowRef<MetricsSource> | null>(() =>
       historyStore.sourceById<MetricsSource>(sourceId),
     );
 
     return {
-      source,
+      sourceRef,
     };
   },
 };

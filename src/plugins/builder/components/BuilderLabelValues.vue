@@ -8,31 +8,20 @@ import { usePart } from '../composables';
 import { LABEL_KEY } from '../const';
 import { textTransformation } from '../utils';
 
-const props = defineProps({
-  settingsKey: {
-    type: String,
-    default: LABEL_KEY,
-  },
-  width: {
-    type: Number,
-    required: true,
-  },
-  height: {
-    type: Number,
-    required: true,
-  },
-  unsetLabel: {
-    type: String,
-    default: '',
-  },
-  x: {
-    type: Number,
-    default: 0,
-  },
-  y: {
-    type: Number,
-    default: 0,
-  },
+interface Props {
+  width: number;
+  height: number;
+  settingsKey?: string;
+  unsetLabel?: string;
+  x?: number;
+  y?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  settingsKey: LABEL_KEY,
+  unsetLabel: '',
+  x: 0,
+  y: 0,
 });
 
 const { part, settings } = usePart.setup();

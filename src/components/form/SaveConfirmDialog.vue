@@ -1,44 +1,27 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 
-export default defineComponent({
-  name: 'SaveConfirmDialog',
-  props: {
-    ...useDialog.props,
-    title: {
-      type: String,
-      default: 'Unsaved changes',
-    },
-    message: {
-      type: String,
-      default: 'Do you want to save your changes before closing?',
-    },
-  },
-  emits: [...useDialog.emits],
-  setup() {
-    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  title?: string;
+  message?: string;
+}
 
-    async function done(save: boolean): Promise<void> {
-      onDialogOK(save);
-    }
-
-    return {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogCancel,
-      done,
-    };
-  },
+withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Unsaved changes',
+  message: 'Do you want to save your changes before closing?',
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<boolean>();
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     no-esc-dismiss
     @hide="onDialogHide"
   >
@@ -54,13 +37,13 @@ export default defineComponent({
           flat
           label="No"
           color="primary"
-          @click="done(false)"
+          @click="onDialogOK(false)"
         />
         <q-btn
           flat
           label="Yes"
           color="primary"
-          @click="done(true)"
+          @click="onDialogOK(true)"
         />
       </template>
     </DialogCard>

@@ -1,89 +1,67 @@
-<script lang="ts">
-import { useField } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { isQuantity } from '@/utils/identity';
-import { fixedNumber, prettyUnit } from '@/utils/quantity';
+<script setup lang="ts">
 import { Quantity } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
+import { VueClassProp } from 'quasar';
+import { computed } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { fixedNumber, prettyUnit } from '@/utils/quantity';
 
-export default defineComponent({
-  name: 'QuantityField',
-  props: {
-    ...useField.props,
-    modelValue: {
-      type: Object as PropType<Quantity>,
-      required: true,
-      validator: isQuantity,
-    },
-    backupValue: {
-      type: Object as PropType<Quantity>,
-      default: null,
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    noLabel: {
-      type: Boolean,
-      default: false,
-    },
-    tagClass: {
-      type: [String, Object, Array],
-      default: '',
-    },
-    decimals: {
-      type: Number,
-      default: 2,
-    },
-    unitTag: {
-      type: String,
-      default: 'small',
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const { activeSlots } = useField.setup();
+interface Props extends UseFieldProps {
+  modelValue: Quantity;
+  backupValue?: Quantity | null;
+  noLabel?: boolean;
+  tagClass?: VueClassProp;
+  decimals?: number;
+  unitTag?: string;
+}
 
-    function change(v: Quantity): void {
-      emit('update:modelValue', v);
-    }
-
-    const displayValue = computed<string>(() =>
-      fixedNumber(props.modelValue.value, props.decimals),
-    );
-
-    const displayUnit = computed<string>(() => prettyUnit(props.modelValue));
-
-    function openDialog(): void {
-      if (props.readonly) {
-        return;
-      }
-
-      const modelValue =
-        props.modelValue.value == null && props.backupValue != null
-          ? props.backupValue
-          : props.modelValue;
-
-      createDialog({
-        component: 'QuantityDialog',
-        componentProps: {
-          modelValue,
-          title: props.title,
-          message: props.message,
-          html: props.html,
-          label: props.label,
-        },
-      }).onOk(change);
-    }
-
-    return {
-      activeSlots,
-      displayValue,
-      displayUnit,
-      openDialog,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  backupValue: null,
+  label: '',
+  noLabel: false,
+  tagClass: '',
+  decimals: 2,
+  unitTag: 'small',
 });
+
+const emit = defineEmits<{
+  'update:modelValue': [payload: Quantity];
+}>();
+
+const { activeSlots } = useField.setup();
+
+function change(v: Quantity): void {
+  emit('update:modelValue', v);
+}
+
+const displayValue = computed<string>(() =>
+  fixedNumber(props.modelValue.value, props.decimals),
+);
+
+const displayUnit = computed<string>(() => prettyUnit(props.modelValue));
+
+function openDialog(): void {
+  if (props.readonly) {
+    return;
+  }
+
+  const modelValue =
+    props.modelValue.value == null && props.backupValue != null
+      ? props.backupValue
+      : props.modelValue;
+
+  createDialog({
+    component: 'QuantityDialog',
+    componentProps: {
+      modelValue,
+      title: props.title,
+      message: props.message,
+      html: props.html,
+      label: props.label,
+    },
+  }).onOk(change);
+}
 </script>
 
 <template>

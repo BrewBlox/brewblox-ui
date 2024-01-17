@@ -1,11 +1,4 @@
-<script lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
-import { makeTypeFilter } from '@/utils/functional';
-import { isLink } from '@/utils/identity';
-import { bloxLink } from '@/utils/link';
+<script setup lang="ts">
 import {
   BlockIntfType,
   BlockOrIntfType,
@@ -15,7 +8,14 @@ import {
   Link,
   SysInfoBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
+import { isLink } from '@/utils/identity';
+import { bloxLink } from '@/utils/link';
 
 const slotNameRules: InputRule[] = [
   (v) => !v || v.length <= 15 || 'Name can only be 15 characters',
@@ -33,142 +33,107 @@ const validTypes: BlockOrIntfType[] = [
 
 const sysInfoFilter = makeTypeFilter<SysInfoBlock>(BlockType.SysInfo);
 
-export default defineComponent({
-  name: 'DisplaySettingsFull',
-  setup() {
-    const { serviceId, block, patchBlock } =
-      useBlockWidget.setup<DisplaySettingsBlock>();
-    const sparkStore = useSparkStore();
+const { serviceId, block, patchBlock } =
+  useBlockWidget.setup<DisplaySettingsBlock>();
+const sparkStore = useSparkStore();
 
-    const slots = computed<(DisplaySlot | null)[]>(() => {
-      const slots = Array(6).fill(null);
-      block.value.data.widgets.forEach((w) => {
-        slots[w.pos - 1] = w;
-      });
-      return slots;
-    });
+const slots = computed<(DisplaySlot | null)[]>(() => {
+  const slots = Array(6).fill(null);
+  block.value.data.widgets.forEach((w) => {
+    slots[w.pos - 1] = w;
+  });
+  return slots;
+});
 
-    const sysInfo = computed<SysInfoBlock | undefined>(() =>
-      sparkStore.blocksByService(serviceId).find(sysInfoFilter),
-    );
+const sysInfo = computed<SysInfoBlock | undefined>(() =>
+  sparkStore.blocksByService(serviceId).find(sysInfoFilter),
+);
 
-    const displayBrightness = computed<number>({
-      get: () => sysInfo.value?.data.displayBrightness ?? 255,
-      set: (displayBrightness) => {
-        sparkStore.patchBlock(sysInfo.value, { displayBrightness });
-      },
-    });
-
-    function slotLink(slot: DisplaySlot | null): Link {
-      if (!slot) {
-        return bloxLink(null);
-      }
-      return Object.values(slot).find((v) => isLink(v)) ?? bloxLink(null);
-    }
-
-    function slotColor(slot: DisplaySlot | null): string {
-      return slot?.color ? `#${slot.color}` : '#ff';
-    }
-
-    function slotColorStyle(slot: DisplaySlot): Mapped<string> {
-      const color = `#${slot?.color || 'ff'}`;
-      return {
-        color,
-        backgroundColor: color,
-      };
-    }
-
-    async function updateSlotLink(idx: number, link: Link): Promise<void> {
-      const pos = idx + 1;
-      if (!link.id) {
-        return patchBlock({
-          widgets: block.value.data.widgets.filter((w) => w.pos !== pos),
-        });
-      }
-
-      const { type } = link;
-      if (!type) {
-        return;
-      }
-
-      const existing = slots.value[idx];
-      const obj: DisplaySlot = {
-        pos,
-        name: existing?.name || link.id.slice(0, 15),
-        color: existing?.color || '4169E1',
-      };
-
-      obj.name = await new Promise((resolve) => {
-        createDialog({
-          component: 'InputDialog',
-          componentProps: {
-            modelValue: obj.name,
-            title: 'Choose label text',
-            label: `Label for block '${link.id}'`,
-            rules: slotNameRules,
-          },
-        })
-          .onOk((v) => resolve(v))
-          .onCancel(() => resolve(obj.name))
-          .onDismiss(() => resolve(obj.name));
-      });
-
-      if (isCompatible(type, BlockIntfType.TempSensorInterface)) {
-        obj.tempSensor = link;
-      } else if (
-        isCompatible(type, BlockIntfType.SetpointSensorPairInterface)
-      ) {
-        obj.setpointSensorPair = link;
-      } else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
-        obj.actuatorAnalog = link;
-      } else if (isCompatible(type, BlockType.Pid)) {
-        obj.pid = link;
-      }
-
-      return patchBlock({
-        widgets: [
-          ...block.value.data.widgets.filter((w) => w.pos !== pos),
-          obj,
-        ],
-      });
-    }
-
-    function updateSlotName(idx: number, name: string): void {
-      const pos = idx + 1;
-      patchBlock({
-        widgets: block.value.data.widgets.map((w) =>
-          w.pos === pos ? { ...w, name } : w,
-        ),
-      });
-    }
-
-    function updateSlotColor(idx: number, color: string): void {
-      const pos = idx + 1;
-      patchBlock({
-        widgets: block.value.data.widgets.map((w) =>
-          w.pos === pos ? { ...w, color: color.replace('#', '') } : w,
-        ),
-      });
-    }
-
-    return {
-      footerRules,
-      slotNameRules,
-      validTypes,
-      serviceId,
-      block,
-      displayBrightness,
-      patchBlock,
-      slots,
-      slotLink,
-      slotColor,
-      slotColorStyle,
-      updateSlotLink,
-      updateSlotName,
-      updateSlotColor,
-    };
+const displayBrightness = computed<number>({
+  get: () => sysInfo.value?.data.displayBrightness ?? 255,
+  set: (displayBrightness) => {
+    sparkStore.patchBlock(sysInfo.value, { displayBrightness });
   },
 });
+
+function slotLink(slot: DisplaySlot | null): Link {
+  if (!slot) {
+    return bloxLink(null);
+  }
+  return Object.values(slot).find((v) => isLink(v)) ?? bloxLink(null);
+}
+
+function slotColor(slot: DisplaySlot | null): string {
+  return slot?.color ? `#${slot.color}` : '#ff';
+}
+
+async function updateSlotLink(idx: number, link: Link): Promise<void> {
+  const pos = idx + 1;
+  if (!link.id) {
+    return patchBlock({
+      widgets: block.value.data.widgets.filter((w) => w.pos !== pos),
+    });
+  }
+
+  const { type } = link;
+  if (!type) {
+    return;
+  }
+
+  const existing = slots.value[idx];
+  const obj: DisplaySlot = {
+    pos,
+    name: existing?.name || link.id.slice(0, 15),
+    color: existing?.color || '4169E1',
+  };
+
+  obj.name = await new Promise((resolve) => {
+    createDialog({
+      component: 'TextDialog',
+      componentProps: {
+        modelValue: obj.name,
+        title: 'Choose label text',
+        label: `Label for block '${link.id}'`,
+        rules: slotNameRules,
+      },
+    })
+      .onOk((v) => resolve(v))
+      .onCancel(() => resolve(obj.name))
+      .onDismiss(() => resolve(obj.name));
+  });
+
+  if (isCompatible(type, BlockIntfType.TempSensorInterface)) {
+    obj.tempSensor = link;
+  } else if (isCompatible(type, BlockIntfType.SetpointSensorPairInterface)) {
+    obj.setpointSensorPair = link;
+  } else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
+    obj.actuatorAnalog = link;
+  } else if (isCompatible(type, BlockType.Pid)) {
+    obj.pid = link;
+  }
+
+  return patchBlock({
+    widgets: [...block.value.data.widgets.filter((w) => w.pos !== pos), obj],
+  });
+}
+
+function updateSlotName(idx: number, name: string): void {
+  const pos = idx + 1;
+  patchBlock({
+    widgets: block.value.data.widgets.map((w) =>
+      w.pos === pos ? { ...w, name } : w,
+    ),
+  });
+}
+
+function updateSlotColor(idx: number, color: string): void {
+  const pos = idx + 1;
+  patchBlock({
+    widgets: block.value.data.widgets.map((w) =>
+      w.pos === pos ? { ...w, color: color.replace('#', '') } : w,
+    ),
+  });
+}
 </script>
 
 <template>
@@ -195,7 +160,7 @@ export default defineComponent({
             @update:model-value="(v) => updateSlotLink(idx, v)"
           />
           <template v-if="slot">
-            <InputField
+            <TextField
               :model-value="slot.name"
               :rules="slotNameRules"
               label="Label text"
@@ -215,7 +180,7 @@ export default defineComponent({
       </div>
 
       <div class="row q-gutter-sm">
-        <InputField
+        <TextField
           :model-value="block.data.name"
           :rules="footerRules"
           class="col-grow"

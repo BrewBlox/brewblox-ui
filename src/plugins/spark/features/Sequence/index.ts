@@ -1,9 +1,3 @@
-import { genericBlockFeature } from '@/plugins/spark/generic';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockSpec } from '@/plugins/spark/types';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { bloxQty } from '@/utils/quantity';
 import {
   BlockType,
   SequenceBlock,
@@ -11,6 +5,12 @@ import {
   SequenceStatus,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockSpec } from '@/plugins/spark/types';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { bloxQty } from '@/utils/quantity';
 import widget from './SequenceWidget.vue';
 
 const type = BlockType.Sequence;

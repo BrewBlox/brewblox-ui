@@ -1,49 +1,29 @@
-<script lang="ts">
+<script setup lang="ts">
 import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig } from '@/plugins/history/types';
 import { selectGraphPrecision } from '@/plugins/history/utils';
 import { notify } from '@/utils/notify';
-import { defineComponent, PropType } from 'vue';
 
-export default defineComponent({
-  name: 'ExportGraphAction',
-  props: {
-    icon: {
-      type: String,
-      default: 'mdi-file-export',
-    },
-    label: {
-      type: String,
-      default: 'Export graph to CSV',
-    },
-    header: {
-      type: String,
-      required: true,
-    },
-    config: {
-      type: Object as PropType<GraphConfig>,
-      required: true,
-    },
-  },
-  setup(props) {
-    async function exportData(): Promise<void> {
-      const historyStore = useHistoryStore();
-      const precision = await selectGraphPrecision();
-      if (precision) {
-        notify.info('Generating CSV... This may take a few seconds.');
-        await historyStore.downloadGraphCsv(
-          props.config,
-          precision,
-          props.header,
-        );
-      }
-    }
+interface Props {
+  config: GraphConfig;
+  header: string;
+  icon?: string;
+  label?: string;
+}
 
-    return {
-      exportData,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  icon: 'mdi-file-export',
+  label: 'Export graph to CSV',
 });
+
+async function exportData(): Promise<void> {
+  const historyStore = useHistoryStore();
+  const precision = await selectGraphPrecision();
+  if (precision) {
+    notify.info('Generating CSV... This may take a few seconds.');
+    await historyStore.downloadGraphCsv(props.config, precision, props.header);
+  }
+}
 </script>
 
 <template>

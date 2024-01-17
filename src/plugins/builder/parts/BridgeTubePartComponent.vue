@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { LEFT, UP } from '@/plugins/builder/const';
 import { computed } from 'vue';
+import { LEFT, UP } from '@/plugins/builder/const';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 

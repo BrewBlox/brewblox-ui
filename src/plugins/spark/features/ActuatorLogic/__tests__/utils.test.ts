@@ -1,4 +1,3 @@
-import { bloxLink } from '@/utils/link';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
@@ -9,6 +8,7 @@ import {
   LogicResult,
 } from 'brewblox-proto/ts';
 import { describe, expect, it } from 'vitest';
+import { bloxLink } from '@/utils/link';
 import {
   comparisonCheck,
   sanitize,

@@ -1,46 +1,35 @@
-<script lang="ts">
-import { emptyDigitalConstraints } from '@/plugins/spark/utils/configuration';
+<script setup lang="ts">
 import { DigitalConstraints } from 'brewblox-proto/ts';
-import produce from 'immer';
+import { produce } from 'immer';
 import defaults from 'lodash/defaults';
-import { computed, defineComponent, PropType, toRaw } from 'vue';
+import { computed, toRaw } from 'vue';
+import { emptyDigitalConstraints } from '@/plugins/spark/utils/configuration';
 
 type DNNDigitalConstraints = DeepNonNullable<DigitalConstraints>;
 
-export default defineComponent({
-  name: 'DigitalConstraintsEditor',
-  props: {
-    modelValue: {
-      type: Object as PropType<DigitalConstraints>,
-      default: () => ({}),
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const constraints = computed<DNNDigitalConstraints>(() =>
-      defaults(props.modelValue, emptyDigitalConstraints()),
-    );
+interface Props {
+  modelValue?: DigitalConstraints;
+  serviceId: string;
+}
 
-    function update(
-      cb: (draft: DNNDigitalConstraints) => void | DNNDigitalConstraints,
-    ): void {
-      const updated = produce<DNNDigitalConstraints>(
-        toRaw(constraints.value),
-        cb,
-      );
-      emit('update:modelValue', updated);
-    }
-
-    return {
-      constraints,
-      update,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: () => ({}),
 });
+
+const emit = defineEmits<{
+  'update:modelValue': [payload: DigitalConstraints];
+}>();
+
+const constraints = computed<DNNDigitalConstraints>(() =>
+  defaults(props.modelValue, emptyDigitalConstraints()),
+);
+
+function update(
+  cb: (draft: DNNDigitalConstraints) => void | DNNDigitalConstraints,
+): void {
+  const updated = produce<DNNDigitalConstraints>(toRaw(constraints.value), cb);
+  emit('update:modelValue', updated);
+}
 </script>
 
 <template>

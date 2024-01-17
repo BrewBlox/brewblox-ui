@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { nanoid } from 'nanoid';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import {
@@ -13,19 +16,15 @@ import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
-import { nanoid } from 'nanoid';
-import { computed, PropType } from 'vue';
-import { useRouter } from 'vue-router';
 
-const props = defineProps({
-  layout: {
-    type: null as unknown as PropType<BuilderLayout | null>,
-    default: null,
-  },
-  noLabel: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  layout?: BuilderLayout | null;
+  noLabel?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  layout: null,
+  noLabel: false,
 });
 
 const systemStore = useSystemStore();
@@ -95,6 +94,7 @@ function createLayoutWidget(): void {
         `for <b>${props.layout.title}</b>?`,
       listSelect: selectOptions.length < 10,
       html: true,
+      modelValue: null,
       selectOptions,
     },
   }).onOk(async (dashboard: string) => {

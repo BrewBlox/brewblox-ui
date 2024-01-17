@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { HOST } from '@/const';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/ImageDisplay';
 import { usePart } from '../composables';
 import { URL_KEY } from '../const';
@@ -7,7 +8,7 @@ import { URL_KEY } from '../const';
 const { settings, width, height, passthrough } = usePart.setup();
 
 const href = computed<string>(
-  () => settings.value[URL_KEY] || '/image-placeholder.png',
+  () => settings.value[URL_KEY] || `${HOST}/ui/image-placeholder.png`,
 );
 </script>
 

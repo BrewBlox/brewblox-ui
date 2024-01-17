@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { BuilderLayout } from '@/plugins/builder/types';
-import { PropType } from 'vue';
 import { useRouter } from 'vue-router';
+import { BuilderLayout } from '@/plugins/builder/types';
 import { startCreateLayout, startImportLayout } from '../utils';
 
-defineProps({
-  layout: {
-    type: null as unknown as PropType<BuilderLayout | null>,
-    default: null,
-  },
+interface Props {
+  layout?: BuilderLayout | null;
+}
+
+withDefaults(defineProps<Props>(), {
+  layout: null,
 });
 
 const router = useRouter();

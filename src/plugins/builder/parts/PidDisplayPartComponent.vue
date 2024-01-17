@@ -1,18 +1,18 @@
 <script setup lang="ts">
+import { Block, BlockType } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import {
   COLD_WATER,
   HOT_WATER,
-  PidBlockT,
   PID_KEY,
   PID_TYPES,
+  PidBlockT,
 } from '@/plugins/builder/const';
 import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { userUnits } from '@/user-settings';
 import { preciseNumber, prettyUnit } from '@/utils/quantity';
-import { Block, BlockType } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/PidDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 

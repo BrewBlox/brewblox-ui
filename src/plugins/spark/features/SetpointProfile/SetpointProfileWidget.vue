@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { WidgetModeComponents } from '@/store/features';
-import { createComponentDialog } from '@/utils/dialog';
-import { isJsonEqual } from '@/utils/objects';
-import { prettyLink } from '@/utils/quantity';
 import { Link, SetpointProfileBlock } from 'brewblox-proto/ts';
-import cloneDeep from 'lodash/cloneDeep';
-import { computed, ref, watch } from 'vue';
-import { GraphProps, profileGraphProps } from './helpers';
+import { Layout, PlotData } from 'plotly.js';
+import { computed, provide, shallowRef, watchEffect } from 'vue';
+import { GraphDataKey } from '@/components/graph/symbols';
+import { useContext, useGlobals } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { createComponentDialog } from '@/utils/dialog';
+import { durationMs, parseDate, prettyLink } from '@/utils/quantity';
 import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';
 import ProfilePresetAction from './ProfilePresetAction.vue';
@@ -16,27 +14,36 @@ import SetpointProfileBasic from './SetpointProfileBasic.vue';
 import SetpointProfileDisableDialog from './SetpointProfileDisableDialog.vue';
 import SetpointProfileFull from './SetpointProfileFull.vue';
 
-type SetpointProfileData = SetpointProfileBlock['data'];
-
-const modes: WidgetModeComponents = {
+const modes = {
   Basic: SetpointProfileBasic,
   Full: SetpointProfileFull,
-};
+} as const;
 
+const { now } = useGlobals.setup();
 const { context, inDialog } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
-const usedData = ref<SetpointProfileData>(cloneDeep(block.value.data));
-const revision = ref<Date>(new Date());
+const graphData = shallowRef<Partial<PlotData>[]>([]);
+provide(GraphDataKey, graphData);
 
 const target = computed<Link>(() => block.value.data.targetId);
 
-const graphProps = computed<GraphProps>(() => profileGraphProps(block.value));
-
-function refresh(): void {
-  usedData.value = cloneDeep(block.value.data);
-  revision.value = new Date();
-}
+const layout = computed<Partial<Layout>>(() => ({
+  shapes: [
+    {
+      type: 'line',
+      yref: 'paper',
+      x0: now.value.getTime(),
+      x1: now.value.getTime(),
+      y0: 0,
+      y1: 1,
+      line: {
+        color: 'rgb(0, 200, 0)',
+        dash: 'dot',
+      },
+    },
+  ],
+}));
 
 function changeEnabled(enabled: boolean): void {
   if (enabled) {
@@ -51,14 +58,19 @@ function changeEnabled(enabled: boolean): void {
   }
 }
 
-watch(
-  () => block.value.data,
-  (newV) => {
-    if (!isJsonEqual(newV, usedData.value)) {
-      refresh();
-    }
-  },
-);
+watchEffect(() => {
+  const { start, points, targetId } = block.value.data;
+  const startMs = parseDate(start)?.getTime() ?? 0;
+
+  graphData.value = [
+    {
+      name: `${targetId.id || ''} setting`,
+      type: 'scattergl',
+      x: points.map((p) => startMs + durationMs(p.time)),
+      y: points.map((p) => p.temperature.value),
+    },
+  ];
+});
 </script>
 
 <template>
@@ -69,8 +81,7 @@ watch(
   >
     <template #preview>
       <PlotlyGraph
-        v-bind="graphProps"
-        :revision="revision"
+        :layout="layout"
         class="fit"
       />
     </template>
@@ -111,8 +122,7 @@ watch(
 
       <template #graph>
         <PlotlyGraph
-          v-bind="graphProps"
-          :revision="revision"
+          :layout="layout"
           class="fit"
         />
       </template>

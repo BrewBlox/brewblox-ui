@@ -1,6 +1,6 @@
-import { notify } from '@/utils/notify';
 import { computed, WritableComputedRef } from 'vue';
 import { useRouter } from 'vue-router';
+import { notify } from '@/utils/notify';
 
 export interface UseKioskComponent {
   kiosk: WritableComputedRef<boolean>;

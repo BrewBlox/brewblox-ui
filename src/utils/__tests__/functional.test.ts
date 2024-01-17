@@ -1,5 +1,5 @@
-import { makeObjectSorter, uniqueFilter } from '@/utils/functional';
 import { describe, expect, it } from 'vitest';
+import { makeObjectSorter, uniqueFilter } from '@/utils/functional';
 
 describe('Array funcs', () => {
   it('should filter and sort arrays', () => {

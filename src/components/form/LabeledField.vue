@@ -1,66 +1,54 @@
-<script lang="ts">
-import { useField } from '@/composables';
-import { fixedNumber } from '@/utils/quantity';
+<script setup lang="ts">
 import { QField } from 'quasar';
-import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
+import { computed, onMounted, ref, useSlots } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
+import { fixedNumber } from '@/utils/quantity';
 
-export default defineComponent({
-  name: 'LabeledField',
-  props: {
-    ...useField.props,
-    modelValue: {
-      type: [String, Number, Boolean, Array, Object, Date] as PropType<any>,
-      default: null,
-    },
-    number: {
-      type: Boolean,
-      default: false,
-    },
-    suffix: {
-      type: String,
-      default: '',
-    },
-    decimals: {
-      type: Number,
-      default: 2,
-    },
-    readonly: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  emits: ['click'],
-  setup(props, { slots, emit }) {
-    const fieldRef = ref<QField>();
-    const { activeSlots } = useField.setup();
+interface Props extends UseFieldProps {
+  modelValue?: any;
+  number?: boolean;
+  suffix?: string;
+  decimals?: number;
+  readonly?: boolean;
+}
 
-    const displayValue = computed<string>(() => {
-      if (slots.control || slots.default) {
-        return ''; // parent has custom implementation
-      }
-      if (props.modelValue == null || props.modelValue === '') {
-        return '<not set>';
-      }
-      return props.number
-        ? fixedNumber(props.modelValue, props.decimals)
-        : `${props.modelValue}`;
-    });
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  modelValue: null,
+  number: false,
+  suffix: '',
+  decimals: 2,
+  readonly: true,
+});
 
-    onMounted(() => {
-      if (fieldRef.value) {
-        // Quasar fields have changed to use inheritAttrs: false,
-        // and do not have a click event handler
-        // We can bypass this by setting the click handler on the top-level html element
-        fieldRef.value.$el.onclick = () => emit('click');
-      }
-    });
+const emit = defineEmits<{
+  click: [];
+}>();
 
-    return {
-      fieldRef,
-      activeSlots,
-      displayValue,
-    };
-  },
+const slots = useSlots();
+
+const fieldRef = ref<QField>();
+const { activeSlots } = useField.setup();
+
+const displayValue = computed<string>(() => {
+  if (slots.control || slots.default) {
+    return ''; // parent has custom implementation
+  }
+  if (props.modelValue == null || props.modelValue === '') {
+    return '<not set>';
+  }
+  return props.number
+    ? fixedNumber(props.modelValue, props.decimals)
+    : `${props.modelValue}`;
+});
+
+onMounted(() => {
+  if (fieldRef.value) {
+    // Quasar fields have changed to use inheritAttrs: false,
+    // and do not have a click event handler
+    // We can bypass this by setting the click handler on the top-level html element
+    fieldRef.value.$el.onclick = () => emit('click');
+  }
 });
 </script>
 

@@ -1,6 +1,6 @@
+import { GlobalComponents } from 'vue';
 import { Service, ServiceStub } from '@/store/services/types';
 import { Widget } from '@/store/widgets/types';
-import { Component, GlobalComponents } from 'vue';
 
 export type ComponentName = keyof GlobalComponents & string;
 
@@ -16,8 +16,6 @@ export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';
 export type ServiceHook = (service: Service) => Awaitable<unknown>;
-
-export type WidgetModeComponents = Record<WidgetMode, Component>;
 
 export interface GridSize {
   cols: number;

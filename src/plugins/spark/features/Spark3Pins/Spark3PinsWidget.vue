@@ -1,24 +1,11 @@
-<script lang="ts">
+<script setup lang="ts">
+import { Spark3PinsBlock } from 'brewblox-proto/ts';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { fixedNumber } from '@/utils/quantity';
-import { Spark3PinsBlock } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'Spark3PinsWidget',
-  setup() {
-    const { context } = useContext.setup();
-    const { block, patchBlock } = useBlockWidget.setup<Spark3PinsBlock>();
-
-    return {
-      fixedNumber,
-      context,
-      block,
-      patchBlock,
-    };
-  },
-});
+const { context } = useContext.setup();
+const { block, patchBlock } = useBlockWidget.setup<Spark3PinsBlock>();
 </script>
 
 <template>

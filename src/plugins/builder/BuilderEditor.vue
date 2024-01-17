@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import { useGlobals, UseUndoRedo } from '@/composables';
-import { startupDone } from '@/user-settings';
-import { rotatedSize } from '@/utils/coordinates';
-import { createDialog } from '@/utils/dialog';
-import { keyEventString } from '@/utils/events';
-import { uniqueFilter } from '@/utils/functional';
-import { notify } from '@/utils/notify';
-import { clampRotation } from '@/utils/quantity';
 import * as d3 from 'd3';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -22,6 +14,14 @@ import {
   watch,
 } from 'vue';
 import { useRouter } from 'vue-router';
+import { useGlobals, UseUndoRedo } from '@/composables';
+import { startupDone } from '@/user-settings';
+import { rotatedSize } from '@/utils/coordinates';
+import { createDialog } from '@/utils/dialog';
+import { keyEventString } from '@/utils/events';
+import { uniqueFilter } from '@/utils/functional';
+import { notify } from '@/utils/notify';
+import { clampRotation } from '@/utils/quantity';
 import {
   normalizeSelectArea,
   useDragSelect,

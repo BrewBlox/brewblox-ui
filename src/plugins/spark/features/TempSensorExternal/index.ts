@@ -1,11 +1,11 @@
+import { BlockType, TempSensorExternalBlock } from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { bloxQty, durationString, tempQty } from '@/utils/quantity';
-import { BlockType, TempSensorExternalBlock } from 'brewblox-proto/ts';
-import { Plugin } from 'vue';
 import widget from './TempSensorExternalWidget.vue';
 
 const type = BlockType.TempSensorExternal;
@@ -19,6 +19,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<TempSensorExternalBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): TempSensorExternalBlock['data'] => ({
         enabled: true,
         timeout: bloxQty('5m'),

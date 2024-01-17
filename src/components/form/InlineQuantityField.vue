@@ -1,61 +1,48 @@
-<script lang="ts">
-import { useField } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { isQuantity } from '@/utils/identity';
-import { prettyQty } from '@/utils/quantity';
+<script setup lang="ts">
 import { Quantity } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
+import { useField, UseFieldProps } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { prettyQty } from '@/utils/quantity';
 
-export default defineComponent({
-  name: 'InlineQuantityField',
-  props: {
-    ...useField.props,
-    modelValue: {
-      type: Object as PropType<Quantity>,
-      required: true,
-      validator: isQuantity,
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    decimals: {
-      type: Number,
-      default: 2,
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const displayValue = computed<string>(() =>
-      prettyQty(props.modelValue, props.decimals),
-    );
+interface Props extends UseFieldProps {
+  modelValue: Quantity;
+  decimals?: number;
+}
 
-    function change(v: Quantity): void {
-      emit('update:modelValue', v);
-    }
-
-    function openDialog(): void {
-      if (props.readonly) {
-        return;
-      }
-      createDialog({
-        component: 'QuantityDialog',
-        componentProps: {
-          modelValue: props.modelValue,
-          title: props.title,
-          message: props.message,
-          html: props.html,
-          label: props.label,
-        },
-      }).onOk(change);
-    }
-
-    return {
-      displayValue,
-      openDialog,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useField.defaultProps,
+  label: '',
+  decimals: 2,
 });
+
+const emit = defineEmits<{
+  'update:modelValue': [payload: Quantity];
+}>();
+
+const displayValue = computed<string>(() =>
+  prettyQty(props.modelValue, props.decimals),
+);
+
+function change(v: Quantity): void {
+  emit('update:modelValue', v);
+}
+
+function openDialog(): void {
+  if (props.readonly) {
+    return;
+  }
+  createDialog({
+    component: 'QuantityDialog',
+    componentProps: {
+      modelValue: props.modelValue,
+      title: props.title,
+      message: props.message,
+      html: props.html,
+      label: props.label,
+    },
+  }).onOk(change);
+}
 </script>
 
 <template>

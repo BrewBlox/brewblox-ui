@@ -1,22 +1,14 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+interface Props {
+  icon?: string;
+  flat?: boolean;
+  label?: string;
+}
 
-export default defineComponent({
-  name: 'ActionMenu',
-  props: {
-    icon: {
-      type: String,
-      default: 'mdi-dots-vertical',
-    },
-    flat: {
-      type: Boolean,
-      default: true,
-    },
-    label: {
-      type: String,
-      default: 'Actions',
-    },
-  },
+withDefaults(defineProps<Props>(), {
+  icon: 'mdi-dots-vertical',
+  flat: true,
+  label: 'Actions',
 });
 </script>
 

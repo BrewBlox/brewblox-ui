@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { BlockStatus } from '@/plugins/spark/types';
-import { PropType } from 'vue';
 
-defineProps({
-  status: {
-    type: null as unknown as PropType<BlockStatus | null>,
-    required: true,
-  },
-});
+interface Props {
+  status: BlockStatus | null;
+}
+
+defineProps<Props>();
 </script>
 
 <template>

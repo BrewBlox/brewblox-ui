@@ -20,7 +20,7 @@ module.exports = {
     'import/prefer-default-export': 0,
     'object-curly-newline': 0,
     'no-param-reassign': 0,
-    'no-console': 'warn',
+    'no-console': ['warn', { allow: ['assert'] }],
     'no-debugger': 'warn',
     'no-multiple-empty-lines': 'error',
     'comma-dangle': ['error', 'always-multiline'],
@@ -63,17 +63,17 @@ module.exports = {
       },
     ],
     'vue/no-v-text-v-html-on-component': 0,
+    'vue/require-default-prop': 0,
   },
   overrides: [
     {
-      files: ['*.js'],
+      files: ['*.mjs'],
       rules: {
-        '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
       },
     },
     {
-      files: ['dev/**.js'],
+      files: ['dev/**.mjs'],
       rules: {
         'no-console': 'off',
       },

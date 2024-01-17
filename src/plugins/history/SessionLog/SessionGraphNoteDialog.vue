@@ -1,47 +1,35 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
-import { defineComponent, PropType, ref } from 'vue';
+import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { SessionGraphNote } from '../types';
 
 type NoteDates = Pick<SessionGraphNote, 'start' | 'end'>;
 
-export default defineComponent({
-  name: 'SessionGraphNoteDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<NoteDates>,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: NoteDates;
+}
 
-    const local = ref<NoteDates>(cloneDeep(props.modelValue));
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<NoteDates>();
+
+const local = ref<NoteDates>(cloneDeep(props.modelValue));
+
+function save(): void {
+  onDialogOK(local.value);
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

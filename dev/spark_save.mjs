@@ -1,7 +1,7 @@
-const fs = require('fs');
-const axios = require('axios');
-const Minimist = require('minimist');
-const { host, fileDir, sparks, objectSorter } = require('./utils');
+import { writeFileSync } from 'fs';
+import axios from 'axios';
+import Minimist from 'minimist';
+import { fileDir, host, objectSorter, sparks } from './utils.mjs';
 
 // Save all services if not further specified
 const args = Minimist(process.argv.slice(2))._;
@@ -12,11 +12,11 @@ async function run() {
     const resp = await axios.post(`${host}/${svc}/blocks/backup/save`);
     resp.data.blocks.sort(objectSorter('id'));
     const fname = `${fileDir}/${svc}.spark.json`;
-    fs.writeFileSync(fname, JSON.stringify(resp.data, undefined, 2));
+    writeFileSync(fname, JSON.stringify(resp.data, undefined, 2));
     console.log('Spark blocks saved', fname);
   }
 }
 
 run()
-  .then(() => console.log('Script done!', __filename))
+  .then(() => console.log('Script done!', import.meta.url))
   .catch((e) => console.log(e));

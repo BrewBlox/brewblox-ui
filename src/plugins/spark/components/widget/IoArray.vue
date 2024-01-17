@@ -1,15 +1,4 @@
-<script lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
-import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
-import {
-  channelName,
-  prettyLimitations,
-} from '@/plugins/spark/utils/formatting';
-import { ifCompatible } from '@/plugins/spark/utils/info';
-import { createDialog } from '@/utils/dialog';
-import { bloxLink } from '@/utils/link';
+<script setup lang="ts">
 import {
   Block,
   BlockIntfType,
@@ -23,7 +12,18 @@ import {
   IoChannel,
   Link,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import {
+  channelName,
+  prettyLimitations,
+} from '@/plugins/spark/utils/formatting';
+import { ifCompatible } from '@/plugins/spark/utils/info';
+import { createDialog } from '@/utils/dialog';
+import { bloxLink } from '@/utils/link';
 
 interface EditableChannel extends IoChannel {
   name: string;
@@ -33,88 +33,72 @@ interface EditableChannel extends IoChannel {
   compatibleTypes: BlockOrIntfType[];
 }
 
-export default defineComponent({
-  name: 'IoArray',
-  setup() {
-    const sparkStore = useSparkStore();
-    const { serviceId, block } = useBlockWidget.setup<IoArrayInterfaceBlock>();
+const sparkStore = useSparkStore();
+const { serviceId, block } = useBlockWidget.setup<IoArrayInterfaceBlock>();
 
-    const channels = computed<EditableChannel[]>(() =>
-      block.value.data.channels.map((c): EditableChannel => {
-        const actuator = sparkStore.blockByLink(serviceId, c.claimedBy);
-        const compatibleTypes: BlockOrIntfType[] = [];
-        if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT) {
-          compatibleTypes.push(BlockOrIntfType.DigitalActuator);
-        }
-        if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ) {
-          compatibleTypes.push(BlockOrIntfType.FastPwm);
-        }
-        return {
-          ...c,
-          compatibleTypes,
-          name: channelName(block.value, c.id) ?? 'Unknown',
-          digitalActuator: ifCompatible(
-            actuator,
-            BlockIntfType.ActuatorDigitalInterface,
-          ),
-          pwmActuator: ifCompatible(actuator, BlockType.FastPwm),
-          actuatorClaimed: actuator?.data.claimedBy.id != null,
-        };
-      }),
-    );
-
-    function actuatorLimitations(block: Block): string | null {
-      return prettyLimitations(block.data.constraints) || null;
+const channels = computed<EditableChannel[]>(() =>
+  block.value.data.channels.map((c): EditableChannel => {
+    const actuator = sparkStore.blockByLink(serviceId, c.claimedBy);
+    const compatibleTypes: BlockOrIntfType[] = [];
+    if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT) {
+      compatibleTypes.push(BlockOrIntfType.DigitalActuator);
     }
-
-    async function replaceActuator(
-      channel: EditableChannel,
-      link: Link,
-    ): Promise<void> {
-      setExclusiveChannelActuator(
-        sparkStore.blockByLink(serviceId, link),
-        bloxLink(block.value.id),
-        channel.id,
-      );
+    if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ) {
+      compatibleTypes.push(BlockOrIntfType.FastPwm);
     }
-
-    async function updateDigitalState(
-      channel: EditableChannel,
-      storedState: DigitalState,
-    ): Promise<void> {
-      await sparkStore.patchBlock(channel.digitalActuator, { storedState });
-    }
-
-    async function updatePwmSetting(channel: EditableChannel): Promise<void> {
-      if (channel.pwmActuator) {
-        createDialog({
-          component: 'SliderDialog',
-          componentProps: {
-            modelValue: channel.pwmActuator.data.storedSetting,
-            title: 'Edit PWM setting',
-            label: 'Pwm %',
-            min: 0,
-            max: 100,
-            quickActions: PWM_SELECT_OPTIONS,
-          },
-        }).onOk((storedSetting) =>
-          sparkStore.patchBlock(channel.pwmActuator, { storedSetting }),
-        );
-      }
-    }
-
     return {
-      BlockType,
-      serviceId,
-      block,
-      channels,
-      actuatorLimitations,
-      replaceActuator,
-      updateDigitalState,
-      updatePwmSetting,
+      ...c,
+      compatibleTypes,
+      name: channelName(block.value, c.id) ?? 'Unknown',
+      digitalActuator: ifCompatible(
+        actuator,
+        BlockIntfType.ActuatorDigitalInterface,
+      ),
+      pwmActuator: ifCompatible(actuator, BlockType.FastPwm),
+      actuatorClaimed: actuator?.data.claimedBy.id != null,
     };
-  },
-});
+  }),
+);
+
+function actuatorLimitations(block: Block): string | null {
+  return prettyLimitations(block.data.constraints) || null;
+}
+
+async function replaceActuator(
+  channel: EditableChannel,
+  link: Link,
+): Promise<void> {
+  setExclusiveChannelActuator(
+    sparkStore.blockByLink(serviceId, link),
+    bloxLink(block.value.id),
+    channel.id,
+  );
+}
+
+async function updateDigitalState(
+  channel: EditableChannel,
+  storedState: DigitalState,
+): Promise<void> {
+  await sparkStore.patchBlock(channel.digitalActuator, { storedState });
+}
+
+async function updatePwmSetting(channel: EditableChannel): Promise<void> {
+  if (channel.pwmActuator) {
+    createDialog({
+      component: 'SliderDialog',
+      componentProps: {
+        modelValue: channel.pwmActuator.data.storedSetting,
+        title: 'Edit PWM setting',
+        label: 'Pwm %',
+        min: 0,
+        max: 100,
+        quickActions: PWM_SELECT_OPTIONS,
+      },
+    }).onOk((storedSetting) =>
+      sparkStore.patchBlock(channel.pwmActuator, { storedSetting }),
+    );
+  }
+}
 </script>
 
 <template>

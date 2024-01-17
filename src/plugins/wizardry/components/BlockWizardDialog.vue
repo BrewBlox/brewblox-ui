@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { useDialog, useGlobals, useRouteId } from '@/composables';
+import { Block, BlockType } from 'brewblox-proto/ts';
+import { nanoid } from 'nanoid';
+import { computed, nextTick, onMounted, ref } from 'vue';
+import {
+  useDialog,
+  UseDialogEmits,
+  UseDialogProps,
+  useGlobals,
+  useRouteId,
+} from '@/composables';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
@@ -23,9 +32,6 @@ import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { typed } from '@/utils/misc';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
-import { BlockType } from 'brewblox-proto/ts';
-import { nanoid } from 'nanoid';
-import { computed, nextTick, onMounted, PropType, ref } from 'vue';
 import { tryCreateBlock } from '../utils';
 
 interface BlockOption extends SelectOption<BlockType> {
@@ -39,33 +45,27 @@ type DashboardOption = SelectOption<string>;
 
 type WizardStep = 'block' | 'service' | 'name' | 'dashboard';
 
-const props = defineProps({
-  ...useDialog.props,
-  compatible: {
-    type: null as unknown as PropType<ComparedBlockType>,
-    default: null,
-  },
-  filter: {
-    type: Function as PropType<(type: BlockType) => boolean>,
-    default: () => true,
-  },
-  serviceId: {
-    type: null as unknown as PropType<string | null>,
-    default: null,
-  },
-  showCreated: {
-    type: Boolean,
-    default: true,
-  },
-  addWidget: {
-    type: Boolean,
-    default: false,
-  },
+interface Props extends UseDialogProps {
+  compatible?: ComparedBlockType;
+  filter?: (type: BlockType) => boolean;
+  serviceId?: string | null;
+  showCreated?: boolean;
+  addWidget?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  compatible: null,
+  filter: () => true,
+  serviceId: null,
+  showCreated: true,
+  addWidget: false,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } =
+  useDialog.setup<Block | null>();
 const { dense } = useGlobals.setup();
 const { activeDashboardId, activeServiceId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();
@@ -76,7 +76,7 @@ const blockSpecStore = useBlockSpecStore();
 const serviceStore = useServiceStore();
 
 const step = ref<WizardStep>('block');
-const search = ref<string | null>('');
+const search = ref<string>('');
 const selectedBlockOpt = ref<BlockOption | null>(null);
 const selectedServiceOpt = ref<ServiceOption | null>(null);
 const selectedDashboardOpt = ref<DashboardOption | null>(null);
@@ -99,8 +99,8 @@ const allBlockOpts = computed<BlockOption[]>(() =>
         tooltip: discovered
           ? 'Discovered block'
           : sysBlock
-          ? 'System block'
-          : undefined,
+            ? 'System block'
+            : undefined,
         generate: spec.generate,
       };
     })
@@ -108,7 +108,7 @@ const allBlockOpts = computed<BlockOption[]>(() =>
 );
 
 const blockOpts = computed<BlockOption[]>(() => {
-  const exp = new RegExp(search.value ?? '', 'i');
+  const exp = new RegExp(search.value, 'i');
   return allBlockOpts.value.filter((opt) =>
     exp.test(`${opt.value} ${opt.label}`),
   );
@@ -315,7 +315,7 @@ onMounted(() => {
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="next"
   >
@@ -341,6 +341,7 @@ onMounted(() => {
             clearable
             autofocus
             class="q-mb-md"
+            @clear="search = ''"
           >
             <template #append>
               <KeyboardButton @click="showSearchKeyboard" />

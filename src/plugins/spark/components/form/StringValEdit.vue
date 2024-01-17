@@ -1,36 +1,32 @@
-<script lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
+<script setup lang="ts">
+import { computed } from 'vue';
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'StringValEdit',
-  props: {
-    ...useValEdit.props,
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<string>();
+type VT = string;
 
-    const displayValue = computed<string>(() => field.value || '<not set>');
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: field.value,
-        },
-      }).onOk((v) => (field.value = v));
-    }
-
-    return {
-      field,
-      startEdit,
-      displayValue,
-      showKeyboard,
-    };
-  },
+withDefaults(defineProps<UseValEditProps<VT>>(), {
+  ...useValEdit.defaultProps<VT>(),
 });
+
+defineEmits<UseValEditEmits<VT>>();
+
+const { field, startEdit } = useValEdit.setup<VT>();
+
+const displayValue = computed<string>(() => field.value || '<not set>');
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: field.value,
+    },
+  }).onOk((v) => (field.value = v));
+}
 </script>
 
 <template>

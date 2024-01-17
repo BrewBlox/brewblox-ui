@@ -1,3 +1,9 @@
+import {
+  ActuatorAnalogMockBlock,
+  BlockType,
+  SettingMode,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -5,12 +11,6 @@ import { prettyConstraints } from '@/plugins/spark/utils/formatting';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
-import {
-  ActuatorAnalogMockBlock,
-  BlockType,
-  SettingMode,
-} from 'brewblox-proto/ts';
-import { Plugin } from 'vue';
 import widget from './ActuatorAnalogMockWidget.vue';
 
 const type = BlockType.ActuatorAnalogMock;
@@ -24,6 +24,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<ActuatorAnalogMockBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): ActuatorAnalogMockBlock['data'] => ({
         enabled: true,
         storedSetting: 0,

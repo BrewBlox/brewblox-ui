@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { DigitalState } from 'brewblox-proto/ts';
+import { computed, watch } from 'vue';
 import {
   UP,
-  ValveBlockT,
   VALVE_CLOSED_KEY,
   VALVE_KEY,
   VALVE_TYPES,
+  ValveBlockT,
 } from '@/plugins/builder/const';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
-import { DigitalState } from 'brewblox-proto/ts';
-import { computed, watch } from 'vue';
 import { usePart, useSettingsBlock } from '../composables';
 
 const paths = {

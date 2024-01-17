@@ -1,44 +1,26 @@
-<script lang="ts">
-import { tempQty } from '@/utils/quantity';
+<script setup lang="ts">
 import { Quantity } from 'brewblox-proto/ts';
-import { defineComponent, PropType, ref } from 'vue';
-import { QuickstartAction } from '../types';
+import { ref } from 'vue';
+import { tempQty } from '@/utils/quantity';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GlycolConfig, GlycolOpts } from './types';
 
-export default defineComponent({
-  name: 'GlycolSettingsTask',
-  props: {
-    config: {
-      type: Object as PropType<GlycolConfig>,
-      required: true,
-    },
-    actions: {
-      type: Array as PropType<QuickstartAction[]>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const beerSetting = ref<Quantity>(tempQty(20));
-    const glycolSetting = ref<Quantity>(tempQty(4));
+const props = defineProps<UseTaskProps<GlycolConfig>>();
 
-    function done(): void {
-      const glycolOpts: GlycolOpts = {
-        beerSetting: beerSetting.value,
-        glycolSetting: glycolSetting.value,
-      };
+const emit = defineEmits<UseTaskEmits<GlycolConfig>>();
 
-      emit('update:config', { ...props.config, glycolOpts });
-      emit('next');
-    }
+const beerSetting = ref<Quantity>(tempQty(20));
+const glycolSetting = ref<Quantity>(tempQty(4));
 
-    return {
-      beerSetting,
-      glycolSetting,
-      done,
-    };
-  },
-});
+function done(): void {
+  const glycolOpts: GlycolOpts = {
+    beerSetting: beerSetting.value,
+    glycolSetting: glycolSetting.value,
+  };
+
+  emit('update:config', { ...props.config, glycolOpts });
+  emit('next');
+}
 </script>
 
 <template>

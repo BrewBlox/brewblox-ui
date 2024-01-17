@@ -1,42 +1,23 @@
-<script lang="ts">
+<script setup lang="ts">
+import { Link, PidBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { prettyLink } from '@/utils/quantity';
-import { Link, PidBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
-import { startRelationsDialog } from './relations';
 
-export default defineComponent({
-  name: 'PidWidget',
-  components: {
-    Basic: PidBasic,
-    Full: PidFull,
-  },
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { block } = useBlockWidget.setup<PidBlock>();
+const modes = {
+  Basic: PidBasic,
+  Full: PidFull,
+} as const;
 
-    const inputLink = computed<Link>(() => block.value.data.inputId);
+const { context, inDialog } = useContext.setup();
+const { block } = useBlockWidget.setup<PidBlock>();
 
-    const outputLink = computed<Link>(() => block.value.data.outputId);
+const inputLink = computed<Link>(() => block.value.data.inputId);
 
-    function showRelations(): void {
-      startRelationsDialog(block.value);
-    }
-
-    return {
-      prettyLink,
-      context,
-      inDialog,
-      block,
-      inputLink,
-      outputLink,
-      showRelations,
-    };
-  },
-});
+const outputLink = computed<Link>(() => block.value.data.outputId);
 </script>
 
 <template>
@@ -46,18 +27,10 @@ export default defineComponent({
     </template>
 
     <template #toolbar>
-      <BlockWidgetToolbar has-mode-toggle>
-        <template #actions>
-          <ActionItem
-            icon="mdi-vector-line"
-            label="Relations"
-            @click="showRelations"
-          />
-        </template>
-      </BlockWidgetToolbar>
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <component :is="context.mode">
+    <component :is="modes[context.mode]">
       <template #warnings>
         <CardWarning v-if="!inputLink.id">
           <template #message> PID has no input block configured. </template>

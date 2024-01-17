@@ -71,7 +71,7 @@ export interface TimeSeriesRange {
 export interface TimeSeriesMetric {
   metric: string;
   value: number;
-  timestamp: number;
+  timestamp: DateString;
 }
 
 export interface TimeSeriesRangesResult {
@@ -95,24 +95,20 @@ export interface RangeValue extends PlotData {
 
 export interface MetricValue {
   field: string;
-  time: number;
+  time: Date;
   value: number | null;
 }
 
 export interface HistorySource {
   id: string;
   command: 'metrics' | 'ranges';
-  transformer: (source: any, result: any) => HistorySource;
   params: QueryParams;
   fields: string[];
   renames: DisplayNames;
 }
 
 export interface GraphSource extends HistorySource {
-  transformer: (
-    source: GraphSource,
-    result: TimeSeriesRangesResult,
-  ) => HistorySource;
+  command: 'ranges';
   axes: GraphValueAxes;
   colors: LineColors;
   precision: LabelPrecision;
@@ -121,10 +117,7 @@ export interface GraphSource extends HistorySource {
 }
 
 export interface MetricsSource extends HistorySource {
-  transformer: (
-    source: MetricsSource,
-    result: TimeSeriesMetricsResult,
-  ) => HistorySource;
+  command: 'metrics';
   updated: Date;
   values: MetricValue[];
 }

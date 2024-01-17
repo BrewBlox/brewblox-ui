@@ -1,23 +1,14 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
 import { useWidget } from '@/composables';
-import { computed, defineComponent } from 'vue';
 import { MetricsConfig } from '../types';
 import { MetricsWidget } from './types';
 
-export default defineComponent({
-  name: 'MetricsFull',
-  setup() {
-    const { widget, saveConfig } = useWidget.setup<MetricsWidget>();
+const { widget, saveConfig } = useWidget.setup<MetricsWidget>();
 
-    const config = computed<MetricsConfig>({
-      get: () => widget.value.config,
-      set: (cfg) => saveConfig(cfg),
-    });
-
-    return {
-      config,
-    };
-  },
+const config = computed<MetricsConfig>({
+  get: () => widget.value.config,
+  set: (cfg) => saveConfig(cfg),
 });
 </script>
 

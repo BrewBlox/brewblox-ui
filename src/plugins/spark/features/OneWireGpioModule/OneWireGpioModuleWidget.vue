@@ -1,90 +1,95 @@
-<script lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { createDialogPromise } from '@/utils/dialog';
+<script setup lang="ts">
 import {
   GpioModuleChannel,
   GpioModuleStatus,
   GpioPins,
   OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { createDialogPromise } from '@/utils/dialog';
 
-export default defineComponent({
-  name: 'OneWireGpioModuleWidget',
-  setup() {
-    const { context } = useContext.setup();
-    const { block, patchBlock } =
-      useBlockWidget.setup<OneWireGpioModuleBlock>();
+/**
+ * Converts GpioPins bitmask to list of 1-indexed pin numbers
+ */
+function listedPins(pins: GpioPins): number[] {
+  return [...Array(8).keys()].filter((i) => (1 << i) & pins).map((i) => i + 1);
+}
 
-    const power = computed<boolean>({
-      get: () => block.value.data.useExternalPower,
-      set: async (useExternalPower) => {
-        const ok =
-          !useExternalPower ||
-          (await createDialogPromise({
-            component: 'ConfirmDialog',
-            componentProps: {
-              title: 'Switch to external power',
-              message:
-                'If enabled, all channels on this module will use the external power supply.' +
-                ' Are you sure?',
-            },
-          }));
-        if (ok) {
-          patchBlock({ useExternalPower });
-        }
-      },
-    });
+const { context } = useContext.setup();
+const { block, patchBlock } = useBlockWidget.setup<OneWireGpioModuleBlock>();
 
-    const channels = computed<GpioModuleChannel[]>({
-      get: () => block.value.data.channels,
-      set: (channels) => patchBlock({ channels }),
-    });
-
-    const errors = computed<string[]>(() => {
-      const values: string[] = [];
-      const { moduleStatus, overCurrent } = block.value.data;
-      if (overCurrent !== GpioPins.NONE) {
-        values.push(
-          'ERROR: Overcurrent on pin ' +
-            [...Array(8).keys()]
-              .filter((i) => (1 << i) & overCurrent)
-              .map((i) => `${i + 1}`)
-              .join(', '),
-        );
-      } else if (moduleStatus & GpioModuleStatus.OVERCURRENT) {
-        values.push('ERROR: Overcurrent');
-      }
-      if (moduleStatus & GpioModuleStatus.OVERVOLTAGE) {
-        values.push('ERROR: Overvoltage');
-      }
-      if (moduleStatus & GpioModuleStatus.UNDERVOLTAGE_LOCKOUT) {
-        values.push('ERROR: Undervoltage');
-      }
-      if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_SHUTDOWN) {
-        values.push('ERROR: Overtemperature');
-      } else if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_WARNING) {
-        values.push('WARNING: Overtemperature');
-      }
-      if (moduleStatus & GpioModuleStatus.POWER_ON_RESET) {
-        values.push('ERROR: Not yet initialized (power on reset)');
-      }
-      if (moduleStatus & GpioModuleStatus.SPI_ERROR) {
-        values.push('ERROR: SPI error');
-      }
-      return values;
-    });
-
-    return {
-      context,
-      block,
-      patchBlock,
-      power,
-      channels,
-      errors,
-    };
+const power = computed<boolean>({
+  get: () => block.value.data.useExternalPower,
+  set: async (useExternalPower) => {
+    const ok =
+      !useExternalPower ||
+      (await createDialogPromise({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Switch to external power',
+          message:
+            'If enabled, all channels on this module will use the external power supply.' +
+            ' Are you sure?',
+        },
+      }));
+    if (ok) {
+      patchBlock({ useExternalPower });
+    }
   },
+});
+
+const channels = computed<GpioModuleChannel[]>({
+  get: () => block.value.data.channels,
+  set: (channels) => patchBlock({ channels }),
+});
+
+const inputPins = computed<GpioPins>(() =>
+  block.value.data.channels
+    .filter((chan) => chan.deviceType.includes('DEV_DETECT'))
+    .reduce(
+      (pins: GpioPins, chan: GpioModuleChannel) => pins | chan.pinsMask,
+      GpioPins.NONE,
+    ),
+);
+
+const errors = computed<string[]>(() => {
+  const values: string[] = [];
+  const { moduleStatus, overCurrent, openLoad } = block.value.data;
+  if (overCurrent !== GpioPins.NONE) {
+    values.push(
+      'ERROR: Overcurrent on pin ' + listedPins(overCurrent).toString(),
+    );
+  } else if (moduleStatus & GpioModuleStatus.OVERCURRENT) {
+    values.push('ERROR: Overcurrent');
+  }
+  if (moduleStatus & GpioModuleStatus.OVERVOLTAGE) {
+    values.push('ERROR: Overvoltage');
+  }
+  if (moduleStatus & GpioModuleStatus.UNDERVOLTAGE_LOCKOUT) {
+    values.push('ERROR: Undervoltage');
+  }
+  if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_SHUTDOWN) {
+    values.push('ERROR: Overtemperature');
+  } else if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_WARNING) {
+    values.push('WARNING: Overtemperature');
+  }
+  if (moduleStatus & GpioModuleStatus.POWER_ON_RESET) {
+    values.push('ERROR: Not yet initialized (power on reset)');
+  }
+  if (moduleStatus & GpioModuleStatus.SPI_ERROR) {
+    values.push('ERROR: SPI error');
+  }
+  if (moduleStatus & GpioModuleStatus.OPEN_LOAD) {
+    const relevantPins = ~inputPins.value & openLoad;
+    if (relevantPins != GpioPins.NONE) {
+      values.push(
+        'WARNING: Open Load on pin ' + listedPins(relevantPins).toString(),
+      );
+    }
+  }
+  return values;
 });
 </script>
 

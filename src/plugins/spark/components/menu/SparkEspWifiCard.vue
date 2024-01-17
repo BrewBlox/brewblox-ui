@@ -1,17 +1,13 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+interface Props {
+  serviceId: string;
+}
 
-export default defineComponent({
-  name: 'SparkEspWifiCard',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['cancel'],
-  setup() {},
-});
+defineProps<Props>();
+
+defineEmits<{
+  cancel: [];
+}>();
 </script>
 
 <template>

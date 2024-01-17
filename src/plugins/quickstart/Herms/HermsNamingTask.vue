@@ -1,6 +1,11 @@
-<script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { HermsBlockNames, HermsConfig } from './types';
+
+const props = defineProps<UseTaskProps<HermsConfig>>();
+
+const emit = defineEmits<UseTaskEmits<HermsConfig>>();
 
 const defaultNames: HermsBlockNames = {
   hltSensor: 'HLT Sensor',
@@ -21,33 +26,16 @@ const defaultNames: HermsBlockNames = {
   balancer: 'Balancer',
 };
 
-export default defineComponent({
-  name: 'HermsNamingTask',
-  props: {
-    config: {
-      type: Object as PropType<HermsConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const localConfig = computed<HermsConfig>({
-      get: () => props.config,
-      set: (cfg) =>
-        emit('update:config', {
-          ...cfg,
-          widgets: [],
-          createdBlocks: [],
-          changedBlocks: [],
-          renamedBlocks: {},
-        }),
-    });
-
-    return {
-      defaultNames,
-      localConfig,
-    };
-  },
+const localConfig = computed<HermsConfig>({
+  get: () => props.config,
+  set: (cfg) =>
+    emit('update:config', {
+      ...cfg,
+      widgets: [],
+      createdBlocks: [],
+      changedBlocks: [],
+      renamedBlocks: {},
+    }),
 });
 </script>
 

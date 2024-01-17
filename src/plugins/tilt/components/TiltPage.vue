@@ -1,4 +1,5 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed, provide, reactive, watch } from 'vue';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltService, TiltStateValue } from '@/plugins/tilt/types';
 import { WidgetContext } from '@/store/features';
@@ -6,7 +7,12 @@ import { useServiceStore } from '@/store/services';
 import { ContextKey } from '@/symbols';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
-import { computed, defineComponent, provide, reactive, watch } from 'vue';
+
+interface Props {
+  serviceId: string;
+}
+
+const props = defineProps<Props>();
 
 const context: WidgetContext = {
   mode: 'Basic',
@@ -14,53 +20,33 @@ const context: WidgetContext = {
   size: 'Content',
 };
 
-export default defineComponent({
-  name: 'TiltPage',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
+const tiltStore = useTiltStore();
+const serviceStore = useServiceStore();
+
+provide(ContextKey, reactive<WidgetContext>(context));
+
+const service = computed<TiltService | null>(() =>
+  serviceStore.serviceById(props.serviceId),
+);
+
+const title = computed<string>(() => service.value?.title ?? 'Spark service');
+
+function editTitle(): void {
+  startChangeServiceTitle(service.value);
+}
+
+watch(
+  () => title.value,
+  (title) => {
+    document.title = `Brewblox | ${title}`;
   },
-  setup(props) {
-    const tiltStore = useTiltStore();
-    const serviceStore = useServiceStore();
+);
 
-    provide(ContextKey, reactive<WidgetContext>(context));
-
-    const service = computed<TiltService | null>(() =>
-      serviceStore.serviceById(props.serviceId),
-    );
-
-    const title = computed<string>(
-      () => service.value?.title ?? 'Spark service',
-    );
-
-    function editTitle(): void {
-      startChangeServiceTitle(service.value);
-    }
-
-    watch(
-      () => title.value,
-      (title) => {
-        document.title = `Brewblox | ${title}`;
-      },
-    );
-
-    const values = computed<TiltStateValue[]>(() =>
-      tiltStore.values
-        .filter((v) => v.serviceId === props.serviceId)
-        .sort(makeObjectSorter('color')),
-    );
-
-    return {
-      service,
-      title,
-      editTitle,
-      values,
-    };
-  },
-});
+const values = computed<TiltStateValue[]>(() =>
+  tiltStore.values
+    .filter((v) => v.serviceId === props.serviceId)
+    .sort(makeObjectSorter('color')),
+);
 </script>
 
 <template>

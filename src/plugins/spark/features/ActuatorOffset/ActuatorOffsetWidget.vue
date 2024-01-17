@@ -1,8 +1,4 @@
-<script lang="ts">
-import { useContext } from '@/composables';
-import { useBlockWidget } from '@/plugins/spark/composables';
-import { createComponentDialog } from '@/utils/dialog';
-import { fixedNumber, prettyLink } from '@/utils/quantity';
+<script setup lang="ts">
 import {
   ActuatorOffsetBlock,
   AnalogConstraints,
@@ -10,7 +6,11 @@ import {
   Quantity,
   ReferenceKind,
 } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
+import { computed } from 'vue';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { createComponentDialog } from '@/utils/dialog';
+import { fixedNumber, prettyLink } from '@/utils/quantity';
 import ActuatorOffsetDisableDialog from './ActuatorOffsetDisableDialog.vue';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
@@ -18,83 +18,59 @@ const referenceOpts: SelectOption<ReferenceKind>[] = [
   { label: 'Measured', value: ReferenceKind.REF_VALUE },
 ];
 
-export default defineComponent({
-  name: 'ActuatorOffsetWidget',
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { serviceId, block, patchBlock, isClaimed } =
-      useBlockWidget.setup<ActuatorOffsetBlock>();
+const { context, inDialog } = useContext.setup();
+const { serviceId, block, patchBlock, isClaimed } =
+  useBlockWidget.setup<ActuatorOffsetBlock>();
 
-    const target = computed<Link>({
-      get: () => block.value.data.targetId,
-      set: (v) => patchBlock({ targetId: v }),
-    });
-
-    const reference = computed<Link>({
-      get: () => block.value.data.referenceId,
-      set: (v) => patchBlock({ referenceId: v }),
-    });
-
-    const refKind = computed<ReferenceKind>({
-      get: () => block.value.data.referenceSettingOrValue,
-      set: (v) => patchBlock({ referenceSettingOrValue: v }),
-    });
-
-    const refKindLabel = computed<string>(
-      () =>
-        referenceOpts.find((v) => v.value === refKind.value)?.label ?? '???',
-    );
-
-    const desiredSetting = computed<Quantity>({
-      get: () => block.value.data.desiredSetting,
-      set: (v) => patchBlock({ storedSetting: v }),
-    });
-
-    const constraints = computed<AnalogConstraints>({
-      get: () => block.value.data.constraints ?? {},
-      set: (v) => patchBlock({ constraints: v }),
-    });
-
-    const isLimited = computed<boolean>(() => {
-      const { enabled, desiredSetting, setting } = block.value.data;
-      return (
-        enabled &&
-        fixedNumber(desiredSetting.value, 1) !== fixedNumber(setting.value, 1)
-      );
-    });
-
-    function changeEnabled(enabled: boolean): void {
-      if (enabled) {
-        patchBlock({ enabled });
-      } else {
-        createComponentDialog({
-          component: ActuatorOffsetDisableDialog,
-          componentProps: {
-            block: block.value,
-          },
-        });
-      }
-    }
-
-    return {
-      prettyLink,
-      referenceOpts,
-      context,
-      inDialog,
-      serviceId,
-      block,
-      isClaimed,
-      target,
-      reference,
-      refKind,
-      refKindLabel,
-      desiredSetting,
-      constraints,
-      isLimited,
-      changeEnabled,
-    };
-  },
+const target = computed<Link>({
+  get: () => block.value.data.targetId,
+  set: (v) => patchBlock({ targetId: v }),
 });
+
+const reference = computed<Link>({
+  get: () => block.value.data.referenceId,
+  set: (v) => patchBlock({ referenceId: v }),
+});
+
+const refKind = computed<ReferenceKind>({
+  get: () => block.value.data.referenceSettingOrValue,
+  set: (v) => patchBlock({ referenceSettingOrValue: v }),
+});
+
+const refKindLabel = computed<string>(
+  () => referenceOpts.find((v) => v.value === refKind.value)?.label ?? '???',
+);
+
+const desiredSetting = computed<Quantity>({
+  get: () => block.value.data.desiredSetting,
+  set: (v) => patchBlock({ storedSetting: v }),
+});
+
+const constraints = computed<AnalogConstraints>({
+  get: () => block.value.data.constraints ?? {},
+  set: (v) => patchBlock({ constraints: v }),
+});
+
+const isLimited = computed<boolean>(() => {
+  const { enabled, desiredSetting, setting } = block.value.data;
+  return (
+    enabled &&
+    fixedNumber(desiredSetting.value, 1) !== fixedNumber(setting.value, 1)
+  );
+});
+
+function changeEnabled(enabled: boolean): void {
+  if (enabled) {
+    patchBlock({ enabled });
+  } else {
+    createComponentDialog({
+      component: ActuatorOffsetDisableDialog,
+      componentProps: {
+        block: block.value,
+      },
+    });
+  }
+}
 </script>
 
 <template>

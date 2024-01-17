@@ -1,68 +1,53 @@
-<script lang="ts">
-import { useDialog, useGlobals } from '@/composables';
-import { createDialog } from '@/utils/dialog';
+<script setup lang="ts">
 import { QInput } from 'quasar';
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
+import {
+  useDialog,
+  UseDialogEmits,
+  UseDialogProps,
+  useGlobals,
+} from '@/composables';
+import { createDialog } from '@/utils/dialog';
 
-export default defineComponent({
-  name: 'MarkdownDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dense } = useGlobals.setup();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: string;
+}
 
-    const local = ref<string>(props.modelValue);
-    const editorRef = ref<QInput>();
-    const preview = ref<boolean>(false);
-
-    if (
-      local.value.length &&
-      local.value.charAt(local.value.length - 1) !== '\n'
-    ) {
-      local.value += '\n';
-    }
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-        },
-      }).onOk((v) => (local.value = v));
-    }
-
-    return {
-      dense,
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      preview,
-      editorRef,
-      save,
-      showKeyboard,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dense } = useGlobals.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<string>();
+
+const local = ref<string>(props.modelValue);
+const editorRef = ref<QInput>();
+
+if (local.value.length && local.value.charAt(local.value.length - 1) !== '\n') {
+  local.value += '\n';
+}
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+    },
+  }).onOk((v) => (local.value = v));
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     :maximized="dense"
     @hide="onDialogHide"
     @keyup.enter="save"

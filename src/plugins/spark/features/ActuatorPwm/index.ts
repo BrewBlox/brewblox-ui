@@ -1,3 +1,10 @@
+import {
+  ActuatorPwmBlock,
+  BlockIntfType,
+  BlockType,
+  SettingMode,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -6,13 +13,6 @@ import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, durationString } from '@/utils/quantity';
-import {
-  ActuatorPwmBlock,
-  BlockIntfType,
-  BlockType,
-  SettingMode,
-} from 'brewblox-proto/ts';
-import { Plugin } from 'vue';
 import widget from './ActuatorPwmWidget.vue';
 
 const type = BlockType.ActuatorPwm;
@@ -26,6 +26,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<ActuatorPwmBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): ActuatorPwmBlock['data'] => ({
         actuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
         period: bloxQty('4s'),

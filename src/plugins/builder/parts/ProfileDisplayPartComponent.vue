@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { Setpoint } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { userUnits } from '@/user-settings';
 import { makeObjectSorter } from '@/utils/functional';
 import { durationMs, preciseNumber, prettyUnit } from '@/utils/quantity';
-import { Setpoint } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/ProfileDisplay';
 import { usePart, useSettingsBlock } from '../composables';
-import { ProfileBlockT, PROFILE_KEY, PROFILE_TYPES } from '../const';
+import { PROFILE_KEY, PROFILE_TYPES, ProfileBlockT } from '../const';
 import { liquidBorderColor } from '../utils';
 
 const { flows, width, height, bordered, passthrough, placeholder } =

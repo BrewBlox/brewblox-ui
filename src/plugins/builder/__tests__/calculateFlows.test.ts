@@ -1,3 +1,6 @@
+import get from 'lodash/get';
+import set from 'lodash/set';
+import { describe, expect, it } from 'vitest';
 import blueprints from '@/plugins/builder/blueprints';
 import {
   asFlowParts,
@@ -18,9 +21,6 @@ import {
   FlowRoute,
   PartTransitions,
 } from '@/plugins/builder/types';
-import get from 'lodash/get';
-import set from 'lodash/set';
-import { describe, expect, it } from 'vitest';
 
 const makeTransitions = (part: BuilderPart): Maybe<PartTransitions> =>
   blueprints[part.type].transitions(part);

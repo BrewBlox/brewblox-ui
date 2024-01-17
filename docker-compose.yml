@@ -1,5 +1,4 @@
-version: '3.7'
-
+name: brewblox-ui
 services:
   eventbus:
     image: ghcr.io/brewblox/mosquitto:develop
@@ -8,27 +7,28 @@ services:
 
   victoria:
     image: victoriametrics/victoria-metrics:v1.88.0
+    command: --envflag.enable=true --envflag.prefix=VM_
     labels:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
+    environment:
+      - VM_retentionPeriod=100y
+      - VM_influxMeasurementFieldSeparator=/
+      - VM_http_pathPrefix=/victoria
+      - VM_search_latencyOffset=10s
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/victoria
         target: /victoria-metrics-data
-    command: >-
-      --retentionPeriod=100y
-      --influxMeasurementFieldSeparator=/
-      --http.pathPrefix=/victoria
-      --search.latencyOffset=10s
 
   redis:
     image: redis:6.0
+    command: --appendonly yes
     labels:
       - traefik.enable=false
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/redis
         target: /data
-    command: --appendonly yes
 
   history:
     image: ghcr.io/brewblox/brewblox-history:develop
@@ -44,44 +44,77 @@ services:
     image: ghcr.io/brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
+    environment:
+      - BREWBLOX_SPARK_SIMULATION=true
+      - BREWBLOX_SPARK_DEVICE_ID=123456789012345678901234
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/simulator__sparkey
         target: /app/simulator
-    command: --name=sparkey --simulation --device-id=123456789012345678901234
 
   spock:
     image: ghcr.io/brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
+    environment:
+      - BREWBLOX_SPARK_SIMULATION=true
+      - BREWBLOX_SPARK_DEVICE_ID=432109876543210987654321
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/simulator__spock
         target: /app/simulator
-    command: --name=spock --simulation --device-id=432109876543210987654321
 
   tilt:
     image: ghcr.io/brewblox/brewblox-tilt:develop
+    restart: unless-stopped
+    privileged: true
     labels:
       - traefik.enable=false
+    environment:
+      - BREWBLOX_TILT_SIMULATE=Pink
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/tilt
         target: /share
-    restart: unless-stopped
-    network_mode: host
-    privileged: true
-    command: --mqtt-port=9001 --simulate=Pink
+
+  auth:
+    image: ghcr.io/brewblox/brewblox-auth:develop
+    environment:
+      - BREWBLOX_AUTH_ENABLED=False
+      - BREWBLOX_AUTH_IGNORE=/|/(ui|static)/.*
+    volumes:
+      - type: bind
+        source: ./dev/auth
+        target: /app/data
 
   traefik:
-    image: traefik:2.2
+    image: traefik:2.10
     ports:
       - '9000:9000'
       - '9001:9001'
+      - '127.0.0.1:9601:9601'
     labels:
       - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
       - traefik.http.routers.api.service=api@internal
       - traefik.http.middlewares.prefix-strip.stripprefixregex.regex=/[^/]+
+      - traefik.http.middlewares.auth.forwardauth.address=http://auth:5000/auth/verify
+      - traefik.http.middlewares.cors.headers.AccessControlAllowMethods=CONNECT,HEAD,GET,DELETE,OPTIONS,PATCH,POST,PUT,TRACE
+      - traefik.http.middlewares.cors.headers.accessControlAllowOriginListRegex=.*
+      - traefik.http.middlewares.cors.headers.AccessControlAllowCredentials=true
+      - traefik.http.middlewares.cors.headers.AccessControlAllowHeaders=Origin,X-Requested-With,Content-Type,Accept
+    environment:
+      - TRAEFIK_API_DASHBOARD=true
+      - TRAEFIK_PROVIDERS_DOCKER=true
+      - TRAEFIK_PROVIDERS_DOCKER_CONSTRAINTS=LabelRegex(`com.docker.compose.project`, `${COMPOSE_PROJECT_NAME}`)
+      - TRAEFIK_PROVIDERS_DOCKER_DEFAULTRULE=PathPrefix(`/{{ index .Labels "com.docker.compose.service" }}`)
+      - TRAEFIK_PROVIDERS_FILE_DIRECTORY=/config
+      - TRAEFIK_ENTRYPOINTS_WEBSECURE_ADDRESS=:9001
+      - TRAEFIK_ENTRYPOINTS_WEBSECURE_HTTP_TLS=true
+      - TRAEFIK_ENTRYPOINTS_WEBSECURE_HTTP_MIDDLEWARES=cors,auth
+      - TRAEFIK_ENTRYPOINTS_WEB_ADDRESS=:9000
+      - TRAEFIK_ENTRYPOINTS_WEB_HTTP_REDIRECTIONS_ENTRYPOINT_TO=websecure
+      - TRAEFIK_ENTRYPOINTS_ADMIN_ADDRESS=:9601
+      - TRAEFIK_ENTRYPOINTS_ADMIN_HTTP_MIDDLEWARES=cors
     volumes:
       - type: bind
         source: ./dev/traefik
@@ -90,13 +123,3 @@ services:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
-    command: >-
-      --api.dashboard=true
-      --providers.docker=true
-      --providers.docker.constraints="Label(`com.docker.compose.project`, `brewblox-ui`)"
-      --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
-      --providers.file.directory=/config
-      --entrypoints.web.address=:9000
-      --entrypoints.websecure.address=:9001
-      --entrypoints.websecure.http.tls=true
-    # --entrypoints.web.http.redirections.entrypoint.to=websecure

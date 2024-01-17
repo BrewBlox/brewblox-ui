@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Block, BlockType } from 'brewblox-proto/ts';
+import { computed, onMounted } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockWidget } from '@/plugins/spark/types';
 import { discoverBlocks } from '@/plugins/spark/utils/actions';
@@ -7,31 +9,19 @@ import {
   isSystemBlockType,
 } from '@/plugins/spark/utils/info';
 import { createDialogPromise } from '@/utils/dialog';
-import { Block, BlockType } from 'brewblox-proto/ts';
-import { computed, onMounted, PropType } from 'vue';
 
-const props = defineProps({
-  widget: {
-    type: Object as PropType<BlockWidget>,
-    required: true,
-  },
-  valid: {
-    type: Boolean,
-    required: true,
-  },
-  featureType: {
-    type: String as PropType<BlockType>,
-    required: true,
-  },
-  featureTitle: {
-    type: String,
-    required: true,
-  },
-});
+interface Props {
+  widget: BlockWidget;
+  valid: boolean;
+  featureType: BlockType;
+  featureTitle: string;
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: 'update:widget', value: BlockWidget): void;
-  (e: 'update:valid', value: boolean): void;
+  'update:widget': [payload: BlockWidget];
+  'update:valid': [payload: boolean];
 }>();
 
 const sparkStore = useSparkStore();

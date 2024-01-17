@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { useDialog, useGlobals, useRouteId } from '@/composables';
+import { nanoid } from 'nanoid';
+import { computed, nextTick, onMounted, ref } from 'vue';
+import {
+  useDialog,
+  UseDialogEmits,
+  UseDialogProps,
+  useGlobals,
+  useRouteId,
+} from '@/composables';
 import { useDashboardStore } from '@/store/dashboards';
 import {
   ComponentName,
@@ -11,8 +19,6 @@ import { userUISettings } from '@/user-settings';
 import { startCreateDashboard } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { nanoid } from 'nanoid';
-import { computed, nextTick, onMounted, PropType, ref } from 'vue';
 import { tryCreateWidget } from '../utils';
 
 interface FeatureOption extends SelectOption<string> {
@@ -24,29 +30,23 @@ type DashboardOption = SelectOption<string>;
 
 type WizardStep = 'widget' | 'editor' | 'dashboard';
 
-const props = defineProps({
-  ...useDialog.props,
-  featureId: {
-    type: String,
-    default: null,
-  },
-  dashboardId: {
-    type: String,
-    default: null,
-  },
-  filter: {
-    type: Function as PropType<(feature: string) => boolean>,
-    default: () => true,
-  },
-  showCreated: {
-    type: Boolean,
-    default: true,
-  },
+interface Props extends UseDialogProps {
+  featureId?: string;
+  dashboardId?: string;
+  filter?: (feature: string) => boolean;
+  showCreated?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  filter: () => true,
+  showCreated: true,
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } =
+  useDialog.setup<Widget | null>();
 const { dense } = useGlobals.setup();
 const { activeDashboardId } = useRouteId.setup();
 const dashboardStore = useDashboardStore();
@@ -55,7 +55,7 @@ const labelSorter = makeObjectSorter('label');
 
 const id = nanoid();
 const step = ref<WizardStep>('widget');
-const search = ref<string | null>('');
+const search = ref<string>('');
 const selectedFeatureOpt = ref<FeatureOption | null>(null);
 const selectedDashboardOpt = ref<DashboardOption | null>(null);
 const widget = ref<Widget | null>(null);
@@ -85,7 +85,7 @@ const allFeatureOpts = computed<FeatureOption[]>(() =>
 );
 
 const featureOpts = computed<FeatureOption[]>(() => {
-  const exp = new RegExp(search.value ?? '', 'i');
+  const exp = new RegExp(search.value, 'i');
   return allFeatureOpts.value.filter((opt) =>
     exp.test(`${opt.value} ${opt.label}`),
   );
@@ -223,7 +223,7 @@ onMounted(() => {
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="next"
   >
@@ -249,6 +249,7 @@ onMounted(() => {
             clearable
             autofocus
             class="q-mb-md"
+            @clear="search = ''"
           >
             <template #append>
               <KeyboardButton @click="showSearchKeyboard" />

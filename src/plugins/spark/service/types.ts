@@ -1,5 +1,5 @@
-import { WidgetRole } from '@/store/features';
 import { BlockType } from 'brewblox-proto/ts';
+import { WidgetRole } from '@/store/features';
 import { BlockAddress } from '../types';
 
 export interface ListRenderAddress extends BlockAddress {

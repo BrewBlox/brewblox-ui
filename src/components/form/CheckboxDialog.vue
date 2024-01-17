@@ -1,59 +1,39 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import { computed, defineComponent, PropType, ref } from 'vue';
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 
-export default defineComponent({
-  name: 'CheckboxDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Array,
-      default: () => [],
-    },
-    selectOptions: {
-      type: Array as PropType<SelectOption[]>,
-      required: true,
-    },
-    ok: {
-      type: String,
-      default: 'OK',
-    },
-    cancel: {
-      type: [String, Boolean],
-      default: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const local = ref<any[]>([...props.modelValue]);
+interface Props extends UseDialogProps {
+  modelValue: any[];
+  selectOptions: SelectOption[];
+  ok?: string;
+  cancel?: string | boolean;
+}
 
-    const cancelLabel = computed<string>(() =>
-      typeof props.cancel === 'string' ? props.cancel : 'Cancel',
-    );
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      cancelLabel,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  ok: 'OK',
+  cancel: true,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<any[]>();
+const local = ref<any[]>([...props.modelValue]);
+
+const cancelLabel = computed<string>(() =>
+  typeof props.cancel === 'string' ? props.cancel : 'Cancel',
+);
+
+function save(): void {
+  onDialogOK(local.value);
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

@@ -1,55 +1,39 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import { defineComponent, PropType, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { parseColor } from '@/utils/colors';
 
-export default defineComponent({
-  name: 'ColorDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: String,
-      required: true,
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-    presets: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const local = ref<string>(props.modelValue);
+interface Props extends UseDialogProps {
+  modelValue: string;
+  clearable?: boolean;
+  presets?: string[];
+}
 
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    function clear(): void {
-      onDialogOK('');
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-      clear,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  clearable: false,
+  presets: () => [],
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<string>();
+const local = ref<string>(parseColor(props.modelValue) ?? '#ffffff');
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+function clear(): void {
+  onDialogOK('');
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

@@ -1,51 +1,33 @@
-<script lang="ts">
-import { prettyLink } from '@/utils/quantity';
+<script setup lang="ts">
 import { AnalogConstraintBase, AnalogConstraints } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
-import { prettyConstraints, prettyLimitations } from '../../utils/formatting';
+import { computed } from 'vue';
+import { prettyLink } from '@/utils/quantity';
 
-export default defineComponent({
-  name: 'AnalogConstraintsField',
-  props: {
-    modelValue: {
-      type: Object as PropType<AnalogConstraints>,
-      default: () => ({}),
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const constraints = computed<AnalogConstraints>(() => props.modelValue);
+interface Props {
+  modelValue?: AnalogConstraints;
+  serviceId: string;
+}
 
-    const isConstrained = computed<boolean>(() => {
-      const { min, max, balanced } = constraints.value;
-      return [min, max, balanced].some((v) => v?.enabled);
-    });
-
-    function constraintClass(constraint: AnalogConstraintBase): string[] {
-      const cls: string[] = [];
-      if (constraint.limiting) {
-        cls.push('text-pink-4');
-      } else if (constraint.enabled) {
-        cls.push('text-indigo-4');
-      } else {
-        cls.push('darkish');
-      }
-      return cls;
-    }
-
-    return {
-      prettyLink,
-      prettyConstraints,
-      prettyLimitations,
-      constraints,
-      isConstrained,
-      constraintClass,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: () => ({}),
 });
+
+const isConstrained = computed<boolean>(() => {
+  const { min, max, balanced } = props.modelValue;
+  return [min, max, balanced].some((v) => v?.enabled);
+});
+
+function constraintClass(constraint: AnalogConstraintBase): string[] {
+  const cls: string[] = [];
+  if (constraint.limiting) {
+    cls.push('text-pink-4');
+  } else if (constraint.enabled) {
+    cls.push('text-indigo-4');
+  } else {
+    cls.push('darkish');
+  }
+  return cls;
+}
 </script>
 
 <template>
@@ -58,22 +40,22 @@ export default defineComponent({
     </div>
 
     <div
-      v-if="constraints.min?.enabled"
-      :class="constraintClass(constraints.min)"
+      v-if="modelValue.min?.enabled"
+      :class="constraintClass(modelValue.min)"
     >
-      Minimum: {{ constraints.min.value }}
+      Minimum: {{ modelValue.min.value }}
     </div>
     <div
-      v-if="constraints.max?.enabled"
-      :class="constraintClass(constraints.max)"
+      v-if="modelValue.max?.enabled"
+      :class="constraintClass(modelValue.max)"
     >
-      Maximum: {{ constraints.max.value }}
+      Maximum: {{ modelValue.max.value }}
     </div>
     <div
-      v-if="constraints.balanced?.enabled"
-      :class="constraintClass(constraints.balanced)"
+      v-if="modelValue.balanced?.enabled"
+      :class="constraintClass(modelValue.balanced)"
     >
-      Balanced: {{ prettyLink(constraints.balanced.balancerId) }}
+      Balanced: {{ prettyLink(modelValue.balanced.balancerId) }}
     </div>
   </div>
 </template>

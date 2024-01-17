@@ -1,4 +1,23 @@
+import '@quasar/extras/material-icons/material-icons.css';
+import '@quasar/extras/mdi-v4/mdi-v4.css';
+import '@quasar/extras/roboto-font/roboto-font.css';
 import '@/css/app.sass';
+import { setAutoFreeze } from 'immer';
+import { createPinia } from 'pinia';
+import PortalVue from 'portal-vue';
+import {
+  Cookies,
+  Dialog,
+  LocalStorage,
+  Meta,
+  Notify,
+  Quasar,
+  QuasarPluginOptions,
+  Screen,
+  SessionStorage,
+} from 'quasar';
+import { computed, createApp, ref } from 'vue';
+import vuedraggable from 'vuedraggable';
 import builder from '@/plugins/builder';
 import history from '@/plugins/history';
 import misc from '@/plugins/misc';
@@ -15,27 +34,6 @@ import { useSystemStore } from '@/store/system';
 import { useWidgetStore } from '@/store/widgets';
 import { DenseKey, NowKey, TouchKey } from '@/symbols';
 import { globRegister } from '@/utils/component-ref';
-import '@quasar/extras/material-icons/material-icons.css';
-import '@quasar/extras/mdi-v4/mdi-v4.css';
-import '@quasar/extras/roboto-font/roboto-font.css';
-import { createPinia } from 'pinia';
-import PortalVue from 'portal-vue';
-import {
-  Cookies,
-  Dialog,
-  LocalStorage,
-  Meta,
-  Notify,
-  Quasar,
-  QuasarPluginOptions,
-  Screen,
-  SessionStorage,
-} from 'quasar';
-import { computed, createApp, ref } from 'vue';
-import vuedraggable from 'vuedraggable';
-// Assumes your root component is App.vue
-// and placed in same folder as main.js
-import { setAutoFreeze } from 'immer';
 import App from './App.vue';
 
 const quasarOpts: Partial<QuasarPluginOptions> = {

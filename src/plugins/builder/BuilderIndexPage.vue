@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { startupDone } from '@/user-settings';
 import { makeObjectSorter } from '@/utils/functional';
-import { computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { BuilderLayout } from './types';
 import { startCreateLayout } from './utils';
 

@@ -1,15 +1,15 @@
 /// <reference types="vitest" />
-import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
-import inject from '@rollup/plugin-inject';
-import vue from '@vitejs/plugin-vue';
 import * as fs from 'fs';
 import { ServerOptions } from 'https';
 import * as path from 'path';
+import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
+import inject from '@rollup/plugin-inject';
+import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig, PluginOption, UserConfig } from 'vite';
+import { defineConfig, PluginOption } from 'vite';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }): UserConfig => {
+export default defineConfig(({ command, mode }) => {
   const buildDate = new Date().toISOString();
   const performanceEnabled = false;
 
@@ -20,7 +20,7 @@ export default defineConfig(({ command, mode }): UserConfig => {
   let apiProtocol: 'http' | 'https' | undefined = undefined;
   let apiHost: string | undefined = undefined;
   let apiPort: number | undefined = undefined;
-  let serverHttps: ServerOptions | boolean = false;
+  let serverHttps: ServerOptions = {};
 
   const plugins: PluginOption[] = [
     vue({
@@ -36,7 +36,7 @@ export default defineConfig(({ command, mode }): UserConfig => {
     apiProtocol = 'http';
     apiHost = 'localhost';
     apiPort = 9001;
-    serverHttps = false;
+    serverHttps = {};
   }
 
   if (isDev) {
@@ -44,8 +44,9 @@ export default defineConfig(({ command, mode }): UserConfig => {
     apiHost = undefined;
     apiPort = 9001;
     serverHttps = {
-      key: fs.readFileSync('./dev/traefik/brewblox.key'),
-      cert: fs.readFileSync('./dev/traefik/brewblox.crt'),
+      ca: fs.readFileSync('./dev/traefik/minica.pem'),
+      key: fs.readFileSync('./dev/traefik/brew.blox/key.pem'),
+      cert: fs.readFileSync('./dev/traefik/brew.blox/cert.pem'),
     };
 
     // Disabled because it fails to infer types from global components
@@ -97,7 +98,7 @@ export default defineConfig(({ command, mode }): UserConfig => {
       open: false,
       host: '0.0.0.0',
       port: 8080,
-      base: '/ui/',
+      // base: '/ui/',
       https: serverHttps,
     },
 

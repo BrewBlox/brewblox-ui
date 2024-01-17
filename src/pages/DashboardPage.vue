@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useGlobals, useKiosk } from '@/composables';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { WidgetContext } from '@/store/features';
@@ -6,8 +8,6 @@ import { useWidgetStore, Widget } from '@/store/widgets';
 import { startChangeDashboardTitle } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { computed, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
 
 const widgetSorter = makeObjectSorter<Widget>('order');
 

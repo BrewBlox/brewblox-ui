@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import { svgPathProperties } from 'svg-path-properties';
-import { computed, PropType } from 'vue';
+import { computed } from 'vue';
 
-const props = defineProps({
-  colors: {
-    type: Array as PropType<string[]>,
-    required: true,
-  },
-  paths: {
-    type: Array as PropType<string[]>,
-    required: true,
-  },
-});
+interface Props {
+  colors: string[];
+  paths: string[];
+}
+
+const props = defineProps<Props>();
 
 const pathLengths = computed<number[]>(() =>
   props.paths.map((v) => new svgPathProperties(v).getTotalLength()),

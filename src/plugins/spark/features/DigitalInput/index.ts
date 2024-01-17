@@ -1,11 +1,3 @@
-import { genericBlockFeature } from '@/plugins/spark/generic';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { enumHint } from '@/plugins/spark/utils/formatting';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { bloxLink } from '@/utils/link';
-import { bloxQty } from '@/utils/quantity';
 import {
   BlockIntfType,
   BlockType,
@@ -14,6 +6,14 @@ import {
   ToggleBehavior,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { enumHint } from '@/plugins/spark/utils/formatting';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { bloxLink } from '@/utils/link';
+import { bloxQty } from '@/utils/quantity';
 import widget from './DigitalInputWidget.vue';
 
 const type = BlockType.DigitalInput;
@@ -27,6 +27,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<DigitalInputBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): DigitalInputBlock['data'] => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         channel: 0,

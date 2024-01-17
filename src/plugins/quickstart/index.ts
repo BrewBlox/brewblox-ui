@@ -1,5 +1,5 @@
-import { globRegister } from '@/utils/component-ref';
 import { Plugin } from 'vue';
+import { globRegister } from '@/utils/component-ref';
 import BrewKettle from './BrewKettle';
 import Ferment from './Ferment';
 import Fridge from './Fridge';

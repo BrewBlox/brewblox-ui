@@ -1,50 +1,56 @@
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
 import { SPARK_SNIPPET_NAMESPACE } from '@/const';
 import { createApi } from '@/database/api';
 import { BlockDataSnippet } from '@/plugins/spark/types';
 import { concatById, filterById, findById } from '@/utils/collections';
-import { defineStore } from 'pinia';
 
 const blockSnippetsApi = createApi<BlockDataSnippet>({
   namespace: SPARK_SNIPPET_NAMESPACE,
 });
 
-interface BlockSnippetStoreState {
-  blockSnippets: BlockDataSnippet[];
-}
+export const useBlockSnippetStore = defineStore('blockSnippetStore', () => {
+  const blockSnippets = ref<BlockDataSnippet[]>([]);
 
-export const useBlockSnippetStore = defineStore('blockSnippetStore', {
-  state: (): BlockSnippetStoreState => ({
-    blockSnippets: [],
-  }),
-  getters: {
-    blockSnippetIds: (state): string[] => state.blockSnippets.map((v) => v.id),
-  },
-  actions: {
-    snippetById(id: string): BlockDataSnippet | null {
-      return findById(this.blockSnippets, id);
-    },
+  const blockSnippetIds = computed<string[]>(() =>
+    blockSnippets.value.map((v) => v.id),
+  );
 
-    async createSnippet(preset: BlockDataSnippet): Promise<void> {
-      await blockSnippetsApi.create(preset); // triggers callback
-    },
+  function snippetById(id: string): BlockDataSnippet | null {
+    return findById(blockSnippets.value, id);
+  }
 
-    async saveSnippet(preset: BlockDataSnippet): Promise<void> {
-      await blockSnippetsApi.persist(preset); // triggers callback
-    },
+  async function createSnippet(preset: BlockDataSnippet): Promise<void> {
+    await blockSnippetsApi.create(preset); // triggers callback
+  }
 
-    async removeSnippet(preset: BlockDataSnippet): Promise<void> {
-      await blockSnippetsApi.remove(preset); // triggers callback
-    },
+  async function saveSnippet(preset: BlockDataSnippet): Promise<void> {
+    await blockSnippetsApi.persist(preset); // triggers callback
+  }
 
-    async start(): Promise<void> {
-      const onChange = async (preset: BlockDataSnippet): Promise<void> => {
-        this.blockSnippets = concatById(this.blockSnippets, preset);
-      };
-      const onDelete = (id: string): void => {
-        this.blockSnippets = filterById(this.blockSnippets, { id });
-      };
-      this.blockSnippets = await blockSnippetsApi.fetch();
-      blockSnippetsApi.subscribe(onChange, onDelete);
-    },
-  },
+  async function removeSnippet(preset: BlockDataSnippet): Promise<void> {
+    await blockSnippetsApi.remove(preset); // triggers callback
+  }
+
+  async function start(): Promise<void> {
+    blockSnippets.value = await blockSnippetsApi.fetch();
+    blockSnippetsApi.subscribe(
+      (snippet) => {
+        blockSnippets.value = concatById(blockSnippets.value, snippet);
+      },
+      (id) => {
+        blockSnippets.value = filterById(blockSnippets.value, { id });
+      },
+    );
+  }
+
+  return {
+    blockSnippets,
+    blockSnippetIds,
+    snippetById,
+    createSnippet,
+    saveSnippet,
+    removeSnippet,
+    start,
+  };
 });

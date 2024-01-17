@@ -1,5 +1,4 @@
-import { useBuilderStore } from '@/plugins/builder/store';
-import produce from 'immer';
+import { produce } from 'immer';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import keyBy from 'lodash/keyBy';
@@ -13,6 +12,7 @@ import {
   toRaw,
   watch,
 } from 'vue';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { calculateNormalizedFlows } from '../calculateFlows';
 import { FlowsKey } from '../symbols';
 import {

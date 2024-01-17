@@ -1,8 +1,8 @@
+import { computed, ComputedRef, inject } from 'vue';
 import { useDashboardStore } from '@/store/dashboards';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { computed, ComputedRef, inject } from 'vue';
 import { PartKey, PatchSettingsKey } from '../symbols';
 import { settingsProp } from '../utils';
 

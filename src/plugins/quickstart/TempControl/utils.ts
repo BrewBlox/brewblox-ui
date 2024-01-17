@@ -1,7 +1,3 @@
-import { useSparkStore } from '@/plugins/spark/store';
-import { createBlockDialogPromise } from '@/utils/block-dialog';
-import { makeTypeFilter } from '@/utils/functional';
-import { bloxLink } from '@/utils/link';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -18,6 +14,10 @@ import {
   TempSensorMockBlock,
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createBlockDialogPromise } from '@/utils/block-dialog';
+import { makeTypeFilter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 import { TempControlConfig, TempControlMode } from './types';
 
 interface TempControlBlocks {

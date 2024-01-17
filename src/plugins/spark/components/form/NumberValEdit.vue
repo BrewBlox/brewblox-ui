@@ -1,42 +1,38 @@
-<script lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
+<script setup lang="ts">
+import { ref } from 'vue';
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
-import { defineComponent, ref } from 'vue';
 
-export default defineComponent({
-  name: 'NumberValEdit',
-  props: {
-    ...useValEdit.props,
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<number>();
-    const local = ref<number>(field.value);
+type VT = number;
 
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: field.value,
-          type: 'number',
-        },
-      }).onOk((v) => (field.value = v));
-    }
-
-    function syncField(): void {
-      if (isFinite(local.value)) {
-        field.value = local.value;
-      }
-    }
-
-    return {
-      local,
-      startEdit,
-      showKeyboard,
-      syncField,
-    };
-  },
+withDefaults(defineProps<UseValEditProps<VT>>(), {
+  ...useValEdit.defaultProps<VT>(),
 });
+
+defineEmits<UseValEditEmits<VT>>();
+
+const { field, startEdit } = useValEdit.setup<VT>();
+const local = ref<number>(field.value);
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: field.value,
+      type: 'number',
+    },
+  }).onOk((v) => (field.value = v));
+}
+
+function syncField(): void {
+  if (isFinite(local.value)) {
+    field.value = local.value;
+  }
+}
 </script>
 
 <template>

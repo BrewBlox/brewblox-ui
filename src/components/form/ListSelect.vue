@@ -1,41 +1,29 @@
 <script setup lang="ts">
 import isObject from 'lodash/isObject';
-import { computed, PropType } from 'vue';
+import { VueClassProp } from 'quasar';
+import { computed } from 'vue';
 
-const props = defineProps({
-  modelValue: {
-    type: [Object, String, Number, Symbol] as PropType<any>,
-    default: null,
-  },
-  options: {
-    type: Array as PropType<any[]>,
-    required: true,
-  },
-  optionValue: {
-    type: String,
-    default: 'id',
-  },
-  optionLabel: {
-    type: String,
-    default: 'title',
-  },
-  optionClass: {
-    type: [String, Array, Object],
-    default: '',
-  },
-  emitValue: {
-    type: Boolean,
-    default: false,
-  },
-  dense: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  modelValue: any;
+  options: any[];
+  optionValue?: string;
+  optionLabel?: string;
+  optionClass?: VueClassProp;
+  emitValue?: boolean;
+  dense?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  optionValue: 'id',
+  optionLabel: 'title',
+  optionClass: '',
+  emitValue: false,
+  dense: false,
 });
 
 const emit = defineEmits<{
-  (e: 'update:model-value', value: any | null): void;
-  (e: 'confirm', value: any): void;
+  'update:modelValue': [value: any | null];
+  confirm: [value: any];
 }>();
 
 const mappedOptions = computed<any[]>(() =>
@@ -69,9 +57,9 @@ function selectValue(opt: any, save: boolean): void {
   if (save) {
     emit('confirm', value);
   } else if (matches(opt)) {
-    emit('update:model-value', null);
+    emit('update:modelValue', null);
   } else {
-    emit('update:model-value', value);
+    emit('update:modelValue', value);
   }
 }
 </script>

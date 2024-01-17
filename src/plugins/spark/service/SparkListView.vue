@@ -1,19 +1,23 @@
-<script lang="ts">
+<script setup lang="ts">
+import { Block, BlockType } from 'brewblox-proto/ts';
+import capitalize from 'lodash/capitalize';
+import { computed, nextTick, ref } from 'vue';
 import { useElementRefs, useGlobals } from '@/composables';
 import { useFeatureStore, WidgetRole } from '@/store/features';
-import { useServiceStore } from '@/store/services';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { Block, BlockType } from 'brewblox-proto/ts';
-import capitalize from 'lodash/capitalize';
-import { computed, defineComponent, nextTick, ref } from 'vue';
 import { useBlockSpecStore, useSparkStore } from '../store';
-import { SparkService } from '../types';
 import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';
 import { ListRenderAddress } from './types';
 
 type ItemSortFunction = (a: ListRenderAddress, b: ListRenderAddress) => number;
+
+interface Props {
+  serviceId: string;
+}
+
+const props = defineProps<Props>();
 
 const roleIcons: Record<WidgetRole, string> = {
   Display: 'mdi-monitor-dashboard',
@@ -40,162 +44,119 @@ const allSorters: Mapped<ItemSortFunction> = {
   role: (a, b): number => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role),
 };
 
-export default defineComponent({
-  name: 'SparkListView',
-  components: {
-    SparkListWidgetWrapper,
-  },
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const { dense } = useGlobals.setup();
-    const { getElementRef, setElementRef } = useElementRefs.setup();
-    const sparkStore = useSparkStore();
-    const specStore = useBlockSpecStore();
-    const featureStore = useFeatureStore();
-    const serviceStore = useServiceStore();
+const { dense } = useGlobals.setup();
+const { getElementRef, setElementRef } = useElementRefs.setup();
+const sparkStore = useSparkStore();
+const specStore = useBlockSpecStore();
+const featureStore = useFeatureStore();
 
-    const validTypes = specStore.blockSpecs.map((s) => s.type);
+const validTypes = specStore.blockSpecs.map((s) => s.type);
 
-    const searchText = ref<string | null>(null);
-    const searchExpression = computed<RegExp>(() =>
-      RegExp(searchText.value ?? '', 'i'),
-    );
+const searchText = ref<string | null>(null);
+const searchExpression = computed<RegExp>(() =>
+  RegExp(searchText.value ?? '', 'i'),
+);
 
-    const service = computed<SparkService | null>(() =>
-      serviceStore.serviceById(props.serviceId),
-    );
-
-    const sorting = computed<string>({
-      get: () => sparkStore.sessionConfigByService(props.serviceId).sorting,
-      set: (v) =>
-        sparkStore.updateSessionConfig(props.serviceId, { sorting: v }),
-    });
-
-    const sorter = computed<ItemSortFunction>(
-      () => allSorters[sorting.value] ?? (() => 0),
-    );
-
-    const expanded = computed<string[]>({
-      get: () => sparkStore.sessionConfigByService(props.serviceId).expanded,
-      set: (v) =>
-        sparkStore.updateSessionConfig(props.serviceId, { expanded: v }),
-    });
-
-    const allRenderItems = computed<ListRenderAddress[]>(() => {
-      const blockItems =
-        sparkStore
-          .blocksByService(props.serviceId)
-          .filter((block) => validTypes.includes(block.type))
-          .map((block) => ({
-            serviceId: props.serviceId,
-            id: block.id,
-            type: block.type,
-            name: block.id,
-            title: featureStore.widgetTitle(block.type),
-            role: featureStore.widgetRole(block.type),
-          }))
-          .sort(sorter.value) ?? [];
-
-      // Override sorting - Device Info should always come first
-      const sysIdx = blockItems.findIndex((v) => v.type === BlockType.SysInfo);
-      if (sysIdx !== -1) {
-        blockItems.unshift(...blockItems.splice(sysIdx, 1));
-      }
-
-      return blockItems;
-    });
-
-    const filteredRenderItems = computed<ListRenderAddress[]>(() =>
-      allRenderItems.value.filter((item) =>
-        searchExpression.value.test(`${item.id} ${item.title}`),
-      ),
-    );
-
-    const expandedRenderItems = computed<ListRenderAddress[]>(() =>
-      filteredRenderItems.value.filter((item) =>
-        expanded.value.includes(item.id),
-      ),
-    );
-
-    function scrollTo(id: string): void {
-      getElementRef(id)?.scrollIntoView();
-    }
-
-    function setExpanded(id: string, enabled: boolean): void {
-      const isExpanded = expanded.value.includes(id);
-      if (isExpanded !== enabled) {
-        const base = expanded.value.filter((v) => v !== id);
-        expanded.value = enabled ? [...base, id] : base;
-      }
-      if (enabled) {
-        nextTick(() => scrollTo(id));
-      }
-    }
-
-    function expandAll(): void {
-      expanded.value = filteredRenderItems.value.map((v) => v.id);
-    }
-
-    function expandNone(): void {
-      expanded.value = [];
-    }
-
-    function onItemClick(item: ListRenderAddress): void {
-      if (dense.value) {
-        createBlockDialog(item, { mode: 'Basic' });
-      } else {
-        setExpanded(item.id, true);
-      }
-    }
-
-    function startCreateBlock(): void {
-      createDialog({
-        component: 'BlockWizardDialog',
-        componentProps: {
-          serviceId: props.serviceId,
-        },
-      }).onOk((block: Maybe<Block>) => {
-        if (block) {
-          setExpanded(block.id, true);
-        }
-      });
-    }
-
-    function showSearchKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: searchText.value ?? '',
-        },
-      }).onOk((v) => (searchText.value = v));
-    }
-
-    return {
-      capitalize,
-      roleIcons,
-      allSorters,
-      dense,
-      setElementRef,
-      searchText,
-      service,
-      sorting,
-      expanded,
-      filteredRenderItems,
-      expandedRenderItems,
-      setExpanded,
-      expandAll,
-      expandNone,
-      onItemClick,
-      startCreateBlock,
-      showSearchKeyboard,
-    };
-  },
+const sorting = computed<string>({
+  get: () => sparkStore.sessionConfigByService(props.serviceId).sorting,
+  set: (v) => sparkStore.updateSessionConfig(props.serviceId, { sorting: v }),
 });
+
+const sorter = computed<ItemSortFunction>(
+  () => allSorters[sorting.value] ?? (() => 0),
+);
+
+const expanded = computed<string[]>({
+  get: () => sparkStore.sessionConfigByService(props.serviceId).expanded,
+  set: (v) => sparkStore.updateSessionConfig(props.serviceId, { expanded: v }),
+});
+
+const allRenderItems = computed<ListRenderAddress[]>(() => {
+  const blockItems =
+    sparkStore
+      .blocksByService(props.serviceId)
+      .filter((block) => validTypes.includes(block.type))
+      .map((block) => ({
+        serviceId: props.serviceId,
+        id: block.id,
+        type: block.type,
+        name: block.id,
+        title: featureStore.widgetTitle(block.type),
+        role: featureStore.widgetRole(block.type),
+      }))
+      .sort(sorter.value) ?? [];
+
+  // Override sorting - Device Info should always come first
+  const sysIdx = blockItems.findIndex((v) => v.type === BlockType.SysInfo);
+  if (sysIdx !== -1) {
+    blockItems.unshift(...blockItems.splice(sysIdx, 1));
+  }
+
+  return blockItems;
+});
+
+const filteredRenderItems = computed<ListRenderAddress[]>(() =>
+  allRenderItems.value.filter((item) =>
+    searchExpression.value.test(`${item.id} ${item.title}`),
+  ),
+);
+
+const expandedRenderItems = computed<ListRenderAddress[]>(() =>
+  filteredRenderItems.value.filter((item) => expanded.value.includes(item.id)),
+);
+
+function scrollTo(id: string): void {
+  getElementRef(id)?.scrollIntoView();
+}
+
+function setExpanded(id: string, enabled: boolean): void {
+  const isExpanded = expanded.value.includes(id);
+  if (isExpanded !== enabled) {
+    const base = expanded.value.filter((v) => v !== id);
+    expanded.value = enabled ? [...base, id] : base;
+  }
+  if (enabled) {
+    nextTick(() => scrollTo(id));
+  }
+}
+
+function expandAll(): void {
+  expanded.value = filteredRenderItems.value.map((v) => v.id);
+}
+
+function expandNone(): void {
+  expanded.value = [];
+}
+
+function onItemClick(item: ListRenderAddress): void {
+  if (dense.value) {
+    createBlockDialog(item, { mode: 'Basic' });
+  } else {
+    setExpanded(item.id, true);
+  }
+}
+
+function startCreateBlock(): void {
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: props.serviceId,
+    },
+  }).onOk((block: Maybe<Block>) => {
+    if (block) {
+      setExpanded(block.id, true);
+    }
+  });
+}
+
+function showSearchKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: searchText.value ?? '',
+    },
+  }).onOk((v) => (searchText.value = v));
+}
 </script>
 
 <template>

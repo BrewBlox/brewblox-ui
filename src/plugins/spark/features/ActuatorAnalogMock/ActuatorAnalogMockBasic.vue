@@ -1,22 +1,9 @@
-<script lang="ts">
-import { useBlockWidget } from '@/plugins/spark/composables';
+<script setup lang="ts">
 import { ActuatorAnalogMockBlock } from 'brewblox-proto/ts';
-import { defineComponent } from 'vue';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
-export default defineComponent({
-  name: 'ActuatorAnalogMockBasic',
-  setup() {
-    const { serviceId, block, isClaimed, patchBlock } =
-      useBlockWidget.setup<ActuatorAnalogMockBlock>();
-
-    return {
-      serviceId,
-      block,
-      isClaimed,
-      patchBlock,
-    };
-  },
-});
+const { serviceId, block, isClaimed, patchBlock } =
+  useBlockWidget.setup<ActuatorAnalogMockBlock>();
 </script>
 
 <template>
@@ -52,7 +39,7 @@ export default defineComponent({
         class="col-grow"
       />
       <AnalogConstraintsField
-        :model-value="block.data.constraints"
+        :model-value="block.data.constraints || {}"
         :service-id="serviceId"
         class="col-grow"
       />

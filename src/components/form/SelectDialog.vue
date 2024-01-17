@@ -1,57 +1,38 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import { defineComponent, PropType, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 
-export default defineComponent({
-  name: 'SelectDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: [Object, String, Number, Symbol] as PropType<any>,
-      default: null,
-    },
-    selectOptions: {
-      type: Array,
-      required: true,
-    },
-    selectProps: {
-      type: Object,
-      default: () => ({}),
-    },
-    listSelect: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: any;
+  selectOptions: any[];
+  selectProps?: AnyDict;
+  listSelect?: boolean;
+}
 
-    const local = ref<any>(props.modelValue);
-
-    function save(value: any): void {
-      if (value !== null || props.selectProps.clearable) {
-        onDialogOK(value);
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  selectProps: () => ({}),
+  listSelect: false,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup();
+
+const local = ref<any>(props.modelValue);
+
+function save(value: any): void {
+  if (value !== null || props.selectProps.clearable) {
+    onDialogOK(value);
+  }
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save(local)"
   >

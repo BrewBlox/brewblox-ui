@@ -101,10 +101,14 @@ export const PROFILE_TYPES = [BlockType.SetpointProfile] as const;
 export type DigitalBlockT = DigitalActuatorBlock;
 export const DIGITAL_TYPES = [BlockType.DigitalActuator] as const;
 
-export type DigitalBaseBlockT = DigitalActuatorBlock | DigitalInputBlock;
+export type DigitalBaseBlockT =
+  | DigitalActuatorBlock
+  | MotorValveBlock
+  | DigitalInputBlock;
 export const DIGITAL_BASE_KEY = 'digitalBase';
 export const DIGITAL_BASE_TYPES = [
   BlockType.DigitalActuator,
+  BlockType.MotorValve,
   BlockType.DigitalInput,
 ] as const;
 

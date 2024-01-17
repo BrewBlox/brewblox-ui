@@ -1,61 +1,38 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
 import { createDialog } from '@/utils/dialog';
-import { computed, defineComponent } from 'vue';
 import { usePart } from '../../composables';
 
-export default defineComponent({
-  name: 'SliderMenuContent',
-  props: {
-    settingsKey: {
-      type: String,
-      required: true,
-    },
-    min: {
-      type: Number,
-      required: true,
-    },
-    max: {
-      type: Number,
-      required: true,
-    },
-    default: {
-      type: Number,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    postfix: {
-      type: String,
-      default: '',
-    },
-  },
-  setup(props) {
-    const { settings, patchSettings } = usePart.setup();
+interface Props {
+  settingsKey: string;
+  min: number;
+  max: number;
+  default: number;
+  label: string;
+  postfix?: string;
+}
 
-    const settingValue = computed<number>(
-      () => settings.value[props.settingsKey] ?? props.default,
-    );
-
-    function edit(): void {
-      createDialog({
-        component: 'SliderDialog',
-        componentProps: {
-          modelValue: settingValue.value,
-          title: props.label,
-          min: props.min,
-          max: props.max,
-        },
-      }).onOk((v) => patchSettings({ [props.settingsKey]: v }));
-    }
-
-    return {
-      settingValue,
-      edit,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  postfix: '',
 });
+
+const { settings, patchSettings } = usePart.setup();
+
+const settingValue = computed<number>(
+  () => settings.value[props.settingsKey] ?? props.default,
+);
+
+function edit(): void {
+  createDialog({
+    component: 'SliderDialog',
+    componentProps: {
+      modelValue: settingValue.value,
+      title: props.label,
+      min: props.min,
+      max: props.max,
+    },
+  }).onOk((v) => patchSettings({ [props.settingsKey]: v }));
+}
 </script>
 
 <template>

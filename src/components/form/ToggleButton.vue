@@ -1,44 +1,32 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 
-export default defineComponent({
-  name: 'ToggleButton',
-  props: {
-    modelValue: {
-      type: Boolean,
-      required: true,
-    },
-    colored: {
-      type: Boolean,
-      default: true,
-    },
-    iconEnabled: {
-      type: String,
-      default: 'mdi-checkbox-marked-outline',
-    },
-    iconDisabled: {
-      type: String,
-      default: 'mdi-checkbox-blank-outline',
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props) {
-    const icon = computed<string>(() =>
-      props.modelValue ? props.iconEnabled : props.iconDisabled,
-    );
+interface Props {
+  modelValue: boolean;
+  colored?: boolean;
+  iconEnabled?: string;
+  iconDisabled?: string;
+}
 
-    const color = computed<string>(() => {
-      if (!props.colored) {
-        return '';
-      }
-      return props.modelValue ? 'primary' : 'smoke';
-    });
+const props = withDefaults(defineProps<Props>(), {
+  colored: true,
+  iconEnabled: 'mdi-checkbox-marked-outline',
+  iconDisabled: 'mdi-checkbox-blank-outline',
+});
 
-    return {
-      icon,
-      color,
-    };
-  },
+defineEmits<{
+  'update:modelValue': [payload: boolean];
+}>();
+
+const icon = computed<string>(() =>
+  props.modelValue ? props.iconEnabled : props.iconDisabled,
+);
+
+const color = computed<string>(() => {
+  if (!props.colored) {
+    return '';
+  }
+  return props.modelValue ? 'primary' : 'smoke';
 });
 </script>
 

@@ -1,3 +1,11 @@
+import {
+  Block,
+  BlockIntfType,
+  BlockType,
+  DisplaySlot,
+} from 'brewblox-proto/ts';
+import isMatch from 'lodash/isMatch';
+import range from 'lodash/range';
 import { typeName as graphType } from '@/plugins/history/Graph/const';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
 import { useSparkStore } from '@/plugins/spark/store';
@@ -8,14 +16,6 @@ import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { notify } from '@/utils/notify';
-import {
-  Block,
-  BlockIntfType,
-  BlockType,
-  DisplaySlot,
-} from 'brewblox-proto/ts';
-import isMatch from 'lodash/isMatch';
-import range from 'lodash/range';
 import { asBlockAddress, makeBlockIdRules } from './configuration';
 import {
   isBlockCompatible,
@@ -51,7 +51,7 @@ export function startChangeBlockId(block: Maybe<Block>): void {
     return;
   }
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: block.id,
       title: 'Change block name',

@@ -1,19 +1,40 @@
-<script lang="ts">
-import { durationString, parseDate } from '@/utils/quantity';
-import find from 'lodash/find';
+<script setup lang="ts" generic="T extends QueryConfig">
+import { Quantity } from 'brewblox-proto/ts';
+import { produce } from 'immer';
 import isEqual from 'lodash/isEqual';
-import matches from 'lodash/matches';
 import { date as dateUtil } from 'quasar';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
+import { computed, toRaw } from 'vue';
+import {
+  bloxQty,
+  durationMs,
+  durationString,
+  parseDate,
+} from '@/utils/quantity';
 import { QueryConfig, QueryParams } from '../types';
 
+interface Props {
+  config: T;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:config': [payload: T];
+}>();
+
+/**
+ * Any given time span is expressed using one or two
+ * of the below properties.
+ * If only `start` or `duration` is given, the span is considered "live",
+ * with `end` moving with current time.
+ */
 interface PeriodDisplay {
   start: boolean;
   duration: boolean;
   end: boolean;
 }
 
-const periodOptions: SelectOption[] = [
+const periodOptions: SelectOption<PeriodDisplay>[] = [
   {
     label: 'Live: [duration] to now',
     value: { start: false, duration: true, end: false },
@@ -42,113 +63,99 @@ const paramDefaults = (): QueryParams => ({
   end: new Date().toISOString(),
 });
 
-export default defineComponent({
-  name: 'GraphPeriodEditor',
-  props: {
-    config: {
-      type: Object as PropType<QueryConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config'],
-  setup(props, { emit }) {
-    const local = ref({ ...props.config });
-    const period = ref(makePeriod(props.config.params));
+function update(cb: (draft: T) => void | T): void {
+  const updated = produce(toRaw(props.config), cb);
+  emit('update:config', updated);
+}
 
-    watch(
-      () => props.config.params,
-      (params) => {
-        period.value = makePeriod(params);
-      },
-    );
+function inferPeriod(params: QueryParams): PeriodDisplay {
+  const period: PeriodDisplay = {
+    start: params?.start != null,
+    duration: params?.duration != null,
+    end: params?.end != null,
+  };
+  const opts = periodOptions.map((opt) => opt.value);
+  const matching = opts.some((v) => isEqual(v, period));
+  return matching ? period : opts[0];
+}
 
-    function makePeriod(params: QueryParams): PeriodDisplay {
-      const period: PeriodDisplay = {
-        start: params?.start !== undefined,
-        duration: params?.duration !== undefined,
-        end: params?.end !== undefined,
-      };
-      const opts = periodOptions.map((opt) => opt.value);
-      const matching = opts.some((v) => isEqual(v, period));
-      return matching ? period : opts[0];
-    }
+/**
+ * Ensures the shape of the query params object matches the desired period.
+ *
+ * Adds default properties where required and not yet set.
+ * Properties that were set, but are no longer relevant, are set to undefined.
+ *
+ * @param draft
+ * @param period
+ */
+function sanitize(draft: T, period: PeriodDisplay): void {
+  const defaults = paramDefaults();
+  const { start, duration, end } = draft.params;
+  const startValue = start ?? defaults.start;
+  const durationValue = duration ?? defaults.duration;
+  const endValue = end ?? defaults.end;
 
-    function saveConfig(config: QueryConfig): void {
-      emit('update:config', config);
-    }
+  draft.params.start = period.start ? startValue : undefined;
+  draft.params.duration = period.duration ? durationValue : undefined;
+  draft.params.end = period.end ? endValue : undefined;
+}
 
-    function saveSanitized(period: PeriodDisplay): void {
-      const defaults = paramDefaults();
-      const { params } = local.value;
-      local.value.params = {
-        ...params,
-        start: !period.start ? undefined : params.start ?? defaults.start,
-        duration: !period.duration
-          ? undefined
-          : params.duration ?? defaults.duration,
-        end: !period.end ? undefined : params.end ?? defaults.end,
-      };
-      saveConfig(local.value);
-    }
+const period = computed<PeriodDisplay>({
+  get: () => inferPeriod(props.config.params),
+  set: (v) =>
+    update((draft) => {
+      // We can retain params from the previously selected
+      sanitize(draft, v ?? periodOptions[0].value);
+    }),
+});
 
-    const isLive = computed<boolean>(() => {
-      const opt = find(periodOptions, matches({ value: period.value }));
-      return opt !== undefined && opt.label.startsWith('Live');
-    });
+const isLive = computed<boolean>(() => {
+  return Object.values(period.value).filter((v) => v).length === 1;
+});
 
-    const start = computed<Date | null>({
-      get: () => parseDate(props.config.params.start),
-      set: (v) => {
-        local.value.params.start = v ? v.toISOString() : undefined;
-        saveSanitized(period.value);
-      },
-    });
+const start = computed<Date | null>({
+  get: () => parseDate(props.config.params.start),
+  set: (v) =>
+    update((draft) => {
+      draft.params.start = v ? v.toISOString() : undefined;
+      sanitize(draft, period.value);
+    }),
+});
 
-    const duration = computed<string>({
-      get: () => props.config.params.duration ?? '',
-      set: (v) => {
-        local.value.params.duration = durationString(v || '10m');
-        saveSanitized(period.value);
-      },
-    });
+const duration = computed<Quantity>({
+  get: () => bloxQty(props.config.params.duration ?? ''),
+  set: (v) =>
+    update((draft) => {
+      const ms = durationMs(v);
+      draft.params.duration = durationString(ms || '10m');
+      sanitize(draft, period.value);
+    }),
+});
 
-    const end = computed<Date | null>({
-      get: () => parseDate(props.config.params.end),
-      set: (v) => {
-        local.value.params.end = v ? v.toISOString() : undefined;
-        saveSanitized(period.value);
-      },
-    });
-
-    return {
-      periodOptions,
-      period,
-      isLive,
-      start,
-      duration,
-      end,
-      saveSanitized,
-    };
-  },
+const end = computed<Date | null>({
+  get: () => parseDate(props.config.params.end),
+  set: (v) =>
+    update((draft) => {
+      draft.params.end = v ? v.toISOString() : undefined;
+      sanitize(draft, period.value);
+    }),
 });
 </script>
 
 <template>
   <div class="row">
     <q-select
-      :model-value="period"
+      v-model="period"
       :options="periodOptions"
       emit-value
       map-options
       label="Time period"
       class="col-auto"
-      @update:model-value="saveSanitized"
     />
     <div class="col-auto row q-gutter-x-sm q-mt-sm q-ml-none">
       <DatetimeField
         v-if="period.start"
         v-model="start"
-        emit-number
         title="Start time"
         label="Start date and time"
         class="col-auto min-width-sm"
@@ -163,7 +170,6 @@ export default defineComponent({
       <DatetimeField
         v-if="period.end"
         v-model="end"
-        emit-number
         title="End time"
         label="End date and time"
         class="col-auto min-width-sm"

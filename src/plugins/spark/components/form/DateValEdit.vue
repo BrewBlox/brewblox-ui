@@ -1,37 +1,34 @@
-<script lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
-import { parseDate, shortDateString } from '@/utils/quantity';
+<script setup lang="ts">
 import { DateString } from 'brewblox-proto/ts';
-import { computed, defineComponent, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
+import { parseDate, shortDateString } from '@/utils/quantity';
 
-export default defineComponent({
-  name: 'DateValEdit',
-  props: {
-    ...useValEdit.props,
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<DateString | null>();
+type VT = DateString | null;
 
-    const displayVal = computed<string>(() => shortDateString(field.value));
+withDefaults(defineProps<UseValEditProps<VT>>(), {
+  ...useValEdit.defaultProps<VT>(),
+});
 
-    onMounted(() => {
-      if (field.value == null) {
-        field.value = new Date().toISOString();
-      }
-    });
+defineEmits<UseValEditEmits<VT>>();
 
-    const date = computed<Date>({
-      get: () => parseDate(field.value) ?? new Date(),
-      set: (v: Date) => (field.value = v.toISOString()),
-    });
+const { field, startEdit } = useValEdit.setup<VT>();
 
-    return {
-      date,
-      displayVal,
-      startEdit,
-    };
-  },
+const displayVal = computed<string>(() => shortDateString(field.value));
+
+onMounted(() => {
+  if (field.value == null) {
+    field.value = new Date().toISOString();
+  }
+});
+
+const date = computed<Date>({
+  get: () => parseDate(field.value) ?? new Date(),
+  set: (v: Date) => (field.value = v.toISOString()),
 });
 </script>
 

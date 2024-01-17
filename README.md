@@ -22,10 +22,12 @@ sudo apt update
 sudo apt upgrade -y
 sudo apt install -y build-essential libssl-dev curl git python3-pip
 
-# Install Node Version Manager + Node.js + Yarn
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+# Install Node Version Manager + Node.js
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 nvm install --lts
-npm install -g yarn
+
+# Loads Yarn when used
+corepack enable
 
 # Install Docker
 curl -sL https://get.docker.com | bash
@@ -40,7 +42,7 @@ reboot
 After the reboot, run the following commands in the `brewblox-ui` directory:
 
 ``` bash
-yarn ci
+yarn install
 docker compose pull
 ```
 
@@ -74,6 +76,34 @@ yarn components
 # Develop is used by default, but a branch name argument can be used
 yarn firmware
 ```
+
+## Trusting the self-signed certificate
+
+On first run, `yarn start` generated CA and leaf certificates.
+When you navigate to `localhost:8080`, your browser shows a warning that the certificate is invalid.
+
+This can be resolved by importing the generated CA certificate in your browser.
+
+For Chrome:
+
+* "Settings"
+* -> "Privacy and security"
+* -> "Security"
+* -> "Manage device certificates"
+* -> "Authorities" (tab)
+* -> "Import" (button)
+* Select the "{REPO_ROOT}/dev/traefik/minica.pem" file
+* Select the "trust this CA to identify websites" option
+
+For Firefox:
+
+* "Settings"
+* -> "Privacy and security"
+* -> "View Certificates" (button, under *Certificates* header)
+* -> "Authorities" (tab)
+* -> "Import" (button)
+* Select the "{REPO_ROOT}/dev/traefik/minica.pem" file
+* Select the "trust this CA to identify websites" option
 
 ## Common issues
 

@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { useDialog, useGlobals } from '@/composables';
+import { nanoid } from 'nanoid';
+import { computed, provide, ref } from 'vue';
+import {
+  useDialog,
+  UseDialogEmits,
+  UseDialogProps,
+  useGlobals,
+} from '@/composables';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { nanoid } from 'nanoid';
-import { computed, PropType, provide, ref } from 'vue';
 import { PlaceholderKey } from '../symbols';
 import { BuilderBlueprint, BuilderPart } from '../types';
 import { coord2grid } from '../utils';
@@ -14,19 +19,21 @@ interface PartDisplay {
   blueprint: BuilderBlueprint;
 }
 
-const props = defineProps({
-  ...useDialog.props,
-  partial: {
-    type: Object as PropType<Partial<BuilderPart>>,
-    default: () => ({}),
-  },
+interface Props extends UseDialogProps {
+  partial?: Partial<BuilderPart>;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  partial: () => ({}),
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
 const builderStore = useBuilderStore();
 const { dense } = useGlobals.setup();
-const { dialogRef, dialogProps, onDialogHide, onDialogOK } = useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK } =
+  useDialog.setup<BuilderPart>();
 
 // Rendered parts should display dummy values instead of errors
 provide(PlaceholderKey, true);
@@ -67,7 +74,7 @@ function showSearchKeyboard(): void {
   createDialog({
     component: 'KeyboardDialog',
     componentProps: {
-      modelValue: partFilter.value ?? undefined,
+      modelValue: partFilter.value,
     },
   }).onOk((v: string) => (partFilter.value = v));
 }
@@ -77,7 +84,7 @@ function showSearchKeyboard(): void {
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     transition-hide="fade"
     @hide="onDialogHide"
   >

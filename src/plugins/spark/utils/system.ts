@@ -1,5 +1,3 @@
-import { useSparkStore } from '@/plugins/spark/store';
-import { makeTypeFilter } from '@/utils/functional';
 import {
   Block,
   DisplaySettingsBlock,
@@ -9,6 +7,8 @@ import {
   SystemBlockType,
   WiFiSettingsBlock,
 } from 'brewblox-proto/ts';
+import { useSparkStore } from '@/plugins/spark/store';
+import { makeTypeFilter } from '@/utils/functional';
 
 type SysBlockFn<BlockT extends Block> = (
   serviceId: string | null | undefined,

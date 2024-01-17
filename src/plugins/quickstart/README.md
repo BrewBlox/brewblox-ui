@@ -11,51 +11,34 @@ Tasks will be executed in order, and are expected to emit `back` and `next` even
 Storage is done using two synchronized properties: `config`, and `actions`.
 New Quickstart runs will be initialized with empty objects for both, and are expected to independently fill and use them.
 
-An example Task component:
+The property and emits definitions can be imported from the [use-task](./composables/use-task.ts) composable.
+
+An example Task component (using `script setup`):
 
 ```ts
-import { PropType, defineComponent } from 'vue';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 
 interface ExampleConfig {
   name: string;
   temperature: number;
 }
 
-type ExampleAction = (config: ExampleConfig) => Awaitable<void>;
+const props = defineProps<UseTaskProps<ExampleConfig>>();
 
-export default defineComponent({
-  name: 'ExampleComponent',
-  props: {
-    config: {
-      type: Object as PropType<ExampleConfig>,
-      required: true,
-    },
-    actions: {
-      type: Array as PropType<ExampleAction[]>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'update:actions', 'back', 'next', 'close'],
-  setup(props, { emit }) {
-    const temperature = computed<number>({
-      get: () => props.config.temperature,
-      set: (v) =>
-        emit('update:config', {
-          ...props.config,
-          temperature: v,
-        }),
-    });
+const emit = defineEmits<UseTaskEmits<ExampleConfig>>();
 
-    function addAction(action: ExampleAction): void {
-      emit('update:actions', [...props.actions, action]);
-    }
-
-    return {
-      temperature,
-      addAction,
-    };
-  },
+const temperature = computed<number>({
+  get: () => props.config.temperature,
+  set: (v) =>
+    emit('update:config', {
+      ...props.config,
+      temperature: v,
+    }),
 });
+
+function addAction(action: ExampleAction): void {
+  emit('update:actions', [...props.actions, action]);
+}
 ```
 
 `config` and `actions` are shared across all tasks.

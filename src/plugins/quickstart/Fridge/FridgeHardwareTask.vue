@@ -1,99 +1,73 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed, onBeforeMount, reactive, ref } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  PropType,
-  reactive,
-  ref,
-} from 'vue';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange, IoChannelAddress } from '../types';
 import { hasShared, resetGpioChanges } from '../utils';
 import { FridgeConfig } from './types';
 
-export default defineComponent({
-  name: 'FridgeHardwareTask',
-  props: {
-    config: {
-      type: Object as PropType<FridgeConfig>,
-      required: true,
+const props = defineProps<UseTaskProps<FridgeConfig>>();
+
+const emit = defineEmits<UseTaskEmits<FridgeConfig>>();
+
+const sparkStore = useSparkStore();
+
+const coolChannel = ref<IoChannelAddress | null>(
+  props.config.coolChannel ?? null,
+);
+const heatChannel = ref<IoChannelAddress | null>(
+  props.config.heatChannel ?? null,
+);
+const fridgeSensor = ref<string | null>(props.config.fridgeSensor ?? null);
+const changedGpio = reactive<GpioChange[]>(
+  props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
+);
+
+const channelSame = computed<boolean>(() =>
+  hasShared([coolChannel.value, heatChannel.value]),
+);
+
+const valuesOk = computed<boolean>(() =>
+  [
+    coolChannel.value,
+    heatChannel.value,
+    !channelSame.value,
+    fridgeSensor.value,
+  ].every(Boolean),
+);
+
+function discover(): void {
+  sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
+}
+
+function startBlockWizard(): void {
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: props.config.serviceId,
     },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const sparkStore = useSparkStore();
+  });
+}
 
-    const coolChannel = ref<IoChannelAddress | null>(
-      props.config.coolChannel ?? null,
-    );
-    const heatChannel = ref<IoChannelAddress | null>(
-      props.config.heatChannel ?? null,
-    );
-    const fridgeSensor = ref<string | null>(props.config.fridgeSensor ?? null);
-    const changedGpio = reactive<GpioChange[]>(
-      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
-    );
+function taskDone(): void {
+  if (!valuesOk.value) {
+    return;
+  }
+  const updates: Partial<FridgeConfig> = {
+    changedGpio,
+    heatChannel: heatChannel.value!,
+    coolChannel: coolChannel.value!,
+    fridgeSensor: fridgeSensor.value!,
+    renamedBlocks: {
+      [fridgeSensor.value!]: props.config.names.fridgeSensor,
+    },
+  };
+  emit('update:config', { ...props.config, ...updates });
+  emit('next');
+}
 
-    const channelSame = computed<boolean>(() =>
-      hasShared([coolChannel.value, heatChannel.value]),
-    );
-
-    const valuesOk = computed<boolean>(() =>
-      [
-        coolChannel.value,
-        heatChannel.value,
-        !channelSame.value,
-        fridgeSensor.value,
-      ].every(Boolean),
-    );
-
-    function discover(): void {
-      sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
-    }
-
-    function startBlockWizard(): void {
-      createDialog({
-        component: 'BlockWizardDialog',
-        componentProps: {
-          serviceId: props.config.serviceId,
-        },
-      });
-    }
-
-    function taskDone(): void {
-      if (!valuesOk.value) {
-        return;
-      }
-      const updates: Partial<FridgeConfig> = {
-        changedGpio,
-        heatChannel: heatChannel.value!,
-        coolChannel: coolChannel.value!,
-        fridgeSensor: fridgeSensor.value!,
-        renamedBlocks: {
-          [fridgeSensor.value!]: props.config.names.fridgeSensor,
-        },
-      };
-      emit('update:config', { ...props.config, ...updates });
-      emit('next');
-    }
-
-    onBeforeMount(() => discover());
-
-    return {
-      coolChannel,
-      heatChannel,
-      fridgeSensor,
-      changedGpio,
-      channelSame,
-      valuesOk,
-      discover,
-      startBlockWizard,
-      taskDone,
-    };
-  },
-});
+onBeforeMount(() => discover());
 </script>
 
 <template>

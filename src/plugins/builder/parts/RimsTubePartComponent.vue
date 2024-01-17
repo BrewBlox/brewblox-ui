@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
-import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/RimsTube';
 import { usePart } from '../composables';
 

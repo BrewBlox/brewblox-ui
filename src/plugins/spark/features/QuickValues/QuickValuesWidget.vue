@@ -1,122 +1,98 @@
-<script lang="ts">
+<script setup lang="ts">
+import { Block, Quantity } from 'brewblox-proto/ts';
+import isNumber from 'lodash/isNumber';
+import { debounce } from 'quasar';
+import { computed } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockFieldSpec } from '@/plugins/spark/types';
 import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
 import { prettyAny, prettyQty, roundedNumber } from '@/utils/quantity';
-import { Block, Quantity } from 'brewblox-proto/ts';
-import isNumber from 'lodash/isNumber';
-import { debounce } from 'quasar';
-import { computed, defineComponent } from 'vue';
 import { QuickValuesWidget } from './types';
 
-export default defineComponent({
-  name: 'QuickValuesWidget',
-  setup() {
-    const sparkStore = useSparkStore();
-    const specStore = useBlockSpecStore();
-    const { context } = useContext.setup();
-    const { widget, config, patchConfig } =
-      useWidget.setup<QuickValuesWidget>();
+const sparkStore = useSparkStore();
+const specStore = useBlockSpecStore();
+const { context } = useContext.setup();
+const { widget, config, patchConfig } = useWidget.setup<QuickValuesWidget>();
 
-    const fieldValue = computed<Quantity | number | null>(() =>
-      sparkStore.fieldByAddress(config.value.addr),
-    );
+const fieldValue = computed<Quantity | number | null>(() =>
+  sparkStore.fieldByAddress(config.value.addr),
+);
 
-    const numValue = computed<number | null>(() => {
-      const v = fieldValue.value;
-      return roundedNumber(isQuantity(v) ? v.value : v);
-    });
-
-    function blockFilter(block: Block): boolean {
-      return specStore.fieldSpecsByType(block.type).some((f) => !f.readonly);
-    }
-
-    function fieldFilter(field: BlockFieldSpec): boolean {
-      const v = field.generate();
-      return !field.readonly && (isNumber(v) || isQuantity(v));
-    }
-
-    function stringValue(value: number): string {
-      return isQuantity(fieldValue.value)
-        ? prettyQty({ ...fieldValue.value, value })
-        : `${value}`;
-    }
-
-    function appliedValue(value: number): number | Quantity {
-      return isQuantity(fieldValue.value)
-        ? { ...fieldValue.value, value }
-        : value;
-    }
-
-    const debouncedSave = debounce(
-      (value: number): void => {
-        const { field } = config.value.addr;
-        const block = sparkStore.blockByAddress(config.value.addr);
-        if (block && field) {
-          sparkStore.patchBlock(block, { [field]: appliedValue(value) });
-        }
-      },
-      300,
-      true,
-    );
-
-    function addValue(value: string, done: (v?: number) => void): void {
-      const parsed = Number(value);
-
-      if (Number.isFinite(parsed)) {
-        done(parsed);
-      } else {
-        notify.warn(`Input value is not a number: '${value}'`);
-        done();
-      }
-    }
-
-    function addSliderValue(value: string, done: (v?: number[]) => void): void {
-      const parsed = value.split(/[,:]/).map(Number);
-
-      let [min, max, step] = parsed;
-
-      if (max === undefined) {
-        max = min;
-        min = 0;
-      }
-
-      if (step === undefined) {
-        step = 1;
-      }
-
-      if (parsed.length > 3) {
-        notify.warn(`Too many values: '${value}'`);
-        return done();
-      }
-
-      if ([min, max, step].some((v) => !Number.isFinite(v))) {
-        notify.warn(`Unable to parse: '${value}'`);
-        return done();
-      }
-
-      done([min, max, step]);
-    }
-
-    return {
-      prettyAny,
-      context,
-      widget,
-      config,
-      patchConfig,
-      fieldValue,
-      numValue,
-      blockFilter,
-      fieldFilter,
-      stringValue,
-      debouncedSave,
-      addValue,
-      addSliderValue,
-    };
-  },
+const numValue = computed<number | null>(() => {
+  const v = fieldValue.value;
+  return roundedNumber(isQuantity(v) ? v.value : v);
 });
+
+function blockFilter(block: Block): boolean {
+  return specStore.fieldSpecsByType(block.type).some((f) => !f.readonly);
+}
+
+function fieldFilter(field: BlockFieldSpec): boolean {
+  const v = field.generate();
+  return !field.readonly && (isNumber(v) || isQuantity(v));
+}
+
+function stringValue(value: number): string {
+  return isQuantity(fieldValue.value)
+    ? prettyQty({ ...fieldValue.value, value })
+    : `${value}`;
+}
+
+function appliedValue(value: number): number | Quantity {
+  return isQuantity(fieldValue.value) ? { ...fieldValue.value, value } : value;
+}
+
+const debouncedSave = debounce(
+  (value: number): void => {
+    const { field } = config.value.addr;
+    const block = sparkStore.blockByAddress(config.value.addr);
+    if (block && field) {
+      sparkStore.patchBlock(block, { [field]: appliedValue(value) });
+    }
+  },
+  300,
+  true,
+);
+
+function addValue(value: string, done: (v?: number) => void): void {
+  const parsed = Number(value);
+
+  if (Number.isFinite(parsed)) {
+    done(parsed);
+  } else {
+    notify.warn(`Input value is not a number: '${value}'`);
+    done();
+  }
+}
+
+function addSliderValue(value: string, done: (v?: number[]) => void): void {
+  const parsed = value.split(/[,:]/).map(Number);
+
+  let [min, max, step] = parsed;
+
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+
+  if (step === undefined) {
+    step = 1;
+  }
+
+  if (parsed.length > 3) {
+    notify.warn(`Too many values: '${value}'`);
+    return done();
+  }
+
+  if ([min, max, step].some((v) => !Number.isFinite(v))) {
+    notify.warn(`Unable to parse: '${value}'`);
+    return done();
+  }
+
+  done([min, max, step]);
+}
 </script>
 
 <template>

@@ -1,16 +1,16 @@
 <script setup lang="ts">
+import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { userUnits } from '@/user-settings';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
-import { ReferenceKind, SetpointSensorPairBlock } from 'brewblox-proto/ts';
-import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,
   MIN_SIZE,
 } from '../blueprints/SetpointDriverDisplay';
 import { usePart, useSettingsBlock } from '../composables';
-import { DriverBlockT, DRIVER_KEY, DRIVER_TYPES } from '../const';
+import { DRIVER_KEY, DRIVER_TYPES, DriverBlockT } from '../const';
 import { liquidBorderColor } from '../utils';
 
 const sparkStore = useSparkStore();

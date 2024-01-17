@@ -1,4 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
+import { BlockIntfType, Link, TempSensorCombiBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_COMBINE_FUNC } from '@/plugins/spark/const';
@@ -7,74 +9,49 @@ import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { prettyQty } from '@/utils/quantity';
-import { BlockIntfType, Link, TempSensorCombiBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
 
 const combineFuncOpts = selectable(ENUM_LABELS_COMBINE_FUNC);
 
-export default defineComponent({
-  name: 'TempSensorCombiWidget',
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const sparkStore = useSparkStore();
-    const { serviceId, block, patchBlock } =
-      useBlockWidget.setup<TempSensorCombiBlock>();
+const { context, inDialog } = useContext.setup();
+const sparkStore = useSparkStore();
+const { serviceId, block, patchBlock } =
+  useBlockWidget.setup<TempSensorCombiBlock>();
 
-    const hasValue = computed<boolean>(
-      () => block.value.data.value.value !== null,
-    );
+const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
 
-    const sensors = computed<Link[]>(() => block.value.data.sensors);
+const sensors = computed<Link[]>(() => block.value.data.sensors);
 
-    function addSensor(): void {
-      createDialog({
-        component: 'LinkDialog',
-        componentProps: {
-          modelValue: bloxLink(null, BlockIntfType.TempSensorInterface),
-          title: 'Add sensor',
-          message:
-            'All linked sensors are evaluated to determine the output value',
-          label: 'Sensor',
-          serviceId,
-        },
-      }).onOk((sensor: Link) => {
-        patchBlock({ sensors: [...block.value.data.sensors, sensor] });
-      });
-    }
-
-    function removeSensor(idx: number): void {
-      patchBlock({
-        sensors: block.value.data.sensors.filter((_, i) => i !== idx),
-      });
-    }
-
-    function updateSensor(idx: number, value: Link): void {
-      const sensors = [...block.value.data.sensors];
-      sensors[idx] = value;
-      patchBlock({ sensors });
-    }
-
-    function sensorValue(link: Link): string {
-      const block = sparkStore.blockByLink(serviceId, link);
-      return prettyQty(block?.data.value ?? null);
-    }
-
-    return {
-      combineFuncOpts,
-      context,
-      inDialog,
+function addSensor(): void {
+  createDialog({
+    component: 'LinkDialog',
+    componentProps: {
+      modelValue: bloxLink(null, BlockIntfType.TempSensorInterface),
+      title: 'Add sensor',
+      message: 'All linked sensors are evaluated to determine the output value',
+      label: 'Sensor',
       serviceId,
-      block,
-      patchBlock,
-      sensors,
-      hasValue,
-      addSensor,
-      removeSensor,
-      updateSensor,
-      sensorValue,
-    };
-  },
-});
+    },
+  }).onOk((sensor: Link) => {
+    patchBlock({ sensors: [...block.value.data.sensors, sensor] });
+  });
+}
+
+function removeSensor(idx: number): void {
+  patchBlock({
+    sensors: block.value.data.sensors.filter((_, i) => i !== idx),
+  });
+}
+
+function updateSensor(idx: number, value: Link): void {
+  const sensors = [...block.value.data.sensors];
+  sensors[idx] = value;
+  patchBlock({ sensors });
+}
+
+function sensorValue(link: Link): string {
+  const block = sparkStore.blockByLink(serviceId, link);
+  return prettyQty(block?.data.value ?? null);
+}
 </script>
 
 <template>

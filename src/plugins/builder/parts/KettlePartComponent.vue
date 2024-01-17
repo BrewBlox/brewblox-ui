@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { colorString } from '@/plugins/builder/utils';
 import { computed } from 'vue';
+import { colorString } from '@/plugins/builder/utils';
 import {
   DEFAULT_KETTLE_FILL_PCT,
   DEFAULT_SIZE,

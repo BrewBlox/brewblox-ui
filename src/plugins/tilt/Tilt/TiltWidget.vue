@@ -1,63 +1,48 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { findById } from '@/utils/collections';
-import { computed, defineComponent } from 'vue';
 import { fieldLabels } from '../const';
 import { useTiltStore } from '../store';
 import { TiltStateValue } from '../types';
 import { makeTiltId, splitTiltId } from '../utils';
 import { TiltWidget } from './types';
 
-export default defineComponent({
-  name: 'TiltWidget',
-  setup() {
-    const tiltStore = useTiltStore();
-    const { context } = useContext.setup();
-    const { config, patchConfig } = useWidget.setup<TiltWidget>();
+const tiltStore = useTiltStore();
+const { context } = useContext.setup();
+const { config, patchConfig } = useWidget.setup<TiltWidget>();
 
-    const tiltOpts = computed<SelectOption<string>[]>(() =>
-      tiltStore.values.map((v) => ({ label: v.name, value: v.id })),
-    );
+const tiltOpts = computed<SelectOption<string>[]>(() =>
+  tiltStore.values.map((v) => ({ label: v.name, value: v.id })),
+);
 
-    const tiltId = computed<string | null>({
-      get: () => {
-        const { serviceId, mac } = config.value;
-        return serviceId && mac ? makeTiltId(serviceId, mac) : null;
-      },
-      set: (id) => {
-        if (id) {
-          const [serviceId, mac] = splitTiltId(id);
-          patchConfig({ serviceId, mac });
-        } else {
-          patchConfig({ serviceId: null, mac: null });
-        }
-      },
-    });
-
-    const value = computed<TiltStateValue | null>(() =>
-      findById(tiltStore.values, tiltId.value),
-    );
-
-    function setShown(key: string, value: boolean): void {
-      patchConfig({
-        hidden: {
-          ...config.value.hidden,
-          [key]: !value || undefined,
-        },
-      });
+const tiltId = computed<string | null>({
+  get: () => {
+    const { serviceId, mac } = config.value;
+    return serviceId && mac ? makeTiltId(serviceId, mac) : null;
+  },
+  set: (id) => {
+    if (id) {
+      const [serviceId, mac] = splitTiltId(id);
+      patchConfig({ serviceId, mac });
+    } else {
+      patchConfig({ serviceId: null, mac: null });
     }
-
-    return {
-      tiltOpts,
-      tiltId,
-      fieldLabels,
-      context,
-      config,
-      value,
-      setShown,
-    };
   },
 });
+
+const value = computed<TiltStateValue | null>(() =>
+  findById(tiltStore.values, tiltId.value),
+);
+
+function setShown(key: string, value: boolean): void {
+  patchConfig({
+    hidden: {
+      ...config.value.hidden,
+      [key]: !value || undefined,
+    },
+  });
+}
 </script>
 
 <template>

@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { useDialog } from '@/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
-import { createDialog } from '@/utils/dialog';
-import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 import {
   Quantity,
   SetpointProfileBlock,
@@ -11,25 +6,28 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
-import { PropType, ref } from 'vue';
+import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { calculateProfileValues } from '@/plugins/spark/utils/configuration';
+import { createDialog } from '@/utils/dialog';
+import { bloxQty, prettyUnit, tempQty } from '@/utils/quantity';
 
-const props = defineProps({
-  ...useDialog.props,
-  block: {
-    type: Object as PropType<SetpointProfileBlock>,
-    required: true,
-  },
-  title: {
-    type: String,
-    default: 'Desired Setpoint settings',
-  },
+interface Props extends UseDialogProps {
+  block: SetpointProfileBlock;
+  title?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Desired Setpoint settings',
 });
 
-defineEmits({ ...useDialog.emitsObject });
+defineEmits<UseDialogEmits>();
 
 const sparkStore = useSparkStore();
-const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-  useDialog.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<never>();
 const profile: SetpointProfileBlock = cloneDeep(props.block);
 const setpoint: SetpointSensorPairBlock | null = sparkStore.blockByLink(
   profile.serviceId,
@@ -78,7 +76,7 @@ async function confirm(): Promise<void> {
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="confirm"
   >

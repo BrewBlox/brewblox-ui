@@ -1,70 +1,63 @@
-<script lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
+<script setup lang="ts">
+import { Quantity } from 'brewblox-proto/ts';
+import { computed, ref } from 'vue';
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
-import { Quantity } from 'brewblox-proto/ts';
-import { computed, defineComponent, ref } from 'vue';
 
-export default defineComponent({
-  name: 'DurationValEdit',
-  props: {
-    ...useValEdit.props,
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<Quantity | string>();
-    const local = ref<string>(durationString(field.value));
+type VT = Quantity | string;
 
-    function findUnit(s: string | null): string {
-      if (!s) {
-        return '';
-      }
-      const match = s.match(/^[0-9\.]*([a-z]*)/i);
-      return match && match[1] ? match[1] : '';
-    }
-
-    const fallbackUnit = computed<string>(() =>
-      findUnit(local.value) ? '' : findUnit(durationString(field.value)),
-    );
-
-    const localMs = computed<number>(() =>
-      local.value ? durationMs(`${local.value}${fallbackUnit.value}`) : 0,
-    );
-
-    const displayValue = computed<string>(() => durationString(field.value));
-
-    function saveNormalized(): void {
-      local.value = durationString(localMs.value);
-      field.value = isQuantity(field.value)
-        ? bloxQty(localMs.value, 'ms')
-        : local.value;
-    }
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-          type: 'duration',
-        },
-      }).onOk((v) => {
-        local.value = v;
-        saveNormalized();
-      });
-    }
-
-    return {
-      startEdit,
-      local,
-      findUnit,
-      fallbackUnit,
-      displayValue,
-      saveNormalized,
-      showKeyboard,
-    };
-  },
+withDefaults(defineProps<UseValEditProps<VT>>(), {
+  ...useValEdit.defaultProps<VT>(),
 });
+
+defineEmits<UseValEditEmits<VT>>();
+
+const { field, startEdit } = useValEdit.setup<VT>();
+const local = ref<string>(durationString(field.value));
+
+function findUnit(s: string | null): string {
+  if (!s) {
+    return '';
+  }
+  const match = s.match(/^[0-9\.]*([a-z]*)/i);
+  return match && match[1] ? match[1] : '';
+}
+
+const fallbackUnit = computed<string>(() =>
+  findUnit(local.value) ? '' : findUnit(durationString(field.value)),
+);
+
+const localMs = computed<number>(() =>
+  local.value ? durationMs(`${local.value}${fallbackUnit.value}`) : 0,
+);
+
+const displayValue = computed<string>(() => durationString(field.value));
+
+function saveNormalized(): void {
+  local.value = durationString(localMs.value);
+  field.value = isQuantity(field.value)
+    ? bloxQty(localMs.value, 'ms')
+    : local.value;
+}
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+      type: 'duration',
+    },
+  }).onOk((v) => {
+    local.value = v;
+    saveNormalized();
+  });
+}
 </script>
 
 <template>

@@ -1,8 +1,7 @@
 <script setup lang="ts">
-// import type { SessionLogWidget } from '@/plugins/history/SessionLog/types';
+import { computed } from 'vue';
 import { useHistoryStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
-import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,

@@ -1,62 +1,43 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { makeRuleValidator } from '@/utils/rules';
-import { computed, defineComponent, PropType, ref } from 'vue';
 
-export default defineComponent({
-  name: 'DatetimeDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Date,
-      required: true,
-    },
-    label: {
-      type: String,
-      default: 'Date and time',
-    },
-    resetIcon: {
-      type: String,
-      default: 'restore',
-    },
-    rules: {
-      type: Array as PropType<InputRule[]>,
-      default: () => [],
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const local = ref<Date | null>(props.modelValue);
+interface Props extends UseDialogProps {
+  modelValue: Date;
+  label?: string;
+  resetIcon?: string;
+  rules?: InputRule[];
+}
 
-    const valid = computed<boolean>(() =>
-      makeRuleValidator(props.rules)(local.value),
-    );
-
-    function save(): void {
-      if (valid.value) {
-        onDialogOK(local.value);
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      valid,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  label: 'Date and time',
+  resetIcon: 'restore',
+  rules: () => [],
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<Date>();
+const local = ref<Date>(props.modelValue);
+
+const valid = computed<boolean>(() =>
+  makeRuleValidator(props.rules)(local.value),
+);
+
+function save(): void {
+  if (valid.value) {
+    onDialogOK(local.value);
+  }
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

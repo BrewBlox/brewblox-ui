@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { isAbsoluteUrl } from '@/utils/url';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { isAbsoluteUrl } from '@/utils/url';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/UrlDisplay';
 import { usePart } from '../composables';
 import { LABEL_KEY, URL_KEY } from '../const';

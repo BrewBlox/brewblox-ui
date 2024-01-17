@@ -1,10 +1,3 @@
-import { genericBlockFeature } from '@/plugins/spark/generic';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { bloxLink } from '@/utils/link';
-import { shortDateString, tempQty } from '@/utils/quantity';
 import {
   BlockIntfType,
   BlockType,
@@ -12,6 +5,13 @@ import {
   SetpointProfileBlock,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { bloxLink } from '@/utils/link';
+import { shortDateString, tempQty } from '@/utils/quantity';
 import widget from './SetpointProfileWidget.vue';
 
 const type = BlockType.SetpointProfile;
@@ -25,6 +25,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<SetpointProfileBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): SetpointProfileBlock['data'] => ({
         start: new Date().toISOString(),
         points: [],

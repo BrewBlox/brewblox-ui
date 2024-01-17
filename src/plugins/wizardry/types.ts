@@ -1,7 +1,7 @@
-import { Dashboard } from '@/store/dashboards';
-import { Widget } from '@/store/widgets';
 import { Block } from 'brewblox-proto/ts';
 import { DialogChainObject } from 'quasar';
+import { Dashboard } from '@/store/dashboards';
+import { Widget } from '@/store/widgets';
 
 /**
  * Output from Wizard dialogs

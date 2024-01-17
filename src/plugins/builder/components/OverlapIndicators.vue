@@ -1,15 +1,14 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Coordinates } from '@/utils/coordinates';
-import { computed, PropType } from 'vue';
 import { BuilderPart } from '../types';
 import { coord2grid } from '../utils';
 
-const props = defineProps({
-  parts: {
-    type: Object as PropType<BuilderPart[]>,
-    required: true,
-  },
-});
+interface Props {
+  parts: BuilderPart[];
+}
+
+const props = defineProps<Props>();
 
 const overlaps = computed<[x: number, y: number, depth: number][]>(() => {
   const counts: Mapped<number> = {};

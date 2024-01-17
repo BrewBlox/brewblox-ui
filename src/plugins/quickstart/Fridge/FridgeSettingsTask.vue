@@ -1,41 +1,24 @@
-<script lang="ts">
-import { tempQty } from '@/utils/quantity';
+<script setup lang="ts">
 import { Quantity } from 'brewblox-proto/ts';
-import { defineComponent, PropType, ref } from 'vue';
-import { QuickstartAction } from '../types';
+import { ref } from 'vue';
+import { tempQty } from '@/utils/quantity';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { FridgeConfig, FridgeOpts } from './types';
 
-export default defineComponent({
-  name: 'FridgeSettingsTask',
-  props: {
-    config: {
-      type: Object as PropType<FridgeConfig>,
-      required: true,
-    },
-    actions: {
-      type: Array as PropType<QuickstartAction[]>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const fridgeSetting = ref<Quantity>(tempQty(20));
+const props = defineProps<UseTaskProps<FridgeConfig>>();
 
-    function done(): void {
-      const fridgeOpts: FridgeOpts = {
-        fridgeSetting: fridgeSetting.value,
-      };
+const emit = defineEmits<UseTaskEmits<FridgeConfig>>();
 
-      emit('update:config', { ...props.config, fridgeOpts });
-      emit('next');
-    }
+const fridgeSetting = ref<Quantity>(tempQty(20));
 
-    return {
-      fridgeSetting,
-      done,
-    };
-  },
-});
+function done(): void {
+  const fridgeOpts: FridgeOpts = {
+    fridgeSetting: fridgeSetting.value,
+  };
+
+  emit('update:config', { ...props.config, fridgeOpts });
+  emit('next');
+}
 </script>
 
 <template>

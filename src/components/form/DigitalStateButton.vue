@@ -1,7 +1,24 @@
-<script lang="ts">
+<script setup lang="ts">
 import { DigitalState } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed } from 'vue';
+
+interface Props {
+  modelValue: DigitalState | number | null;
+  pending?: boolean;
+  pendingReason?: string | null;
+  disable?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  pending: false,
+  pendingReason: null,
+  disable: false,
+});
+
+const emit = defineEmits<{
+  'update:modelValue': [payload: DigitalState];
+}>();
 
 const alternatives: Record<number | string, DigitalState> = {
   0: DigitalState.STATE_INACTIVE,
@@ -32,62 +49,29 @@ const options = [
   },
 ];
 
-export default defineComponent({
-  name: 'DigitalStateButton',
-  props: {
-    modelValue: {
-      type: null as unknown as PropType<DigitalState | number | null>,
-      required: true,
-    },
-    pending: {
-      type: Boolean,
-      default: () => false,
-    },
-    pendingReason: {
-      type: null as unknown as PropType<string | null>,
-      default: () => null,
-    },
-    disable: {
-      type: Boolean,
-      default: () => false,
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const on = DigitalState.STATE_ACTIVE;
-    const off = DigitalState.STATE_INACTIVE;
+const on = DigitalState.STATE_ACTIVE;
+const off = DigitalState.STATE_INACTIVE;
 
-    const state = computed<DigitalState>({
-      get: () => {
-        if (props.modelValue == null) {
-          return DigitalState.STATE_UNKNOWN;
-        }
-        if (Enum.isType(DigitalState, props.modelValue)) {
-          return props.modelValue;
-        }
-        return alternatives[props.modelValue] ?? DigitalState.STATE_UNKNOWN;
-      },
-      set: (v) => emit('update:modelValue', v),
-    });
-
-    const known = computed<boolean>(() => state.value in DigitalState);
-
-    function toggle(): void {
-      if (!props.disable) {
-        state.value = state.value === off ? on : off;
-      }
+const state = computed<DigitalState>({
+  get: () => {
+    if (props.modelValue == null) {
+      return DigitalState.STATE_UNKNOWN;
     }
-
-    return {
-      options,
-      on,
-      off,
-      state,
-      known,
-      toggle,
-    };
+    if (Enum.isType(DigitalState, props.modelValue)) {
+      return props.modelValue;
+    }
+    return alternatives[props.modelValue] ?? DigitalState.STATE_UNKNOWN;
   },
+  set: (v) => emit('update:modelValue', v),
 });
+
+const known = computed<boolean>(() => state.value in DigitalState);
+
+function toggle(): void {
+  if (!props.disable) {
+    state.value = state.value === off ? on : off;
+  }
+}
 </script>
 
 <template>

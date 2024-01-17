@@ -1,67 +1,48 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { defineComponent, PropType, ref } from 'vue';
 
-export default defineComponent({
-  name: 'TextAreaDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: String,
-      required: true,
-    },
-    autogrow: {
-      type: Boolean,
-      default: true,
-    },
-    rules: {
-      type: Array as PropType<InputRule[]>,
-      default: () => [],
-    },
-    label: {
-      type: String,
-      default: 'Value',
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: string;
+  autogrow?: boolean;
+  rules?: InputRule[];
+  label?: string;
+}
 
-    const local = ref<string>(props.modelValue ?? '');
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-          rules: props.rules,
-        },
-      }).onOk((v) => (local.value = v));
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-      showKeyboard,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  autogrow: true,
+  rules: () => [],
+  label: 'Value',
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<string>();
+
+const local = ref<string>(props.modelValue ?? '');
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+      rules: props.rules,
+    },
+  }).onOk((v) => (local.value = v));
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

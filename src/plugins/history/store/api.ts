@@ -1,7 +1,7 @@
+import { AxiosResponse } from 'axios';
 import { SESSION_NAMESPACE, WS_HOST } from '@/const';
 import { createApi } from '@/database/api';
 import { http } from '@/utils/http';
-import { AxiosResponse } from 'axios';
 import { CsvQuery, LoggedSession } from '../types';
 
 export const historyApi = {

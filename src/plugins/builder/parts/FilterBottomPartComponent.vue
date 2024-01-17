@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { LEFT } from '@/plugins/builder/const';
 import { computed } from 'vue';
+import { LEFT } from '@/plugins/builder/const';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/FilterBottom';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';

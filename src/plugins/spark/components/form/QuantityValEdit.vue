@@ -1,56 +1,49 @@
-<script lang="ts">
-import { useValEdit } from '@/plugins/spark/composables';
-import { createDialog } from '@/utils/dialog';
-import { prettyQty, prettyUnit, roundedNumber } from '@/utils/quantity';
+<script setup lang="ts">
 import { Quantity } from 'brewblox-proto/ts';
 import isFinite from 'lodash/isFinite';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
+import {
+  useValEdit,
+  UseValEditEmits,
+  UseValEditProps,
+} from '@/plugins/spark/composables';
+import { createDialog } from '@/utils/dialog';
+import { prettyQty, prettyUnit, roundedNumber } from '@/utils/quantity';
 
-export default defineComponent({
-  name: 'QuantityValEdit',
-  props: {
-    ...useValEdit.props,
-  },
-  emits: [...useValEdit.emits],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<Quantity>();
-    const local = ref<number | null>(roundedNumber(field.value.value));
+type VT = Quantity;
 
-    function syncField(): void {
-      if (local.value === null || isFinite(local.value)) {
-        field.value.value = local.value;
-      }
-    }
-
-    const displayValue = computed<string>(() => prettyQty(field.value));
-
-    const notation = computed<string>(() => prettyUnit(field.value));
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-          type: 'number',
-          suffix: notation.value,
-        },
-      }).onOk((v) => {
-        local.value = v;
-        syncField();
-      });
-    }
-
-    return {
-      field,
-      startEdit,
-      local,
-      syncField,
-      displayValue,
-      notation,
-      showKeyboard,
-    };
-  },
+withDefaults(defineProps<UseValEditProps<VT>>(), {
+  ...useValEdit.defaultProps<VT>(),
 });
+
+defineEmits<UseValEditEmits<VT>>();
+
+const { field, startEdit } = useValEdit.setup<VT>();
+const local = ref<number | null>(roundedNumber(field.value.value));
+
+function syncField(): void {
+  if (local.value === null || isFinite(local.value)) {
+    field.value.value = local.value;
+  }
+}
+
+const displayValue = computed<string>(() => prettyQty(field.value));
+
+const notation = computed<string>(() => prettyUnit(field.value));
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+      type: 'number',
+      suffix: notation.value,
+    },
+  }).onOk((v) => {
+    local.value = v;
+    syncField();
+  });
+}
 </script>
 
 <template>

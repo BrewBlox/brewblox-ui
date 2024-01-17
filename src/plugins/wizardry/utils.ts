@@ -1,9 +1,9 @@
+import { Block } from 'brewblox-proto/ts';
 import { useSparkStore } from '@/plugins/spark/store';
 import { useFeatureStore } from '@/store/features';
 import { useWidgetStore, Widget } from '@/store/widgets';
 import { sleep } from '@/utils/misc';
 import { notify } from '@/utils/notify';
-import { Block } from 'brewblox-proto/ts';
 
 export async function tryCreateWidget<T>(
   widget: Widget<T>,

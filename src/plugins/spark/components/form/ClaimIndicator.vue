@@ -1,62 +1,30 @@
-<script lang="ts">
+<script setup lang="ts">
+import { BlockClaim } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialog } from '@/utils/block-dialog';
-import { BlockClaim } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'ClaimIndicator',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    blockId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const sparkStore = useSparkStore();
+interface Props {
+  serviceId: string;
+  blockId: string;
+}
 
-    const claim = computed<BlockClaim | undefined>(() =>
-      sparkStore
-        .claimsByService(props.serviceId)
-        .find((c) => c.target === props.blockId),
-    );
+const props = defineProps<Props>();
 
-    const claimedBy = computed<string | null>(() =>
-      claim.value ? claim.value.intermediate[0] ?? claim.value.source : null,
-    );
+const sparkStore = useSparkStore();
 
-    function showClaimingBlock(): void {
-      if (claimedBy.value) {
-        createBlockDialog(
-          {
-            serviceId: props.serviceId,
-            id: claimedBy.value,
-            type: null,
-          },
-          { mode: 'Basic' },
-        );
-      }
-    }
+const claim = computed<BlockClaim | undefined>(() =>
+  sparkStore
+    .claimsByService(props.serviceId)
+    .find((c) => c.target === props.blockId),
+);
 
-    function showBlockById(id: string): void {
-      createBlockDialog(
-        { serviceId: props.serviceId, id, type: null },
-        { mode: 'Basic' },
-      );
-    }
-
-    return {
-      claim,
-      claimedBy,
-      showClaimingBlock,
-      showBlockById,
-    };
-  },
-});
+function showBlockById(id: string): void {
+  createBlockDialog(
+    { serviceId: props.serviceId, id, type: null },
+    { mode: 'Basic' },
+  );
+}
 </script>
 
 <template>

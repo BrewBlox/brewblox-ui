@@ -1,3 +1,6 @@
+import { Block, BlockType, UserBlockType } from 'brewblox-proto/ts';
+import { defineStore } from 'pinia';
+import { shallowRef } from 'vue';
 import {
   BlockAddress,
   BlockFieldAddress,
@@ -5,13 +8,10 @@ import {
   BlockSpec,
 } from '@/plugins/spark/types';
 import { findByKey } from '@/utils/collections';
-import { Block, BlockType, UserBlockType } from 'brewblox-proto/ts';
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
 
 export const useBlockSpecStore = defineStore('blockSpecStore', () => {
-  const blockSpecs = ref<BlockSpec[]>([]);
-  const fieldSpecs = ref<BlockFieldSpec[]>([]);
+  const blockSpecs = shallowRef<BlockSpec<any>[]>([]);
+  const fieldSpecs = shallowRef<BlockFieldSpec[]>([]);
 
   // We're assuming here that a spec is registered for every user block type
   function blockSpecByType<T extends Block>(
@@ -35,7 +35,7 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
   }
 
   function addBlockSpec<T extends Block>(spec: BlockSpec<T>): void {
-    blockSpecs.value = [...blockSpecs.value, spec as unknown as BlockSpec];
+    blockSpecs.value.push(spec as unknown as BlockSpec);
   }
 
   function fieldSpecsByType(type: Maybe<BlockType>): BlockFieldSpec[] {
@@ -53,7 +53,7 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
   }
 
   function addFieldSpecs<T extends Block>(specs: BlockFieldSpec<T>[]): void {
-    fieldSpecs.value = [...fieldSpecs.value, ...specs];
+    fieldSpecs.value.push(...(specs as unknown as BlockFieldSpec[]));
   }
 
   return {
@@ -63,7 +63,6 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
     blockSpecByType,
     blockSpecByAddress,
     addBlockSpec,
-
     fieldSpecsByType,
     fieldSpecByFieldAddress,
     addFieldSpecs,

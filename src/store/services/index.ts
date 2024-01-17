@@ -1,11 +1,14 @@
-import { ServiceHook, useFeatureStore } from '@/store/features';
-import { concatById, filterById, findById } from '@/utils/collections';
 import isEqual from 'lodash/isEqual';
 import { defineStore } from 'pinia';
+import { computed, reactive } from 'vue';
+import { ServiceHook, useFeatureStore } from '@/store/features';
+import { makeObjectSorter } from '@/utils/functional';
 import api from './api';
 import type { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
+
+const sorter = makeObjectSorter<Service | ServiceStub | ServiceStatus>('id');
 
 const onStartService: ServiceHook = (service) =>
   useFeatureStore().serviceById(service.type)?.onStart?.(service);
@@ -13,81 +16,105 @@ const onStartService: ServiceHook = (service) =>
 const onRemoveService: ServiceHook = (service) =>
   useFeatureStore().serviceById(service.type)?.onRemove?.(service);
 
-interface ServiceStoreState {
-  services: Service[];
-  stubs: ServiceStub[];
-  statuses: ServiceStatus[];
-}
+export const useServiceStore = defineStore('serviceStore', () => {
+  const serviceMap = reactive<Mapped<Service>>({});
+  const stubMap = reactive<Mapped<ServiceStub>>({});
+  const statusMap = reactive<Mapped<ServiceStatus>>({});
 
-export const useServiceStore = defineStore('serviceStore', {
-  state: (): ServiceStoreState => ({
-    services: [],
-    stubs: [],
-    statuses: [],
-  }),
-  getters: {
-    serviceIds: (state): string[] => state.services.map((v) => v.id),
-    stubIds: (state): string[] => state.stubs.map((v) => v.id),
-  },
-  actions: {
-    serviceById(id: Maybe<string>): Service | null {
-      return findById(this.services, id);
-    },
-    setService(service: Service): void {
-      this.services = concatById(this.services, service);
-      this.stubs = filterById(this.stubs, service); // stubs have the same ID
-    },
-    setAllServices(services: Service[]): void {
-      const ids = services.map((svc) => svc.id);
-      this.services = services;
-      this.stubs = this.stubs.filter((s) => !ids.includes(s.id));
-    },
-    trySetStub(stub: ServiceStub): void {
-      if (!this.serviceById(stub.id)) {
-        this.stubs = concatById(this.stubs, stub);
+  const services = computed<Service[]>(() =>
+    Object.values(serviceMap).sort(sorter),
+  );
+  const stubs = computed<ServiceStub[]>(() =>
+    Object.values(stubMap).sort(sorter),
+  );
+  const statuses = computed<ServiceStatus[]>(() =>
+    Object.values(statusMap).sort(sorter),
+  );
+
+  const serviceIds = computed<string[]>(() => services.value.map((v) => v.id));
+  const stubIds = computed<string[]>(() => stubs.value.map((v) => v.id));
+
+  function serviceById(id: Maybe<string>): Service | null {
+    return serviceMap[id ?? ''] ?? null;
+  }
+
+  function setService(service: Service): void {
+    serviceMap[service.id] = service;
+    delete stubMap[service.id];
+  }
+
+  function trySetStub(stub: ServiceStub): void {
+    if (serviceMap[stub.id] == null) {
+      stubMap[stub.id] = stub;
+    }
+  }
+
+  function setStatus(status: ServiceStatus): void {
+    statusMap[status.id] = status;
+  }
+
+  async function createService(service: Service): Promise<void> {
+    await api.create(service); // triggers callback
+  }
+
+  async function saveService(service: Service): Promise<void> {
+    await api.persist(service); // triggers callback
+  }
+
+  async function removeService(service: Service): Promise<void> {
+    await api.remove(service); // triggers callback
+  }
+
+  async function ensureStub(stub: ServiceStub): Promise<void> {
+    trySetStub(stub);
+  }
+
+  async function updateStatus(status: ServiceStatus): Promise<void> {
+    if (!statuses.value.some((v) => isEqual(v, status))) {
+      setStatus(status);
+    }
+  }
+
+  async function start(): Promise<void> {
+    const onChange = async (service: Service): Promise<void> => {
+      const existing = serviceById(service.id);
+      setService(service);
+      if (!existing) {
+        await onStartService(service);
       }
-    },
-    setStatus(status: ServiceStatus): void {
-      this.statuses = concatById(this.statuses, status);
-    },
-    async createService(service: Service): Promise<void> {
-      await api.create(service); // triggers callback
-    },
-    async saveService(service: Service): Promise<void> {
-      await api.persist(service); // triggers callback
-    },
-    async removeService(service: Service): Promise<void> {
-      await api.remove(service); // triggers callback
-    },
-    async ensureStub(stub: ServiceStub): Promise<void> {
-      this.trySetStub(stub);
-    },
-    async updateStatus(status: ServiceStatus): Promise<void> {
-      if (!this.statuses.some((v) => isEqual(v, status))) {
-        this.setStatus(status);
+    };
+    const onDelete = async (id: string): Promise<void> => {
+      const existing = serviceById(id);
+      if (existing) {
+        await onRemoveService(existing);
+        delete serviceMap[id];
       }
-    },
-    async start(): Promise<void> {
-      const onChange = async (service: Service): Promise<void> => {
-        const existing = this.serviceById(service.id);
-        this.setService(service);
-        if (!existing) {
-          await onStartService(service);
-        }
-      };
-      const onDelete = async (id: string): Promise<void> => {
-        const existing = this.serviceById(id);
-        if (existing) {
-          await onRemoveService(existing);
-          this.services = filterById(this.services, existing);
-        }
-      };
+    };
 
-      const services = await api.fetch();
-      this.setAllServices(services);
-      await Promise.all(services.map(onStartService));
+    const initialServices = await api.fetch();
+    initialServices.forEach((v) => (serviceMap[v.id] = v));
+    await Promise.all(initialServices.map(onStartService));
 
-      api.subscribe(onChange, onDelete);
-    },
-  },
+    api.subscribe(onChange, onDelete);
+  }
+
+  return {
+    services,
+    stubs,
+    statuses,
+
+    serviceIds,
+    stubIds,
+
+    serviceById,
+    setService,
+    trySetStub,
+    setStatus,
+    createService,
+    saveService,
+    removeService,
+    ensureStub,
+    updateStatus,
+    start,
+  };
 });

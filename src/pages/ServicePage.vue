@@ -1,38 +1,28 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
 import { useFeatureStore } from '@/store/features';
 import { Service, useServiceStore } from '@/store/services';
-import { computed, defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'ServicePage',
-  props: {
-    routeId: {
-      type: String,
-      default: '',
-    },
-  },
-  setup(props) {
-    const featureStore = useFeatureStore();
-    const serviceStore = useServiceStore();
-    const serviceId = computed<string>(() => props.routeId);
-
-    const service = computed<Service | null>(() =>
-      serviceStore.serviceById(serviceId.value),
-    );
-
-    const pageComponent = computed<string | null>(() =>
-      service.value !== null
-        ? featureStore.serviceById(service.value.type)?.pageComponent ?? null
-        : null,
-    );
-
-    return {
-      serviceId,
-      service,
-      pageComponent,
-    };
+const props = defineProps({
+  routeId: {
+    type: String,
+    default: '',
   },
 });
+
+const featureStore = useFeatureStore();
+const serviceStore = useServiceStore();
+const serviceId = computed<string>(() => props.routeId);
+
+const service = computed<Service | null>(() =>
+  serviceStore.serviceById(serviceId.value),
+);
+
+const pageComponent = computed<string | null>(() =>
+  service.value !== null
+    ? featureStore.serviceById(service.value.type)?.pageComponent ?? null
+    : null,
+);
 </script>
 
 <template>

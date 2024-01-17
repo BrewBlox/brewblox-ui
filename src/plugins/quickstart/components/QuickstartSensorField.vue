@@ -1,52 +1,41 @@
-<script lang="ts">
+<script setup lang="ts">
+import { Block, BlockIntfType } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { prettyQty } from '@/utils/quantity';
-import { Block, BlockIntfType } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType } from 'vue';
+
+interface Props {
+  modelValue: string | null;
+  serviceId: string;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:modelValue': [payload: string];
+}>();
 
 const sensorFilter = (block: Block): boolean =>
   isCompatible(block.type, BlockIntfType.TempSensorInterface);
 
-export default defineComponent({
-  name: 'QuickstartSensorField',
-  props: {
-    modelValue: {
-      type: null as unknown as PropType<string | null>,
-      default: () => null,
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const sparkStore = useSparkStore();
+const sparkStore = useSparkStore();
 
-    const local = computed<string>({
-      get: () => props.modelValue ?? '',
-      set: (v) => emit('update:modelValue', v),
-    });
+const local = computed<string>({
+  get: () => props.modelValue ?? '',
+  set: (v) => emit('update:modelValue', v),
+});
 
-    const opts = computed<string[]>(() =>
-      sparkStore
-        .blocksByService(props.serviceId)
-        .filter(sensorFilter)
-        .map((block) => block.id),
-    );
+const opts = computed<string[]>(() =>
+  sparkStore
+    .blocksByService(props.serviceId)
+    .filter(sensorFilter)
+    .map((block) => block.id),
+);
 
-    const sensorTemp = computed<string>(() => {
-      const block = sparkStore.blockById(props.serviceId, local.value);
-      return prettyQty(block?.data.value);
-    });
-
-    return {
-      local,
-      opts,
-      sensorTemp,
-    };
-  },
+const sensorTemp = computed<string>(() => {
+  const block = sparkStore.blockById(props.serviceId, local.value);
+  return prettyQty(block?.data.value);
 });
 </script>
 

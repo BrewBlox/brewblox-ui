@@ -1,6 +1,6 @@
-import { MetricsConfig } from '@/plugins/history/types';
 import { StoreObject } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
+import { MetricsConfig } from '@/plugins/history/types';
 
 export const BuilderType = Enum(
   'BeerBottle',

@@ -1,12 +1,14 @@
-import { MetricsConfig } from '@/plugins/history/types';
-import { emptyMetricsConfig } from '@/plugins/history/utils';
 import {
   computed,
   ComputedRef,
+  DeepReadonly,
   inject,
+  Ref,
   shallowRef,
   WritableComputedRef,
 } from 'vue';
+import { MetricsConfig } from '@/plugins/history/types';
+import { emptyMetricsConfig } from '@/plugins/history/utils';
 import { BORDER_KEY, COLOR_KEY, PASSTHROUGH_KEY } from '../const';
 import {
   EditableKey,
@@ -25,7 +27,7 @@ export interface UsePartComponent {
   /**
    * The builder part itself.
    */
-  part: ComputedRef<BuilderPart>;
+  part: DeepReadonly<Ref<BuilderPart>>;
 
   /**
    * `part.settings`, extracted for convenience.
@@ -36,7 +38,7 @@ export interface UsePartComponent {
    * Part metrics will be merged per layout,
    * and the data is accessible through the useMetrics composable.
    */
-  metrics: ComputedRef<MetricsConfig>;
+  metrics: DeepReadonly<Ref<MetricsConfig>>;
 
   /**
    * Part flows if defined and calculated.
@@ -76,7 +78,7 @@ export interface UsePartComponent {
    * Part can allow custom click and hover handlers.
    * This is also handled by the BuilderInteraction component.
    */
-  interactable: ComputedRef<boolean>;
+  interactable: DeepReadonly<Ref<boolean>>;
 
   /**
    * Optional: the liquid color property.
@@ -149,7 +151,7 @@ export const usePart: UsePartComposable = {
 
     const settings = computed<Mapped<any>>(() => part.value.settings);
 
-    const metrics = computed<MetricsConfig>(
+    const metrics = computed<DeepReadonly<MetricsConfig>>(
       () => part.value.metrics ?? emptyMetricsConfig(),
     );
 

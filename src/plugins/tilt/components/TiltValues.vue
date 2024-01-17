@@ -1,48 +1,32 @@
-<script lang="ts">
+<script setup lang="ts">
 import { fieldLabels } from '@/plugins/tilt/const';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltFieldIndex, TiltStateValue } from '@/plugins/tilt/types';
 import { fixedNumber, prettyQty, shortDateString } from '@/utils/quantity';
-import { defineComponent, PropType } from 'vue';
+
+interface Props {
+  state: TiltStateValue;
+  hidden?: Partial<TiltFieldIndex>;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hidden: () => ({}),
+});
 
 const fieldClass = 'col-5 col-grow q-my-none';
 
-export default defineComponent({
-  name: 'TiltValues',
-  props: {
-    state: {
-      type: Object as PropType<TiltStateValue>,
-      required: true,
-    },
-    hidden: {
-      type: Object as PropType<Partial<TiltFieldIndex>>,
-      default: () => ({}),
-    },
-  },
-  setup(props) {
-    const tiltStore = useTiltStore();
+const tiltStore = useTiltStore();
 
-    function saveName(name: string | null): void {
-      if (name) {
-        tiltStore.saveDeviceName(props.state.id, name);
-      }
-    }
-
-    return {
-      fixedNumber,
-      shortDateString,
-      prettyQty,
-      fieldClass,
-      fieldLabels,
-      saveName,
-    };
-  },
-});
+function saveName(name: string | null): void {
+  if (name) {
+    tiltStore.saveDeviceName(props.state.id, name);
+  }
+}
 </script>
 
 <template>
   <div class="row">
-    <InputField
+    <TextField
       v-if="!hidden.name"
       :label="fieldLabels.name"
       :title="fieldLabels.name"

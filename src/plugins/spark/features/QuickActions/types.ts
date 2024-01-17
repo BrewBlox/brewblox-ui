@@ -1,6 +1,6 @@
+import { Block } from 'brewblox-proto/ts';
 import { BlockFieldSpec } from '@/plugins/spark/types';
 import { Widget } from '@/store/widgets';
-import { Block } from 'brewblox-proto/ts';
 
 export interface BlockChange<BlockT extends Block = Block> {
   id: string;

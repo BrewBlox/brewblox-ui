@@ -1,42 +1,26 @@
-<script lang="ts">
+<script setup lang="ts">
+import { TempSensorOneWireBlock } from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createComponentDialog } from '@/utils/dialog';
-import { TempSensorOneWireBlock } from 'brewblox-proto/ts';
-import { computed, defineComponent } from 'vue';
 import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 
-export default defineComponent({
-  name: 'TempSensorOneWireWidget',
-  setup() {
-    const { context, inDialog } = useContext.setup();
-    const { serviceId, blockId, block, patchBlock } =
-      useBlockWidget.setup<TempSensorOneWireBlock>();
+const { context, inDialog } = useContext.setup();
+const { serviceId, blockId, block, patchBlock } =
+  useBlockWidget.setup<TempSensorOneWireBlock>();
 
-    const hasValue = computed<boolean>(
-      () => block.value.data.value.value !== null,
-    );
+const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
 
-    function startSwap(): void {
-      createComponentDialog({
-        component: TempSensorSwapDialog,
-        componentProps: {
-          serviceId,
-          leftId: blockId,
-        },
-      });
-    }
-
-    return {
-      context,
-      inDialog,
-      block,
-      patchBlock,
-      hasValue,
-      startSwap,
-    };
-  },
-});
+function startSwap(): void {
+  createComponentDialog({
+    component: TempSensorSwapDialog,
+    componentProps: {
+      serviceId,
+      leftId: blockId,
+    },
+  });
+}
 </script>
 
 <template>
@@ -93,7 +77,7 @@ export default defineComponent({
             class="col-grow"
             @update:model-value="(v) => patchBlock({ offset: v })"
           />
-          <InputField
+          <TextField
             :model-value="block.data.address"
             title="Address"
             label="Address"

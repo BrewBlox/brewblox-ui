@@ -1,42 +1,32 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
 import { useWidget } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockWidget } from '@/plugins/spark/types';
-import { computed, defineComponent } from 'vue';
 
 interface AbsenceReason {
   message: string;
   temporary: boolean;
 }
 
-export default defineComponent({
-  name: 'UnknownBlockWidget',
-  setup() {
-    const { config } = useWidget.setup<BlockWidget>();
-    const sparkStore = useSparkStore();
+const { config } = useWidget.setup<BlockWidget>();
+const sparkStore = useSparkStore();
 
-    const reason = computed<AbsenceReason>(() =>
-      sparkStore.lastBlocksAtByService(config.value.serviceId)
-        ? {
-            message: `Block ${config.value.blockId} not found on service ${config.value.serviceId}`,
-            temporary: false,
-          }
-        : {
-            message: 'Waiting for service...',
-            temporary: true,
-          },
-    );
+const reason = computed<AbsenceReason>(() =>
+  sparkStore.lastBlocksAtByService(config.value.serviceId)
+    ? {
+        message: `Block ${config.value.blockId} not found on service ${config.value.serviceId}`,
+        temporary: false,
+      }
+    : {
+        message: 'Waiting for service...',
+        temporary: true,
+      },
+);
 
-    function fetch(): void {
-      sparkStore.fetchAll(config.value.serviceId);
-    }
-
-    return {
-      reason,
-      fetch,
-    };
-  },
-});
+function fetch(): void {
+  sparkStore.fetchAll(config.value.serviceId);
+}
 </script>
 
 <template>

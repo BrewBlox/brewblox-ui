@@ -1,76 +1,56 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { isQuantity } from '@/utils/identity';
-import { bloxQty, prettyUnit } from '@/utils/quantity';
+<script setup lang="ts">
 import { Quantity } from 'brewblox-proto/ts';
 import round from 'lodash/round';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { bloxQty, prettyUnit } from '@/utils/quantity';
 
-export default defineComponent({
-  name: 'QuantityDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<Quantity>,
-      required: true,
-      validator: isQuantity,
-    },
-    decimals: {
-      type: Number,
-      default: 2,
-    },
-    label: {
-      type: String,
-      default: 'Value',
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogProps, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: Quantity;
+  decimals?: number;
+  label?: string;
+}
 
-    const local = ref<number | null>(
-      props.modelValue.value !== null
-        ? round(props.modelValue.value, props.decimals)
-        : null,
-    );
-
-    function save(): void {
-      onDialogOK(bloxQty(props.modelValue).copy(local.value));
-    }
-
-    const notation = computed<string>(() => prettyUnit(props.modelValue));
-
-    function showKeyboard(): void {
-      createDialog({
-        component: 'KeyboardDialog',
-        componentProps: {
-          modelValue: local.value,
-          type: 'number',
-          suffix: notation.value,
-        },
-      }).onOk((v) => (local.value = v));
-    }
-
-    return {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      save,
-      notation,
-      showKeyboard,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  decimals: 2,
+  label: 'Value',
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogOpts, dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<Quantity>();
+
+const local = ref<number | null>(
+  props.modelValue.value !== null
+    ? round(props.modelValue.value, props.decimals)
+    : null,
+);
+
+function save(): void {
+  onDialogOK(bloxQty(props.modelValue).copy(local.value));
+}
+
+const notation = computed<string>(() => prettyUnit(props.modelValue));
+
+function showKeyboard(): void {
+  createDialog({
+    component: 'KeyboardDialog',
+    componentProps: {
+      modelValue: local.value,
+      type: 'number',
+      suffix: notation.value,
+    },
+  }).onOk((v) => (local.value = v));
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

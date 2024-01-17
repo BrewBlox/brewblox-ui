@@ -1,3 +1,10 @@
+import {
+  BlockIntfType,
+  BlockType,
+  FilterChoice,
+  PidBlock,
+} from 'brewblox-proto/ts';
+import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
@@ -11,13 +18,6 @@ import {
   inverseTempQty,
   tempQty,
 } from '@/utils/quantity';
-import {
-  BlockIntfType,
-  BlockType,
-  FilterChoice,
-  PidBlock,
-} from 'brewblox-proto/ts';
-import { Plugin } from 'vue';
 import widget from './PidWidget.vue';
 
 const type = BlockType.Pid;
@@ -31,6 +31,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<PidBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): PidBlock['data'] => ({
         inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),

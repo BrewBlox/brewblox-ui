@@ -1,152 +1,112 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed, onBeforeMount, reactive, ref } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  PropType,
-  reactive,
-  ref,
-} from 'vue';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { GpioChange, IoChannelAddress } from '../types';
 import { hasShared, resetGpioChanges } from '../utils';
 import { GlycolConfig, GlycolControlMode } from './types';
 
-export default defineComponent({
-  name: 'GlycolHardwareTask',
-  props: {
-    config: {
-      type: Object as PropType<GlycolConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const sparkStore = useSparkStore();
+const props = defineProps<UseTaskProps<GlycolConfig>>();
 
-    const heated = ref<boolean>(props.config.heated ?? false);
-    const glycolControl = ref<GlycolControlMode>(
-      props.config.glycolControl ?? 'No',
-    );
-    const coolChannel = ref<IoChannelAddress | null>(
-      props.config.coolChannel ?? null,
-    );
-    const heatChannel = ref<IoChannelAddress | null>(
-      props.config.heatChannel ?? null,
-    );
-    const glycolChannel = ref<IoChannelAddress | null>(
-      props.config.glycolChannel ?? null,
-    );
-    const beerSensor = ref<string | null>(props.config.beerSensor ?? null);
-    const glycolSensor = ref<string | null>(props.config.glycolSensor ?? null);
-    const changedGpio = reactive<GpioChange[]>(
-      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
-    );
+const emit = defineEmits<UseTaskEmits<GlycolConfig>>();
 
-    const heatedDesc = computed<'Yes' | 'No'>({
-      get: () => (heated.value ? 'Yes' : 'No'),
-      set: (v) => (heated.value = v === 'Yes'),
-    });
+const sparkStore = useSparkStore();
 
-    const channelSame = computed<boolean>(
-      () =>
-        (heated.value &&
-          hasShared([
-            coolChannel.value,
-            heatChannel.value,
-            glycolChannel.value,
-          ])) ||
-        (glycolControl.value === 'Control' &&
-          hasShared([
-            coolChannel.value,
-            heatChannel.value,
-            glycolChannel.value,
-          ])),
-    );
+const heated = ref<boolean>(props.config.heated ?? false);
+const glycolControl = ref<GlycolControlMode>(
+  props.config.glycolControl ?? 'No',
+);
+const coolChannel = ref<IoChannelAddress | null>(
+  props.config.coolChannel ?? null,
+);
+const heatChannel = ref<IoChannelAddress | null>(
+  props.config.heatChannel ?? null,
+);
+const glycolChannel = ref<IoChannelAddress | null>(
+  props.config.glycolChannel ?? null,
+);
+const beerSensor = ref<string | null>(props.config.beerSensor ?? null);
+const glycolSensor = ref<string | null>(props.config.glycolSensor ?? null);
+const changedGpio = reactive<GpioChange[]>(
+  props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
+);
 
-    const sensorSame = computed<boolean>(
-      () =>
-        glycolControl.value !== 'No' &&
-        hasShared([beerSensor.value, glycolSensor.value]),
-    );
-
-    const valuesOk = computed<boolean>(() =>
-      [
-        coolChannel.value,
-        heatChannel.value || !heated.value,
-        glycolChannel.value || glycolControl.value !== 'Control',
-        !channelSame.value,
-        beerSensor.value,
-        glycolSensor.value || glycolControl.value === 'No',
-        !sensorSame.value,
-      ].every(Boolean),
-    );
-
-    function discover(): void {
-      sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
-    }
-
-    function startBlockWizard(): void {
-      createDialog({
-        component: 'BlockWizardDialog',
-        componentProps: {
-          serviceId: props.config.serviceId,
-        },
-      });
-    }
-
-    function taskDone(): void {
-      if (!valuesOk.value) {
-        return;
-      }
-
-      const updates: Partial<GlycolConfig> = {
-        changedGpio,
-        heated: heated.value,
-        heatChannel: heated.value ? heatChannel.value : null,
-        coolChannel: coolChannel.value!,
-        beerSensor: beerSensor.value!,
-        glycolSensor: glycolSensor.value!,
-        glycolControl: glycolControl.value,
-        glycolChannel:
-          glycolControl.value === 'Control' ? glycolChannel.value : null,
-        renamedBlocks:
-          glycolControl.value === 'No'
-            ? {
-                [beerSensor.value!]: props.config.names.beerSensor,
-              }
-            : {
-                [beerSensor.value!]: props.config.names.beerSensor,
-                [glycolSensor.value!]: props.config.names.glycolSensor,
-              },
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('next');
-    }
-
-    onBeforeMount(() => discover());
-
-    return {
-      heated,
-      heatedDesc,
-      glycolControl,
-      coolChannel,
-      heatChannel,
-      glycolChannel,
-      beerSensor,
-      glycolSensor,
-      changedGpio,
-      channelSame,
-      sensorSame,
-      valuesOk,
-      discover,
-      startBlockWizard,
-      taskDone,
-    };
-  },
+const heatedDesc = computed<'Yes' | 'No'>({
+  get: () => (heated.value ? 'Yes' : 'No'),
+  set: (v) => (heated.value = v === 'Yes'),
 });
+
+const channelSame = computed<boolean>(
+  () =>
+    (heated.value &&
+      hasShared([coolChannel.value, heatChannel.value, glycolChannel.value])) ||
+    (glycolControl.value === 'Control' &&
+      hasShared([coolChannel.value, heatChannel.value, glycolChannel.value])),
+);
+
+const sensorSame = computed<boolean>(
+  () =>
+    glycolControl.value !== 'No' &&
+    hasShared([beerSensor.value, glycolSensor.value]),
+);
+
+const valuesOk = computed<boolean>(() =>
+  [
+    coolChannel.value,
+    heatChannel.value || !heated.value,
+    glycolChannel.value || glycolControl.value !== 'Control',
+    !channelSame.value,
+    beerSensor.value,
+    glycolSensor.value || glycolControl.value === 'No',
+    !sensorSame.value,
+  ].every(Boolean),
+);
+
+function discover(): void {
+  sparkStore.fetchDiscoveredBlocks(props.config.serviceId);
+}
+
+function startBlockWizard(): void {
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: props.config.serviceId,
+    },
+  });
+}
+
+function taskDone(): void {
+  if (!valuesOk.value) {
+    return;
+  }
+
+  const updates: Partial<GlycolConfig> = {
+    changedGpio,
+    heated: heated.value,
+    heatChannel: heated.value ? heatChannel.value : null,
+    coolChannel: coolChannel.value!,
+    beerSensor: beerSensor.value!,
+    glycolSensor: glycolSensor.value!,
+    glycolControl: glycolControl.value,
+    glycolChannel:
+      glycolControl.value === 'Control' ? glycolChannel.value : null,
+    renamedBlocks:
+      glycolControl.value === 'No'
+        ? {
+            [beerSensor.value!]: props.config.names.beerSensor,
+          }
+        : {
+            [beerSensor.value!]: props.config.names.beerSensor,
+            [glycolSensor.value!]: props.config.names.glycolSensor,
+          },
+  };
+
+  emit('update:config', { ...props.config, ...updates });
+  emit('next');
+}
+
+onBeforeMount(() => discover());
 </script>
 
 <template>

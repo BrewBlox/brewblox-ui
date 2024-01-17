@@ -1,62 +1,75 @@
-import { concatById, filterById, findById } from '@/utils/collections';
 import { defineStore } from 'pinia';
+import { computed, reactive } from 'vue';
+import { makeObjectSorter } from '@/utils/functional';
 import { useFeatureStore } from '../features';
 import api from './api';
 import type { Widget } from './types';
 
 export * from './types';
 
-interface WidgetStoreState {
-  widgets: Widget[];
-}
+const sorter = makeObjectSorter<Widget>('id');
 
-export const useWidgetStore = defineStore('widgetStore', {
-  state: (): WidgetStoreState => ({
-    widgets: [],
-  }),
-  getters: {
-    widgetIds: (state): string[] => state.widgets.map((v) => v.id),
-  },
-  actions: {
-    widgetById<T extends Widget>(id: Maybe<string>): T | null {
-      return findById(this.widgets, id) as T | null;
-    },
+export const useWidgetStore = defineStore('widgetStore', () => {
+  const widgetMap = reactive<Mapped<Widget>>({});
 
-    async createWidget(widget: Widget): Promise<void> {
-      await api.create(widget); // triggers callback
-    },
+  const widgets = computed<Widget[]>(() =>
+    Object.values(widgetMap).sort(sorter),
+  );
 
-    async appendWidget(widget: Widget): Promise<void> {
-      const order =
-        this.widgets.filter((v) => v.dashboard === widget.dashboard).length + 1;
-      await this.createWidget({ ...widget, order });
-    },
+  const widgetIds = computed<string[]>(() => widgets.value.map((v) => v.id));
 
-    async saveWidget(widget: Widget): Promise<void> {
-      await api.persist(widget); // triggers callback
-    },
+  function widgetById<T extends Widget>(id: Maybe<string>): T | null {
+    return (widgetMap[id ?? ''] as T) ?? null;
+  }
 
-    async removeWidget(widget: Widget): Promise<void> {
-      await api.remove(widget); // triggers callback
-    },
+  async function createWidget(widget: Widget): Promise<void> {
+    await api.create(widget); // triggers callback
+  }
 
-    async start(): Promise<void> {
-      this.widgets = await api.fetch();
+  async function appendWidget(widget: Widget): Promise<void> {
+    const order =
+      widgets.value.filter((v) => v.dashboard === widget.dashboard).length + 1;
+    await createWidget({ ...widget, order });
+  }
 
-      const featureStore = useFeatureStore();
-      [...this.widgets].forEach((widget) => {
-        const upgraded = featureStore.upgradeWidget(widget);
-        if (upgraded) {
-          // Immediately set upgraded widget, to prevent rendering with invalid data
-          concatById(this.widgets, widget);
-          this.saveWidget(upgraded);
-        }
-      });
+  async function saveWidget(widget: Widget): Promise<void> {
+    await api.persist(widget); // triggers callback
+  }
 
-      api.subscribe(
-        (widget) => (this.widgets = concatById(this.widgets, widget)),
-        (id) => (this.widgets = filterById(this.widgets, { id })),
-      );
-    },
-  },
+  async function removeWidget(widget: Widget): Promise<void> {
+    await api.remove(widget); // triggers callback
+  }
+
+  async function start(): Promise<void> {
+    const featureStore = useFeatureStore();
+
+    const storedWidgets: Widget[] = await api.fetch();
+
+    const upgradedWidgets = storedWidgets
+      .map((stored) => {
+        const changed = featureStore.upgradeWidget(stored);
+        const actual = changed ?? stored;
+        widgetMap[actual.id] = actual;
+        return changed;
+      })
+      .filter((v): v is Widget => v != null);
+
+    api.persistMult(upgradedWidgets);
+
+    api.subscribe(
+      (widget) => (widgetMap[widget.id] = widget),
+      (id) => delete widgetMap[id],
+    );
+  }
+
+  return {
+    widgets,
+    widgetIds,
+    widgetById,
+    createWidget,
+    appendWidget,
+    saveWidget,
+    removeWidget,
+    start,
+  };
 });

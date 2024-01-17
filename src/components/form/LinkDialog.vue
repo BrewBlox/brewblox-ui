@@ -1,5 +1,7 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
+import { Block, Link } from 'brewblox-proto/ts';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { ComparedBlockType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils/info';
@@ -8,137 +10,101 @@ import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
-import { Block, Link } from 'brewblox-proto/ts';
-import { computed, defineComponent, PropType, ref } from 'vue';
 
-export default defineComponent({
-  name: 'LinkDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<Link>,
-      default: () => bloxLink(null),
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    label: {
-      type: String,
-      default: 'Link',
-    },
-    compatible: {
-      type: [String, Array] as PropType<ComparedBlockType>,
-      default: null,
-    },
-    blockFilter: {
-      type: Function as PropType<(block: Block) => boolean>,
-      default: () => true,
-    },
-    clearable: {
-      type: Boolean,
-      default: true,
-    },
-    creatable: {
-      type: Boolean,
-      default: true,
-    },
-    configurable: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const sparkStore = useSparkStore();
-    const featureStore = useFeatureStore();
+interface Props extends UseDialogProps {
+  modelValue: Link;
+  serviceId: string;
+  label?: string;
+  compatible?: ComparedBlockType;
+  blockFilter?: (block: Block) => boolean;
+  clearable?: boolean;
+  creatable?: boolean;
+  configurable?: boolean;
+}
 
-    const local = ref<Link>(bloxLink(props.modelValue));
-
-    const blockTypeFilter = computed<(block: Block) => boolean>(
-      () => (block) =>
-        isCompatible(
-          block.type,
-          props.compatible ?? props.modelValue?.type ?? null,
-        ),
-    );
-
-    const linkOpts = computed<Link[]>(() =>
-      sparkStore
-        .blocksByService(props.serviceId)
-        .filter(blockTypeFilter.value)
-        .filter(props.blockFilter)
-        .map((block) => bloxLink(block.id, block.type))
-        .sort(makeObjectSorter('id')),
-    );
-
-    const block = computed<Block | null>(() =>
-      sparkStore.blockById(props.serviceId, local.value.id),
-    );
-
-    const tooltip = computed<string | null>(() =>
-      block.value ? featureStore.widgetTitle(block.value.type) : null,
-    );
-
-    const localOk = computed<boolean>(
-      () => block.value !== null || props.clearable,
-    );
-
-    function update(link: Link | null): void {
-      local.value =
-        link !== null ? bloxLink(link) : bloxLink(null, props.modelValue.type);
-    }
-
-    function configureBlock(): void {
-      createBlockDialog(block.value);
-    }
-
-    function createBlock(): void {
-      createDialog({
-        component: 'BlockWizardDialog',
-        componentProps: {
-          serviceId: props.serviceId,
-          compatible: props.compatible ?? local.value.type,
-        },
-      }).onOk((block: Maybe<Block>) => {
-        if (block) {
-          // Retain original type
-          local.value = bloxLink(block.id, props.modelValue.type);
-        }
-      });
-    }
-
-    function save(): void {
-      if (localOk.value) {
-        onDialogOK(local.value);
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      linkOpts,
-      block,
-      tooltip,
-      localOk,
-      update,
-      configureBlock,
-      createBlock,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  label: 'Link',
+  compatible: null,
+  blockFilter: () => true,
+  clearable: true,
+  creatable: true,
+  configurable: true,
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<Link>();
+const sparkStore = useSparkStore();
+const featureStore = useFeatureStore();
+
+const local = ref<Link>(bloxLink(props.modelValue));
+
+const blockTypeFilter = computed<(block: Block) => boolean>(
+  () => (block) =>
+    isCompatible(
+      block.type,
+      props.compatible ?? props.modelValue?.type ?? null,
+    ),
+);
+
+const linkOpts = computed<Link[]>(() =>
+  sparkStore
+    .blocksByService(props.serviceId)
+    .filter(blockTypeFilter.value)
+    .filter(props.blockFilter)
+    .map((block) => bloxLink(block.id, block.type))
+    .sort(makeObjectSorter('id')),
+);
+
+const block = computed<Block | null>(() =>
+  sparkStore.blockById(props.serviceId, local.value.id),
+);
+
+const tooltip = computed<string | null>(() =>
+  block.value ? featureStore.widgetTitle(block.value.type) : null,
+);
+
+const localOk = computed<boolean>(
+  () => block.value !== null || props.clearable,
+);
+
+function update(link: Link | null): void {
+  local.value =
+    link !== null ? bloxLink(link) : bloxLink(null, props.modelValue.type);
+}
+
+function configureBlock(): void {
+  createBlockDialog(block.value);
+}
+
+function createBlock(): void {
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: props.serviceId,
+      compatible: props.compatible ?? local.value.type,
+    },
+  }).onOk((block: Maybe<Block>) => {
+    if (block) {
+      // Retain original type
+      local.value = bloxLink(block.id, props.modelValue.type);
+    }
+  });
+}
+
+function save(): void {
+  if (localOk.value) {
+    onDialogOK(local.value);
+  }
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

@@ -1,8 +1,3 @@
-import { discoveredBlockFeature } from '@/plugins/spark/generic';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockSpec } from '@/plugins/spark/types';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
 import {
   BlockType,
   GpioModuleStatus,
@@ -10,6 +5,11 @@ import {
   OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { discoveredBlockFeature } from '@/plugins/spark/generic';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockSpec } from '@/plugins/spark/types';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 import widget from './OneWireGpioModuleWidget.vue';
 
 const type = BlockType.OneWireGpioModule;
@@ -23,6 +23,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<OneWireGpioModuleBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): OneWireGpioModuleBlock['data'] => ({
         channels: [],
         modulePosition: 0,
@@ -43,7 +44,10 @@ const plugin: Plugin = {
       }),
       analyze: (block: OneWireGpioModuleBlock) => {
         const { moduleStatus } = block.data;
-        if (moduleStatus != GpioModuleStatus.NONE) {
+        if (
+          moduleStatus != GpioModuleStatus.NONE &&
+          moduleStatus != GpioModuleStatus.OPEN_LOAD
+        ) {
           return 'Invalid';
         }
         return 'Active';

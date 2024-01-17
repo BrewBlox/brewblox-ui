@@ -1,100 +1,86 @@
-<script lang="ts">
-import format from 'date-fns/format';
-import isEqual from 'date-fns/isEqual';
-import isValid from 'date-fns/isValid';
-import parseISO from 'date-fns/parseISO';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
+<script setup lang="ts">
+import { format } from 'date-fns/format';
+import { isEqual } from 'date-fns/isEqual';
+import { isValid } from 'date-fns/isValid';
+import { parseISO } from 'date-fns/parseISO';
+import { computed, ref, watch } from 'vue';
 
 type DateFormatType = 'date' | 'number' | 'string';
 
-export default defineComponent({
-  name: 'DatetimeInput',
-  props: {
-    modelValue: {
-      type: null as unknown as PropType<Date | number | string | null>,
-      default: null,
-    },
-    output: {
-      type: String as PropType<DateFormatType>,
-      default: 'date',
-    },
-    dateAttrs: {
-      type: Object as PropType<AnyDict>,
-      default: () => ({}),
-    },
-    timeAttrs: {
-      type: Object as PropType<AnyDict>,
-      default: () => ({}),
-    },
-  },
-  emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    function asDate(v: Date | number | string | null): Date | null {
-      if (typeof v === 'number') {
-        return new Date(v);
-      } else if (typeof v === 'string') {
-        return parseISO(v);
-      } else if (v instanceof Date) {
-        return v;
-      } else {
-        return null;
-      }
-    }
+interface Props {
+  modelValue: Date | number | string | null;
+  output?: DateFormatType;
+  dateAttrs?: AnyDict;
+  timeAttrs?: AnyDict;
+}
 
-    function asDateString(v: Date | null): string {
-      return v !== null && isValid(v) ? format(v, 'yyyy-MM-dd') : '';
-    }
-
-    function asTimeString(v: Date | null): string {
-      return v !== null && isValid(v) ? format(v, 'HH:mm:ss') : '';
-    }
-
-    function save(v: Date | null): void {
-      let output: Date | string | number | null = v;
-      if (v && props.output === 'string') {
-        output = v.toISOString();
-      }
-      if (v && props.output === 'number') {
-        output = v.getTime();
-      }
-      emit('update:modelValue', output);
-    }
-
-    const local = ref<Date | null>(asDate(props.modelValue));
-
-    function combine(
-      dateVal: string | undefined,
-      timeVal: string | undefined,
-    ): Date | null {
-      const dv = dateVal ?? asDateString(local.value);
-      const tv = timeVal ?? asTimeString(local.value);
-      return parseISO(`${dv} ${tv}`);
-    }
-
-    const dateString = computed<string>(() => asDateString(local.value));
-
-    const timeString = computed<string>(() => asTimeString(local.value));
-
-    watch(
-      () => props.modelValue,
-      (v) => {
-        const dt = asDate(v);
-        if (dt === null) {
-          local.value = null;
-        } else if (!local.value || !isEqual(dt, local.value)) {
-          local.value = dt;
-        }
-      },
-    );
-
-    return {
-      dateString,
-      timeString,
-      combine,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  output: 'date',
+  dateAttrs: () => ({}),
+  timeAttrs: () => ({}),
 });
+
+const emit = defineEmits<{
+  'update:modelValue': [payload: Date | number | string | null];
+}>();
+
+function asDate(v: Date | number | string | null): Date | null {
+  if (typeof v === 'number') {
+    return new Date(v);
+  } else if (typeof v === 'string') {
+    return parseISO(v);
+  } else if (v instanceof Date) {
+    return v;
+  } else {
+    return null;
+  }
+}
+
+function asDateString(v: Date | null): string {
+  return v !== null && isValid(v) ? format(v, 'yyyy-MM-dd') : '';
+}
+
+function asTimeString(v: Date | null): string {
+  return v !== null && isValid(v) ? format(v, 'HH:mm:ss') : '';
+}
+
+function save(v: Date | null): void {
+  let output: Date | string | number | null = v;
+  if (v && props.output === 'string') {
+    output = v.toISOString();
+  }
+  if (v && props.output === 'number') {
+    output = v.getTime();
+  }
+  emit('update:modelValue', output);
+}
+
+const local = ref<Date | null>(asDate(props.modelValue));
+
+function combine(
+  dateVal: string | undefined,
+  timeVal: string | undefined,
+): Date | null {
+  const dv = dateVal ?? asDateString(local.value);
+  const tv = timeVal ?? asTimeString(local.value);
+  return parseISO(`${dv} ${tv}`);
+}
+
+const dateString = computed<string>(() => asDateString(local.value));
+
+const timeString = computed<string>(() => asTimeString(local.value));
+
+watch(
+  () => props.modelValue,
+  (v) => {
+    const dt = asDate(v);
+    if (dt === null) {
+      local.value = null;
+    } else if (!local.value || !isEqual(dt, local.value)) {
+      local.value = dt;
+    }
+  },
+);
 </script>
 
 <template>

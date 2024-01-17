@@ -1,18 +1,40 @@
-<script lang="ts">
-import { useDialog, useGlobals } from '@/composables';
-import { useSparkStore } from '@/plugins/spark/store';
-import { createDialog } from '@/utils/dialog';
-import { makeTypeFilter } from '@/utils/functional';
-import { bloxQty, inverseTempQty } from '@/utils/quantity';
+<script setup lang="ts">
 import {
   BlockType,
+  Link,
   Quantity,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, defineComponent, PropType, reactive } from 'vue';
+import { computed, reactive } from 'vue';
+import {
+  useDialog,
+  UseDialogEmits,
+  UseDialogProps,
+  useGlobals,
+} from '@/composables';
+import { useSparkStore } from '@/plugins/spark/store';
+import { createDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
+import { bloxQty, inverseTempQty } from '@/utils/quantity';
 import { PidConfig } from '../types';
 import { TempControlMode } from './types';
+
+interface Props extends UseDialogProps {
+  modelValue: TempControlMode;
+  saveMode: (mode: TempControlMode) => unknown;
+  serviceId: string;
+  title?: string;
+  showConfirm?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  title: 'Edit control mode',
+  showConfirm: false,
+});
+
+defineEmits<UseDialogEmits>();
 
 const setpointFilter = makeTypeFilter(BlockType.SetpointSensorPair);
 const durationRules: InputRule[] = [
@@ -20,119 +42,72 @@ const durationRules: InputRule[] = [
   (v) => v < 2 ** 16 * 1000 || 'Value is too large to be stored in firmware',
 ];
 
-export default defineComponent({
-  name: 'TempControlModeDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<TempControlMode>,
-      required: true,
+const { dense } = useGlobals.setup();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<TempControlMode>();
+const tempMode = reactive<TempControlMode>(cloneDeep(props.modelValue));
+const sparkStore = useSparkStore();
+
+function save(): void {
+  props.saveMode(tempMode);
+}
+
+const setpoint = computed<SetpointSensorPairBlock | null>(() =>
+  sparkStore.blockByLink(props.serviceId, tempMode.setpoint),
+);
+
+function removeConfig(kind: 'cool' | 'heat'): void {
+  createDialog({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: `Remove ${kind} config`,
+      message:
+        `Are you sure you want to remove the ${kind} ` +
+        `config from the ${tempMode.title} mode?`,
     },
-    saveMode: {
-      type: Function as PropType<(mode: TempControlMode) => unknown>,
-      required: true,
-    },
-    serviceId: {
-      type: String,
-      required: true,
-    },
-    title: {
-      type: String,
-      default: 'Edit control mode',
-    },
-    showConfirm: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dense } = useGlobals.setup();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
-    const tempMode = reactive<TempControlMode>(cloneDeep(props.modelValue));
-    const sparkStore = useSparkStore();
+    noBackdropDismiss: true,
+  }).onOk(() => {
+    tempMode[kind + 'Config'] = null;
+    save();
+  });
+}
 
-    function save(): void {
-      props.saveMode(tempMode);
-    }
+function updateConfig(
+  cfg: 'cool' | 'heat',
+  key: keyof PidConfig,
+  value: Quantity,
+): void {
+  const config: PidConfig | undefined = tempMode[cfg + 'Config'];
+  if (config) {
+    config[key] = value;
+    save();
+  }
+}
 
-    const setpoint = computed<SetpointSensorPairBlock | null>(() =>
-      sparkStore.blockByLink(props.serviceId, tempMode.setpoint),
-    );
+function addCoolConfig(): void {
+  tempMode.coolConfig = {
+    kp: inverseTempQty(-50),
+    ti: bloxQty('0s'),
+    td: bloxQty('0s'),
+  };
+  save();
+}
 
-    function removeConfig(kind: 'cool' | 'heat'): void {
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: `Remove ${kind} config`,
-          message:
-            `Are you sure you want to remove the ${kind} ` +
-            `config from the ${tempMode.title} mode?`,
-        },
-        noBackdropDismiss: true,
-      }).onOk(() => {
-        tempMode[kind + 'Config'] = null;
-        save();
-      });
-    }
-
-    function updateConfig(
-      cfg: 'cool' | 'heat',
-      key: keyof PidConfig,
-      value: Quantity,
-    ): void {
-      const config: PidConfig | undefined = tempMode[cfg + 'Config'];
-      if (config) {
-        config[key] = value;
-        save();
-      }
-    }
-
-    function addCoolConfig(): void {
-      tempMode.coolConfig = {
-        kp: inverseTempQty(-50),
-        ti: bloxQty('0s'),
-        td: bloxQty('0s'),
-      };
-      save();
-    }
-
-    function addHeatConfig(): void {
-      tempMode.heatConfig = {
-        kp: inverseTempQty(100),
-        ti: bloxQty('0s'),
-        td: bloxQty('0s'),
-      };
-      save();
-    }
-
-    return {
-      setpointFilter,
-      durationRules,
-      dense,
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-      tempMode,
-      save,
-      setpoint,
-      removeConfig,
-      updateConfig,
-      addCoolConfig,
-      addHeatConfig,
-    };
-  },
-});
+function addHeatConfig(): void {
+  tempMode.heatConfig = {
+    kp: inverseTempQty(100),
+    ti: bloxQty('0s'),
+    td: bloxQty('0s'),
+  };
+  save();
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
     :maximized="dense"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
   >
     <Card>
@@ -144,7 +119,7 @@ export default defineComponent({
       </template>
 
       <q-card-section class="row q-gutter-xs">
-        <InputField
+        <TextField
           :model-value="tempMode.title"
           label="Mode name"
           title="Mode name"
@@ -166,7 +141,7 @@ export default defineComponent({
           label="PID input Setpoint"
           class="col-grow"
           @update:model-value="
-            (v) => {
+            (v: Link) => {
               tempMode.setpoint = v;
               save();
             }

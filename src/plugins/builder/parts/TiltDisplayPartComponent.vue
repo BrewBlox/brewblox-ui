@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { liquidBorderColor } from '@/plugins/builder/utils';
 import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltStateValue } from '@/plugins/tilt/types';
 import { userUnits } from '@/user-settings';
 import { fixedNumber, preciseNumber, prettyUnit } from '@/utils/quantity';
-import { computed } from 'vue';
 import {
   DEFAULT_SIZE,
   MAX_SIZE,

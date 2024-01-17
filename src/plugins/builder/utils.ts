@@ -1,29 +1,30 @@
-import { useSparkStore } from '@/plugins/spark/store';
-import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
-import { isCompatible } from '@/plugins/spark/utils/info';
-import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
-import { createDialog, createDialogPromise } from '@/utils/dialog';
-import { loadFile } from '@/utils/import-export';
 import { Block } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import isObject from 'lodash/isObject';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
+import { DeepReadonly } from 'vue';
 import { Router } from 'vue-router';
+import { useSparkStore } from '@/plugins/spark/store';
+import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils/info';
+import { Coordinates, CoordinatesParam } from '@/utils/coordinates';
+import { createDialog, createDialogPromise } from '@/utils/dialog';
+import { loadFile } from '@/utils/import-export';
 import { upgradeGraphConfig, upgradeMetricsConfig } from '../history/utils';
 import {
   CENTER,
   COLOR_KEY,
   DEFAULT_LAYOUT_HEIGHT,
   DEFAULT_LAYOUT_WIDTH,
-  deprecatedTypes,
   DEPRECATED_HEIGHT_KEY,
   DEPRECATED_IO_LIQUIDS_KEY,
   DEPRECATED_IO_PRESSURE_KEY,
   DEPRECATED_PUMP_KEY,
   DEPRECATED_SCALE_KEY,
   DEPRECATED_WIDTH_KEY,
+  deprecatedTypes,
   GRAPH_CONFIG_KEY,
   IO_ENABLED_KEY,
   PASSTHROUGH_KEY,
@@ -54,7 +55,10 @@ export function settingsProp<T = any>(
   return undefined;
 }
 
-export function settingsAddress(part: BuilderPart, key: string): BlockAddress {
+export function settingsAddress(
+  part: DeepReadonly<BuilderPart>,
+  key: string,
+): BlockAddress {
   const obj = settingsProp(part.settings, key, isObject) ?? {};
   return {
     // Older objects use 'blockId' as key
@@ -65,7 +69,7 @@ export function settingsAddress(part: BuilderPart, key: string): BlockAddress {
 }
 
 export function settingsBlock<T extends Block>(
-  part: BuilderPart,
+  part: DeepReadonly<BuilderPart>,
   key: string,
   intf: ComparedBlockType,
 ): T | null {
@@ -230,7 +234,7 @@ export function passthroughTransitions({
   width,
   height,
   settings,
-}: BuilderPart): PartTransitions {
+}: DeepReadonly<BuilderPart>): PartTransitions {
   if (!settings[PASSTHROUGH_KEY]) {
     return {};
   }
@@ -260,7 +264,7 @@ export function coord2translate(x: number, y: number): string {
 }
 
 export function textTransformation(
-  part: BuilderPart,
+  part: DeepReadonly<BuilderPart>,
   { width, height }: AreaSize, // text dimensions
   counterRotate = true,
 ): string {
@@ -284,7 +288,10 @@ export function elbow(dX: number, dY: number, fromHorizontal: boolean): string {
   return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
 }
 
-export function showAbsentBlock(part: BuilderPart, key: string): void {
+export function showAbsentBlock(
+  part: DeepReadonly<BuilderPart>,
+  key: string,
+): void {
   const addr = settingsAddress(part, key);
   if (!!addr.serviceId && !!addr.id) {
     createDialog({
@@ -299,7 +306,7 @@ export function showAbsentBlock(part: BuilderPart, key: string): void {
 }
 
 export function rotatedCoord(
-  part: BuilderPart,
+  part: DeepReadonly<BuilderPart>,
   coord: CoordinatesParam,
 ): string {
   return new Coordinates(coord)
@@ -309,7 +316,7 @@ export function rotatedCoord(
 }
 
 export function liquidOnCoord(
-  part: BuilderPart,
+  part: DeepReadonly<BuilderPart>,
   flows: PartFlows,
   baseInCoords: string,
 ): string[] {
@@ -330,7 +337,7 @@ export function liquidBorderColor(flows: PartFlows): string {
 }
 
 export function flowOnCoord(
-  part: BuilderPart,
+  part: DeepReadonly<BuilderPart>,
   flows: PartFlows,
   baseInCoords: string,
 ): number {
@@ -361,7 +368,7 @@ export async function startCreateLayout(
   source?: Maybe<BuilderLayout>,
 ): Promise<void> {
   const title = await createDialogPromise({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: '',
       title: 'New Layout',
@@ -391,7 +398,7 @@ export function startChangeLayoutTitle(layout: Maybe<BuilderLayout>): void {
   }
   const builderStore = useBuilderStore();
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       title: 'Change Layout title',
       message: `Choose a new name for ${layout.title}`,

@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { Block } from 'brewblox-proto/ts';
+import cloneDeep from 'lodash/cloneDeep';
+import { nanoid } from 'nanoid';
+import { computed, ref } from 'vue';
 import { useGlobals, useWidget } from '@/composables';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { filterById, spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { deserialize } from '@/utils/parsing';
-import { Block } from 'brewblox-proto/ts';
-import cloneDeep from 'lodash/cloneDeep';
-import { nanoid } from 'nanoid';
-import { computed, ref } from 'vue';
 import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, ChangeAction, QuickActionsWidget } from './types';
 
@@ -54,7 +54,7 @@ function duplicateAction(action: ChangeAction): void {
 function renameAction(action: ChangeAction): void {
   const stepName = action.name;
   createDialog({
-    component: 'InputDialog',
+    component: 'TextDialog',
     componentProps: {
       modelValue: stepName,
       title: 'Change ChangeAction name',

@@ -1,6 +1,4 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
+<script setup lang="ts">
 const colors = [
   'red',
   'pink',
@@ -23,16 +21,7 @@ const colors = [
   'blue-grey',
 ];
 
-export default defineComponent({
-  name: 'StylesPage',
-  setup() {
-    document.title = 'Brewblox | Style Guide';
-
-    return {
-      colors,
-    };
-  },
-});
+document.title = 'Brewblox | Style Guide';
 </script>
 
 <template>

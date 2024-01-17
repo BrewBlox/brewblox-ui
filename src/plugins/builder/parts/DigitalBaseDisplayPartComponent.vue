@@ -8,9 +8,9 @@ import {
 } from '../blueprints/DigitalBaseDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 import {
-  DigitalBaseBlockT,
   DIGITAL_BASE_KEY,
   DIGITAL_BASE_TYPES,
+  DigitalBaseBlockT,
   LABEL_KEY,
 } from '../const';
 import { liquidBorderColor, textTransformation } from '../utils';

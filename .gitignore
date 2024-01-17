@@ -15,6 +15,8 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+.yarn
+.pnp.*
 
 # Build output
 /dist
@@ -24,5 +26,7 @@ stats.html
 # Dev environment files
 /.env
 /dev/.env
-/dev/traefik/brewblox.crt
-/dev/traefik/brewblox.key
+/dev/traefik/**/*.pem
+/dev/traefik/**/*.der
+/dev/traefik/**/*.crt
+/dev/traefik/**/*.key

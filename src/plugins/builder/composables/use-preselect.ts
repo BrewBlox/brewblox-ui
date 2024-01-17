@@ -1,6 +1,6 @@
+import { computed, ComputedRef, Ref, ref } from 'vue';
 import { useGlobals } from '@/composables';
 import { userUISettings } from '@/user-settings';
-import { computed, ComputedRef, Ref, ref } from 'vue';
 
 export interface UsePreselectComponent {
   preselectedId: Ref<string | null>;

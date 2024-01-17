@@ -1,3 +1,10 @@
+import {
+  Block,
+  BlockType,
+  DigitalActuatorBlock,
+  FastPwmBlock,
+} from 'brewblox-proto/ts';
+import { computed, ComputedRef, inject } from 'vue';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockAddress,
@@ -8,13 +15,6 @@ import { isBlockCompatible, isCompatible } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { durationMs } from '@/utils/quantity';
-import {
-  Block,
-  BlockType,
-  DigitalActuatorBlock,
-  FastPwmBlock,
-} from 'brewblox-proto/ts';
-import { computed, ComputedRef, inject } from 'vue';
 import { PartKey, PatchSettingsKey } from '../symbols';
 import { settingsAddress, showAbsentBlock } from '../utils';
 

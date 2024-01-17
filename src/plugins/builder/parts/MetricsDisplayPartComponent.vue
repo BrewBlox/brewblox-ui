@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import {
   DEFAULT_METRICS_DECIMALS,
-  DEFAULT_METRICS_EXPIRY,
+  DEFAULT_METRICS_EXPIRY_MS,
 } from '@/plugins/history/const';
 import { defaultLabel } from '@/plugins/history/nodes';
 import { fixedNumber, shortDateString } from '@/utils/quantity';
-import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/MetricsDisplay';
 import { usePart } from '../composables';
 import { useMetrics } from '../composables/use-metrics';
@@ -21,19 +21,23 @@ interface MetricDisplay {
 
 const { flows, metrics, width, height, bordered, passthrough } =
   usePart.setup();
-const { source } = useMetrics.setupConsumer();
+const { sourceRef } = useMetrics.setupConsumer();
 
 const color = computed<string>(() => liquidBorderColor(flows.value));
 
 function fieldFreshDuration(field: string): number {
-  return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY;
+  return metrics.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY_MS;
 }
 
 const values = computed<MetricDisplay[]>(() => {
-  if (!source.value) {
+  // The computed returns a ref, so we need to unwrap twice
+  const source = sourceRef.value;
+  const now = new Date().getTime();
+
+  if (source == null) {
     return [];
   }
-  const now = new Date().getTime();
+
   return source.value.values
     .filter((v) => metrics.value.fields.includes(v.field))
     .map((v) => ({
@@ -45,7 +49,7 @@ const values = computed<MetricDisplay[]>(() => {
         metrics.value.decimals[v.field] ?? DEFAULT_METRICS_DECIMALS,
       ),
       stale:
-        !!v.time && ((now - v.time) as number) > fieldFreshDuration(v.field),
+        v.time != null && now - v.time.getTime() > fieldFreshDuration(v.field),
     }));
 });
 </script>

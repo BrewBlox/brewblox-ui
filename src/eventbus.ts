@@ -1,11 +1,11 @@
-// import mqtt from 'mqtt';
+import mqtt from 'mqtt';
+import { nanoid } from 'nanoid';
+import { Ref, ref } from 'vue';
 import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';
 import { popById } from '@/utils/collections';
 import { mqttTopicExp } from '@/utils/misc';
 import { notify } from '@/utils/notify';
-import * as mqtt from 'mqtt/dist/mqtt.min';
-import { nanoid } from 'nanoid';
-import { Ref, ref } from 'vue';
+import { createDialog } from './utils/dialog';
 
 export type EventCallback = (topic: string, evt: any) => unknown;
 
@@ -30,6 +30,9 @@ export class BrewbloxEventbus {
       path: '/eventbus',
       rejectUnauthorized: false,
     };
+    if (this.client) {
+      this.client.end();
+    }
     const client = mqtt.connect(opts);
     this.client = client;
     this.checkIOSBug();
@@ -69,7 +72,7 @@ export class BrewbloxEventbus {
             target="_blank"
             style="color: white"
           >
-            This may be caused by an iOS bug.
+            Self-signed SSL certificates are a known problem on iOS.
           </a>
           `,
             html: true,
@@ -79,9 +82,9 @@ export class BrewbloxEventbus {
                 textColor: 'white',
               },
               {
-                label: 'Switch to HTTP',
+                label: 'Install SSL Cert',
                 textColor: 'white',
-                handler: () => (location.protocol = 'http:'),
+                handler: () => createDialog({ component: 'SslCertDialog' }),
               },
             ],
           }),

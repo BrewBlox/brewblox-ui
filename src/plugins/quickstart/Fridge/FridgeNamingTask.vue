@@ -1,6 +1,11 @@
-<script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
+import { UseTaskEmits, UseTaskProps } from '../composables';
 import { FridgeConfig, FridgeConfigNames } from './types';
+
+const props = defineProps<UseTaskProps<FridgeConfig>>();
+
+const emit = defineEmits<UseTaskEmits<FridgeConfig>>();
 
 const defaultNames: FridgeConfigNames = {
   fridgeSensor: 'Sensor',
@@ -15,33 +20,16 @@ const defaultNames: FridgeConfigNames = {
   heatPid: 'Heat PID',
 };
 
-export default defineComponent({
-  name: 'FridgeNamingTask',
-  props: {
-    config: {
-      type: Object as PropType<FridgeConfig>,
-      required: true,
-    },
-  },
-  emits: ['update:config', 'back', 'next'],
-  setup(props, { emit }) {
-    const localConfig = computed<FridgeConfig>({
-      get: () => props.config,
-      set: (cfg) =>
-        emit('update:config', {
-          ...cfg,
-          widgets: [],
-          createdBlocks: [],
-          changedBlocks: [],
-          renamedBlocks: {},
-        }),
-    });
-
-    return {
-      defaultNames,
-      localConfig,
-    };
-  },
+const localConfig = computed<FridgeConfig>({
+  get: () => props.config,
+  set: (cfg) =>
+    emit('update:config', {
+      ...cfg,
+      widgets: [],
+      createdBlocks: [],
+      changedBlocks: [],
+      renamedBlocks: {},
+    }),
 });
 </script>
 

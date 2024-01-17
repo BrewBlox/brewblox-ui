@@ -1,10 +1,3 @@
-import { genericBlockFeature } from '@/plugins/spark/generic';
-import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
-import { useFeatureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { bloxLink } from '@/utils/link';
-import { deltaTempQty, tempQty } from '@/utils/quantity';
 import {
   BlockIntfType,
   BlockType,
@@ -13,6 +6,13 @@ import {
   SettingMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
+import { genericBlockFeature } from '@/plugins/spark/generic';
+import { useBlockSpecStore } from '@/plugins/spark/store';
+import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { bloxLink } from '@/utils/link';
+import { deltaTempQty, tempQty } from '@/utils/quantity';
 import widget from './SetpointSensorPairWidget.vue';
 
 const type = BlockType.SetpointSensorPair;
@@ -26,6 +26,7 @@ const plugin: Plugin = {
     const blockSpec: BlockSpec<SetpointSensorPairBlock> = {
       type,
       title,
+      hasRelations: true,
       generate: (): SetpointSensorPairBlock['data'] => ({
         sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
         storedSetting: tempQty(20),

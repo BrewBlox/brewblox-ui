@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import {
   BORDER_KEY,
   COLOR_KEY,
@@ -8,7 +9,6 @@ import {
 import { BuilderLayout } from '@/plugins/builder/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { typed } from '@/utils/misc';
-import { nanoid } from 'nanoid';
 import { withPrefix } from '../utils';
 import { BrewKettleConfig } from './types';
 

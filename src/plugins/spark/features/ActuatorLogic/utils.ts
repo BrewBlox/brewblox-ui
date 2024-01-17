@@ -1,16 +1,16 @@
 import {
+  ActuatorLogicBlock,
+  AnalogCompare,
+  BlockType,
+  DigitalCompare,
+} from 'brewblox-proto/ts';
+import {
   ENUM_LABELS_ANALOG_OP,
   ENUM_LABELS_DIGITAL_OP,
   ENUM_LABELS_DIGITAL_STATE,
 } from '@/plugins/spark/const';
 import { isCompatible } from '@/plugins/spark/utils/info';
 import { tempQty } from '@/utils/quantity';
-import {
-  ActuatorLogicBlock,
-  AnalogCompare,
-  BlockType,
-  DigitalCompare,
-} from 'brewblox-proto/ts';
 import { ExpressionError } from './types';
 
 export const keyCode = (s: string): number => s.charCodeAt(0);

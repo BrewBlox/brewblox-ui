@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { useServiceStore } from '@/store/services';
 import { userUISettings } from '@/user-settings';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
-import { computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
 
 const sorter = makeObjectSorter<Dashboard>('title');
 

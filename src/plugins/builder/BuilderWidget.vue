@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { nanoid } from 'nanoid';
+import { computed, provide, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
-import { nanoid } from 'nanoid';
-import { computed, provide, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { usePreselect } from './composables/use-preselect';

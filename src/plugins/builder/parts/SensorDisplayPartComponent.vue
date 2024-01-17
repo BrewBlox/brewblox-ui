@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import {
-  SensorBlockT,
   SENSOR_KEY,
   SENSOR_TYPES,
+  SensorBlockT,
 } from '@/plugins/builder/const';
 import { liquidBorderColor, textTransformation } from '@/plugins/builder/utils';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
-import { computed } from 'vue';
 import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE } from '../blueprints/SensorDisplay';
 import { usePart, useSettingsBlock } from '../composables';
 

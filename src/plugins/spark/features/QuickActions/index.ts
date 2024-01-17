@@ -1,8 +1,8 @@
+import { nanoid } from 'nanoid';
+import { Plugin } from 'vue';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import { cref } from '@/utils/component-ref';
-import { nanoid } from 'nanoid';
-import { Plugin } from 'vue';
 import {
   convertDeprecatedAnalogConstraints,
   convertDeprecatedDigitalConstraints,

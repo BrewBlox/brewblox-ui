@@ -1,8 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
+import { authRefresh, checkAuthEnabled } from '@/auth';
 import { database } from '@/database';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
-import { defineComponent } from 'vue';
+import { AUTH_REFRESH_INTERVAL_MS } from './const';
+import { createDialogPromise } from './utils/dialog';
 
 /**
  * Order of startup is important here.
@@ -12,18 +14,18 @@ import { defineComponent } from 'vue';
  * they will miss the first (immediate) data push.
  */
 async function onAppSetup(): Promise<void> {
+  checkAuthEnabled(); // don't wait
+  if (!(await authRefresh())) {
+    await createDialogPromise({ component: 'LoginDialog' });
+  }
+  setInterval(() => authRefresh().catch(), AUTH_REFRESH_INTERVAL_MS);
+
   await database.connect();
   await startup.start();
   await eventbus.connect();
 }
 
-export default defineComponent({
-  name: 'App',
-  setup() {
-    onAppSetup();
-    return {};
-  },
-});
+onAppSetup();
 </script>
 
 <template>

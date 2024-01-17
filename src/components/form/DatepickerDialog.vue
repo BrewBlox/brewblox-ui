@@ -1,63 +1,44 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
+<script setup lang="ts">
 import { date as qdate } from 'quasar';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 
-export default defineComponent({
-  name: 'DatepickerDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Date,
-      required: true,
-    },
-    label: {
-      type: String,
-      default: 'Date and time',
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
-      useDialog.setup();
-    const tab = ref<'date' | 'time'>('date');
-    const stringValue = ref<string>(
-      qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'),
-    );
+interface Props extends UseDialogProps {
+  modelValue: Date;
+  label?: string;
+}
 
-    const parsed = computed<Date>(() =>
-      qdate.extractDate(stringValue.value, 'YYYY/MM/DD HH:mm:ss'),
-    );
-
-    const valid = computed<boolean>(() =>
-      Number.isFinite(parsed.value.getTime()),
-    );
-
-    function save(): void {
-      if (valid.value) {
-        onDialogOK(parsed.value);
-      }
-    }
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      tab,
-      stringValue,
-      parsed,
-      valid,
-      save,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
+  label: 'Date and time',
 });
+
+defineEmits<UseDialogEmits>();
+
+const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
+  useDialog.setup<Date>();
+const tab = ref<'date' | 'time'>('date');
+const stringValue = ref<string>(
+  qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'),
+);
+
+const parsed = computed<Date>(() =>
+  qdate.extractDate(stringValue.value, 'YYYY/MM/DD HH:mm:ss'),
+);
+
+const valid = computed<boolean>(() => Number.isFinite(parsed.value.getTime()));
+
+function save(): void {
+  if (valid.value) {
+    onDialogOK(parsed.value);
+  }
+}
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

@@ -1,63 +1,54 @@
-<script lang="ts">
-import { useDialog } from '@/composables';
-import { parseDate } from '@/utils/quantity';
+<script setup lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
+import { parseDate } from '@/utils/quantity';
 import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 
-export default defineComponent({
-  name: 'SessionHeaderDialog',
-  props: {
-    ...useDialog.props,
-    modelValue: {
-      type: Object as PropType<LoggedSession>,
-      required: true,
-    },
-  },
-  emits: [...useDialog.emits],
-  setup(props) {
-    const historyStore = useHistoryStore();
-    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialog.setup();
+interface Props extends UseDialogProps {
+  modelValue: LoggedSession;
+}
 
-    const local = ref<LoggedSession>(cloneDeep(props.modelValue));
-
-    const date = computed<Date | null>({
-      get: () => parseDate(local.value.date),
-      set: (v) =>
-        (local.value.date = v ? v.toISOString() : new Date().toISOString()),
-    });
-
-    function save(): void {
-      onDialogOK(local.value);
-    }
-
-    const knownTags = computed<string[]>(() => historyStore.sessionTags);
-
-    return {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      local,
-      date,
-      save,
-      knownTags,
-    };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  ...useDialog.defaultProps,
 });
+
+defineEmits<UseDialogEmits>();
+
+const historyStore = useHistoryStore();
+const { dialogRef, dialogOpts, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialog.setup<LoggedSession>();
+
+const local = ref<LoggedSession>(cloneDeep(props.modelValue));
+
+const tags = computed<string[]>({
+  get: () => local.value.tags ?? [],
+  set: (v) => (local.value.tags = v),
+});
+
+const date = computed<Date | null>({
+  get: () => parseDate(local.value.date),
+  set: (v) =>
+    (local.value.date = v ? v.toISOString() : new Date().toISOString()),
+});
+
+function save(): void {
+  onDialogOK(local.value);
+}
+
+const knownTags = computed<string[]>(() => historyStore.sessionTags);
 </script>
 
 <template>
   <q-dialog
     ref="dialogRef"
-    v-bind="dialogProps"
+    v-bind="dialogOpts"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard :title="title">
-      <InputField
+      <TextField
         v-model="local.title"
         title="Session name"
         label="Session name"
@@ -73,7 +64,7 @@ export default defineComponent({
         item-aligned
       />
       <TagSelectField
-        v-model="local.tags"
+        v-model="tags"
         :existing="knownTags"
       />
       <template #actions>
