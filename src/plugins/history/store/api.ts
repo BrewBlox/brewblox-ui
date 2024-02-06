@@ -10,10 +10,10 @@ export const historyApi = {
 
   fetchFields: async (duration: string): Promise<string[]> =>
     http
-      .post<{ duration: string }, AxiosResponse<string[]>>(
-        '/history/timeseries/fields',
-        { duration },
-      )
+      .post<
+        { duration: string },
+        AxiosResponse<string[]>
+      >('/history/timeseries/fields', { duration })
       .then((resp) => resp.data),
 
   downloadCsv: async (query: CsvQuery): Promise<Blob> =>
