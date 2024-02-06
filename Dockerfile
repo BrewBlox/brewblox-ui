@@ -29,8 +29,13 @@ server {
     font/woff
     font/woff2;
 
-  # Redirect / and /ui to UI index
-  location ~ ^/(ui)?$ {
+  location = / {
+    add_header used_location slash;
+    rewrite ^ /ui/index.html;
+  }
+
+  location = /ui {
+    add_header used_location slashui;
     rewrite ^ /ui/index.html;
   }
 
@@ -52,7 +57,7 @@ server {
 
   # SPA support: return index.html without redirection
   location /ui/ {
-    try_files $uri $uri/ /ui/index.html;
+    try_files $uri $uri.html /ui/index.html;
   }
 
   # Static files are handled separately

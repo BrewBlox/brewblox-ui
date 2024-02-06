@@ -56,7 +56,9 @@ const router = createRouter({
 // Strip hash on fresh page loads
 // We use the hash to handle back button in dialogs
 router.beforeResolve((to, from, next) => {
-  from.fullPath === '/' && to.hash ? next({ path: to.path, hash: '' }) : next();
+  from.fullPath === '/' && to.hash.startsWith('#')
+    ? next({ path: to.path, hash: '' })
+    : next();
 });
 
 export default router;
