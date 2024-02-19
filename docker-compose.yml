@@ -71,7 +71,7 @@ services:
     labels:
       - traefik.enable=false
     environment:
-      - BREWBLOX_TILT_SIMULATE=Pink
+      - BREWBLOX_TILT_SIMULATE=["Pink"]
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/tilt
