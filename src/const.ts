@@ -30,17 +30,18 @@ export const SPARK_SNIPPET_NAMESPACE = `${UI_NAMESPACE}:spark-presets`;
 
 const { userAgent, platform, maxTouchPoints } = navigator;
 
-export const IS_CHROME = userAgent.indexOf('Chrome') > -1;
-export const IS_FIREFOX = userAgent.indexOf('Firefox') > -1;
-export const IS_SAFARI = !IS_CHROME && userAgent.indexOf('Safari') > -1;
+export const IS_CHROME = /Chrome/i.test(userAgent);
+export const IS_FIREFOX = /Firefox/i.test(userAgent);
+export const IS_ANDROID = /Android/i.test(userAgent);
+export const IS_SAFARI = !IS_CHROME && /Safari/i.test(userAgent);
 
-export const IS_APPLE = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+export const IS_APPLE = /(Mac|iPhone|iPod|iPad)/i.test(platform);
 export const IS_WEBKIT = IS_SAFARI || IS_APPLE;
 
 export const IS_IOS =
   import.meta.env.MODE !== 'test'
-    ? /iPad|iPhone|iPod/.test(platform) ||
-      (platform === 'MacIntel' && maxTouchPoints > 1)
+    ? /iPad|iPhone|iPod/i.test(platform) ||
+      (/MacIntel/i.test(platform) && maxTouchPoints > 1)
     : false;
 
 export const AUTH_REFRESH_INTERVAL_MS = 10 * 60 * 1000;

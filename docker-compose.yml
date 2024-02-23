@@ -6,7 +6,7 @@ services:
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
   victoria:
-    image: victoriametrics/victoria-metrics:v1.88.0
+    image: victoriametrics/victoria-metrics:v1.98.0
     command: --envflag.enable=true --envflag.prefix=VM_
     labels:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
@@ -71,7 +71,7 @@ services:
     labels:
       - traefik.enable=false
     environment:
-      - BREWBLOX_TILT_SIMULATE=Pink
+      - BREWBLOX_TILT_SIMULATE=["Pink"]
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/tilt

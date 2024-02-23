@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
-import { HOST, IS_FIREFOX, IS_IOS, IS_SAFARI } from '@/const';
+import { HOST, IS_ANDROID, IS_FIREFOX, IS_IOS, IS_SAFARI } from '@/const';
 
-type BrowserKind = 'chrome' | 'firefox' | 'mac' | 'ios';
+type BrowserKind = 'chrome' | 'firefox' | 'mac' | 'ios' | 'android';
 
 withDefaults(defineProps<UseDialogProps>(), {
   ...useDialog.defaultProps,
@@ -18,6 +18,8 @@ const activeTab = ref<BrowserKind>('chrome');
 
 if (IS_IOS) {
   activeTab.value = 'ios';
+} else if (IS_ANDROID) {
+  activeTab.value = 'android';
 } else if (IS_SAFARI) {
   activeTab.value = 'mac';
 } else if (IS_FIREFOX) {
@@ -62,11 +64,6 @@ if (IS_IOS) {
           your Brewblox install. Select your platform below, and follow the
           instructions.
         </p>
-        <p>
-          <b>
-            Android does not support installing additional CA certificates.
-          </b>
-        </p>
       </q-card-section>
 
       <q-separator />
@@ -94,6 +91,10 @@ if (IS_IOS) {
         <q-tab
           name="ios"
           label="iOS"
+        />
+        <q-tab
+          name="android"
+          label="Android"
         />
       </q-tabs>
       <q-tab-panels v-model="activeTab">
@@ -208,6 +209,33 @@ if (IS_IOS) {
             </li>
             <li>Enable the toggle button next to the certificate</li>
             <li>Tap "Continue" when prompted</li>
+            <li>Reload the Brewblox UI page in your browser</li>
+          </ul>
+        </q-tab-panel>
+        <q-tab-panel name="android">
+          <p>
+            Android settings can vary between releases and vendors. The below
+            instructions use stock Android 13 as reference.
+          </p>
+          <ul>
+            <li>
+              <a
+                outline
+                :href="`${HOST}/static/minica.pem`"
+                target="_blank"
+                style="color: white"
+              >
+                Click here to download the <b>minica.pem</b> file
+              </a>
+            </li>
+            <li>Open the "Settings" app</li>
+            <li>Select "Security &amp; Privacy"</li>
+            <li>Select "More security settings"</li>
+            <li>Select "Encryption &amp; credentials"</li>
+            <li>Select "Install a certificate"</li>
+            <li>Select "CA certificate"</li>
+            <li>Tap "Install anyway" in the warning screen</li>
+            <li>Select "minica.pem.crt" under "Recent files"</li>
             <li>Reload the Brewblox UI page in your browser</li>
           </ul>
         </q-tab-panel>

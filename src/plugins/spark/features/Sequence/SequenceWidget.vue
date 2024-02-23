@@ -36,7 +36,7 @@ const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.INVALID_TARGET]: 'Target block is invalid or missing',
   [SequenceError.DISABLED_TARGET]: 'Target block is disabled',
   [SequenceError.INACTIVE_TARGET]:
-    'Target block is inactive (claimed by disabled block)',
+    'Target block is inactive or claimed by disabled block',
   [SequenceError.SYSTEM_TIME_NOT_AVAILABLE]:
     'System time not set on controller',
 };
