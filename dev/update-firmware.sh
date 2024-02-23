@@ -15,8 +15,8 @@ curl -sSf \
 # Extract variables from ini
 firmware_date=$(awk -F "=" '/firmware_date/ {print $2}' ./firmware.ini)
 firmware_version=$(awk -F "=" '/firmware_version/ {print $2}' ./firmware.ini)
-proto_version=$(awk -F "=" '/proto_version/ {print $2}' ./firmware.ini)
+proto_sha=$(awk -F "=" '/proto_sha/ {print $2}' ./firmware.ini)
 
 echo "Updating to firmware release ${firmware_date}-${firmware_version}"
 
-yarn add "https://github.com/brewblox/brewblox-proto#${proto_version}"
+yarn add "brewblox-proto@https://github.com/brewblox/brewblox-proto#commit=${proto_sha}"
