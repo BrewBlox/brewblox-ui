@@ -25,6 +25,7 @@ declare module '@vue/runtime-core' {
     SparkBackupDialog: typeof import('src/plugins/spark/components/menu/SparkBackupDialog.vue').default;
     FirmwareUpdateDialog: typeof import('src/plugins/spark/components/menu/FirmwareUpdateDialog.vue').default;
     BlockJsonDialog: typeof import('src/plugins/spark/components/menu/BlockJsonDialog.vue').default;
+    VarContainerField: typeof import('src/plugins/spark/components/form/VarContainerField.vue').default;
     StringValEdit: typeof import('src/plugins/spark/components/form/StringValEdit.vue').default;
     StateValEdit: typeof import('src/plugins/spark/components/form/StateValEdit.vue').default;
     SetpointSettingDialog: typeof import('src/plugins/spark/components/form/SetpointSettingDialog.vue').default;

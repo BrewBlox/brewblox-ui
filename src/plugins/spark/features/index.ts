@@ -30,6 +30,7 @@ import TempSensorCombi from './TempSensorCombi';
 import TempSensorExternal from './TempSensorExternal';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
+import Variables from './Variables';
 
 const plugins: Plugin[] = [
   ActuatorAnalogMock,
@@ -63,6 +64,7 @@ const plugins: Plugin[] = [
   TempSensorExternal,
   TempSensorMock,
   TempSensorOneWire,
+  Variables,
 ];
 
 export default plugins;
