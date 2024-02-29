@@ -74,7 +74,7 @@ const link = computed<Link | undefined>({
     >
       <template #label>
         <span class="text-label">{{ label }}</span>
-        <span class="text-kind">[Number]</span>
+        <span class="text-kind">[PWM value]</span>
       </template>
     </NumberField>
   </template>
@@ -96,13 +96,14 @@ const link = computed<Link | undefined>({
     >
       <template #label>
         <span class="text-label">{{ label }}</span>
-        <span class="text-kind">[Delta Temperature]</span>
+        <span class="text-kind">[Temperature difference]</span>
       </template>
     </QuantityField>
   </template>
   <template v-if="timestamp !== undefined">
     <DatetimeField
       v-model="timestamp"
+      default-now
       v-bind="$attrs"
     >
       <template #label>

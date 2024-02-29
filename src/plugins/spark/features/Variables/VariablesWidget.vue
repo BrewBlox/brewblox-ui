@@ -6,6 +6,7 @@ import { selectable } from '@/utils/collections';
 import { createDialogPromise } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
 
 type ContainerKey = Exclude<KeysOfUnion<VarContainer>, 'empty'>;
 
@@ -65,21 +66,22 @@ async function addVar(): Promise<void> {
     return;
   }
 
+  const rules: InputRule[] = [
+    (v) => v.length > 0 || 'Name must not be empty',
+    (v) => v.length < 16 || 'Name must be less than 16 characters',
+    (v) =>
+      /^[\w\-]+$/.test(v) ||
+      'Name can only contain letters, numbers, underscores, and dashes',
+    (v) =>
+      !sortedVars.value.map((v) => v[0]).includes(v) || 'Name must be unique',
+  ];
+
   const name: string | undefined = await createDialogPromise({
     component: 'TextDialog',
     componentProps: {
       title: 'Variable name',
-      modelValue: '',
-      rules: [
-        (v) => v.length > 0 || 'Name must not be empty',
-        (v) => v.length < 16 || 'Name must be less than 16 characters',
-        (v) =>
-          /^\w+$/.test(v) ||
-          'Name can only contain alphanumeric characters and underscores',
-        (v) =>
-          !sortedVars.value.map((v) => v[0]).includes(v) ||
-          'Name must be unique',
-      ],
+      modelValue: suggestId(key, makeRuleValidator(rules)),
+      rules,
     },
   });
 
