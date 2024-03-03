@@ -1,11 +1,11 @@
 {
   "name": null,
-  "timestamp": "2023-02-09T14:01:39Z",
+  "timestamp": "2024-03-03T21:08:15Z",
   "firmware": {
-    "firmware_version": "072cc202",
-    "proto_version": "e9b2f8b9",
-    "firmware_date": "2023-02-09",
-    "proto_date": "2023-02-09"
+    "firmware_version": "b6270308",
+    "proto_version": "a5dc48c8",
+    "firmware_date": "2024-03-01",
+    "proto_date": "2024-03-01"
   },
   "device": {
     "device_id": "432109876543210987654321"
@@ -21,6 +21,7 @@
         "maxSetting": 30,
         "minValue": 40,
         "maxValue": 60,
+        "constraints": {},
         "enabled": false,
         "storedSetting": 0,
         "desiredSetting": 0,
@@ -425,6 +426,7 @@
           "type": "SetpointSensorPairInterface",
           "id": "setpoint-sensor-pair-1"
         },
+        "constraints": {},
         "enabled": false,
         "storedSetting": {
           "__bloxtype": "Quantity",
@@ -652,6 +654,7 @@
       "serviceId": "spock",
       "data": {
         "storedState": 2,
+        "constraints": {},
         "hwDevice": {
           "__bloxtype": "Link",
           "type": "IoArrayInterface",
@@ -731,6 +734,12 @@
           "__bloxtype": "Link",
           "type": "SetpointSensorPair",
           "id": null
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
         }
       }
     },
@@ -936,7 +945,12 @@
         "systemTime": null,
         "timeZone": "",
         "tempUnit": 0,
-        "displayBrightness": 0
+        "displayBrightness": 0,
+        "voltage5": 0,
+        "voltageExternal": 0,
+        "memoryFree": 0,
+        "memoryFreeContiguous": 0,
+        "memoryFreeLowest": 0
       }
     }
   ],
