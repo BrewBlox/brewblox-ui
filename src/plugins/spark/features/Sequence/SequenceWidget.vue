@@ -39,6 +39,10 @@ const ERROR_TEXT: Record<SequenceError, string | null> = {
     'Target block is inactive or claimed by disabled block',
   [SequenceError.SYSTEM_TIME_NOT_AVAILABLE]:
     'System time not set on controller',
+  [SequenceError.VARIABLES_NOT_SUPPORTED]:
+    'Variables not supported on this Spark',
+  [SequenceError.UNDEFINED_VARIABLE]: 'Variable is not defined',
+  [SequenceError.INVALID_VARIABLE]: 'Variable is of an invalid type',
 };
 
 const activeInstructionTheme = EditorView.baseTheme({
@@ -52,7 +56,7 @@ const activeInstructionAttributes = Decoration.line({
 });
 
 const { inDialog } = useContext.setup();
-const { block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
+const { serviceId, block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
 const editor = ref<HTMLDivElement>();
 const configError = ref<string | undefined>();
 
@@ -400,8 +404,8 @@ function skipTo(idx: number): void {
       </div>
 
       <div class="row">
-        <q-space />
         <template v-if="editing">
+          <q-space />
           <q-btn
             flat
             label="Revert"
@@ -415,6 +419,16 @@ function skipTo(idx: number): void {
             :disable="!dirty"
             color="primary"
             @click="saveLocal"
+          />
+        </template>
+        <template v-else>
+          <LinkField
+            :model-value="block.data.variablesId"
+            :service-id="serviceId"
+            title="variables"
+            label="Variables"
+            class="col-grow q-mr-sm"
+            @update:model-value="(v) => patchBlock({ variablesId: v })"
           />
         </template>
         <q-btn

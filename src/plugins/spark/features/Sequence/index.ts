@@ -10,6 +10,7 @@ import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
+import { bloxLink } from '@/utils/link';
 import { bloxQty } from '@/utils/quantity';
 import widget from './SequenceWidget.vue';
 
@@ -32,6 +33,7 @@ const plugin: Plugin = {
         status: SequenceStatus.UNKNOWN,
         error: SequenceError.NONE,
         instructions: [],
+        variablesId: bloxLink(null),
       }),
       analyze: (block: SequenceBlock) => {
         const { enabled, status } = block.data;

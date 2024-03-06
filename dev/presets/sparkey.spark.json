@@ -1,11 +1,11 @@
 {
   "name": null,
-  "timestamp": "2023-02-09T14:01:39Z",
+  "timestamp": "2024-03-03T21:08:15Z",
   "firmware": {
-    "firmware_version": "072cc202",
-    "proto_version": "e9b2f8b9",
-    "firmware_date": "2023-02-09",
-    "proto_date": "2023-02-09"
+    "firmware_version": "b6270308",
+    "proto_version": "a5dc48c8",
+    "firmware_date": "2024-03-01",
+    "proto_date": "2024-03-01"
   },
   "device": {
     "device_id": "123456789012345678901234"
@@ -287,6 +287,7 @@
         },
         "enabled": true,
         "settingMode": 1,
+        "constraints": {},
         "storedSetting": 0,
         "desiredSetting": 0,
         "setting": 0,
@@ -521,6 +522,7 @@
         },
         "enabled": true,
         "settingMode": 1,
+        "constraints": {},
         "storedSetting": 0,
         "desiredSetting": 0,
         "setting": 0,
@@ -596,7 +598,13 @@
           "id": "Ferment Beer Setting"
         },
         "start": "2021-01-27T14:26:33Z",
-        "enabled": false
+        "enabled": false,
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0,
+          "readonly": true
+        }
       }
     },
     {
@@ -1450,15 +1458,19 @@
         ],
         "overrideState": true,
         "activeInstruction": 1,
-        "activeInstructionStartedAt": "2023-02-09T14:01:29Z",
-        "disabledAt": null,
-        "disabledDuration": {
-          "__bloxtype": "Quantity",
-          "unit": "second",
-          "value": 0
+        "variablesId": {
+          "__bloxtype": "Link",
+          "type": "Variables",
+          "id": "Variables"
         },
         "status": 0,
-        "error": 0
+        "error": 0,
+        "elapsed": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0,
+          "readonly": true
+        }
       }
     },
     {
@@ -1484,7 +1496,12 @@
         },
         "updatesPerSecond": 0,
         "systemTime": null,
-        "tempUnit": 0
+        "tempUnit": 0,
+        "voltage5": 0,
+        "voltageExternal": 0,
+        "memoryFree": 0,
+        "memoryFreeContiguous": 0,
+        "memoryFreeLowest": 0
       }
     },
     {
@@ -1504,12 +1521,43 @@
           "unit": "degC",
           "value": 20
         },
-        "lastUpdated": "2023-02-09T13:29:21Z",
+        "lastUpdated": "2024-03-03T20:47:23Z",
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
           "value": 0,
           "readonly": true
+        }
+      }
+    },
+    {
+      "id": "Variables",
+      "nid": 138,
+      "type": "Variables",
+      "serviceId": "sparkey",
+      "data": {
+        "variables": {
+          "setpoint_temp": {
+            "temp": {
+              "__bloxtype": "Quantity",
+              "unit": "degC",
+              "value": 20
+            }
+          },
+          "duration_1": {
+            "duration": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 60
+            }
+          },
+          "precision": {
+            "deltaTemp": {
+              "__bloxtype": "Quantity",
+              "unit": "delta_degC",
+              "value": 1
+            }
+          }
         }
       }
     }
@@ -1820,6 +1868,13 @@
       "keys": [
         "Mock Pins",
         137
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Variables",
+        138
       ],
       "data": {}
     }

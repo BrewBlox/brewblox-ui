@@ -68,7 +68,7 @@ async function addVar(): Promise<void> {
 
   const rules: InputRule[] = [
     (v) => v.length > 0 || 'Name must not be empty',
-    (v) => v.length < 16 || 'Name must be less than 16 characters',
+    (v) => v.length <= 16 || 'Name can have max 16 characters',
     (v) =>
       /^[\w\-]+$/.test(v) ||
       'Name can only contain letters, numbers, underscores, and dashes',
