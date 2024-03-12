@@ -3,6 +3,7 @@ import {
   SequenceBlock,
   SequenceError,
   SequenceStatus,
+  SequenceStoreMode,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
@@ -34,6 +35,7 @@ const plugin: Plugin = {
         error: SequenceError.NONE,
         instructions: [],
         variablesId: bloxLink(null),
+        storeMode: SequenceStoreMode.AT_RESTORE_INSTRUCTION_RESTORE_ENABLED,
       }),
       analyze: (block: SequenceBlock) => {
         const { enabled, status } = block.data;

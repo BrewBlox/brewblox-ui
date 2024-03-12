@@ -10,6 +10,7 @@ import {
   LogicResult,
   PwmFrequency,
   SensorCombiFunc,
+  SequenceStoreMode,
   TransitionDurationPreset,
   ValveState,
 } from 'brewblox-proto/ts';
@@ -131,3 +132,12 @@ export const PWM_SELECT_OPTIONS: SelectOption<number>[] = [
   { label: '75%', value: 75 },
   { label: '100%', value: 100 },
 ];
+
+export const ENUM_LABELS_STORE_MODE: EnumLabels<SequenceStoreMode> = {
+  AT_RESTORE_INSTRUCTION_RESTORE_ENABLED: 'As before, at active instruction',
+  AT_RESTORE_INSTRUCTION_ALWAYS_ENABLED: 'Enabled, at active instruction',
+  AT_RESTORE_INSTRUCTION_NEVER_ENABLED: 'Disabled, at active instruction',
+  AT_FIRST_INSTRUCTION_RESTORE_ENABLED: 'As before, at first instruction',
+  AT_FIRST_INSTRUCTION_ALWAYS_ENABLED: 'Enabled, at first instruction',
+  AT_FIRST_INSTRUCTION_NEVER_ENABLED: 'Disabled, at first instruction',
+};

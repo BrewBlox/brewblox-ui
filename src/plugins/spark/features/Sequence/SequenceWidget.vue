@@ -26,8 +26,10 @@ import { colors } from 'quasar';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
+import { ENUM_LABELS_STORE_MODE } from '../../const';
 import SequenceDocumentation from './SequenceDocumentation.vue';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
@@ -45,6 +47,8 @@ const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.INVALID_VARIABLE]: 'Variable is of an invalid type',
 };
 
+const storeModeOpts = selectable(ENUM_LABELS_STORE_MODE);
+
 const activeInstructionTheme = EditorView.baseTheme({
   '&dark .cm-activeInstruction': {
     backgroundColor: colors.getPaletteColor('secondary'),
@@ -55,7 +59,7 @@ const activeInstructionAttributes = Decoration.line({
   attributes: { class: 'cm-activeInstruction' },
 });
 
-const { inDialog } = useContext.setup();
+const { context, inDialog } = useContext.setup();
 const { serviceId, block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
 const editor = ref<HTMLDivElement>();
 const configError = ref<string | undefined>();
@@ -342,7 +346,7 @@ function skipTo(idx: number): void {
     </template>
 
     <template #toolbar>
-      <BlockWidgetToolbar />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
     <div class="column q-ma-md q-gutter-y-sm">
@@ -403,9 +407,9 @@ function skipTo(idx: number): void {
         {{ configError }}
       </div>
 
-      <div class="row">
+      <div class="row q-gutter-sm">
+        <q-space />
         <template v-if="editing">
-          <q-space />
           <q-btn
             flat
             label="Revert"
@@ -421,16 +425,6 @@ function skipTo(idx: number): void {
             @click="saveLocal"
           />
         </template>
-        <template v-else>
-          <LinkField
-            :model-value="block.data.variablesId"
-            :service-id="serviceId"
-            title="variables"
-            label="Variables"
-            class="col-grow q-mr-sm"
-            @update:model-value="(v) => patchBlock({ variablesId: v })"
-          />
-        </template>
         <q-btn
           flat
           :label="editing ? 'Stop editing' : 'Edit instructions'"
@@ -440,5 +434,26 @@ function skipTo(idx: number): void {
         />
       </div>
     </div>
+    <template v-if="context.mode === 'Full'">
+      <q-separator inset />
+      <div class="widget-body row">
+        <LinkField
+          :model-value="block.data.variablesId"
+          :service-id="serviceId"
+          title="variables"
+          label="Variables"
+          class="col-grow"
+          @update:model-value="(v) => patchBlock({ variablesId: v })"
+        />
+        <SelectField
+          :model-value="block.data.storeMode"
+          :options="storeModeOpts"
+          title="On Spark start"
+          label="On Spark start"
+          class="col-grow"
+          @update:model-value="(v) => patchBlock({ storeMode: v })"
+        />
+      </div>
+    </template>
   </PreviewCard>
 </template>
