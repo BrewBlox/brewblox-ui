@@ -440,7 +440,7 @@ function skipTo(idx: number): void {
         <LinkField
           :model-value="block.data.variablesId"
           :service-id="serviceId"
-          title="variables"
+          title="Variables"
           label="Variables"
           class="col-grow"
           @update:model-value="(v) => patchBlock({ variablesId: v })"
@@ -448,8 +448,20 @@ function skipTo(idx: number): void {
         <SelectField
           :model-value="block.data.storeMode"
           :options="storeModeOpts"
-          title="On Spark start"
-          label="On Spark start"
+          html
+          title="Sequence startup behavior"
+          label="Startup behavior"
+          message="<p>
+          When the Spark starts it restores all blocks settings.
+          This includes sequence position and enabled/disabled state.<br/>
+          You can choose to reset the sequence to a specific state.
+          </p>
+
+          <p>
+          Instead of restoring the position, you can always jump to the first instruction.<br/>
+          Instead of restoring the enabled/disabled setting,
+          you can always enable or disable the sequence.
+          </p>"
           class="col-grow"
           @update:model-value="(v) => patchBlock({ storeMode: v })"
         />

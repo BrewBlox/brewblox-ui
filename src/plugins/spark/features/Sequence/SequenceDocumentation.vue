@@ -65,19 +65,43 @@ import { instructions } from 'brewblox-proto/docs/Sequence.json';
           are allowed but optional.
         </p>
         <p>
+          Argument values may refer to a value stored in a linked
+          <i>Variables</i> block. For variable values, the
+          <code>key=$var_name</code> syntax is used, where
+          <code>var_name</code> is the name of the entry stored in the
+          <i>Variables</i> block.
+        </p>
+        <p>
+          When using variables, the variable type must match the argument value
+          type. If it does not, the instruction will trigger an error. <br />
+          Variables are resolved when the instruction starts. If the linked
+          <i>Variables</i> block is changed, the active instruction is reloaded.
+        </p>
+        <p>
           Lines that start with a <code>#</code> are comments, and will not be
           executed. Comments are stored on the Spark, and may cause it to run
           out of memory.
         </p>
         <p>Example instructions:</p>
         <p>
-          <code>SET_SETPOINT target=BK Setpoint, setting=65C</code><br />
-          <code>ENABLE target='BK Setpoint'</code><br />
-          <code>WAIT_SETPOINT target='BK Setpoint', precision=1dC</code><br />
-          <code># Starting the profile sets its start time to 'now'</code><br />
-          <code>START_PROFILE target='BK Profile '</code><br />
-          <code>ENABLE target='BK Profile'</code><br />
-          <code>WAIT_PROFILE target='BK Profile '</code><br />
+          <code>SET_SETPOINT target=BK Setpoint, setting=65C</code>
+          <br />
+          <code>ENABLE target='BK Setpoint'</code>
+          <br />
+          <code>WAIT_SETPOINT target='BK Setpoint', precision=1dC</code>
+          <br />
+          <code># Starting the profile sets its start time to 'now'</code>
+          <br />
+          <code>START_PROFILE target='BK Profile '</code>
+          <br />
+          <code>ENABLE target='BK Profile'</code>
+          <br />
+          <code>WAIT_PROFILE target='BK Profile '</code>
+          <br />
+          <code>DISABLE target='BK Profile'</code>
+          <br />
+          <code> SET_SETPOINT target='BK Setpoint', setting=$bk_setting </code>
+          <br />
         </p>
       </div>
     </q-expansion-item>
