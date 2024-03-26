@@ -41,6 +41,7 @@ watch(
   (title) => {
     document.title = `Brewblox | ${title}`;
   },
+  { immediate: true },
 );
 
 const isAvailable = computed<boolean>(

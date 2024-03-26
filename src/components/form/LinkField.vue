@@ -91,6 +91,8 @@ function openDialog(): void {
       {{ displayValue }}
     </slot>
     <template #append>
+      <!-- dummy to fix https://github.com/quasarframework/quasar/issues/16589 -->
+      <q-btn v-show="false" />
       <q-btn
         v-if="canEdit"
         flat

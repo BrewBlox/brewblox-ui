@@ -31,6 +31,8 @@ type Awaitable<T> = T | PromiseLike<T>;
 
 type Maybe<T> = T | null | undefined;
 
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+
 interface HasId {
   id: string;
 }

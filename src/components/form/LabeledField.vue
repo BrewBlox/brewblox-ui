@@ -47,7 +47,10 @@ onMounted(() => {
     // Quasar fields have changed to use inheritAttrs: false,
     // and do not have a click event handler
     // We can bypass this by setting the click handler on the top-level html element
-    fieldRef.value.$el.onclick = () => emit('click');
+    fieldRef.value.$el.onclick = (evt: PointerEvent) => {
+      evt.preventDefault();
+      emit('click');
+    };
   }
 });
 </script>

@@ -5,21 +5,15 @@ import { useField, UseFieldProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/quantity';
 
-interface Props extends UseFieldProps {
-  modelValue: Quantity;
-}
+const model = defineModel<Quantity>({ required: true });
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<UseFieldProps>(), {
   ...useField.defaultProps,
 });
 
-const emit = defineEmits<{
-  'update:modelValue': [payload: Quantity];
-}>();
-
 const { activeSlots } = useField.setup();
 
-const displayValue = computed<string>(() => durationString(props.modelValue));
+const displayValue = computed<string>(() => durationString(model.value));
 
 function openDialog(): void {
   if (props.readonly) {
@@ -28,14 +22,16 @@ function openDialog(): void {
   createDialog({
     component: 'DurationDialog',
     componentProps: {
-      modelValue: props.modelValue,
+      modelValue: model.value,
       title: props.title,
       message: props.message,
       html: props.html,
       label: props.label,
       rules: props.rules,
     },
-  }).onOk((v: Quantity) => emit('update:modelValue', v));
+  }).onOk((v: Quantity) => {
+    model.value = v;
+  });
 }
 </script>
 

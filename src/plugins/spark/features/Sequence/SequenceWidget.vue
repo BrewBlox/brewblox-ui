@@ -26,8 +26,10 @@ import { colors } from 'quasar';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
+import { ENUM_LABELS_STORE_MODE } from '../../const';
 import SequenceDocumentation from './SequenceDocumentation.vue';
 
 const ERROR_TEXT: Record<SequenceError, string | null> = {
@@ -39,7 +41,13 @@ const ERROR_TEXT: Record<SequenceError, string | null> = {
     'Target block is inactive or claimed by disabled block',
   [SequenceError.SYSTEM_TIME_NOT_AVAILABLE]:
     'System time not set on controller',
+  [SequenceError.VARIABLES_NOT_SUPPORTED]:
+    'Variables not supported on this Spark',
+  [SequenceError.UNDEFINED_VARIABLE]: 'Variable is not defined',
+  [SequenceError.INVALID_VARIABLE]: 'Variable is of an invalid type',
 };
+
+const storeModeOpts = selectable(ENUM_LABELS_STORE_MODE);
 
 const activeInstructionTheme = EditorView.baseTheme({
   '&dark .cm-activeInstruction': {
@@ -51,8 +59,8 @@ const activeInstructionAttributes = Decoration.line({
   attributes: { class: 'cm-activeInstruction' },
 });
 
-const { inDialog } = useContext.setup();
-const { block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
+const { context, inDialog } = useContext.setup();
+const { serviceId, block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
 const editor = ref<HTMLDivElement>();
 const configError = ref<string | undefined>();
 
@@ -338,7 +346,7 @@ function skipTo(idx: number): void {
     </template>
 
     <template #toolbar>
-      <BlockWidgetToolbar />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
     <div class="column q-ma-md q-gutter-y-sm">
@@ -399,7 +407,7 @@ function skipTo(idx: number): void {
         {{ configError }}
       </div>
 
-      <div class="row">
+      <div class="row q-gutter-sm">
         <q-space />
         <template v-if="editing">
           <q-btn
@@ -426,5 +434,38 @@ function skipTo(idx: number): void {
         />
       </div>
     </div>
+    <template v-if="context.mode === 'Full'">
+      <q-separator inset />
+      <div class="widget-body row">
+        <LinkField
+          :model-value="block.data.variablesId"
+          :service-id="serviceId"
+          title="Variables"
+          label="Variables"
+          class="col-grow"
+          @update:model-value="(v) => patchBlock({ variablesId: v })"
+        />
+        <SelectField
+          :model-value="block.data.storeMode"
+          :options="storeModeOpts"
+          html
+          title="Sequence startup behavior"
+          label="Startup behavior"
+          message="<p>
+          When the Spark starts it restores all blocks settings.
+          This includes sequence position and enabled/disabled state.<br/>
+          You can choose to reset the sequence to a specific state.
+          </p>
+
+          <p>
+          Instead of restoring the position, you can always jump to the first instruction.<br/>
+          Instead of restoring the enabled/disabled setting,
+          you can always enable or disable the sequence.
+          </p>"
+          class="col-grow"
+          @update:model-value="(v) => patchBlock({ storeMode: v })"
+        />
+      </div>
+    </template>
   </PreviewCard>
 </template>
