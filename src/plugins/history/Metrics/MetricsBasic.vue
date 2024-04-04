@@ -16,7 +16,7 @@ import { durationString, fixedNumber, shortDateString } from '@/utils/quantity';
 import { DEFAULT_METRICS_DECIMALS, DEFAULT_METRICS_EXPIRY_MS } from '../const';
 import { MetricsWidget } from './types';
 
-interface DisplayValue extends MetricValue {
+interface DisplayValue extends Partial<MetricValue> {
   name: string;
   stale: boolean;
   decimals: number;
@@ -52,20 +52,23 @@ const values = computed<DisplayValue[]>(() => {
     return [];
   }
 
-  return source.value.values.map((result): DisplayValue => {
-    const name =
-      config.value.renames[result.field] || defaultLabel(result.field);
-    const decimals =
-      config.value.decimals[result.field] ?? DEFAULT_METRICS_DECIMALS;
+  return config.value.fields.map((field): DisplayValue => {
+    const result: Partial<MetricValue> =
+      source.value.values.find((v) => v.field === field) ?? {};
+
+    const name = config.value.renames[field] || defaultLabel(field);
+    const decimals = config.value.decimals[field] ?? DEFAULT_METRICS_DECIMALS;
     const freshDuration =
-      config.value.freshDuration[result.field] ?? DEFAULT_METRICS_EXPIRY_MS;
+      config.value.freshDuration[field] ?? DEFAULT_METRICS_EXPIRY_MS;
+    const stale =
+      result?.time == null || now - result.time.getTime() > freshDuration;
 
     return {
       ...result,
       name,
       decimals,
       freshDuration,
-      stale: result.time != null && now - result.time.getTime() > freshDuration,
+      stale,
       fixedValue: fixedNumber(result.value, decimals),
     };
   });
