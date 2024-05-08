@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
+  GpioErrorFlags,
   GpioModuleChannel,
-  GpioModuleStatus,
   GpioPins,
   OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
@@ -56,32 +56,32 @@ const inputPins = computed<GpioPins>(() =>
 
 const errors = computed<string[]>(() => {
   const values: string[] = [];
-  const { moduleStatus, overCurrent, openLoad } = block.value.data;
+  const { moduleStatus, overCurrent, openLoad } = block.value.data.status;
   if (overCurrent !== GpioPins.NONE) {
     values.push(
       'ERROR: Overcurrent on pin ' + listedPins(overCurrent).toString(),
     );
-  } else if (moduleStatus & GpioModuleStatus.OVERCURRENT) {
+  } else if (moduleStatus & GpioErrorFlags.OVERCURRENT) {
     values.push('ERROR: Overcurrent');
   }
-  if (moduleStatus & GpioModuleStatus.OVERVOLTAGE) {
+  if (moduleStatus & GpioErrorFlags.OVERVOLTAGE) {
     values.push('ERROR: Overvoltage');
   }
-  if (moduleStatus & GpioModuleStatus.UNDERVOLTAGE_LOCKOUT) {
+  if (moduleStatus & GpioErrorFlags.UNDERVOLTAGE_LOCKOUT) {
     values.push('ERROR: Undervoltage');
   }
-  if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_SHUTDOWN) {
+  if (moduleStatus & GpioErrorFlags.OVERTEMPERATURE_SHUTDOWN) {
     values.push('ERROR: Overtemperature');
-  } else if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_WARNING) {
+  } else if (moduleStatus & GpioErrorFlags.OVERTEMPERATURE_WARNING) {
     values.push('WARNING: Overtemperature');
   }
-  if (moduleStatus & GpioModuleStatus.POWER_ON_RESET) {
+  if (moduleStatus & GpioErrorFlags.POWER_ON_RESET) {
     values.push('ERROR: Not yet initialized (power on reset)');
   }
-  if (moduleStatus & GpioModuleStatus.SPI_ERROR) {
+  if (moduleStatus & GpioErrorFlags.SPI_ERROR) {
     values.push('ERROR: SPI error');
   }
-  if (moduleStatus & GpioModuleStatus.OPEN_LOAD) {
+  if (moduleStatus & GpioErrorFlags.OPEN_LOAD) {
     const relevantPins = ~inputPins.value & openLoad;
     if (relevantPins != GpioPins.NONE) {
       values.push(
@@ -122,7 +122,7 @@ const errors = computed<string[]>(() => {
 
       <OneWireGpioEditor
         v-model:channels="channels"
-        :error-pins="block.data.overCurrent"
+        :error-pins="block.data.status.overCurrent"
       />
 
       <template v-if="context.mode === 'Full'">

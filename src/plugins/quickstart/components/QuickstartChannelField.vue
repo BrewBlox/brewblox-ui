@@ -4,6 +4,7 @@ import {
   BlockType,
   ChannelCapabilities,
   GpioDeviceType,
+  GpioErrorFlags,
   GpioPins,
   IoArrayInterfaceBlock,
   IoChannel,
@@ -54,6 +55,7 @@ const local = computed<IoChannelAddress | null>({
           pinsMask: GpioPins.NONE,
           capabilities: ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT,
           claimedBy: bloxLink(null),
+          errorFlags: GpioErrorFlags.NONE,
         });
         emit('update:modelValue', { ...addr, channelId });
       }

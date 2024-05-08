@@ -2,6 +2,7 @@
 import {
   ChannelCapabilities,
   GpioDeviceType,
+  GpioErrorFlags,
   GpioModuleChannel,
   GpioPins,
 } from 'brewblox-proto/ts';
@@ -241,6 +242,7 @@ function save(): void {
     width,
     capabilities,
     claimedBy: bloxLink(null),
+    errorFlags: GpioErrorFlags.NONE,
   };
 
   onDialogOK(channel);

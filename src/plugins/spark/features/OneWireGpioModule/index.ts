@@ -1,6 +1,6 @@
 import {
   BlockType,
-  GpioModuleStatus,
+  GpioErrorFlags,
   GpioPins,
   OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
@@ -28,25 +28,27 @@ const plugin: Plugin = {
         channels: [],
         modulePosition: 0,
         useExternalPower: false,
-        moduleStatus: GpioModuleStatus.NONE,
-        pullUpDesired: GpioPins.NONE,
-        pullUpStatus: GpioPins.NONE,
-        pullUpWhenActive: GpioPins.NONE,
-        pullUpWhenInactive: GpioPins.NONE,
-        pullDownDesired: GpioPins.NONE,
-        pullDownStatus: GpioPins.NONE,
-        pullDownWhenActive: GpioPins.NONE,
-        pullDownWhenInactive: GpioPins.NONE,
-        overCurrent: GpioPins.NONE,
-        openLoad: GpioPins.NONE,
-        faultsHistory5m: GpioModuleStatus.NONE,
-        faultsHistory60m: GpioModuleStatus.NONE,
+        status: {
+          moduleStatus: GpioErrorFlags.NONE,
+          pullUpDesired: GpioPins.NONE,
+          pullUpStatus: GpioPins.NONE,
+          pullUpWhenActive: GpioPins.NONE,
+          pullUpWhenInactive: GpioPins.NONE,
+          pullDownDesired: GpioPins.NONE,
+          pullDownStatus: GpioPins.NONE,
+          pullDownWhenActive: GpioPins.NONE,
+          pullDownWhenInactive: GpioPins.NONE,
+          overCurrent: GpioPins.NONE,
+          openLoad: GpioPins.NONE,
+          faultsHistory5m: GpioErrorFlags.NONE,
+          faultsHistory60m: GpioErrorFlags.NONE,
+        },
       }),
       analyze: (block: OneWireGpioModuleBlock) => {
-        const { moduleStatus } = block.data;
+        const { moduleStatus } = block.data.status;
         if (
-          moduleStatus != GpioModuleStatus.NONE &&
-          moduleStatus != GpioModuleStatus.OPEN_LOAD
+          moduleStatus != GpioErrorFlags.NONE &&
+          moduleStatus != GpioErrorFlags.OPEN_LOAD
         ) {
           return 'Invalid';
         }
