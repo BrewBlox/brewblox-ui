@@ -1,4 +1,5 @@
 import {
+  AnalogClaimerInterfaceBlock,
   AnalogConstraintKey,
   AnalogConstraints,
   Block,
@@ -16,7 +17,7 @@ import {
   DeprecatedMutexedConstraint,
   DigitalConstraintKey,
   DigitalConstraints,
-  IoDriverInterfaceBlock,
+  IoClaimerInterfaceBlock,
   Link,
   SetpointProfileBlock,
 } from 'brewblox-proto/ts';
@@ -149,7 +150,7 @@ export function calculateWiFiPct(dbm: number): number {
   return Math.round(-0.0154 * dbm * dbm - 0.3794 * dbm + 98.182);
 }
 
-export async function unlinkChannelActuators(
+export async function unlinkIoChannelClaimers(
   serviceId: string,
   hwDevice: Link,
   channel: number,
@@ -163,8 +164,8 @@ export async function unlinkChannelActuators(
   await Promise.all(
     sparkStore
       .blocksByService(serviceId)
-      .filter((block): block is IoDriverInterfaceBlock =>
-        isBlockCompatible(block, BlockIntfType.IoDriverInterface),
+      .filter((block): block is IoClaimerInterfaceBlock =>
+        isBlockCompatible(block, BlockIntfType.IoClaimerInterface),
       )
       .filter(
         (block) =>
@@ -177,15 +178,46 @@ export async function unlinkChannelActuators(
   );
 }
 
-export async function setExclusiveChannelActuator(
+export async function unlinkAnalogChannelClaimers(
+  serviceId: string,
+  analogDevice: Link,
+  analogChannel: number,
+): Promise<void> {
+  if (!analogDevice.id || !analogChannel) {
+    return;
+  }
+
+  const sparkStore = useSparkStore();
+
+  await Promise.all(
+    sparkStore
+      .blocksByService(serviceId)
+      .filter((block): block is AnalogClaimerInterfaceBlock =>
+        isBlockCompatible(block, BlockIntfType.AnalogClaimerInterface),
+      )
+      .filter(
+        (block) =>
+          block.data.analogDevice.id === analogDevice.id &&
+          block.data.analogChannel === analogChannel,
+      )
+      .map((block) =>
+        sparkStore.patchBlock(block, {
+          analogDevice: bloxLink(null),
+          analogChannel: 0,
+        }),
+      ),
+  );
+}
+
+export async function setExclusiveIoChannelClaimer(
   actuator: Maybe<Block>,
   hwDevice: Link,
   channel: number,
 ): Promise<void> {
   if (
-    !isBlockCompatible<IoDriverInterfaceBlock>(
+    !isBlockCompatible<IoClaimerInterfaceBlock>(
       actuator,
-      BlockIntfType.IoDriverInterface,
+      BlockIntfType.IoClaimerInterface,
     )
   ) {
     return;
@@ -198,8 +230,37 @@ export async function setExclusiveChannelActuator(
     return; // no change
   }
 
-  await unlinkChannelActuators(actuator.serviceId, hwDevice, channel);
+  await unlinkIoChannelClaimers(actuator.serviceId, hwDevice, channel);
   await useSparkStore().patchBlock(actuator, { hwDevice, channel });
+}
+
+export async function setExclusiveAnalogChannelClaimer(
+  actuator: Maybe<Block>,
+  analogDevice: Link,
+  analogChannel: number,
+): Promise<void> {
+  if (
+    !isBlockCompatible<AnalogClaimerInterfaceBlock>(
+      actuator,
+      BlockIntfType.AnalogClaimerInterface,
+    )
+  ) {
+    return;
+  }
+
+  if (
+    actuator.data.analogDevice.id === analogDevice.id &&
+    actuator.data.analogChannel === analogChannel
+  ) {
+    return; // no change
+  }
+
+  await unlinkAnalogChannelClaimers(
+    actuator.serviceId,
+    analogDevice,
+    analogChannel,
+  );
+  await useSparkStore().patchBlock(actuator, { analogDevice, analogChannel });
 }
 
 export function emptyAnalogConstraints(): DeepNonNullable<AnalogConstraints> {

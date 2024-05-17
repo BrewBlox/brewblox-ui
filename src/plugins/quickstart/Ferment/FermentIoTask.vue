@@ -51,7 +51,7 @@ function taskDone(): void {
       <div class="text-subtitle1">
         Position {{ change.modulePosition }}: GPIO Module {{ change.blockId }}
       </div>
-      <OneWireGpioEditor v-model:channels="change.channels" />
+      <GpioArrayEditor v-model:channels="change.channels" />
     </q-card-section>
     <template #actions>
       <q-btn

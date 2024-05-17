@@ -3,6 +3,7 @@ import ActuatorAnalogMock from './ActuatorAnalogMock';
 import ActuatorLogic from './ActuatorLogic';
 import ActuatorOffset from './ActuatorOffset';
 import ActuatorPwm from './ActuatorPwm';
+import AnalogGpioModule from './AnalogGpioModule';
 import Balancer from './Balancer';
 import DeprecatedObject from './DeprecatedObject';
 import DigitalActuator from './DigitalActuator';
@@ -26,6 +27,7 @@ import Spark2Pins from './Spark2Pins';
 import Spark3Pins from './Spark3Pins';
 import SparkDisplay from './SparkDisplay';
 import SysInfo from './SysInfo';
+import TempSensorAnalog from './TempSensorAnalog';
 import TempSensorCombi from './TempSensorCombi';
 import TempSensorExternal from './TempSensorExternal';
 import TempSensorMock from './TempSensorMock';
@@ -37,6 +39,7 @@ const plugins: Plugin[] = [
   ActuatorLogic,
   ActuatorOffset,
   ActuatorPwm,
+  AnalogGpioModule,
   Balancer,
   DigitalActuator,
   DigitalInput,
@@ -60,6 +63,7 @@ const plugins: Plugin[] = [
   SysInfo,
   QuickActions,
   QuickValues,
+  TempSensorAnalog,
   TempSensorCombi,
   TempSensorExternal,
   TempSensorMock,

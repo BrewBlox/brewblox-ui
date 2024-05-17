@@ -6,7 +6,7 @@ import {
 } from 'brewblox-proto/ts';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
 
 const behaviorOpts: SelectOption<ToggleBehavior>[] = [
   { value: ToggleBehavior.DIRECT, label: 'Direct' },
@@ -60,7 +60,7 @@ const { serviceId, block, patchBlock } =
           class="col-grow"
           @update:model-value="
             ({ hwDevice, channel }) =>
-              setExclusiveChannelActuator(block, hwDevice, channel)
+              setExclusiveIoChannelClaimer(block, hwDevice, channel)
           "
         />
         <LabeledField

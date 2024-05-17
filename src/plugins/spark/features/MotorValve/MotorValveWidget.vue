@@ -10,7 +10,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_VALVE_STATE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
 import { getSpark3PinsBlock } from '@/plugins/spark/utils/system';
 
 const sparkStore = useSparkStore();
@@ -118,7 +118,7 @@ function enable12V(): void {
           class="col-grow"
           @update:model-value="
             ({ hwDevice, channel }) =>
-              setExclusiveChannelActuator(block, hwDevice, channel)
+              setExclusiveIoChannelClaimer(block, hwDevice, channel)
           "
         />
 

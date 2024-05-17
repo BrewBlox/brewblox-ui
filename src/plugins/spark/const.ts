@@ -1,6 +1,7 @@
 import {
   AnalogCompareOp,
   AnalogConstraintKey,
+  AnalogSensorType,
   AnyConstraintKey,
   DigitalCompareOp,
   DigitalConstraintKey,
@@ -11,6 +12,8 @@ import {
   PwmFrequency,
   SensorCombiFunc,
   SequenceStoreMode,
+  TempSensorAnalogSpec,
+  TempSensorAnalogType,
   TransitionDurationPreset,
   ValveState,
 } from 'brewblox-proto/ts';
@@ -144,4 +147,30 @@ export const ENUM_LABELS_STORE_MODE: EnumLabels<SequenceStoreMode> = {
     'Go to first instruction and enable sequence',
   AT_FIRST_INSTRUCTION_NEVER_ENABLED:
     'Go to first instruction and disable sequence',
+};
+
+export const ENUM_LABELS_TEMP_SENSOR_ANALOG_TYPE: EnumLabels<TempSensorAnalogType> =
+  {
+    TEMP_SENSOR_TYPE_NOT_SET: 'Not set',
+    TEMP_SENSOR_TYPE_RTD_2WIRE: 'RTD (two wire)',
+    TEMP_SENSOR_TYPE_RTD_3WIRE: 'RTD (three wire)',
+    TEMP_SENSOR_TYPE_RTD_4WIRE: 'RTD (four wire)',
+  };
+
+export const ENUM_LABELS_TEMP_SENSOR_ANALOG_SPEC: EnumLabels<TempSensorAnalogSpec> =
+  {
+    SPEC_NOT_SET: 'Not set',
+    SPEC_PT100_385: 'PT100 (385)',
+    SPEC_PT100_392: 'PT100 (392)',
+    SPEC_PT1000_385: 'PT1000 (385)',
+    SPEC_PT1000_392: 'PT1000 (392)',
+  };
+
+export const ENUM_LABELS_ANALOG_SENSOR_TYPE: EnumLabels<AnalogSensorType> = {
+  ANALOG_SENSOR_TYPE_NONE: 'None',
+  ANALOG_SENSOR_TYPE_STRAIN_GAUGE: 'Strain gauge',
+  ANALOG_SENSOR_TYPE_RTD_2WIRE: 'RTD (two wire)',
+  ANALOG_SENSOR_TYPE_RTD_3WIRE: 'RTD (three wire)',
+  ANALOG_SENSOR_TYPE_RTD_4WIRE: 'RTD (four wire)',
+  ANALOG_SENSOR_TYPE_RTD_3WIRE_LS: 'RTD (three wire LS)',
 };

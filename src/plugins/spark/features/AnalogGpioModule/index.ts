@@ -1,8 +1,8 @@
 import {
+  AnalogGpioModuleBlock,
   BlockType,
   GpioErrorFlags,
   GpioPins,
-  OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
@@ -10,21 +10,21 @@ import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
-import widget from './OneWireGpioModuleWidget.vue';
+import widget from './AnalogGpioModuleWidget.vue';
 
-const type = BlockType.OneWireGpioModule;
-const title = 'OneWire GPIO Module';
+const type = BlockType.AnalogGpioModule;
+const title = 'Analog GPIO Module';
 
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
     const featureStore = useFeatureStore();
 
-    const blockSpec: BlockSpec<OneWireGpioModuleBlock> = {
+    const blockSpec: BlockSpec<AnalogGpioModuleBlock> = {
       type,
       title,
       hasRelations: true,
-      generate: (): OneWireGpioModuleBlock['data'] => ({
+      generate: (): AnalogGpioModuleBlock['data'] => ({
         channels: [],
         modulePosition: 0,
         useExternalPower: false,
@@ -43,8 +43,9 @@ const plugin: Plugin = {
           faultsHistory5m: GpioErrorFlags.NONE,
           faultsHistory60m: GpioErrorFlags.NONE,
         },
+        analogChannels: [],
       }),
-      analyze: (block: OneWireGpioModuleBlock) => {
+      analyze: (block: AnalogGpioModuleBlock) => {
         const { moduleStatus } = block.data.status;
         switch (moduleStatus) {
           case GpioErrorFlags.NONE:
@@ -66,6 +67,7 @@ const plugin: Plugin = {
         cols: 4,
         rows: 4,
       },
+      experimental: true,
     };
 
     specStore.addBlockSpec(blockSpec);

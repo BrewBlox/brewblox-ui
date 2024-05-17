@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {
+  AnalogGpioModuleBlock,
+  AnalogModuleChannel,
   GpioErrorFlags,
   GpioModuleChannel,
   GpioPins,
-  OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useContext } from '@/composables';
@@ -18,7 +19,7 @@ function listedPins(pins: GpioPins): number[] {
 }
 
 const { context } = useContext.setup();
-const { block, patchBlock } = useBlockWidget.setup<OneWireGpioModuleBlock>();
+const { block, patchBlock } = useBlockWidget.setup<AnalogGpioModuleBlock>();
 
 const power = computed<boolean>({
   get: () => block.value.data.useExternalPower,
@@ -43,6 +44,11 @@ const power = computed<boolean>({
 const channels = computed<GpioModuleChannel[]>({
   get: () => block.value.data.channels,
   set: (channels) => patchBlock({ channels }),
+});
+
+const analogChannels = computed<AnalogModuleChannel[]>({
+  get: () => block.value.data.analogChannels,
+  set: (analogChannels) => patchBlock({ analogChannels }),
 });
 
 const inputPins = computed<GpioPins>(() =>
@@ -123,6 +129,26 @@ const errors = computed<string[]>(() => {
       <GpioArrayEditor
         v-model:channels="channels"
         :error-pins="block.data.status.overCurrent"
+      />
+
+      <AnalogArrayEditor v-model:channels="analogChannels" />
+
+      <div class="col-break" />
+
+      <QuantityField
+        v-if="block.data.baroPressure != undefined"
+        :model-value="block.data.baroPressure"
+        label="Barometric pressure"
+        class="col-grow"
+        readonly
+      />
+
+      <NumberField
+        v-if="block.data.baroTemperature != undefined"
+        :model-value="block.data.baroTemperature"
+        label="Barometric temperature"
+        class="col-grow"
+        readonly
       />
 
       <template v-if="context.mode === 'Full'">
