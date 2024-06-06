@@ -83,13 +83,6 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
                 )
             "
           />
-          <QuantityField
-            :model-value="block.data.offset"
-            title="Offset"
-            label="Offset"
-            class="col-grow"
-            @update:model-value="(v) => patchBlock({ offset: v })"
-          />
           <SelectField
             :model-value="block.data.sensorType"
             :options="tempSensorAnalogTypeOpts"
@@ -106,8 +99,18 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             class="col-grow"
             @update:model-value="(v) => patchBlock({ spec: v })"
           />
+
+          <div class="col-break" />
+
+          <QuantityField
+            :model-value="block.data.offset"
+            title="Offset"
+            label="Offset"
+            class="col-grow"
+            @update:model-value="(v) => patchBlock({ offset: v })"
+          />
           <LabeledField
-            v-model="ENUM_LABELS_ANALOG_SENSOR_TYPE[block.data.sensorType]"
+            v-model="ENUM_LABELS_ANALOG_SENSOR_TYPE[block.data.detected]"
             readonly
             label="Detected type"
             class="col-grow"
