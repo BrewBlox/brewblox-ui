@@ -34,7 +34,7 @@ services:
     image: ghcr.io/brewblox/brewblox-history:develop
 
   node-red:
-    image: ghcr.io/brewblox/node-red:develop
+    image: nodered/node-red:latest-minimal
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/node-red
