@@ -52,6 +52,15 @@ const connectionStep = computed<ConnectionStep>(() => {
   return status.value.connection_status;
 });
 
+const usbSupported = computed<boolean>(() => {
+  if (!status.value) {
+    return true;
+  }
+  // The Spark 4 does not support USB, and has a device ID of 12 (hex MAC address)
+  // If there is no desired device ID, we assume USB may be supported.
+  return status.value.service.device.device_id?.length != 12;
+});
+
 function isStepDone(step: ConnectionStep): boolean {
   return stepOrder.indexOf(step) < stepOrder.indexOf(connectionStep.value);
 }
@@ -146,11 +155,10 @@ function serviceReboot(): void {
                 <li>Does your controller have the correct firmware?</li>
                 <li>WiFi: Does your controller display its IP address?</li>
                 <li>Are there any error messages in your service logs?</li>
-                <li>
-                  USB: Your service must have been (re)started after plugging in
-                  the USB cable.
-                </li>
-                <li>USB: Can your service access USB devices? (Mac hosts)</li>
+                <template v-if="usbSupported">
+                  <li>USB: Is the USB proxy enabled in brewblox.yml?</li>
+                  <li>USB: Can your service access USB devices? (Mac hosts)</li>
+                </template>
               </ul>
             </template>
             <template v-else>
