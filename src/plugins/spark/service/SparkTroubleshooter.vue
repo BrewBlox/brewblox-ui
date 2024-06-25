@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { SparkStatusDescription } from 'brewblox-proto/ts';
-import { computed, provide, reactive } from 'vue';
+import { computed, inject, provide, reactive, ref, watch } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
+import { fetchKnownUsbDevices } from '@/plugins/spark/store/spark-api';
+import { SparkUsbDevices } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
-import { ContextKey } from '@/symbols';
+import { ContextKey, NowKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { shortDateString } from '@/utils/quantity';
 
@@ -36,6 +38,8 @@ provide(
 );
 
 const sparkStore = useSparkStore();
+const now = inject(NowKey)!;
+const usbDevices = ref<SparkUsbDevices | null>(null);
 
 const status = computed<SparkStatusDescription | null>(() =>
   sparkStore.statusByService(props.serviceId),
@@ -86,6 +90,16 @@ function startFirmwareUpdate(): void {
 function serviceReboot(): void {
   sparkStore.serviceReboot(props.serviceId);
 }
+
+watch(
+  () => now.value,
+  async () => {
+    if (usbSupported.value) {
+      usbDevices.value = await fetchKnownUsbDevices(props.serviceId);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -152,12 +166,30 @@ function serviceReboot(): void {
               controller.
               <ul>
                 <li>Is your controller turned on?</li>
-                <li>Does your controller have the correct firmware?</li>
-                <li>WiFi: Does your controller display its IP address?</li>
                 <li>Are there any error messages in your service logs?</li>
+                <li>WiFi: Does your controller display its IP address?</li>
                 <template v-if="usbSupported">
-                  <li>USB: Is the USB proxy enabled in brewblox.yml?</li>
-                  <li>USB: Can your service access USB devices? (Mac hosts)</li>
+                  <template v-if="usbDevices == null">
+                    USB: Checking USB devices...
+                  </template>
+                  <template v-else-if="usbDevices.enabled">
+                    <li>
+                      USB: Detected {{ usbDevices.devices.length }} USB
+                      device(s)
+                      <ul>
+                        <li
+                          v-for="dev in usbDevices.devices"
+                          :key="dev"
+                        >
+                          {{ dev }}
+                        </li>
+                      </ul>
+                    </li>
+                    <li>USB: Can Docker access USB devices? (Mac hosts)</li>
+                  </template>
+                  <template v-else>
+                    <li>USB: The USB proxy is not enabled in brewblox.yml.</li>
+                  </template>
                 </template>
               </ul>
             </template>

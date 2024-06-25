@@ -64,6 +64,13 @@ services:
         source: ${BREWBLOX_CACHE_DIR}/simulator__spock
         target: /app/simulator
 
+  usb-proxy:
+    image: ghcr.io/brewblox/brewblox-usb-proxy:develop
+    restart: unless-stopped
+    privileged: true
+    labels:
+      - traefik.http.services.usb-proxy.loadbalancer.server.port=5000
+
   tilt:
     image: ghcr.io/brewblox/brewblox-tilt:develop
     restart: unless-stopped
