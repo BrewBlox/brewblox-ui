@@ -94,7 +94,7 @@ function serviceReboot(): void {
 watch(
   () => now.value,
   async () => {
-    if (usbSupported.value) {
+    if (connectionStep.value != 'UNREACHABLE' && usbSupported.value) {
       usbDevices.value = await fetchKnownUsbDevices(props.serviceId);
     }
   },
