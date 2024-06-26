@@ -12,31 +12,12 @@ import {
   OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
-import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
-import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 import { durationString, prettyLink } from '@/utils/quantity';
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>
   v?.id || '<not set>';
-
-export async function cleanUnusedNames(
-  serviceId: string | null,
-): Promise<void> {
-  const sparkStore = useSparkStore();
-  if (!sparkStore.has(serviceId)) {
-    return;
-  }
-  const names = await sparkStore.cleanUnusedNames(serviceId);
-
-  const message =
-    names.length > 0
-      ? `Cleaned block names: <i>${names.join(', ')}</i>.`
-      : 'No unused names found.';
-
-  notify.info({ message, icon: 'mdi-tag-remove' });
-}
 
 export const enumHint = (e: Enum<any>): string =>
   'One of: ' +

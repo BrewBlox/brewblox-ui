@@ -3124,6 +3124,7 @@ __metadata:
     parse-duration: "npm:^1.1.0"
     pinia: "npm:^2.1.7"
     plotly.js: "npm:^2.32.0"
+    pluralize: "npm:^8.0.0"
     portal-vue: "npm:^3.0.0"
     prettier: "npm:^3.2.5"
     process: "npm:^0.11.10"
@@ -7984,6 +7985,13 @@ __metadata:
     webgl-context: "npm:^2.2.0"
     world-calendars: "npm:^1.0.3"
   checksum: 10c0/f013b3a95788c205c73b0975ef97892123b41d8814c49175790ae40714287d39cd498be42af2059ea6f72948f4be056b8cd44c32e7915532db2d313f3359bad7
+  languageName: node
+  linkType: hard
+
+"pluralize@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "pluralize@npm:8.0.0"
+  checksum: 10c0/2044cfc34b2e8c88b73379ea4a36fc577db04f651c2909041b054c981cd863dd5373ebd030123ab058d194ae615d3a97cfdac653991e499d10caf592e8b3dc33
   languageName: node
   linkType: hard
 
