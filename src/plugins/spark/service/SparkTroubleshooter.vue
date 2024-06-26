@@ -67,7 +67,7 @@ const desiredDeviceId = computed<string | null>(
 );
 
 const discoveryKindDesc = computed<string>(() => {
-  const kind = status.value?.discovery_kind;
+  const kind = status.value?.['discovery_kind'];
   switch (kind) {
     case undefined:
       return 'Unknown';
