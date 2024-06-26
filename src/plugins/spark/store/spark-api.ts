@@ -287,3 +287,9 @@ export const fetchKnownUsbDevices = (
     .post(`/${encodeURIComponent(serviceId)}/system/usb`, {})
     .then((resp) => resp.data)
     .catch(intercept(`Failed to query USB devices for ${serviceId}`));
+
+export const fetchKnownMdnsDevices = (serviceId: string): Promise<string[]> =>
+  http
+    .post(`/${encodeURIComponent(serviceId)}/system/mdns`, {})
+    .then((resp) => resp.data)
+    .catch(intercept(`Failed to query mDNS devices for ${serviceId}`));

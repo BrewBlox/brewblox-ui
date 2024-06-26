@@ -34,7 +34,7 @@ services:
   #       source: ../brewblox-devcon-spark/brewblox_devcon_spark
   #       target: /app/brewblox_devcon_spark
   #   ports:
-  #     - "5678:5678"
+  #     - '5678:5678'
   #   environment:
   #     - ENABLE_DEBUGGER=1
   #   labels:
@@ -75,3 +75,12 @@ services:
   #     - type: bind
   #       source: ../brewblox-auth/entrypoint.sh
   #       target: /app/entrypoint.sh
+
+  # You need to change "enp8s0" to the name of your physical network interface
+  # reflector:
+  #   image: yuxzhu/mdns-reflector:latest
+  #   restart: on-failure:3
+  #   network_mode: host
+  #   labels:
+  #     - traefik.enable=false
+  #   command: mdns-reflector -fn4 enp8s0 br-${COMPOSE_PROJECT_NAME}

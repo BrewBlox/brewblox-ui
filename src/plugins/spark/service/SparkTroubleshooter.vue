@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { SparkStatusDescription } from 'brewblox-proto/ts';
+import pluralize from 'pluralize';
 import { computed, inject, provide, reactive, ref, watch } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
-import { fetchKnownUsbDevices } from '@/plugins/spark/store/spark-api';
+import {
+  fetchKnownMdnsDevices,
+  fetchKnownUsbDevices,
+} from '@/plugins/spark/store/spark-api';
 import { SparkUsbDevices } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
 import { ContextKey, NowKey } from '@/symbols';
@@ -39,6 +43,8 @@ provide(
 
 const sparkStore = useSparkStore();
 const now = inject(NowKey)!;
+
+const mDNSDevices = ref<string[] | null>(null);
 const usbDevices = ref<SparkUsbDevices | null>(null);
 
 const status = computed<SparkStatusDescription | null>(() =>
@@ -56,14 +62,33 @@ const connectionStep = computed<ConnectionStep>(() => {
   return status.value.connection_status;
 });
 
-const usbSupported = computed<boolean>(() => {
-  if (!status.value) {
-    return true;
+const desiredDeviceId = computed<string | null>(
+  () => status.value?.service.device.device_id ?? null,
+);
+
+const discoveryKindDesc = computed<string>(() => {
+  const kind = status.value?.discovery_kind;
+  switch (kind) {
+    case undefined:
+      return 'Unknown';
+    case 'ADDRESS':
+      return 'Fixed IP address';
+    case 'SIM':
+      return 'Simulator';
+    case 'MDNS':
+      return 'mDNS';
+    case 'ALL':
+      return 'USB, mDNS, and MQTT';
+    default:
+      return kind;
   }
-  // The Spark 4 does not support USB, and has a device ID of 12 (hex MAC address)
-  // If there is no desired device ID, we assume USB may be supported.
-  return status.value.service.device.device_id?.length != 12;
 });
+
+// The Spark 4 does not support USB, and has a device ID of 12 (hex MAC address)
+// If there is no desired device ID, we assume USB may be supported.
+const usbSupported = computed<boolean>(
+  () => desiredDeviceId.value?.length != 12,
+);
 
 function isStepDone(step: ConnectionStep): boolean {
   return stepOrder.indexOf(step) < stepOrder.indexOf(connectionStep.value);
@@ -94,8 +119,13 @@ function serviceReboot(): void {
 watch(
   () => now.value,
   async () => {
-    if (connectionStep.value != 'UNREACHABLE' && usbSupported.value) {
+    if (
+      connectionStep.value != 'UNREACHABLE' &&
+      usbSupported.value &&
+      status.value?.enabled !== false
+    ) {
       usbDevices.value = await fetchKnownUsbDevices(props.serviceId);
+      mDNSDevices.value = await fetchKnownMdnsDevices(props.serviceId);
     }
   },
   { immediate: true },
@@ -163,19 +193,44 @@ watch(
           <template v-if="status">
             <template v-if="status.enabled">
               Your Spark service is online, but not connected to your
-              controller.
+              controller. The service discovers controllers using
+              <b>{{ discoveryKindDesc }} </b>, and the desired device ID is
+              <b>{{ desiredDeviceId || 'any' }}</b>
+              .
+
               <ul>
                 <li>Is your controller turned on?</li>
                 <li>Are there any error messages in your service logs?</li>
-                <li>WiFi: Does your controller display its IP address?</li>
+                <li>Does your controller display its IP address?</li>
+                <template v-if="mDNSDevices == null">
+                  <li>Checking mDNS devices...</li>
+                </template>
+                <template v-else>
+                  <li>
+                    Detected
+                    {{ pluralize('controller', mDNSDevices.length, true) }}
+                    using mDNS
+                    <ul>
+                      <li
+                        v-for="dev in mDNSDevices"
+                        :key="dev"
+                      >
+                        {{ dev }}
+                      </li>
+                    </ul>
+                  </li>
+                </template>
                 <template v-if="usbSupported">
                   <template v-if="usbDevices == null">
-                    USB: Checking USB devices...
+                    <li>Checking USB devices...</li>
                   </template>
                   <template v-else-if="usbDevices.enabled">
                     <li>
-                      USB: Detected {{ usbDevices.devices.length }} USB
-                      device(s)
+                      Detected
+                      {{
+                        pluralize('controller', usbDevices.devices.length, true)
+                      }}
+                      using USB
                       <ul>
                         <li
                           v-for="dev in usbDevices.devices"
@@ -185,7 +240,6 @@ watch(
                         </li>
                       </ul>
                     </li>
-                    <li>USB: Can Docker access USB devices? (Mac hosts)</li>
                   </template>
                   <template v-else>
                     <li>USB: The USB proxy is not enabled in brewblox.yml.</li>

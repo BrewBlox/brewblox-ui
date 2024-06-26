@@ -67,7 +67,7 @@ function startDialog(component: GlobalDialogName): void {
       />
       <ActionItem
         icon="mdi-magnify-plus-outline"
-        label="Discover new OneWire blocks"
+        label="Discover blocks"
         @click="discoverBlocks(serviceId)"
       />
       <ActionItem
