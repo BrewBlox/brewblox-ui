@@ -144,12 +144,6 @@ export const clearBlocks = (serviceId: string): Promise<any> =>
     .post(`/${encodeURIComponent(serviceId)}/blocks/all/delete`)
     .catch(intercept(`Failed to clear blocks on ${serviceId}`));
 
-export const cleanUnusedNames = (serviceId: string): Promise<string[]> =>
-  http
-    .post<BlockIds[]>(`/${encodeURIComponent(serviceId)}/blocks/cleanup`)
-    .then((resp) => resp.data.map((v) => v.id!))
-    .catch(intercept(`Failed to clean unused block names on ${serviceId}`));
-
 export const fetchDiscoveredBlocks = (serviceId: string): Promise<Block[]> =>
   http
     .post<Block[]>(`/${encodeURIComponent(serviceId)}/blocks/discover`)
