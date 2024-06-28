@@ -1,7 +1,7 @@
 import {
   BlockType,
   DigitalActuatorBlock,
-  OneWireGpioModuleBlock,
+  GpioModuleBlock,
   PidBlock,
 } from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
@@ -26,14 +26,12 @@ const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
   BlockType.DigitalActuator,
 );
 
-const oneWireGpioFilter = makeTypeFilter<OneWireGpioModuleBlock>(
-  BlockType.OneWireGpioModule,
-);
+const GpioFilter = makeTypeFilter<GpioModuleBlock>(BlockType.GpioModule);
 
 export function resetGpioChanges(serviceId: string): GpioChange[] {
   return useSparkStore()
     .blocksByService(serviceId)
-    .filter(oneWireGpioFilter)
+    .filter(GpioFilter)
     .sort((a, b) => a.data.modulePosition - b.data.modulePosition)
     .map((block) => ({
       blockId: block.id,
@@ -69,7 +67,7 @@ export function unlinkedActuators(
 export function changedIoModules(
   serviceId: string,
   changes: GpioChange[],
-): QuickstartPatch<OneWireGpioModuleBlock>[] {
+): QuickstartPatch<GpioModuleBlock>[] {
   return changes.map((change) => {
     const { blockId, channels } = change;
     return { blockId, patch: { channels } };

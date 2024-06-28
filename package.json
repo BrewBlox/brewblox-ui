@@ -35,7 +35,7 @@
   "dependencies": {
     "@quasar/extras": "^1.16.11",
     "axios": "^1.6.8",
-    "brewblox-proto": "https://github.com/brewblox/brewblox-proto#commit=4f015c84245de0cc0dbf07c8f23e90e4ba1b1779",
+    "brewblox-proto": "https://github.com/brewblox/brewblox-proto#commit=e50c045c341e570e1fd141f54979e9e5ce9bd62e",
     "buffer": "^6.0.3",
     "cm6-theme-basic-dark": "^0.2.0",
     "codemirror": "^6.0.1",

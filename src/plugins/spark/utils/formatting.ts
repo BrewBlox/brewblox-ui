@@ -9,7 +9,7 @@ import {
   CHANNEL_NAMES_SPARK_3,
   DigitalConstraints,
   DS2408Block,
-  OneWireGpioModuleBlock,
+  GpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -47,7 +47,7 @@ export function channelName(
   if (matchesType<DS2408Block>(BlockType.DS2408, block)) {
     return CHANNEL_NAMES_DS2408[block.data.connectMode][id];
   }
-  if (matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)) {
+  if (matchesType<GpioModuleBlock>(BlockType.GpioModule, block)) {
     return block.data.channels.find((c) => c.id === id)?.name;
   }
   return undefined;

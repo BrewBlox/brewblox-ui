@@ -5,7 +5,7 @@ import {
   BlockType,
   DS2408Block,
   DS2413Block,
-  OneWireGpioModuleBlock,
+  GpioModuleBlock,
   TempSensorOneWireBlock,
 } from 'brewblox-proto/ts';
 import { computed, onBeforeMount } from 'vue';
@@ -37,7 +37,7 @@ const discoveredBlocks = computed<Block[]>(
       .filter((block) =>
         isCompatible(block.type, [
           BlockIntfType.OneWireDeviceInterface,
-          BlockType.OneWireGpioModule,
+          BlockType.GpioModule,
         ]),
       )
       .sort(makeObjectSorter('id')) ?? [],
@@ -48,7 +48,7 @@ function about(block: Block): string {
     return prettyQty(block.data.value);
   }
 
-  if (matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)) {
+  if (matchesType<GpioModuleBlock>(BlockType.GpioModule, block)) {
     return `Position ${block.data.modulePosition}`;
   }
 

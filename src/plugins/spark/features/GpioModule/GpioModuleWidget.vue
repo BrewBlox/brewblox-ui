@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
-  AnalogGpioModuleBlock,
-  AnalogModuleChannel,
+  GpioModuleBlock,
+  AnalogChannel,
   GpioErrorFlags,
   GpioModuleChannel,
   GpioPins,
@@ -19,7 +19,7 @@ function listedPins(pins: GpioPins): number[] {
 }
 
 const { context } = useContext.setup();
-const { block, patchBlock } = useBlockWidget.setup<AnalogGpioModuleBlock>();
+const { block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
 
 const power = computed<boolean>({
   get: () => block.value.data.useExternalPower,
