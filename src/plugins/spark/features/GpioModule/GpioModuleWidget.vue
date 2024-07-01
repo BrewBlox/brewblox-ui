@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
-  GpioModuleBlock,
   AnalogModuleChannel,
   GpioErrorFlags,
+  GpioModuleBlock,
   GpioModuleChannel,
   GpioPins,
 } from 'brewblox-proto/ts';
@@ -19,7 +19,8 @@ function listedPins(pins: GpioPins): number[] {
 }
 
 const { context } = useContext.setup();
-const { serviceId, block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
+const { serviceId, block, patchBlock } =
+  useBlockWidget.setup<GpioModuleBlock>();
 
 const power = computed<boolean>({
   get: () => block.value.data.useExternalPower,
@@ -125,12 +126,12 @@ const errors = computed<string[]>(() => {
           {{ block.data.modulePosition }}
         </LabeledField>
         <QuantityField
-        v-if="block.data.baroPressure != undefined"
-        :model-value="block.data.baroPressure"
-        label="Barometric pressure"
-        class="col-3"
-        readonly
-      />
+          v-if="block.data.baroPressure != undefined"
+          :model-value="block.data.baroPressure"
+          label="Barometric pressure"
+          class="col-3"
+          readonly
+        />
       </div>
       <q-separator />
       <GpioArrayEditor
@@ -140,7 +141,11 @@ const errors = computed<string[]>(() => {
 
       <template v-if="analogChannels.length > 0">
         <q-separator />
-        <AnalogArrayEditor v-model:channels="analogChannels" :service-id="serviceId" :block-id="block.id"/>
+        <AnalogArrayEditor
+          v-model:channels="analogChannels"
+          :service-id="serviceId"
+          :block-id="block.id"
+        />
       </template>
       <div class="col-break" />
       <template v-if="context.mode === 'Full'">
