@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import {
-  AnalogGpioModuleBlock,
   AnalogModuleChannel,
   GpioErrorFlags,
+  GpioModuleBlock,
   GpioModuleChannel,
   GpioPins,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { asBlockAddress } from '@/plugins/spark/utils/configuration';
 import { createDialogPromise } from '@/utils/dialog';
 
 /**
@@ -19,7 +20,7 @@ function listedPins(pins: GpioPins): number[] {
 }
 
 const { context } = useContext.setup();
-const { block, patchBlock } = useBlockWidget.setup<AnalogGpioModuleBlock>();
+const { block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
 
 const power = computed<boolean>({
   get: () => block.value.data.useExternalPower,
@@ -120,39 +121,34 @@ const errors = computed<string[]>(() => {
       <div class="row q-gutter-sm">
         <LabeledField
           label="Module position"
-          class="col-grow"
+          class="col-3"
         >
           {{ block.data.modulePosition }}
         </LabeledField>
+        <QuantityField
+          v-if="block.data.baroPressure != undefined"
+          :model-value="block.data.baroPressure"
+          label="Barometric pressure"
+          class="col-3"
+          readonly
+        />
       </div>
-
+      <q-separator />
       <GpioArrayEditor
         v-model:channels="channels"
         :error-pins="block.data.status.overCurrent"
       />
 
-      <AnalogArrayEditor v-model:channels="analogChannels" />
-
+      <template v-if="analogChannels.length > 0">
+        <q-separator />
+        <AnalogArrayEditor
+          v-model:channels="analogChannels"
+          :address="asBlockAddress(block)"
+        />
+      </template>
       <div class="col-break" />
-
-      <QuantityField
-        v-if="block.data.baroPressure != undefined"
-        :model-value="block.data.baroPressure"
-        label="Barometric pressure"
-        class="col-grow"
-        readonly
-      />
-
-      <NumberField
-        v-if="block.data.baroTemperature != undefined"
-        :model-value="block.data.baroTemperature"
-        label="Barometric temperature"
-        class="col-grow"
-        readonly
-      />
-
       <template v-if="context.mode === 'Full'">
-        <q-separator inset />
+        <q-separator />
 
         <div class="column q-gutter-sm">
           <div>

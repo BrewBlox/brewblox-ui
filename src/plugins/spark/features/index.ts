@@ -3,7 +3,6 @@ import ActuatorAnalogMock from './ActuatorAnalogMock';
 import ActuatorLogic from './ActuatorLogic';
 import ActuatorOffset from './ActuatorOffset';
 import ActuatorPwm from './ActuatorPwm';
-import AnalogGpioModule from './AnalogGpioModule';
 import Balancer from './Balancer';
 import DeprecatedObject from './DeprecatedObject';
 import DigitalActuator from './DigitalActuator';
@@ -12,11 +11,11 @@ import DisplaySettings from './DisplaySettings';
 import DS2408 from './DS2408';
 import DS2413 from './DS2413';
 import FastPwm from './FastPwm';
+import GpioModule from './GpioModule';
 import InactiveObject from './InactiveObject';
 import MockPins from './MockPins';
 import MotorValve from './MotorValve';
 import Mutex from './Mutex';
-import OneWireGpioModule from './OneWireGpioModule';
 import Pid from './Pid';
 import QuickActions from './QuickActions';
 import QuickValues from './QuickValues';
@@ -39,7 +38,6 @@ const plugins: Plugin[] = [
   ActuatorLogic,
   ActuatorOffset,
   ActuatorPwm,
-  AnalogGpioModule,
   Balancer,
   DigitalActuator,
   DigitalInput,
@@ -48,12 +46,12 @@ const plugins: Plugin[] = [
   DS2413,
   DeprecatedObject,
   FastPwm,
+  GpioModule,
   InactiveObject,
   MockPins,
-  Pid,
   MotorValve,
   Mutex,
-  OneWireGpioModule,
+  Pid,
   Sequence,
   SetpointProfile,
   SetpointSensorPair,

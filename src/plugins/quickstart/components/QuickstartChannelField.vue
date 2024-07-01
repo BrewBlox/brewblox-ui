@@ -73,7 +73,7 @@ const opts = computed<SelectOption<IoChannelAddress>[]>(() => {
       .filter(
         (block): block is IoArrayInterfaceBlock =>
           isCompatible(block.type, BlockIntfType.IoArrayInterface) &&
-          block.type !== BlockType.OneWireGpioModule,
+          block.type !== BlockType.GpioModule,
       )
       .flatMap((block): IoChannelAddress[] =>
         block.data.channels.map((channel: IoChannel) => ({

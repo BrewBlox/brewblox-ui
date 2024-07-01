@@ -1,30 +1,147 @@
 <script setup lang="ts">
-import { AnalogModuleChannel } from 'brewblox-proto/ts';
+import {
+  AnalogModuleChannel,
+  AnalogSensorType,
+  Block,
+  BlockOrIntfType,
+} from 'brewblox-proto/ts';
+import { computed } from 'vue';
+import { ENUM_LABELS_ANALOG_SENSOR_TYPE } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
+import { createBlockDialog } from '@/utils/block-dialog';
+import { createDialog } from '@/utils/dialog';
 
 interface Props {
   channels: AnalogModuleChannel[];
+  address: BlockAddress;
+}
+const sparkStore = useSparkStore();
+
+const props = defineProps<Props>();
+
+const existingSensors = computed<{ [channelId: number]: Block[] }>(() => {
+  const sensors = sparkStore
+    .blocksByType(props.address.serviceId, BlockOrIntfType.TempSensorAnalog)
+    .filter((block) => block.data.analogDevice.id === props.address.id);
+  return props.channels.reduce((acc, channel) => {
+    acc[channel.id] = sensors.filter(
+      (block) => block.data.analogChannel === channel.id,
+    );
+    return acc;
+  }, {});
+});
+
+function sensorToBlockType(
+  sensorType: AnalogSensorType,
+): BlockOrIntfType | null {
+  if (
+    sensorType === AnalogSensorType.ANALOG_SENSOR_TYPE_RTD_2WIRE ||
+    sensorType === AnalogSensorType.ANALOG_SENSOR_TYPE_RTD_3WIRE ||
+    sensorType === AnalogSensorType.ANALOG_SENSOR_TYPE_RTD_4WIRE
+  ) {
+    return BlockOrIntfType.TempSensorAnalog;
+  }
+  return null;
 }
 
-defineProps<Props>();
+function createSensor(sensorType: BlockOrIntfType | null): void {
+  if (sensorType == null) {
+    return;
+  }
+  createDialog({
+    component: 'BlockWizardDialog',
+    componentProps: {
+      serviceId: props.address.serviceId,
+      compatible: sensorType,
+    },
+  });
+}
 </script>
 
 <template>
-  <div class="column q-gutter-y-sm">
+  <div class="column">
     <div
       v-for="channel in channels"
       :key="`channel-${channel.id}`"
-      class="row q-gutter-sm"
+      class="row q-gutter-xs"
     >
-      <NumberField
-        v-model="channel.id"
-        label="ID"
+      <LabeledField
+        label="Channel"
         readonly
-      />
+        class="col-2"
+      >
+        Analog {{ channel.id }}
+      </LabeledField>
       <LabeledField
         label="Sensor Type"
         readonly
+        class="col-2"
       >
-        {{ channel.sensorType }}
+        {{ ENUM_LABELS_ANALOG_SENSOR_TYPE[channel.sensorType] }}
+      </LabeledField>
+      <QuantityField
+        v-if="channel.resistance !== undefined"
+        v-model="channel.resistance"
+        label="Resistance"
+        readonly
+        class="col-2"
+      />
+      <QuantityField
+        v-if="channel.leadResistance !== undefined"
+        v-model="channel.leadResistance"
+        label="Lead-wire"
+        readonly
+        class="col-2"
+      />
+      <NumberField
+        v-if="channel.bridgeOutput !== undefined"
+        v-model="channel.bridgeOutput"
+        label="Sensor output"
+        readonly
+        class="col-2"
+      />
+      <QuantityField
+        v-if="channel.bridgeResistance !== undefined"
+        v-model="channel.bridgeResistance"
+        label="Sensor resistance"
+        readonly
+        class="col-2"
+      />
+      <LabeledField
+        v-if="existingSensors[channel.id].length > 0"
+        label="Used by"
+        readonly
+        class="col-grow row"
+      >
+        <q-btn
+          v-for="userBlock in existingSensors[channel.id]"
+          :key="userBlock.id"
+          :label="userBlock.id"
+          dense
+          no-caps
+          flat
+          class="depth-1"
+          @click="createBlockDialog(userBlock)"
+        />
+      </LabeledField>
+      <LabeledField
+        v-if="
+          sensorToBlockType(channel.sensorType) !== null &&
+          existingSensors[channel.id].length == 0
+        "
+        label="Not used"
+        readonly
+        class="col-grow row"
+      >
+        <q-btn
+          label="New Sensor"
+          dense
+          no-caps
+          flat
+          class="depth-1"
+          @click="createSensor(sensorToBlockType(channel.sensorType))"
+        />
       </LabeledField>
     </div>
   </div>
