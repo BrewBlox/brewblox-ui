@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -euox pipefail
+set -euo pipefail
 pushd "$(git rev-parse --show-toplevel)" >/dev/null
 
 mkdir -p dev/traefik/

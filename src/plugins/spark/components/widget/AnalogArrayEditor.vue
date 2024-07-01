@@ -5,30 +5,32 @@ import {
   Block,
   BlockOrIntfType,
 } from 'brewblox-proto/ts';
-import { defineProps } from 'vue';
+import { computed } from 'vue';
 import { ENUM_LABELS_ANALOG_SENSOR_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 
 interface Props {
   channels: AnalogModuleChannel[];
-  serviceId: string;
-  blockId: string;
+  address: BlockAddress;
 }
 const sparkStore = useSparkStore();
 
 const props = defineProps<Props>();
 
-function existingSensors(channel: number): Block[] {
-  return sparkStore
+const existingSensors = computed<{ [channelId: number]: Block[] }>(() => {
+  const sensors = sparkStore
     .blocksByType(props.serviceId, BlockOrIntfType.TempSensorAnalog)
-    .filter(
-      (block) =>
-        block.data.analogDevice.id === props.blockId &&
-        block.data.analogChannel === channel,
+    .filter((block) => block.data.analogDevice.id === props.address.id);
+  return props.channels.reduce((acc, channel) => {
+    acc[channel.id] = sensors.filter(
+      (block) => block.data.analogChannel === channel.id,
     );
-}
+    return acc;
+  }, {});
+});
 
 function sensorToBlockType(
   sensorType: AnalogSensorType,
@@ -44,13 +46,13 @@ function sensorToBlockType(
 }
 
 function createSensor(sensorType: BlockOrIntfType | null): void {
-  if (sensorType === null) {
+  if (sensorType == null) {
     return;
   }
   createDialog({
     component: 'BlockWizardDialog',
     componentProps: {
-      serviceId: props.serviceId,
+      serviceId: props.address.serviceId,
       compatible: sensorType,
     },
   });
@@ -107,13 +109,13 @@ function createSensor(sensorType: BlockOrIntfType | null): void {
         class="col-2"
       />
       <LabeledField
-        v-if="existingSensors(channel.id).length > 0"
+        v-if="existingSensors[channel.id].length > 0"
         label="Used by"
         readonly
         class="col-grow row"
       >
         <q-btn
-          v-for="userBlock in existingSensors(channel.id)"
+          v-for="userBlock in existingSensors[channel.id]"
           :key="userBlock.id"
           :label="userBlock.id"
           dense
@@ -126,7 +128,7 @@ function createSensor(sensorType: BlockOrIntfType | null): void {
       <LabeledField
         v-if="
           sensorToBlockType(channel.sensorType) !== null &&
-          existingSensors(channel.id).length == 0
+          existingSensors[channel.id].length == 0
         "
         label="Not used"
         readonly

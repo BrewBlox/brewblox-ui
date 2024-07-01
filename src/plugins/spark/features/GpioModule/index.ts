@@ -67,7 +67,6 @@ const plugin: Plugin = {
         cols: 4,
         rows: 4,
       },
-      experimental: true,
     };
 
     specStore.addBlockSpec(blockSpec);
