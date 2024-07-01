@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   GpioModuleBlock,
-  AnalogChannel,
+  AnalogModuleChannel,
   GpioErrorFlags,
   GpioModuleChannel,
   GpioPins,
@@ -19,7 +19,7 @@ function listedPins(pins: GpioPins): number[] {
 }
 
 const { context } = useContext.setup();
-const { block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
+const { serviceId, block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
 
 const power = computed<boolean>({
   get: () => block.value.data.useExternalPower,
@@ -120,39 +120,31 @@ const errors = computed<string[]>(() => {
       <div class="row q-gutter-sm">
         <LabeledField
           label="Module position"
-          class="col-grow"
+          class="col-3"
         >
           {{ block.data.modulePosition }}
         </LabeledField>
+        <QuantityField
+        v-if="block.data.baroPressure != undefined"
+        :model-value="block.data.baroPressure"
+        label="Barometric pressure"
+        class="col-3"
+        readonly
+      />
       </div>
-
+      <q-separator />
       <GpioArrayEditor
         v-model:channels="channels"
         :error-pins="block.data.status.overCurrent"
       />
 
-      <AnalogArrayEditor v-model:channels="analogChannels" />
-
+      <template v-if="analogChannels.length > 0">
+        <q-separator />
+        <AnalogArrayEditor v-model:channels="analogChannels" :service-id="serviceId" :block-id="block.id"/>
+      </template>
       <div class="col-break" />
-
-      <QuantityField
-        v-if="block.data.baroPressure != undefined"
-        :model-value="block.data.baroPressure"
-        label="Barometric pressure"
-        class="col-grow"
-        readonly
-      />
-
-      <NumberField
-        v-if="block.data.baroTemperature != undefined"
-        :model-value="block.data.baroTemperature"
-        label="Barometric temperature"
-        class="col-grow"
-        readonly
-      />
-
       <template v-if="context.mode === 'Full'">
-        <q-separator inset />
+        <q-separator />
 
         <div class="column q-gutter-sm">
           <div>
