@@ -9,6 +9,7 @@ import {
 import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { asBlockAddress } from '@/plugins/spark/utils/configuration';
 import { createDialogPromise } from '@/utils/dialog';
 
 /**
@@ -19,8 +20,7 @@ function listedPins(pins: GpioPins): number[] {
 }
 
 const { context } = useContext.setup();
-const { serviceId, block, patchBlock } =
-  useBlockWidget.setup<GpioModuleBlock>();
+const { block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
 
 const power = computed<boolean>({
   get: () => block.value.data.useExternalPower,
@@ -143,8 +143,7 @@ const errors = computed<string[]>(() => {
         <q-separator />
         <AnalogArrayEditor
           v-model:channels="analogChannels"
-          :service-id="serviceId"
-          :block-id="block.id"
+          :address="asBlockAddress(block)"
         />
       </template>
       <div class="col-break" />

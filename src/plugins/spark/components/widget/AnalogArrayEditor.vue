@@ -22,7 +22,7 @@ const props = defineProps<Props>();
 
 const existingSensors = computed<{ [channelId: number]: Block[] }>(() => {
   const sensors = sparkStore
-    .blocksByType(props.serviceId, BlockOrIntfType.TempSensorAnalog)
+    .blocksByType(props.address.serviceId, BlockOrIntfType.TempSensorAnalog)
     .filter((block) => block.data.analogDevice.id === props.address.id);
   return props.channels.reduce((acc, channel) => {
     acc[channel.id] = sensors.filter(
