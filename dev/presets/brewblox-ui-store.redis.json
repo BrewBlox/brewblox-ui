@@ -86,6 +86,21 @@
     }
   },
   {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "2-UtLY_8z24JlcbI8oLrF",
+    "title": "Old OneWire",
+    "feature": "OneWireGpioModule",
+    "cols": 4,
+    "order": 20,
+    "pinnedPosition": null,
+    "rows": 4,
+    "dashboard": "dashboard-home",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "gpio-1"
+    }
+  },
+  {
     "namespace": "brewblox-ui-store:logged-sessions",
     "id": "3d15296d-0abd-4d45-383c-0bec436ae319",
     "title": "Teddy",

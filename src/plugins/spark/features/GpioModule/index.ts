@@ -7,8 +7,9 @@ import {
 import { Plugin } from 'vue';
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockConfig, BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { Widget } from '@/store/widgets';
 import { cref } from '@/utils/component-ref';
 import widget from './GpioModuleWidget.vue';
 
@@ -69,8 +70,22 @@ const plugin: Plugin = {
       },
     };
 
+    const renamedFeature: WidgetFeature = {
+      ...discoveredBlockFeature,
+      id: 'OneWireGpioModule',
+      title: 'OneWire GPIO Module (renamed)',
+      role: 'Output',
+      component: '',
+      widgetSize: { cols: 0, rows: 0 },
+      upgrade: (widget: Widget<unknown>): Widget<BlockConfig> | null => {
+        return { ...widget, feature: type } as Widget<BlockConfig>;
+      },
+      experimental: true,
+    };
+
     specStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
+    featureStore.addWidgetFeature(renamedFeature);
   },
 };
 
