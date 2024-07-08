@@ -3,19 +3,24 @@ import {
   ActuatorOffsetBlock,
   Block,
   BlockType,
+  FilterChoice,
   PidBlock,
   Quantity,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import {
+  ENUM_LABELS_DERIVATIVE_FILTER_CHOICE,
+  ENUM_LABELS_FILTER_CHOICE,
+} from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockClaimed } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { matchesType } from '@/utils/objects';
-import { ENUM_LABELS_FILTER_CHOICE, ENUM_LABELS_DERIVATIVE_FILTER_CHOICE } from '@/plugins/spark/const';
 import {
   bloxQty,
   durationMs,
@@ -114,6 +119,31 @@ function startEditIValue(): void {
       html: true,
     },
   }).onOk((v: number) => patchBlock({ integralReset: v || 0.001 }));
+}
+
+function openDerivativeFilterDialog(): void {
+  createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      modelValue: block.value.data.derivativeFilterChoice,
+      title: 'Derivative filter delay',
+      message: `
+              <p>
+                The derivative is calculated from filtered input to reduce
+                the effect of noise and limited sensor resolution.
+              </p>
+              <p>
+                A longer delay will surpress derivative output from small sensor changes,
+                but can result in the D part of the PID being too late to counteract P.
+              </p>
+              `,
+      html: true,
+      selectOptions: derivativeFilterOpts,
+      selectProps: {
+        label: 'Filter delay',
+      },
+    },
+  }).onOk((v) => patchBlock({ derivativeFilterChoice: v }));
 }
 </script>
 
@@ -432,7 +462,7 @@ function startEditIValue(): void {
 
     <div class="row items-center justify-center boil q-pa-md q-gutter-y-sm">
       <div class="col-auto">
-        <span>Boil mode: keep the output above </span>
+        <span>Boil mode keeps the output above </span>
         <InlineQuantityField
           v-model="boilMinOutputQty"
           :class="{ 'text-green': boiling }"
@@ -441,7 +471,7 @@ function startEditIValue(): void {
       </div>
 
       <div class="col-auto">
-        <span>when the setpoint is higher than</span>
+        <span>when the setpoint is above</span>
         <InlineQuantityField
           v-model="boilPoint"
           :class="{ 'text-green': boiling }"
@@ -456,40 +486,28 @@ function startEditIValue(): void {
     <q-separator inset />
     <div class="row items-center justify-center boil q-pa-md q-gutter-y-sm">
       <div class="col-auto">
-        <span>Derivative filter delay is
+        <span>Derivative filter delay is </span>
+        <span
+          class="clickable q-pa-sm q-ma-xs rounded-borders text-bold"
+          style="line-height: 200%"
+          @click="openDerivativeFilterDialog"
+        >
+          {{
+            ENUM_LABELS_DERIVATIVE_FILTER_CHOICE[
+              block.data.derivativeFilterChoice
+            ]
+          }}
         </span>
-        <SelectField
-        :model-value="block.data.derivativeFilterChoice"
-        :options="filterOpts"
-        :html="true"
-        title="Derivaive filter period"
-        label="Derivaive Filter period"
-        message="
-              <p>
-                A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
-                Changes faster than the filter period will be filtered out.
-              </p>
-              <p>
-                A longer period will give a smoother output at the cost of a delay in response.
-                This delay is equal to the chosen period.
-              </p>
-              "
-        class="col-grow"
-        @update:model-value="(v) => patchBlock({ derivativeFilterChoice: v })"
-      />
-      </div>
-
-      <div class="col-auto">
-        <span>when the setpoint is higher than</span>
-        <InlineQuantityField
-          v-model="boilPoint"
-          :class="{ 'text-green': boiling }"
-          title="Boiling point"
-          message="
-        When the Setpoint is set to this temperature or higher,
-      the output of the PID will stay above the configured miniumum for boiling.
-      "
-        />
+        <template
+          v-if="
+            block.data.derivativeFilterChoice === FilterChoice.FILTER_NONE &&
+            block.data.derivativeFilter !== FilterChoice.FILTER_NONE
+          "
+        >
+          ({{
+            ENUM_LABELS_DERIVATIVE_FILTER_CHOICE[block.data.derivativeFilter]
+          }})
+        </template>
       </div>
     </div>
   </div>
