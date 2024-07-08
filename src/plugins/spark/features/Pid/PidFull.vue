@@ -15,6 +15,7 @@ import { isBlockClaimed } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { matchesType } from '@/utils/objects';
+import { ENUM_LABELS_FILTER_CHOICE, ENUM_LABELS_DERIVATIVE_FILTER_CHOICE } from '@/plugins/spark/const';
 import {
   bloxQty,
   durationMs,
@@ -26,6 +27,9 @@ import {
 
 const sparkStore = useSparkStore();
 const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();
+
+const filterOpts = selectable(ENUM_LABELS_FILTER_CHOICE);
+const derivativeFilterOpts = selectable(ENUM_LABELS_DERIVATIVE_FILTER_CHOICE);
 
 const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
   sparkStore.blockByLink(serviceId, block.value.data.inputId),
@@ -428,12 +432,51 @@ function startEditIValue(): void {
 
     <div class="row items-center justify-center boil q-pa-md q-gutter-y-sm">
       <div class="col-auto">
-        <span>Keep output above </span>
+        <span>Boil mode: keep the output above </span>
         <InlineQuantityField
           v-model="boilMinOutputQty"
           :class="{ 'text-green': boiling }"
           title="Minimum output when boiling"
         />
+      </div>
+
+      <div class="col-auto">
+        <span>when the setpoint is higher than</span>
+        <InlineQuantityField
+          v-model="boilPoint"
+          :class="{ 'text-green': boiling }"
+          title="Boiling point"
+          message="
+        When the Setpoint is set to this temperature or higher,
+      the output of the PID will stay above the configured miniumum for boiling.
+      "
+        />
+      </div>
+    </div>
+    <q-separator inset />
+    <div class="row items-center justify-center boil q-pa-md q-gutter-y-sm">
+      <div class="col-auto">
+        <span>Derivative filter delay is
+        </span>
+        <SelectField
+        :model-value="block.data.derivativeFilterChoice"
+        :options="filterOpts"
+        :html="true"
+        title="Derivaive filter period"
+        label="Derivaive Filter period"
+        message="
+              <p>
+                A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
+                Changes faster than the filter period will be filtered out.
+              </p>
+              <p>
+                A longer period will give a smoother output at the cost of a delay in response.
+                This delay is equal to the chosen period.
+              </p>
+              "
+        class="col-grow"
+        @update:model-value="(v) => patchBlock({ derivativeFilterChoice: v })"
+      />
       </div>
 
       <div class="col-auto">

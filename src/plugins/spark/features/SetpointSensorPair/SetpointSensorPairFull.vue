@@ -75,13 +75,13 @@ const usedBy = computed<Block[]>(() => {
       <QuantityField
         :model-value="block.data.filterThreshold"
         :html="true"
-        title="Filter bypass threshold"
-        label="Bypass threshold"
+        title="Filter reset threshold"
+        label="Filter reset threshold"
         message="
               <p>
                 The filter can detect when a large step occurs
-                at the input and temporary bypass slow filtering.
-                The threshold for an input change that should trigger this can be set here.
+                at the input. It will then reset itself to the unfiltered value to avoid a delay.
+                The step detection threshold should be large enough to only trigger when you add hot or cold water, not when the heater or cooler turns on.
               </p>
               "
         class="col-grow"
@@ -90,12 +90,11 @@ const usedBy = computed<Block[]>(() => {
         <template #append>
           <q-btn
             flat
-            round
-            icon="mdi-skip-forward"
             class="self-end"
             @click.stop="patchBlock({ resetFilter: true })"
           >
-            <q-tooltip>Bypass filter now</q-tooltip>
+            <q-tooltip>Reset filter now</q-tooltip>
+            Trigger
           </q-btn>
         </template>
       </QuantityField>
