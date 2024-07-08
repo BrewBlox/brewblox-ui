@@ -52,6 +52,16 @@ export const ENUM_LABELS_FILTER_CHOICE: EnumLabels<FilterChoice> = {
   FILTER_30m: 'Filter 30m',
 };
 
+export const ENUM_LABELS_DERIVATIVE_FILTER_CHOICE: EnumLabels<FilterChoice> = {
+  FILTER_NONE: 'Derived from Td',
+  FILTER_15s: '20s',
+  FILTER_45s: '1m',
+  FILTER_90s: '2.5m',
+  FILTER_3m: '5m',
+  FILTER_10m: '15m',
+  FILTER_30m: '45m',
+};
+
 export const ENUM_LABELS_COMBINE_FUNC: EnumLabels<SensorCombiFunc> = {
   SENSOR_COMBI_FUNC_AVG: 'Average',
   SENSOR_COMBI_FUNC_MIN: 'Minimum',

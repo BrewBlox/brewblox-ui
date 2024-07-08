@@ -3,16 +3,19 @@ import {
   ActuatorOffsetBlock,
   Block,
   BlockType,
+  FilterChoice,
   PidBlock,
   Quantity,
   SetpointSensorPairBlock,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_DERIVATIVE_FILTER_CHOICE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockClaimed } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
+import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { matchesType } from '@/utils/objects';
 import {
@@ -26,6 +29,8 @@ import {
 
 const sparkStore = useSparkStore();
 const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();
+
+const derivativeFilterOpts = selectable(ENUM_LABELS_DERIVATIVE_FILTER_CHOICE);
 
 const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
   sparkStore.blockByLink(serviceId, block.value.data.inputId),
@@ -110,6 +115,31 @@ function startEditIValue(): void {
       html: true,
     },
   }).onOk((v: number) => patchBlock({ integralReset: v || 0.001 }));
+}
+
+function openDerivativeFilterDialog(): void {
+  createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      modelValue: block.value.data.derivativeFilterChoice,
+      title: 'Derivative filter delay',
+      message: `
+              <p>
+                The derivative is calculated from filtered input to reduce
+                the effect of noise and limited sensor resolution.
+              </p>
+              <p>
+                A longer delay will surpress derivative output from small sensor changes,
+                but can result in the D part of the PID being too late to counteract P.
+              </p>
+              `,
+      html: true,
+      selectOptions: derivativeFilterOpts,
+      selectProps: {
+        label: 'Filter delay',
+      },
+    },
+  }).onOk((v) => patchBlock({ derivativeFilterChoice: v }));
 }
 </script>
 
@@ -428,7 +458,7 @@ function startEditIValue(): void {
 
     <div class="row items-center justify-center boil q-pa-md q-gutter-y-sm">
       <div class="col-auto">
-        <span>Keep output above </span>
+        <span>Boil mode keeps the output above </span>
         <InlineQuantityField
           v-model="boilMinOutputQty"
           :class="{ 'text-green': boiling }"
@@ -437,7 +467,7 @@ function startEditIValue(): void {
       </div>
 
       <div class="col-auto">
-        <span>when the setpoint is higher than</span>
+        <span>when the setpoint is above</span>
         <InlineQuantityField
           v-model="boilPoint"
           :class="{ 'text-green': boiling }"
@@ -447,6 +477,33 @@ function startEditIValue(): void {
       the output of the PID will stay above the configured miniumum for boiling.
       "
         />
+      </div>
+    </div>
+    <q-separator inset />
+    <div class="row items-center justify-center boil q-pa-md q-gutter-y-sm">
+      <div class="col-auto">
+        <span>Derivative filter delay is </span>
+        <span
+          class="clickable q-pa-sm q-ma-xs rounded-borders text-bold"
+          style="line-height: 200%"
+          @click="openDerivativeFilterDialog"
+        >
+          {{
+            ENUM_LABELS_DERIVATIVE_FILTER_CHOICE[
+              block.data.derivativeFilterChoice
+            ]
+          }}
+        </span>
+        <template
+          v-if="
+            block.data.derivativeFilterChoice === FilterChoice.FILTER_NONE &&
+            block.data.derivativeFilter !== FilterChoice.FILTER_NONE
+          "
+        >
+          ({{
+            ENUM_LABELS_DERIVATIVE_FILTER_CHOICE[block.data.derivativeFilter]
+          }})
+        </template>
       </div>
     </div>
   </div>
