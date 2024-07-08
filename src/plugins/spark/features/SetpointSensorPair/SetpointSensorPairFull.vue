@@ -81,7 +81,8 @@ const usedBy = computed<Block[]>(() => {
               <p>
                 The filter can detect when a large step occurs
                 at the input. It will then reset itself to the unfiltered value to avoid a delay.
-                The step detection threshold should be large enough to only trigger when you add hot or cold water, not when the heater or cooler turns on.
+                The step detection threshold should be large enough to only trigger when you
+                add hot or cold water, not when the heater or cooler turns on.
               </p>
               "
         class="col-grow"

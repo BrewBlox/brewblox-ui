@@ -10,10 +10,7 @@ import {
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import {
-  ENUM_LABELS_DERIVATIVE_FILTER_CHOICE,
-  ENUM_LABELS_FILTER_CHOICE,
-} from '@/plugins/spark/const';
+import { ENUM_LABELS_DERIVATIVE_FILTER_CHOICE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockClaimed } from '@/plugins/spark/utils/info';
@@ -33,7 +30,6 @@ import {
 const sparkStore = useSparkStore();
 const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();
 
-const filterOpts = selectable(ENUM_LABELS_FILTER_CHOICE);
 const derivativeFilterOpts = selectable(ENUM_LABELS_DERIVATIVE_FILTER_CHOICE);
 
 const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
