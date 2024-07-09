@@ -10,7 +10,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_TRANSITION_PRESET } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
 import { selectable } from '@/utils/collections';
 import { prettyQty } from '@/utils/quantity';
 
@@ -98,7 +98,7 @@ const softStartSupported = computed<boolean>(() => {
           class="col-grow"
           @update:model-value="
             ({ hwDevice, channel }) =>
-              setExclusiveChannelActuator(block, hwDevice, channel)
+              setExclusiveIoChannelClaimer(block, hwDevice, channel)
           "
         />
         <LabeledField

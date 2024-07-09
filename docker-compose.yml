@@ -1,4 +1,10 @@
 name: brewblox-ui
+
+networks:
+  default:
+    driver_opts:
+      com.docker.network.bridge.name: br-${COMPOSE_PROJECT_NAME}
+
 services:
   eventbus:
     image: ghcr.io/brewblox/mosquitto:develop
@@ -34,7 +40,7 @@ services:
     image: ghcr.io/brewblox/brewblox-history:develop
 
   node-red:
-    image: ghcr.io/brewblox/node-red:develop
+    image: nodered/node-red:latest-minimal
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/node-red
@@ -63,6 +69,13 @@ services:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/simulator__spock
         target: /app/simulator
+
+  usb-proxy:
+    image: ghcr.io/brewblox/brewblox-usb-proxy:develop
+    restart: unless-stopped
+    privileged: true
+    labels:
+      - traefik.http.services.usb-proxy.loadbalancer.server.port=5000
 
   tilt:
     image: ghcr.io/brewblox/brewblox-tilt:develop

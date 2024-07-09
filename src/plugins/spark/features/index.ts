@@ -11,11 +11,11 @@ import DisplaySettings from './DisplaySettings';
 import DS2408 from './DS2408';
 import DS2413 from './DS2413';
 import FastPwm from './FastPwm';
+import GpioModule from './GpioModule';
 import InactiveObject from './InactiveObject';
 import MockPins from './MockPins';
 import MotorValve from './MotorValve';
 import Mutex from './Mutex';
-import OneWireGpioModule from './OneWireGpioModule';
 import Pid from './Pid';
 import QuickActions from './QuickActions';
 import QuickValues from './QuickValues';
@@ -26,6 +26,7 @@ import Spark2Pins from './Spark2Pins';
 import Spark3Pins from './Spark3Pins';
 import SparkDisplay from './SparkDisplay';
 import SysInfo from './SysInfo';
+import TempSensorAnalog from './TempSensorAnalog';
 import TempSensorCombi from './TempSensorCombi';
 import TempSensorExternal from './TempSensorExternal';
 import TempSensorMock from './TempSensorMock';
@@ -45,12 +46,12 @@ const plugins: Plugin[] = [
   DS2413,
   DeprecatedObject,
   FastPwm,
+  GpioModule,
   InactiveObject,
   MockPins,
-  Pid,
   MotorValve,
   Mutex,
-  OneWireGpioModule,
+  Pid,
   Sequence,
   SetpointProfile,
   SetpointSensorPair,
@@ -60,6 +61,7 @@ const plugins: Plugin[] = [
   SysInfo,
   QuickActions,
   QuickValues,
+  TempSensorAnalog,
   TempSensorCombi,
   TempSensorExternal,
   TempSensorMock,

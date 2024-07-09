@@ -9,34 +9,15 @@ import {
   CHANNEL_NAMES_SPARK_3,
   DigitalConstraints,
   DS2408Block,
-  OneWireGpioModuleBlock,
+  GpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
-import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
-import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 import { durationString, prettyLink } from '@/utils/quantity';
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>
   v?.id || '<not set>';
-
-export async function cleanUnusedNames(
-  serviceId: string | null,
-): Promise<void> {
-  const sparkStore = useSparkStore();
-  if (!sparkStore.has(serviceId)) {
-    return;
-  }
-  const names = await sparkStore.cleanUnusedNames(serviceId);
-
-  const message =
-    names.length > 0
-      ? `Cleaned block names: <i>${names.join(', ')}</i>.`
-      : 'No unused names found.';
-
-  notify.info({ message, icon: 'mdi-tag-remove' });
-}
 
 export const enumHint = (e: Enum<any>): string =>
   'One of: ' +
@@ -66,7 +47,7 @@ export function channelName(
   if (matchesType<DS2408Block>(BlockType.DS2408, block)) {
     return CHANNEL_NAMES_DS2408[block.data.connectMode][id];
   }
-  if (matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)) {
+  if (matchesType<GpioModuleBlock>(BlockType.GpioModule, block)) {
     return block.data.channels.find((c) => c.id === id)?.name;
   }
   return undefined;

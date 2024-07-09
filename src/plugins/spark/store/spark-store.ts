@@ -244,10 +244,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
     discoveredBlockIds.value[serviceId] = [];
   }
 
-  async function cleanUnusedNames(serviceId: string): Promise<string[]> {
-    return await sparkApi.cleanUnusedNames(serviceId);
-  }
-
   async function fetchBlock(block: Maybe<Block>): Promise<void> {
     if (block) {
       const fetched = await sparkApi.fetchBlock(block);
@@ -525,7 +521,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
     invalidateBlocks,
     saveEnabled,
     clearDiscoveredBlocks,
-    cleanUnusedNames,
     fetchBlock,
     fetchStoredBlock,
     fetchBlocks,

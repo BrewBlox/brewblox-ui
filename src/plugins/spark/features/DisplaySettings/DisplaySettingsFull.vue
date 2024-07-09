@@ -169,7 +169,7 @@ function updateSlotColor(idx: number, color: string): void {
               @update:model-value="(v) => updateSlotName(idx, v)"
             />
             <ColorField
-              :model-value="slot.color"
+              :model-value="slotColor(slot)"
               title="Color"
               label="Color"
               message="Choose the LCD display background color for this block"

@@ -6,7 +6,6 @@ import {
   discoverBlocks,
   startResetBlocks,
 } from '@/plugins/spark/utils/actions';
-import { cleanUnusedNames } from '@/plugins/spark/utils/formatting';
 import { useServiceStore } from '@/store/services';
 import { useSystemStore } from '@/store/system';
 import { userUISettings } from '@/user-settings';
@@ -68,7 +67,7 @@ function startDialog(component: GlobalDialogName): void {
       />
       <ActionItem
         icon="mdi-magnify-plus-outline"
-        label="Discover new OneWire blocks"
+        label="Discover blocks"
         @click="discoverBlocks(serviceId)"
       />
       <ActionItem
@@ -95,11 +94,6 @@ function startDialog(component: GlobalDialogName): void {
         icon="mdi-file-export"
         label="Controller backups"
         @click="startDialog('SparkBackupDialog')"
-      />
-      <ActionItem
-        icon="mdi-tag-remove"
-        label="Remove unused block names"
-        @click="cleanUnusedNames(serviceId)"
       />
       <ActionItem
         icon="delete"

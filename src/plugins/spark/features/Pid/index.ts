@@ -51,6 +51,7 @@ const plugin: Plugin = {
         integral: 0,
         derivative: 0,
         derivativeFilter: FilterChoice.FILTER_NONE,
+        derivativeFilterChoice: FilterChoice.FILTER_NONE,
         integralReset: 0,
         boilPointAdjust: deltaTempQty(0),
         boilMinOutput: 0,

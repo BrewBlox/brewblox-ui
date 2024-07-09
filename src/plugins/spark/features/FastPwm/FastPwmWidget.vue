@@ -14,7 +14,7 @@ import {
   PWM_SELECT_OPTIONS,
 } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
 import { channelName, prettyBlock } from '@/plugins/spark/utils/formatting';
 import { selectable } from '@/utils/collections';
 import { fixedNumber, prettyQty, roundedNumber } from '@/utils/quantity';
@@ -171,7 +171,7 @@ const pwmDesired = computed<number | null>(() => {
             class="col-grow"
             @update:model-value="
               ({ hwDevice, channel }) =>
-                setExclusiveChannelActuator(block, hwDevice, channel)
+                setExclusiveIoChannelClaimer(block, hwDevice, channel)
             "
           />
           <LabeledField

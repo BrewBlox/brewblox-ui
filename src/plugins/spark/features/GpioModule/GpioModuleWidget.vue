@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import {
+  AnalogModuleChannel,
+  GpioErrorFlags,
+  GpioModuleBlock,
   GpioModuleChannel,
-  GpioModuleStatus,
   GpioPins,
-  OneWireGpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { asBlockAddress } from '@/plugins/spark/utils/configuration';
 import { createDialogPromise } from '@/utils/dialog';
 
 /**
@@ -18,7 +20,7 @@ function listedPins(pins: GpioPins): number[] {
 }
 
 const { context } = useContext.setup();
-const { block, patchBlock } = useBlockWidget.setup<OneWireGpioModuleBlock>();
+const { block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
 
 const power = computed<boolean>({
   get: () => block.value.data.useExternalPower,
@@ -45,6 +47,11 @@ const channels = computed<GpioModuleChannel[]>({
   set: (channels) => patchBlock({ channels }),
 });
 
+const analogChannels = computed<AnalogModuleChannel[]>({
+  get: () => block.value.data.analogChannels,
+  set: (analogChannels) => patchBlock({ analogChannels }),
+});
+
 const inputPins = computed<GpioPins>(() =>
   block.value.data.channels
     .filter((chan) => chan.deviceType.includes('DEV_DETECT'))
@@ -56,32 +63,32 @@ const inputPins = computed<GpioPins>(() =>
 
 const errors = computed<string[]>(() => {
   const values: string[] = [];
-  const { moduleStatus, overCurrent, openLoad } = block.value.data;
+  const { moduleStatus, overCurrent, openLoad } = block.value.data.status;
   if (overCurrent !== GpioPins.NONE) {
     values.push(
       'ERROR: Overcurrent on pin ' + listedPins(overCurrent).toString(),
     );
-  } else if (moduleStatus & GpioModuleStatus.OVERCURRENT) {
+  } else if (moduleStatus & GpioErrorFlags.OVERCURRENT) {
     values.push('ERROR: Overcurrent');
   }
-  if (moduleStatus & GpioModuleStatus.OVERVOLTAGE) {
+  if (moduleStatus & GpioErrorFlags.OVERVOLTAGE) {
     values.push('ERROR: Overvoltage');
   }
-  if (moduleStatus & GpioModuleStatus.UNDERVOLTAGE_LOCKOUT) {
+  if (moduleStatus & GpioErrorFlags.UNDERVOLTAGE_LOCKOUT) {
     values.push('ERROR: Undervoltage');
   }
-  if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_SHUTDOWN) {
+  if (moduleStatus & GpioErrorFlags.OVERTEMPERATURE_SHUTDOWN) {
     values.push('ERROR: Overtemperature');
-  } else if (moduleStatus & GpioModuleStatus.OVERTEMPERATURE_WARNING) {
+  } else if (moduleStatus & GpioErrorFlags.OVERTEMPERATURE_WARNING) {
     values.push('WARNING: Overtemperature');
   }
-  if (moduleStatus & GpioModuleStatus.POWER_ON_RESET) {
+  if (moduleStatus & GpioErrorFlags.POWER_ON_RESET) {
     values.push('ERROR: Not yet initialized (power on reset)');
   }
-  if (moduleStatus & GpioModuleStatus.SPI_ERROR) {
+  if (moduleStatus & GpioErrorFlags.SPI_ERROR) {
     values.push('ERROR: SPI error');
   }
-  if (moduleStatus & GpioModuleStatus.OPEN_LOAD) {
+  if (moduleStatus & GpioErrorFlags.OPEN_LOAD) {
     const relevantPins = ~inputPins.value & openLoad;
     if (relevantPins != GpioPins.NONE) {
       values.push(
@@ -114,19 +121,34 @@ const errors = computed<string[]>(() => {
       <div class="row q-gutter-sm">
         <LabeledField
           label="Module position"
-          class="col-grow"
+          class="col-3"
         >
           {{ block.data.modulePosition }}
         </LabeledField>
+        <QuantityField
+          v-if="block.data.baroPressure != undefined"
+          :model-value="block.data.baroPressure"
+          label="Barometric pressure"
+          class="col-3"
+          readonly
+        />
       </div>
-
-      <OneWireGpioEditor
+      <q-separator />
+      <GpioArrayEditor
         v-model:channels="channels"
-        :error-pins="block.data.overCurrent"
+        :error-pins="block.data.status.overCurrent"
       />
 
+      <template v-if="analogChannels.length > 0">
+        <q-separator />
+        <AnalogArrayEditor
+          v-model:channels="analogChannels"
+          :address="asBlockAddress(block)"
+        />
+      </template>
+      <div class="col-break" />
       <template v-if="context.mode === 'Full'">
-        <q-separator inset />
+        <q-separator />
 
         <div class="column q-gutter-sm">
           <div>

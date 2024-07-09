@@ -56,6 +56,11 @@ export interface SparkBackup {
   store: SparkStoreEntry[];
 }
 
+export interface SparkUsbDevices {
+  enabled: boolean;
+  devices: string[];
+}
+
 export interface BlockLimitation {
   target: string;
   constraint: AnyConstraintKey;

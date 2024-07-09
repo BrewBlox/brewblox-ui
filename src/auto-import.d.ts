@@ -12,11 +12,12 @@ declare module '@vue/runtime-core' {
     UnknownBlockWidget: typeof import('src/plugins/spark/components/widget/UnknownBlockWidget.vue').default;
     RelationsDialog: typeof import('src/plugins/spark/components/widget/RelationsDialog.vue').default;
     RelationsDiagram: typeof import('src/plugins/spark/components/widget/RelationsDiagram.vue').default;
-    OneWireGpioEditor: typeof import('src/plugins/spark/components/widget/OneWireGpioEditor.vue').default;
     IoArray: typeof import('src/plugins/spark/components/widget/IoArray.vue').default;
     GpioChannelDialog: typeof import('src/plugins/spark/components/widget/GpioChannelDialog.vue').default;
+    GpioArrayEditor: typeof import('src/plugins/spark/components/widget/GpioArrayEditor.vue').default;
     BlockWidgetWrapper: typeof import('src/plugins/spark/components/widget/BlockWidgetWrapper.vue').default;
     BlockGraph: typeof import('src/plugins/spark/components/widget/BlockGraph.vue').default;
+    AnalogArrayEditor: typeof import('src/plugins/spark/components/widget/AnalogArrayEditor.vue').default;
     BlockWidgetToolbar: typeof import('src/plugins/spark/components/toolbar/BlockWidgetToolbar.vue').default;
     BlockActions: typeof import('src/plugins/spark/components/toolbar/BlockActions.vue').default;
     SparkWifiDialog: typeof import('src/plugins/spark/components/menu/SparkWifiDialog.vue').default;
@@ -49,6 +50,7 @@ declare module '@vue/runtime-core' {
     AnalogConstraintsValEdit: typeof import('src/plugins/spark/components/form/AnalogConstraintsValEdit.vue').default;
     AnalogConstraintsField: typeof import('src/plugins/spark/components/form/AnalogConstraintsField.vue').default;
     AnalogConstraintsEditor: typeof import('src/plugins/spark/components/form/AnalogConstraintsEditor.vue').default;
+    AnalogChannelSelectField: typeof import('src/plugins/spark/components/form/AnalogChannelSelectField.vue').default;
     QuickstartTaskMaster: typeof import('src/plugins/quickstart/components/QuickstartTaskMaster.vue').default;
     QuickstartServiceTask: typeof import('src/plugins/quickstart/components/QuickstartServiceTask.vue').default;
     QuickstartSensorField: typeof import('src/plugins/quickstart/components/QuickstartSensorField.vue').default;

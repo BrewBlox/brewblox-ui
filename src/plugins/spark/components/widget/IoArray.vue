@@ -16,7 +16,7 @@ import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveChannelActuator } from '@/plugins/spark/utils/configuration';
+import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
 import {
   channelName,
   prettyLimitations,
@@ -68,7 +68,7 @@ async function replaceActuator(
   channel: EditableChannel,
   link: Link,
 ): Promise<void> {
-  setExclusiveChannelActuator(
+  setExclusiveIoChannelClaimer(
     sparkStore.blockByLink(serviceId, link),
     bloxLink(block.value.id),
     channel.id,

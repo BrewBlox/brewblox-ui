@@ -29,6 +29,7 @@ export class BrewbloxEventbus {
       port: PORT,
       path: '/eventbus',
       rejectUnauthorized: false,
+      reschedulePings: false,
     };
     if (this.client) {
       this.client.end();

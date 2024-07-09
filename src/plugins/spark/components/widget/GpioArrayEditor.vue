@@ -2,6 +2,7 @@
 import {
   ChannelCapabilities,
   GpioDeviceType,
+  GpioErrorFlags,
   GpioModuleChannel,
   GpioPins,
 } from 'brewblox-proto/ts';
@@ -208,6 +209,7 @@ function addChannel(): void {
     width: 2,
     capabilities: ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_OUTPUT,
     claimedBy: bloxLink(null),
+    errorFlags: GpioErrorFlags.NONE,
   };
   modifyChannel(channel);
 }

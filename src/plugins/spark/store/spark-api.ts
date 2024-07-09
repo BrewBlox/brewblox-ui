@@ -1,6 +1,11 @@
 import { AxiosResponse } from 'axios';
 import { Block, SparkStatusDescription } from 'brewblox-proto/ts';
-import { BlockIds, BlockPatchArgs, SparkBackup } from '@/plugins/spark/types';
+import {
+  BlockIds,
+  BlockPatchArgs,
+  SparkBackup,
+  SparkUsbDevices,
+} from '@/plugins/spark/types';
 import { http, intercept } from '@/utils/http';
 import { notify } from '@/utils/notify';
 
@@ -139,12 +144,6 @@ export const clearBlocks = (serviceId: string): Promise<any> =>
     .post(`/${encodeURIComponent(serviceId)}/blocks/all/delete`)
     .catch(intercept(`Failed to clear blocks on ${serviceId}`));
 
-export const cleanUnusedNames = (serviceId: string): Promise<string[]> =>
-  http
-    .post<BlockIds[]>(`/${encodeURIComponent(serviceId)}/blocks/cleanup`)
-    .then((resp) => resp.data.map((v) => v.id!))
-    .catch(intercept(`Failed to clean unused block names on ${serviceId}`));
-
 export const fetchDiscoveredBlocks = (serviceId: string): Promise<Block[]> =>
   http
     .post<Block[]>(`/${encodeURIComponent(serviceId)}/blocks/discover`)
@@ -280,3 +279,17 @@ export const controllerReboot = (serviceId: string): Promise<any> =>
     .post(`/${encodeURIComponent(serviceId)}/system/reboot/controller`, {})
     .then((resp) => resp.data)
     .catch(intercept(`Failed to reboot ${serviceId}`));
+
+export const fetchKnownUsbDevices = (
+  serviceId: string,
+): Promise<SparkUsbDevices> =>
+  http
+    .post(`/${encodeURIComponent(serviceId)}/system/usb`, {})
+    .then((resp) => resp.data)
+    .catch(intercept(`Failed to query USB devices for ${serviceId}`));
+
+export const fetchKnownMdnsDevices = (serviceId: string): Promise<string[]> =>
+  http
+    .post(`/${encodeURIComponent(serviceId)}/system/mdns`, {})
+    .then((resp) => resp.data)
+    .catch(intercept(`Failed to query mDNS devices for ${serviceId}`));
