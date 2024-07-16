@@ -15,6 +15,8 @@ import {
 export const defaultPresets = (): QueryParams[] => [
   { duration: '10m' },
   { duration: '1h' },
+  { duration: '4h' },
+  { duration: '12h' },
   { duration: '1d' },
   { duration: '3d' },
   { duration: '7d' },
