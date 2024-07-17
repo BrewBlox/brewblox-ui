@@ -42,6 +42,7 @@ export const BuilderType = Enum(
   'StraightTube',
   'SystemIO',
   'TeeTube',
+  'ThreeWayValve',
   'TiltDisplay',
   'UrlDisplay',
   'Valve',

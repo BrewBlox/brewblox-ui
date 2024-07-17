@@ -54,6 +54,7 @@ export const PASSTHROUGH_KEY = 'flowEnabled';
 export const URL_KEY = 'url';
 export const LABEL_KEY = 'text';
 export const VALVE_CLOSED_KEY = 'closed';
+export const VALVE_POSITION_KEY = 'valvePosition';
 export const GRAPH_CONFIG_KEY = 'graphConfig';
 
 // Deprecated setting keys
