@@ -38,6 +38,7 @@ import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
 import SystemIO from './SystemIO';
 import TeeTube from './TeeTube';
+import ThreeWayValve from './ThreeWayValve';
 import TiltDisplay from './TiltDisplay';
 import UrlDisplay from './UrlDisplay';
 import Valve from './Valve';
@@ -84,6 +85,7 @@ const blueprints: Record<BuilderType, BuilderBlueprint> = {
   StraightTube,
   SystemIO,
   TeeTube,
+  ThreeWayValve,
   TiltDisplay,
   UrlDisplay,
   Valve,
