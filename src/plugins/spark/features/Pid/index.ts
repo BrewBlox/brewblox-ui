@@ -120,6 +120,13 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'boilMinOutput',
+        title: 'Boil mode minimum output',
+        component: 'NumberValEdit',
+        generate: () => 0,
+      },
+      {
+        type,
         key: 'inputSetting',
         title: 'Input target',
         component: 'QuantityValEdit',
