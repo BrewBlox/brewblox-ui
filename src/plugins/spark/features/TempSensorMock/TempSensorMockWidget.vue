@@ -127,7 +127,7 @@ function editSetting(): void {
             title="Period"
             label="Period"
             class="col-grow"
-            @update:qty-value="
+            @update:model-value="
               (period) => updateFluctuation(idx, { ...fluct, period })
             "
           />

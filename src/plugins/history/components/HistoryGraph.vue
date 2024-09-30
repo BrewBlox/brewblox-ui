@@ -70,6 +70,8 @@ function createSource(): void {
     props.config.axes,
     props.config.colors,
     props.config.precision,
+    props.config.min || {},
+    props.config.max || {},
     props.config.fields,
   );
 }
