@@ -78,6 +78,30 @@ const precision = computed<number>({
   },
 });
 
+const min = computed<number | null>({
+  get: () => local.min?.[props.field] ?? null,
+  set: (v) => {
+    if (v != null) {
+      if (!local.min) local.min = {};
+      local.min[props.field] = v;
+    } else {
+      delete local.min?.[props.field];
+    }
+  },
+});
+
+const max = computed<number | null>({
+  get: () => local.max?.[props.field] ?? null,
+  set: (v) => {
+    if (v != null) {
+      if (!local.max) local.max = {};
+      local.max[props.field] = v;
+    } else {
+      delete local.max?.[props.field];
+    }
+  },
+});
+
 function save(): void {
   onDialogOK(local);
 }
@@ -123,6 +147,20 @@ function save(): void {
             class="depth-1"
           />
         </LabeledField>
+        <NumberField
+          v-model="min"
+          title="Hide values below"
+          label="Hide values below"
+          :decimals="precision"
+          clearable
+        />
+        <NumberField
+          v-model="max"
+          title="Hide values above"
+          label="Hide values above"
+          :decimals="precision"
+          clearable
+        />
       </div>
 
       <template #actions>

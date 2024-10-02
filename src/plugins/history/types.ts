@@ -61,6 +61,14 @@ export interface LabelPrecision {
   [key: string]: number;
 }
 
+export interface RangeMin {
+  [key: string]: number | null;
+}
+
+export interface RangeMax {
+  [key: string]: number | null;
+}
+
 export interface TimeSeriesRange {
   metric: {
     __name__: string;
@@ -114,6 +122,8 @@ export interface GraphSource extends HistorySource {
   precision: LabelPrecision;
   values: Mapped<RangeValue>;
   truncated: boolean;
+  min?: RangeMin;
+  max?: RangeMax;
 }
 
 export interface MetricsSource extends HistorySource {
@@ -130,6 +140,8 @@ export interface GraphConfig extends QueryConfig {
   axes: GraphValueAxes;
   colors: LineColors;
   precision: LabelPrecision;
+  min?: RangeMin;
+  max?: RangeMax;
 }
 
 export interface SharedGraphConfig {

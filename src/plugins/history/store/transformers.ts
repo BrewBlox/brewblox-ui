@@ -59,13 +59,25 @@ export function graphSourceTransformer(
     result.ranges.forEach((range) => {
       const key = range.metric.__name__;
       const existing = source.values[key];
+      const min = source.min?.[key];
+      const max = source.max?.[key];
+
       const x: number[] = boundedConcat(
         existing?.x,
         range.values.map((v) => v[0] * 1000),
       );
       const y: number[] = boundedConcat(
         existing?.y,
-        range.values.map((v) => Number(v[1])),
+        range.values.map((v) => {
+          const value = Number(v[1]);
+          if (min != null && value < min) {
+            return NaN;
+          }
+          if (max != null && value > max) {
+            return NaN;
+          }
+          return Number(v[1]);
+        }),
       );
       source.values[key] = {
         ...existing, // Plotly can set values

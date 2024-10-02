@@ -26,6 +26,8 @@ import type {
   LoggedSession,
   MetricsSource,
   QueryParams,
+  RangeMax,
+  RangeMin,
 } from '../types';
 import { upgradeGraphConfig } from '../utils';
 import { historyApi, sessionApi } from './api';
@@ -168,6 +170,8 @@ export const useHistoryStore = defineStore('historyStore', () => {
     axes: GraphValueAxes,
     colors: LineColors,
     precision: LabelPrecision,
+    min: RangeMin,
+    max: RangeMax,
     fields: string[],
   ): Promise<void> {
     const validFields = fields.filter((field) => !!field);
@@ -182,6 +186,8 @@ export const useHistoryStore = defineStore('historyStore', () => {
         axes,
         colors,
         precision,
+        min,
+        max,
         command: 'ranges',
         fields: validFields,
         values: {},
