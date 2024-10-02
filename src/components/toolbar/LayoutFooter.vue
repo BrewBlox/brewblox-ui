@@ -40,14 +40,17 @@ function showAuthExplanation(): void {
       html: true,
       title: 'Authentication',
       message: `
-      <p>
-        Password protection is disabled.
-        To enable it, run:
-      </p>
-      <b/>
-      <p class="monospace">
-        brewblox-ctl auth enable
-      </p>`,
+<p>Password protection is disabled.
+To enable it, add this to your <i>brewblox.yml</i> file:
+<pre><code>auth:
+  enabled: True
+</code></pre>
+Add a user with:
+<pre><code>brewblox-ctl auth add-user
+</code></pre>
+And apply the changes with:
+<pre><code>brewblox-ctl config apply
+</code></pre>`,
     },
   });
 }
