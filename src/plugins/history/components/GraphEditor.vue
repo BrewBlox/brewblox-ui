@@ -74,6 +74,16 @@ function editLeaf(node: QTreeNode): void {
             label="Axis"
             dense
           />
+          <LabeledField
+            :model-value="config.min ? config.min[node.value] || null : null"
+            label="Hide below"
+            dense
+          />
+          <LabeledField
+            :model-value="config.max ? config.max[node.value] || null : null"
+            label="Hide Above"
+            dense
+          />
         </q-tooltip>
       </div>
     </template>

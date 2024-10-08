@@ -5,7 +5,7 @@ import { createDialog } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/quantity';
 
 export interface Props extends UseFieldProps {
-  modelValue: number;
+  modelValue: number | null;
   decimals?: number;
   clearable?: boolean;
   autogrow?: boolean;

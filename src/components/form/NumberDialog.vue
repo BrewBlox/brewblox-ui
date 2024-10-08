@@ -2,11 +2,11 @@
 import { computed, ref } from 'vue';
 import { useDialog, UseDialogEmits, UseDialogProps } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { roundedNumber } from '@/utils/quantity';
+import { fixedNumber, roundedNumber } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
 
 interface Props extends UseDialogProps {
-  modelValue: number;
+  modelValue: number | null;
   decimals?: number;
   label?: string;
   rules?: InputRule[];
@@ -32,16 +32,24 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<UseDialogEmits>();
 
 const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
-  useDialog.setup<number>();
+  useDialog.setup<number | null>();
 
 function parse(v: Maybe<string | number>): number | null {
+  if (v == null) {
+    return null;
+  }
+  if (v == '') {
+    return null;
+  }
   return roundedNumber(Number(v), props.decimals);
 }
 
 const local = ref<string | number>(parse(props.modelValue) ?? '');
 
-const parsed = computed<number>(() => parse(local.value) ?? 0);
-
+const parsed = computed<number | null>(() => parse(local.value));
+const parsedDisplay =
+  computed<string>(() => fixedNumber(parse(local.value), props.decimals)) ??
+  '<not set>';
 const validator = computed<(val: any) => boolean>(() =>
   makeRuleValidator(props.rules),
 );
@@ -85,7 +93,7 @@ function showKeyboard(): void {
           rules,
         }"
         :input-style="{ fontSize }"
-        :hint="`${parsed}`"
+        :hint="`${parsedDisplay}`"
         type="number"
         step="any"
         inputmode="numeric"
