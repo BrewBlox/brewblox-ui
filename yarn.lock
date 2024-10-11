@@ -3103,7 +3103,7 @@ __metadata:
     core-js: "npm:^3.37.0"
     d3: "npm:^7.9.0"
     date-fns: "npm:^3.6.0"
-    dompurify: "npm:^3.1.2"
+    dompurify: "npm:^3.1.3"
     elkjs: "npm:^0.9.3"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
@@ -4376,10 +4376,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:^3.1.2":
-  version: 3.1.2
-  resolution: "dompurify@npm:3.1.2"
-  checksum: 10c0/6f072da177ba850c196184d76a277933a19831e59313edd90f094e8884579c8193b21ea105889d89059771f058f4b2e0c14fc5a58f19f7dad2a6756be807d091
+"dompurify@npm:^3.1.3":
+  version: 3.1.7
+  resolution: "dompurify@npm:3.1.7"
+  checksum: 10c0/fcceef2e9f824d712a056fa699b0538f3337f5cf00ccb7227bdc7eba5463823e15d9aecc00a2fd81c726b28a71e7b09f0eb8a2fde1021c40e35f12dc67b66394
   languageName: node
   linkType: hard
 
