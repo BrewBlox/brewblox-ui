@@ -50,7 +50,13 @@ const sysInfo = computed<SysInfoBlock | undefined>(() =>
 );
 
 const displayBrightness = computed<number>({
-  get: () => sysInfo.value?.data.displayBrightness ?? 255,
+  get: () => {
+    const brightness = sysInfo.value?.data.displayBrightness ?? 255;
+    if (brightness < 20) {
+      return 255; // values under 20 are not applied in firmware and will give max brightness
+    }
+    return brightness;
+  },
   set: (displayBrightness) => {
     sparkStore.patchBlock(sysInfo.value, { displayBrightness });
   },
