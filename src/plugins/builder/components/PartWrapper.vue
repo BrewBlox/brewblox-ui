@@ -112,6 +112,8 @@ onErrorCaptured((err: Error) => {
   error.value = err.message;
   const { type, x, y } = props.part;
   notify.error(`${type} (${x},${y}) :${err.message}`);
+  // eslint-disable-next-line no-console
+  console.trace(err);
   return false;
 });
 </script>

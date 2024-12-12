@@ -6,6 +6,7 @@ import {
   BlockType,
   ChannelCapabilities,
   DigitalActuatorBlock,
+  DigitalInputBlock,
   DigitalState,
   FastPwmBlock,
   IoArrayInterfaceBlock,
@@ -31,6 +32,7 @@ interface EditableChannel extends IoChannel {
   pwmActuator: FastPwmBlock | null;
   actuatorClaimed: boolean;
   compatibleTypes: BlockOrIntfType[];
+  input: DigitalInputBlock | null;
 }
 
 const sparkStore = useSparkStore();
@@ -46,6 +48,9 @@ const channels = computed<EditableChannel[]>(() =>
     if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ) {
       compatibleTypes.push(BlockOrIntfType.FastPwm);
     }
+    if (c.capabilities & ChannelCapabilities.CHAN_SUPPORTS_DIGITAL_INPUT) {
+      compatibleTypes.push(BlockOrIntfType.DigitalInput);
+    }
     return {
       ...c,
       compatibleTypes,
@@ -55,7 +60,8 @@ const channels = computed<EditableChannel[]>(() =>
         BlockIntfType.ActuatorDigitalInterface,
       ),
       pwmActuator: ifCompatible(actuator, BlockType.FastPwm),
-      actuatorClaimed: actuator?.data.claimedBy.id != null,
+      actuatorClaimed: actuator?.data.claimedBy?.id != null,
+      input: ifCompatible(actuator, BlockType.DigitalInput),
     };
   }),
 );
@@ -135,6 +141,12 @@ async function updatePwmSetting(channel: EditableChannel): Promise<void> {
             @click="updatePwmSetting(channel)"
           />
         </div>
+        <DigitalStateButton
+          v-else-if="channel.input"
+          disable
+          :model-value="channel.input.data.state"
+          class="col-auto self-center"
+        />
         <div
           v-else
           class="darkened text-italic q-pa-sm"

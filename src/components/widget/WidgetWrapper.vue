@@ -51,6 +51,8 @@ provide(ContextKey, reactive<WidgetContext>(cloneDeep(props.context)));
 
 provide(InvalidateKey, (reason?: string) => {
   error.value = reason ?? 'Unknown error';
+  // eslint-disable-next-line no-console
+  console.error(error.value);
   invalidateParent(reason);
 });
 
@@ -60,6 +62,8 @@ provide(ChangeWidgetTitleKey, () => startChangeWidgetTitle(props.widget));
 
 onErrorCaptured((err: Error) => {
   error.value = err.message;
+  // eslint-disable-next-line no-console
+  console.trace(err);
   return false;
 });
 </script>
