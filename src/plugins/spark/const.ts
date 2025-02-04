@@ -162,9 +162,9 @@ export const ENUM_LABELS_STORE_MODE: EnumLabels<SequenceStoreMode> = {
 export const ENUM_LABELS_TEMP_SENSOR_ANALOG_TYPE: EnumLabels<TempSensorAnalogType> =
   {
     TEMP_SENSOR_TYPE_NOT_SET: 'Not set',
-    TEMP_SENSOR_TYPE_RTD_2WIRE: 'RTD (two wire)',
-    TEMP_SENSOR_TYPE_RTD_3WIRE: 'RTD (three wire)',
-    TEMP_SENSOR_TYPE_RTD_4WIRE: 'RTD (four wire)',
+  TEMP_SENSOR_TYPE_RTD_2WIRE: 'RTD (2-wire)',
+  TEMP_SENSOR_TYPE_RTD_3WIRE: 'RTD (3-wire)',
+  TEMP_SENSOR_TYPE_RTD_4WIRE: 'RTD (4-wire)',
   };
 
 export const ENUM_LABELS_TEMP_SENSOR_ANALOG_SPEC: EnumLabels<TempSensorAnalogSpec> =

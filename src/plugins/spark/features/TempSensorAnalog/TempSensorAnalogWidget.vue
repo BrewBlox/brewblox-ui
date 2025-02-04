@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { TempSensorAnalogBlock } from 'brewblox-proto/ts';
+import {
+  TempSensorAnalogBlock,
+  TempSensorAnalogSpec,
+  TempSensorAnalogType,
+} from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
@@ -8,7 +12,7 @@ import {
   ENUM_LABELS_TEMP_SENSOR_ANALOG_SPEC,
   ENUM_LABELS_TEMP_SENSOR_ANALOG_TYPE,
 } from '@/plugins/spark/const';
-import { setExclusiveAnalogChannelClaimer } from '@/plugins/spark/utils/configuration';
+import { setAnalogChannelClaimer } from '@/plugins/spark/utils/configuration';
 import { selectable } from '@/utils/collections';
 
 const tempSensorAnalogTypeOpts = selectable(
@@ -76,10 +80,11 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             class="col-grow"
             @update:model-value="
               ({ analogDevice, analogChannel }) =>
-                setExclusiveAnalogChannelClaimer(
+                setAnalogChannelClaimer(
                   block,
                   analogDevice,
                   analogChannel,
+                  false,
                 )
             "
           />
@@ -90,7 +95,20 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             label="Sensor type"
             class="col-grow"
             @update:model-value="(v) => patchBlock({ sensorType: v })"
-          />
+          >
+            <template
+              v-if="
+                block.data.sensorType ===
+                TempSensorAnalogType.TEMP_SENSOR_TYPE_NOT_SET
+              "
+              #prepend
+            >
+              <q-icon
+                name="warning"
+                color="warning"
+              />
+            </template>
+          </SelectField>
           <SelectField
             :model-value="block.data.spec"
             :options="tempSensorAnalogSpecOpts"
@@ -98,7 +116,20 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             label="Sensor spec"
             class="col-grow"
             @update:model-value="(v) => patchBlock({ spec: v })"
-          />
+          >
+            <template
+              v-if="
+                block.data.spec ===
+                TempSensorAnalogSpec.SPEC_NOT_SET
+              "
+              #prepend
+            >
+              <q-icon
+                name="warning"
+                color="warning"
+              />
+            </template>
+          </SelectField>
 
           <div class="col-break" />
 

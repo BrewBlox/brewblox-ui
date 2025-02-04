@@ -234,14 +234,15 @@ export async function setExclusiveIoChannelClaimer(
   await useSparkStore().patchBlock(actuator, { hwDevice, channel });
 }
 
-export async function setExclusiveAnalogChannelClaimer(
-  actuator: Maybe<Block>,
+export async function setAnalogChannelClaimer(
+  sensor: Maybe<Block>,
   analogDevice: Link,
   analogChannel: number,
+  exclusive: boolean,
 ): Promise<void> {
   if (
     !isBlockCompatible<AnalogClaimerInterfaceBlock>(
-      actuator,
+      sensor,
       BlockIntfType.AnalogClaimerInterface,
     )
   ) {
@@ -249,18 +250,19 @@ export async function setExclusiveAnalogChannelClaimer(
   }
 
   if (
-    actuator.data.analogDevice.id === analogDevice.id &&
-    actuator.data.analogChannel === analogChannel
+    sensor.data.analogDevice.id === analogDevice.id &&
+    sensor.data.analogChannel === analogChannel
   ) {
     return; // no change
   }
-
-  await unlinkAnalogChannelClaimers(
-    actuator.serviceId,
-    analogDevice,
-    analogChannel,
-  );
-  await useSparkStore().patchBlock(actuator, { analogDevice, analogChannel });
+  if (exclusive) {
+    await unlinkAnalogChannelClaimers(
+      sensor.serviceId,
+      analogDevice,
+      analogChannel,
+    );
+  }
+  await useSparkStore().patchBlock(sensor, { analogDevice, analogChannel });
 }
 
 export function emptyAnalogConstraints(): DeepNonNullable<AnalogConstraints> {

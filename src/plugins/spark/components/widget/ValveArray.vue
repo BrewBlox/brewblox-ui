@@ -70,7 +70,7 @@ async function updateDigitalState(
       <div class="col-auto row items-baseline min-width-sm">
         <DigitalStateButton
           v-if="channel.actuator"
-          :disable="channel.actuator.data.claimedBy.id != null"
+          :disable="channel.actuator.data.claimedBy?.id != null"
           :model-value="channel.actuator.data.desiredState"
           :pending="
             channel.actuator.data.state !== channel.actuator.data.desiredState

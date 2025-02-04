@@ -4,6 +4,8 @@ import {
   AnalogSensorType,
   Block,
   BlockOrIntfType,
+  BlockIntfType,
+  AnalogClaimerInterfaceBlock,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { ENUM_LABELS_ANALOG_SENSOR_TYPE } from '@/plugins/spark/const';
@@ -11,6 +13,8 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { analogChannelName } from '../../utils/formatting';
 
 interface Props {
   channels: AnalogModuleChannel[];
@@ -22,7 +26,10 @@ const props = defineProps<Props>();
 
 const existingSensors = computed<{ [channelId: number]: Block[] }>(() => {
   const sensors = sparkStore
-    .blocksByType(props.address.serviceId, BlockOrIntfType.TempSensorAnalog)
+    .blocksByService(props.address.serviceId)
+    .filter((block): block is AnalogClaimerInterfaceBlock =>
+      isBlockCompatible(block, BlockIntfType.AnalogClaimerInterface),
+    )
     .filter((block) => block.data.analogDevice.id === props.address.id);
   return props.channels.reduce((acc, channel) => {
     acc[channel.id] = sensors.filter(
@@ -71,7 +78,7 @@ function createSensor(sensorType: BlockOrIntfType | null): void {
         readonly
         class="col-2"
       >
-        Analog {{ channel.id }}
+        {{analogChannelName(channel.id)}}
       </LabeledField>
       <LabeledField
         label="Sensor Type"
@@ -112,7 +119,7 @@ function createSensor(sensorType: BlockOrIntfType | null): void {
         v-if="existingSensors[channel.id].length > 0"
         label="Used by"
         readonly
-        class="col-grow row"
+        class="col-auto"
       >
         <q-btn
           v-for="userBlock in existingSensors[channel.id]"
@@ -120,8 +127,8 @@ function createSensor(sensorType: BlockOrIntfType | null): void {
           :label="userBlock.id"
           dense
           no-caps
-          flat
-          class="depth-1"
+          class="depth-1 q-mx-xs"
+          color="primary"
           @click="createBlockDialog(userBlock)"
         />
       </LabeledField>
@@ -132,14 +139,14 @@ function createSensor(sensorType: BlockOrIntfType | null): void {
         "
         label="Not used"
         readonly
-        class="col-grow row"
+        class="col-auto"
       >
         <q-btn
           label="New Sensor"
           dense
           no-caps
           flat
-          class="depth-1"
+          class="depth-1 q-mx-xs"
           @click="createSensor(sensorToBlockType(channel.sensorType))"
         />
       </LabeledField>
