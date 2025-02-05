@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  Quantity,
   TempSensorAnalogBlock,
   TempSensorAnalogSpec,
   TempSensorAnalogType,
@@ -109,6 +110,17 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
               />
             </template>
           </SelectField>
+          <LabeledField
+            v-model="ENUM_LABELS_ANALOG_SENSOR_TYPE[block.data.detected]"
+            readonly
+            label="Detected type"
+            class="col-grow"
+            tooltip="Detected sensor type.
+            If this doesn't match the selected type, the sensor will not give a value.
+            Detected 3-wire when 4-wires was configured is allowed,
+            beause the lead-wire resistance can still be corrected for."
+          />
+          <div class="col-break" />
           <SelectField
             :model-value="block.data.spec"
             :options="tempSensorAnalogSpecOpts"
@@ -130,21 +142,63 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
               />
             </template>
           </SelectField>
-
-          <div class="col-break" />
-
           <QuantityField
-            :model-value="block.data.offset"
-            title="Offset"
-            label="Offset"
-            class="col-grow"
-            @update:model-value="(v) => patchBlock({ offset: v })"
+          :model-value="block.data.spec_r0"
+          title="R0 (Resistance at 0°C)"
+          label="R0 (Resistance at 0°C)"
+          class="col-grow"
+          :suffix="block.data.spec_r0_override ? ' (custom)' : '(default)'"
+            placeholder=""
+            message="<p>Set a custom R0 for the Callendar-Van Dusen equation.</p>
+                     <p>Clear or set to 0 to revert back to the default for the spec.</p>"
+            html
+            clearable
+          @update:model-value="(v: Quantity) => {
+            if (v.value === null) {
+              v.value = 0;
+            }
+            return patchBlock({ spec_r0_override: v });
+          }"
           />
-          <LabeledField
-            v-model="ENUM_LABELS_ANALOG_SENSOR_TYPE[block.data.detected]"
-            readonly
-            label="Detected type"
+          <div class="col-break" />
+          <ScientificNumberField
+            :model-value="block.data.spec_a"
+            title="Custom temperature coefficient A"
+            label="Temperature coefficient A"
             class="col-grow"
+            :suffix="block.data.spec_a_override ? ' (custom)' : '(default)'"
+            dialog-suffix='custom'
+            placeholder=""
+            message="<p>Set a custom coefficient A for the Callendar-Van Dusen equation.</p>
+                     <p>Clear or set to 0 to revert back to the default for the spec.</p>"
+            html
+            @update:model-value="(v) => patchBlock({ spec_a_override: v })"
+          />
+          <ScientificNumberField
+            :model-value="block.data.spec_b"
+            title="Temperature coefficient B"
+            label="Temperature coefficient B"
+            class="col-grow"
+            :suffix="block.data.spec_a_override ? ' (custom)' : '(default)'"
+            dialog-suffix='custom'
+            placeholder=""
+            message="<p>Set a custom coefficient B for the Callendar-Van Dusen equation.</p>
+                     <p>Clear or set to 0 to revert back to the default for the spec.</p>"
+            html
+            @update:model-value="(v) => patchBlock({ spec_b_override: v })"
+          />
+          <ScientificNumberField
+            :model-value="block.data.spec_c"
+            title="Temperature coefficient C"
+            label="Temperature coefficient C"
+            class="col-grow"
+            :suffix="block.data.spec_a_override ? ' (custom)' : '(default)'"
+            dialog-suffix='custom'
+            placeholder=""
+            message="<p>Set a custom coefficient C for the Callendar-Van Dusen equation.</p>
+                     <p>Clear or set to 0 to revert back to the default for the spec.</p>"
+            html
+            @update:model-value="(v) => patchBlock({ spec_c_override: v })"
           />
         </div>
       </template>
