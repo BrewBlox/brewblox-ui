@@ -10,12 +10,14 @@ interface Props extends UseDialogProps {
   modelValue: Quantity;
   decimals?: number;
   label?: string;
+  clearable?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   ...useDialog.defaultProps,
   decimals: 2,
   label: 'Value',
+  clearable: false,
 });
 
 defineEmits<UseDialogEmits>();
@@ -59,6 +61,7 @@ function showKeyboard(): void {
         v-model.number="local"
         :label="label"
         :suffix="notation"
+        :clearable="clearable"
         input-class="text-big"
         inputmode="numeric"
         pattern="[0-9\.]*"

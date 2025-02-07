@@ -162,6 +162,8 @@ declare module '@vue/runtime-core' {
     QuantityDialog: typeof import('src/components/form/QuantityDialog.vue').default;
     NumberField: typeof import('src/components/form/NumberField.vue').default;
     NumberDialog: typeof import('src/components/form/NumberDialog.vue').default;
+    ScientificNumberField: typeof import('src/components/form/ScientificNumberField.vue').default;
+    ScientificNumberDialog: typeof import('src/components/form/ScientificNumberDialog.vue').default;
     MarkdownView: typeof import('src/components/form/MarkdownView.vue').default;
     MarkdownDialog: typeof import('src/components/form/MarkdownDialog.vue').default;
     LoginDialog: typeof import('src/components/form/LoginDialog.vue').default;
