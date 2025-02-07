@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import {
+  AnalogClaimerInterfaceBlock,
   AnalogModuleChannel,
   AnalogSensorType,
   Block,
-  BlockOrIntfType,
   BlockIntfType,
-  AnalogClaimerInterfaceBlock,
+  BlockOrIntfType,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { ENUM_LABELS_ANALOG_SENSOR_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
+import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { analogChannelName } from '../../utils/formatting';
 
 interface Props {
@@ -78,7 +78,7 @@ function createSensor(sensorType: BlockOrIntfType | null): void {
         readonly
         class="col-2"
       >
-        {{analogChannelName(channel.id)}}
+        {{ analogChannelName(channel.id) }}
       </LabeledField>
       <LabeledField
         label="Sensor Type"

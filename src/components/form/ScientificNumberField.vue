@@ -28,9 +28,14 @@ const emit = defineEmits<{
 
 const { activeSlots } = useField.setup();
 
-const displayValue = computed<string>(() =>
- Number.parseFloat(props.modelValue).toExponential(props.fractionDigits),
-);
+const displayValue = computed<string>(() => {
+  if (props.modelValue === null) {
+    return '';
+  }
+  return Number.parseFloat(String(props.modelValue)).toExponential(
+    props.fractionDigits,
+  );
+});
 
 function openDialog(): void {
   if (props.readonly) {

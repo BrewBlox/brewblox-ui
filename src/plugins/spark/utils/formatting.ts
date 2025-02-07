@@ -53,17 +53,14 @@ export function channelName(
   return undefined;
 }
 
-export function analogChannelName(
-  analogChannel: number,
-): string {
+export function analogChannelName(analogChannel: number): string {
   const names = ['Not set', 'A1', 'A2', 'B1', 'B2'];
   const channelName =
     analogChannel < 0 || analogChannel > 4
       ? 'Invalid channel'
       : names[analogChannel];
   return channelName;
-};
-
+}
 
 export function prettyConstraints(
   constraints: Maybe<AnalogConstraints | DigitalConstraints>,

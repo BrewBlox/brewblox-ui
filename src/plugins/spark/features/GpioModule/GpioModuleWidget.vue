@@ -7,7 +7,6 @@ import {
   GpioPins,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
-import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { asBlockAddress } from '@/plugins/spark/utils/configuration';
 import { createDialogPromise } from '@/utils/dialog';
@@ -19,7 +18,6 @@ function listedPins(pins: GpioPins): number[] {
   return [...Array(8).keys()].filter((i) => (1 << i) & pins).map((i) => i + 1);
 }
 
-const { context } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
 
 const power = computed<boolean>({
@@ -137,19 +135,19 @@ const errors = computed<string[]>(() => {
       <div class="text-subtitle1 text-right col">Module settings</div>
       <div class="row q-gutter-sm">
         <LabeledField
-        label="Module position"
-        class="col-3"
+          label="Module position"
+          class="col-3"
         >
-        {{ block.data.modulePosition }}
-      </LabeledField>
-      <QuantityField
-      v-if="block.data.baroPressure != undefined"
-      :model-value="block.data.baroPressure"
-      label="Barometric pressure"
-      class="col-3"
-      readonly
-      />
-      <LabeledField label="Digital channels voltage">
+          {{ block.data.modulePosition }}
+        </LabeledField>
+        <QuantityField
+          v-if="block.data.baroPressure != undefined"
+          :model-value="block.data.baroPressure"
+          label="Barometric pressure"
+          class="col-3"
+          readonly
+        />
+        <LabeledField label="Digital channels voltage">
           <q-btn-group
             outline
             class="fit"
@@ -182,7 +180,7 @@ const errors = computed<string[]>(() => {
             between 5V or the shared external power source.
           </div>
         </div>
+      </div>
     </div>
-  </div>
   </Card>
 </template>

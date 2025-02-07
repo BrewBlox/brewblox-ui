@@ -34,7 +34,8 @@ const { dialogRef, dialogOpts, onDialogHide, onDialogCancel, onDialogOK } =
   useDialog.setup<number | null>();
 
 const local = ref<string | number>(
-  props.modelValue != null ? Number(props.modelValue).toExponential(props.fractionDigits)
+  props.modelValue != null
+    ? Number(props.modelValue).toExponential(props.fractionDigits)
     : '',
 );
 

@@ -30,7 +30,10 @@ const props = defineProps<Props>();
 
 const sparkStore = useSparkStore();
 
-const channelNameWithBlock = (blockId: string | null, channelId: number): string => {
+const channelNameWithBlock = (
+  blockId: string | null,
+  channelId: number,
+): string => {
   return `${analogChannelName(channelId)} ${blockId ? `on ${blockId}` : ''}`;
 };
 
@@ -106,7 +109,10 @@ const channelOpts = computed<SelectOption[]>(() =>
   >
     <template #value>
       {{
-        channelNameWithBlock(modelValue.analogDevice.id, modelValue.analogChannel)
+        channelNameWithBlock(
+          modelValue.analogDevice.id,
+          modelValue.analogChannel,
+        )
       }}
     </template>
   </SelectField>

@@ -13,7 +13,7 @@ import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
-import { deltaTempQty, tempQty } from '@/utils/quantity';
+import { bloxQty, tempQty } from '@/utils/quantity';
 import widget from './TempSensorAnalogWidget.vue';
 
 const type = BlockType.TempSensorAnalog;
@@ -29,13 +29,21 @@ const plugin: Plugin = {
       title,
       hasRelations: true,
       generate: (): TempSensorAnalogBlock['data'] => ({
-        value: tempQty(20),
-        offset: deltaTempQty(0),
+        value: tempQty(null),
         sensorType: TempSensorAnalogType.TEMP_SENSOR_TYPE_NOT_SET,
         analogDevice: bloxLink(null, BlockIntfType.AnalogArrayInterface),
         analogChannel: 0,
         detected: AnalogSensorType.ANALOG_SENSOR_TYPE_NONE,
         spec: TempSensorAnalogSpec.SPEC_NOT_SET,
+        resistance: bloxQty(null, 'ohm'),
+        spec_r0: bloxQty(null, 'ohm'),
+        spec_a: 0,
+        spec_b: 0,
+        spec_c: 0,
+        spec_r0_override: bloxQty(null, 'ohm'),
+        spec_a_override: 0,
+        spec_b_override: 0,
+        spec_c_override: 0,
       }),
       analyze: (block: TempSensorAnalogBlock) => {
         const { value, analogDevice, analogChannel } = block.data;

@@ -130,10 +130,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             @update:model-value="(v) => patchBlock({ spec: v })"
           >
             <template
-              v-if="
-                block.data.spec ===
-                TempSensorAnalogSpec.SPEC_NOT_SET
-              "
+              v-if="block.data.spec === TempSensorAnalogSpec.SPEC_NOT_SET"
               #prepend
             >
               <q-icon
@@ -143,22 +140,24 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             </template>
           </SelectField>
           <QuantityField
-          :model-value="block.data.spec_r0"
-          title="R0 (Resistance at 0°C)"
-          label="R0 (Resistance at 0°C)"
-          class="col-grow"
-          :suffix="block.data.spec_r0_override ? ' (custom)' : '(default)'"
+            :model-value="block.data.spec_r0"
+            title="R0 (Resistance at 0°C)"
+            label="R0 (Resistance at 0°C)"
+            class="col-grow"
+            :suffix="block.data.spec_r0_override ? ' (custom)' : '(default)'"
             placeholder=""
             message="<p>Set a custom R0 for the Callendar-Van Dusen equation.</p>
                      <p>Clear or set to 0 to revert back to the default for the spec.</p>"
             html
             clearable
-          @update:model-value="(v: Quantity) => {
-            if (v.value === null) {
-              v.value = 0;
-            }
-            return patchBlock({ spec_r0_override: v });
-          }"
+            @update:model-value="
+              (v: Quantity) => {
+                if (v.value === null) {
+                  v.value = 0;
+                }
+                return patchBlock({ spec_r0_override: v });
+              }
+            "
           />
           <div class="col-break" />
           <ScientificNumberField
@@ -167,7 +166,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             label="Temperature coefficient A"
             class="col-grow"
             :suffix="block.data.spec_a_override ? ' (custom)' : '(default)'"
-            dialog-suffix='custom'
+            dialog-suffix="custom"
             placeholder=""
             message="<p>Set a custom coefficient A for the Callendar-Van Dusen equation.</p>
                      <p>Clear or set to 0 to revert back to the default for the spec.</p>"
@@ -180,7 +179,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             label="Temperature coefficient B"
             class="col-grow"
             :suffix="block.data.spec_a_override ? ' (custom)' : '(default)'"
-            dialog-suffix='custom'
+            dialog-suffix="custom"
             placeholder=""
             message="<p>Set a custom coefficient B for the Callendar-Van Dusen equation.</p>
                      <p>Clear or set to 0 to revert back to the default for the spec.</p>"
@@ -193,7 +192,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             label="Temperature coefficient C"
             class="col-grow"
             :suffix="block.data.spec_a_override ? ' (custom)' : '(default)'"
-            dialog-suffix='custom'
+            dialog-suffix="custom"
             placeholder=""
             message="<p>Set a custom coefficient C for the Callendar-Van Dusen equation.</p>
                      <p>Clear or set to 0 to revert back to the default for the spec.</p>"
