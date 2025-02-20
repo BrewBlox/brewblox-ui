@@ -10,7 +10,10 @@ import {
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ENUM_LABELS_DERIVATIVE_FILTER_CHOICE } from '@/plugins/spark/const';
+import {
+  ENUM_LABELS_DERIVATIVE_FILTER_CHOICE,
+  ENUM_LABELS_FILTER_CHOICE,
+} from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockClaimed } from '@/plugins/spark/utils/info';
@@ -45,6 +48,15 @@ const inputStoredSetting = computed<Quantity | null>({
   set: (q) => {
     if (inputBlock.value && q) {
       sparkStore.patchBlock(inputBlock.value, { storedSetting: q });
+    }
+  },
+});
+
+const inputFilter = computed<FilterChoice | null>({
+  get: () => inputBlock.value?.data.filter ?? null,
+  set: (q) => {
+    if (inputBlock.value && q) {
+      sparkStore.patchBlock(inputBlock.value, { filter: q });
     }
   },
 });
@@ -129,8 +141,10 @@ function openDerivativeFilterDialog(): void {
                 the effect of noise and limited sensor resolution.
               </p>
               <p>
-                A longer delay will surpress derivative output from small sensor changes,
-                but can result in the D part of the PID being too late to counteract P.
+                A longer delay will surpress quick fluctuations more,
+                but too much delay can cause D to be out of sync with P.
+                When you choose <b>Derived from Td</b>, a filter is selected automatically to
+                have less than Td delay until max derivative.
               </p>
               `,
       html: true,
@@ -335,20 +349,27 @@ function openDerivativeFilterDialog(): void {
           label="Ti"
           message="
                 <p>
-                  The purpose of the integrator is to remove steady state errors.
-                  The integrator slowly builds up when the error is not zero.
+                  The I part of PID, the integrator, is for removing steady state errors.
+                  The integrator slowly builds up when the error is not zero by accumulating P,
+                  until the target is reached and P is zero.
                 </p>
                 <p>
-                  When the proportional action (P) brings the input close
-                  to the desired value but a small error remains,
-                  the integrator will correct it over time.
-                  The integratal increases by P every second.
-                  I, which is integral/Ti, will increase by P in Ti seconds.
+                  I increases with P / Ti every second.
+                  Ti should be long enough so I does not increase much during a step change,
+                  where P should bring the output to the target.
                 </p>
                 <p>
-                  The integrator should be slow enough
-                  to give the process time to respond to proportional action (P).
-                  Overshoot due to too much integrator action is usually a sign of Kp being too low.
+                  A good guess for Ti is: <br/>
+                  at least 3x the time between the output dipping under 100%
+                  and reaching the setpoint on a step.
+                </p>
+                <p>
+                  When you have overshoot due to I, it can have 2 reasons:
+                  <ul>
+                    <li> Ti is too short, so I increases too fast. </li>
+                    <li> Kp is too low,
+                       which makes I the main driver of the output instead of P. </li>
+                  </ul>
                 </p>
                 <p>Setting Ti to zero will disable the integrator.</p>
                 "
@@ -403,17 +424,18 @@ function openDerivativeFilterDialog(): void {
           label="Td"
           message="
               <p>
-                When the input is approaching its target fast,
-                the derivative action (D) can counteract the proportional action (P).
-                This slows down the approach to avoid overshoot.
+                The D part of PID, the derivative, has the opposite sign of P.
+                When the input is approaching the target quickly,
+                it will reduce the output to avoid overshoot.
+                D is clipped to +/- P.
               </p>
               <p>
                 Td is the derivative time constant.
-                It should be equal to how long it takes for the process
-                to stabilize after you turn off the actuator.
+                A good starting point for Td is
+                the time between when the output is 0% and when the overshoot peaks.
               </p>
               <p>
-                When there is no overshoot in the system, Td should be set to zero.
+                When there is little overshoot in the system, Td is best kept at zero.
               </p>
               "
           borderless
@@ -480,9 +502,31 @@ function openDerivativeFilterDialog(): void {
       </div>
     </div>
     <q-separator inset />
-    <div class="row items-center justify-center boil q-pa-md q-gutter-y-sm">
+    <div
+      v-if="inputFilter !== null"
+      class="row items-center justify-center boil q-pt-md"
+    >
       <div class="col-auto">
-        <span>Derivative filter delay is </span>
+        <span>The input has a smoothing filter with </span>
+        <span
+          class="clickable q-pa-sm q-ma-xs rounded-borders text-bold"
+          style="line-height: 200%"
+          @click="openDerivativeFilterDialog"
+        >
+          {{ ENUM_LABELS_FILTER_CHOICE[inputFilter] }}
+        </span>
+      </div>
+    </div>
+    <div class="row items-center justify-center boil q-pt-md">
+      <div class="col-auto">
+        <span
+          >The derivative has a smoothing filter
+          {{
+            block.data.derivativeFilterChoice === FilterChoice.FILTER_NONE
+              ? ''
+              : 'with'
+          }}</span
+        >
         <span
           class="clickable q-pa-sm q-ma-xs rounded-borders text-bold"
           style="line-height: 200%"
@@ -500,10 +544,12 @@ function openDerivativeFilterDialog(): void {
             block.data.derivativeFilter !== FilterChoice.FILTER_NONE
           "
         >
-          ({{
+          which has
+          {{
             ENUM_LABELS_DERIVATIVE_FILTER_CHOICE[block.data.derivativeFilter]
-          }})
+          }}
         </template>
+        <template v-else> </template>
       </div>
     </div>
   </div>
