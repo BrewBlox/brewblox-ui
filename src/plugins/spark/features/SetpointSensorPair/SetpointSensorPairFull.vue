@@ -58,15 +58,13 @@ const usedBy = computed<Block[]>(() => {
         :options="filterOpts"
         :html="true"
         title="Filter"
-        label="Filter period"
+        label="Filter"
         message="
               <p>
                 A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
-                Changes faster than the filter period will be filtered out.
-              </p>
+                </p>
               <p>
-                A longer period will give a smoother output at the cost of a delay in response.
-                This delay is equal to the chosen period.
+                A slower filter will give a smoother output at the cost of a delay in response.
               </p>
               "
         class="col-grow"
