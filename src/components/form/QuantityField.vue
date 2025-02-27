@@ -7,7 +7,7 @@ import { createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyUnit } from '@/utils/quantity';
 
 interface Props extends UseFieldProps {
-  modelValue: Quantity | null;
+  modelValue: Quantity;
   backupValue?: Quantity | null;
   noLabel?: boolean;
   tagClass?: VueClassProp;
@@ -38,7 +38,7 @@ function change(v: Quantity): void {
 }
 
 const displayValue = computed<string>(() =>
-  fixedNumber(props.modelValue?.value, props.decimals),
+  fixedNumber(props.modelValue.value, props.decimals),
 );
 
 const displayUnit = computed<string>(() => prettyUnit(props.modelValue));
@@ -49,7 +49,7 @@ function openDialog(): void {
   }
 
   const modelValue =
-    props.modelValue?.value == null && props.backupValue != null
+    props.modelValue.value == null && props.backupValue != null
       ? props.backupValue
       : props.modelValue;
 
@@ -77,7 +77,7 @@ function openDialog(): void {
     </slot>
     <component
       :is="unitTag"
-      v-if="modelValue?.value !== null"
+      v-if="modelValue.value !== null"
       class="self-end darkish q-ml-xs"
     >
       {{ displayUnit }}

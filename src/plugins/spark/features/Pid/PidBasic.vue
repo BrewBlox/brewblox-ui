@@ -148,7 +148,12 @@ function showOutput(): void {
           class="col-grow"
           thumb-path=""
         />
-        <div v-if="block.data.ff != null" class="col-auto self-center text-bold">FF</div>
+        <div
+          v-if="block.data.ff != null"
+          class="col-auto self-center text-bold"
+        >
+          FF
+        </div>
         <q-slider
           v-if="block.data.ff != null"
           :model-value="fit(block.data.ff)"

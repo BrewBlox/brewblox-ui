@@ -104,8 +104,8 @@ const boilMinOutputQty = computed<Quantity>({
   },
 });
 
-const ambientRaw = computed<Quantity | null>(() =>
-  ambientBlock.value ? bloxQty(ambientBlock.value.data.value) : null,
+const ambientRaw = computed<Quantity>(() =>
+  tempQty(ambientBlock.value?.data.value ?? null),
 );
 
 function showInput(): void {
@@ -349,12 +349,9 @@ function openDerivativeFilterDialog(): void {
         >
           <q-tooltip>Edit {{ prettyBlock(ambientBlock) }}</q-tooltip>
         </q-btn>
-        <q-btn
+        <div
           v-else
-          disable
-          flat
           class="col-1"
-          icon="mdi-cancel"
         />
       </div>
       <q-separator class="q-ma-sm" />
@@ -504,7 +501,6 @@ function openDerivativeFilterDialog(): void {
                 The D part of PID, the derivative, has the opposite sign of P.
                 When the input is approaching the target quickly,
                 it will reduce the output to avoid overshoot.
-                D is clipped to +/- P.
               </p>
               <p>
                 Td is the derivative time constant.
@@ -513,6 +509,7 @@ function openDerivativeFilterDialog(): void {
               </p>
               <p>
                 When there is little overshoot in the system, Td is best kept at zero.
+                D is clipped to +/- P or +- Kp, whichever is larger.
               </p>
               "
             borderless
@@ -643,7 +640,7 @@ function openDerivativeFilterDialog(): void {
           <span
             class="clickable q-pa-sm q-ma-xs rounded-borders text-bold"
             style="line-height: 200%"
-            @click="openDerivativeFilterDialog"
+            @click="showInput"
           >
             {{ ENUM_LABELS_FILTER_CHOICE[inputFilter] }}
           </span>
