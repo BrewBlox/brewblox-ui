@@ -509,7 +509,7 @@ function openDerivativeFilterDialog(): void {
               </p>
               <p>
                 When there is little overshoot in the system, Td is best kept at zero.
-                D is clipped to +/- P or +- Kp, whichever is larger.
+                D is clipped to +/- P to avoid oscillations.
               </p>
               "
             borderless
