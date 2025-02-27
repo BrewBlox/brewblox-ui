@@ -35,6 +35,7 @@ const plugin: Plugin = {
       generate: (): PidBlock['data'] => ({
         inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
+        ambientId: bloxLink(null, BlockIntfType.TempSensorInterface),
         inputValue: tempQty(0),
         inputSetting: tempQty(0),
         outputValue: 0,
@@ -44,9 +45,11 @@ const plugin: Plugin = {
         kp: inverseTempQty(20),
         ti: bloxQty('2h'),
         td: bloxQty('0s'),
+        kff: inverseTempQty(0),
         p: 0,
         i: 0,
         d: 0,
+        ff: 0,
         error: deltaTempQty(0),
         integral: 0,
         derivative: 0,
@@ -56,6 +59,8 @@ const plugin: Plugin = {
         boilPointAdjust: deltaTempQty(0),
         boilMinOutput: 0,
         boilModeActive: false,
+        ambientValue: tempQty(0),
+        ambientOffset: deltaTempQty(0),
       }),
       analyze: (block: PidBlock) => {
         const { enabled, inputId, outputId, active } = block.data;
@@ -147,6 +152,16 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'ambientValue',
+        title: 'Ambient smoothed',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(0),
+        readonly: true,
+        graphed: false,
+        graphAxis: 'y2',
+      },
+      {
+        type,
         key: 'p',
         title: 'P',
         component: 'NumberValEdit',
@@ -174,8 +189,17 @@ const plugin: Plugin = {
       },
       {
         type,
+        key: 'ff',
+        title: 'FF',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
         key: 'outputSetting',
-        title: 'Output target (P+I+D)',
+        title: 'Output target (P+I+D+FF)',
         component: 'NumberValEdit',
         generate: () => 0,
         readonly: true,
@@ -189,6 +213,27 @@ const plugin: Plugin = {
         generate: () => 0,
         readonly: true,
         graphed: true,
+      },
+      {
+        type,
+        key: 'kff',
+        title: 'Kff',
+        component: 'QuantityValEdit',
+        generate: () => inverseTempQty(0),
+      },
+      {
+        type,
+        key: 'ambientId',
+        title: 'Ambient Sensor',
+        component: 'LinkValEdit',
+        generate: () => bloxLink(null, BlockIntfType.TempSensorInterface),
+      },
+      {
+        type,
+        key: 'ambientOffset',
+        title: 'Ambient Offset',
+        component: 'QuantityValEdit',
+        generate: () => deltaTempQty(0),
       },
     ];
 
