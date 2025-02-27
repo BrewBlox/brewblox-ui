@@ -148,7 +148,15 @@ function showOutput(): void {
           class="col-grow"
           thumb-path=""
         />
-
+        <div v-if="block.data.ff != null" class="col-auto self-center text-bold">FF</div>
+        <q-slider
+          v-if="block.data.ff != null"
+          :model-value="fit(block.data.ff)"
+          :max="100"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
         <div
           v-if="!!block.data.boilMinOutput"
           :class="[
