@@ -27,6 +27,7 @@ import {
   durationString,
   fixedNumber,
   prettyQty,
+  roundedNumber,
   tempQty,
 } from '@/utils/quantity';
 
@@ -119,6 +120,19 @@ function showOutput(): void {
 function showAmbient(): void {
   createBlockDialog(ambientBlock.value);
 }
+
+const ambientHint = computed<string>(() => {
+  const offset = bloxQty(block.value.data.ambientOffset);
+  if (!offset.value) {
+    return '';
+  }
+  const sum = block.value.data.i + block.value.data.ff;
+  const suggestedKff = sum / offset.value;
+  return `<i>Hint: FF is now ${roundedNumber(block.value.data.ff, 2)} and
+   I is ${roundedNumber(block.value.data.i, 2)}.<br>
+  A Kff setting of ${roundedNumber(suggestedKff, 2)}
+  will make FF ${roundedNumber(sum, 2)} and I zero.</i>`;
+});
 
 function startEditIValue(): void {
   createDialog({
@@ -551,7 +565,7 @@ function openDerivativeFilterDialog(): void {
             :html="true"
             title="Feed Forward gain Kff"
             label="Kff"
-            message="
+            :message="`
               <p>
                 Kff is the feed forward gain.
               </p>
@@ -563,10 +577,9 @@ function openDerivativeFilterDialog(): void {
                 FF = Kff * (input setting - ambient temperature).
                 </p>
                 <p>
-                  When you change Kff, the integral will be modified to keep the output the same.
-                  You can click the I part to set it manually.
-                </p>
-              "
+                  When you change Kff, the integral will be adjusted so that I+FF does not change.
+                  You can click the I part to override it if desired.
+                </p>${ambientHint}`"
             borderless
             @update:model-value="(kff) => patchBlock({ kff })"
           />
