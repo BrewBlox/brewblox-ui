@@ -7,7 +7,6 @@ import {
   GpioPins,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
-import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { asBlockAddress } from '@/plugins/spark/utils/configuration';
 import { createDialogPromise } from '@/utils/dialog';
@@ -19,7 +18,6 @@ function listedPins(pins: GpioPins): number[] {
   return [...Array(8).keys()].filter((i) => (1 << i) & pins).map((i) => i + 1);
 }
 
-const { context } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<GpioModuleBlock>();
 
 const power = computed<boolean>({
@@ -103,7 +101,7 @@ const errors = computed<string[]>(() => {
 <template>
   <Card>
     <template #toolbar>
-      <BlockWidgetToolbar has-mode-toggle />
+      <BlockWidgetToolbar />
     </template>
 
     <CardWarning v-if="errors.length">
@@ -118,6 +116,23 @@ const errors = computed<string[]>(() => {
     </CardWarning>
 
     <div class="widget-body">
+      <div class="text-subtitle1 text-right col">Digital channels</div>
+      <GpioArrayEditor
+        v-model:channels="channels"
+        :error-pins="block.data.status.overCurrent"
+      />
+
+      <template v-if="analogChannels.length > 0">
+        <q-separator />
+        <div class="text-subtitle1 text-right col">Analog channels</div>
+        <AnalogArrayEditor
+          v-model:channels="analogChannels"
+          :address="asBlockAddress(block)"
+        />
+      </template>
+      <div class="col-break" />
+      <q-separator />
+      <div class="text-subtitle1 text-right col">Module settings</div>
       <div class="row q-gutter-sm">
         <LabeledField
           label="Module position"
@@ -132,37 +147,7 @@ const errors = computed<string[]>(() => {
           class="col-3"
           readonly
         />
-      </div>
-      <q-separator />
-      <GpioArrayEditor
-        v-model:channels="channels"
-        :error-pins="block.data.status.overCurrent"
-      />
-
-      <template v-if="analogChannels.length > 0">
-        <q-separator />
-        <AnalogArrayEditor
-          v-model:channels="analogChannels"
-          :address="asBlockAddress(block)"
-        />
-      </template>
-      <div class="col-break" />
-      <template v-if="context.mode === 'Full'">
-        <q-separator />
-
-        <div class="column q-gutter-sm">
-          <div>
-            All channels in a module use the same power source. This is either
-            5V, or the external power supply.
-          </div>
-          <div>
-            There are two ways to attach an external power source: connected to
-            the two right-most pins in any GPIO module, or using a Power over
-            Ethernet (PoE) adapter. <br />
-            Any external power supply is a valid source for all modules.
-          </div>
-        </div>
-        <LabeledField label="Module power source">
+        <LabeledField label="Digital channels voltage">
           <q-btn-group
             outline
             class="fit"
@@ -180,7 +165,22 @@ const errors = computed<string[]>(() => {
             />
           </q-btn-group>
         </LabeledField>
-      </template>
+        <div class="column q-pt-md">
+          <div>
+            All channels in a module use the same power source. This is either
+            the internal 5V, or the external power supply.
+          </div>
+          <div>
+            There are two ways to attach an external power source: connected to
+            the two right-most pins in any GPIO module, or using a Power over
+            Ethernet (PoE) adapter. <br />
+
+            External power is internally routed to all modules. You cannot use a
+            different external voltage for each module, but they can each toggle
+            between 5V or the shared external power source.
+          </div>
+        </div>
+      </div>
     </div>
   </Card>
 </template>

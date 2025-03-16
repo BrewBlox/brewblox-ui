@@ -13,6 +13,7 @@ interface Props extends UseFieldProps {
   tagClass?: VueClassProp;
   decimals?: number;
   unitTag?: string;
+  clearable?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   tagClass: '',
   decimals: 2,
   unitTag: 'small',
+  clearable: false,
 });
 
 const emit = defineEmits<{
@@ -59,6 +61,7 @@ function openDialog(): void {
       message: props.message,
       html: props.html,
       label: props.label,
+      clearable: props.clearable,
     },
   }).onOk(change);
 }

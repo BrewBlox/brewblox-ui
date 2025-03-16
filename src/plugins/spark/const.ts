@@ -44,22 +44,22 @@ export const ENUM_LABELS_ANY_CONSTRAINT: EnumLabels<AnyConstraintKey> = {
 
 export const ENUM_LABELS_FILTER_CHOICE: EnumLabels<FilterChoice> = {
   FILTER_NONE: 'No filtering',
-  FILTER_15s: 'Filter 15s',
-  FILTER_45s: 'Filter 45s',
-  FILTER_90s: 'Filter 90s',
-  FILTER_3m: 'Filter 3m',
-  FILTER_10m: 'Filter 10m',
-  FILTER_30m: 'Filter 30m',
+  FILTER_15s: '15s delay',
+  FILTER_45s: '45s delay',
+  FILTER_90s: '90s delay',
+  FILTER_3m: '3m delay',
+  FILTER_10m: '10m delay',
+  FILTER_30m: '30m delay',
 };
 
 export const ENUM_LABELS_DERIVATIVE_FILTER_CHOICE: EnumLabels<FilterChoice> = {
   FILTER_NONE: 'Derived from Td',
-  FILTER_15s: '20s',
-  FILTER_45s: '1m',
-  FILTER_90s: '2.5m',
-  FILTER_3m: '5m',
-  FILTER_10m: '15m',
-  FILTER_30m: '45m',
+  FILTER_15s: '20s delay',
+  FILTER_45s: '1m delay',
+  FILTER_90s: '2.5m delay',
+  FILTER_3m: '5m delay',
+  FILTER_10m: '15m delay',
+  FILTER_30m: '45m delay',
 };
 
 export const ENUM_LABELS_COMBINE_FUNC: EnumLabels<SensorCombiFunc> = {
@@ -162,9 +162,9 @@ export const ENUM_LABELS_STORE_MODE: EnumLabels<SequenceStoreMode> = {
 export const ENUM_LABELS_TEMP_SENSOR_ANALOG_TYPE: EnumLabels<TempSensorAnalogType> =
   {
     TEMP_SENSOR_TYPE_NOT_SET: 'Not set',
-    TEMP_SENSOR_TYPE_RTD_2WIRE: 'RTD (two wire)',
-    TEMP_SENSOR_TYPE_RTD_3WIRE: 'RTD (three wire)',
-    TEMP_SENSOR_TYPE_RTD_4WIRE: 'RTD (four wire)',
+    TEMP_SENSOR_TYPE_RTD_2WIRE: 'RTD (2-wire)',
+    TEMP_SENSOR_TYPE_RTD_3WIRE: 'RTD (3-wire)',
+    TEMP_SENSOR_TYPE_RTD_4WIRE: 'RTD (4-wire)',
   };
 
 export const ENUM_LABELS_TEMP_SENSOR_ANALOG_SPEC: EnumLabels<TempSensorAnalogSpec> =
