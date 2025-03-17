@@ -18,6 +18,22 @@ const usedBy = computed<Block[]>(() => {
     .blocksByService(serviceId)
     .filter((b) => b.data.inputId?.id === blockId);
 });
+
+const rampMessage = `
+    <p>
+      By seting a ramp limit and a ramp duration, you can limit how fast the setpoint
+      can change. With the ramp limit enabled, you can make step changes to the setpoint,
+      but the setpoint will not change faster than the ramp limit.
+    </p>
+    <p>
+      For example, if the ramp limit is set to 1 °C and the ramp duration is set
+      to 1 hour, the setpoint will not change faster than 1 °C per hour.
+    </p>
+    <p>
+      This can be used to avoid shocking the yeast during fermentation.
+    </p>
+    `;
+
 </script>
 
 <template>
@@ -62,7 +78,7 @@ const usedBy = computed<Block[]>(() => {
         message="
               <p>
                 A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
-                </p>
+              </p>
               <p>
                 A slower filter will give a smoother output at the cost of a delay in response.
               </p>
@@ -132,35 +148,42 @@ const usedBy = computed<Block[]>(() => {
 
       <div class="col-break" />
 
+      <ToggleButton
+        :model-value="block.data.rampLimitEnabled"
+        no-caps
+        class="col-5"
+        label="Limit how fast setpoint can ramp"
+        @update:model-value="(v) => patchBlock({ rampLimitEnabled: v })"
+      />
+      <QuantityField
+        :model-value="block.data.rampLimit"
+        title="Ramp limit"
+        label="Ramp limit"
+        class="col-grow"
+        tag="big"
+        html
+        :message=rampMessage
+        @update:model-value="(v) => patchBlock({ rampLimit: v })"
+      />
+      <span class="col-auto self-center">per</span>
+      <DurationField
+        v-model="block.data.rampDuration"
+        title="Ramp duration"
+        label="Ramp duration"
+        class="col-grow"
+        tag="big"
+        html
+        :message=rampMessage
+        @update:model-value="(v) => patchBlock({ rampDuration: v })"
+      />
+
+      <div class="col-break" />
+
       <ClaimIndicator
         :block-id="block.id"
         :service-id="serviceId"
         class="col-grow"
       />
     </div>
-
-    <q-card-section v-if="false">
-      <q-separator inset />
-
-      <q-item class="items-start">
-        <q-item-section class="col-4" />
-        <q-item-section v-if="usedBy.length" />
-      </q-item>
-
-      <q-item class="items-end">
-        <q-item-section class="col-4" />
-        <q-item-section class="col-3" />
-        <q-item-section class="col-4" />
-      </q-item>
-
-      <q-item>
-        <q-item-section class="col-4" />
-        <q-item-section class="col-7" />
-      </q-item>
-
-      <q-item>
-        <q-item-section />
-      </q-item>
-    </q-card-section>
   </div>
 </template>

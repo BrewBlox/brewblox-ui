@@ -3060,12 +3060,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"brewblox-proto@https://github.com/brewblox/brewblox-proto#commit=2db2674fbfef5684fef3200102584ee7ed8ca663":
+"brewblox-proto@https://github.com/brewblox/brewblox-proto#commit=3d4adfbae22d6cbe945786777c78287aaf085ec4":
   version: 1.0.0
-  resolution: "brewblox-proto@https://github.com/brewblox/brewblox-proto.git#commit=2db2674fbfef5684fef3200102584ee7ed8ca663"
+  resolution: "brewblox-proto@https://github.com/brewblox/brewblox-proto.git#commit=3d4adfbae22d6cbe945786777c78287aaf085ec4"
   dependencies:
     typescript-string-enums: "npm:^1.0.0"
-  checksum: 10c0/21497054495c41de14b4f0b757ca2ff14fca3d9aa2cfee96d4b1c13773b6fd80c8ad0ac7bf9aadd1064ae21a50d89d6a0bbc1a0533742ec386925c11a882dc92
+  checksum: 10c0/c0d7e1ea9ef4d4115bcb73f6f77a740a843d349c05aed6e061458542af2fa712acd31ff0a3ae7f3c54103a6e2389af2d687ede7af719bb248cfe91bf100ac144
   languageName: node
   linkType: hard
 
@@ -3096,7 +3096,7 @@ __metadata:
     "@vue/test-utils": "npm:^2.4.6"
     autoprefixer: "npm:^10.4.19"
     axios: "npm:^1.6.8"
-    brewblox-proto: "https://github.com/brewblox/brewblox-proto#commit=2db2674fbfef5684fef3200102584ee7ed8ca663"
+    brewblox-proto: "https://github.com/brewblox/brewblox-proto#commit=3d4adfbae22d6cbe945786777c78287aaf085ec4"
     buffer: "npm:^6.0.3"
     cm6-theme-basic-dark: "npm:^0.2.0"
     codemirror: "npm:^6.0.1"
