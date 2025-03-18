@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { Quantity, Setpoint, SetpointProfileBlock } from 'brewblox-proto/ts';
+import {
+  Quantity,
+  Setpoint,
+  SetpointProfileBlock,
+  SetpointSensorPairBlock,
+} from 'brewblox-proto/ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { bloxQty, durationMs, tempQty } from '@/utils/quantity';
@@ -15,6 +21,15 @@ interface DisplaySetpoint {
 
 const { serviceId, block, patchBlock } =
   useBlockWidget.setup<SetpointProfileBlock>();
+
+const sparkStore = useSparkStore();
+const targetBlock = computed<SetpointSensorPairBlock | null>(() =>
+  sparkStore.blockByLink(serviceId, block.value.data.targetId),
+);
+
+const targetSetting = computed(
+  () => targetBlock.value?.data.setting ?? tempQty(null),
+);
 
 const start = computed<Date>({
   get: () => new Date(block.value.data.start ?? 0),
@@ -211,6 +226,7 @@ function updatePointTemperature(index: number, value: Quantity): void {
         class="col-grow"
         @update:model-value="(v) => patchBlock({ targetId: v })"
       />
+      <div class="col-break" />
       <QuantityField
         :model-value="block.data.setting"
         label="Setting"
@@ -218,7 +234,13 @@ function updatePointTemperature(index: number, value: Quantity): void {
         tag="big"
         class="col-grow min-width-md"
       />
-
+      <QuantityField
+        :model-value="targetSetting"
+        label="Target Setting"
+        readonly
+        tag="big"
+        class="col-grow min-width-md"
+      />
       <div class="col-break" />
 
       <div
@@ -270,6 +292,13 @@ function updatePointTemperature(index: number, value: Quantity): void {
       </div>
 
       <div class="col-break" />
+      <ToggleButton
+        :model-value="!block.data.interpolateDisabled"
+        no-caps
+        class="col-5"
+        label="Interpolate between points"
+        @update:model-value="(v) => patchBlock({ interpolateDisabled: !v })"
+      />
 
       <div class="col row justify-end q-mt-sm">
         <q-btn

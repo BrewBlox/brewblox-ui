@@ -33,7 +33,6 @@ const rampMessage = `
       This can be used to avoid shocking the yeast during fermentation.
     </p>
     `;
-
 </script>
 
 <template>
@@ -47,10 +46,18 @@ const rampMessage = `
         :readonly="isClaimed"
         :class="{ darkened: !block.data.enabled }"
         title="Setting"
-        label="Setting"
+        :label="block.data.rampLimitEnabled ? 'Desired Setting' : 'Setting'"
         tag="big"
         class="col-grow"
         @update:model-value="(v) => patchBlock({ storedSetting: v })"
+      />
+      <QuantityField
+        v-if="block.data.rampLimitEnabled"
+        :model-value="block.data.setting"
+        label="Ramp limited setting"
+        readonly
+        tag="big"
+        class="col-grow"
       />
       <QuantityField
         :model-value="block.data.value"
@@ -162,7 +169,7 @@ const rampMessage = `
         class="col-grow"
         tag="big"
         html
-        :message=rampMessage
+        :message="rampMessage"
         @update:model-value="(v) => patchBlock({ rampLimit: v })"
       />
       <span class="col-auto self-center">per</span>
@@ -173,7 +180,7 @@ const rampMessage = `
         class="col-grow"
         tag="big"
         html
-        :message=rampMessage
+        :message="rampMessage"
         @update:model-value="(v) => patchBlock({ rampDuration: v })"
       />
 
