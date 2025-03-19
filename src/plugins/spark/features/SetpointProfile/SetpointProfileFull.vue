@@ -31,6 +31,18 @@ const targetSetting = computed(
   () => targetBlock.value?.data.setting ?? tempQty(null),
 );
 
+const rampLimited = computed(() => {
+  if (!targetBlock.value) {
+    return false;
+  }
+
+  return (
+    targetBlock.value.data.rampLimitEnabled &&
+    targetBlock.value.data.rampLimit.value &&
+    targetBlock.value.data.rampDuration.value
+  );
+});
+
 const start = computed<Date>({
   get: () => new Date(block.value.data.start ?? 0),
   set: (v) => patchBlock({ start: v.toISOString() }),
@@ -292,6 +304,7 @@ function updatePointTemperature(index: number, value: Quantity): void {
       </div>
 
       <div class="col-break" />
+
       <ToggleButton
         :model-value="!block.data.interpolateDisabled"
         no-caps
@@ -309,6 +322,22 @@ function updatePointTemperature(index: number, value: Quantity): void {
         >
           <q-tooltip>Add point</q-tooltip>
         </q-btn>
+      </div>
+
+      <div class="col-break" />
+      <div
+        v-if="rampLimited"
+        class="col q-pt-md"
+      >
+        <span class="text-italic">
+          Ramp limit is enabled on target setpoint.
+        </span>
+        <span
+          v-if="block.data.interpolateDisabled"
+          class="text-italic"
+        >
+          Consider disabling interpolation in the profile.
+        </span>
       </div>
     </div>
   </div>

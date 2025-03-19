@@ -81,7 +81,7 @@ const maxRamp = computed(() => {
 });
 
 watchEffect(() => {
-  const { start, points, targetId, interpolateDisabled } = block.value.data;
+  const { start, points, interpolateDisabled } = block.value.data;
   if (!points || points.length === 0) {
     graphData.value = [];
     return;
@@ -114,7 +114,7 @@ watchEffect(() => {
 
   // Prepare the base trace
   const baseTrace: Partial<PlotData> = {
-    name: `${targetId.id || ''} setting`,
+    name: 'Setting applied by profile',
     type: 'scattergl',
     x: xPoints,
     y: yPoints,
@@ -181,7 +181,7 @@ watchEffect(() => {
     }
 
     const rampTrace: Partial<PlotData> = {
-      name: `${targetId.id || ''} ramp limit`,
+      name: 'Setting after ramp limit',
       type: 'scattergl',
       x: xPointsRamped,
       y: yPointsRamped,
