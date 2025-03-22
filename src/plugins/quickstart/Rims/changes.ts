@@ -74,6 +74,9 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         resetFilter: false,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
+        rampLimitEnabled: false,
+        rampLimit: deltaTempQty(0),
+        rampDuration: bloxQty('0s'),
       },
     }),
     typed<SetpointSensorPairBlock>({
@@ -93,6 +96,9 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         resetFilter: false,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
+        rampLimitEnabled: false,
+        rampLimit: deltaTempQty(0),
+        rampDuration: bloxQty('0s'),
       },
     }),
     // Setpoint Driver

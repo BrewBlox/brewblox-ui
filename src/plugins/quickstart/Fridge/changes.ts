@@ -67,6 +67,9 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
         resetFilter: false,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
+        rampLimitEnabled: false,
+        rampLimit: deltaTempQty(0),
+        rampDuration: bloxQty('0s'),
       },
     }),
     // Mutex
@@ -206,6 +209,7 @@ export function defineCreatedBlocks(config: FridgeConfig): Block[] {
             temperature: bloxQty(fridgeSetting).copy(fridgeSetting.value! + 3),
           },
         ],
+        interpolateDisabled: false,
       },
     }),
     // PID

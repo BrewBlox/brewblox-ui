@@ -12,7 +12,7 @@ import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
-import { deltaTempQty, tempQty } from '@/utils/quantity';
+import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 import widget from './SetpointSensorPairWidget.vue';
 
 const type = BlockType.SetpointSensorPair;
@@ -40,6 +40,9 @@ const plugin: Plugin = {
         filterThreshold: deltaTempQty(5),
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
+        rampLimitEnabled: false,
+        rampLimit: deltaTempQty(0),
+        rampDuration: bloxQty('0s'),
       }),
       analyze: (block: SetpointSensorPairBlock) => {
         const { enabled, sensorId, setting, value } = block.data;

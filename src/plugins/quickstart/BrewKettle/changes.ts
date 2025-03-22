@@ -64,6 +64,9 @@ export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
         resetFilter: false,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
+        rampLimitEnabled: false,
+        rampLimit: deltaTempQty(0),
+        rampDuration: bloxQty('0s'),
       },
     },
     {

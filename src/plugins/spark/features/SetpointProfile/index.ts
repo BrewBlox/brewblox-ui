@@ -32,6 +32,7 @@ const plugin: Plugin = {
         enabled: false,
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         setting: tempQty(null),
+        interpolateDisabled: false,
       }),
       analyze: (block: SetpointProfileBlock) => {
         const { enabled, targetId } = block.data;

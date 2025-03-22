@@ -92,6 +92,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
         resetFilter: false,
         claimedBy: bloxLink(null),
         settingMode: SettingMode.STORED,
+        rampLimitEnabled: false,
+        rampLimit: deltaTempQty(0),
+        rampDuration: bloxQty('0s'),
       },
     }),
     // Profile
@@ -118,6 +121,7 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
             temperature: bloxQty(beerSetting).copy(beerSetting.value! + 3),
           },
         ],
+        interpolateDisabled: false,
       },
     }),
     // Mutex
@@ -273,6 +277,9 @@ export function defineCreatedBlocks(config: GlycolConfig): Block[] {
           resetFilter: false,
           claimedBy: bloxLink(null),
           settingMode: SettingMode.STORED,
+          rampLimitEnabled: false,
+          rampLimit: deltaTempQty(0),
+          rampDuration: bloxQty('0s'),
         },
       }),
       // Digital actuator
