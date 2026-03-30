@@ -11,14 +11,14 @@ import {
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
-  ENUM_LABELS_DERIVATIVE_FILTER_CHOICE,
-  ENUM_LABELS_FILTER_CHOICE,
+  derivativeFilterSelectOptions,
+  derivativeFilterLabel,
+  filterLabel,
 } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { isBlockClaimed } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
-import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { matchesType } from '@/utils/objects';
 import {
@@ -34,10 +34,19 @@ import {
 const sparkStore = useSparkStore();
 const { serviceId, block, patchBlock } = useBlockWidget.setup<PidBlock>();
 
-const derivativeFilterOpts = selectable(ENUM_LABELS_DERIVATIVE_FILTER_CHOICE);
-
 const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
   sparkStore.blockByLink(serviceId, block.value.data.inputId),
+);
+
+const updateIntervalMs = computed(
+  () => inputBlock.value?.data.updateInterval?.value ?? null,
+);
+const derivativeFilterOpts = computed(() =>
+  derivativeFilterSelectOptions(updateIntervalMs.value),
+);
+
+const showSmoothGain = computed(
+  () => block.value.data.smoothGain < 0.99999,
 );
 
 const ambientBlock = computed<Block | null>(() =>
@@ -160,21 +169,25 @@ function openDerivativeFilterDialog(): void {
     component: 'SelectDialog',
     componentProps: {
       modelValue: block.value.data.derivativeFilterChoice,
-      title: 'Derivative filter delay',
+      title: 'Derivative filter',
       message: `
               <p>
                 The derivative is calculated from filtered input to reduce
                 the effect of noise and limited sensor resolution.
               </p>
               <p>
-                A longer delay will surpress quick fluctuations more,
-                but too much delay can cause D to be out of sync with P.
-                When you choose <b>Derived from Td</b>, a filter is selected automatically to
-                have less than Td delay until max derivative.
+                A stronger filter suppresses quick fluctuations more,
+                but too much delay can cause the D component to be out of sync with P.
+                The displayed duration is how long it takes for the filter
+                to catch up to 95% of a step change.
+              </p>
+              <p>
+                When you choose <b>Derived from Td</b>, a filter is selected automatically
+                based on the derivative time constant (Td).
               </p>
               `,
       html: true,
-      selectOptions: derivativeFilterOpts,
+      selectOptions: derivativeFilterOpts.value,
       selectProps: {
         label: 'Filter delay',
       },
@@ -371,7 +384,10 @@ function openDerivativeFilterDialog(): void {
       <q-separator class="q-ma-sm" />
 
       <!-- Calculation -->
-      <div class="flex-center calculation grid-container q-pa-md">
+      <div
+        class="flex-center calculation q-pa-md"
+        :class="showSmoothGain ? 'grid-16' : 'grid-14'"
+      >
         <div class="span-s big p-parts">P</div>
         <div class="span-s big">=</div>
         <div class="span-l">
@@ -400,6 +416,18 @@ function openDerivativeFilterDialog(): void {
             borderless
             @update:model-value="(kp) => patchBlock({ kp })"
           />
+        </div>
+
+        <div :class="showSmoothGain ? 'span-s big text-center' : ''">
+          {{ showSmoothGain ? '\xd7' : '' }}
+        </div>
+        <div :class="showSmoothGain ? 'span-l' : ''">
+          <LabeledField
+            v-if="showSmoothGain"
+            label="Smoothing"
+          >
+            {{ fixedNumber(block.data.smoothGain, 2) }}
+          </LabeledField>
         </div>
 
         <div class="span-s text-center big">=</div>
@@ -473,6 +501,9 @@ function openDerivativeFilterDialog(): void {
           </DurationField>
         </div>
 
+        <div :class="showSmoothGain ? 'span-s' : ''" />
+        <div :class="showSmoothGain ? 'span-l' : ''" />
+
         <div class="span-s text-center big">=</div>
 
         <div
@@ -537,6 +568,19 @@ function openDerivativeFilterDialog(): void {
             </template>
           </DurationField>
         </div>
+
+        <div :class="showSmoothGain ? 'span-s big text-center' : ''">
+          {{ showSmoothGain ? '\xd7' : '' }}
+        </div>
+        <div :class="showSmoothGain ? 'span-l' : ''">
+          <LabeledField
+            v-if="showSmoothGain"
+            label="Smoothing"
+          >
+            {{ fixedNumber(block.data.smoothGain, 2) }}
+          </LabeledField>
+        </div>
+
         <div class="span-s text-center big">=</div>
 
         <div class="span-m row items-center full-height">
@@ -585,6 +629,9 @@ function openDerivativeFilterDialog(): void {
           />
         </div>
 
+        <div :class="showSmoothGain ? 'span-s' : ''" />
+        <div :class="showSmoothGain ? 'span-l' : ''" />
+
         <div class="span-s text-center big">=</div>
 
         <div class="span-m row items-center full-height">
@@ -594,10 +641,11 @@ function openDerivativeFilterDialog(): void {
         </div>
 
         <div class="span-s" />
-        <div class="span-s" />
         <div class="span-l" />
         <div class="span-s" />
-        <div class="span-l big row q-mt-md">
+        <div :class="showSmoothGain ? 'span-s' : ''" />
+        <div :class="showSmoothGain ? 'span-l' : ''" />
+        <div class="span-4 big row no-wrap q-mt-md justify-end">
           <div class="p-parts">P</div>
           <div class="q-mx-sm">+</div>
           <div class="i-parts">I</div>
@@ -644,6 +692,34 @@ function openDerivativeFilterDialog(): void {
         </div>
       </div>
       <q-separator class="q-ma-xs" />
+      <div class="row items-center justify-center q-pa-sm">
+        <div class="col-auto">
+          <span>Smooth P and D when temperature stays within </span>
+          <InlineQuantityField
+            :model-value="block.data.smoothBand"
+            title="Smooth band"
+            html
+            message="
+              <p>
+                When temperature is steady near the setpoint,
+                the integral does all the work.
+                Smooth band gradually reduces P and D gain
+                while temperature remains stable,
+                so they don't react to small sensor fluctuations caused by noise.
+                If temperature drifts, they ramp back up quickly.
+              </p>
+              <p>
+                The gain decreases on the same time scale as Ti.
+                Set the band to 2-3x the noise
+                on your sensor. Default is 0.25°C. Set to 0 to disable.
+              </p>
+              "
+            @update:model-value="(v) => patchBlock({ smoothBand: v })"
+          />
+          <span> of the setpoint</span>
+        </div>
+      </div>
+      <q-separator class="q-ma-xs" />
       <div
         v-if="inputFilter !== null"
         class="row items-center justify-center q-pa-sm"
@@ -655,7 +731,7 @@ function openDerivativeFilterDialog(): void {
             style="line-height: 200%"
             @click="showInput"
           >
-            {{ ENUM_LABELS_FILTER_CHOICE[inputFilter] }}
+            {{ filterLabel(inputFilter, updateIntervalMs) }}
           </span>
         </div>
       </div>
@@ -675,9 +751,10 @@ function openDerivativeFilterDialog(): void {
             @click="openDerivativeFilterDialog"
           >
             {{
-              ENUM_LABELS_DERIVATIVE_FILTER_CHOICE[
-                block.data.derivativeFilterChoice
-              ]
+              derivativeFilterLabel(
+                block.data.derivativeFilterChoice,
+                updateIntervalMs,
+              )
             }}
           </span>
           <template
@@ -688,7 +765,10 @@ function openDerivativeFilterDialog(): void {
           >
             which has
             {{
-              ENUM_LABELS_DERIVATIVE_FILTER_CHOICE[block.data.derivativeFilter]
+              derivativeFilterLabel(
+                block.data.derivativeFilter,
+                updateIntervalMs,
+              )
             }}
           </template>
           <template v-else> </template>
@@ -699,15 +779,23 @@ function openDerivativeFilterDialog(): void {
 </template>
 
 <style lang="sass" scoped>
-.grid-container
+.grid-14
   display: grid
   grid-template-columns: repeat(14, 1fr)
+  grid-row-gap: 10px
+
+.grid-16
+  display: grid
+  grid-template-columns: repeat(16, 1fr)
   grid-row-gap: 10px
 
 .span-s
   grid-column: span 1
 
 .span-l
+  grid-column: span 3
+
+.span-4
   grid-column: span 4
 
 .span-m

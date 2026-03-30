@@ -61,6 +61,8 @@ const plugin: Plugin = {
         boilModeActive: false,
         ambientValue: tempQty(0),
         ambientOffset: deltaTempQty(0),
+        smoothBand: deltaTempQty(0),
+        smoothGain: 1,
       }),
       analyze: (block: PidBlock) => {
         const { enabled, inputId, outputId, active } = block.data;

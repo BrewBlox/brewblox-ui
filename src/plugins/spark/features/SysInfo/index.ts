@@ -43,6 +43,7 @@ const plugin: Plugin = {
         memoryFree: 0,
         memoryFreeContiguous: 0,
         memoryFreeLowest: 0,
+        mainTaskStackFreeLowest: 0,
       }),
       analyze: () => 'Active',
     };
