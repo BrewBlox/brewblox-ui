@@ -2,16 +2,17 @@
 import { Block, SetpointSensorPairBlock } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ENUM_LABELS_FILTER_CHOICE } from '@/plugins/spark/const';
+import { filterSelectOptions } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createBlockDialog } from '@/utils/block-dialog';
-import { selectable } from '@/utils/collections';
-
-const filterOpts = selectable(ENUM_LABELS_FILTER_CHOICE);
 
 const sparkStore = useSparkStore();
 const { serviceId, blockId, block, patchBlock, isClaimed } =
   useBlockWidget.setup<SetpointSensorPairBlock>();
+
+const filterOpts = computed(() =>
+  filterSelectOptions(block.value.data.updateInterval?.value ?? null),
+);
 
 const usedBy = computed<Block[]>(() => {
   return sparkStore
@@ -84,10 +85,13 @@ const rampMessage = `
         label="Filter"
         message="
               <p>
-                A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
+                A filter smooths the sensor value to reduce noise, spikes, and sudden jumps.
               </p>
               <p>
-                A slower filter will give a smoother output at the cost of a delay in response.
+                A stronger filter gives a more stable reading,
+                but takes longer to reflect actual temperature changes.
+                The displayed duration is how long it takes for the filtered value
+                to catch up to 95% of a step change.
               </p>
               "
         class="col-grow"
