@@ -11,8 +11,8 @@ import {
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import {
-  derivativeFilterSelectOptions,
   derivativeFilterLabel,
+  derivativeFilterSelectOptions,
   filterLabel,
 } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
@@ -45,9 +45,7 @@ const derivativeFilterOpts = computed(() =>
   derivativeFilterSelectOptions(updateIntervalMs.value),
 );
 
-const showSmoothGain = computed(
-  () => block.value.data.smoothGain < 0.99999,
-);
+const showSmoothGain = computed(() => block.value.data.smoothGain < 0.99999);
 
 const ambientBlock = computed<Block | null>(() =>
   sparkStore.blockByLink(serviceId, block.value.data.ambientId),
