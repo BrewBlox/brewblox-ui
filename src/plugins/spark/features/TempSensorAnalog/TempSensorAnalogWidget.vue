@@ -120,6 +120,12 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             Detected 3-wire when 4-wires was configured is allowed,
             beause the lead-wire resistance can still be corrected for."
           />
+          <QuantityField
+            :model-value="block.data.resistance"
+            readonly
+            label="Resistance"
+            class="col-grow"
+          />
           <div class="col-break" />
           <SelectField
             :model-value="block.data.spec"
