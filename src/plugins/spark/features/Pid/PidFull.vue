@@ -45,7 +45,7 @@ const derivativeFilterOpts = computed(() =>
   derivativeFilterSelectOptions(updateIntervalMs.value),
 );
 
-const showSmoothGain = computed(() => block.value.data.smoothGain < 0.99999);
+const showSmoothGain = computed(() => block.value.data.smoothGain != null);
 
 const ambientBlock = computed<Block | null>(() =>
   sparkStore.blockByLink(serviceId, block.value.data.ambientId),
