@@ -692,7 +692,7 @@ function openDerivativeFilterDialog(): void {
       <q-separator class="q-ma-xs" />
       <div class="row items-center justify-center q-pa-sm">
         <div class="col-auto">
-          <span>Smooth P and D when temperature stays within </span>
+          <span>Suppress P and D when temperature stays within </span>
           <InlineQuantityField
             :model-value="block.data.smoothBand"
             title="Smooth band"
@@ -714,7 +714,7 @@ function openDerivativeFilterDialog(): void {
               "
             @update:model-value="(v) => patchBlock({ smoothBand: v })"
           />
-          <span> of the setpoint</span>
+          <span> of the setpoint (smooth band)</span>
         </div>
       </div>
       <q-separator class="q-ma-xs" />
@@ -723,7 +723,7 @@ function openDerivativeFilterDialog(): void {
         class="row items-center justify-center q-pa-sm"
       >
         <div class="col-auto">
-          <span>The input has a smoothing filter with </span>
+          <span>The input has a low-pass filter with a delay of </span>
           <span
             class="clickable q-pa-sm q-ma-xs rounded-borders text-bold"
             style="line-height: 200%"
@@ -736,11 +736,11 @@ function openDerivativeFilterDialog(): void {
       <div class="row items-center justify-center q-pa-sm">
         <div class="col-auto">
           <span
-            >The derivative has a smoothing filter
+            >The derivative has a low-pass filter
             {{
               block.data.derivativeFilterChoice === FilterChoice.FILTER_NONE
                 ? ''
-                : 'with'
+                : 'with a delay of'
             }}</span
           >
           <span
@@ -761,9 +761,9 @@ function openDerivativeFilterDialog(): void {
               block.data.derivativeFilter !== FilterChoice.FILTER_NONE
             "
           >
-            which has
+            with a delay of
             {{
-              derivativeFilterLabel(
+              filterLabel(
                 block.data.derivativeFilter,
                 updateIntervalMs,
               )

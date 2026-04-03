@@ -236,6 +236,16 @@ const plugin: Plugin = {
         title: 'Ambient Offset',
         component: 'QuantityValEdit',
         generate: () => deltaTempQty(0),
+        readonly: true,
+      },
+      {
+        type,
+        key: 'smoothGain',
+        title: 'Smooth gain',
+        component: 'NumberValEdit',
+        generate: () => 1,
+        readonly: true,
+        graphed: true,
       },
     ];
 
