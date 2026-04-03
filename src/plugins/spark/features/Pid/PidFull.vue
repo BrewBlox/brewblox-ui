@@ -762,12 +762,7 @@ function openDerivativeFilterDialog(): void {
             "
           >
             with a delay of
-            {{
-              filterLabel(
-                block.data.derivativeFilter,
-                updateIntervalMs,
-              )
-            }}
+            {{ filterLabel(block.data.derivativeFilter, updateIntervalMs) }}
           </template>
           <template v-else> </template>
         </div>
