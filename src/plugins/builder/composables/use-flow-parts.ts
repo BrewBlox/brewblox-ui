@@ -14,7 +14,10 @@ import {
 } from 'vue';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { notify } from '@/utils/notify';
-import { calculateNormalizedFlows } from '../calculateFlows';
+import {
+  calculateNormalizedFlows,
+  translatedTransitions,
+} from '../calculateFlows';
 import { FlowsKey } from '../symbols';
 import {
   BuilderLayout,
@@ -74,13 +77,15 @@ export const useFlowParts: UseFlowPartsComposable = {
     // and may also depend on external state, such as linked blocks.
     // All reactive state read while evaluating is tracked here,
     // so a change to a linked block causes the transitions to be re-evaluated.
+    // Coordinates are made absolute here, so that moving, rotating,
+    // or flipping a part also changes the result.
     const transitions = computed<Mapped<PartTransitions>>(() =>
       Object.values(parts.value).reduce((acc, part) => {
         const partTransitions = builderStore
           .blueprintByType(part.type)
           ?.transitions(part);
         if (partTransitions) {
-          acc[part.id] = partTransitions;
+          acc[part.id] = translatedTransitions(part, partTransitions);
         }
         return acc;
       }, {}),

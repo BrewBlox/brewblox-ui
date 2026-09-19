@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import blueprints from '@/plugins/builder/blueprints';
 import {
+  absoluteTransitions,
   asFlowParts,
   calculateFlows,
   calculateNormalizedFlows,
@@ -113,7 +114,7 @@ describe('A three-way split where two branches rejoin', () => {
   it('has no warnings', () => {
     const { warnings } = calculateNormalizedFlows(
       parts,
-      makeAllTransitions(parts),
+      absoluteTransitions(parts, makeAllTransitions(parts)),
     );
     expect(warnings).toEqual([]);
   });
@@ -306,7 +307,7 @@ describe('A manifold of cross tubes', () => {
     const parts = manifold(4);
     const { flows } = calculateNormalizedFlows(
       parts,
-      makeAllTransitions(parts),
+      absoluteTransitions(parts, makeAllTransitions(parts)),
     );
     const out = Object.values(flows['src'][RIGHT]).reduce((a, b) => a + b, 0);
     const inn = Object.values(flows['sink'][LEFT]).reduce((a, b) => a + b, 0);
@@ -318,7 +319,7 @@ describe('A manifold of cross tubes', () => {
     const start = performance.now();
     const { flows } = calculateNormalizedFlows(
       parts,
-      makeAllTransitions(parts),
+      absoluteTransitions(parts, makeAllTransitions(parts)),
     );
     expect(performance.now() - start).toBeLessThan(1000);
     const out = Object.values(flows['src'][RIGHT]).reduce((a, b) => a + b, 0);
@@ -471,6 +472,39 @@ describe('A closed loop without source or sink', () => {
   });
 });
 
+describe('Flow without liquid', () => {
+  // cold(10) -> tee <- pump(10) <- inlet without color
+  //             tee -> tube -> sink
+  // Frictions: inlets 1, pump 1, tee 0.5 per leg, tube 1.
+  // Tee pressure V: (10 - V) / 1.5 + (10 - V) / 2.5 = V / 2.5, so V = 80 / 11
+  const parts: BuilderPart[] = [
+    makeSource('cold', 1, 1, 0, 10),
+    makePart('tee', 'TeeTube', 2, 1, 180),
+    makePump('pump', 3, 1, 0, 10),
+    makePart('blank', 'SystemIO', 4, 1, 180, {
+      [IO_ENABLED_KEY]: true,
+      [IO_PRESSURE_KEY]: 0,
+    }),
+    makePart('tube', 'StraightTube', 2, 2, 90),
+    makeSink('sink', 2, 3, 270),
+  ];
+
+  it('is not reported as colored liquid', () => {
+    const result = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
+    const byId = Object.fromEntries(result.map((v) => [v.id, v.flows]));
+    const coldFlow = 20 / 11;
+    expect(byId['cold']['2,1.5,0'][COLD_WATER]).toBeCloseTo(coldFlow, 6);
+    // Cold water leaving the tee equals cold water entering it,
+    // even though the pump adds flow without liquid
+    expect(byId['tee']['2.5,2,0'][COLD_WATER]).toBeCloseTo(coldFlow, 6);
+    expect(byId['sink']['2.5,3,0'][COLD_WATER]).toBeCloseTo(-coldFlow, 6);
+    // Flow without liquid is not shown
+    expect(byId['pump']).toEqual({});
+  });
+});
+
 describe('Mixing liquids', () => {
   // cold(12) -> tee <- hot(12)
   //             tee -> tube -> sink
@@ -541,7 +575,10 @@ describe('Two check valves in a pumped ring', () => {
     expect(flows['sink']['1,2.5,0']).toBeCloseTo(-12 / 5, 6);
     expect(flows['D1']?.['3,0.5,0'] ?? 0).toBe(0);
     expect(
-      calculateNormalizedFlows(parts, makeAllTransitions(parts)).warnings,
+      calculateNormalizedFlows(
+        parts,
+        absoluteTransitions(parts, makeAllTransitions(parts)),
+      ).warnings,
     ).toEqual([]);
   });
 });

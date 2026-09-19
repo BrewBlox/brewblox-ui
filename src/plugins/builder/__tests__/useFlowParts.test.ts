@@ -269,6 +269,45 @@ describe('useFlowParts', () => {
     wrapper.unmount();
   });
 
+  it('recalculates when a part is moved, rotated, or flipped', async () => {
+    mocks.onLayoutChanged(valveLayout());
+    const wrapper = mount(Host, { props: { layoutId: 'valve-layout' } });
+    wrapper.vm.api.updateParts((draft) => {
+      draft['valve'] = { ...draft['valve'], settings: {} };
+    });
+    await settle();
+    expect(tubeFlow(wrapper, 'tube1')).toBeCloseTo(12 / 5, 6);
+
+    // Moving the valve out of the line breaks the connection
+    wrapper.vm.api.updateParts((draft) => {
+      draft['valve'] = { ...draft['valve'], y: 5 };
+    });
+    await settle();
+    expect(tubeFlow(wrapper, 'tube1')).toBe(0);
+
+    wrapper.vm.api.updateParts((draft) => {
+      draft['valve'] = { ...draft['valve'], y: 2 };
+    });
+    await settle();
+    expect(tubeFlow(wrapper, 'tube1')).toBeCloseTo(12 / 5, 6);
+
+    // A valve rotated across the line does not pass liquid
+    wrapper.vm.api.updateParts((draft) => {
+      draft['valve'] = { ...draft['valve'], rotate: 90 };
+    });
+    await settle();
+    expect(tubeFlow(wrapper, 'tube1')).toBe(0);
+
+    // Flipping a symmetric part changes nothing, and is not recalculated
+    const calls = vi.mocked(calculateNormalizedFlows).mock.calls.length;
+    wrapper.vm.api.updateParts((draft) => {
+      draft['tube1'] = { ...draft['tube1'], flipped: true };
+    });
+    await settle();
+    expect(vi.mocked(calculateNormalizedFlows).mock.calls.length).toBe(calls);
+    wrapper.unmount();
+  });
+
   it('shows calculation warnings once', async () => {
     vi.mocked(calculateNormalizedFlows).mockImplementation(() => ({
       flows: {},

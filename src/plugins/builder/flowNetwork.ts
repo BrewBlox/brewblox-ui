@@ -484,7 +484,17 @@ const tailNode = (edge: NetworkEdge): number =>
 const headNode = (edge: NetworkEdge): number =>
   edge.flow > 0 ? edge.vNode : edge.uNode;
 
+/**
+ * Flow from a terminal without liquids (a kettle without a color).
+ * It is tracked like a liquid while propagating, so that mixing fractions
+ * add up to the total flow, and is left out of the reported flows.
+ */
+const NO_LIQUID = '';
+
 const equalFractions = (liquids: Set<string>): LiquidFlow => {
+  if (liquids.size === 0) {
+    return { [NO_LIQUID]: 1 };
+  }
   const fractions: LiquidFlow = {};
   liquids.forEach((liquid) => {
     fractions[liquid] = 1 / liquids.size;
@@ -636,7 +646,7 @@ function findStaticLiquids(network: FlowNetwork): Map<number, Set<string>> {
   for (const edge of edges) {
     if (edge.flow !== 0) {
       for (const liquid in edge.liquidFlows) {
-        if (edge.liquidFlows[liquid] > FLOW_EPSILON) {
+        if (liquid !== NO_LIQUID && edge.liquidFlows[liquid] > FLOW_EPSILON) {
           add(headNode(edge), liquid);
         }
       }
@@ -693,6 +703,9 @@ function partFlows(
       // Liquid enters the part at the tail, and leaves at the head
       const [tail, head] = edge.flow > 0 ? [u, v] : [v, u];
       for (const liquid in edge.liquidFlows) {
+        if (liquid === NO_LIQUID) {
+          continue;
+        }
         add(part, tail, liquid, -edge.liquidFlows[liquid]);
         add(part, head, liquid, edge.liquidFlows[liquid]);
       }

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import blueprints from '@/plugins/builder/blueprints';
-import { calculateNormalizedFlows } from '@/plugins/builder/calculateFlows';
+import {
+  absoluteTransitions,
+  calculateNormalizedFlows,
+} from '@/plugins/builder/calculateFlows';
 import { VALVE_CLOSED_KEY } from '@/plugins/builder/const';
 import {
   BuilderLayout,
@@ -44,7 +47,7 @@ describe('Preset layouts', () => {
         const start = performance.now();
         const { flows, warnings } = calculateNormalizedFlows(
           layout.parts,
-          makeAllTransitions(layout.parts),
+          absoluteTransitions(layout.parts, makeAllTransitions(layout.parts)),
         );
         expect(performance.now() - start).toBeLessThan(200);
         expect(warnings).toEqual([]);
@@ -60,7 +63,7 @@ describe('Preset layouts', () => {
         const start = performance.now();
         const { flows, warnings } = calculateNormalizedFlows(
           parts,
-          makeAllTransitions(parts),
+          absoluteTransitions(parts, makeAllTransitions(parts)),
         );
         expect(performance.now() - start).toBeLessThan(200);
         expect(warnings).toEqual([]);

@@ -21,7 +21,12 @@ const normalizeFlows = (
   return acc;
 };
 
-const translatedTransitions = (
+/**
+ * Translates blueprint transitions to absolute coordinates.
+ * Blueprints return coordinates relative to the part anchor,
+ * and are not aware of the part position, rotation, or flip.
+ */
+export const translatedTransitions = (
   part: BuilderPart,
   transitions: Maybe<PartTransitions>,
 ): PartTransitions => {
@@ -54,6 +59,18 @@ const translatedTransitions = (
   return result;
 };
 
+/**
+ * Translates blueprint transitions for all parts to absolute coordinates.
+ */
+export const absoluteTransitions = (
+  parts: BuilderPart[],
+  allTransitions: Mapped<PartTransitions>,
+): Mapped<PartTransitions> =>
+  parts.reduce((acc, part) => {
+    acc[part.id] = translatedTransitions(part, allTransitions[part.id]);
+    return acc;
+  }, {});
+
 export const asFlowParts = (
   parts: BuilderPart[],
   allTransitions: Mapped<PartTransitions>,
@@ -85,16 +102,19 @@ export interface FlowCalculation {
 
 /**
  * Calculates flows for all parts.
- * Flow coordinates are relative to the part.
+ * `transitions` must have absolute coordinates: see `absoluteTransitions()`.
+ * Flow coordinates in the result are relative to the part.
  */
 export const calculateNormalizedFlows = (
   parts: BuilderPart[],
-  allTransitions: Mapped<PartTransitions>,
+  transitions: Mapped<PartTransitions>,
 ): FlowCalculation => {
   const warnings = new Set<string>();
-  const flows = calculateFlows(
-    asFlowParts(parts, allTransitions),
-    warnings,
-  ).reduce(normalizeFlows, {});
+  const flowParts: FlowPart[] = parts.map((part) => ({
+    ...part,
+    transitions: transitions[part.id] ?? {},
+    flows: {},
+  }));
+  const flows = calculateFlows(flowParts, warnings).reduce(normalizeFlows, {});
   return { flows, warnings: [...warnings] };
 };
