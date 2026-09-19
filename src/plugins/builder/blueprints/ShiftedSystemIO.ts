@@ -14,12 +14,13 @@ const blueprint: BuilderBlueprint = {
   component: 'ShiftedSystemIOPartComponent',
   defaultSize: { width: 2, height: 2 },
   transitions: (part: BuilderPart) => {
-    const enabled = Boolean(part.settings[IO_ENABLED_KEY]);
+    const color = part.settings[COLOR_KEY];
+    // An inlet without a liquid color has nothing to push
+    const enabled = Boolean(part.settings[IO_ENABLED_KEY]) && Boolean(color);
     const pressure = enabled
       ? Number(part.settings[IO_PRESSURE_KEY] ?? DEFAULT_IO_PRESSURE)
       : 0;
-    const color = part.settings[COLOR_KEY];
-    const liquids = enabled && color ? [color] : [];
+    const liquids = enabled ? [color] : [];
     return {
       [CENTER]: [
         {
