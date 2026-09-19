@@ -165,6 +165,7 @@ const innerFlowPath = (
   parts: FlowPart[],
   start: FlowPart,
   inRoute: FlowRoute,
+  warnings: Set<string>,
 ): FlowSegment | null => {
   const inCoord = inRoute.outCoords;
   const outFlows: FlowRoute[] = get(start, ['transitions', inCoord], []);
@@ -229,7 +230,7 @@ const innerFlowPath = (
         filterTransitions(candidateParts, inCoord, outFlow.outCoords);
         // filter out reverse transition
         filterTransitions(candidateParts, outFlow.outCoords, inCoord);
-        const next = innerFlowPath(candidateParts, nextPart, outFlow);
+        const next = innerFlowPath(candidateParts, nextPart, outFlow, warnings);
         if (next !== null && next.sinksTo.size) {
           nextPaths.push(next);
           next.sinksTo.forEach((sink) => {
@@ -246,7 +247,7 @@ const innerFlowPath = (
 
   if (nextPaths.length > 1) {
     path.splits = nextPaths;
-    return mergeOverlappingSplits(path);
+    return mergeOverlappingSplits(path, warnings);
   }
 
   if (path.sinksTo.size !== 0) {
@@ -259,11 +260,13 @@ export const flowPath = (
   parts: FlowPart[],
   start: FlowPart,
   inRoute: FlowRoute,
+  warnings: Set<string> = new Set(),
 ): FlowSegment | null =>
   innerFlowPath(
     parts.map((part) => ({ ...part, transitions: { ...part.transitions } })),
     start,
     inRoute,
+    warnings,
   );
 
 export const addFlowForPath = (
@@ -311,15 +314,21 @@ export const addFlowForPath = (
 export const findPathsFromSources = (
   parts: FlowPart[],
   part: FlowPart,
+  warnings: Set<string> = new Set(),
 ): FlowSegment[] => {
   const paths: FlowSegment[] = [];
   for (const [inCoord, outCoords] of Object.entries(part.transitions)) {
     const startFlow = outCoords.find((route) => route.source && route.liquids);
     if (startFlow) {
-      const path = flowPath(parts, part, {
-        outCoords: inCoord,
-        liquids: startFlow.liquids,
-      });
+      const path = flowPath(
+        parts,
+        part,
+        {
+          outCoords: inCoord,
+          liquids: startFlow.liquids,
+        },
+        warnings,
+      );
       if (path !== null) {
         paths.push(path);
       }
@@ -328,8 +337,12 @@ export const findPathsFromSources = (
   return paths;
 };
 
-const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
-  for (const path of findPathsFromSources(parts, part)) {
+const addFlowFromPart = (
+  parts: FlowPart[],
+  part: FlowPart,
+  warnings: Set<string>,
+): FlowPart[] => {
+  for (const path of findPathsFromSources(parts, part, warnings)) {
     const { friction, pressureDiff } = path.friction({
       pressureDiff: 0,
       friction: 0,
@@ -349,13 +362,32 @@ const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
 // total flow is a superposition of all sources in the system
 // for each part, add the flow it adds to the global list of parts
 // merge the flows afterwards
-export const calculateFlows = (parts: FlowPart[]): FlowPart[] =>
+export const calculateFlows = (
+  parts: FlowPart[],
+  warnings: Set<string> = new Set(),
+): FlowPart[] =>
   parts
-    .reduce(addFlowFromPart, parts)
+    .reduce((acc, part) => addFlowFromPart(acc, part, warnings), parts)
     .map((part) => ({ ...part, flows: mergeFlows(part.flows) }));
+
+export interface FlowCalculation {
+  flows: Mapped<PartFlows>;
+  /**
+   * Distinct warnings raised while calculating.
+   * The calculation is best effort: flows are still returned,
+   * but may be incorrect where a warning applies.
+   */
+  warnings: string[];
+}
 
 export const calculateNormalizedFlows = (
   parts: BuilderPart[],
   allTransitions: Mapped<PartTransitions>,
-): Mapped<PartFlows> =>
-  calculateFlows(asFlowParts(parts, allTransitions)).reduce(normalizeFlows, {});
+): FlowCalculation => {
+  const warnings = new Set<string>();
+  const flows = calculateFlows(
+    asFlowParts(parts, allTransitions),
+    warnings,
+  ).reduce(normalizeFlows, {});
+  return { flows, warnings: [...warnings] };
+};

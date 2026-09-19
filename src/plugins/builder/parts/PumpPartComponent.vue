@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import {
   DEFAULT_PUMP_PRESSURE,
   DIGITAL_TYPES,
@@ -21,8 +21,7 @@ import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { ON_INTERACT_KEY, OnInteractBehavior } from '../blueprints/Pump';
 import { usePart, useSettingsBlock } from '../composables';
 
-const { part, flows, settings, width, height, patchSettings, reflow } =
-  usePart.setup();
+const { part, flows, settings, width, height, patchSettings } = usePart.setup();
 
 const {
   block,
@@ -85,34 +84,6 @@ const duration = computed<number>(() => {
   const animationDuration = 60 / pressure;
   return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
 });
-
-function checkDirty(newV: PumpBlockT | null, oldV: PumpBlockT | null): boolean {
-  if (newV == null || oldV == null) {
-    return true;
-  }
-  if (newV.type !== oldV.type) {
-    return true;
-  }
-  if (isDigital(newV) && isDigital(oldV)) {
-    return newV.data.state !== oldV.data.state;
-  }
-  if (isPwm(newV) && isPwm(oldV)) {
-    return (
-      newV.data.setting !== oldV.data.setting ||
-      newV.data.enabled !== oldV.data.enabled
-    );
-  }
-  return false;
-}
-
-watch(
-  () => block.value,
-  (newV, oldV) => {
-    if (checkDirty(newV, oldV)) {
-      reflow();
-    }
-  },
-);
 
 function toggleHandler(): void {
   // No block has been linked - change the part setting

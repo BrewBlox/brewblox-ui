@@ -1,4 +1,3 @@
-import { Notify } from 'quasar';
 import { DEFAULT_FRICTION } from './const';
 import {
   BuilderPart,
@@ -166,8 +165,12 @@ export class FlowSegment {
   }
 }
 
+export const SPLIT_MERGE_WARNING =
+  'The flows split and rejoin in too many places. Some flows might be incorrect.';
+
 const mergeEnds = (
   splits: FlowSegment[],
+  warnings: Set<string>,
 ): { splits: FlowSegment[]; end: FlowSegment | null } => {
   if (splits.length < 2) {
     return { splits, end: null };
@@ -199,12 +202,7 @@ const mergeEnds = (
         }
       }
       if (unTouchedSplits.length !== 0) {
-        Notify.create({
-          icon: 'warning',
-          color: 'warning',
-          message:
-            'The flows split and rejoin in too many places. Some flows might be incorrect.',
-        });
+        warnings.add(SPLIT_MERGE_WARNING);
       }
       return { splits: combinedSplits, end: end };
     }
@@ -216,7 +214,10 @@ const mergeEnds = (
   }
 };
 
-export const mergeOverlappingSplits = (path: FlowSegment): FlowSegment => {
+export const mergeOverlappingSplits = (
+  path: FlowSegment,
+  warnings: Set<string>,
+): FlowSegment => {
   const sortedBySink: {
     [coords: string]: { splits: FlowSegment[]; end: FlowSegment | null };
   } = {};
@@ -236,7 +237,7 @@ export const mergeOverlappingSplits = (path: FlowSegment): FlowSegment => {
       // found an overlapping path
       // merge until number of splits stays the same
       const oldLength = sortedBySink[sink].splits.length;
-      sortedBySink[sink] = mergeEnds(sortedBySink[sink].splits);
+      sortedBySink[sink] = mergeEnds(sortedBySink[sink].splits, warnings);
       const newLength = sortedBySink[sink].splits.length;
       if (newLength === oldLength) {
         break;
