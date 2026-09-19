@@ -1,4 +1,4 @@
-import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-vitest';
+import { config } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import {
   Cookies,
@@ -6,6 +6,7 @@ import {
   LocalStorage,
   Meta,
   Notify,
+  Quasar,
   SessionStorage,
 } from 'quasar';
 import { beforeEach } from 'vitest';
@@ -15,9 +16,11 @@ const app = createApp({});
 const pinia = createPinia();
 app.use(pinia);
 
-installQuasarPlugin({
-  plugins: { Cookies, Dialog, LocalStorage, Meta, Notify, SessionStorage },
-});
+// Install Quasar in every mounted component, with the plugins used by the app
+config.global.plugins.push([
+  Quasar,
+  { plugins: { Cookies, Dialog, LocalStorage, Meta, Notify, SessionStorage } },
+]);
 
 beforeEach(() => {
   setActivePinia(pinia);
