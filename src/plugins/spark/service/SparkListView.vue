@@ -295,7 +295,7 @@ function showSearchKeyboard(): void {
         <q-item
           v-for="item in expandedRenderItems"
           :ref="(el) => setElementRef(item.id, el)"
-          :key="`expanded-${serviceId}-${item.id}`"
+          :key="`expanded-${serviceId}-${item.id}-${item.type}`"
           class="q-pt-none q-pb-md"
         >
           <q-item-section>

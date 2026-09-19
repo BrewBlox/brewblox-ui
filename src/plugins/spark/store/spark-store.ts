@@ -364,10 +364,17 @@ export const useSparkStore = defineStore('sparkStore', () => {
 
   function patchBlocks(evt: SparkPatchEvent): void {
     const serviceId = evt.key;
+    const existing = blocks.value[serviceId];
+    // A patch is a change to the full block list.
+    // Without a full list (the service is not synchronized, or the list was
+    // invalidated), the next state event brings all blocks, including these.
+    if (!existing?.length) {
+      return;
+    }
     const { changed, deleted } = evt.data;
     const affected = [...changed.map((block) => block.id), ...deleted];
     blocks.value[serviceId] = [
-      ...blocks.value[serviceId].filter((v) => !affected.includes(v.id)),
+      ...existing.filter((v) => !affected.includes(v.id)),
       ...changed.map(deserialize),
     ];
   }
