@@ -377,6 +377,11 @@ export const useSparkStore = defineStore('sparkStore', () => {
       ...existing.filter((v) => !affected.includes(v.id)),
       ...changed.map(deserialize),
     ];
+    // A patch proves the full block list is still current.
+    // The timestamp is only refreshed if it was not invalidated.
+    if (lastBlocksAt.value[serviceId] != null) {
+      lastBlocksAt.value[serviceId] = new Date();
+    }
   }
 
   function updateStatus(
