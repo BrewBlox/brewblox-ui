@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, CSSProperties } from 'vue';
 import {
+  COLOR_KEY,
   DEFAULT_IO_PRESSURE,
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
@@ -9,6 +10,7 @@ import {
   RIGHT,
 } from '@/plugins/builder/const';
 import {
+  colorString,
   flowOnCoord,
   horizontalChevrons,
   liquidOnCoord,
@@ -31,6 +33,14 @@ const flowSpeed = computed<number>(() =>
 const liquids = computed<string[]>(() =>
   liquidOnCoord(part.value, flows.value, RIGHT),
 );
+
+// An active inlet pushes liquid of its own color: the chevrons show that,
+// whether or not liquid moves. The stub still shows what is in the tube.
+const chevronStyle = computed<CSSProperties>(() =>
+  pressured.value
+    ? { stroke: colorString(settings.value[COLOR_KEY]) || 'white' }
+    : { stroke: 'grey', strokeWidth: '1' },
+);
 </script>
 
 <template>
@@ -48,6 +58,13 @@ const liquids = computed<string[]>(() =>
       path="M25,25 H50"
     />
     <g class="outline">
+      <path d="M30,21 H50" />
+      <path d="M30,29 H50" />
+    </g>
+    <g
+      class="outline"
+      :style="chevronStyle"
+    >
       <path
         v-if="flowSpeed > 0"
         :d="chevrons.right"
@@ -60,8 +77,6 @@ const liquids = computed<string[]>(() =>
         v-else
         :d="chevrons.straight"
       />
-      <path d="M30,21 H50" />
-      <path d="M30,29 H50" />
     </g>
     <BuilderInteraction @interact="pressured = !pressured">
       <q-menu

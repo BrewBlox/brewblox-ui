@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, CSSProperties } from 'vue';
 import {
+  COLOR_KEY,
   DEFAULT_IO_PRESSURE,
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
@@ -9,6 +10,7 @@ import {
   UP,
 } from '@/plugins/builder/const';
 import {
+  colorString,
   flowOnCoord,
   liquidOnCoord,
   verticalChevrons,
@@ -31,6 +33,14 @@ const flowSpeed = computed<number>(
 const liquids = computed<string[]>(() =>
   liquidOnCoord(part.value, flows.value, UP),
 );
+
+// An active inlet pushes liquid of its own color: the chevrons show that,
+// whether or not liquid moves. The stub still shows what is in the tube.
+const chevronStyle = computed<CSSProperties>(() =>
+  pressured.value
+    ? { stroke: colorString(settings.value[COLOR_KEY]) || 'white' }
+    : { stroke: 'grey', strokeWidth: '1' },
+);
 </script>
 
 <template>
@@ -49,6 +59,11 @@ const liquids = computed<string[]>(() =>
     <g class="outline">
       <path d="M21,0v20c0,5,4,9,9,9 h13 c1.7,0 1.3,3 3,3 V75" />
       <path d="M29,0v18c0,1.7,1.3,3,3,3 h13 c5,0 9,4 9,9 V75" />
+    </g>
+    <g
+      class="outline"
+      :style="chevronStyle"
+    >
       <path
         v-if="flowSpeed > 0"
         :d="chevrons.down"
