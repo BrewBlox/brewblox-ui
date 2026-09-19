@@ -19,4 +19,11 @@ proto_sha=$(awk -F "=" '/proto_sha/ {print $2}' ./firmware.ini)
 
 echo "Updating to firmware release ${firmware_date}-${firmware_version}"
 
-yarn add "brewblox-proto@https://github.com/brewblox/brewblox-proto#commit=${proto_sha}"
+# The shared types are a git submodule, linked into node_modules by yarn.
+# Checking out the matching commit is all that is needed.
+git submodule update --init brewblox-proto
+git -C brewblox-proto fetch --quiet origin
+git -C brewblox-proto checkout --quiet "${proto_sha}"
+
+echo "brewblox-proto is now at ${proto_sha}"
+echo "Commit firmware.ini and the brewblox-proto submodule to pin this release."

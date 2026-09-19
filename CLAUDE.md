@@ -23,7 +23,7 @@ yarn test:ci                 # vitest --run --coverage
 yarn vitest run src/utils/__tests__/quantity.test.ts   # single test file
 yarn vitest run -t "pattern"                           # tests matching a name
 yarn components              # regenerate src/auto-import.d.ts (global component typings)
-yarn firmware [release]      # pull firmware.ini for a firmware release and pin brewblox-proto to its proto_sha
+yarn firmware [release]      # pull firmware.ini for a firmware release and check out the brewblox-proto submodule at its proto_sha
 yarn redis / yarn spark      # reset datastore widgets / Spark blocks from dev/presets
 yarn redis:save / yarn spark:save   # overwrite dev/presets with the current backend state
 ```
@@ -36,7 +36,7 @@ Lint conventions enforced by config: prettier with sorted imports (builtin → t
 
 ## Architecture
 
-Vue 3 + Quasar + TypeScript + Pinia, built with Vite. Block/service types come from the `brewblox-proto` package (generated from the firmware `.proto` files), pinned by commit hash in `package.json` and updated via `yarn firmware`; `firmware.ini` records the matching firmware release.
+Vue 3 + Quasar + TypeScript + Pinia, built with Vite. Block/service types come from the `brewblox-proto` git submodule (generated from the firmware `.proto` files), linked into `node_modules` as a `portal:` dependency, so a checkout of the submodule is live without reinstalling; `yarn firmware` checks out the commit matching a firmware release and `firmware.ini` records that release. Clone with `--recurse-submodules` or run `git submodule update --init`.
 
 ### Plugins and features
 
