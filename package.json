@@ -7,6 +7,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "ci": "yarn install --immutable",
+    "prepare": "simple-git-hooks",
     "makecert": "bash dev/makecert.sh",
     "initdev": "bash dev/initdev.sh",
     "redis:load": "node dev/redis_load.mjs",
@@ -32,7 +33,7 @@
     "firmware": "bash dev/update-firmware.sh",
     "components": "vue-global-type-gen && echo 'export {};' >> src/auto-import.d.ts"
   },
-  "gitHooks": {
+  "simple-git-hooks": {
     "pre-push": "yarn lint"
   },
   "dependencies": {
@@ -99,14 +100,14 @@
     "rollup": "^4.63.4",
     "rollup-plugin-visualizer": "^7.1.1",
     "sass": "^1.104.1",
+    "simple-git-hooks": "^2.14.0",
     "svgpath": "^2.6.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.6",
     "vite-plugin-checker": "^0.14.5",
     "vitest": "^4.1.11",
     "vue-global-type-gen": "^1.1.0",
-    "vue-tsc": "^3.3.11",
-    "yorkie": "^2.0.0"
+    "vue-tsc": "^3.3.11"
   },
   "engines": {
     "node": ">= 22"
