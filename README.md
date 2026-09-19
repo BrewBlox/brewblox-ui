@@ -64,8 +64,11 @@ and over MQTTS at `localhost:9884`.
 # Restart backend containers
 yarn compose:new
 
+# Serve the UI without restarting backend containers
+yarn serve
+
 # Reset widgets
-yarn datastore:load
+yarn redis:load
 
 # Reset Spark blocks
 yarn spark:load
