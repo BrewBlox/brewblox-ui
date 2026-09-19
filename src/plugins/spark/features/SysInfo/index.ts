@@ -1,6 +1,7 @@
 import {
   BlockType,
   DisplayTempUnit,
+  ResetReason,
   SparkPlatform,
   SysInfoBlock,
 } from 'brewblox-proto/ts';
@@ -44,6 +45,7 @@ const plugin: Plugin = {
         memoryFreeContiguous: 0,
         memoryFreeLowest: 0,
         mainTaskStackFreeLowest: 0,
+        resetReason: ResetReason.RESET_REASON_UNKNOWN,
       }),
       analyze: () => 'Active',
     };
