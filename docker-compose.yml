@@ -30,10 +30,10 @@ services:
     labels:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
     environment:
-      - VM_retentionPeriod=100y
+      - VM_retentionPeriod=7d
       - VM_influxMeasurementFieldSeparator=/
       - VM_http_pathPrefix=/victoria
-      - VM_search_latencyOffset=10s
+      - VM_search_latencyOffset=1s
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/victoria
@@ -51,6 +51,9 @@ services:
 
   history:
     image: ghcr.io/brewblox/brewblox-history:develop
+    environment:
+      - BREWBLOX_HISTORY_RANGES_INTERVAL=1s
+      - BREWBLOX_HISTORY_MINIMUM_STEP=1s
 
   node-red:
     image: nodered/node-red:latest-minimal
@@ -66,6 +69,7 @@ services:
     environment:
       - BREWBLOX_SPARK_SIMULATION=true
       - BREWBLOX_SPARK_DEVICE_ID=123456789012345678901234
+      - BREWBLOX_SPARK_BROADCAST_INTERVAL=1s
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/simulator__sparkey
@@ -78,6 +82,7 @@ services:
     environment:
       - BREWBLOX_SPARK_SIMULATION=true
       - BREWBLOX_SPARK_DEVICE_ID=432109876543210987654321
+      - BREWBLOX_SPARK_BROADCAST_INTERVAL=1s
     volumes:
       - type: bind
         source: ${BREWBLOX_CACHE_DIR}/simulator__spock
