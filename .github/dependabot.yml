@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # One PR per week for everything that stays within its major
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # Pinned to the firmware release by `yarn firmware`
+      - dependency-name: brewblox-proto
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

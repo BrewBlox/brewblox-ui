@@ -109,7 +109,7 @@
     "yorkie": "^2.0.0"
   },
   "engines": {
-    "node": ">= 18"
+    "node": ">= 22"
   },
   "browserslist": [
     "defaults",
