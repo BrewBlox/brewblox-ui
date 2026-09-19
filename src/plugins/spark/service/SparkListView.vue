@@ -8,6 +8,7 @@ import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { useBlockSpecStore, useSparkStore } from '../store';
+import { isErrorBlockType } from '../utils/info';
 import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';
 import { ListRenderAddress } from './types';
 
@@ -75,13 +76,18 @@ const allRenderItems = computed<ListRenderAddress[]>(() => {
   const blockItems =
     sparkStore
       .blocksByService(props.serviceId)
-      .filter((block) => validTypes.includes(block.type))
+      .filter(
+        (block) =>
+          validTypes.includes(block.type) || isErrorBlockType(block.type),
+      )
       .map((block) => ({
         serviceId: props.serviceId,
         id: block.id,
         type: block.type,
         name: block.id,
-        title: featureStore.widgetTitle(block.type),
+        title: isErrorBlockType(block.type)
+          ? `Error (${block.data.blockType ?? 'Unknown type'})`
+          : featureStore.widgetTitle(block.type),
         role: featureStore.widgetRole(block.type),
       }))
       .sort(sorter.value) ?? [];
