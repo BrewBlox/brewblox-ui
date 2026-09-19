@@ -23,6 +23,7 @@ const blueprint: BuilderBlueprint = {
     switch (position) {
       case 3:
         return {
+          [LEFT]: [],
           [RIGHT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
           [DOWN]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
           [CENTER]: [
@@ -32,6 +33,7 @@ const blueprint: BuilderBlueprint = {
         } as PartTransitions;
       case 2:
         return {
+          [DOWN]: [],
           [LEFT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
           [RIGHT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
           [CENTER]: [
@@ -41,6 +43,7 @@ const blueprint: BuilderBlueprint = {
         } as PartTransitions;
       case 1:
         return {
+          [RIGHT]: [],
           [LEFT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
           [DOWN]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
           [CENTER]: [

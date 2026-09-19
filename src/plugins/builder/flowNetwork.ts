@@ -83,6 +83,11 @@ interface FlowNetwork {
   terminals: Map<number, Set<string>>;
   /** Coordinates that identify a terminal */
   terminalCoords: Set<string>;
+  /**
+   * Coordinates where a part touches the network without any route,
+   * such as the ends of a closed valve. Maps the coordinate to its node.
+   */
+  blockedPorts: Map<FlowPart, Map<string, number>>;
 }
 
 class UnionFind {
@@ -129,6 +134,7 @@ function buildNetwork(parts: FlowPart[]): FlowNetwork {
   const terminalCoords = new Set<string>();
   const terminalLiquids = new Map<string, Set<string>>();
   const edges: NetworkEdge[] = [];
+  const blockedCoords = new Map<FlowPart, string[]>();
 
   const nodeId = (coord: string): number => {
     let id = coordNodes.get(coord);
@@ -152,6 +158,13 @@ function buildNetwork(parts: FlowPart[]): FlowNetwork {
     const pairs = new Map<string, RoutePair>();
 
     for (const inCoord in part.transitions) {
+      if (part.transitions[inCoord].length === 0) {
+        const coords = blockedCoords.get(part) ?? [];
+        blockedCoords.set(part, coords);
+        coords.push(inCoord);
+        nodeId(inCoord);
+        continue;
+      }
       for (const route of part.transitions[inCoord]) {
         const outCoord = route.outCoords;
         if (inCoord === outCoord) {
@@ -230,11 +243,20 @@ function buildNetwork(parts: FlowPart[]): FlowNetwork {
     terminals.set(node, known);
   }
 
+  const blockedPorts = new Map<FlowPart, Map<string, number>>();
+  for (const [part, coords] of blockedCoords) {
+    blockedPorts.set(
+      part,
+      new Map(coords.map((coord) => [coord, nodeIds.find(nodeId(coord))])),
+    );
+  }
+
   return {
     edges,
     nodeCount: coordNodes.size,
     terminals,
     terminalCoords,
+    blockedPorts,
   };
 }
 
@@ -682,6 +704,15 @@ function partFlows(
       });
       staticLiquids.get(edge.vNode)?.forEach((liquid) => {
         add(part, v, liquid, 0);
+      });
+    }
+  }
+
+  // A closed port holds the liquid present on its side of the part
+  for (const [part, ports] of network.blockedPorts) {
+    for (const [coord, node] of ports) {
+      staticLiquids.get(node)?.forEach((liquid) => {
+        add(part, coord, liquid, 0);
       });
     }
   }

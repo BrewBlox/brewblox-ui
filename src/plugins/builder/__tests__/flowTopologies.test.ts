@@ -13,6 +13,7 @@ import {
   IO_PRESSURE_KEY,
   LEFT,
   RIGHT,
+  VALVE_POSITION_KEY,
 } from '@/plugins/builder/const';
 import { BuilderPart, PartTransitions } from '@/plugins/builder/types';
 
@@ -429,7 +430,25 @@ describe('Liquids without flow', () => {
     );
     const byId = Object.fromEntries(result.map((v) => [v.id, v.flows]));
     expect(byId['tube1']['3,2.5,0']).toEqual({ [COLD_WATER]: 0 });
-    expect(byId['valve']).toEqual({});
+    // Each side of the closed valve holds the liquid of its own tube
+    expect(byId['valve']).toEqual({
+      '3.5,2,0': { [COLD_WATER]: 0 },
+      '3.5,1,0': { [HOT_WATER]: 0 },
+    });
+  });
+
+  it('are shown on the blocked port of a three-way valve', () => {
+    // src(0, cold) -> tube -> three-way valve (left port blocked)
+    const blocked = [
+      makeSource('src', 1, 2, 0, 0),
+      makePart('tube1', 'StraightTube', 2, 2),
+      makePart('valve', 'ThreeWayValve', 3, 2, 0, { [VALVE_POSITION_KEY]: 3 }),
+    ];
+    const result = calculateFlows(
+      asFlowParts(blocked, makeAllTransitions(blocked)),
+    );
+    const byId = Object.fromEntries(result.map((v) => [v.id, v.flows]));
+    expect(byId['valve']).toEqual({ '3,2.5,0': { [COLD_WATER]: 0 } });
   });
 });
 
