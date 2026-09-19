@@ -29,6 +29,7 @@ const pageComponent = computed<string | null>(() =>
   <component
     :is="pageComponent"
     v-if="pageComponent !== null"
+    :key="serviceId"
     :service-id="serviceId"
   />
   <q-page

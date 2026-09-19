@@ -29,7 +29,7 @@ const service = computed<TiltService | null>(() =>
   serviceStore.serviceById(props.serviceId),
 );
 
-const title = computed<string>(() => service.value?.title ?? 'Spark service');
+const title = computed<string>(() => service.value?.title ?? 'Tilt service');
 
 function editTitle(): void {
   startChangeServiceTitle(service.value);
@@ -40,6 +40,7 @@ watch(
   (title) => {
     document.title = `Brewblox | ${title}`;
   },
+  { immediate: true },
 );
 
 const values = computed<TiltStateValue[]>(() =>
