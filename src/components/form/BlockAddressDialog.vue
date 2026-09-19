@@ -60,7 +60,7 @@ const serviceId = computed<string>({
     const { serviceId } = local.value ?? modelValueAddr.value;
     return serviceId && serviceIds.value.includes(serviceId)
       ? serviceId
-      : serviceIds.value[0] ?? '';
+      : (serviceIds.value[0] ?? '');
   },
   set: (serviceId) => {
     if (local.value?.serviceId !== serviceId) {

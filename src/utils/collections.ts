@@ -10,7 +10,7 @@ export function findById<T extends HasId>(
   id: Maybe<string>,
   fallback: T | null = null,
 ): T | typeof fallback {
-  return id != null ? arr.find((v) => v.id === id) ?? fallback : fallback;
+  return id != null ? (arr.find((v) => v.id === id) ?? fallback) : fallback;
 }
 
 /**
@@ -30,7 +30,7 @@ export function findByKey<T>(
   fallback: T | null = null,
 ): T | typeof fallback {
   return desired != null
-    ? arr.find((v) => v[key] === desired) ?? fallback
+    ? (arr.find((v) => v[key] === desired) ?? fallback)
     : fallback;
 }
 

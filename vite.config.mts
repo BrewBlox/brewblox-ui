@@ -29,7 +29,8 @@ export default defineConfig(({ command, mode }) => {
     }),
 
     quasar({
-      sassVariables: 'src/css/variables.sass',
+      // An absolute path: the modern Sass API resolves imports from the importing file
+      sassVariables: path.resolve(__dirname, 'src/css/variables.sass'),
     }),
   ];
 

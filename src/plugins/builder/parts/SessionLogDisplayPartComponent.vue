@@ -25,7 +25,7 @@ const session = computed<LoggedSession | null>(() =>
 );
 
 const displayText = computed<string>(() =>
-  widgetId.value ? session.value?.title ?? 'no active session' : 'Not linked',
+  widgetId.value ? (session.value?.title ?? 'no active session') : 'Not linked',
 );
 </script>
 

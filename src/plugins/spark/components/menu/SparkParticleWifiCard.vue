@@ -50,8 +50,8 @@ const values = reactive<WiFiSettingsBlock['data']>({
   signal: 0,
 });
 
-const block = computed<WiFiSettingsBlock>(
-  () => getWiFiSettingsBlock(props.serviceId)!,
+const block = computed<WiFiSettingsBlock>(() =>
+  getWiFiSettingsBlock(props.serviceId)!,
 );
 
 async function save(): Promise<void> {

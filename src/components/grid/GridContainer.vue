@@ -133,7 +133,8 @@ function updateItemSize(id: string, cols: number, rows: number): void {
 
 .grid-container-overlay-grid {
   background-size: 120px 120px;
-  background-image: linear-gradient(#121a1f 20px, transparent 0px),
+  background-image:
+    linear-gradient(#121a1f 20px, transparent 0px),
     linear-gradient(90deg, #121a1f 20px, transparent 0px),
     linear-gradient(#fff, #fff);
   background-position:

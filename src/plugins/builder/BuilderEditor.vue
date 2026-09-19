@@ -330,8 +330,8 @@ function isHoveringUnselectedPart(): boolean {
   const hovered = findHoveredPart();
   return Boolean(
     hovered &&
-      selectedIds.value.length &&
-      !selectedIds.value.some((v) => v === hovered.id),
+    selectedIds.value.length &&
+    !selectedIds.value.some((v) => v === hovered.id),
   );
 }
 

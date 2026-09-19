@@ -411,7 +411,7 @@ export function bloxQty(value: QuantityCompatible, unit?: string): JSQuantity {
 export function durationMs(duration: Maybe<DurationCompatible>): number {
   if (isQuantity(duration)) {
     return isDurationUnit(duration.unit)
-      ? bloxQty(duration).to('ms').value ?? 0
+      ? (bloxQty(duration).to('ms').value ?? 0)
       : 0;
   } else if (isFinite(duration)) {
     return Number(duration);
