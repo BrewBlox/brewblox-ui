@@ -40,6 +40,9 @@ const block = ref<Block>();
 const storeBlock = computed<Block | null>(() =>
   sparkStore.blockById(serviceId.value, blockId.value),
 );
+const serviceBlocks = computed<Block[]>(() =>
+  sparkStore.blocksByService(serviceId.value),
+);
 
 function assignBlock(): void {
   if (storeBlock.value) {
@@ -53,9 +56,18 @@ function assignBlock(): void {
     error.value = `Waiting for block: '${serviceId.value}/${blockId.value}'`;
   }
 
-  // We don't recover errors in dialogs
+  // We don't recover errors in dialogs, but we do wait out transient states.
+  // The store empties the service block list when the service is disconnected,
+  // or when a periodic state update fails or is stale.
+  // A missing block while other blocks are present means it was removed or renamed.
   if (error.value && context?.container === 'Dialog') {
-    invalidate(error.value);
+    const transient =
+      sparkStore.has(serviceId.value) &&
+      !storeBlock.value &&
+      serviceBlocks.value.length === 0;
+    if (!transient) {
+      invalidate(error.value);
+    }
   }
 }
 
@@ -66,8 +78,11 @@ provide(BlockKey, block as ComputedRef<Block>);
 // Override the function provided in WidgetWrapper
 provide(ChangeWidgetTitleKey, () => startChangeBlockId(block.value));
 
+// The block count is also watched:
+// storeBlock remains null if the block is gone
+// when blocks are received again after a transient state.
 watch(
-  () => storeBlock,
+  () => [storeBlock, serviceBlocks.value.length],
   () => assignBlock(),
   { immediate: true, deep: true },
 );
@@ -103,6 +118,16 @@ onErrorCaptured((err: Error) => {
   >
     <div>{{ error }}</div>
     <q-btn
+      v-if="context?.container === 'Dialog'"
+      v-close-popup
+      label="Close"
+      flat
+      color="secondary"
+      icon="mdi-close-circle"
+      class="q-mt-lg"
+    />
+    <q-btn
+      v-else
       label="Remove widget"
       flat
       color="secondary"

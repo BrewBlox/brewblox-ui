@@ -11,6 +11,7 @@ import type {
   PageMode,
   SparkService,
 } from '@/plugins/spark/types';
+import { isErrorBlockType } from '@/plugins/spark/utils/info';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
@@ -71,13 +72,20 @@ const pageMode = computed<PageMode>({
 const nodes = computed<BlockRelationNode[]>(() =>
   sparkStore
     .blocksByService(props.serviceId)
-    .filter((block) => validTypes.includes(block.type))
+    .filter(
+      (block) =>
+        validTypes.includes(block.type) || isErrorBlockType(block.type),
+    )
     .map(
       (block): BlockRelationNode => ({
         id: block.id,
-        type: featureStore.widgetTitle(block.type),
+        type: isErrorBlockType(block.type)
+          ? `Error (${block.data.blockType ?? 'Unknown type'})`
+          : featureStore.widgetTitle(block.type),
         name: block.type === BlockType.SysInfo ? title.value : undefined,
-        status: specStore.blockSpecByType(block.type)?.analyze(block),
+        status: isErrorBlockType(block.type)
+          ? 'Invalid'
+          : specStore.blockSpecByType(block.type)?.analyze(block),
       }),
     )
     .sort(makeObjectSorter('type')),

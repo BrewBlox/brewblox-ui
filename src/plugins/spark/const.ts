@@ -12,6 +12,7 @@ import {
   PwmFrequency,
   SensorCombiFunc,
   SequenceStoreMode,
+  SparkPlatform,
   TempSensorAnalogSpec,
   TempSensorAnalogType,
   TransitionDurationPreset,
@@ -101,6 +102,15 @@ export const ENUM_LABELS_COMBINE_FUNC: EnumLabels<SensorCombiFunc> = {
 export const ENUM_LABELS_DISPLAY_TEMP: EnumLabels<DisplayTempUnit> = {
   TEMP_CELSIUS: 'Celsius',
   TEMP_FAHRENHEIT: 'Fahrenheit',
+};
+
+export const ENUM_LABELS_SPARK_PLATFORM: EnumLabels<SparkPlatform> = {
+  PLATFORM_UNKNOWN: 'Unknown',
+  PLATFORM_GCC: 'Simulator (legacy)',
+  PLATFORM_PHOTON: 'Spark 2 (Photon)',
+  PLATFORM_P1: 'Spark 3 (P1)',
+  PLATFORM_ESP: 'Spark 4 (ESP32)',
+  PLATFORM_SIM: 'Simulator',
 };
 
 export const ENUM_LABELS_DIGITAL_STATE: EnumLabels<DigitalState> = {

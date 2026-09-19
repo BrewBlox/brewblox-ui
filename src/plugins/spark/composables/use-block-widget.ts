@@ -22,7 +22,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   blockId: string;
   block: ComputedRef<BlockT>;
   graphConfig: WritableComputedRef<GraphConfig>;
-  blockSpec: ComputedRef<BlockSpec<BlockT>>;
+  blockSpec: ComputedRef<BlockSpec<BlockT> | null>;
 
   patchBlock(data: Partial<BlockT['data']>): Promise<void>;
 
@@ -67,8 +67,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       throw new Error('Block not injected');
     }
 
-    const blockSpec = computed<BlockSpec<BlockT>>(
-      () => specStore.blockSpecByAddress(block.value)!,
+    const blockSpec = computed<BlockSpec<BlockT> | null>(() =>
+      specStore.blockSpecByAddress(block.value),
     );
 
     async function patchBlock(data: Partial<BlockT['data']>): Promise<void> {
@@ -79,7 +79,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       () => prettyLimitations(block.value.data.constraints) || null,
     );
 
-    const hasRelations: boolean = !!blockSpec.value.hasRelations;
+    const hasRelations: boolean = !!blockSpec.value?.hasRelations;
 
     const hasGraph: boolean = specStore.fieldSpecs.some(
       (f) => f.type === block.value.type && f.graphed,

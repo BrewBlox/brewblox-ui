@@ -10,6 +10,7 @@ import DigitalInput from './DigitalInput';
 import DisplaySettings from './DisplaySettings';
 import DS2408 from './DS2408';
 import DS2413 from './DS2413';
+import ErrorObject from './ErrorObject';
 import FastPwm from './FastPwm';
 import GpioModule from './GpioModule';
 import InactiveObject from './InactiveObject';
@@ -45,6 +46,7 @@ const plugins: Plugin[] = [
   DS2408,
   DS2413,
   DeprecatedObject,
+  ErrorObject,
   FastPwm,
   GpioModule,
   InactiveObject,

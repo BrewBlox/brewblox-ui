@@ -54,14 +54,21 @@ yarn start
 
 The UI will be served with hot reloading at <https://localhost:8080/ui>
 
+The backend services are proxied by Traefik at <https://localhost:9001>.
+The eventbus is also reachable over plain MQTT at `localhost:9883`,
+and over MQTTS at `localhost:9884`.
+
 ## Additional dev commands
 
 ```bash
 # Restart backend containers
 yarn compose:new
 
+# Serve the UI without restarting backend containers
+yarn serve
+
 # Reset widgets
-yarn datastore:load
+yarn redis:load
 
 # Reset Spark blocks
 yarn spark:load

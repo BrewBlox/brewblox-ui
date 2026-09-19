@@ -2,6 +2,7 @@
 import { SysInfoBlock } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { ENUM_LABELS_SPARK_PLATFORM } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import {
   dateString,
@@ -46,6 +47,18 @@ const ready = computed<boolean>(
           {{ block.data.releaseDate }}
         </LabeledField>
         <LabeledField
+          label="Protocol version"
+          class="col-lg-5 col-11"
+        >
+          {{ block.data.protocolVersion }}
+        </LabeledField>
+        <LabeledField
+          label="Protocol date"
+          class="col-lg-5 col-11"
+        >
+          {{ block.data.protocolDate }}
+        </LabeledField>
+        <LabeledField
           label="Controller date / time"
           class="col-lg-5 col-11"
         >
@@ -69,6 +82,12 @@ const ready = computed<boolean>(
           tag-style="word-wrap: break-word;"
         >
           {{ block.data.deviceId }}
+        </LabeledField>
+        <LabeledField
+          label="Platform"
+          class="col-lg-5 col-11"
+        >
+          {{ ENUM_LABELS_SPARK_PLATFORM[block.data.platform] }}
         </LabeledField>
         <LabeledField
           label="IP address"
@@ -95,6 +114,12 @@ const ready = computed<boolean>(
           {{ roundedNumber(block.data.voltageExternal, 3) }}V
         </LabeledField>
         <LabeledField
+          label="Updates per second"
+          class="col-lg-5 col-11"
+        >
+          {{ roundedNumber(block.data.updatesPerSecond, 1) }}
+        </LabeledField>
+        <LabeledField
           label="Free RAM"
           class="col-lg-5 col-11"
           tag-class="q-gutter-y-xs"
@@ -102,6 +127,12 @@ const ready = computed<boolean>(
           <div>Total: {{ block.data.memoryFree }}</div>
           <div>Contiguous: {{ block.data.memoryFreeContiguous }}</div>
           <div>Lowest: {{ block.data.memoryFreeLowest }}</div>
+        </LabeledField>
+        <LabeledField
+          label="Free stack (main task)"
+          class="col-lg-5 col-11"
+        >
+          <div>Lowest: {{ block.data.mainTaskStackFreeLowest }}</div>
         </LabeledField>
       </div>
     </div>
