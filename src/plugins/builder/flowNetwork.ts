@@ -15,8 +15,9 @@ import { FlowPart, FlowRoute, LiquidFlow, PartFlows } from './types';
  * - Transitions without friction (container cells) merge their nodes.
  *
  * Node pressures follow from conservation of flow at every node.
- * One-way edges that would carry flow in the wrong direction are removed,
- * and the network is solved again until all remaining flows are valid.
+ * One-way edges that would carry flow in the wrong direction are blocked,
+ * blocked edges with a positive pressure difference are opened again,
+ * and the network is solved repeatedly until no edge changes state.
  *
  * Liquids are then propagated from terminals, downstream along the flow.
  * Liquids also spread through connected parts without flow,
@@ -28,12 +29,15 @@ export const FLOW_EPSILON = 1e-9;
 
 /** Results are rounded to remove floating point noise */
 const roundFlow = (value: number): number => {
-  const rounded = Math.round(value / FLOW_EPSILON) * FLOW_EPSILON;
+  const rounded = Math.round(value * 1e9) / 1e9;
   return rounded === 0 ? 0 : rounded;
 };
 
-const MAX_ONE_WAY_ITERATIONS = 20;
-const MAX_LIQUID_ITERATIONS = 100;
+const MAX_ONE_WAY_ITERATIONS = 50;
+const MAX_LIQUID_ITERATIONS = 500;
+
+/** Friction used instead of zero for routes that do not merge their nodes */
+const MIN_FRICTION = 0.01;
 
 export const ONE_WAY_WARNING =
   'The direction of flow through one-way parts could not be resolved. ' +
@@ -183,7 +187,12 @@ function buildNetwork(parts: FlowPart[]): FlowNetwork {
       const pressure =
         uRoutes.reduce((acc, r) => acc + routePressure(r), 0) -
         vRoutes.reduce((acc, r) => acc + routePressure(r), 0);
-      const friction = Math.min(...allRoutes.map(routeFriction));
+      // Only container cells (source and sink routes) merge their nodes.
+      // Other routes without friction are given a small friction instead.
+      const isTerminal = allRoutes.some((r) => r.source || r.sink);
+      const friction =
+        Math.min(...allRoutes.map(routeFriction)) ||
+        (isTerminal ? 0 : MIN_FRICTION);
 
       const uNode = nodeId(u);
       const vNode = nodeId(v);
@@ -327,7 +336,8 @@ function solvePressures(network: FlowNetwork): Solution {
       if (candidateDegree < degree) {
         node = candidate;
         degree = candidateDegree;
-        if (degree <= 1) {
+        // Eliminating a node with two neighbors adds at most one connection
+        if (degree <= 2) {
           break;
         }
       }
@@ -393,27 +403,55 @@ function applyPressures(network: FlowNetwork, solution: Solution): void {
     if (edge.friction === 0 && edge.uNode === edge.vNode) {
       const uIsTerminal = network.terminalCoords.has(edge.u);
       edge.flow = uIsTerminal ? leaving[edge.uNode] : -leaving[edge.uNode];
+      if (Math.abs(edge.flow) < FLOW_EPSILON) {
+        edge.flow = 0;
+      }
     }
   }
 }
 
 /**
  * Solves flows, and blocks one-way edges that carry reverse flow.
- * Blocking an edge changes the flow elsewhere,
- * so the network is solved repeatedly until no new edges are blocked.
+ * Blocking an edge changes the pressure elsewhere,
+ * which can open a blocked edge again.
+ * The network is solved repeatedly until no edge changes state.
  */
 function solveFlows(network: FlowNetwork, warnings: Set<string>): void {
+  const { edges, terminals } = network;
+  const oneWay = edges.filter((edge) => edge.oneWay && edge.friction > 0);
+
+  // Pressure difference that would push liquid along the edge
+  const drivingPressure = (edge: NetworkEdge, solution: Solution): number =>
+    solution.pressures[edge.uNode] -
+    solution.pressures[edge.vNode] +
+    edge.pressure;
+
+  // Nodes without a path to a terminal have no meaningful pressure
+  const isConnected = (node: number, solution: Solution): boolean =>
+    terminals.has(node) || solution.connected.has(node);
+
   for (let i = 0; i < MAX_ONE_WAY_ITERATIONS; i++) {
-    applyPressures(network, solvePressures(network));
-    const reversed = network.edges.filter(
-      (edge) => edge.oneWay && isActive(edge) && edge.flow < 0,
-    );
-    if (reversed.length === 0) {
+    const solution = solvePressures(network);
+    applyPressures(network, solution);
+
+    let changed = false;
+    for (const edge of oneWay) {
+      if (!edge.blocked && edge.flow < 0) {
+        edge.blocked = true;
+        changed = true;
+      } else if (
+        edge.blocked &&
+        isConnected(edge.uNode, solution) &&
+        isConnected(edge.vNode, solution) &&
+        drivingPressure(edge, solution) > FLOW_EPSILON
+      ) {
+        edge.blocked = false;
+        changed = true;
+      }
+    }
+    if (!changed) {
       return;
     }
-    reversed.forEach((edge) => {
-      edge.blocked = true;
-    });
   }
   warnings.add(ONE_WAY_WARNING);
 }
@@ -424,23 +462,34 @@ const tailNode = (edge: NetworkEdge): number =>
 const headNode = (edge: NetworkEdge): number =>
   edge.flow > 0 ? edge.vNode : edge.uNode;
 
+const equalFractions = (liquids: Set<string>): LiquidFlow => {
+  const fractions: LiquidFlow = {};
+  liquids.forEach((liquid) => {
+    fractions[liquid] = 1 / liquids.size;
+  });
+  return fractions;
+};
+
 /**
  * Propagates liquids downstream.
  * Terminals with liquids inject them into all outgoing flow.
  * Other nodes pass on the liquids they receive,
  * in proportion to the amount received.
+ *
+ * Flow that circulates without being fed by a terminal
+ * (a pumped loop off a dead end) carries the liquid
+ * that is present without flow.
  */
-function propagateLiquids(network: FlowNetwork): void {
+function propagateLiquids(
+  network: FlowNetwork,
+  staticLiquids: Map<number, Set<string>>,
+): void {
   const { edges, nodeCount, terminals } = network;
   const flowing = edges.filter((edge) => edge.flow !== 0);
 
   const terminalFractions = new Map<number, LiquidFlow>();
   for (const [node, liquids] of terminals) {
-    const fractions: LiquidFlow = {};
-    liquids.forEach((liquid) => {
-      fractions[liquid] = 1 / liquids.size;
-    });
-    terminalFractions.set(node, fractions);
+    terminalFractions.set(node, equalFractions(liquids));
   }
 
   // Process edges in order of distance from a terminal.
@@ -499,6 +548,15 @@ function propagateLiquids(network: FlowNetwork): void {
             updated[liquid] = value;
           }
         }
+        if (Object.keys(updated).length === 0) {
+          const seed = staticLiquids.get(tail);
+          if (seed?.size) {
+            const seedFractions = equalFractions(seed);
+            for (const liquid in seedFractions) {
+              updated[liquid] = amount * seedFractions[liquid];
+            }
+          }
+        }
       }
       const liquids = new Set([
         ...Object.keys(edge.liquidFlows),
@@ -516,6 +574,18 @@ function propagateLiquids(network: FlowNetwork): void {
     }
     if (!changed) {
       break;
+    }
+  }
+
+  // The iteration converges slowly for strongly recirculating loops.
+  // The liquid amounts are scaled to always add up to the total flow.
+  for (const edge of flowing) {
+    const total = Object.values(edge.liquidFlows).reduce((a, b) => a + b, 0);
+    if (total > 0) {
+      const scale = Math.abs(edge.flow) / total;
+      for (const liquid in edge.liquidFlows) {
+        edge.liquidFlows[liquid] *= scale;
+      }
     }
   }
 }
@@ -551,11 +621,14 @@ function findStaticLiquids(network: FlowNetwork): Map<number, Set<string>> {
     }
   }
 
+  // Liquid does not spread backwards through one-way parts
   const adjacent: number[][] = Array.from({ length: nodeCount }, () => []);
   for (const edge of edges) {
     if (isActive(edge) && edge.flow === 0) {
       adjacent[edge.uNode].push(edge.vNode);
-      adjacent[edge.vNode].push(edge.uNode);
+      if (!edge.oneWay) {
+        adjacent[edge.vNode].push(edge.uNode);
+      }
     }
   }
   const queue = [...liquids.keys()];
@@ -601,13 +674,13 @@ function partFlows(
         add(part, tail, liquid, -edge.liquidFlows[liquid]);
         add(part, head, liquid, edge.liquidFlows[liquid]);
       }
-    } else if (isActive(edge) || edge.friction === 0) {
-      const liquids = new Set<string>([
-        ...(staticLiquids.get(edge.uNode) ?? []),
-        ...(staticLiquids.get(edge.vNode) ?? []),
-      ]);
-      liquids.forEach((liquid) => {
+    } else {
+      // Without flow, each end holds the liquid present at its node.
+      // The ends differ for one-way parts, and for closed one-way parts.
+      staticLiquids.get(edge.uNode)?.forEach((liquid) => {
         add(part, u, liquid, 0);
+      });
+      staticLiquids.get(edge.vNode)?.forEach((liquid) => {
         add(part, v, liquid, 0);
       });
     }
@@ -633,7 +706,9 @@ export function solveNetworkFlows(
 ): FlowPart[] {
   const network = buildNetwork(parts);
   solveFlows(network, warnings);
-  propagateLiquids(network);
+  // Liquids present without flow are found before and after propagation:
+  // the first pass seeds circulating flow, the second includes flowing liquids
+  propagateLiquids(network, findStaticLiquids(network));
   const staticLiquids = findStaticLiquids(network);
   const flows = partFlows(network, staticLiquids);
 

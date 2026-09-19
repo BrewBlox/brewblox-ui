@@ -490,3 +490,195 @@ describe('Mixing liquids', () => {
     expect(hot.flows['3,1.5,0'][COLD_WATER]).toBeLessThan(0);
   });
 });
+
+describe('Two check valves in a pumped ring', () => {
+  // The all-open solution reverses both valves.
+  // Closing one of them leaves a forward pressure on the other.
+  //
+  //   x -> D1 -> y
+  //   |          |
+  // link       pump (pushes y-wards)
+  //   |          |
+  //   q <- D2 <- p <- src
+  //   |
+  //  sink
+  const parts: BuilderPart[] = [
+    makePart('x', 'ElbowTube', 1, 0, 90),
+    makePart('D1', 'CheckValve', 2, 0),
+    makePart('y', 'ElbowTube', 3, 0, 180),
+    makePart('link', 'StraightTube', 1, 1, 90),
+    makePump('pump', 3, 1, 90, 30),
+    makePart('q', 'TeeTube', 1, 2),
+    makePart('D2', 'CheckValve', 2, 2, 180),
+    makePart('p', 'TeeTube', 3, 2),
+    makeSource('src', 4, 2, 180, 12),
+    makeSink('sink', 0, 2, 0),
+  ];
+
+  it('keeps the valve with forward pressure open', () => {
+    const flows = totalFlows(parts);
+    // src -> p -> D2 -> q -> sink: 1 + 0.5 + 0.5 + 1 + 0.5 + 0.5 + 1
+    expect(flows['D2']['2,2.5,0']).toBeCloseTo(12 / 5, 6);
+    expect(flows['sink']['1,2.5,0']).toBeCloseTo(-12 / 5, 6);
+    expect(flows['D1']?.['3,0.5,0'] ?? 0).toBe(0);
+    expect(
+      calculateNormalizedFlows(parts, makeAllTransitions(parts)).warnings,
+    ).toEqual([]);
+  });
+});
+
+describe('A pumped loop attached to a dead end', () => {
+  // src -> tee -> loop with a pump, back into the tee
+  const parts = (pumpPressure: number): BuilderPart[] => [
+    makeSource('src', 1, 2, 0),
+    makePart('tee', 'TeeTube', 2, 2, 270),
+    makePart('loop1', 'ElbowTube', 2, 1, 90),
+    makePump('pump', 3, 1, 180, pumpPressure),
+    makePart('loop2', 'ElbowTube', 4, 1, 180),
+    makePart('loop3', 'StraightTube', 4, 2, 90),
+    makePart('loop4', 'ElbowTube', 4, 3, 270),
+    makePart('loop5', 'StraightTube', 3, 3),
+    makePart('loop6', 'ElbowTube', 2, 3, 0),
+  ];
+
+  it('circulates the liquid of the source', () => {
+    const result = calculateFlows(
+      asFlowParts(parts(10), makeAllTransitions(parts(10))),
+    );
+    const pump = result.find((v) => v.id === 'pump')!;
+    // 0.5 + 0.5 + 1 + 1 + 1 + 1 + 1 + 1 + 1
+    expect(pump.flows['4,1.5,0']).toEqual({
+      [COLD_WATER]: expect.closeTo(10 / 8, 6),
+    });
+    const src = result.find((v) => v.id === 'src')!;
+    expect(src.flows['2,2.5,0']).toEqual({ [COLD_WATER]: 0 });
+  });
+
+  it('holds the liquid of the source without flow', () => {
+    const result = calculateFlows(
+      asFlowParts(parts(0), makeAllTransitions(parts(0))),
+    );
+    const pump = result.find((v) => v.id === 'pump')!;
+    expect(pump.flows['4,1.5,0']).toEqual({ [COLD_WATER]: 0 });
+  });
+});
+
+describe('A strongly recirculating loop', () => {
+  // src(0) -> 20 tubes -> tee -> pump(100) -> tee -> 20 tubes -> sink
+  //                           -> tubes    ->
+  const tubes = (from: number, count: number): BuilderPart[] =>
+    Array.from({ length: count }, (_, i) =>
+      makePart(`t${from + i}`, 'StraightTube', from + i, 2),
+    );
+  const parts: BuilderPart[] = [
+    makeSource('src', 0, 2, 0, 0),
+    ...tubes(1, 20),
+    makePart('tee1', 'TeeTube', 21, 2, 270),
+    makePart('a1', 'ElbowTube', 21, 1, 90),
+    makePump('pump', 22, 1, 180, 100),
+    makePart('a2', 'ElbowTube', 23, 1, 180),
+    makePart('b1', 'ElbowTube', 21, 3, 0),
+    makePart('b2', 'StraightTube', 22, 3),
+    makePart('b3', 'ElbowTube', 23, 3, 270),
+    makePart('tee2', 'TeeTube', 23, 2, 90),
+    ...tubes(24, 20),
+    makeSink('sink', 44, 2, 180),
+  ];
+
+  it('reports the full flow for the liquid', () => {
+    const flows = totalFlows(parts);
+    // Thevenin: pump 100 over 4 in parallel with 4 -> 50 over 2;
+    // external path 21.5 + 21.5
+    const through = 50 / 45;
+    const pumpFlow = (100 - (50 - through * 2)) / 4;
+    expect(flows['sink']['44,2.5,0']).toBeCloseTo(-through, 6);
+    expect(flows['pump']['23,1.5,0']).toBeCloseTo(pumpFlow, 6);
+    expect(flows['b2']['23,3.5,0']).toBeCloseTo(through - pumpFlow, 6);
+  });
+});
+
+describe('An inlet without a color', () => {
+  it('does not push liquid', () => {
+    const colorless = makePart('src', 'SystemIO', 1, 1, 0, {
+      [IO_ENABLED_KEY]: true,
+      [IO_PRESSURE_KEY]: 10,
+    });
+    const route = makeAllTransitions([colorless])['src']['0.5,0.5,0'][0];
+    expect(route.pressure).toBe(0);
+    expect(route.liquids).toEqual([]);
+  });
+});
+
+describe('Static liquid and one-way parts', () => {
+  it('does not spread backwards through an open check valve', () => {
+    // src -> tube -> tee -> tube -> sink
+    //                tee <- check valve <- dead end
+    const parts: BuilderPart[] = [
+      makeSource('src', 1, 2, 0, 0),
+      makePart('tube1', 'StraightTube', 2, 2),
+      makePart('tee', 'TeeTube', 3, 2, 180),
+      makePart('tube2', 'StraightTube', 4, 2),
+      makeSink('sink', 5, 2, 180),
+      makePart('valve', 'CheckValve', 3, 3, 270),
+      makePart('dead', 'StraightTube', 3, 4, 90),
+    ];
+    const result = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
+    const byId = Object.fromEntries(result.map((v) => [v.id, v.flows]));
+    expect(byId['tube1']['3,2.5,0']).toEqual({ [COLD_WATER]: 0 });
+    expect(byId['valve']).toEqual({ '3.5,3,0': { [COLD_WATER]: 0 } });
+    expect(byId['dead']).toEqual({});
+  });
+
+  it('shows liquid on the inlet side of a closed check valve', () => {
+    const parts: BuilderPart[] = [
+      makeSource('src', 1, 1, 0, 10),
+      makePart('tube1', 'StraightTube', 2, 1),
+      makePart('valve', 'CheckValve', 3, 1, 180),
+      makePart('tube2', 'StraightTube', 4, 1),
+      makeSink('sink', 5, 1, 180),
+    ];
+    const result = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
+    const byId = Object.fromEntries(result.map((v) => [v.id, v.flows]));
+    expect(byId['tube1']['3,1.5,0']).toEqual({ [COLD_WATER]: 0 });
+    expect(byId['valve']).toEqual({ '3,1.5,0': { [COLD_WATER]: 0 } });
+    expect(byId['tube2']).toEqual({});
+  });
+});
+
+describe('Routes without friction', () => {
+  it('are only merged for container cells', () => {
+    const parts: BuilderPart[] = [
+      makeSource('src', 1, 1, 0, 10),
+      makePart('slick', 'StraightTube', 2, 1),
+      makePart('tube', 'StraightTube', 3, 1),
+      makeSink('sink', 4, 1, 180),
+    ];
+    const transitions = {
+      ...makeAllTransitions(parts),
+      slick: {
+        [LEFT]: [{ outCoords: RIGHT, friction: 0 }],
+        [RIGHT]: [{ outCoords: LEFT, friction: 0 }],
+      },
+    };
+    const result = calculateFlows(asFlowParts(parts, transitions));
+    const byId = Object.fromEntries(result.map((v) => [v.id, v.flows]));
+    const total = 10 / (1 + 0.01 + 1 + 1);
+    expect(byId['slick']['3,1.5,0'][COLD_WATER]).toBeCloseTo(total, 6);
+    expect(byId['tube']['4,1.5,0'][COLD_WATER]).toBeCloseTo(total, 6);
+  });
+});
+
+describe('Rounding', () => {
+  it('produces clean numbers', () => {
+    const parts: BuilderPart[] = [
+      makeSource('src', 1, 1, 0, 0.9),
+      makePart('tube', 'StraightTube', 2, 1),
+      makeSink('sink', 3, 1, 180),
+    ];
+    expect(totalFlows(parts)['tube']['3,1.5,0']).toBe(0.3);
+  });
+});
