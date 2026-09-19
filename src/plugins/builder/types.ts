@@ -74,9 +74,11 @@ export interface PartFlows {
   [inCoords: string]: LiquidFlow;
 }
 
-export interface PathFriction {
-  friction: number;
-  pressureDiff: number;
+export interface FlowPart extends BuilderPart {
+  /** Transitions with absolute coordinates */
+  transitions: PartTransitions;
+  /** Calculated flows with absolute coordinates */
+  flows: PartFlows;
 }
 
 export interface BuilderPart {

@@ -4,29 +4,22 @@ import {
   asFlowParts,
   calculateFlows,
   calculateNormalizedFlows,
-  findPathsFromSources,
 } from '@/plugins/builder/calculateFlows';
 import {
   COLD_WATER,
   COLOR_KEY,
+  HOT_WATER,
   IO_ENABLED_KEY,
   IO_PRESSURE_KEY,
   LEFT,
   RIGHT,
 } from '@/plugins/builder/const';
-import {
-  FlowSegment,
-  SPLIT_MERGE_WARNING,
-} from '@/plugins/builder/FlowSegment';
 import { BuilderPart, PartTransitions } from '@/plugins/builder/types';
 
 /**
  * Flow calculation for layout topologies that go beyond a single series path.
- *
- * Tests marked with `it.fails` describe the physically correct outcome
- * for layouts where the path enumeration algorithm is known to be wrong.
- * They are expected to fail until the calculation is replaced,
- * and will start failing as "did not fail" when they are fixed.
+ * Expected values are derived by hand from series/parallel friction,
+ * or from conservation of flow.
  */
 
 const makeAllTransitions = (parts: BuilderPart[]): Mapped<PartTransitions> =>
@@ -101,13 +94,6 @@ const totalFlows = (parts: BuilderPart[]): Mapped<Mapped<number>> => {
 const allValues = (flows: Mapped<Mapped<number>>): number[] =>
   Object.values(flows).flatMap((v) => Object.values(v));
 
-const countSegments = (segment: FlowSegment | null): number =>
-  segment === null
-    ? 0
-    : 1 +
-      countSegments(segment.next) +
-      segment.splits.reduce((acc, split) => acc + countSegments(split), 0);
-
 describe('A three-way split where two branches rejoin', () => {
   // src -> tube -> cross -> up: elbow, elbow -> tee -> sink X
   //                      -> right: tee -> sink X
@@ -123,15 +109,15 @@ describe('A three-way split where two branches rejoin', () => {
     makeSink('sinkY', 3, 3, 270),
   ];
 
-  it('collects a warning instead of raising it', () => {
+  it('has no warnings', () => {
     const { warnings } = calculateNormalizedFlows(
       parts,
       makeAllTransitions(parts),
     );
-    expect(warnings).toEqual([SPLIT_MERGE_WARNING]);
+    expect(warnings).toEqual([]);
   });
 
-  it.fails('conserves flow between source and sinks', () => {
+  it('conserves flow between source and sinks', () => {
     const flows = totalFlows(parts);
     const out = Math.abs(flows['src']['2,2.5,0']);
     const inX = Math.abs(flows['sinkX']['5,2.5,0']);
@@ -139,7 +125,7 @@ describe('A three-way split where two branches rejoin', () => {
     expect(inX + inY).toBeCloseTo(out, 6);
   });
 
-  it.fails('conserves flow at the rejoining tee', () => {
+  it('conserves flow at the rejoining tee', () => {
     const flows = totalFlows(parts);
     const fromCross = Math.abs(flows['tee']['4,2.5,0']);
     const fromElbow = Math.abs(flows['tee']['4.5,2,0']);
@@ -165,7 +151,6 @@ describe('A fork that rejoins, followed by a second fork', () => {
     makeSink('sinkUp', 6, 1, 90),
     makeSink('sinkDown', 6, 3, 270),
   ];
-  const flowParts = asFlowParts(parts, makeAllTransitions(parts));
 
   it('conserves flow between source and sinks', () => {
     const flows = totalFlows(parts);
@@ -175,14 +160,14 @@ describe('A fork that rejoins, followed by a second fork', () => {
     expect(inUp + inDown).toBeCloseTo(out, 6);
   });
 
-  it.fails('has the series/parallel friction of the entire path', () => {
-    // source 1 + tube 1 + tee in 0.5
-    // + parallel(0.5 + 1 + 1, 0.5 + 1 + 1) = 1.25
-    // + tee in 0.5 + tee out 0.5 + tube 1 + tee in 0.5
+  it('has the series/parallel friction of the entire path', () => {
+    // source 1 + tube 1 + tee out 0.5
+    // + parallel(0.5 + 1 + 1 + 0.5, 0.5 + 1 + 1 + 0.5) = 1.5
+    // + tee out 0.5 + tube 1 + tee in 0.5
     // + parallel(0.5 + 1, 0.5 + 1) = 0.75
-    const [path] = findPathsFromSources(flowParts, flowParts[0]);
-    const { friction } = path.friction({ pressureDiff: 0, friction: 0 });
-    expect(friction).toBeCloseTo(7, 6);
+    const flows = totalFlows(parts);
+    expect(flows['src']['2,2.5,0']).toBeCloseTo(12 / 6.75, 6);
+    expect(flows['sinkUp']['6.5,2,0']).toBeCloseTo(-12 / 6.75 / 2, 6);
   });
 });
 
@@ -195,7 +180,7 @@ describe('A source without pressure, with a split downstream', () => {
     makeSink('sinkDown', 3, 3, 270),
   ];
 
-  it.fails('has zero flow everywhere', () => {
+  it('has zero flow everywhere', () => {
     const values = allValues(totalFlows(parts));
     expect(values.length).toBeGreaterThan(0);
     values.forEach((v) => expect(v).toBe(0));
@@ -221,7 +206,7 @@ describe('A split where the source and pump pressures cancel out', () => {
     );
   });
 
-  it.fails('has finite flows when pressures are equal', () => {
+  it('has finite flows when pressures are equal', () => {
     allValues(totalFlows(parts(30))).forEach((v) =>
       expect(Number.isFinite(v)).toBe(true),
     );
@@ -246,15 +231,8 @@ describe('A passive loop attached to a junction', () => {
     makePart('loop8', 'StraightTube', 3, 3),
     makePart('loop9', 'ElbowTube', 2, 3, 0),
   ];
-  const flowParts = asFlowParts(parts, makeAllTransitions(parts));
 
-  it('finds a single path', () => {
-    const paths = findPathsFromSources(flowParts, flowParts[0]);
-    expect(paths).toHaveLength(1);
-    expect(countSegments(paths[0])).toBeGreaterThan(0);
-  });
-
-  it.fails('does not route flow through the loop', () => {
+  it('does not route flow through the loop', () => {
     const flows = totalFlows(parts);
     // source 1 + cross 0.5 + 0.5 + tube 1 + sink 1
     expect(Math.abs(flows['tube']['3,2.5,0'])).toBeCloseTo(12 / 4, 6);
@@ -278,7 +256,7 @@ describe('A pump working against a pressurized inlet', () => {
     expect(totalFlows(parts(false))['pump']['3,1.5,0']).toBeCloseTo(4, 6);
   });
 
-  it.fails('has less flow with the pump enabled', () => {
+  it('has less flow with the pump enabled', () => {
     expect(totalFlows(parts(true))['pump']['3,1.5,0']).toBeCloseTo(
       (12 - 10) / 3,
       6,
@@ -297,7 +275,7 @@ describe('Two sources feeding a single pump', () => {
     makeSink('sink', 2, 3, 270),
   ];
 
-  it.fails('counts the pump pressure once', () => {
+  it('counts the pump pressure once', () => {
     // parallel(source 1 + tee 0.5, source 1 + tee 0.5) = 0.75
     // + tee 0.5 + pump 1 + sink 1
     const flows = totalFlows(parts);
@@ -310,10 +288,7 @@ describe('Two sources feeding a single pump', () => {
 });
 
 describe('A manifold of cross tubes', () => {
-  // The number of enumerated paths grows exponentially with the grid size.
-  // A 4x4 grid takes ~150ms. A 5x5 grid takes ~20s.
-  const size = 4;
-  const parts: BuilderPart[] = [
+  const manifold = (size: number): BuilderPart[] => [
     makeSource('src', 0, 1, 0, 20),
     ...Array.from({ length: size * size }, (_, n) =>
       makePart(
@@ -326,7 +301,8 @@ describe('A manifold of cross tubes', () => {
     makeSink('sink', 1 + size, size, 180),
   ];
 
-  it.fails('conserves flow between source and sink', () => {
+  it('conserves flow between source and sink', () => {
+    const parts = manifold(4);
     const { flows } = calculateNormalizedFlows(
       parts,
       makeAllTransitions(parts),
@@ -334,5 +310,183 @@ describe('A manifold of cross tubes', () => {
     const out = Object.values(flows['src'][RIGHT]).reduce((a, b) => a + b, 0);
     const inn = Object.values(flows['sink'][LEFT]).reduce((a, b) => a + b, 0);
     expect(Math.abs(inn)).toBeCloseTo(Math.abs(out), 6);
+  });
+
+  it('is calculated quickly for a large grid', () => {
+    const parts = manifold(10);
+    const start = performance.now();
+    const { flows } = calculateNormalizedFlows(
+      parts,
+      makeAllTransitions(parts),
+    );
+    expect(performance.now() - start).toBeLessThan(1000);
+    const out = Object.values(flows['src'][RIGHT]).reduce((a, b) => a + b, 0);
+    const inn = Object.values(flows['sink'][LEFT]).reduce((a, b) => a + b, 0);
+    expect(Math.abs(inn)).toBeCloseTo(Math.abs(out), 6);
+    expect(out).toBeGreaterThan(0);
+  });
+});
+
+describe('A check valve', () => {
+  // src(12) -> check valve -> sink, with the valve in either direction
+  const parts = (rotate: number): BuilderPart[] => [
+    makeSource('src', 1, 1, 0, 12),
+    makePart('valve', 'CheckValve', 2, 1, rotate),
+    makeSink('sink', 3, 1, 180),
+  ];
+
+  it('passes flow in its own direction', () => {
+    const flows = totalFlows(parts(0));
+    expect(flows['valve']['3,1.5,0']).toBeCloseTo(12 / 3, 6);
+  });
+
+  it('blocks flow in the opposite direction', () => {
+    const flows = totalFlows(parts(180));
+    expect(flows['valve']?.['3,1.5,0'] ?? 0).toBe(0);
+    expect(flows['src']?.['2,1.5,0'] ?? 0).toBe(0);
+  });
+
+  it('blocks a bypass around a pump that pumps in the other direction', () => {
+    // src(0) -> tee1 -> pump(10) -> tee2 -> sink
+    //           tee1 <- check valve <- tee2
+    const parts: BuilderPart[] = [
+      makeSource('src', 1, 2, 0, 0),
+      makePart('tee1', 'TeeTube', 2, 2),
+      makePump('pump', 3, 2, 180, 10),
+      makePart('tee2', 'TeeTube', 4, 2),
+      makeSink('sink', 5, 2, 180),
+      makePart('elbow1', 'ElbowTube', 2, 1, 90),
+      makePart('valve', 'CheckValve', 3, 1),
+      makePart('elbow2', 'ElbowTube', 4, 1, 180),
+    ];
+    const flows = totalFlows(parts);
+    // The check valve would carry flow from tee2 back to tee1
+    expect(flows['valve']?.['4,1.5,0'] ?? 0).toBe(0);
+    // source 1 + tee 0.5 + 0.5 + pump 1 + tee 0.5 + 0.5 + sink 1
+    expect(flows['pump']['4,2.5,0']).toBeCloseTo(10 / 5, 6);
+    expect(flows['sink']['5,2.5,0']).toBeCloseTo(-10 / 5, 6);
+  });
+
+  it('passes a bypass around a pump that pumps in its direction', () => {
+    const parts: BuilderPart[] = [
+      makeSource('src', 1, 2, 0, 0),
+      makePart('tee1', 'TeeTube', 2, 2),
+      makePump('pump', 3, 2, 180, 10),
+      makePart('tee2', 'TeeTube', 4, 2),
+      makeSink('sink', 5, 2, 180),
+      makePart('elbow1', 'ElbowTube', 2, 1, 90),
+      makePart('valve', 'CheckValve', 3, 1, 180),
+      makePart('elbow2', 'ElbowTube', 4, 1, 180),
+    ];
+    const flows = totalFlows(parts);
+    // The pump pushes liquid around: through the check valve (4),
+    // or through the sink and the source (3)
+    const pumpFlow = 10 / (2 + (4 * 3) / (4 + 3));
+    expect(flows['pump']['4,2.5,0']).toBeCloseTo(pumpFlow, 6);
+    expect(flows['valve']['3,1.5,0']).toBeCloseTo((pumpFlow * 3) / 7, 6);
+    expect(flows['sink']['5,2.5,0']).toBeCloseTo((-pumpFlow * 4) / 7, 6);
+  });
+});
+
+describe('Liquids without flow', () => {
+  // src(0, cold) -> tube -> tee -> tube -> sink (hot, 0)
+  //                             -> tube (dead end)
+  const parts: BuilderPart[] = [
+    makeSource('src', 1, 2, 0, 0),
+    makePart('tube1', 'StraightTube', 2, 2),
+    makePart('tee', 'TeeTube', 3, 2, 270),
+    makePart('tube2', 'StraightTube', 3, 1, 90),
+    makePart('tube3', 'StraightTube', 3, 3, 90),
+    makePart('sink', 'SystemIO', 3, 0, 90, {
+      [IO_ENABLED_KEY]: true,
+      [IO_PRESSURE_KEY]: 0,
+      [COLOR_KEY]: HOT_WATER,
+    }),
+  ];
+
+  it('are shown in all connected parts', () => {
+    const result = calculateFlows(
+      asFlowParts(parts, makeAllTransitions(parts)),
+    );
+    const byId = Object.fromEntries(result.map((v) => [v.id, v.flows]));
+    expect(byId['tube1']['3,2.5,0']).toEqual({
+      [COLD_WATER]: 0,
+      [HOT_WATER]: 0,
+    });
+    expect(byId['tube3']['3.5,4,0']).toEqual({
+      [COLD_WATER]: 0,
+      [HOT_WATER]: 0,
+    });
+  });
+
+  it('do not pass a closed valve', () => {
+    const closed = [
+      ...parts.filter((v) => v.id !== 'tube2'),
+      makePart('valve', 'Valve', 3, 1, 90, { closed: true }),
+    ];
+    const result = calculateFlows(
+      asFlowParts(closed, makeAllTransitions(closed)),
+    );
+    const byId = Object.fromEntries(result.map((v) => [v.id, v.flows]));
+    expect(byId['tube1']['3,2.5,0']).toEqual({ [COLD_WATER]: 0 });
+    expect(byId['valve']).toEqual({});
+  });
+});
+
+describe('A closed loop without source or sink', () => {
+  // A ring of tubes with a pump, not connected to anything else
+  const parts: BuilderPart[] = [
+    makePart('elbow1', 'ElbowTube', 1, 1, 90),
+    makePump('pump', 2, 1, 0, 10),
+    makePart('elbow2', 'ElbowTube', 3, 1, 180),
+    makePart('tube1', 'StraightTube', 3, 2, 90),
+    makePart('elbow3', 'ElbowTube', 3, 3, 270),
+    makePart('tube2', 'StraightTube', 2, 3),
+    makePart('elbow4', 'ElbowTube', 1, 3, 0),
+    makePart('tube3', 'StraightTube', 1, 2, 90),
+  ];
+
+  it('has no flow', () => {
+    const flows = totalFlows(parts);
+    expect(allValues(flows)).toEqual([]);
+  });
+});
+
+describe('Mixing liquids', () => {
+  // cold(12) -> tee <- hot(12)
+  //             tee -> tube -> sink
+  const parts = (hotPressure: number): BuilderPart[] => [
+    makeSource('cold', 1, 1, 0, 12),
+    makePart('hot', 'SystemIO', 3, 1, 180, {
+      [IO_ENABLED_KEY]: true,
+      [IO_PRESSURE_KEY]: hotPressure,
+      [COLOR_KEY]: HOT_WATER,
+    }),
+    makePart('tee', 'TeeTube', 2, 1, 180),
+    makePart('tube', 'StraightTube', 2, 2, 90),
+    makeSink('sink', 2, 3, 270),
+  ];
+
+  it('splits flow between liquids in proportion to their inflow', () => {
+    const result = calculateFlows(
+      asFlowParts(parts(12), makeAllTransitions(parts(12))),
+    );
+    const tube = result.find((v) => v.id === 'tube')!;
+    // tee node pressure V: 2 * (12 - V) / 1.5 = V / 2.5 -> V = 60 / 6.5
+    const each = (12 - 60 / 6.5) / 1.5;
+    expect(tube.flows['2.5,3,0']).toEqual({
+      [COLD_WATER]: expect.closeTo(each, 6),
+      [HOT_WATER]: expect.closeTo(each, 6),
+    });
+  });
+
+  it('pushes back into a weaker source', () => {
+    const result = calculateFlows(
+      asFlowParts(parts(0), makeAllTransitions(parts(0))),
+    );
+    const hot = result.find((v) => v.id === 'hot')!;
+    // The weaker source receives cold water
+    expect(Object.keys(hot.flows['3,1.5,0'])).toEqual([COLD_WATER]);
+    expect(hot.flows['3,1.5,0'][COLD_WATER]).toBeLessThan(0);
   });
 });

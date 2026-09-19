@@ -9,6 +9,7 @@ import {
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { computed, defineComponent, h, nextTick } from 'vue';
 import blueprints from '@/plugins/builder/blueprints';
+import { calculateNormalizedFlows } from '@/plugins/builder/calculateFlows';
 import { useFlowParts } from '@/plugins/builder/composables';
 import {
   COLD_WATER,
@@ -18,7 +19,6 @@ import {
   PUMP_KEY,
   VALVE_KEY,
 } from '@/plugins/builder/const';
-import { SPLIT_MERGE_WARNING } from '@/plugins/builder/FlowSegment';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout, BuilderPart } from '@/plugins/builder/types';
 import { useSparkStore } from '@/plugins/spark/store';
@@ -27,6 +27,15 @@ import { notify } from '@/utils/notify';
 const mocks = vi.hoisted(() => ({
   onLayoutChanged: (() => {}) as (layout: unknown) => void,
 }));
+
+vi.mock('@/plugins/builder/calculateFlows', async (orig) => {
+  const actual =
+    await orig<typeof import('@/plugins/builder/calculateFlows')>();
+  return {
+    ...actual,
+    calculateNormalizedFlows: vi.fn(actual.calculateNormalizedFlows),
+  };
+});
 
 vi.mock('@/plugins/builder/store/api', () => ({
   default: {
@@ -135,25 +144,6 @@ const pumpLayout = (): BuilderLayout =>
     makePart('sink', 'SystemIO', 3, 2, 180),
   ]);
 
-// src -> tube -> cross -> up: elbow, elbow -> tee -> sink X
-//                      -> right: tee -> sink X
-//                      -> down: sink Y
-const splitLayout = (): BuilderLayout =>
-  makeLayout('split-layout', [
-    makePart('src', 'SystemIO', 1, 2, 0, {
-      [IO_ENABLED_KEY]: true,
-      [IO_PRESSURE_KEY]: 12,
-      [COLOR_KEY]: COLD_WATER,
-    }),
-    makePart('tube', 'StraightTube', 2, 2),
-    makePart('cross', 'CrossTube', 3, 2),
-    makePart('up1', 'ElbowTube', 3, 1, 90),
-    makePart('up2', 'ElbowTube', 4, 1, 180),
-    makePart('tee', 'TeeTube', 4, 2, 0),
-    makePart('sinkX', 'SystemIO', 5, 2, 180),
-    makePart('sinkY', 'SystemIO', 3, 3, 270),
-  ]);
-
 const Host = defineComponent({
   props: { layoutId: { type: String, required: true } },
   setup(props) {
@@ -185,6 +175,7 @@ describe('useFlowParts', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.mocked(calculateNormalizedFlows).mockRestore();
     builderStore = useBuilderStore();
     sparkStore = useSparkStore();
     builderStore.blueprints = Object.values(blueprints);
@@ -279,11 +270,16 @@ describe('useFlowParts', () => {
   });
 
   it('shows calculation warnings once', async () => {
-    mocks.onLayoutChanged(splitLayout());
-    const wrapper = mount(Host, { props: { layoutId: 'split-layout' } });
+    vi.mocked(calculateNormalizedFlows).mockImplementation(() => ({
+      flows: {},
+      warnings: ['Test warning'],
+    }));
+    mocks.onLayoutChanged(valveLayout());
+    const wrapper = mount(Host, { props: { layoutId: 'valve-layout' } });
     await settle();
+    expect(calculateNormalizedFlows).toHaveBeenCalledTimes(1);
     expect(notify.warn).toHaveBeenCalledTimes(1);
-    expect(notify.warn).toHaveBeenCalledWith(SPLIT_MERGE_WARNING);
+    expect(notify.warn).toHaveBeenCalledWith('Test warning');
 
     wrapper.vm.api.updateParts((draft) => {
       draft['src'] = {
@@ -292,7 +288,21 @@ describe('useFlowParts', () => {
       };
     });
     await settle();
+    expect(calculateNormalizedFlows).toHaveBeenCalledTimes(2);
     expect(notify.warn).toHaveBeenCalledTimes(1);
+    wrapper.unmount();
+  });
+
+  it('reports calculation errors', async () => {
+    vi.mocked(calculateNormalizedFlows).mockImplementation(() => {
+      throw new Error('Test error');
+    });
+    mocks.onLayoutChanged(valveLayout());
+    sparkStore.blocks[serviceId] = [valveBlock(DigitalState.STATE_ACTIVE)];
+    const wrapper = mount(Host, { props: { layoutId: 'valve-layout' } });
+    await settle();
+    expect(notify.error).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.api.flows.value).toEqual({});
     wrapper.unmount();
   });
 });
