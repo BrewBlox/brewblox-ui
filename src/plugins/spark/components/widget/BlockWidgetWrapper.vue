@@ -118,7 +118,16 @@ onErrorCaptured((err: Error) => {
   >
     <div>{{ error }}</div>
     <q-btn
-      v-if="context?.container !== 'Dialog'"
+      v-if="context?.container === 'Dialog'"
+      v-close-popup
+      label="Close"
+      flat
+      color="secondary"
+      icon="mdi-close-circle"
+      class="q-mt-lg"
+    />
+    <q-btn
+      v-else
       label="Remove widget"
       flat
       color="secondary"
