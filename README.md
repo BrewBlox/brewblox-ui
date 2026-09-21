@@ -39,12 +39,17 @@ sudo usermod -aG docker $USER
 reboot
 ```
 
-After the reboot, run the following commands in the `brewblox-ui` directory:
+After the reboot, clone the repository including the `brewblox-proto` submodule,
+and run the following commands in the `brewblox-ui` directory:
 
 ``` bash
+git clone --recurse-submodules https://github.com/BrewBlox/brewblox-ui.git
+cd brewblox-ui
 yarn install
 docker compose pull
 ```
+
+If you cloned without `--recurse-submodules`, run `git submodule update --init` first.
 
 ## Run
 
@@ -79,7 +84,8 @@ yarn build
 # Generate import types for global components
 yarn components
 
-# Pull shared types for a specific firmware build
+# Pull firmware.ini for a firmware build, and check out the matching
+# commit of the brewblox-proto submodule (shared types).
 # Develop is used by default, but a branch name argument can be used
 yarn firmware
 ```

@@ -1,0 +1,3 @@
+[submodule "brewblox-proto"]
+	path = brewblox-proto
+	url = https://github.com/BrewBlox/brewblox-proto
