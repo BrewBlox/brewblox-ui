@@ -2,7 +2,10 @@
 import { SysInfoBlock } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { ENUM_LABELS_SPARK_PLATFORM } from '@/plugins/spark/const';
+import {
+  ENUM_LABELS_RESET_REASON,
+  ENUM_LABELS_SPARK_PLATFORM,
+} from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import {
   dateString,
@@ -88,6 +91,12 @@ const ready = computed<boolean>(
           class="col-lg-5 col-11"
         >
           {{ ENUM_LABELS_SPARK_PLATFORM[block.data.platform] }}
+        </LabeledField>
+        <LabeledField
+          label="Last reset reason"
+          class="col-lg-5 col-11"
+        >
+          {{ ENUM_LABELS_RESET_REASON[block.data.resetReason] }}
         </LabeledField>
         <LabeledField
           label="IP address"

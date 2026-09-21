@@ -10,6 +10,7 @@ import {
   FilterChoice,
   LogicResult,
   PwmFrequency,
+  ResetReason,
   SensorCombiFunc,
   SequenceStoreMode,
   SparkPlatform,
@@ -111,6 +112,32 @@ export const ENUM_LABELS_SPARK_PLATFORM: EnumLabels<SparkPlatform> = {
   PLATFORM_P1: 'Spark 3 (P1)',
   PLATFORM_ESP: 'Spark 4 (ESP32)',
   PLATFORM_SIM: 'Simulator',
+};
+
+export const ENUM_LABELS_RESET_REASON: EnumLabels<ResetReason> = {
+  RESET_REASON_UNKNOWN: 'Unknown',
+  RESET_REASON_POWER_ON: 'Power on',
+  RESET_REASON_EXTERNAL: 'External reset',
+  RESET_REASON_SOFTWARE: 'Software reset',
+  RESET_REASON_PANIC: 'Panic (crash)',
+  RESET_REASON_INTERRUPT_WDT: 'Interrupt watchdog',
+  RESET_REASON_TASK_WDT: 'Task watchdog',
+  RESET_REASON_OTHER_WDT: 'Watchdog',
+  RESET_REASON_DEEP_SLEEP: 'Wake from deep sleep',
+  RESET_REASON_BROWNOUT: 'Brownout (low voltage)',
+  RESET_REASON_SDIO: 'SDIO reset',
+  RESET_REASON_USB: 'USB reset',
+  RESET_REASON_JTAG: 'JTAG reset',
+  RESET_REASON_EFUSE: 'eFuse error',
+  RESET_REASON_POWER_GLITCH: 'Power glitch',
+  RESET_REASON_CPU_LOCKUP: 'CPU lockup',
+  RESET_REASON_FIRMWARE_UPDATE: 'Firmware update',
+  RESET_REASON_FIRMWARE_UPDATE_FAILED: 'Firmware update failed',
+  RESET_REASON_FIRMWARE_UPDATE_TIMEOUT: 'Firmware update timed out',
+  RESET_REASON_FACTORY_RESET: 'Factory reset',
+  RESET_REASON_SAFE_MODE: 'Safe mode',
+  RESET_REASON_DFU_MODE: 'DFU mode',
+  RESET_REASON_USER_REQUESTED: 'Requested by user',
 };
 
 export const ENUM_LABELS_DIGITAL_STATE: EnumLabels<DigitalState> = {
