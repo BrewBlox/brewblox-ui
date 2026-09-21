@@ -5,6 +5,7 @@ import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
+import { bloxLink } from '@/utils/link';
 import widget from './DS2408Widget.vue';
 
 const type = BlockType.DS2408;
@@ -20,7 +21,7 @@ const plugin: Plugin = {
       title,
       hasRelations: true,
       generate: (): DS2408Block['data'] => ({
-        oneWireBusId: 0,
+        oneWireBusId: bloxLink(null),
         address: '',
         connected: false,
         channels: [],

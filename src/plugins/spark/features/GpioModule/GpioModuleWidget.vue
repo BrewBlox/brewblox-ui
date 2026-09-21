@@ -45,10 +45,10 @@ const channels = computed<GpioModuleChannel[]>({
   set: (channels) => patchBlock({ channels }),
 });
 
-const analogChannels = computed<AnalogModuleChannel[]>({
-  get: () => block.value.data.analogChannels,
-  set: (analogChannels) => patchBlock({ analogChannels }),
-});
+// Analog channels and their sensor type are detected by the controller
+const analogChannels = computed<Readonly<AnalogModuleChannel[]>>(
+  () => block.value.data.analogChannels,
+);
 
 const inputPins = computed<GpioPins>(() =>
   block.value.data.channels
@@ -126,7 +126,7 @@ const errors = computed<string[]>(() => {
         <q-separator />
         <div class="text-subtitle1 text-right col">Analog channels</div>
         <AnalogArrayEditor
-          v-model:channels="analogChannels"
+          :channels="analogChannels"
           :address="asBlockAddress(block)"
         />
       </template>

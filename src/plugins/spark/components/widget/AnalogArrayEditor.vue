@@ -17,7 +17,7 @@ import { createDialog } from '@/utils/dialog';
 import { analogChannelName } from '../../utils/formatting';
 
 interface Props {
-  channels: AnalogModuleChannel[];
+  channels: Readonly<AnalogModuleChannel[]>;
   address: BlockAddress;
 }
 const sparkStore = useSparkStore();

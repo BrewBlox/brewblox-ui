@@ -15,6 +15,7 @@ import {
 } from '@/plugins/spark/const';
 import { setAnalogChannelClaimer } from '@/plugins/spark/utils/configuration';
 import { selectable } from '@/utils/collections';
+import { bloxQty } from '@/utils/quantity';
 
 const tempSensorAnalogTypeOpts = selectable(
   ENUM_LABELS_TEMP_SENSOR_ANALOG_TYPE,
@@ -121,7 +122,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             beause the lead-wire resistance can still be corrected for."
           />
           <QuantityField
-            :model-value="block.data.resistance"
+            :model-value="block.data.resistance ?? bloxQty(0, 'ohm')"
             readonly
             label="Resistance"
             class="col-grow"
@@ -146,7 +147,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             </template>
           </SelectField>
           <QuantityField
-            :model-value="block.data.spec_r0"
+            :model-value="block.data.spec_r0 ?? bloxQty(0, 'ohm')"
             title="R0 (Resistance at 0°C)"
             label="R0 (Resistance at 0°C)"
             class="col-grow"
@@ -167,7 +168,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
           />
           <div class="col-break" />
           <ScientificNumberField
-            :model-value="block.data.spec_a"
+            :model-value="block.data.spec_a ?? null"
             title="Custom temperature coefficient A"
             label="Temperature coefficient A"
             class="col-grow"
@@ -180,7 +181,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             @update:model-value="(v) => patchBlock({ spec_a_override: v })"
           />
           <ScientificNumberField
-            :model-value="block.data.spec_b"
+            :model-value="block.data.spec_b ?? null"
             title="Temperature coefficient B"
             label="Temperature coefficient B"
             class="col-grow"
@@ -193,7 +194,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             @update:model-value="(v) => patchBlock({ spec_b_override: v })"
           />
           <ScientificNumberField
-            :model-value="block.data.spec_c"
+            :model-value="block.data.spec_c ?? null"
             title="Temperature coefficient C"
             label="Temperature coefficient C"
             class="col-grow"
