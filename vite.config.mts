@@ -17,7 +17,7 @@ export default defineConfig(({ command, mode }) => {
   const isTest = mode === 'test';
   const isDev = mode === 'development' && command === 'serve';
 
-  // Host/port are also hardcoded in dev/utils.js
+  // The admin port used by the dev scripts is hardcoded in dev/utils.mjs
   let apiProtocol: 'http' | 'https' | undefined = undefined;
   let apiHost: string | undefined = undefined;
   let apiPort: number | undefined = undefined;
@@ -29,7 +29,8 @@ export default defineConfig(({ command, mode }) => {
     }),
 
     quasar({
-      sassVariables: 'src/css/variables.sass',
+      // An absolute path: the modern Sass API resolves imports from the importing file
+      sassVariables: path.resolve(__dirname, 'src/css/variables.sass'),
     }),
   ];
 
@@ -41,9 +42,10 @@ export default defineConfig(({ command, mode }) => {
   }
 
   if (isDev) {
+    // The API is reached through the dev server proxy, on the same origin as the UI
     apiProtocol = undefined;
     apiHost = undefined;
-    apiPort = 9001;
+    apiPort = undefined;
     serverHttps = {
       ca: fs.readFileSync('./dev/traefik/minica.pem'),
       key: fs.readFileSync('./dev/traefik/brew.blox/key.pem'),
@@ -109,8 +111,19 @@ export default defineConfig(({ command, mode }) => {
       open: false,
       host: '0.0.0.0',
       port: 8080,
-      // base: '/ui/',
       https: serverHttps,
+      // Everything outside /ui is forwarded to the Traefik dev proxy.
+      // The browser then only talks to this server, as it does with a Brewblox install:
+      // no CORS, and the certificate only has to be accepted once.
+      proxy: isDev
+        ? {
+            '^/(?!ui(/|$))': {
+              target: 'https://localhost:9001',
+              secure: false,
+              ws: true,
+            },
+          }
+        : undefined,
     },
 
     build: {

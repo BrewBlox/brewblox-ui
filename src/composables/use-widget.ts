@@ -56,8 +56,8 @@ export const useWidget: UseWidgetComposable = {
         featureStore.widgetTitle(widget.value.feature) ?? widget.value.feature,
     );
 
-    const widgetComponent = computed<string>(
-      () => featureStore.widgetComponent(widget.value)!,
+    const widgetComponent = computed<string>(() =>
+      featureStore.widgetComponent(widget.value)!,
     );
 
     async function saveConfig(config: ConfigT): Promise<void> {

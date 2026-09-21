@@ -37,9 +37,7 @@ export interface AutofixCallbacks {
 }
 
 type TempSensorBlock =
-  | TempSensorCombiBlock
-  | TempSensorMockBlock
-  | TempSensorOneWireBlock;
+  TempSensorCombiBlock | TempSensorMockBlock | TempSensorOneWireBlock;
 
 const isProfile = makeTypeFilter<SetpointProfileBlock>(
   BlockType.SetpointProfile,

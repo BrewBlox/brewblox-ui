@@ -25,7 +25,7 @@ export type UseDialogEmits = {
 };
 
 export interface UseDialogComponent<T> {
-  dialogRef: Ref<QDialog | undefined>;
+  dialogRef: Ref<QDialog | null>;
   onDialogHide: () => void;
   onDialogOK: (payload?: T) => void;
   onDialogCancel: () => void;
@@ -62,7 +62,7 @@ export const useDialog: UseDialogComposable = {
     );
 
     // Lets all nested elements declare that the dialog should be closed immediately
-    provide(InvalidateKey, onDialogHide);
+    provide(InvalidateKey, () => onDialogHide());
 
     // We want the dialog to be part of the navigation stack.
     // This lets mobile users close dialogs by using the back button.

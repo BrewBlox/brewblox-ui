@@ -10,8 +10,6 @@
     "esModuleInterop": true,
     "useDefineForClassFields": true,
     "importHelpers": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
     "skipLibCheck": true,

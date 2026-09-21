@@ -16,8 +16,9 @@ import { BlockConfig, BlockSpec, BlockWidget } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils/configuration';
 import { prettyLimitations } from '@/plugins/spark/utils/formatting';
 
-export interface UseBlockWidgetComponent<BlockT extends Block>
-  extends UseWidgetComponent<BlockWidget> {
+export interface UseBlockWidgetComponent<
+  BlockT extends Block,
+> extends UseWidgetComponent<BlockWidget> {
   serviceId: string;
   blockId: string;
   block: ComputedRef<BlockT>;

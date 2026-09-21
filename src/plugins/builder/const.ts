@@ -103,9 +103,7 @@ export type DigitalBlockT = DigitalActuatorBlock;
 export const DIGITAL_TYPES = [BlockType.DigitalActuator] as const;
 
 export type DigitalBaseBlockT =
-  | DigitalActuatorBlock
-  | MotorValveBlock
-  | DigitalInputBlock;
+  DigitalActuatorBlock | MotorValveBlock | DigitalInputBlock;
 export const DIGITAL_BASE_KEY = 'digitalBase';
 export const DIGITAL_BASE_TYPES = [
   BlockType.DigitalActuator,

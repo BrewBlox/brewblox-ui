@@ -46,9 +46,9 @@ export const useBlockSpecStore = defineStore('blockSpecStore', () => {
     addr: Maybe<BlockFieldAddress>,
   ): BlockFieldSpec | null {
     return addr && addr.type && addr.field
-      ? fieldSpecs.value.find(
+      ? (fieldSpecs.value.find(
           (f) => f.type === addr.type && f.key === addr.field,
-        ) ?? null
+        ) ?? null)
       : null;
   }
 

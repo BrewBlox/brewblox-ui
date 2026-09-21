@@ -153,9 +153,10 @@ async function applyChanges(action: ChangeAction): Promise<void> {
     }
   }
 
-  const patches = applied.map(
-    (change): BlockPatchArgs<Block> => [change.block, change.patch],
-  );
+  const patches = applied.map((change): BlockPatchArgs<Block> => [
+    change.block,
+    change.patch,
+  ]);
 
   // The patches are sent twice
   // This is a quick and dirty hack to ensure that you can

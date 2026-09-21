@@ -140,7 +140,7 @@ describe('Check parsing durations', () => {
     expect(durationMs('2h 6m')).toBe((120 + 6) * 60 * 1000);
     expect(durationMs('')).toBe(0);
     expect(durationMs('10')).toBe(10);
-    expect(durationMs('10 10')).toBe(20);
+    expect(durationMs('10s 10ms')).toBe(10010);
     expect(durationMs(NaN)).toBe(0);
     expect(durationMs(bloxQty(10, 's'))).toBe(10000);
     expect(durationMs(bloxQty(null, 's'))).toBe(0);
@@ -151,7 +151,7 @@ describe('Check parsing durations', () => {
     expect(durationString('2h 6m')).toBe('2h 6m');
     expect(durationString('')).toBe('0s');
     expect(durationString('10')).toBe('10ms');
-    expect(durationString('10 10')).toBe('20ms');
+    expect(durationString('5s 10ms')).toBe('5s 10ms');
     expect(durationString(NaN)).toBe('0s');
     expect(durationString(bloxQty(10, 's'))).toBe('10s');
     expect(durationString(bloxQty(null, 's'))).toBe('0s');

@@ -52,15 +52,15 @@ const heatPid = computed<PidBlock | null>(() =>
 const differentSetpoints = computed<boolean>(() =>
   Boolean(
     sparkStore.has(serviceId.value) &&
-      coolPid.value &&
-      heatPid.value &&
-      coolPid.value.data.inputId.id !== heatPid.value.data.inputId.id,
+    coolPid.value &&
+    heatPid.value &&
+    coolPid.value.data.inputId.id !== heatPid.value.data.inputId.id,
   ),
 );
 
 const setpoint = computed<SetpointSensorPairBlock | null>(() =>
   sparkStore.has(serviceId.value) && !differentSetpoints.value
-    ? pidSetpoint(coolPid.value) ?? pidSetpoint(heatPid.value)
+    ? (pidSetpoint(coolPid.value) ?? pidSetpoint(heatPid.value))
     : null,
 );
 

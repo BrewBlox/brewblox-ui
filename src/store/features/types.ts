@@ -5,12 +5,7 @@ import { Widget } from '@/store/widgets/types';
 export type ComponentName = keyof GlobalComponents & string;
 
 export type WidgetRole =
-  | 'Process'
-  | 'Control'
-  | 'Output'
-  | 'Constraint'
-  | 'Display'
-  | 'Other';
+  'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
 
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';

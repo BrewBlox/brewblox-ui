@@ -76,18 +76,16 @@ const nodes = computed<BlockRelationNode[]>(() =>
       (block) =>
         validTypes.includes(block.type) || isErrorBlockType(block.type),
     )
-    .map(
-      (block): BlockRelationNode => ({
-        id: block.id,
-        type: isErrorBlockType(block.type)
-          ? `Error (${block.data.blockType ?? 'Unknown type'})`
-          : featureStore.widgetTitle(block.type),
-        name: block.type === BlockType.SysInfo ? title.value : undefined,
-        status: isErrorBlockType(block.type)
-          ? 'Invalid'
-          : specStore.blockSpecByType(block.type)?.analyze(block),
-      }),
-    )
+    .map((block): BlockRelationNode => ({
+      id: block.id,
+      type: isErrorBlockType(block.type)
+        ? `Error (${block.data.blockType ?? 'Unknown type'})`
+        : featureStore.widgetTitle(block.type),
+      name: block.type === BlockType.SysInfo ? title.value : undefined,
+      status: isErrorBlockType(block.type)
+        ? 'Invalid'
+        : specStore.blockSpecByType(block.type)?.analyze(block),
+    }))
     .sort(makeObjectSorter('type')),
 );
 

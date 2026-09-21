@@ -19,9 +19,7 @@ import { Service } from '@/store/services';
 import { Widget } from '@/store/widgets';
 
 export type ComparedBlockType =
-  | BlockOrIntfType
-  | readonly BlockOrIntfType[]
-  | null;
+  BlockOrIntfType | readonly BlockOrIntfType[] | null;
 
 export type PageMode = 'Relations' | 'List';
 

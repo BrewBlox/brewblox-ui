@@ -73,14 +73,12 @@ const allFeatureOpts = computed<FeatureOption[]>(() =>
         (!props.featureId || props.featureId === feature.id) &&
         props.filter(feature.id),
     )
-    .map(
-      (feature): FeatureOption => ({
-        label: feature.title,
-        value: feature.id,
-        editor: feature.editor ?? 'GenericWidgetEditor',
-        badge: feature.experimental ? 'experimental' : null,
-      }),
-    )
+    .map((feature): FeatureOption => ({
+      label: feature.title,
+      value: feature.id,
+      editor: feature.editor ?? 'GenericWidgetEditor',
+      badge: feature.experimental ? 'experimental' : null,
+    }))
     .sort(labelSorter),
 );
 

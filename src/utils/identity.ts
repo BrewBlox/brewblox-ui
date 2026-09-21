@@ -63,7 +63,7 @@ const unitConversionGroups: UnitGroup[] = [
 ];
 
 const findGroup = (unit?: string): UnitGroup | null =>
-  unit ? unitConversionGroups.find((g) => g.test(unit)) ?? null : null;
+  unit ? (unitConversionGroups.find((g) => g.test(unit)) ?? null) : null;
 
 export const libUnit = (unit: string): string =>
   findGroup(unit)?.convert(unit) ?? unit;
