@@ -52,10 +52,26 @@ export class BrewbloxEventbus {
       if (body.length === 0) {
         return;
       }
-      const data = JSON.parse(body.toString());
+      // The MQTT client calls this handler synchronously while parsing packets.
+      // An uncaught error here stalls all further message handling.
+      let data: any;
+      try {
+        data = JSON.parse(body.toString());
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(`Invalid JSON on topic '${topic}':`, e);
+        return;
+      }
       this.listeners
         .filter((listener) => listener.exp.test(topic))
-        .forEach((listener) => listener.callback(topic, data));
+        .forEach((listener) => {
+          try {
+            listener.callback(topic, data);
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(`Error handling message on topic '${topic}':`, e);
+          }
+        });
     });
   }
 

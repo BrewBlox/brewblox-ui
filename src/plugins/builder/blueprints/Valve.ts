@@ -24,8 +24,12 @@ const blueprint: BuilderBlueprint = {
       ? block?.data.state !== DigitalState.STATE_ACTIVE
       : Boolean(part.settings[VALVE_CLOSED_KEY]);
 
+    // A closed valve still touches the tubes on either side
     return closed
-      ? null
+      ? {
+          [LEFT]: [],
+          [RIGHT]: [],
+        }
       : {
           [LEFT]: [{ outCoords: RIGHT }],
           [RIGHT]: [{ outCoords: LEFT }],

@@ -17,8 +17,14 @@ const pathLength = computed<number>(() =>
   new svgPathProperties(props.path).getTotalLength(),
 );
 
+// Calculated flows may be invalid (NaN or Infinity)
+// for degenerate layouts. Invalid flows are not animated.
+const active = computed<boolean>(
+  () => Number.isFinite(props.speed) && props.speed !== 0,
+);
+
 const duration = computed<number>(() => {
-  if (props.speed && pathLength.value) {
+  if (active.value && pathLength.value) {
     return pathLength.value / (25 * Math.abs(props.speed));
   }
   return 0;
@@ -43,10 +49,11 @@ const keyPoints = computed<string>(
 </script>
 
 <template>
-  <g v-if="speed">
+  <g v-if="active">
+    <!-- Keyed by duration: elements are recreated to restart the animation -->
     <g
-      v-for="start in starts"
-      :key="start"
+      v-for="(start, idx) in starts"
+      :key="`${idx}-${duration}`"
       visibility="hidden"
     >
       <path

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import {
+  LEFT,
   RIGHT,
   VALVE_CLOSED_KEY,
   VALVE_KEY,
@@ -21,12 +22,12 @@ const paths = {
     'M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z',
   ],
   openLiquid: ['m0,25h50'],
-  closedLiquid: ['m0,25h19', 'm31,25h50'],
+  closedLeftLiquid: ['m0,25h19'],
+  closedRightLiquid: ['m31,25h50'],
   arrows: 'M0,25H50',
 };
 
-const { part, flows, settings, width, height, patchSettings, reflow } =
-  usePart.setup();
+const { part, flows, settings, width, height, patchSettings } = usePart.setup();
 
 const {
   hasAddress,
@@ -45,6 +46,11 @@ const flowSpeed = computed<number>(() =>
 
 const liquids = computed<string[]>(() =>
   liquidOnCoord(part.value, flows.value, RIGHT),
+);
+
+// When closed, each side of the valve holds the liquid of its own tube
+const leftLiquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, LEFT),
 );
 
 const closed = computed<boolean>(() =>
@@ -77,15 +83,6 @@ const valveRotation = computed<number>(() => {
       return 45;
   }
 });
-
-watch(
-  () => block.value,
-  (newV, oldV) => {
-    if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
-      reflow();
-    }
-  },
-);
 
 function toggle(): void {
   if (hasAddress.value) {
@@ -124,11 +121,16 @@ function toggle(): void {
       v-if="pending"
       r="18"
     />
-    <LiquidStroke
-      v-if="closed"
-      :paths="paths.closedLiquid"
-      :colors="liquids"
-    />
+    <template v-if="closed">
+      <LiquidStroke
+        :paths="paths.closedLeftLiquid"
+        :colors="leftLiquids"
+      />
+      <LiquidStroke
+        :paths="paths.closedRightLiquid"
+        :colors="liquids"
+      />
+    </template>
     <LiquidStroke
       v-else
       :paths="paths.openLiquid"

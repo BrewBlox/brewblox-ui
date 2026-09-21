@@ -68,7 +68,7 @@ The block list of a service and its relations diagram (`service/SparkPage.vue`, 
 ### Other plugins
 
 - `history` — graphs/metrics/session logs backed by the history service (Victoria Metrics).
-- `builder` — the process-view editor; parts live in `builder/parts`, flow calculation in `calculateFlows.ts`.
+- `builder` — the process-view editor; parts live in `builder/parts`, blueprints (transitions per part type) in `builder/blueprints`. Flows are calculated in `flowNetwork.ts` by solving the layout as a linear network (nodal analysis: friction is resistance, pumps and inlets are pressure sources). `use-flow-parts.ts` recalculates whenever the computed transitions change, so blueprints may read Spark block state directly without extra watchers.
 - `quickstart` — multi-step wizards that generate services, dashboards, widgets and blocks; see `src/plugins/quickstart/README.md` for the task/`config`/`actions` protocol.
 - `wizardry` — the generic widget/block creation wizard dialogs.
 

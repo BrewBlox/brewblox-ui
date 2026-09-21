@@ -14,7 +14,7 @@ import {
   RIGHT,
 } from '@/plugins/builder/const';
 import { BuilderBlueprint, BuilderPart } from '@/plugins/builder/types';
-import { settingsBlock } from '@/plugins/builder/utils';
+import { settingsAddress, settingsBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 
 export type OnInteractBehavior = 'toggle' | 'dialog';
@@ -22,11 +22,16 @@ export type OnInteractBehavior = 'toggle' | 'dialog';
 export const ON_INTERACT_KEY = 'onInteract';
 
 const calcPressure = (part: BuilderPart): number => {
-  const block = settingsBlock<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
-  if (block == null) {
+  // The manual setting only applies if no block is linked.
+  // A linked, but unavailable block is treated as inactive.
+  if (settingsAddress(part, PUMP_KEY).id === null) {
     return part.settings[IO_ENABLED_KEY]
       ? Number(part.settings[IO_PRESSURE_KEY] ?? DEFAULT_PUMP_PRESSURE)
       : 0;
+  }
+  const block = settingsBlock<PumpBlockT>(part, PUMP_KEY, PUMP_TYPES);
+  if (block == null) {
+    return 0;
   }
   if (isBlockCompatible<DigitalBlockT>(block, DIGITAL_TYPES)) {
     return block.data.state === DigitalState.STATE_ACTIVE

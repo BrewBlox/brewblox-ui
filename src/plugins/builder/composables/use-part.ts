@@ -123,10 +123,11 @@ export interface UsePartComponent {
   patchSettings: (patch: Partial<BuilderPart['settings']>) => void;
 
   /**
-   * Causes the active layout to recalculate flows.
-   * Flows are always recalculated if settings are changed,
-   * but external changes (such as block values) may also
-   * justify flows to be re-rendered.
+   * Forces the active layout to recalculate flows.
+   *
+   * This is not required for changes to part settings or linked blocks:
+   * all reactive state read by the blueprint `transitions()` function
+   * is tracked, and flows are recalculated when the result changes.
    */
   reflow: () => void;
 }

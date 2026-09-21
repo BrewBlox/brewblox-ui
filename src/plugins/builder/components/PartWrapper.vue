@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onErrorCaptured, provide, ref } from 'vue';
+import { computed, onErrorCaptured, provide, ref, watch } from 'vue';
 import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderPart } from '@/plugins/builder/types';
 import { coord2grid, coord2translate } from '@/plugins/builder/utils';
@@ -116,6 +116,15 @@ onErrorCaptured((err: Error) => {
   console.trace(err);
   return false;
 });
+
+// The part is rendered again after it changed.
+// Without this, a single error would permanently hide the part.
+watch(
+  () => props.part,
+  () => {
+    error.value = undefined;
+  },
+);
 </script>
 
 <template>

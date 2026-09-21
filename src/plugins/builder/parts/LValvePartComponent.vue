@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DigitalState } from 'brewblox-proto/ts';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 import {
   UP,
   VALVE_CLOSED_KEY,
@@ -24,8 +24,7 @@ const paths = {
   liquidRight: `M25,0 v17 ${elbow(8, 8, false)} H50`,
 };
 
-const { part, flows, settings, width, height, patchSettings, reflow } =
-  usePart.setup();
+const { part, flows, settings, width, height, patchSettings } = usePart.setup();
 
 const {
   hasAddress,
@@ -70,15 +69,6 @@ function toggle(): void {
     });
   }
 }
-
-watch(
-  () => block.value,
-  (newV, oldV) => {
-    if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
-      reflow();
-    }
-  },
-);
 </script>
 
 <template>
