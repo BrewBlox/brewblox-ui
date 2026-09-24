@@ -21,6 +21,7 @@ import { useServiceStore } from '@/store/services';
 import { useWidgetStore } from '@/store/widgets';
 import { concatById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
+import { isJsonEqual } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 import { calculateClaims } from '../utils/claims';
 import { isSparkPatch, isSparkState } from '../utils/info';
@@ -162,7 +163,8 @@ export const useSparkStore = defineStore('sparkStore', () => {
     data: Partial<T['data']>,
   ): Promise<T | null> {
     if (block) {
-      return await sparkApi.patchBlock(block, data); // triggers patch event
+      const patched = await sparkApi.patchBlock(block, data); // triggers patch event
+      return deserialize(patched);
     }
     return null;
   }
@@ -368,20 +370,16 @@ export const useSparkStore = defineStore('sparkStore', () => {
     const { changed, deleted } = evt.data;
     // Changed blocks are replaced in place, so the list keeps its order.
     // Patches arrive every second, and views list blocks in store order.
-    const updated = new Map(
-      changed.map((block) => [block.id, deserialize(block)]),
+    blocks.value[serviceId] = changed.map(deserialize).reduce(
+      concatById,
+      existing.filter((v) => !deleted.includes(v.id)),
     );
-    const kept = existing
-      .filter((v) => !deleted.includes(v.id))
-      .map((v) => updated.get(v.id) ?? v);
-    const keptIds = new Set(kept.map((v) => v.id));
-    blocks.value[serviceId] = [
-      ...kept,
-      ...[...updated.values()].filter((v) => !keptIds.has(v.id)),
-    ];
     // Patch events carry no claims, so they are derived from the blocks.
     // The next state event replaces them with the list from the service.
-    claims.value[serviceId] = calculateClaims(blocks.value[serviceId]);
+    const derivedClaims = calculateClaims(blocks.value[serviceId]);
+    if (!isJsonEqual(derivedClaims, claims.value[serviceId])) {
+      claims.value[serviceId] = derivedClaims;
+    }
     // A patch proves the full block list is still current.
     // The timestamp is only refreshed if it was not invalidated.
     if (lastBlocksAt.value[serviceId] != null) {

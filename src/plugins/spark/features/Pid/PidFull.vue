@@ -116,12 +116,11 @@ const ambientRaw = computed<Quantity>(() =>
   tempQty(ambientBlock.value?.data.value ?? null),
 );
 
-// The parts are null while the PID input is invalid
+// P, I and D are null while the PID input is invalid.
+// FF is null without a valid ambient value, and then adds nothing.
 const outputSum = computed<number | null>(() => {
   const { p, i, d, ff } = block.value.data;
-  return p != null && i != null && d != null && ff != null
-    ? p + i + d + ff
-    : null;
+  return p != null && i != null && d != null ? p + i + d + (ff ?? 0) : null;
 });
 
 function showInput(): void {

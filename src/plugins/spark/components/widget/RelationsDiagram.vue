@@ -44,6 +44,7 @@ const graphHeight = ref<number>(0);
 
 const renderedNodes = ref<BlockRelationNode[]>();
 const renderedEdges = ref<BlockRelation[]>();
+let layoutCount = 0;
 
 function relevantNodes(
   nodes: BlockRelationNode[],
@@ -66,6 +67,18 @@ function withoutStatus(
   nodes: BlockRelationNode[] | undefined,
 ): Omit<BlockRelationNode, 'status'>[] | undefined {
   return nodes?.map((node) => omit(node, 'status'));
+}
+
+// Status updates can arrive while a layout is calculated.
+// The icons always show the statuses of the latest nodes.
+function drawStatuses(): void {
+  if (!gRef.value) {
+    return;
+  }
+  const statuses = new Map(renderedNodes.value?.map((n) => [n.id, n.status]));
+  d3.select(gRef.value)
+    .selectAll<SVGCircleElement, ElkRelationNode>('.status-icon')
+    .attr('class', (d) => `status-icon status__${statuses.get(d.id)}`);
 }
 
 function openSettings(id: string): void {
@@ -122,10 +135,7 @@ async function drawGraph(
     isJsonEqual(edges, renderedEdges.value)
   ) {
     renderedNodes.value = cloneDeep(nodes);
-    const statuses = new Map(nodes.map((n) => [n.id, n.status]));
-    d3.select(gRef.value)
-      .selectAll<SVGCircleElement, ElkRelationNode>('.status-icon')
-      .attr('class', (d) => `status-icon status__${statuses.get(d.id)}`);
+    drawStatuses();
     return;
   }
 
@@ -134,6 +144,7 @@ async function drawGraph(
 
   renderedNodes.value = nodes;
   renderedEdges.value = edges;
+  const layoutId = ++layoutCount;
 
   const graph = await elk.layout({
     id: 'root',
@@ -152,6 +163,11 @@ async function drawGraph(
       targets: [v.target],
     })),
   });
+
+  // A newer layout started while this one was calculated
+  if (layoutId !== layoutCount) {
+    return;
+  }
 
   // Set component variables
   // These will be needed for centering the graph
@@ -218,6 +234,7 @@ async function drawGraph(
     .attr('cx', 7)
     .attr('cy', 7)
     .attr('r', 4);
+  drawStatuses();
 
   // We want to use the HTML text rendering features for content
   // Add a foreign object to render content
