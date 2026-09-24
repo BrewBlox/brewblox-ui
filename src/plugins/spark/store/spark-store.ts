@@ -22,6 +22,7 @@ import { useWidgetStore } from '@/store/widgets';
 import { concatById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { deserialize } from '@/utils/parsing';
+import { calculateClaims } from '../utils/claims';
 import { isSparkPatch, isSparkState } from '../utils/info';
 import * as sparkApi from './spark-api';
 import {
@@ -378,6 +379,9 @@ export const useSparkStore = defineStore('sparkStore', () => {
       ...kept,
       ...[...updated.values()].filter((v) => !keptIds.has(v.id)),
     ];
+    // Patch events carry no claims, so they are derived from the blocks.
+    // The next state event replaces them with the list from the service.
+    claims.value[serviceId] = calculateClaims(blocks.value[serviceId]);
     // A patch proves the full block list is still current.
     // The timestamp is only refreshed if it was not invalidated.
     if (lastBlocksAt.value[serviceId] != null) {
