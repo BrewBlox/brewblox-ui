@@ -159,10 +159,11 @@ export const useSparkStore = defineStore('sparkStore', () => {
   async function patchBlock<T extends Block>(
     block: Maybe<T>,
     data: Partial<T['data']>,
-  ): Promise<void> {
+  ): Promise<T | null> {
     if (block) {
-      await sparkApi.patchBlock(block, data); // triggers patch event
+      return await sparkApi.patchBlock(block, data); // triggers patch event
     }
+    return null;
   }
 
   async function removeBlock(block: Block): Promise<void> {
