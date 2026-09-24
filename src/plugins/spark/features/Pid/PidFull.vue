@@ -116,6 +116,14 @@ const ambientRaw = computed<Quantity>(() =>
   tempQty(ambientBlock.value?.data.value ?? null),
 );
 
+// The parts are null while the PID input is invalid
+const outputSum = computed<number | null>(() => {
+  const { p, i, d, ff } = block.value.data;
+  return p != null && i != null && d != null && ff != null
+    ? p + i + d + ff
+    : null;
+});
+
 function showInput(): void {
   createBlockDialog(inputBlock.value);
 }
@@ -130,10 +138,11 @@ function showAmbient(): void {
 
 const ambientHint = computed<string>(() => {
   const offset = bloxQty(block.value.data.ambientOffset);
-  if (!offset.value) {
+  const { i, ff } = block.value.data;
+  if (!offset.value || i == null || ff == null) {
     return '';
   }
-  const sum = block.value.data.i + block.value.data.ff;
+  const sum = i + ff;
   const suggestedKff = sum / offset.value;
   return `<i>Hint: FF is now ${roundedNumber(block.value.data.ff, 2)} and
    I is ${roundedNumber(block.value.data.i, 2)}.<br>
@@ -655,11 +664,7 @@ function openDerivativeFilterDialog(): void {
         <div class="span-s text-center big q-mt-md">=</div>
         <div class="span-m row items-center full-height summed">
           <div class="big text-right q-pr-sm q-mt-md full-width">
-            {{
-              fixedNumber(
-                block.data.p + block.data.i + block.data.d + block.data.ff,
-              )
-            }}
+            {{ fixedNumber(outputSum) }}
           </div>
         </div>
       </div>
