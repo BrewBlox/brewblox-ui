@@ -26,8 +26,10 @@ import { colors } from 'quasar';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import { selectable } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
+import { notify } from '@/utils/notify';
 import { bloxQty, durationMs, durationString } from '@/utils/quantity';
 import { ENUM_LABELS_STORE_MODE } from '../../const';
 import SequenceDocumentation from './SequenceDocumentation.vue';
@@ -60,6 +62,7 @@ const activeInstructionAttributes = Decoration.line({
 });
 
 const { context, inDialog } = useContext.setup();
+const sparkStore = useSparkStore();
 const { serviceId, block, patchBlock } = useBlockWidget.setup<SequenceBlock>();
 const editor = ref<HTMLDivElement>();
 const configError = ref<string | undefined>();
@@ -260,13 +263,21 @@ function revertLocal(): void {
 
 async function saveLocal(): Promise<void> {
   try {
-    await patchBlock({
+    const wasEnabled = block.value.data.enabled;
+    const patched = await sparkStore.patchBlock(block.value, {
       instructions: localInstructionsText.value
         .trim()
         .split('\n')
         .filter((s) => !!s.trim()),
     });
     configError.value = undefined;
+    // The controller stops the sequence if the edit removed the active instruction
+    if (wasEnabled && patched?.data.enabled === false) {
+      notify.warn(
+        'The active instruction was removed. ' +
+          'The sequence was reset to the first instruction and disabled.',
+      );
+    }
   } catch (e) {
     configError.value = (e as any).response?.data?.error;
   }

@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import ELK, { ElkExtendedEdge, ElkNode } from 'elkjs/lib/elk.bundled';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
+import omit from 'lodash/omit';
 import toFinite from 'lodash/toFinite';
 import { onMounted, ref, watch } from 'vue';
 import { BlockRelationNode } from '@/plugins/spark/types';
@@ -43,6 +44,7 @@ const graphHeight = ref<number>(0);
 
 const renderedNodes = ref<BlockRelationNode[]>();
 const renderedEdges = ref<BlockRelation[]>();
+let layoutCount = 0;
 
 function relevantNodes(
   nodes: BlockRelationNode[],
@@ -59,6 +61,24 @@ function relevantNodes(
     .filter((id) => !nodeIds.has(id))
     .map((id) => ({ id, type: UNKNOWN_TYPE }));
   return [...knownNodes, ...unknownNodes];
+}
+
+function withoutStatus(
+  nodes: BlockRelationNode[] | undefined,
+): Omit<BlockRelationNode, 'status'>[] | undefined {
+  return nodes?.map((node) => omit(node, 'status'));
+}
+
+// Status updates can arrive while a layout is calculated.
+// The icons always show the statuses of the latest nodes.
+function drawStatuses(): void {
+  if (!gRef.value) {
+    return;
+  }
+  const statuses = new Map(renderedNodes.value?.map((n) => [n.id, n.status]));
+  d3.select(gRef.value)
+    .selectAll<SVGCircleElement, ElkRelationNode>('.status-icon')
+    .attr('class', (d) => `status-icon status__${statuses.get(d.id)}`);
 }
 
 function openSettings(id: string): void {
@@ -108,11 +128,23 @@ async function drawGraph(
     return;
   }
 
+  // Block status changes far more often than the relations do.
+  // Keep the layout and zoom level, and only update the status icons.
+  if (
+    isJsonEqual(withoutStatus(nodes), withoutStatus(renderedNodes.value)) &&
+    isJsonEqual(edges, renderedEdges.value)
+  ) {
+    renderedNodes.value = cloneDeep(nodes);
+    drawStatuses();
+    return;
+  }
+
   nodes = cloneDeep(nodes);
   edges = cloneDeep(edges);
 
   renderedNodes.value = nodes;
   renderedEdges.value = edges;
+  const layoutId = ++layoutCount;
 
   const graph = await elk.layout({
     id: 'root',
@@ -131,6 +163,11 @@ async function drawGraph(
       targets: [v.target],
     })),
   });
+
+  // A newer layout started while this one was calculated
+  if (layoutId !== layoutCount) {
+    return;
+  }
 
   // Set component variables
   // These will be needed for centering the graph
@@ -176,6 +213,10 @@ async function drawGraph(
     .attr('height', LABEL_HEIGHT)
     .on('click', (evt, d) => openSettings(d.id));
 
+  // The selection includes nodes from the previous draw.
+  // Clear their content before adding it again.
+  nodeSelect.selectChildren().remove();
+
   // SVG objects can't have a background color
   // Add a rect to serve as background
   nodeSelect
@@ -193,6 +234,7 @@ async function drawGraph(
     .attr('cx', 7)
     .attr('cy', 7)
     .attr('r', 4);
+  drawStatuses();
 
   // We want to use the HTML text rendering features for content
   // Add a foreign object to render content

@@ -25,6 +25,7 @@ import {
 import { ifCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
+import { fixedNumber } from '@/utils/quantity';
 
 interface EditableChannel extends IoChannel {
   name: string;
@@ -137,7 +138,7 @@ async function updatePwmSetting(channel: EditableChannel): Promise<void> {
           <q-btn
             unelevated
             :disable="channel.actuatorClaimed"
-            :label="`${channel.pwmActuator.data.desiredSetting}%`"
+            :label="`${fixedNumber(channel.pwmActuator.data.desiredSetting, 0)}%`"
             @click="updatePwmSetting(channel)"
           />
         </div>

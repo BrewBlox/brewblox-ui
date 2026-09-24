@@ -54,6 +54,9 @@ const block = computed<WiFiSettingsBlock>(() =>
   getWiFiSettingsBlock(props.serviceId)!,
 );
 
+// The controller reports the network it joined, and nothing while not connected
+values.ssid = block.value?.data.ssid ?? '';
+
 async function save(): Promise<void> {
   busy.value = true;
   await sparkStore

@@ -21,7 +21,9 @@ import { useServiceStore } from '@/store/services';
 import { useWidgetStore } from '@/store/widgets';
 import { concatById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
+import { isJsonEqual } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
+import { calculateClaims } from '../utils/claims';
 import { isSparkPatch, isSparkState } from '../utils/info';
 import * as sparkApi from './spark-api';
 import {
@@ -156,17 +158,15 @@ export const useSparkStore = defineStore('sparkStore', () => {
     await sparkApi.createBlock(block); // triggers patch event
   }
 
-  async function saveBlock(block: Block): Promise<void> {
-    await sparkApi.persistBlock(block); // triggers patch event
-  }
-
   async function patchBlock<T extends Block>(
     block: Maybe<T>,
     data: Partial<T['data']>,
-  ): Promise<void> {
+  ): Promise<T | null> {
     if (block) {
-      await sparkApi.patchBlock(block, data); // triggers patch event
+      const patched = await sparkApi.patchBlock(block, data); // triggers patch event
+      return deserialize(patched);
     }
+    return null;
   }
 
   async function removeBlock(block: Block): Promise<void> {
@@ -175,10 +175,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
 
   async function batchCreateBlocks(blocks: Block[]): Promise<void> {
     await sparkApi.batchCreateBlocks(blocks); // triggers patch event
-  }
-
-  async function batchSaveBlocks(blocks: Block[]): Promise<void> {
-    await sparkApi.batchPersistBlocks(blocks); // triggers patch event
   }
 
   async function batchPatchBlocks(
@@ -372,11 +368,18 @@ export const useSparkStore = defineStore('sparkStore', () => {
       return;
     }
     const { changed, deleted } = evt.data;
-    const affected = [...changed.map((block) => block.id), ...deleted];
-    blocks.value[serviceId] = [
-      ...existing.filter((v) => !affected.includes(v.id)),
-      ...changed.map(deserialize),
-    ];
+    // Changed blocks are replaced in place, so the list keeps its order.
+    // Patches arrive every second, and views list blocks in store order.
+    blocks.value[serviceId] = changed.map(deserialize).reduce(
+      concatById,
+      existing.filter((v) => !deleted.includes(v.id)),
+    );
+    // Patch events carry no claims, so they are derived from the blocks.
+    // The next state event replaces them with the list from the service.
+    const derivedClaims = calculateClaims(blocks.value[serviceId]);
+    if (!isJsonEqual(derivedClaims, claims.value[serviceId])) {
+      claims.value[serviceId] = derivedClaims;
+    }
     // A patch proves the full block list is still current.
     // The timestamp is only refreshed if it was not invalidated.
     if (lastBlocksAt.value[serviceId] != null) {
@@ -521,11 +524,9 @@ export const useSparkStore = defineStore('sparkStore', () => {
     lastStatusAtByService,
     sessionConfigByService,
     createBlock,
-    saveBlock,
     patchBlock,
     removeBlock,
     batchCreateBlocks,
-    batchSaveBlocks,
     batchPatchBlocks,
     batchRemoveBlocks,
     renameBlock,

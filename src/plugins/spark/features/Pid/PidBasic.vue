@@ -33,8 +33,9 @@ const outputSuffix = computed<string>(() => {
 
 const kp = computed<number | null>(() => block.value.data.kp.value);
 
-function fit(v: number): number {
-  return Math.min(v, 100);
+// The parts are null while the PID input is invalid
+function fit(v: number | null): number {
+  return Math.min(v ?? 0, 100);
 }
 
 function showInput(): void {
