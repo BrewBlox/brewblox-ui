@@ -156,10 +156,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
     await sparkApi.createBlock(block); // triggers patch event
   }
 
-  async function saveBlock(block: Block): Promise<void> {
-    await sparkApi.persistBlock(block); // triggers patch event
-  }
-
   async function patchBlock<T extends Block>(
     block: Maybe<T>,
     data: Partial<T['data']>,
@@ -175,10 +171,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
 
   async function batchCreateBlocks(blocks: Block[]): Promise<void> {
     await sparkApi.batchCreateBlocks(blocks); // triggers patch event
-  }
-
-  async function batchSaveBlocks(blocks: Block[]): Promise<void> {
-    await sparkApi.batchPersistBlocks(blocks); // triggers patch event
   }
 
   async function batchPatchBlocks(
@@ -529,11 +521,9 @@ export const useSparkStore = defineStore('sparkStore', () => {
     lastStatusAtByService,
     sessionConfigByService,
     createBlock,
-    saveBlock,
     patchBlock,
     removeBlock,
     batchCreateBlocks,
-    batchSaveBlocks,
     batchPatchBlocks,
     batchRemoveBlocks,
     renameBlock,

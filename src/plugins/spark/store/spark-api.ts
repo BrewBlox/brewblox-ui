@@ -44,12 +44,6 @@ export const createBlock = (block: Block): Promise<Block> =>
     .then((resp) => resp.data)
     .catch(intercept(`Failed to create ${block.id}`));
 
-export const persistBlock = (block: Block): Promise<Block> =>
-  http
-    .post<Block>(`/${encodeURIComponent(block.serviceId)}/blocks/write`, block)
-    .then((resp) => resp.data)
-    .catch(intercept(`Failed to persist ${block.id}`));
-
 export const patchBlock = <T extends Block>(
   block: BlockPatchArgs<T>[0],
   data: BlockPatchArgs<T>[1],
@@ -92,20 +86,6 @@ export async function batchCreateBlocks(blocks: Block[]): Promise<Block[]> {
     )
     .then((resp) => resp.data)
     .catch(intercept('Failed to batch create blocks'));
-}
-
-export async function batchPersistBlocks(blocks: Block[]): Promise<Block[]> {
-  if (!blocks.length) {
-    return [];
-  }
-  const { serviceId } = blocks[0];
-  return http
-    .post<Block[]>(
-      `/${encodeURIComponent(serviceId)}/blocks/batch/write`,
-      blocks,
-    )
-    .then((resp) => resp.data)
-    .catch(intercept('Failed to batch write blocks'));
 }
 
 export async function batchPatchBlocks(
