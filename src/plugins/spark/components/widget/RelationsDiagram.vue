@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import ELK, { ElkExtendedEdge, ElkNode } from 'elkjs/lib/elk.bundled';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
+import omit from 'lodash/omit';
 import toFinite from 'lodash/toFinite';
 import { onMounted, ref, watch } from 'vue';
 import { BlockRelationNode } from '@/plugins/spark/types';
@@ -61,6 +62,12 @@ function relevantNodes(
   return [...knownNodes, ...unknownNodes];
 }
 
+function withoutStatus(
+  nodes: BlockRelationNode[] | undefined,
+): Omit<BlockRelationNode, 'status'>[] | undefined {
+  return nodes?.map((node) => omit(node, 'status'));
+}
+
 function openSettings(id: string): void {
   const addr = {
     id,
@@ -105,6 +112,20 @@ async function drawGraph(
     isJsonEqual(nodes, renderedNodes.value) &&
     isJsonEqual(edges, renderedEdges.value)
   ) {
+    return;
+  }
+
+  // Block status changes far more often than the relations do.
+  // Keep the layout and zoom level, and only update the status icons.
+  if (
+    isJsonEqual(withoutStatus(nodes), withoutStatus(renderedNodes.value)) &&
+    isJsonEqual(edges, renderedEdges.value)
+  ) {
+    renderedNodes.value = cloneDeep(nodes);
+    const statuses = new Map(nodes.map((n) => [n.id, n.status]));
+    d3.select(gRef.value)
+      .selectAll<SVGCircleElement, ElkRelationNode>('.status-icon')
+      .attr('class', (d) => `status-icon status__${statuses.get(d.id)}`);
     return;
   }
 
@@ -175,6 +196,10 @@ async function drawGraph(
     .attr('width', LABEL_WIDTH)
     .attr('height', LABEL_HEIGHT)
     .on('click', (evt, d) => openSettings(d.id));
+
+  // The selection includes nodes from the previous draw.
+  // Clear their content before adding it again.
+  nodeSelect.selectChildren().remove();
 
   // SVG objects can't have a background color
   // Add a rect to serve as background
