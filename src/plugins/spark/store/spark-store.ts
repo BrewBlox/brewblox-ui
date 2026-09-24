@@ -372,10 +372,18 @@ export const useSparkStore = defineStore('sparkStore', () => {
       return;
     }
     const { changed, deleted } = evt.data;
-    const affected = [...changed.map((block) => block.id), ...deleted];
+    // Changed blocks are replaced in place, so the list keeps its order.
+    // Patches arrive every second, and views list blocks in store order.
+    const updated = new Map(
+      changed.map((block) => [block.id, deserialize(block)]),
+    );
+    const kept = existing
+      .filter((v) => !deleted.includes(v.id))
+      .map((v) => updated.get(v.id) ?? v);
+    const keptIds = new Set(kept.map((v) => v.id));
     blocks.value[serviceId] = [
-      ...existing.filter((v) => !affected.includes(v.id)),
-      ...changed.map(deserialize),
+      ...kept,
+      ...[...updated.values()].filter((v) => !keptIds.has(v.id)),
     ];
     // A patch proves the full block list is still current.
     // The timestamp is only refreshed if it was not invalidated.

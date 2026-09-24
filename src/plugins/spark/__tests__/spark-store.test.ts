@@ -67,6 +67,15 @@ describe('Spark store block events', () => {
     expect(store.blockById(serviceId, 'Setpoint-1')?.data.value).toBe(3);
   });
 
+  it('keeps the block order when patching', () => {
+    send('/patch', patchEvent([block('Pid-1', 4), block('Sensor-1', 5)]));
+    expect(ids(store)).toEqual(['Pid-1', 'Setpoint-1', 'Sensor-1']);
+    expect(store.blockById(serviceId, 'Pid-1')?.data.value).toBe(4);
+
+    send('/patch', patchEvent([block('Setpoint-1', 6)]));
+    expect(ids(store)).toEqual(['Pid-1', 'Setpoint-1', 'Sensor-1']);
+  });
+
   it('ignores a patch while the block list is empty', () => {
     // The service broadcasts an empty list while it is not synchronized
     send('', stateEvent([]));
