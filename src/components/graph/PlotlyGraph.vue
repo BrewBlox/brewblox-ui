@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import merge from 'lodash/merge';
 import Plotly, {
   ClickAnnotationEvent,
   Config,
   Layout,
+  PlotData,
   PlotlyHTMLElement,
   PlotMouseEvent,
+  PlotRelayoutEvent,
 } from 'plotly.js';
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Y2_COLOR } from '@/plugins/history/const';
@@ -15,6 +18,17 @@ import { GraphAnnotation } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { GraphDataKey } from './symbols';
+import {
+  emptyGraphView,
+  fitYRanges,
+  GraphRange,
+  GraphView,
+  parsePlotlyRange,
+  relayoutView,
+  viewAxis,
+  viewRange,
+  YAxisName,
+} from './view';
 
 interface Props {
   layout?: Partial<Layout>;
@@ -22,6 +36,8 @@ interface Props {
   annotated?: boolean;
   revision?: Date;
   static?: boolean;
+  /** An x window whose points the y axes fit, when set */
+  fitY?: GraphRange | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -30,11 +46,21 @@ const props = withDefaults(defineProps<Props>(), {
   annotated: false,
   revision: () => new Date(),
   static: false,
+  fitY: null,
 });
 
 const emit = defineEmits<{
   annotations: [payload: GraphAnnotation[]];
 }>();
+
+// What the x axis shows. It is updated after a zoom, pan or reset in the graph.
+// Parents that do not bind it get a view that lasts as long as this component.
+const view = defineModel<GraphView>('view', { default: emptyGraphView });
+
+// Plotly.react keeps zoom, pan and legend edits made in the graph
+// as long as uirevision stays the same (compared with ===)
+const UI_REVISION = 'graph';
+const STATIC_REVISION = 'static';
 
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
@@ -83,9 +109,6 @@ const graphData = inject(GraphDataKey)!;
 if (!graphData) {
   throw new Error('No graph data ref injected');
 }
-
-let zoomed = false;
-let skippedRender = false;
 
 const annotations = computed<GraphAnnotation[]>(
   () => props.layout.annotations ?? [],
@@ -146,7 +169,34 @@ function combinedConfig(): Partial<Config> {
   );
 }
 
-function combinedLayout(): Partial<Layout> {
+// The y axes that fit the points inside the `fitY` window.
+// An axis the layout fixes, as the graph's range settings do, keeps its range.
+// The revision is per window: a new window drops a y zoom made in the graph,
+// and while the fitted ranges stay the same, Plotly keeps a y zoom made after.
+function fittedYAxes(): Partial<Layout> {
+  if (props.fitY == null || props.static) {
+    return {};
+  }
+  const shown = ((plotlyElement.value as any)?.data ??
+    []) as Partial<PlotData>[];
+  const hidden = new Set(
+    shown
+      .filter((t) => t.visible === 'legendonly' || t.visible === false)
+      .map((t) => `${t.uid}`),
+  );
+  const revision = `fit:${props.fitY[0]}:${props.fitY[1]}`;
+  const axes: Partial<Layout> = {};
+  for (const [axis, range] of Object.entries(
+    fitYRanges(graphData.value, props.fitY, hidden),
+  ) as [YAxisName, GraphRange][]) {
+    if (props.layout[axis]?.autorange !== false) {
+      axes[axis] = { autorange: false, range, uirevision: revision };
+    }
+  }
+  return axes;
+}
+
+function combinedLayout(range: GraphRange | null, fit = true): Partial<Layout> {
   return merge<
     Partial<Layout>,
     Partial<Layout>,
@@ -156,27 +206,65 @@ function combinedLayout(): Partial<Layout> {
   >(
     layoutDefaults(),
     props.layout,
-    calcSize(),
-    props.static ? { dragmode: false, hovermode: false } : {},
-    graphData.value.some((d) => d.yaxis === 'y2')
-      ? { xaxis: { domain: [0, 0.89] }, yaxis: { position: 0.9 } }
-      : { xaxis: { domain: [0, 0.94] }, yaxis: { position: 0.95 } },
+    {
+      ...calcSize(),
+      ...(fit ? fittedYAxes() : {}),
+      uirevision: UI_REVISION,
+      xaxis: viewAxis(range),
+    },
+    // A static plot cannot be reset: another revision drops a zoom made before
+    props.static
+      ? {
+          dragmode: false,
+          hovermode: false,
+          xaxis: { uirevision: STATIC_REVISION },
+          yaxis: { uirevision: STATIC_REVISION },
+          yaxis2: { uirevision: STATIC_REVISION },
+        }
+      : {},
+    yAxesPositions(),
   );
+}
+
+// The y axes sit at the right, each with its tick labels to its right.
+// A label column takes 5% of the width, and at least 40 px:
+// in a narrow graph, 5% put the labels of y and y2 against each other.
+const LABEL_COLUMN_PX = 40;
+
+function yAxesPositions(): Partial<Layout> {
+  const column = Math.max(0.05, LABEL_COLUMN_PX / calcSize().width);
+  return graphData.value.some((d) => d.yaxis === 'y2')
+    ? {
+        xaxis: { domain: [0, 1 - 2 * column - 0.01] },
+        yaxis: { position: 1 - 2 * column },
+        yaxis2: { position: 1 - column },
+      }
+    : {
+        xaxis: { domain: [0, 1 - column - 0.01] },
+        yaxis: { position: 1 - column },
+      };
 }
 
 function displayError(msg: string): void {
   notify.warn(`Failed to render graph: ${msg}`);
 }
 
-async function relayoutPlot(): Promise<void> {
-  await Plotly.relayout(plotlyElement.value!, combinedLayout());
+// Plotly gets new copies of the traces for every render.
+// It writes edits made in the graph, such as a legend click, into the traces it gets,
+// and keeps them across renders only while the traces it gets do not carry them:
+// the same objects again would, and the edit would be lost with the next copies.
+function plotTraces(): Partial<PlotData>[] {
+  return graphData.value.map((trace) => ({ ...trace }));
 }
 
 async function reactPlot(): Promise<void> {
   await Plotly.react(
     plotlyElement.value!,
-    graphData.value,
-    combinedLayout(),
+    plotTraces(),
+    // A static plot cannot be zoomed, nor reset: it shows all data
+    combinedLayout(
+      props.static ? null : viewRange(view.value, graphData.value),
+    ),
     combinedConfig(),
   );
 }
@@ -187,42 +275,70 @@ async function createPlot(): Promise<void> {
   }
   try {
     // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
+    // A double click returns to the ranges the plot was created with.
+    // The plot is created with autorange, so a double click shows all data;
+    // the view and the fitted y axes follow in a render right after.
     await Plotly.newPlot(
       plotlyElement.value,
-      graphData.value,
-      combinedLayout(),
+      plotTraces(),
+      combinedLayout(null, false),
       combinedConfig(),
     );
     plotlyElement.value.on('plotly_relayout', onRelayout);
+    // A legend click changes which traces the fitted y axes count
+    plotlyElement.value.on('plotly_restyle', () => {
+      if (props.fitY != null) {
+        debouncedRender();
+      }
+    });
     plotlyElement.value.on('plotly_click', onClick);
     plotlyElement.value.on('plotly_doubleclick', onDoubleClick);
     plotlyElement.value.on('plotly_clickannotation', onAnnotationClick);
+    if ((view.value.range != null || props.fitY != null) && !props.static) {
+      await reactPlot();
+    }
   } catch (e: any) {
     displayError(e.message);
   }
 }
 
-async function renderPlot(layoutChanged: boolean): Promise<void> {
+// Every render goes through Plotly.react, with the current data and layout.
+// Plotly.relayout would reset the zoom (the layout defaults autorange),
+// and would emit plotly_relayout for our own changes.
+async function renderPlot(): Promise<void> {
   if (!plotlyElement.value) {
     return;
   }
-  if (zoomed) {
-    skippedRender = true;
-    return;
-  }
   try {
-    layoutChanged ? await relayoutPlot() : await reactPlot();
+    await reactPlot();
   } catch (e: any) {
     displayError(e.message);
   }
 }
+
+// Plotly reports the first click of a double click as a click.
+// The prompt for an annotation waits until that is ruled out:
+// a double click resets the zoom, also on a line.
+const DOUBLE_CLICK_DELAY_MS = 300; // Plotly's default doubleClickDelay
+let pendingAnnotation: ReturnType<typeof setTimeout> | undefined;
 
 function onClick(evt: PlotMouseEvent): void {
   if (!props.annotated || !evt.points.length) {
     return;
   }
-
   const point = evt.points[0];
+  clearTimeout(pendingAnnotation);
+  pendingAnnotation = setTimeout(
+    () => promptAnnotation(point),
+    DOUBLE_CLICK_DELAY_MS,
+  );
+}
+
+function onDoubleClick(): void {
+  clearTimeout(pendingAnnotation);
+}
+
+function promptAnnotation(point: PlotMouseEvent['points'][number]): void {
   createDialog({
     component: 'TextDialog',
     componentProps: {
@@ -243,14 +359,6 @@ function onClick(evt: PlotMouseEvent): void {
     };
     emit('annotations', [...annotations.value, a]);
   });
-}
-
-function onDoubleClick(): void {
-  zoomed = false;
-  if (skippedRender) {
-    skippedRender = false;
-    renderPlot(false);
-  }
 }
 
 function onAnnotationClick(evt: ClickAnnotationEvent): void {
@@ -274,35 +382,40 @@ function onAnnotationClick(evt: ClickAnnotationEvent): void {
   });
 }
 
-function onRelayout(eventdata: Mapped<any>): void {
-  if (eventdata['xaxis.range[0]'] || eventdata['xaxis.range[1]']) {
-    zoomed = true;
+// Only zoom, pan and reset in the graph change the view.
+// Plotly.react does not emit plotly_relayout, so renders do not.
+function onRelayout(event: PlotRelayoutEvent): void {
+  const shown = parsePlotlyRange(plotlyElement.value?.layout.xaxis?.range);
+  const updated = relayoutView(event as Mapped<unknown>, shown);
+  if (updated != null && !isEqual(updated, view.value)) {
+    view.value = updated;
   }
 }
 
 const debouncedRender = debounce(renderPlot, 50);
-const debouncedRelayout = debounce(relayoutPlot, 100);
 
 watch(
-  () => [props.config, props.revision, graphData.value],
-  () => debouncedRender(false),
+  () => [props.config, props.revision, graphData.value, view.value, props.fitY],
+  () => debouncedRender(),
 );
 
 watch(
   () => props.layout,
-  () => debouncedRender(true),
+  () => debouncedRender(),
   { deep: true },
 );
 
 onMounted(() => {
   createPlot();
-  window.addEventListener('resize', debouncedRelayout);
-  window.addEventListener('orientationchange', debouncedRelayout);
+  window.addEventListener('resize', debouncedRender);
+  window.addEventListener('orientationchange', debouncedRender);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', debouncedRelayout);
-  window.removeEventListener('orientationchange', debouncedRelayout);
+  debouncedRender.cancel();
+  clearTimeout(pendingAnnotation);
+  window.removeEventListener('resize', debouncedRender);
+  window.removeEventListener('orientationchange', debouncedRender);
   Plotly.purge(plotlyElement.value!);
 });
 </script>
@@ -314,7 +427,7 @@ onBeforeUnmount(() => {
       @resize="
         (v) => {
           containerSize = v;
-          debouncedRender(true);
+          debouncedRender();
         }
       "
     />
@@ -335,4 +448,9 @@ onBeforeUnmount(() => {
 
 .xy2
   color: green
+
+// Plotly's tips after a zoom or a legend click sit at the top right of the window,
+// over graph controls there, and would take their clicks
+.plotly-notifier
+  pointer-events: none
 </style>

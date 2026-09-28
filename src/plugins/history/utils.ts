@@ -24,6 +24,15 @@ export const defaultPresets = (): QueryParams[] => [
   { duration: '30d' },
 ];
 
+/**
+ * Whether the history service keeps sending new data for a query.
+ * A query with an end, or with both a start and a duration,
+ * covers a closed window, and gets a single answer.
+ */
+export function isOpenEndedQuery(params: QueryParams): boolean {
+  return !params.end && !(params.start && params.duration);
+}
+
 export const emptyGraphConfig = (): GraphConfig => ({
   version: '1.0',
   layout: {},

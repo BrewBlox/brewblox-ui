@@ -54,7 +54,7 @@ function saveLocalParams(params: QueryParams): void {
         v-bind="{
           graphId,
           sharedSources,
-          usePresets,
+          controlPresets: usePresets,
           annotated,
           sourceRevision,
         }"

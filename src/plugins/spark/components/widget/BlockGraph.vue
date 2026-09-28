@@ -95,10 +95,12 @@ function saveLayout(layout: Partial<Layout>): void {
 </script>
 
 <template>
+  <!-- Dialogs opened from the graph controls add to the route: that must not close this one -->
   <q-dialog
     v-model="dialogOpen"
     transition-show="fade"
     maximized
+    no-route-dismiss
   >
     <q-card
       v-if="dialogOpen"
@@ -115,10 +117,10 @@ function saveLayout(layout: Partial<Layout>): void {
         @layout="saveLayout"
       >
         <template #controls>
+          <!-- Not closed by any click: the Display Axis header only expands -->
           <q-btn-dropdown
             flat
             icon="settings"
-            :auto-close="true"
           >
             <ExportGraphAction
               :config="graphConfig"

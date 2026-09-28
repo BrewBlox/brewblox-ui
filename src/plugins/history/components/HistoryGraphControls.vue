@@ -13,12 +13,19 @@ interface Props {
   params: QueryParams;
   showRange?: boolean;
   showPresets?: boolean;
+  showFollow?: boolean;
+  showRefine?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showRange: false,
   showPresets: false,
+  showFollow: false,
+  showRefine: false,
 });
+
+const follow = defineModel<boolean>('follow', { default: false });
+const refined = defineModel<boolean>('refined', { default: false });
 
 const emit = defineEmits<{
   'update:layout': [payload: Partial<Layout>];
@@ -47,6 +54,32 @@ function chooseDuration(): void {
 </script>
 
 <template>
+  <q-btn
+    v-if="showFollow"
+    flat
+    icon="mdi-arrow-collapse-right"
+    :color="follow ? 'primary' : ''"
+    class="col-auto"
+    @click="follow = !follow"
+  >
+    <q-tooltip>Follow the newest data</q-tooltip>
+  </q-btn>
+  <q-btn
+    v-if="showRefine"
+    flat
+    icon="mdi-magnify-plus-outline"
+    :color="refined ? 'primary' : ''"
+    class="col-auto"
+    @click="refined = !refined"
+  >
+    <q-tooltip>
+      {{
+        refined
+          ? 'Showing the zoomed period in more detail'
+          : 'Show the zoomed period in more detail'
+      }}
+    </q-tooltip>
+  </q-btn>
   <ActionMenu
     v-if="showRange"
     icon="mdi-arrow-expand-vertical"
