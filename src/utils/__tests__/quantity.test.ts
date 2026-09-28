@@ -159,6 +159,14 @@ describe('Check parsing durations', () => {
     expect(durationMs(bloxQty(10, 'parsecs'))).toBe(0);
   });
 
+  it('Should read a number without unit after a unit as the next smaller unit', () => {
+    // parse-duration 2 changed these: 1.x read '1h 30' as 1h 30ms
+    expect(durationMs('1h 30')).toBe((60 + 30) * 60 * 1000);
+    expect(durationMs('1m 30')).toBe(90 * 1000);
+    // Numbers without any unit are grouped digits, in ms
+    expect(durationMs('10 10')).toBe(1010);
+  });
+
   it('Should format durations as string', () => {
     expect(durationString('2h 6m')).toBe('2h 6m');
     expect(durationString('')).toBe('0s');
