@@ -31,6 +31,7 @@ import {
 } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { builderTools, SQUARE_SIZE } from './const';
+import { openPartMenu } from './part-menu';
 import { useBuilderStore } from './store';
 import { EditableKey, PortalIdKey } from './symbols';
 import {
@@ -284,24 +285,25 @@ function combinedPartSize(parts: BuilderPart[]): AreaSize {
     );
 }
 
-function findPartAtCoords(coords: XYPosition | null): BuilderPart | null {
-  // iterate right to left to match rendering order
-  // when items overlap, the later item is rendered on top
-  if (coords) {
-    for (let idx = orderedParts.value.length - 1; idx >= 0; idx--) {
-      const part = orderedParts.value[idx];
+// The parts at a position, the topmost first:
+// when parts overlap, the later one is rendered on top
+function partsAtCoords(coords: XYPosition): BuilderPart[] {
+  return orderedParts.value
+    .filter((part) => {
       const { width, height } = rotatedSize(part.rotate, part);
-      if (
+      return (
         coords.x >= part.x &&
         coords.x < part.x + width &&
         coords.y >= part.y &&
         coords.y < part.y + height
-      ) {
-        return cloneDeep(part);
-      }
-    }
-  }
-  return null;
+      );
+    })
+    .reverse();
+}
+
+function findPartAtCoords(coords: XYPosition | null): BuilderPart | null {
+  const part = coords ? partsAtCoords(coords)[0] : null;
+  return part ? cloneDeep(part) : null;
 }
 
 function findHoveredPart(): BuilderPart | null {
@@ -673,6 +675,29 @@ function deltaMove(delta: XYPosition): void {
       draft[part.id].y += delta.y;
     }
   });
+}
+
+/**
+ * A right click cancels what is pending, as Escape does:
+ * placing parts, a selection area, or the selection.
+ * With nothing pending, it opens the menu of the part under the pointer.
+ * In the interact tool, parts receive the right click themselves.
+ */
+function contextMenuHandler(evt: MouseEvent): void {
+  if (activeToolId.value === 'interact') {
+    return;
+  }
+  if (floater.value || activeSelectArea.value || selectedIds.value.length) {
+    clear();
+    return;
+  }
+  // The topmost part with a menu: a dip tube, for one, lies on a kettle without one
+  for (const part of partsAtCoords(toCoords(d3EventPos(evt)))) {
+    const partEl = svgContentRef.value?.querySelector(`[part-id="${part.id}"]`);
+    if (partEl && openPartMenu(partEl, evt.clientX, evt.clientY)) {
+      return;
+    }
+  }
 }
 
 function keyHandler(evt: KeyboardEvent): void {
@@ -1080,6 +1105,7 @@ onBeforeUnmount(() => {
         ref="svgRef"
         class="absolute fit"
         :style="{ cursor }"
+        @contextmenu="contextMenuHandler"
       >
         <!-- Background element to ensure mouse events
         outside content are received by the SVG element -->
