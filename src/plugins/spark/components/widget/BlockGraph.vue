@@ -95,10 +95,12 @@ function saveLayout(layout: Partial<Layout>): void {
 </script>
 
 <template>
+  <!-- Dialogs opened from the graph controls add to the route: that must not close this one -->
   <q-dialog
     v-model="dialogOpen"
     transition-show="fade"
     maximized
+    no-route-dismiss
   >
     <q-card
       v-if="dialogOpen"
