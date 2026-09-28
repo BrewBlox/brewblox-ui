@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { defineStore } from 'pinia';
 import { exportFile } from 'quasar';
 import {
@@ -13,6 +14,7 @@ import { uniqueFilter } from '@/utils/functional';
 import { typed } from '@/utils/misc';
 import { notify } from '@/utils/notify';
 import { bloxQty, isoDateString, JSQuantity } from '@/utils/quantity';
+import { MIGRATION_POLL_ACTIVE_MS, MIGRATION_POLL_IDLE_MS } from '../migration';
 import type {
   ApiQuery,
   CsvPrecision,
@@ -25,6 +27,7 @@ import type {
   LineColors,
   LoggedSession,
   MetricsSource,
+  MigrationStatus,
   QueryParams,
   RangeMax,
   RangeMin,
@@ -60,6 +63,9 @@ export const useHistoryStore = defineStore('historyStore', () => {
   const sources = shallowReactive<SourcesContainer>({});
   const streamConnected = ref<boolean>(false);
   const stream = ref<WebSocket | null>(null);
+  const migration = ref<MigrationStatus | null>(null);
+  let migrationTimer: ReturnType<typeof setTimeout> | undefined;
+  let migrationFetches = 0;
 
   const sessionTags = computed<string[]>(() =>
     sessions.value
@@ -108,6 +114,8 @@ export const useHistoryStore = defineStore('historyStore', () => {
     stream.value.onopen = () => {
       streamConnected.value = true;
       Object.values(sources).forEach((src) => _startQuery(src.value));
+      // The history service may have restarted, or been updated
+      fetchMigration();
     };
     stream.value.onmessage = (event: MessageEvent) => {
       const data = JSON.parse(event.data);
@@ -123,6 +131,43 @@ export const useHistoryStore = defineStore('historyStore', () => {
       stream.value?.close();
       stream.value = null;
     };
+  }
+
+  /**
+   * Fetches the status of the migration of a legacy history database,
+   * and schedules the next fetch: often while a migration is not done, else seldom.
+   * A history service without migrations answers 404 in JSON:
+   * it is asked again when the stream reconnects.
+   * The proxy's 404 while history is down is plain text, and keeps the last status.
+   */
+  async function fetchMigration(): Promise<void> {
+    const fetchId = ++migrationFetches;
+    clearTimeout(migrationTimer);
+    try {
+      const status = await historyApi.fetchMigrationStatus();
+      if (fetchId !== migrationFetches) {
+        return;
+      }
+      migration.value = status;
+    } catch (e) {
+      if (fetchId !== migrationFetches) {
+        return;
+      }
+      if (
+        axios.isAxiosError(e) &&
+        e.response?.status === 404 &&
+        `${e.response.headers['content-type']}`.includes('application/json')
+      ) {
+        migration.value = null;
+        return;
+      }
+      // Keep the last status while the history service does not answer
+    }
+    const active = migration.value != null && migration.value.phase !== 'done';
+    migrationTimer = setTimeout(
+      () => fetchMigration(),
+      active ? MIGRATION_POLL_ACTIVE_MS : MIGRATION_POLL_IDLE_MS,
+    );
   }
 
   function sessionById(id: Maybe<string>): LoggedSession | null {
@@ -303,6 +348,7 @@ export const useHistoryStore = defineStore('historyStore', () => {
     sources,
     streamConnected,
     stream,
+    migration,
     sessionTags,
 
     sessionById,
@@ -316,6 +362,7 @@ export const useHistoryStore = defineStore('historyStore', () => {
     fetchFields,
     downloadCsv,
     downloadGraphCsv,
+    fetchMigration,
     start,
   };
 });

@@ -183,3 +183,35 @@ export interface LoggedSession extends StoreObject {
   notes: SessionNote[];
   tags?: string[];
 }
+
+/**
+ * The status of the history service's migration of a legacy database,
+ * as returned by `GET /history/timeseries/migrate` (`MigrationStatus` in brewblox-history).
+ * Times are Unix seconds.
+ */
+export interface MigrationStatus {
+  /**
+   * seed: copying the last days of raw samples into the dense database.
+   * walk: averaging the whole legacy history into the long-term database, newest first.
+   */
+  phase: 'seed' | 'walk' | 'done';
+  running: boolean;
+  cancelled: boolean;
+  /** Days of raw samples the seed copies */
+  dense_days: number;
+  /** The walk starts one interval after this */
+  earliest: number;
+  /** The long-term database's resolution in seconds */
+  sparse_interval: number;
+  /** The end of the legacy history */
+  legacy_end: number;
+  chunks_total: number;
+  /** Null until counted */
+  chunks_done: number | null;
+  /** Kept while the migration tries again after an error */
+  last_error: string | null;
+  started: number;
+  finished: number | null;
+  lost_chunks: number[];
+  missing_series: string[];
+}
