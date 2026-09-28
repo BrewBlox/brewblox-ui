@@ -20,6 +20,12 @@ import {
   xAutorange,
 } from '../../../../test/plotly';
 
+// The annotation prompt
+const { createDialog } = vi.hoisted(() => ({
+  createDialog: vi.fn(() => ({ onOk: vi.fn() })),
+}));
+vi.mock('@/utils/dialog', () => ({ createDialog }));
+
 const MIN = 60 * 1000;
 const T0 = new Date(2026, 8, 28, 10, 0).getTime();
 const at = (minutes: number): number => T0 + minutes * MIN;
@@ -377,6 +383,26 @@ describe('PlotlyGraph view', () => {
     await wrapper.setProps({ fitY: null });
     await settle();
     expect((gd() as any)._fullLayout.yaxis.autorange).toBe(true);
+  });
+
+  it('asks for an annotation after a click, not after a double click', async () => {
+    const { gd } = await mountGraph({ annotated: true });
+    const wait = (): Promise<void> =>
+      new Promise((resolve) => setTimeout(resolve, 400));
+    const click = {
+      points: [{ x: local(10), y: 1, data: { yaxis: 'y' } }],
+    };
+    createDialog.mockClear();
+
+    // Plotly reports the first click of a double click as a click
+    (gd() as any).emit('plotly_click', click);
+    (gd() as any).emit('plotly_doubleclick');
+    await wait();
+    expect(createDialog).not.toHaveBeenCalled();
+
+    (gd() as any).emit('plotly_click', click);
+    await wait();
+    expect(createDialog).toHaveBeenCalledTimes(1);
   });
 
   it('keeps a y range set in the layout when fitting', async () => {

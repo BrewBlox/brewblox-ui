@@ -275,6 +275,7 @@ async function createPlot(): Promise<void> {
       }
     });
     plotlyElement.value.on('plotly_click', onClick);
+    plotlyElement.value.on('plotly_doubleclick', onDoubleClick);
     plotlyElement.value.on('plotly_clickannotation', onAnnotationClick);
     if ((view.value.range != null || props.fitY != null) && !props.static) {
       await reactPlot();
@@ -298,12 +299,29 @@ async function renderPlot(): Promise<void> {
   }
 }
 
+// Plotly reports the first click of a double click as a click.
+// The prompt for an annotation waits until that is ruled out:
+// a double click resets the zoom, also on a line.
+const DOUBLE_CLICK_DELAY_MS = 300; // Plotly's default doubleClickDelay
+let pendingAnnotation: ReturnType<typeof setTimeout> | undefined;
+
 function onClick(evt: PlotMouseEvent): void {
   if (!props.annotated || !evt.points.length) {
     return;
   }
-
   const point = evt.points[0];
+  clearTimeout(pendingAnnotation);
+  pendingAnnotation = setTimeout(
+    () => promptAnnotation(point),
+    DOUBLE_CLICK_DELAY_MS,
+  );
+}
+
+function onDoubleClick(): void {
+  clearTimeout(pendingAnnotation);
+}
+
+function promptAnnotation(point: PlotMouseEvent['points'][number]): void {
   createDialog({
     component: 'TextDialog',
     componentProps: {
@@ -378,6 +396,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   debouncedRender.cancel();
+  clearTimeout(pendingAnnotation);
   window.removeEventListener('resize', debouncedRender);
   window.removeEventListener('orientationchange', debouncedRender);
   Plotly.purge(plotlyElement.value!);
