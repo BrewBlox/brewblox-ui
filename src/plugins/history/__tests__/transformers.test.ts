@@ -245,7 +245,6 @@ describe('graphSourceTransformer', () => {
       ]),
     );
 
-    vi.setSystemTime((NOW + 60) * 1000);
     graphSourceTransformer(
       source,
       message(false, [range(SENSOR, [[NOW + 55, 22]])]),
@@ -269,10 +268,76 @@ describe('graphSourceTransformer', () => {
       ]),
     );
 
-    vi.setSystemTime((NOW + 600) * 1000);
-    graphSourceTransformer(source, message(false, [range(SENSOR, [])]));
+    graphSourceTransformer(
+      source,
+      message(false, [range(SENSOR, [[NOW + 595, 22]])]),
+    );
+
+    expect(source.values[SENSOR].y).toEqual([20, 21, 22]);
+  });
+
+  it('empties a line once all its points fell out of a live window', () => {
+    const source = graphSource({ duration: '10m' });
+    graphSourceTransformer(
+      source,
+      message(true, [
+        range(SENSOR, [[NOW - 60, 20]]),
+        range(PWM, [[NOW - 500, 50]]),
+      ]),
+    );
+
+    graphSourceTransformer(
+      source,
+      message(false, [range(SENSOR, [[NOW + 195, 21]])]),
+    );
 
     expect(source.values[SENSOR].y).toEqual([20, 21]);
+    expect(source.values[PWM].x).toEqual([]);
+    expect(source.values[PWM].y).toEqual([]);
+    expect(source.values[PWM].name).toContain('--.--');
+  });
+
+  it('trims a live window from its newest point when the browser clock is ahead', () => {
+    // A Brewblox host without a clock source can run behind the device that shows the graph
+    vi.setSystemTime((NOW + 900) * 1000);
+    const source = graphSource({ duration: '10m' });
+    graphSourceTransformer(
+      source,
+      message(true, [
+        range(SENSOR, [
+          [NOW - 595, 20],
+          [NOW - 300, 21],
+          [NOW - 5, 22],
+        ]),
+      ]),
+    );
+    expect(source.values[SENSOR].y).toEqual([20, 21, 22]);
+
+    graphSourceTransformer(
+      source,
+      message(false, [range(SENSOR, [[NOW + 10, 23]])]),
+    );
+    expect(source.values[SENSOR].y).toEqual([21, 22, 23]);
+  });
+
+  it('trims a live window from its newest point when the browser clock is behind', () => {
+    vi.setSystemTime((NOW - 900) * 1000);
+    const source = graphSource({ duration: '10m' });
+    graphSourceTransformer(
+      source,
+      message(true, [
+        range(SENSOR, [
+          [NOW - 595, 20],
+          [NOW - 5, 21],
+        ]),
+      ]),
+    );
+
+    graphSourceTransformer(
+      source,
+      message(false, [range(SENSOR, [[NOW + 10, 22]])]),
+    );
+    expect(source.values[SENSOR].y).toEqual([21, 22]);
   });
 });
 

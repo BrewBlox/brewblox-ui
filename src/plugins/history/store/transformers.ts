@@ -103,14 +103,25 @@ export function graphSourceTransformer(
   });
 
   if (source.params.duration && !source.params.start && !source.params.end) {
-    // timestamp in Ms that should be discarded
-    const boundary =
-      new Date().getTime() - (parseDuration(source.params.duration) ?? 0);
-    forEach(source.values, (val) => {
+    // The window ends at the newest point, not at the browser's now:
+    // the points carry the time of the history host, whose clock can differ.
+    // Timestamp in Ms that should be discarded
+    const newest = Math.max(
+      ...Object.values(source.values).map((val) => last(val.x) ?? -Infinity),
+    );
+    const boundary = newest - (parseDuration(source.params.duration) ?? 0);
+    forEach(source.values, (val, key) => {
       const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
       if (boundaryIdx > 0) {
         val.x = val.x.slice(boundaryIdx);
         val.y = val.y.slice(boundaryIdx);
+      }
+      // A field that stopped getting points (a deleted block, a removed service)
+      // would otherwise keep its line, and stretch the x axis back to it
+      if (boundaryIdx === -1 && val.x.length > 0) {
+        val.x = [];
+        val.y = [];
+        val.name = fieldLabel(source, key, undefined);
       }
     });
   }
