@@ -124,14 +124,13 @@ function toggleHandler(): void {
     return;
   }
 
-  // We can't toggle the block setting if it's claimed
-  // Show the dialog as fallback behavior
-  if (isClaimed.value) {
-    showBlockDialog();
-    return;
-  }
-
   if (isDigital(block.value)) {
+    // The block claiming the actuator sets its state: toggling it does nothing.
+    // Show the dialog as fallback behavior
+    if (isClaimed.value) {
+      showBlockDialog();
+      return;
+    }
     const storedState =
       block.value.data.state === DigitalState.STATE_INACTIVE
         ? DigitalState.STATE_ACTIVE
