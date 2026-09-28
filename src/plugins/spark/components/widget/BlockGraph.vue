@@ -117,10 +117,10 @@ function saveLayout(layout: Partial<Layout>): void {
         @layout="saveLayout"
       >
         <template #controls>
+          <!-- Not closed by any click: the Display Axis header only expands -->
           <q-btn-dropdown
             flat
             icon="settings"
-            :auto-close="true"
           >
             <ExportGraphAction
               :config="graphConfig"
