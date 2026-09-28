@@ -4,6 +4,7 @@ import {
   bloxQty,
   durationMs,
   durationString,
+  fixedNumber,
   prettyQty,
   prettyUnit,
   rawQty,
@@ -59,6 +60,17 @@ describe('prettify Quantity', () => {
   it('should prettify quantities', () => {
     expect(prettyQty(bloxQty(10, 'degC'))).toBe('10.00 °C');
     expect(prettyQty(bloxQty('61m30s'))).toBe('1h 1m 30s');
+  });
+});
+
+describe('fixedNumber', () => {
+  it('should show a placeholder with as many decimals', () => {
+    expect(fixedNumber(20.04, 1)).toEqual('20.0');
+    expect(fixedNumber(null, 1)).toEqual('--.-');
+    expect(fixedNumber(undefined)).toEqual('--.--');
+    expect(fixedNumber(null, 3)).toEqual('--.---');
+    expect(fixedNumber(null, 0)).toEqual('---');
+    expect(prettyQty(rawQty(null, 'degC'), 1)).toEqual('--.- °C');
   });
 });
 
