@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>Brewblox</title>
@@ -66,6 +66,40 @@
   </script>
 
   <body>
+    <!-- Shown by the check below in browsers older than the build supports -->
+    <div
+      id="unsupported-browser"
+      hidden
+      style="
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 10000;
+        padding: 40px 16px;
+        text-align: center;
+        font-family: sans-serif;
+        color: white;
+        background: #121212;
+      "
+    >
+      This browser is too old for Brewblox.<br />
+      Update it, or open Brewblox in another browser.
+    </div>
+    <script>
+      // The build supports Chrome 87, Safari 14 and Firefox 78 (vite.config.mts).
+      // Older browsers show a blank page without this.
+      // replaceAll is missing before Chrome 85 and Firefox 77; BigInt before Safari 14.
+      if (!('replaceAll' in String.prototype) || typeof BigInt !== 'function') {
+        document.getElementById('unsupported-browser').hidden = false;
+      }
+    </script>
+    <!-- Browsers without module support never load the app -->
+    <script nomodule>
+      document.getElementById('unsupported-browser').hidden = false;
+    </script>
+
     <!-- DO NOT touch the following DIV -->
     <div id="q-app"></div>
     <script

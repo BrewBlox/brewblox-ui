@@ -11,6 +11,13 @@
 
 Due to limitations in the way Docker is handled on Windows, Linux or Mac is required for development.
 
+## Supported browsers
+
+Chrome and Edge 87+, Firefox 78+ and Safari 14+ (iOS 14+), as set in `vite.config.mts` and `browserslist` in `package.json`.
+The build compiles newer syntax down for these browsers, and adds polyfills for the newer functions that the app and its libraries use.
+Older browsers show a message asking to update.
+Below Chrome 111, Safari 16.2 and Firefox 113, shadows are not drawn.
+
 ## Installation
 
 **This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at <https://brewblox.com/>**

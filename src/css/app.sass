@@ -162,6 +162,21 @@ $widget-border-radius: 4px
 .monospace
   font-family: "Lucida Console", Monaco, monospace
 
+// Quasar limits dialogs to the viewport with dvh units, which browsers before
+// Chrome 108 and Safari 15.4 do not know: they drop the whole rule,
+// and a tall dialog runs off the screen.
+// On iOS, Quasar sets --q-dialog-viewport-height to the part the keyboard leaves free.
+@supports not (height: 100dvh)
+  .q-dialog__inner--minimized > div
+    max-height: calc(var(--q-dialog-viewport-height, 100vh) - 48px)
+
+  .q-dialog__inner--maximized > div
+    max-height: var(--q-dialog-viewport-height, 100vh)
+
+  body.q-ios-padding .q-dialog__inner > div,
+  body.q-safe-area-padding .q-dialog__inner > div
+    max-height: calc(var(--q-dialog-viewport-height, 100vh) - var(--q-safe-area-inset-top) - var(--q-safe-area-inset-bottom)) !important
+
 .q-dialog
   &__backdrop
     background: rgba(0, 0, 0, 0.9)
