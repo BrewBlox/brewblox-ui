@@ -36,6 +36,10 @@ const emit = defineEmits<{
   annotations: [payload: GraphAnnotation[]];
 }>();
 
+// Plotly.react keeps zoom, pan and legend edits made in the graph
+// as long as uirevision stays the same (compared with ===)
+const UI_REVISION = 'graph';
+
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
   font: {
@@ -83,9 +87,6 @@ const graphData = inject(GraphDataKey)!;
 if (!graphData) {
   throw new Error('No graph data ref injected');
 }
-
-let zoomed = false;
-let skippedRender = false;
 
 const annotations = computed<GraphAnnotation[]>(
   () => props.layout.annotations ?? [],
@@ -156,7 +157,7 @@ function combinedLayout(): Partial<Layout> {
   >(
     layoutDefaults(),
     props.layout,
-    calcSize(),
+    { ...calcSize(), uirevision: UI_REVISION },
     props.static ? { dragmode: false, hovermode: false } : {},
     graphData.value.some((d) => d.yaxis === 'y2')
       ? { xaxis: { domain: [0, 0.89] }, yaxis: { position: 0.9 } }
@@ -166,10 +167,6 @@ function combinedLayout(): Partial<Layout> {
 
 function displayError(msg: string): void {
   notify.warn(`Failed to render graph: ${msg}`);
-}
-
-async function relayoutPlot(): Promise<void> {
-  await Plotly.relayout(plotlyElement.value!, combinedLayout());
 }
 
 async function reactPlot(): Promise<void> {
@@ -193,25 +190,22 @@ async function createPlot(): Promise<void> {
       combinedLayout(),
       combinedConfig(),
     );
-    plotlyElement.value.on('plotly_relayout', onRelayout);
     plotlyElement.value.on('plotly_click', onClick);
-    plotlyElement.value.on('plotly_doubleclick', onDoubleClick);
     plotlyElement.value.on('plotly_clickannotation', onAnnotationClick);
   } catch (e: any) {
     displayError(e.message);
   }
 }
 
-async function renderPlot(layoutChanged: boolean): Promise<void> {
+// Every render goes through Plotly.react, with the current data and layout.
+// Plotly.relayout would reset the zoom (the layout defaults autorange),
+// and would emit plotly_relayout for our own changes.
+async function renderPlot(): Promise<void> {
   if (!plotlyElement.value) {
     return;
   }
-  if (zoomed) {
-    skippedRender = true;
-    return;
-  }
   try {
-    layoutChanged ? await relayoutPlot() : await reactPlot();
+    await reactPlot();
   } catch (e: any) {
     displayError(e.message);
   }
@@ -245,14 +239,6 @@ function onClick(evt: PlotMouseEvent): void {
   });
 }
 
-function onDoubleClick(): void {
-  zoomed = false;
-  if (skippedRender) {
-    skippedRender = false;
-    renderPlot(false);
-  }
-}
-
 function onAnnotationClick(evt: ClickAnnotationEvent): void {
   if (!props.annotated || annotations.value.length < evt.index) {
     return;
@@ -274,35 +260,29 @@ function onAnnotationClick(evt: ClickAnnotationEvent): void {
   });
 }
 
-function onRelayout(eventdata: Mapped<any>): void {
-  if (eventdata['xaxis.range[0]'] || eventdata['xaxis.range[1]']) {
-    zoomed = true;
-  }
-}
-
 const debouncedRender = debounce(renderPlot, 50);
-const debouncedRelayout = debounce(relayoutPlot, 100);
 
 watch(
   () => [props.config, props.revision, graphData.value],
-  () => debouncedRender(false),
+  () => debouncedRender(),
 );
 
 watch(
   () => props.layout,
-  () => debouncedRender(true),
+  () => debouncedRender(),
   { deep: true },
 );
 
 onMounted(() => {
   createPlot();
-  window.addEventListener('resize', debouncedRelayout);
-  window.addEventListener('orientationchange', debouncedRelayout);
+  window.addEventListener('resize', debouncedRender);
+  window.addEventListener('orientationchange', debouncedRender);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', debouncedRelayout);
-  window.removeEventListener('orientationchange', debouncedRelayout);
+  debouncedRender.cancel();
+  window.removeEventListener('resize', debouncedRender);
+  window.removeEventListener('orientationchange', debouncedRender);
   Plotly.purge(plotlyElement.value!);
 });
 </script>
@@ -314,7 +294,7 @@ onBeforeUnmount(() => {
       @resize="
         (v) => {
           containerSize = v;
-          debouncedRender(true);
+          debouncedRender();
         }
       "
     />
