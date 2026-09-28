@@ -18,6 +18,7 @@ import {
 } from '@/plugins/builder/const';
 import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { prettyLink, roundedNumber } from '@/utils/quantity';
 import { ON_INTERACT_KEY, OnInteractBehavior } from '../blueprints/Pump';
 import { usePart, useSettingsBlock } from '../composables';
 
@@ -75,6 +76,30 @@ const liquids = computed<string[]>(() =>
 const pwmSetting = computed<number>(() =>
   isPwm(block.value) ? Number(block.value.data.setting) : 100,
 );
+
+const pwmBlock = computed<PwmBlockT | null>(() =>
+  isPwm(block.value) ? block.value : null,
+);
+
+const pressureNote = computed<string>(() =>
+  pwmBlock.value ? 'With a PWM, this is the pressure at 100%.' : '',
+);
+
+// The speed the PWM runs at, after its constraints.
+// A claiming PID can desire far more than 100%.
+const pwmSpeed = computed<number | null>(() => {
+  const v = pwmBlock.value?.data.setting;
+  return v != null ? roundedNumber(v, 0) : null;
+});
+
+// The slider sets the stored setting: it shows what was set by hand,
+// or while a PID claims the PWM, the speed it runs at
+const pwmSliderValue = computed<number>(() => {
+  const v = isClaimed.value
+    ? pwmSpeed.value
+    : pwmBlock.value?.data.desiredSetting;
+  return v != null ? roundedNumber(v, 0) : 0;
+});
 
 const duration = computed<number>(() => {
   const onPressure = Number(
@@ -268,11 +293,32 @@ function interactHandler(): void {
             @show="showBlockDialog"
             @assign="showBlockSelectDialog"
           />
+          <q-item v-if="pwmBlock">
+            <q-item-section>
+              <q-item-label>
+                Speed: {{ pwmSpeed != null ? `${pwmSpeed}%` : '-' }}
+              </q-item-label>
+              <q-item-label
+                v-if="isClaimed"
+                caption
+              >
+                Set by {{ prettyLink(pwmBlock.data.claimedBy) }}
+              </q-item-label>
+              <q-slider
+                :model-value="pwmSliderValue"
+                :disable="isClaimed"
+                label
+                color="primary"
+                @change="(v) => patchBlock({ storedSetting: v })"
+              />
+            </q-item-section>
+          </q-item>
           <PressureMenuContent
             :settings-key="IO_PRESSURE_KEY"
             :min="MIN_PUMP_PRESSURE"
             :max="MAX_PUMP_PRESSURE"
             :default="DEFAULT_PUMP_PRESSURE"
+            :note="pressureNote"
           />
         </q-list>
       </q-menu>
