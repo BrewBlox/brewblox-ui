@@ -405,6 +405,34 @@ describe('PlotlyGraph view', () => {
     expect(createDialog).toHaveBeenCalledTimes(1);
   });
 
+  it('gives each y axis a label column of at least 40 px', async () => {
+    const both = (): Partial<PlotData>[] => [
+      trace(60),
+      { ...trace(60), uid: 'b', yaxis: 'y2' },
+    ];
+    const positions = (gd: HTMLElement): number[] => {
+      const layout = (gd as any)._fullLayout;
+      return [
+        layout.xaxis.domain[1],
+        layout.yaxis.position,
+        layout.yaxis2.position,
+      ].map((v) => +v.toFixed(3));
+    };
+
+    const narrow = await mountGraph(
+      { layout: { width: 400, height: 300 } },
+      shallowRef(both()),
+    );
+    expect(positions(narrow.gd())).toEqual([0.79, 0.8, 0.9]);
+
+    // Wide graphs keep 5% per column
+    const wide = await mountGraph(
+      { layout: { width: 1600, height: 300 } },
+      shallowRef(both()),
+    );
+    expect(positions(wide.gd())).toEqual([0.89, 0.9, 0.95]);
+  });
+
   it('keeps a y range set in the layout when fitting', async () => {
     const { gd } = await mountGraph({
       fitY: [at(10), at(20)],

@@ -222,10 +222,27 @@ function combinedLayout(range: GraphRange | null, fit = true): Partial<Layout> {
           yaxis2: { uirevision: STATIC_REVISION },
         }
       : {},
-    graphData.value.some((d) => d.yaxis === 'y2')
-      ? { xaxis: { domain: [0, 0.89] }, yaxis: { position: 0.9 } }
-      : { xaxis: { domain: [0, 0.94] }, yaxis: { position: 0.95 } },
+    yAxesPositions(),
   );
+}
+
+// The y axes sit at the right, each with its tick labels to its right.
+// A label column takes 5% of the width, and at least 40 px:
+// in a narrow graph, 5% put the labels of y and y2 against each other.
+const LABEL_COLUMN_PX = 40;
+
+function yAxesPositions(): Partial<Layout> {
+  const column = Math.max(0.05, LABEL_COLUMN_PX / calcSize().width);
+  return graphData.value.some((d) => d.yaxis === 'y2')
+    ? {
+        xaxis: { domain: [0, 1 - 2 * column - 0.01] },
+        yaxis: { position: 1 - 2 * column },
+        yaxis2: { position: 1 - column },
+      }
+    : {
+        xaxis: { domain: [0, 1 - column - 0.01] },
+        yaxis: { position: 1 - column },
+      };
 }
 
 function displayError(msg: string): void {
