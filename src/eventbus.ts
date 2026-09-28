@@ -5,6 +5,7 @@ import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';
 import { popById } from '@/utils/collections';
 import { mqttTopicExp } from '@/utils/misc';
 import { notify } from '@/utils/notify';
+import { workerInterval } from '@/utils/worker-interval';
 import { createDialog } from './utils/dialog';
 
 export type EventCallback = (topic: string, evt: any) => unknown;
@@ -30,6 +31,8 @@ export class BrewbloxEventbus {
       path: '/eventbus',
       rejectUnauthorized: false,
       reschedulePings: false,
+      // mqtt's own worker timers can fire every keepalive at once: see workerInterval
+      timerVariant: workerInterval,
     };
     if (this.client) {
       this.client.end();
