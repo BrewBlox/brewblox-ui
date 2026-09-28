@@ -31,6 +31,7 @@ import {
 } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { builderTools, SQUARE_SIZE } from './const';
+import { isEditorEvent } from './editor-events';
 import { openPartMenu } from './part-menu';
 import { useBuilderStore } from './store';
 import { EditableKey, PortalIdKey } from './symbols';
@@ -99,6 +100,7 @@ const portalId = nanoid();
 provide(PortalIdKey, portalId);
 
 const toolsMenuExpanded = ref<boolean>(!dense.value);
+const focusAreaRef = ref<HTMLElement>();
 const activeToolId = ref<BuilderToolName | null>('pan');
 
 const gridHoverPos = ref<XYPosition | null>(null);
@@ -106,11 +108,6 @@ const partDragStart = ref<XYPosition | null>(null);
 
 const selectedIds = ref<string[]>([]);
 const floater = ref<Floater | null>(null);
-
-const focusWarningEnabled = computed<boolean>({
-  get: () => builderStore.focusWarningEnabled,
-  set: (v) => (builderStore.focusWarningEnabled = v),
-});
 
 const layouts = computed<BuilderLayout[]>(() => builderStore.layouts);
 
@@ -613,6 +610,9 @@ const disabledTools = computed<BuilderToolName[]>(() => {
 ////////////////////////////////////////////////////////////////
 
 function onClipboardCopy(evt: ClipboardEvent): void {
+  if (!isEditorEvent(evt, focusAreaRef.value)) {
+    return;
+  }
   const activeParts = findActiveParts(true);
   if (!activeParts.length) {
     return;
@@ -625,6 +625,9 @@ function onClipboardCopy(evt: ClipboardEvent): void {
 }
 
 function onClipboardCut(evt: ClipboardEvent): void {
+  if (!isEditorEvent(evt, focusAreaRef.value)) {
+    return;
+  }
   const activeParts = findActiveParts(true);
   if (!activeParts.length) {
     return;
@@ -645,6 +648,9 @@ function onClipboardCut(evt: ClipboardEvent): void {
 }
 
 function onClipboardPaste(evt: ClipboardEvent): void {
+  if (!isEditorEvent(evt, focusAreaRef.value)) {
+    return;
+  }
   evt.preventDefault();
   const content = evt.clipboardData?.getData('BuilderClipboardContent');
   if (!content) {
@@ -701,6 +707,9 @@ function contextMenuHandler(evt: MouseEvent): void {
 }
 
 function keyHandler(evt: KeyboardEvent): void {
+  if (!isEditorEvent(evt, focusAreaRef.value)) {
+    return;
+  }
   const key = keyEventString(evt);
   const keyDelta = moveKeys[key];
   const tool = builderTools.find((v) => v.shortcut === key);
@@ -989,12 +998,14 @@ watch(
 );
 
 onBeforeMount(() => {
+  document.body.addEventListener('keydown', keyHandler);
   document.body.addEventListener('copy', onClipboardCopy);
   document.body.addEventListener('cut', onClipboardCut);
   document.body.addEventListener('paste', onClipboardPaste);
 });
 
 onBeforeUnmount(() => {
+  document.body.removeEventListener('keydown', keyHandler);
   document.body.removeEventListener('copy', onClipboardCopy);
   document.body.removeEventListener('cut', onClipboardCut);
   document.body.removeEventListener('paste', onClipboardPaste);
@@ -1004,9 +1015,6 @@ onBeforeUnmount(() => {
 <template>
   <q-page
     class="page-height"
-    @keydown="keyHandler"
-    @cut="onClipboardCut"
-    @paste="onClipboardPaste"
     @contextmenu.prevent
   >
     <TitleTeleport v-if="layout">
@@ -1053,10 +1061,6 @@ onBeforeUnmount(() => {
             icon="mdi-stretch-to-page-outline"
             @click="resetZoom"
           />
-          <ToggleAction
-            v-model="focusWarningEnabled"
-            label="Show focus warning"
-          />
         </template>
       </ActionMenu>
     </ButtonsTeleport>
@@ -1098,6 +1102,7 @@ onBeforeUnmount(() => {
     <!-- Grid -->
     <div
       v-else
+      ref="focusAreaRef"
       class="fit focus-area"
       tabindex="-1"
     >
@@ -1181,19 +1186,6 @@ onBeforeUnmount(() => {
         @touchstart.stop
         @mousedown.stop
       />
-      <div
-        v-if="focusWarningEnabled"
-        class="unfocus-overlay"
-        @click.stop="setFocus"
-        @contextmenu.prevent
-      >
-        <transition
-          appear
-          name="fade"
-        >
-          <div class="unfocus-message">Click to resume editing</div>
-        </transition>
-      </div>
     </div>
     <div id="builder-teleport" />
   </q-page>
@@ -1203,37 +1195,4 @@ onBeforeUnmount(() => {
 .q-page-container
   max-height: 100vh
   max-width: 100vw
-
-.focus-area:focus-within .unfocus-overlay
-  display: none
-
-.unfocus-overlay
-  position: absolute
-  top: 0
-  left: 0
-  height: 100%
-  width: 100%
-  background-color: rgba(0, 0, 0, 0.5)
-  transition: 1s
-
-.unfocus-message
-  position: absolute
-  top: 50%
-  left: 50%
-  transform: translate(-50%, -50%)
-  padding: 20px
-  border: 2px solid silver
-  border-radius: 40px
-  color: white
-  background-color: rgba(0, 0, 0, 0.7)
-  font-size: 1.8rem
-
-.fade-enter-active
-  transition: opacity 4s ease
-
-.fade-enter
-  opacity: 0
-
-  &-to
-    opacity: 1
 </style>
