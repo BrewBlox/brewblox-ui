@@ -13,12 +13,16 @@ interface Props {
   params: QueryParams;
   showRange?: boolean;
   showPresets?: boolean;
+  showFollow?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showRange: false,
   showPresets: false,
+  showFollow: false,
 });
+
+const follow = defineModel<boolean>('follow', { default: false });
 
 const emit = defineEmits<{
   'update:layout': [payload: Partial<Layout>];
@@ -47,6 +51,16 @@ function chooseDuration(): void {
 </script>
 
 <template>
+  <q-btn
+    v-if="showFollow"
+    flat
+    icon="mdi-arrow-collapse-right"
+    :color="follow ? 'primary' : ''"
+    class="col-auto"
+    @click="follow = !follow"
+  >
+    <q-tooltip>Follow the newest data</q-tooltip>
+  </q-btn>
   <ActionMenu
     v-if="showRange"
     icon="mdi-arrow-expand-vertical"

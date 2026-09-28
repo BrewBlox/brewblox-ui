@@ -359,4 +359,9 @@ onBeforeUnmount(() => {
 
 .xy2
   color: green
+
+// Plotly's tips after a zoom or a legend click sit at the top right of the window,
+// over graph controls there, and would take their clicks
+.plotly-notifier
+  pointer-events: none
 </style>

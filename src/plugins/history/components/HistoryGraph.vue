@@ -13,9 +13,18 @@ import {
   watchEffect,
 } from 'vue';
 import { GraphDataKey } from '@/components/graph/symbols';
+import {
+  emptyGraphView,
+  GraphRange,
+  GraphView,
+  oldestX,
+  viewRange,
+} from '@/components/graph/view';
 import { migrationGraphHint } from '@/plugins/history/migration';
 import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
+import { isOpenEndedQuery } from '@/plugins/history/utils';
+import { isJsonEqual } from '@/utils/objects';
 
 interface Props {
   graphId: string;
@@ -26,6 +35,7 @@ interface Props {
   teleportControls?: boolean;
   sourceRevision?: Date;
   renderRevision?: Date;
+  static?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -35,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
   teleportControls: false,
   sourceRevision: () => new Date(),
   renderRevision: () => new Date(),
+  static: false,
 });
 
 const emit = defineEmits<{
@@ -59,6 +70,60 @@ const params = computed<QueryParams>({
 const layout = computed<Partial<Layout>>({
   get: () => props.config.layout ?? {},
   set: (v) => emit('layout', v),
+});
+
+// The x view is kept here, and not in the graph layout:
+// it is not persisted, and it outlives the PlotlyGraph,
+// which is recreated when the data is reloaded.
+const view = shallowRef<GraphView>(emptyGraphView());
+
+// A zoom belongs to the data it was made on.
+// A layout edit keeps it.
+watch(
+  () => [props.config.params, props.config.fields],
+  (newV, oldV) => {
+    if (!isJsonEqual(newV, oldV)) {
+      view.value = emptyGraphView();
+    }
+  },
+);
+
+// A static graph cannot be zoomed, nor reset
+watch(
+  () => props.static,
+  (isStatic) => {
+    if (isStatic) {
+      view.value = emptyGraphView();
+    }
+  },
+);
+
+// Following new data only applies to queries that keep getting new data
+const showFollow = computed<boolean>(
+  () =>
+    view.value.range != null && !props.static && isOpenEndedQuery(params.value),
+);
+
+// The x range the graph showed last.
+// While the data reloads, the graph is not shown and has no points to follow.
+let shownRange: GraphRange | null = null;
+watchEffect(() => {
+  if (error.value == null) {
+    shownRange = viewRange(view.value, graphData.value);
+  }
+});
+
+// Turning Follow on or off keeps the window that was shown last,
+// also while the data reloads
+const follow = computed<boolean>({
+  get: () => view.value.follow,
+  set: (v) => {
+    const range =
+      error.value == null ? viewRange(view.value, graphData.value) : shownRange;
+    if (range != null) {
+      view.value = { range, follow: v };
+    }
+  },
 });
 
 const sourceRef = computed<ShallowRef<GraphSource> | null>(() =>
@@ -131,6 +196,21 @@ watchEffect(() => {
     : NO_DATA;
 });
 
+// A live window drops its oldest points as new ones arrive.
+// Once a fixed zoom lies before all points that are left, the graph shows all data again.
+watch(graphData, (data) => {
+  const range = view.value.range;
+  const liveWindow =
+    !!params.value.duration && !params.value.start && !params.value.end;
+  if (range == null || view.value.follow || !liveWindow) {
+    return;
+  }
+  const oldest = oldestX(data);
+  if (oldest != null && range[1] < oldest) {
+    view.value = emptyGraphView();
+  }
+});
+
 // Why a graph of a period before the update can be empty for a while after it
 const migrationHint = computed<string | null>(() =>
   error.value === NO_DATA
@@ -149,11 +229,13 @@ if (!props.sharedSources) {
 </script>
 
 <template>
-  <div class="col column">
+  <div class="col column history-graph">
     <ButtonsTeleport v-if="teleportControls">
       <HistoryGraphControls
         v-model:layout="layout"
         v-model:params="params"
+        v-model:follow="follow"
+        :show-follow="showFollow"
         :show-presets="controlPresets"
         :show-range="controlRange"
       >
@@ -162,13 +244,24 @@ if (!props.sharedSources) {
         </template>
       </HistoryGraphControls>
     </ButtonsTeleport>
+    <!--
+      Without other controls, the row takes no height:
+      the Follow toggle then sits in the top margin of the plot,
+      and does not push the plot down when it appears.
+    -->
     <div
       v-else
       class="col-auto row justify-end z-top"
+      :class="{
+        'controls-overlay':
+          !controlPresets && !controlRange && !$slots.controls,
+      }"
     >
       <HistoryGraphControls
         v-model:layout="layout"
         v-model:params="params"
+        v-model:follow="follow"
+        :show-follow="showFollow"
         :show-presets="controlPresets"
         :show-range="controlRange"
       >
@@ -205,10 +298,22 @@ if (!props.sharedSources) {
 
     <PlotlyGraph
       v-else
+      v-model:view="view"
       :layout="layout"
       :revision="revision"
+      :static="props.static"
       class="col"
       v-bind="$attrs"
     />
   </div>
 </template>
+
+<style lang="sass" scoped>
+// The controls are lifted above the plot.
+// Isolating the graph keeps them below menus, dialogs and the page header.
+.history-graph
+  isolation: isolate
+
+.controls-overlay
+  height: 0
+</style>
