@@ -35,7 +35,9 @@ fi
 mkdir -p ./dist
 mkdir -p "${BREWBLOX_CACHE_DIR}/node-red"
 mkdir -p "${BREWBLOX_CACHE_DIR}/redis"
-mkdir -p "${BREWBLOX_CACHE_DIR}/victoria"
+# History's databases. ${BREWBLOX_CACHE_DIR}/victoria is left to the v1.98 victoria of older branches.
+mkdir -p "${BREWBLOX_CACHE_DIR}/history/victoria"
+mkdir -p "${BREWBLOX_CACHE_DIR}/history/victoria-dense"
 mkdir -p "${BREWBLOX_CACHE_DIR}/simulator__sparkey"
 mkdir -p "${BREWBLOX_CACHE_DIR}/simulator__spock"
 mkdir -p "${BREWBLOX_CACHE_DIR}/tilt"

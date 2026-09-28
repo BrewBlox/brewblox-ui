@@ -24,19 +24,41 @@ services:
       # MQTT over websockets
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
+  # History's databases as brewblox-ctl renders them, without its flush intervals and memory limits.
+  # victoria is the long-term database: 60 s averages that history computes from victoria-dense.
+  # Their data is kept apart from ${BREWBLOX_CACHE_DIR}/victoria, where older branches run v1.98:
+  # that version misses what a newer one writes into its directory.
   victoria:
-    image: victoriametrics/victoria-metrics:v1.98.0
+    image: victoriametrics/victoria-metrics:v1.152.0
     command: --envflag.enable=true --envflag.prefix=VM_
     labels:
       - traefik.http.services.victoria.loadbalancer.server.port=8428
     environment:
-      - VM_retentionPeriod=7d
+      - VM_retentionPeriod=100y
       - VM_influxMeasurementFieldSeparator=/
       - VM_http_pathPrefix=/victoria
+      - VM_dedup_minScrapeInterval=1ms
       - VM_search_latencyOffset=1s
     volumes:
       - type: bind
-        source: ${BREWBLOX_CACHE_DIR}/victoria
+        source: ${BREWBLOX_CACHE_DIR}/history/victoria
+        target: /victoria-metrics-data
+
+  # Every raw sample, kept as long as history's BREWBLOX_HISTORY_DENSE_RETENTION
+  victoria-dense:
+    image: victoriametrics/victoria-metrics:v1.152.0
+    command: --envflag.enable=true --envflag.prefix=VM_
+    labels:
+      - traefik.http.services.victoria-dense.loadbalancer.server.port=8428
+    environment:
+      - VM_retentionPeriod=30d
+      - VM_influxMeasurementFieldSeparator=/
+      - VM_http_pathPrefix=/victoria-dense
+      - VM_dedup_minScrapeInterval=1ms
+      - VM_search_latencyOffset=1s
+    volumes:
+      - type: bind
+        source: ${BREWBLOX_CACHE_DIR}/history/victoria-dense
         target: /victoria-metrics-data
 
   redis:
@@ -52,8 +74,8 @@ services:
   history:
     image: ghcr.io/brewblox/brewblox-history:develop
     environment:
-      - BREWBLOX_HISTORY_RANGES_INTERVAL=1s
-      - BREWBLOX_HISTORY_MINIMUM_STEP=1s
+      # Must equal victoria-dense's VM_retentionPeriod
+      - BREWBLOX_HISTORY_DENSE_RETENTION=30d
 
   node-red:
     image: nodered/node-red:latest-minimal
