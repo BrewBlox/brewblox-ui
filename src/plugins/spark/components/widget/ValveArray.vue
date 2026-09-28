@@ -14,6 +14,7 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
 import {
   channelName,
+  claimReason,
   prettyLimitations,
 } from '@/plugins/spark/utils/formatting';
 import { bloxLink } from '@/utils/link';
@@ -71,6 +72,7 @@ async function updateDigitalState(
         <DigitalStateButton
           v-if="channel.actuator"
           :disable="channel.actuator.data.claimedBy?.id != null"
+          :disable-reason="claimReason(channel.actuator)"
           :model-value="channel.actuator.data.desiredState"
           :pending="
             channel.actuator.data.state !== channel.actuator.data.desiredState

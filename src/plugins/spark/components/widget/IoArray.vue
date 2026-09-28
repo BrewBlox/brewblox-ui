@@ -20,11 +20,13 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
 import {
   channelName,
+  claimReason,
   prettyLimitations,
 } from '@/plugins/spark/utils/formatting';
 import { ifCompatible } from '@/plugins/spark/utils/info';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
+import { notify } from '@/utils/notify';
 import { fixedNumber } from '@/utils/quantity';
 
 interface EditableChannel extends IoChannel {
@@ -122,6 +124,7 @@ async function updatePwmSetting(channel: EditableChannel): Promise<void> {
         <DigitalStateButton
           v-if="channel.digitalActuator"
           :disable="channel.actuatorClaimed"
+          :disable-reason="claimReason(channel.digitalActuator)"
           :model-value="channel.digitalActuator.data.desiredState"
           :pending="
             channel.digitalActuator.data.state !==
@@ -133,11 +136,22 @@ async function updatePwmSetting(channel: EditableChannel): Promise<void> {
         />
         <div
           v-else-if="channel.pwmActuator"
-          class="col-auto clickable rounded-borders depth-1 text-bold"
+          :class="[
+            'col-auto clickable rounded-borders depth-1 text-bold',
+            { 'cursor-not-allowed': channel.actuatorClaimed },
+          ]"
+          @click="
+            channel.actuatorClaimed &&
+            notify.info(claimReason(channel.pwmActuator)!)
+          "
         >
+          <q-tooltip v-if="channel.actuatorClaimed">
+            {{ claimReason(channel.pwmActuator) }}
+          </q-tooltip>
           <q-btn
             unelevated
             :disable="channel.actuatorClaimed"
+            :class="{ 'no-pointer-events': channel.actuatorClaimed }"
             :label="`${fixedNumber(channel.pwmActuator.data.desiredSetting, 0)}%`"
             @click="updatePwmSetting(channel)"
           />
