@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AnalogConstraintBase, AnalogConstraints } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useShowBlock } from '@/plugins/spark/composables';
 import { prettyLink } from '@/utils/quantity';
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: () => ({}),
 });
+
+const showBlock = useShowBlock.setup(props.serviceId);
 
 const isConstrained = computed<boolean>(() => {
   const { min, max, balanced } = props.modelValue;
@@ -53,7 +56,8 @@ function constraintClass(constraint: AnalogConstraintBase): string[] {
     </div>
     <div
       v-if="modelValue.balanced?.enabled"
-      :class="constraintClass(modelValue.balanced)"
+      :class="[constraintClass(modelValue.balanced), 'clickable']"
+      @click="showBlock(modelValue.balanced.balancerId.id)"
     >
       Balanced: {{ prettyLink(modelValue.balanced.balancerId) }}
     </div>
