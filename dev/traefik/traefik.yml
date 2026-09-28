@@ -10,7 +10,7 @@ api:
 
 providers:
   docker:
-    constraints: 'LabelRegex(`com.docker.compose.project`, `brewblox-ui`)'
+    constraints: 'Label(`com.docker.compose.project`, `brewblox-ui`)'
     defaultRule: 'PathPrefix(`/{{ index .Labels "com.docker.compose.service" }}`)'
   file:
     directory: /config/dynamic
