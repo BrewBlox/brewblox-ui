@@ -115,6 +115,12 @@ const errors = computed<string[]>(() => {
       </template>
     </CardWarning>
 
+    <!-- Switch the actuators of the channels, as on other IO modules -->
+    <template v-if="block.data.channels.length > 0">
+      <IoArray />
+      <q-separator />
+    </template>
+
     <div class="widget-body">
       <div class="text-subtitle1 text-right col">Digital channels</div>
       <GpioArrayEditor
