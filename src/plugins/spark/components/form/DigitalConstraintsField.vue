@@ -63,8 +63,11 @@ function constraintMutexString(constraint: MutexedConstraint): string {
 </script>
 
 <template>
-  <div class="col-auto row q-ma-sm q-pa-sm q-gutter-x-sm">
-    <div class="col-auto column">
+  <LabeledField
+    label="Constraints"
+    class="q-ma-sm"
+  >
+    <div class="column">
       <div
         v-if="!isConstrained"
         class="text-italic darkish text-small"
@@ -110,5 +113,5 @@ function constraintMutexString(constraint: MutexedConstraint): string {
         {{ constraintMutexString(modelValue.mutexed) }}
       </div>
     </div>
-  </div>
+  </LabeledField>
 </template>
