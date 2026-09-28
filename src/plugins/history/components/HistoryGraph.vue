@@ -22,6 +22,7 @@ import {
 } from '@/components/graph/view';
 import { migrationGraphHint } from '@/plugins/history/migration';
 import { useHistoryStore } from '@/plugins/history/store';
+import { legendName } from '@/plugins/history/store/transformers';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 import { isOpenEndedQuery } from '@/plugins/history/utils';
 import { isJsonEqual } from '@/utils/objects';
@@ -190,7 +191,17 @@ watchEffect(() => {
     return;
   }
 
-  graphData.value = Object.values(source.value.values);
+  // Plotly gets copies of the traces. The legend shows the value of each field
+  // at the right edge of the window shown, and what Plotly writes into its data,
+  // such as a legend click, stays with this graph: other graphs may share the source.
+  const traces = source.value.values;
+  const end = props.static
+    ? null
+    : (viewRange(view.value, Object.values(traces))?.[1] ?? null);
+  graphData.value = Object.entries(traces).map(([key, trace]) => ({
+    ...trace,
+    name: legendName(source.value, key, end),
+  }));
   error.value = graphData.value.some((data) => data.x && data.x.length > 0)
     ? null
     : NO_DATA;

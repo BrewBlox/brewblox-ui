@@ -7,6 +7,7 @@ import Plotly, {
   ClickAnnotationEvent,
   Config,
   Layout,
+  PlotData,
   PlotlyHTMLElement,
   PlotMouseEvent,
   PlotRelayoutEvent,
@@ -194,10 +195,18 @@ function displayError(msg: string): void {
   notify.warn(`Failed to render graph: ${msg}`);
 }
 
+// Plotly gets new copies of the traces for every render.
+// It writes edits made in the graph, such as a legend click, into the traces it gets,
+// and keeps them across renders only while the traces it gets do not carry them:
+// the same objects again would, and the edit would be lost with the next copies.
+function plotTraces(): Partial<PlotData>[] {
+  return graphData.value.map((trace) => ({ ...trace }));
+}
+
 async function reactPlot(): Promise<void> {
   await Plotly.react(
     plotlyElement.value!,
-    graphData.value,
+    plotTraces(),
     // A static plot cannot be zoomed, nor reset: it shows all data
     combinedLayout(
       props.static ? null : viewRange(view.value, graphData.value),
@@ -216,7 +225,7 @@ async function createPlot(): Promise<void> {
     // The plot is created with autorange, so a double click shows all data.
     await Plotly.newPlot(
       plotlyElement.value,
-      graphData.value,
+      plotTraces(),
       combinedLayout(null),
       combinedConfig(),
     );

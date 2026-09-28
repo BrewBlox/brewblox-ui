@@ -14,7 +14,9 @@ import { notify } from '@/utils/notify';
 import {
   doubleClick,
   guiRelayout,
+  guiRestyle,
   shownXRange,
+  traceVisibility,
   xAutorange,
 } from '../../../../test/plotly';
 
@@ -302,6 +304,25 @@ describe('PlotlyGraph view', () => {
     expect((gd() as any)._context.staticPlot).toBe(true);
     expect(xAutorange(gd())).toBe(true);
     expect((gd() as any)._fullLayout.yaxis.autorange).toBe(true);
+  });
+
+  it('keeps a hidden legend entry through renders without new data', async () => {
+    const two = (minutes: number): Partial<PlotData>[] => [
+      trace(minutes),
+      { ...trace(minutes), uid: 'b' },
+    ];
+    const { wrapper, graphData, gd } = await mountGraph(
+      {},
+      shallowRef(two(60)),
+    );
+    await guiRestyle(gd(), { visible: 'legendonly' }, [1]);
+
+    // A size change renders the same traces
+    await wrapper.setProps({ layout: { width: 500, height: 300 } });
+    await settle();
+    graphData.value = two(61);
+    await settle();
+    expect(traceVisibility(gd())).toEqual([true, 'legendonly']);
   });
 
   it('keeps a zoom without a bound view', async () => {

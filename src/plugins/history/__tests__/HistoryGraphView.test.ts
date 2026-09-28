@@ -10,7 +10,12 @@ import { graphSourceTransformer } from '@/plugins/history/store/transformers';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 import { emptyGraphConfig, isOpenEndedQuery } from '@/plugins/history/utils';
 import { notify } from '@/utils/notify';
-import { guiRelayout, shownXRange } from '../../../../test/plotly';
+import {
+  guiRelayout,
+  guiRestyle,
+  shownXRange,
+  traceVisibility,
+} from '../../../../test/plotly';
 
 const MIN = 60 * 1000;
 const T0 = new Date(2026, 8, 28, 10, 0).getTime();
@@ -40,6 +45,7 @@ const graphConfig = (params: QueryParams = {}): GraphConfig => ({
 });
 
 interface Mounted {
+  graphId: string;
   wrapper: VueWrapper;
   send: (initial: boolean, minutes: number[]) => Promise<void>;
   reload: () => Promise<void>;
@@ -52,8 +58,8 @@ const mounted: VueWrapper[] = [];
 async function mountGraph(
   props: Record<string, unknown> = {},
   minutes = range(0, 60),
+  graphId = nanoid(),
 ): Promise<Mounted> {
-  const graphId = nanoid();
   const historyStore = useHistoryStore();
   const source = (): any => historyStore.sourceById<GraphSource>(graphId)!;
 
@@ -93,9 +99,13 @@ async function mountGraph(
     await settle();
   };
 
-  await send(true, minutes);
+  // A graph with a shared source shows what the owner of the source gets
+  if (!props.sharedSources) {
+    await send(true, minutes);
+  }
 
   return {
+    graphId,
     wrapper,
     send,
     reload,
@@ -314,6 +324,64 @@ describe('HistoryGraph view', () => {
     await settle();
     await send(false, [62]);
     expect((gd() as any)._fullLayout.xaxis.autorange).toBe(true);
+  });
+
+  it('shows the value at the right edge of the window in the legend', async () => {
+    // The value at minute m is m % 7
+    const { gd, send, followButton } = await mountGraph();
+    const names = (): string[] => (gd() as any).data.map((t: any) => t.name);
+    expect(names()[0]).toContain('4.00');
+
+    await zoom(gd(), 10, 20);
+    expect(names()[0]).toContain('6.00');
+    await send(false, [61]);
+    expect(names()[0]).toContain('6.00');
+
+    // Before the first point, there is no value
+    await zoom(gd(), -20, -10);
+    expect(names()[0]).toContain('--.--');
+
+    await zoom(gd(), 10, 20);
+    await followButton()!.trigger('click');
+    await settle();
+    expect(names()[0]).toContain('5.00');
+    await send(false, [62]);
+    expect(names()[0]).toContain('6.00');
+  });
+
+  it('keeps a hidden legend entry through follow-ups and a reconnect', async () => {
+    const { gd, send, graphId } = await mountGraph();
+    await guiRestyle(gd(), { visible: 'legendonly' }, [1]);
+    expect(traceVisibility(gd())).toEqual([true, 'legendonly']);
+
+    await send(false, [61]);
+    await send(false, [62]);
+    // A reconnect starts the stream again with an initial message
+    await send(true, range(0, 63));
+    expect(traceVisibility(gd())).toEqual([true, 'legendonly']);
+
+    // What Plotly writes into its data stays out of the source
+    const source = useHistoryStore().sourceById<GraphSource>(graphId)!;
+    expect(Object.values(source.value.values).map((v) => v.visible)).toEqual([
+      undefined,
+      undefined,
+    ]);
+
+    await guiRestyle(gd(), { visible: true }, [1]);
+    await send(false, [64]);
+    await send(true, range(0, 65));
+    expect(traceVisibility(gd())).toEqual([true, true]);
+  });
+
+  it('keeps its own legend in graphs that share a source', async () => {
+    const owner = await mountGraph();
+    const shared = await mountGraph({ sharedSources: true }, [], owner.graphId);
+    await settle();
+
+    await guiRestyle(shared.gd(), { visible: 'legendonly' }, [0]);
+    await owner.send(false, [61]);
+    expect(traceVisibility(shared.gd())).toEqual(['legendonly', true]);
+    expect(traceVisibility(owner.gd())).toEqual([true, true]);
   });
 
   it('offers Follow only for graphs that get new data', async () => {

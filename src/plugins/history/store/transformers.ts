@@ -1,5 +1,6 @@
 import forEach from 'lodash/forEach';
 import last from 'lodash/last';
+import sortedLastIndex from 'lodash/sortedLastIndex';
 import parseDuration from 'parse-duration';
 import {
   DEFAULT_GRAPH_DECIMALS,
@@ -59,6 +60,25 @@ export function traceUid(key: string): string {
   return Array.from(new TextEncoder().encode(key), (byte) =>
     byte.toString(16).padStart(2, '0'),
   ).join('');
+}
+
+/**
+ * The legend name of a field: its label, and its value at the right edge of the window
+ * shown (`end`, epoch ms), or its newest value when the graph shows all data.
+ *
+ * @param source
+ * @param key
+ * @param end
+ * @returns
+ */
+export function legendName(
+  source: GraphSource,
+  key: string,
+  end: number | null,
+): string {
+  const { x, y } = source.values[key];
+  const idx = end == null ? y.length - 1 : sortedLastIndex(x, end) - 1;
+  return fieldLabel(source, key, idx >= 0 ? y[idx] : undefined);
 }
 
 /**
