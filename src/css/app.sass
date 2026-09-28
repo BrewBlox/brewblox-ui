@@ -177,6 +177,13 @@ $widget-border-radius: 4px
   body.q-safe-area-padding .q-dialog__inner > div
     max-height: calc(var(--q-dialog-viewport-height, 100vh) - var(--q-safe-area-inset-top) - var(--q-safe-area-inset-bottom)) !important
 
+// Since Quasar 2.17 menus are capped at 65vh, and scroll even with room below them.
+// Action menus hang below their button, and Quasar keeps them within the space there.
+// Menus opened at the pointer, such as those of builder parts, are only flipped
+// by Quasar: they keep the cap, or their top could end up outside a short window.
+.q-menu.action-menu
+  max-height: 100vh
+
 .q-dialog
   &__backdrop
     background: rgba(0, 0, 0, 0.9)
