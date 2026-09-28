@@ -19,6 +19,7 @@ import {
 import { GraphDataKey } from '@/components/graph/symbols';
 import {
   emptyGraphView,
+  followRange,
   GraphRange,
   GraphView,
   oldestX,
@@ -138,8 +139,11 @@ const sourceRef = computed<ShallowRef<GraphSource> | null>(() =>
 // A refined window: the window shown, fetched once at its own resolution.
 // The graph shows its points inside the window and the live points around it.
 // Every graph has its own, also graphs that share the live source.
+// While following, the refined window is live: a window as wide as the zoom,
+// which history keeps sending new points for at its own resolution.
 interface Refinement {
   range: GraphRange;
+  live: boolean;
 }
 const refineId = `${props.graphId}:refine:${nanoid(6)}`;
 const refinement = shallowRef<Refinement | null>(null);
@@ -150,13 +154,16 @@ const refinedSourceRef = computed<ShallowRef<GraphSource> | null>(() =>
     : null,
 );
 
-function refine(range: GraphRange): void {
+function refine(range: GraphRange, live = false): void {
+  const params: QueryParams = live
+    ? { duration: `${Math.max(1, Math.round((range[1] - range[0]) / 1000))}s` }
+    : {
+        start: new Date(range[0]).toISOString(),
+        end: new Date(range[1]).toISOString(),
+      };
   historyStore.createGraphSource(
     refineId,
-    {
-      start: new Date(range[0]).toISOString(),
-      end: new Date(range[1]).toISOString(),
-    },
+    params,
     props.config.renames,
     props.config.axes,
     props.config.colors,
@@ -165,7 +172,7 @@ function refine(range: GraphRange): void {
     props.config.max || {},
     props.config.fields,
   );
-  refinement.value = { range };
+  refinement.value = { range, live };
 }
 
 function dropRefinement(): void {
@@ -175,10 +182,25 @@ function dropRefinement(): void {
   }
 }
 
-// Showing all data again, or a new query or fields, ends the refinement
-watch(view, (v) => {
+// Showing all data again, or a new query or fields, ends the refinement.
+// Following the refined window makes it live.
+// When following stops, by the toggle or by a zoom or pan in the graph,
+// the refinement becomes a fixed window again: the window followed last.
+watch(view, (v, old) => {
+  const current = refinement.value;
   if (v.range == null) {
     dropRefinement();
+  } else if (current == null || old.range == null) {
+    return;
+  } else if (
+    v.follow &&
+    !old.follow &&
+    !current.live &&
+    isEqual(current.range, viewRange(old, graphData.value))
+  ) {
+    refine(v.range, true);
+  } else if (!v.follow && old.follow && current.live) {
+    refine(followRange(old.range, graphData.value));
   }
 });
 
@@ -193,16 +215,22 @@ const showRefine = computed<boolean>(
   () => view.value.range != null && !props.static,
 );
 
-// On while the window shown is the refined one.
+// On while the window shown is the refined one, or while a live refinement is followed.
 // After another zoom it is off, and refines the new window when turned on.
 const refined = computed<boolean>({
-  get: () =>
-    refinement.value != null &&
-    isEqual(refinement.value.range, viewRange(view.value, graphData.value)),
+  get: () => {
+    const current = refinement.value;
+    if (current == null) {
+      return false;
+    }
+    return current.live
+      ? view.value.follow
+      : isEqual(current.range, viewRange(view.value, graphData.value));
+  },
   set: (v) => {
     const range = viewRange(view.value, graphData.value);
     if (v && range != null) {
-      refine(range);
+      refine(range, view.value.follow);
     } else {
       dropRefinement();
     }
@@ -253,7 +281,7 @@ watch(
     // After this update: an edit of the query or the fields ends the refinement.
     nextTick(() => {
       if (refinement.value != null) {
-        refine(refinement.value.range);
+        refine(refinement.value.range, refinement.value.live);
       }
     });
   },

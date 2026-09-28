@@ -54,7 +54,7 @@ interface Mounted {
   followButton: () => DOMWrapper<Element> | undefined;
   refineButton: () => DOMWrapper<Element> | undefined;
   refineSource: () => GraphSource | null;
-  sendRefined: (minutes: number[]) => Promise<void>;
+  sendRefined: (minutes: number[], initial?: boolean) => Promise<void>;
 }
 
 const mounted: VueWrapper[] = [];
@@ -108,10 +108,13 @@ async function mountGraph(
       ? (historyStore.sources[ids[0]].value as GraphSource)
       : null;
   };
-  const sendRefined = async (minutes: number[]): Promise<void> => {
+  const sendRefined = async (
+    minutes: number[],
+    initial = true,
+  ): Promise<void> => {
     const ref = historyStore.sources[refineIds()[0]];
     graphSourceTransformer(ref.value as GraphSource, {
-      initial: true,
+      initial,
       ranges: ['a', 'b'].map((key) => ({
         metric: { __name__: key },
         values: minutes.map((m) => [at(m) / 1000, `${100 + m}`]),
@@ -487,6 +490,65 @@ describe('HistoryGraph view', () => {
     await doubleClick(gd());
     await settle();
     expect(yaxis().autorange).toBe(true);
+  });
+
+  it('refines the live edge while following', async () => {
+    const { gd, send, followButton, refineButton, refineSource, sendRefined } =
+      await mountGraph();
+    const name = (): string => (gd() as any).data[0].name;
+    await zoom(gd(), 50, 60);
+    await followButton()!.trigger('click');
+    await settle();
+    await refineButton()!.trigger('click');
+    await settle();
+
+    // A live window as wide as the zoom: history keeps sending its points
+    expect(refineSource()!.params).toEqual({ duration: '600s' });
+    await sendRefined(range(50, 60));
+    await send(false, [61]);
+    await sendRefined([61], false);
+    expect(refineButton()!.classes()).toContain('text-primary');
+    expect(shownXRange(gd())).toEqual([local(51), local(61)]);
+    expect(name()).toContain('161.00');
+  });
+
+  it('makes a refined window live while following, and fixed again after', async () => {
+    const { gd, followButton, refineButton, refineSource } = await mountGraph();
+    const toggle = async (btn: () => any): Promise<void> => {
+      await btn()!.trigger('click');
+      await settle();
+    };
+    const fixed = {
+      start: new Date(at(50)).toISOString(),
+      end: new Date(at(60)).toISOString(),
+    };
+    await zoom(gd(), 50, 60);
+    await toggle(refineButton);
+    expect(refineSource()!.params).toEqual(fixed);
+
+    await toggle(followButton);
+    expect(refineSource()!.params).toEqual({ duration: '600s' });
+    expect(refineButton()!.classes()).toContain('text-primary');
+
+    await toggle(followButton);
+    expect(refineSource()!.params).toEqual(fixed);
+    expect(refineButton()!.classes()).toContain('text-primary');
+  });
+
+  it('fixes a live refinement at the window followed after a zoom', async () => {
+    const { gd, followButton, refineButton, refineSource } = await mountGraph();
+    await zoom(gd(), 50, 60);
+    await followButton()!.trigger('click');
+    await settle();
+    await refineButton()!.trigger('click');
+    await settle();
+
+    await zoom(gd(), 52, 55);
+    expect(refineSource()!.params).toEqual({
+      start: new Date(at(50)).toISOString(),
+      end: new Date(at(60)).toISOString(),
+    });
+    expect(refineButton()!.classes()).not.toContain('text-primary');
   });
 
   it('refines again after another zoom, and stops on a click or double click', async () => {
