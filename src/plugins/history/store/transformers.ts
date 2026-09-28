@@ -48,6 +48,20 @@ function fieldLabel(
 }
 
 /**
+ * The trace uid of a field: its name as hex.
+ * Plotly builds CSS selectors and element ids from uids,
+ * and a field name can hold any character.
+ *
+ * @param key
+ * @returns
+ */
+export function traceUid(key: string): string {
+  return Array.from(new TextEncoder().encode(key), (byte) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('');
+}
+
+/**
  * Applies a message of a `ranges` stream to the graph source.
  *
  * An initial message replaces everything the source holds, also when it has no ranges.
@@ -92,6 +106,7 @@ export function graphSourceTransformer(
     );
     source.values[key] = {
       ...existing, // Plotly can set values
+      uid: traceUid(key),
       x,
       y,
       type: 'scattergl',
