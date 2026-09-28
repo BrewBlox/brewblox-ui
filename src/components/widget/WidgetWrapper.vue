@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
-import { computed, inject, onErrorCaptured, provide, reactive, ref } from 'vue';
-import { useFeatureStore, WidgetContext } from '@/store/features';
+import {
+  computed,
+  inject,
+  onErrorCaptured,
+  provide,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
+import { useFeatureStore, WidgetContext, WidgetMode } from '@/store/features';
 import { Widget } from '@/store/widgets';
 import {
   ChangeWidgetTitleKey,
@@ -25,6 +33,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:widget': [payload: Widget];
+  /** The widget switched between Basic and Full */
+  'update:mode': [mode: WidgetMode];
 }>();
 
 const featureStore = useFeatureStore();
@@ -47,7 +57,12 @@ provide(PatchWidgetKey, (patch: Partial<Widget>) => {
   emit('update:widget', { ...props.widget, ...patch });
 });
 
-provide(ContextKey, reactive<WidgetContext>(cloneDeep(props.context)));
+const context = reactive<WidgetContext>(cloneDeep(props.context));
+provide(ContextKey, context);
+watch(
+  () => context.mode,
+  (mode) => emit('update:mode', mode),
+);
 
 provide(InvalidateKey, (reason?: string) => {
   error.value = reason ?? 'Unknown error';

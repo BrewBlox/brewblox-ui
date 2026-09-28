@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { Block } from 'brewblox-proto/ts';
 import { nanoid } from 'nanoid';
-import { computed, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 import {
   useDialog,
   UseDialogEmits,
@@ -11,6 +10,7 @@ import {
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockWidget } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetContext, WidgetMode } from '@/store/features';
+import { DialogStepBackKey, ShowBlockKey } from '@/symbols';
 
 interface Props extends UseDialogProps {
   serviceId: string;
@@ -27,34 +27,61 @@ const props = withDefaults(defineProps<Props>(), {
 
 defineEmits<UseDialogEmits>();
 
-const { dialogRef, dialogOpts, onDialogHide } = useDialog.setup<never>();
+const {
+  dialogRef,
+  dialogOpts,
+  onDialogHide,
+  pushRouteStep,
+  routeSteps,
+  routeStepBack,
+} = useDialog.setup<never>();
 const { dense } = useGlobals.setup();
-const widgetId = nanoid();
 const sparkStore = useSparkStore();
 const featureStore = useFeatureStore();
 
-const block = computed<Block | null>(() =>
-  sparkStore.blockById(props.serviceId, props.blockId),
+function blockWidget(blockId: string): BlockWidget {
+  const blockType = sparkStore.blockById(props.serviceId, blockId)?.type ?? '';
+  return {
+    id: nanoid(),
+    title: blockId,
+    feature: blockType,
+    dashboard: '',
+    order: 0,
+    config: {
+      serviceId: props.serviceId,
+      blockId,
+    },
+    ...featureStore.widgetSize(blockType),
+  };
+}
+
+const widget = ref<BlockWidget>(blockWidget(props.blockId));
+// Follows the widget's Basic/Full toggle
+const mode = ref<WidgetMode>(props.mode);
+
+// Other blocks are shown in the same dialog, in the mode the dialog is in.
+// The back button returns to the previous one, in the mode it was in.
+function showBlock(blockId: string): void {
+  const previous = { widget: widget.value, mode: mode.value };
+  if (blockId === previous.widget.config.blockId) {
+    return;
+  }
+  widget.value = blockWidget(blockId);
+  pushRouteStep(() => {
+    widget.value = previous.widget;
+    mode.value = previous.mode;
+  });
+}
+
+provide(ShowBlockKey, showBlock);
+provide(
+  DialogStepBackKey,
+  computed(() => (routeSteps.value > 0 ? routeStepBack : null)),
 );
-
-const blockType = computed<string>(() => block.value?.type ?? '');
-
-const widget = ref<BlockWidget>({
-  id: widgetId,
-  title: props.blockId,
-  feature: blockType.value,
-  dashboard: '',
-  order: 0,
-  config: {
-    serviceId: props.serviceId,
-    blockId: props.blockId,
-  },
-  ...featureStore.widgetSize(blockType.value),
-});
 
 const context = computed<WidgetContext>(() => ({
   container: 'Dialog',
-  mode: props.mode,
+  mode: mode.value,
   size: 'Fixed',
 }));
 
@@ -72,10 +99,12 @@ const widgetProps = computed<AnyDict>(() => props.getProps() ?? {});
   >
     <WidgetWrapper
       v-if="widget"
+      :key="widget.id"
       v-model:widget="widget"
       :context="context"
       v-bind="widgetProps"
       volatile
+      @update:mode="(v) => (mode = v)"
       @close="onDialogHide"
     />
   </q-dialog>
