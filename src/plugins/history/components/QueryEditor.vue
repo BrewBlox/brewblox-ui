@@ -3,11 +3,15 @@ import { Quantity } from 'brewblox-proto/ts';
 import isEqual from 'lodash/isEqual';
 import { QTree, QTreeNode } from 'quasar';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
-import { filteredNodes, nodeBuilder } from '@/plugins/history/nodes';
+import {
+  filteredNodes,
+  nodeBuilder,
+  withFields,
+} from '@/plugins/history/nodes';
 import { useHistoryStore } from '@/plugins/history/store';
 import type { QueryConfig } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
-import { bloxQty } from '@/utils/quantity';
+import { bloxQty, durationString } from '@/utils/quantity';
 
 interface Props {
   config: T;
@@ -23,8 +27,12 @@ const historyStore = useHistoryStore();
 const selectFilter = ref<string>('');
 const expandedKeys = ref<string[]>([]);
 const treeRef = ref<QTree>();
+const fieldsLoaded = ref<boolean>(false);
 
-onBeforeMount(() => historyStore.fetchFields());
+onBeforeMount(async () => {
+  await historyStore.fetchFields();
+  fieldsLoaded.value = true;
+});
 onMounted(() => expand());
 
 watch(
@@ -121,13 +129,27 @@ const fieldsDuration = computed<Quantity>({
 
 const fields = computed<Mapped<string[]>>(() => historyStore.fields);
 
+const listedKeys = computed<Set<string>>(
+  () =>
+    new Set(
+      Object.entries(fields.value).flatMap(([service, keys]) =>
+        keys.map((key) => `${service}/${key}`),
+      ),
+    ),
+);
+
+// Selected fields are always listed, so they can be deselected
 const nodes = computed<QTreeNode[]>(() =>
-  nodeBuilder(fields.value, {
+  nodeBuilder(withFields(fields.value, ticked.value), {
     selectable: true,
     handler: nodeHandler,
     header: 'leaf',
   }),
 );
+
+function isInactive(node: QTreeNode): boolean {
+  return fieldsLoaded.value && !listedKeys.value.has(node.value);
+}
 
 const ticked = computed<string[]>({
   get: () => props.config.fields,
@@ -163,43 +185,42 @@ const ticked = computed<string[]>({
 
     <DurationField
       v-model="fieldsDuration"
-      title="Inactive fields filter"
-      label="Hide after"
+      title="Listed fields"
+      label="Show fields from the last"
       message="
-      Stale fields are automatically hidden.
-      Select the cutoff period:
-      only fields with a published value more recent than this are shown.
+      Only fields with a value logged in this period are listed.
+      Selected fields are always listed:
+      they are greyed out when they have no values in this period.
       "
-      class="col-auto min-width-sm"
+      class="col-grow"
     />
 
-    <q-btn
-      flat
-      dense
-      icon="mdi-expand-all"
-      class="self-end"
-      @click="expand"
-    >
-      <q-tooltip>Expand</q-tooltip>
-    </q-btn>
-    <q-btn
-      flat
-      dense
-      icon="mdi-collapse-all"
-      class="self-end"
-      @click="collapse"
-    >
-      <q-tooltip>Collapse</q-tooltip>
-    </q-btn>
-    <q-btn
-      flat
-      dense
-      icon="mdi-checkbox-blank-off-outline"
-      class="self-end"
-      @click="ticked = []"
-    >
-      <q-tooltip>Clear selection</q-tooltip>
-    </q-btn>
+    <div class="col-auto row no-wrap self-end">
+      <q-btn
+        flat
+        dense
+        icon="mdi-expand-all"
+        @click="expand"
+      >
+        <q-tooltip>Expand</q-tooltip>
+      </q-btn>
+      <q-btn
+        flat
+        dense
+        icon="mdi-collapse-all"
+        @click="collapse"
+      >
+        <q-tooltip>Collapse</q-tooltip>
+      </q-btn>
+      <q-btn
+        flat
+        dense
+        icon="mdi-checkbox-blank-off-outline"
+        @click="ticked = []"
+      >
+        <q-tooltip>Clear selection</q-tooltip>
+      </q-btn>
+    </div>
 
     <div class="col-break" />
 
@@ -215,11 +236,25 @@ const ticked = computed<string[]>({
       class="col-grow"
     >
       <template #header-leaf="leafprops">
-        <div class="q-pa-xs full-width editable hoverable rounded-borders">
-          <slot
-            name="leaf"
-            :node="leafprops.node"
-          />
+        <div
+          class="row no-wrap items-center full-width"
+          :class="{ 'text-grey': isInactive(leafprops.node) }"
+        >
+          <div class="col q-pa-xs editable hoverable rounded-borders">
+            <slot
+              name="leaf"
+              :node="leafprops.node"
+            />
+          </div>
+          <q-icon
+            v-if="isInactive(leafprops.node)"
+            name="mdi-clock-alert-outline"
+            class="q-ml-sm"
+          >
+            <q-tooltip>
+              No values logged in the last {{ durationString(fieldsDuration) }}
+            </q-tooltip>
+          </q-icon>
         </div>
       </template>
     </q-tree>
