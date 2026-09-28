@@ -30,10 +30,19 @@ const isStoreEvent = (data: unknown): data is DatastoreEvent =>
   isObjectLike(data) &&
   ('changed' in (data as any) || 'deleted' in (data as any));
 
-function intercept(message: string, namespace: string): (e: unknown) => never {
+/**
+ * Logs a failed request, and throws on.
+ * A failed write is also shown: its change is lost,
+ * and the UI shows only what the datastore has.
+ */
+function intercept(
+  message: string,
+  namespace: string,
+  shown = false,
+): (e: unknown) => never {
   return (e: unknown) => {
     notify.error(`DB error in ${message}(${namespace}): ${parseHttpError(e)}`, {
-      shown: false,
+      shown,
     });
     throw e;
   };
@@ -159,7 +168,7 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
         },
       )
       .then((resp) => resp.data.value)
-      .catch(intercept(`Persist '${obj.id}'`, namespace));
+      .catch(intercept(`Persist '${obj.id}'`, namespace, true));
   }
 
   public create = this.persist;
@@ -180,7 +189,9 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
         },
       )
       .then((resp) => resp.data.values)
-      .catch(intercept(`PersistMult '${objs.map((v) => v.id)}'`, namespace));
+      .catch(
+        intercept(`PersistMult '${objs.map((v) => v.id)}'`, namespace, true),
+      );
   }
 
   public async remove<T extends StoreObject>(
@@ -192,7 +203,7 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
         namespace,
         id: obj.id,
       })
-      .catch(intercept(`Remove '${obj.id}'`, namespace));
+      .catch(intercept(`Remove '${obj.id}'`, namespace, true));
     return obj;
   }
 }
