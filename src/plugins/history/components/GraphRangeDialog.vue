@@ -27,7 +27,7 @@ const minVRules = computed<InputRule[]>(() => [
 ]);
 
 const maxVRules = computed<InputRule[]>(() => [
-  (v) => Number(v) > maxV.value || 'Upper bound must be more than lower bound',
+  (v) => Number(v) > minV.value || 'Upper bound must be more than lower bound',
 ]);
 
 const valuesOk = computed<boolean>(() => minV.value < maxV.value);
