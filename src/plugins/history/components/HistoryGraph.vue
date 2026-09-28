@@ -13,6 +13,7 @@ import {
   watchEffect,
 } from 'vue';
 import { GraphDataKey } from '@/components/graph/symbols';
+import { migrationGraphHint } from '@/plugins/history/migration';
 import { useHistoryStore } from '@/plugins/history/store';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 
@@ -40,6 +41,8 @@ const emit = defineEmits<{
   params: [payload: QueryParams];
   layout: [payload: Partial<Layout>];
 }>();
+
+const NO_DATA = 'No data (yet) for selected period';
 
 const historyStore = useHistoryStore();
 const revision = ref(new Date());
@@ -125,8 +128,19 @@ watchEffect(() => {
   graphData.value = Object.values(source.value.values);
   error.value = graphData.value.some((data) => data.x && data.x.length > 0)
     ? null
-    : 'No data (yet) for selected period';
+    : NO_DATA;
 });
+
+// Why a graph of a period before the update can be empty for a while after it
+const migrationHint = computed<string | null>(() =>
+  error.value === NO_DATA
+    ? migrationGraphHint(
+        historyStore.migration,
+        props.config.params ?? {},
+        Date.now(),
+      )
+    : null,
+);
 
 if (!props.sharedSources) {
   onMounted(() => createSource());
@@ -179,6 +193,12 @@ if (!props.sharedSources) {
           <div class="col-auto q-px-md">
             {{ error }}
           </div>
+        </div>
+        <div
+          v-if="migrationHint"
+          class="col-auto text-center q-px-md"
+        >
+          {{ migrationHint }}
         </div>
       </div>
     </slot>

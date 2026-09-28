@@ -67,11 +67,11 @@ The block list of a service and its relations diagram (`service/SparkPage.vue`, 
 
 ### Other plugins
 
-- `history` — graphs/metrics/session logs backed by the history service (Victoria Metrics).
+- `history` — graphs/metrics/session logs backed by the history service (VictoriaMetrics: `victoria-dense` keeps raw samples for 30 days, `victoria` 60 s averages). `src/plugins/history/README.md` describes what the graphs rely on from the service.
 - `builder` — the process-view editor; parts live in `builder/parts`, blueprints (transitions per part type) in `builder/blueprints`. Flows are calculated in `flowNetwork.ts` by solving the layout as a linear network (nodal analysis: friction is resistance, pumps and inlets are pressure sources). `use-flow-parts.ts` recalculates whenever the computed transitions change, so blueprints may read Spark block state directly without extra watchers.
 - `quickstart` — multi-step wizards that generate services, dashboards, widgets and blocks; see `src/plugins/quickstart/README.md` for the task/`config`/`actions` protocol.
 - `wizardry` — the generic widget/block creation wizard dialogs.
 
 ### Dev backend
 
-`docker-compose.yml` runs the backend stack (traefik, eventbus/mosquitto, redis, victoria, history, auth, two Spark simulators `sparkey` and `spock`, usb-proxy, node-red). Traefik config is in `dev/traefik/`. `yarn start` resets backend data to `dev/presets/` on every run; commit updated presets after `yarn redis:save`/`yarn spark:save` to make changes permanent.
+`docker-compose.yml` runs the backend stack (traefik, eventbus/mosquitto, redis, victoria, victoria-dense, history, auth, two Spark simulators `sparkey` and `spock`, usb-proxy, tilt, node-red). Traefik config is in `dev/traefik/`. `yarn start` resets the datastore widgets and Spark blocks to `dev/presets/` on every run; commit updated presets after `yarn redis:save`/`yarn spark:save` to make changes permanent. History data persists under `${BREWBLOX_CACHE_DIR}/history`. `yarn start` does not pull images: run `docker compose pull` to get new `:develop` images.

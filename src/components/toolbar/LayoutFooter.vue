@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { authEnabled } from '@/auth';
 import { eventbus } from '@/eventbus';
+import { migrationSummary } from '@/plugins/history/migration';
 import { useHistoryStore } from '@/plugins/history/store';
 import { useLoggingStore } from '@/store/logging';
 import { createDialog } from '@/utils/dialog';
@@ -19,6 +20,10 @@ const loggingStore = useLoggingStore();
 const historyStore = useHistoryStore();
 
 const historyConnected = computed<boolean>(() => historyStore.streamConnected);
+
+const historyMigration = computed(() =>
+  migrationSummary(historyStore.migration),
+);
 
 const eventbusConnected = computed<boolean>(() => eventbus.connected.value);
 
@@ -71,6 +76,34 @@ And apply the changes with:
       >
         No history
       </div>
+      <q-btn
+        v-if="historyMigration"
+        flat
+        stretch
+        no-caps
+        icon="mdi-database-refresh"
+        :label="historyMigration.label"
+        :class="historyMigration.color && `text-${historyMigration.color}`"
+      >
+        <q-menu>
+          <q-list
+            bordered
+            style="max-width: 400px"
+          >
+            <q-item
+              v-for="(line, idx) in historyMigration.lines"
+              :key="'line-' + idx"
+            >
+              <q-item-section>
+                <code v-if="line.command">{{ line.text }}</code>
+                <template v-else>
+                  {{ line.text }}
+                </template>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
       <q-btn
         flat
         stretch

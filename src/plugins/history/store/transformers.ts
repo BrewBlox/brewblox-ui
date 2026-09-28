@@ -47,67 +47,88 @@ function fieldLabel(
   return `<span ${prop}>${label}<br>${fixedNumber(value, precision)}</span>`;
 }
 
+/**
+ * Applies a message of a `ranges` stream to the graph source.
+ *
+ * An initial message replaces everything the source holds, also when it has no ranges.
+ * History sends one at the start of every stream: it leaves out the fields without points
+ * in the window, and has no ranges when none has points.
+ * It sends another after its clock went back, which lists every field.
+ * Follow-up messages hold only the new points of the fields that have them, and are appended.
+ *
+ * @param source
+ * @param result
+ */
 export function graphSourceTransformer(
   source: GraphSource,
   result: TimeSeriesRangesResult,
 ): void {
-  if (result.ranges.length > 0) {
-    if (result.initial) {
-      source.values = {};
-    }
-
-    result.ranges.forEach((range) => {
-      const key = range.metric.__name__;
-      const existing = source.values[key];
-      const min = source.min?.[key];
-      const max = source.max?.[key];
-
-      const x: number[] = boundedConcat(
-        existing?.x,
-        range.values.map((v) => v[0] * 1000),
-      );
-      const y: number[] = boundedConcat(
-        existing?.y,
-        range.values.map((v) => {
-          const value = Number(v[1]);
-          if (min != null && value < min) {
-            return NaN;
-          }
-          if (max != null && value > max) {
-            return NaN;
-          }
-          return Number(v[1]);
-        }),
-      );
-      source.values[key] = {
-        ...existing, // Plotly can set values
-        x,
-        y,
-        type: 'scattergl',
-        mode: 'lines',
-        name: fieldLabel(source, key, last(y)),
-        yaxis: source.axes[key] ?? 'y',
-        line: { color: source.colors[key] },
-      };
-    });
-
-    if (source.params.duration && !source.params.start && !source.params.end) {
-      // timestamp in Ms that should be discarded
-      const boundary =
-        new Date().getTime() - (parseDuration(source.params.duration) ?? 0);
-      forEach(source.values, (val) => {
-        const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
-        if (boundaryIdx > 0) {
-          val.x = val.x.slice(boundaryIdx);
-          val.y = val.y.slice(boundaryIdx);
-        }
-      });
-    }
-
-    source.truncated = Object.values(source.values).some(
-      (vals) => vals.x.length === MAX_GRAPH_POINTS,
-    );
+  if (result.initial) {
+    source.values = {};
   }
+
+  result.ranges.forEach((range) => {
+    const key = range.metric.__name__;
+    const existing = source.values[key];
+    const min = source.min?.[key];
+    const max = source.max?.[key];
+
+    const x: number[] = boundedConcat(
+      existing?.x,
+      range.values.map((v) => v[0] * 1000),
+    );
+    const y: number[] = boundedConcat(
+      existing?.y,
+      range.values.map((v) => {
+        const value = Number(v[1]);
+        if (min != null && value < min) {
+          return NaN;
+        }
+        if (max != null && value > max) {
+          return NaN;
+        }
+        return Number(v[1]);
+      }),
+    );
+    source.values[key] = {
+      ...existing, // Plotly can set values
+      x,
+      y,
+      type: 'scattergl',
+      mode: 'lines',
+      name: fieldLabel(source, key, last(y)),
+      yaxis: source.axes[key] ?? 'y',
+      line: { color: source.colors[key] },
+    };
+  });
+
+  if (source.params.duration && !source.params.start && !source.params.end) {
+    // The window ends at the newest point, not at the browser's now:
+    // the points carry the time of the history host, whose clock can differ.
+    // Timestamp in Ms that should be discarded
+    const newest = Math.max(
+      ...Object.values(source.values).map((val) => last(val.x) ?? -Infinity),
+    );
+    const boundary = newest - (parseDuration(source.params.duration) ?? 0);
+    forEach(source.values, (val, key) => {
+      const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
+      if (boundaryIdx > 0) {
+        val.x = val.x.slice(boundaryIdx);
+        val.y = val.y.slice(boundaryIdx);
+      }
+      // A field that stopped getting points (a deleted block, a removed service)
+      // would otherwise keep its line, and stretch the x axis back to it
+      if (boundaryIdx === -1 && val.x.length > 0) {
+        val.x = [];
+        val.y = [];
+        val.name = fieldLabel(source, key, undefined);
+      }
+    });
+  }
+
+  source.truncated = Object.values(source.values).some(
+    (vals) => vals.x.length === MAX_GRAPH_POINTS,
+  );
 }
 
 export function metricsSourceTransformer(
