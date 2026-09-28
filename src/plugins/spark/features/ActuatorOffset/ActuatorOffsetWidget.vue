@@ -141,11 +141,6 @@ function changeEnabled(enabled: boolean): void {
 
         <div class="col-break" />
 
-        <ClaimIndicator
-          :block-id="block.id"
-          :service-id="serviceId"
-          class="col-grow"
-        />
         <AnalogConstraintsField
           :model-value="constraints"
           :service-id="serviceId"

@@ -4,7 +4,7 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/quantity';
 
-const { serviceId, block, patchBlock, isClaimed } =
+const { block, patchBlock, isClaimed } =
   useBlockWidget.setup<SetpointSensorPairBlock>();
 
 function editSetting(): void {
@@ -64,12 +64,6 @@ function editSetting(): void {
       </SettingValueField>
 
       <div class="col-break" />
-
-      <ClaimIndicator
-        :block-id="block.id"
-        :service-id="serviceId"
-        class="col-grow"
-      />
     </div>
   </div>
 </template>

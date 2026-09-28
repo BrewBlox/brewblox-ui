@@ -37,6 +37,9 @@ $widget-border-radius: 4px
       .content__Dashboard
         height: calc(100vh - 40px) !important
 
+        &.content--footer
+          height: calc(100vh - 40px - var(--card-footer-height)) !important
+
 .toolbar
   &__Dialog
     height: 40px
@@ -64,6 +67,26 @@ $widget-border-radius: 4px
     height: calc(100% - 40px)
     position: relative
     border-radius: 0 0 $widget-border-radius $widget-border-radius
+
+.content--footer
+  height: calc(100% - 40px - var(--card-footer-height))
+  border-radius: 0
+
+.footer
+  // The footer's content is laid out inside it (absolutely),
+  // so it can not widen the card, and scrolls instead
+  &__Dialog,
+  &__Dashboard
+    position: relative
+    height: var(--card-footer-height)
+    min-height: var(--card-footer-height)
+    overflow: hidden
+    // A border would take a pixel from the rows
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1)
+    border-radius: 0 0 $widget-border-radius $widget-border-radius
+
+  &__Dialog
+    background-color: $dark
 
 .card__dense,
 .card__dense .toolbar__Dialog,

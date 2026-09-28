@@ -160,3 +160,20 @@ export interface BlockSpec<T extends Block = Block> {
   generate: () => T['data'];
   analyze: (block: T) => BlockStatus;
 }
+
+/** A step of a control chain, as the chain footer of a block widget shows it */
+export interface ChainItem {
+  id: string;
+  channel?: number;
+  /** The block type */
+  label: string;
+  /** The block name, with the channel */
+  name: string;
+  value: string;
+  current: boolean;
+  /** False for a block that can be disabled and is */
+  enabled: boolean;
+  /** Whether the link from the previous step is in effect */
+  active: boolean;
+  alternatives: { id: string; type: string }[];
+}

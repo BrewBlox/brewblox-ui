@@ -69,11 +69,6 @@ const softStartSupported = computed<boolean>(() => {
 
       <div class="col-break" />
 
-      <ClaimIndicator
-        :block-id="block.id"
-        :service-id="serviceId"
-        class="col-grow"
-      />
       <DigitalConstraintsField
         :model-value="block.data.constraints"
         :service-id="serviceId"

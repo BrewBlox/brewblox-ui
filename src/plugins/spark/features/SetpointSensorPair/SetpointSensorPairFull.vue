@@ -189,12 +189,6 @@ const rampMessage = `
       />
 
       <div class="col-break" />
-
-      <ClaimIndicator
-        :block-id="block.id"
-        :service-id="serviceId"
-        class="col-grow"
-      />
     </div>
   </div>
 </template>

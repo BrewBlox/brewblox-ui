@@ -9,6 +9,8 @@ interface BlockDialogOpts {
   props?: any;
   mode?: WidgetMode;
   verify?: boolean;
+  /** The block whose control chain the block is opened from */
+  chainOf?: string | null;
 }
 
 /**
@@ -35,13 +37,14 @@ export function createBlockDialog(
     notify.warn(`Block not found: <i>${addr.id}</i>`);
     return null;
   }
-  const { props, mode } = opts;
+  const { props, mode, chainOf } = opts;
   return createDialog({
     component: 'BlockWidgetDialog',
     componentProps: {
       serviceId: addr.serviceId,
       blockId: addr.id,
       mode,
+      chainOf,
       getProps: () => props || {},
     },
   });
