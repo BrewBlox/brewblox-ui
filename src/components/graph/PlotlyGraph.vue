@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import merge from 'lodash/merge';
 import Plotly, {
   ClickAnnotationEvent,
@@ -8,6 +9,7 @@ import Plotly, {
   Layout,
   PlotlyHTMLElement,
   PlotMouseEvent,
+  PlotRelayoutEvent,
 } from 'plotly.js';
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Y2_COLOR } from '@/plugins/history/const';
@@ -15,6 +17,15 @@ import { GraphAnnotation } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { GraphDataKey } from './symbols';
+import {
+  emptyGraphView,
+  GraphRange,
+  GraphView,
+  parsePlotlyRange,
+  relayoutView,
+  viewAxis,
+  viewRange,
+} from './view';
 
 interface Props {
   layout?: Partial<Layout>;
@@ -36,9 +47,14 @@ const emit = defineEmits<{
   annotations: [payload: GraphAnnotation[]];
 }>();
 
+// What the x axis shows. It is updated after a zoom, pan or reset in the graph.
+// Parents that do not bind it get a view that lasts as long as this component.
+const view = defineModel<GraphView>('view', { default: emptyGraphView });
+
 // Plotly.react keeps zoom, pan and legend edits made in the graph
 // as long as uirevision stays the same (compared with ===)
 const UI_REVISION = 'graph';
+const STATIC_REVISION = 'static';
 
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
@@ -147,7 +163,7 @@ function combinedConfig(): Partial<Config> {
   );
 }
 
-function combinedLayout(): Partial<Layout> {
+function combinedLayout(range: GraphRange | null): Partial<Layout> {
   return merge<
     Partial<Layout>,
     Partial<Layout>,
@@ -157,8 +173,17 @@ function combinedLayout(): Partial<Layout> {
   >(
     layoutDefaults(),
     props.layout,
-    { ...calcSize(), uirevision: UI_REVISION },
-    props.static ? { dragmode: false, hovermode: false } : {},
+    { ...calcSize(), uirevision: UI_REVISION, xaxis: viewAxis(range) },
+    // A static plot cannot be reset: another revision drops a zoom made before
+    props.static
+      ? {
+          dragmode: false,
+          hovermode: false,
+          xaxis: { uirevision: STATIC_REVISION },
+          yaxis: { uirevision: STATIC_REVISION },
+          yaxis2: { uirevision: STATIC_REVISION },
+        }
+      : {},
     graphData.value.some((d) => d.yaxis === 'y2')
       ? { xaxis: { domain: [0, 0.89] }, yaxis: { position: 0.9 } }
       : { xaxis: { domain: [0, 0.94] }, yaxis: { position: 0.95 } },
@@ -173,7 +198,10 @@ async function reactPlot(): Promise<void> {
   await Plotly.react(
     plotlyElement.value!,
     graphData.value,
-    combinedLayout(),
+    // A static plot cannot be zoomed, nor reset: it shows all data
+    combinedLayout(
+      props.static ? null : viewRange(view.value, graphData.value),
+    ),
     combinedConfig(),
   );
 }
@@ -184,14 +212,20 @@ async function createPlot(): Promise<void> {
   }
   try {
     // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
+    // A double click returns to the x range the plot was created with.
+    // The plot is created with autorange, so a double click shows all data.
     await Plotly.newPlot(
       plotlyElement.value,
       graphData.value,
-      combinedLayout(),
+      combinedLayout(null),
       combinedConfig(),
     );
+    plotlyElement.value.on('plotly_relayout', onRelayout);
     plotlyElement.value.on('plotly_click', onClick);
     plotlyElement.value.on('plotly_clickannotation', onAnnotationClick);
+    if (view.value.range != null && !props.static) {
+      await reactPlot();
+    }
   } catch (e: any) {
     displayError(e.message);
   }
@@ -260,10 +294,20 @@ function onAnnotationClick(evt: ClickAnnotationEvent): void {
   });
 }
 
+// Only zoom, pan and reset in the graph change the view.
+// Plotly.react does not emit plotly_relayout, so renders do not.
+function onRelayout(event: PlotRelayoutEvent): void {
+  const shown = parsePlotlyRange(plotlyElement.value?.layout.xaxis?.range);
+  const updated = relayoutView(event as Mapped<unknown>, shown);
+  if (updated != null && !isEqual(updated, view.value)) {
+    view.value = updated;
+  }
+}
+
 const debouncedRender = debounce(renderPlot, 50);
 
 watch(
-  () => [props.config, props.revision, graphData.value],
+  () => [props.config, props.revision, graphData.value, view.value],
   () => debouncedRender(),
 );
 
