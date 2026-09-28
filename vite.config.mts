@@ -111,6 +111,11 @@ export default defineConfig(({ command, mode }) => {
         'plotly.js': path.resolve(__dirname, './plotly-bundle'),
         // The bundler file still needs access to the actual plotly module
         'plotly-dist': path.resolve(__dirname, './node_modules/plotly.js'),
+        // Plotly imports the stylesheet of its map traces, which are not in our bundle
+        'maplibre-gl/dist/maplibre-gl.css': path.resolve(
+          __dirname,
+          './src/css/empty.css',
+        ),
 
         // This matches the @ alias set in tsconfig.json
         '@': path.resolve(__dirname, './src'),
