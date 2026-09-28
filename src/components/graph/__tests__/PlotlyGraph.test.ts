@@ -323,6 +323,72 @@ describe('PlotlyGraph view', () => {
     graphData.value = two(61);
     await settle();
     expect(traceVisibility(gd())).toEqual([true, 'legendonly']);
+
+    // A legend click renders again while the y axes are fitted
+    await wrapper.setProps({ fitY: [at(10), at(20)] });
+    await settle();
+    await guiRestyle(gd(), { visible: 'legendonly' }, [0]);
+    await settle();
+    graphData.value = two(62);
+    await settle();
+    expect(traceVisibility(gd())).toEqual(['legendonly', 'legendonly']);
+  });
+
+  it('is created without the fitted y range, which it applies after', async () => {
+    const rising = (): Partial<PlotData> => ({
+      ...trace(60),
+      y: Array.from({ length: 61 }, (_, i) => i),
+    });
+    const { gd } = await mountGraph(
+      { fitY: [at(10), at(20)] },
+      shallowRef([rising()]),
+    );
+    // A double click returns to the range a plot was created with
+    const yaxis = (gd() as any)._fullLayout.yaxis;
+    expect([yaxis._rangeInitial0, yaxis._rangeInitial1]).toEqual([
+      undefined,
+      undefined,
+    ]);
+    expect((gd() as any)._fullLayout.yaxis.range).toEqual([9.5, 20.5]);
+  });
+
+  it('fits the y axis to the points inside a window', async () => {
+    // y rises by 1 per minute, from 0 to 60
+    const rising = (): Partial<PlotData> => ({
+      ...trace(60),
+      y: Array.from({ length: 61 }, (_, i) => i),
+    });
+    const { wrapper, gd } = await mountGraph({}, shallowRef([rising()]));
+    const yRange = (): unknown => (gd() as any)._fullLayout.yaxis.range;
+
+    // A y zoom made before is dropped
+    await guiRelayout(gd(), { 'yaxis.range[0]': 0, 'yaxis.range[1]': 2 });
+    await wrapper.setProps({ fitY: [at(10), at(20)] });
+    await settle();
+    expect(yRange()).toEqual([9.5, 20.5]);
+
+    // A y zoom made after is kept while the fitted range stays the same
+    await guiRelayout(gd(), { 'yaxis.range[0]': 12, 'yaxis.range[1]': 14 });
+    await wrapper.setProps({ layout: { width: 500, height: 300 } });
+    await settle();
+    expect(yRange()).toEqual([12, 14]);
+
+    // Without a window the y axis fits all data again
+    await wrapper.setProps({ fitY: null });
+    await settle();
+    expect((gd() as any)._fullLayout.yaxis.autorange).toBe(true);
+  });
+
+  it('keeps a y range set in the layout when fitting', async () => {
+    const { gd } = await mountGraph({
+      fitY: [at(10), at(20)],
+      layout: {
+        width: 400,
+        height: 300,
+        yaxis: { autorange: false, range: [-10, 10] },
+      },
+    });
+    expect((gd() as any)._fullLayout.yaxis.range).toEqual([-10, 10]);
   });
 
   it('keeps a zoom without a bound view', async () => {

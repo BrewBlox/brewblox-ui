@@ -1,5 +1,6 @@
 import forEach from 'lodash/forEach';
 import last from 'lodash/last';
+import sortedIndex from 'lodash/sortedIndex';
 import sortedLastIndex from 'lodash/sortedLastIndex';
 import parseDuration from 'parse-duration';
 import {
@@ -62,23 +63,61 @@ export function traceUid(key: string): string {
   ).join('');
 }
 
+export interface GraphPoints {
+  x: number[];
+  y: number[];
+}
+
 /**
  * The legend name of a field: its label, and its value at the right edge of the window
  * shown (`end`, epoch ms), or its newest value when the graph shows all data.
  *
  * @param source
  * @param key
+ * @param points
  * @param end
  * @returns
  */
 export function legendName(
   source: GraphSource,
   key: string,
+  { x, y }: GraphPoints,
   end: number | null,
 ): string {
-  const { x, y } = source.values[key];
   const idx = end == null ? y.length - 1 : sortedLastIndex(x, end) - 1;
   return fieldLabel(source, key, idx >= 0 ? y[idx] : undefined);
+}
+
+/**
+ * The points of a field with a refined stretch: the refined points,
+ * and the live points before and after them.
+ * Without refined points, or with fewer than the live points they cover,
+ * these are the live points.
+ *
+ * @param live
+ * @param refined
+ * @returns
+ */
+export function mergeRefined(
+  live: Maybe<GraphPoints>,
+  refined: Maybe<GraphPoints>,
+): GraphPoints {
+  const x = live?.x ?? [];
+  const y = live?.y ?? [];
+  if (refined == null || refined.x.length === 0) {
+    return { x, y };
+  }
+  const before = sortedIndex(x, refined.x[0]);
+  const after = sortedLastIndex(x, refined.x[refined.x.length - 1]);
+  // A refined window can have a coarser step than the live points it covers,
+  // such as follow-ups at 10 s under 60 s averages: keep the finer ones
+  if (after - before > refined.x.length) {
+    return { x, y };
+  }
+  return {
+    x: [...x.slice(0, before), ...refined.x, ...x.slice(after)],
+    y: [...y.slice(0, before), ...refined.y, ...y.slice(after)],
+  };
 }
 
 /**

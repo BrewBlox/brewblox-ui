@@ -1,3 +1,4 @@
+import sortedIndex from 'lodash/sortedIndex';
 import { LayoutAxis, PlotData } from 'plotly.js';
 
 /** Start and end of an x axis range, in epoch milliseconds */
@@ -168,6 +169,51 @@ export function viewRange(
  *
  * The range is copied, because Plotly writes GUI edits into its layout input.
  */
+export type YAxisName = 'yaxis' | 'yaxis2';
+
+/**
+ * The y ranges that fit the points inside an x window, per y axis,
+ * with a margin of 5% of the span on both sides, or of 1 for a flat line.
+ * The traces with a uid in `hidden` do not count, as in Plotly's autorange.
+ * The x values must be sorted numbers.
+ */
+export function fitYRanges(
+  data: Partial<PlotData>[],
+  window: GraphRange,
+  hidden: Set<string> = new Set(),
+): Partial<Record<YAxisName, GraphRange>> {
+  const bounds: Partial<Record<YAxisName, GraphRange>> = {};
+  for (const trace of data) {
+    if (trace.uid != null && hidden.has(trace.uid)) {
+      continue;
+    }
+    const axis: YAxisName = trace.yaxis === 'y2' ? 'yaxis2' : 'yaxis';
+    const x = (trace.x ?? []) as number[];
+    const y = (trace.y ?? []) as number[];
+    for (
+      let i = sortedIndex(x, window[0]);
+      i < x.length && x[i] <= window[1];
+      i++
+    ) {
+      const v = y[i];
+      if (typeof v === 'number' && Number.isFinite(v)) {
+        const b = bounds[axis];
+        bounds[axis] =
+          b == null ? [v, v] : [Math.min(b[0], v), Math.max(b[1], v)];
+      }
+    }
+  }
+  const ranges: Partial<Record<YAxisName, GraphRange>> = {};
+  for (const [axis, [min, max]] of Object.entries(bounds) as [
+    YAxisName,
+    GraphRange,
+  ][]) {
+    const margin = max > min ? (max - min) * 0.05 : 1;
+    ranges[axis] = [min - margin, max + margin];
+  }
+  return ranges;
+}
+
 export function viewAxis(range: GraphRange | null): Partial<LayoutAxis> {
   return range != null
     ? { autorange: false, range: [...range] }

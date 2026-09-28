@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MAX_GRAPH_POINTS } from '../const';
 import {
   graphSourceTransformer,
+  mergeRefined,
   metricsSourceTransformer,
 } from '../store/transformers';
 import {
@@ -371,5 +372,38 @@ describe('metricsSourceTransformer', () => {
       },
     ]);
     expect(source.updated.getTime()).toBeGreaterThan(0);
+  });
+});
+
+describe('mergeRefined', () => {
+  const points = (x: number[]): { x: number[]; y: number[] } => ({
+    x,
+    y: x.map((v) => v * 10),
+  });
+
+  it('puts the refined points between the live points around them', () => {
+    expect(
+      mergeRefined(points([0, 5, 10, 15, 20]), points([8, 9, 10, 11, 12])),
+    ).toEqual(points([0, 5, 8, 9, 10, 11, 12, 15, 20]));
+    // Beyond the live points on either side
+    expect(mergeRefined(points([5, 10]), points([0, 1, 12]))).toEqual(
+      points([0, 1, 12]),
+    );
+  });
+
+  it('keeps the live points where they are finer', () => {
+    const live = points([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(mergeRefined(live, points([2, 6, 10]))).toEqual(live);
+    // Equally fine: the refined points
+    expect(mergeRefined(points([0, 2, 4]), points([1, 3, 4]))).toEqual(
+      points([0, 1, 3, 4]),
+    );
+  });
+
+  it('keeps the live points without refined ones', () => {
+    expect(mergeRefined(points([0, 5]), undefined)).toEqual(points([0, 5]));
+    expect(mergeRefined(points([0, 5]), points([]))).toEqual(points([0, 5]));
+    expect(mergeRefined(undefined, points([1, 2]))).toEqual(points([1, 2]));
+    expect(mergeRefined(undefined, undefined)).toEqual(points([]));
   });
 });

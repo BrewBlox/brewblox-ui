@@ -20,12 +20,14 @@ import { notify } from '@/utils/notify';
 import { GraphDataKey } from './symbols';
 import {
   emptyGraphView,
+  fitYRanges,
   GraphRange,
   GraphView,
   parsePlotlyRange,
   relayoutView,
   viewAxis,
   viewRange,
+  YAxisName,
 } from './view';
 
 interface Props {
@@ -34,6 +36,8 @@ interface Props {
   annotated?: boolean;
   revision?: Date;
   static?: boolean;
+  /** An x window whose points the y axes fit, when set */
+  fitY?: GraphRange | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -42,6 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
   annotated: false,
   revision: () => new Date(),
   static: false,
+  fitY: null,
 });
 
 const emit = defineEmits<{
@@ -164,7 +169,34 @@ function combinedConfig(): Partial<Config> {
   );
 }
 
-function combinedLayout(range: GraphRange | null): Partial<Layout> {
+// The y axes that fit the points inside the `fitY` window.
+// An axis the layout fixes, as the graph's range settings do, keeps its range.
+// The revision is per window: a new window drops a y zoom made in the graph,
+// and while the fitted ranges stay the same, Plotly keeps a y zoom made after.
+function fittedYAxes(): Partial<Layout> {
+  if (props.fitY == null || props.static) {
+    return {};
+  }
+  const shown = ((plotlyElement.value as any)?.data ??
+    []) as Partial<PlotData>[];
+  const hidden = new Set(
+    shown
+      .filter((t) => t.visible === 'legendonly' || t.visible === false)
+      .map((t) => `${t.uid}`),
+  );
+  const revision = `fit:${props.fitY[0]}:${props.fitY[1]}`;
+  const axes: Partial<Layout> = {};
+  for (const [axis, range] of Object.entries(
+    fitYRanges(graphData.value, props.fitY, hidden),
+  ) as [YAxisName, GraphRange][]) {
+    if (props.layout[axis]?.autorange !== false) {
+      axes[axis] = { autorange: false, range, uirevision: revision };
+    }
+  }
+  return axes;
+}
+
+function combinedLayout(range: GraphRange | null, fit = true): Partial<Layout> {
   return merge<
     Partial<Layout>,
     Partial<Layout>,
@@ -174,7 +206,12 @@ function combinedLayout(range: GraphRange | null): Partial<Layout> {
   >(
     layoutDefaults(),
     props.layout,
-    { ...calcSize(), uirevision: UI_REVISION, xaxis: viewAxis(range) },
+    {
+      ...calcSize(),
+      ...(fit ? fittedYAxes() : {}),
+      uirevision: UI_REVISION,
+      xaxis: viewAxis(range),
+    },
     // A static plot cannot be reset: another revision drops a zoom made before
     props.static
       ? {
@@ -221,18 +258,25 @@ async function createPlot(): Promise<void> {
   }
   try {
     // https://plot.ly/javascript/plotlyjs-function-reference/#plotlynewplot
-    // A double click returns to the x range the plot was created with.
-    // The plot is created with autorange, so a double click shows all data.
+    // A double click returns to the ranges the plot was created with.
+    // The plot is created with autorange, so a double click shows all data;
+    // the view and the fitted y axes follow in a render right after.
     await Plotly.newPlot(
       plotlyElement.value,
       plotTraces(),
-      combinedLayout(null),
+      combinedLayout(null, false),
       combinedConfig(),
     );
     plotlyElement.value.on('plotly_relayout', onRelayout);
+    // A legend click changes which traces the fitted y axes count
+    plotlyElement.value.on('plotly_restyle', () => {
+      if (props.fitY != null) {
+        debouncedRender();
+      }
+    });
     plotlyElement.value.on('plotly_click', onClick);
     plotlyElement.value.on('plotly_clickannotation', onAnnotationClick);
-    if (view.value.range != null && !props.static) {
+    if ((view.value.range != null || props.fitY != null) && !props.static) {
       await reactPlot();
     }
   } catch (e: any) {
@@ -316,7 +360,7 @@ function onRelayout(event: PlotRelayoutEvent): void {
 const debouncedRender = debounce(renderPlot, 50);
 
 watch(
-  () => [props.config, props.revision, graphData.value, view.value],
+  () => [props.config, props.revision, graphData.value, view.value, props.fitY],
   () => debouncedRender(),
 );
 

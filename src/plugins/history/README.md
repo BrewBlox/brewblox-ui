@@ -87,7 +87,7 @@ Plotly reports date axis values as strings in local wall-clock time without a zo
 Every render passes the view, also when it is unset: `{ autorange: true }` without a range, `{ autorange: false, range }` with one. A static plot always gets `{ autorange: true }`.
 Once a render has passed an explicit range, a later render with autorange autoranges, and `uirevision` no longer keeps a zoom made in the graph after that. The zoom therefore has to be explicit state, not something left to Plotly.
 
-The plot is created with autorange, and the view is applied by a `react` right after: a plot created with an explicit range returns to that range on a double click or Reset, instead of showing all data.
+The plot is created with autorange, and the view (and fitted y axes, see Refine) is applied by a `react` right after: a plot created with an explicit range returns to that range on a double click or Reset, instead of showing all data.
 
 `PlotlyGraph` has an optional two-way `view` model. `PlotlyGraph` changes it only after a zoom, pan or reset in the graph; renders go through `react`, which emits no `plotly_relayout`, so they never change it. The parent can change it too: `HistoryGraph` does for Follow, and clears it in the cases below.
 A parent that does not bind it, such as the setpoint profile widget, gets a view that lasts as long as the `PlotlyGraph`; its zoom now survives the updates of its moving "now" line.
@@ -120,6 +120,16 @@ The toggle sits with the other graph controls: in the page toolbar on the graph 
 Where a graph has no other controls, as in a graph widget in Basic mode, the controls row takes no height and the toggle sits in the empty top margin of the plot. Otherwise the plot would shrink and move down on the first zoom, and grow back on a double click.
 The controls row has a high z-index to stay above the plot. The graph root sets `isolation: isolate`, which keeps that z-index inside the graph, so on a dashboard the toggle stays below menus, dialogs and the page header.
 
+### Refine
+
+A zoom only magnifies the points the graph has: a 1 day graph holds points 120 s apart, and its follow-ups come every 10 s. While the x axis is zoomed, the graph controls show a Refine toggle (not on static graphs). It fetches the window shown once, as its own closed-window query (`start` and `end`), under a stream id of its own per graph (`<graphId>:refine:<random>`). History answers it at the window's own step: raw samples for windows under about 16.7 h in the last 30 days (1 s apart under about 16 min), 60 s averages for older periods.
+
+- **Merged, not swapped** (`mergeRefined` in `store/transformers.ts`): per field, the graph shows the refined points and the live points before and after them. Zooming out or panning shows coarse data around the refined stretch instead of an empty graph, and new points keep arriving at the right edge. A refined window can have a coarser step than the live points it covers (60 s averages for zooms of 16.7 h or more, where the newest live points are 10 s apart), so each field keeps whichever has more points in the stretch; equally fine, the refined points.
+- **Waits for the live data.** While the live data reloads (the 5000-point reload, a config edit), the graph shows nothing rather than the refined stretch alone, as if it were all data.
+- **On while the refined window is shown.** After another zoom the toggle is off again, and refines the new window when turned on: a zoom into a refined window can be refined further. Turning it off returns to the live points.
+- **Ends with the zoom.** Showing all data (double click, Autoscale, Reset axes), an edit of the query or the fields, and a graph turning static end it; so does removing the graph. A config edit that reloads the data fetches the refined window again with the new config. A reconnect sends its query again, as it does for every stream.
+- **The y axes fit the window shown while the graph holds refined points** (`fitYRanges` in `src/components/graph/view.ts`, the `fitY` prop of `PlotlyGraph`), also after another zoom inside a refined window, until showing all data ends the refinement. Refined points are not averaged, so their peaks reach beyond the range of the coarse points, and a box zoom that was not exactly horizontal also fixed the y range. The fit leaves out hidden traces, as Plotly's autorange does, and keeps a y range set in the graph's range settings. Each refined window has its own y `uirevision`: refining drops a y zoom made before, and a y zoom made after is kept while the fitted range stays the same.
+
 ### The legend
 
 The legend shows each field's value at the right edge of the window shown (`legendName` in `store/transformers.ts`): the newest value while the graph shows all data or follows, and the value at the end of a fixed zoom. A graph of a past period must not show current values. There is no value before a field's first point.
@@ -132,7 +142,7 @@ Graphs that share a source, such as the builder graph display and its maximized 
 
 ### Known limits
 
-- The y axes autorange over all data, not over the visible x window, so an x zoom or Follow on a long graph can show a flat line. A diagonal box zoom sets the y range too.
+- Outside a refined window, the y axes autorange over all data, not over the visible x window, so an x zoom or Follow on a long graph can show a flat line. A diagonal box zoom sets the y range too.
 - The 5000-point reload resets the resolution of the newest data to the query's initial step. The x zoom and Follow survive it; a y zoom and hidden legend entries do not.
 - A hidden field that an initial message leaves out (it has no points in the window) is shown again when it comes back.
 - Follow moves only when new data arrive: every 1 s for short graphs, up to every 10 s for long ones.

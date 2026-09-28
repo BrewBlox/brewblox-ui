@@ -2,6 +2,7 @@ import { PlotData } from 'plotly.js';
 import { describe, expect, it } from 'vitest';
 import {
   emptyGraphView,
+  fitYRanges,
   followRange,
   GraphRange,
   newestX,
@@ -240,5 +241,50 @@ describe('viewAxis', () => {
     expect(axis).toEqual({ autorange: false, range });
     expect(axis.range).not.toBe(range);
     expect(viewAxis(null)).toEqual({ autorange: true });
+  });
+});
+
+describe('fitYRanges', () => {
+  const points = (
+    minutes: number[],
+    values: number[],
+    extra: Partial<PlotData> = {},
+  ): Partial<PlotData> => ({
+    x: minutes.map((m) => T0 + m * MIN),
+    y: values,
+    ...extra,
+  });
+  const window: GraphRange = [T0 + 10 * MIN, T0 + 20 * MIN];
+
+  it('fits the points inside the window, per y axis', () => {
+    expect(
+      fitYRanges(
+        [
+          points([0, 10, 15, 20, 30], [100, 2, 12, 7, -50]),
+          points([5, 12, 18], [1, 40, 60], { yaxis: 'y2' }),
+        ],
+        window,
+      ),
+    ).toEqual({ yaxis: [1.5, 12.5], yaxis2: [39, 61] });
+  });
+
+  it('leaves out hidden traces, and values that are not finite', () => {
+    expect(
+      fitYRanges(
+        [
+          points([10, 20], [0, 10], { uid: 'a' }),
+          points([12, 14, 16], [4, NaN, 6], { uid: 'b' }),
+        ],
+        window,
+        new Set(['a']),
+      ),
+    ).toEqual({ yaxis: [3.9, 6.1] });
+  });
+
+  it('gives a flat line a margin of 1, and no range without points', () => {
+    expect(fitYRanges([points([12], [20])], window)).toEqual({
+      yaxis: [19, 21],
+    });
+    expect(fitYRanges([points([0, 30], [1, 2])], window)).toEqual({});
   });
 });

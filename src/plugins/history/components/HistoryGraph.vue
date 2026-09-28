@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import debounce from 'lodash/debounce';
+import isEqual from 'lodash/isEqual';
+import union from 'lodash/union';
+import { nanoid } from 'nanoid';
 import { Layout, PlotData } from 'plotly.js';
 import {
   computed,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   provide,
@@ -22,7 +26,7 @@ import {
 } from '@/components/graph/view';
 import { migrationGraphHint } from '@/plugins/history/migration';
 import { useHistoryStore } from '@/plugins/history/store';
-import { legendName } from '@/plugins/history/store/transformers';
+import { legendName, mergeRefined } from '@/plugins/history/store/transformers';
 import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 import { isOpenEndedQuery } from '@/plugins/history/utils';
 import { isJsonEqual } from '@/utils/objects';
@@ -131,6 +135,80 @@ const sourceRef = computed<ShallowRef<GraphSource> | null>(() =>
   historyStore.sourceById<GraphSource>(props.graphId),
 );
 
+// A refined window: the window shown, fetched once at its own resolution.
+// The graph shows its points inside the window and the live points around it.
+// Every graph has its own, also graphs that share the live source.
+interface Refinement {
+  range: GraphRange;
+}
+const refineId = `${props.graphId}:refine:${nanoid(6)}`;
+const refinement = shallowRef<Refinement | null>(null);
+
+const refinedSourceRef = computed<ShallowRef<GraphSource> | null>(() =>
+  refinement.value != null
+    ? historyStore.sourceById<GraphSource>(refineId)
+    : null,
+);
+
+function refine(range: GraphRange): void {
+  historyStore.createGraphSource(
+    refineId,
+    {
+      start: new Date(range[0]).toISOString(),
+      end: new Date(range[1]).toISOString(),
+    },
+    props.config.renames,
+    props.config.axes,
+    props.config.colors,
+    props.config.precision,
+    props.config.min || {},
+    props.config.max || {},
+    props.config.fields,
+  );
+  refinement.value = { range };
+}
+
+function dropRefinement(): void {
+  if (refinement.value != null) {
+    historyStore.removeSource(refineId);
+    refinement.value = null;
+  }
+}
+
+// Showing all data again, or a new query or fields, ends the refinement
+watch(view, (v) => {
+  if (v.range == null) {
+    dropRefinement();
+  }
+});
+
+// While the graph holds refined points, the y axes fit the window shown:
+// refined points are not averaged, so peaks can reach beyond the range before,
+// and a box zoom that was not exactly horizontal would fix the y range
+const refinedWindow = computed<GraphRange | null>(() =>
+  refinement.value != null ? viewRange(view.value, graphData.value) : null,
+);
+
+const showRefine = computed<boolean>(
+  () => view.value.range != null && !props.static,
+);
+
+// On while the window shown is the refined one.
+// After another zoom it is off, and refines the new window when turned on.
+const refined = computed<boolean>({
+  get: () =>
+    refinement.value != null &&
+    isEqual(refinement.value.range, viewRange(view.value, graphData.value)),
+  set: (v) => {
+    const range = viewRange(view.value, graphData.value);
+    if (v && range != null) {
+      refine(range);
+    } else {
+      dropRefinement();
+    }
+  },
+});
+
 function createSource(): void {
   historyStore.createGraphSource(
     props.graphId,
@@ -169,7 +247,16 @@ watch(
 
 watch(
   () => props.sourceRevision,
-  () => resetSource(),
+  () => {
+    resetSource();
+    // With the edited config: the colors, names and limits may have changed.
+    // After this update: an edit of the query or the fields ends the refinement.
+    nextTick(() => {
+      if (refinement.value != null) {
+        refine(refinement.value.range);
+      }
+    });
+  },
 );
 
 watchEffect(() => {
@@ -194,13 +281,26 @@ watchEffect(() => {
   // Plotly gets copies of the traces. The legend shows the value of each field
   // at the right edge of the window shown, and what Plotly writes into its data,
   // such as a legend click, stays with this graph: other graphs may share the source.
-  const traces = source.value.values;
+  const live = source.value.values;
+  // While the live data (re)loads, the graph waits for it:
+  // the refined stretch alone would show as if it were all data
+  const loaded = Object.values(live).some((v) => v.x.length > 0);
+  const fine = loaded ? (refinedSourceRef.value?.value.values ?? {}) : {};
+  const traces = union(Object.keys(live), Object.keys(fine)).map((key) => ({
+    key,
+    trace: live[key] ?? fine[key],
+    points: mergeRefined(live[key], fine[key]),
+  }));
   const end = props.static
     ? null
-    : (viewRange(view.value, Object.values(traces))?.[1] ?? null);
-  graphData.value = Object.entries(traces).map(([key, trace]) => ({
+    : (viewRange(
+        view.value,
+        traces.map(({ points }) => points),
+      )?.[1] ?? null);
+  graphData.value = traces.map(({ key, trace, points }) => ({
     ...trace,
-    name: legendName(source.value, key, end),
+    ...points,
+    name: legendName(source.value, key, points, end),
   }));
   error.value = graphData.value.some((data) => data.x && data.x.length > 0)
     ? null
@@ -237,6 +337,7 @@ if (!props.sharedSources) {
   onMounted(() => createSource());
   onBeforeUnmount(() => removeSource());
 }
+onBeforeUnmount(() => dropRefinement());
 </script>
 
 <template>
@@ -246,7 +347,9 @@ if (!props.sharedSources) {
         v-model:layout="layout"
         v-model:params="params"
         v-model:follow="follow"
+        v-model:refined="refined"
         :show-follow="showFollow"
+        :show-refine="showRefine"
         :show-presets="controlPresets"
         :show-range="controlRange"
       >
@@ -272,7 +375,9 @@ if (!props.sharedSources) {
         v-model:layout="layout"
         v-model:params="params"
         v-model:follow="follow"
+        v-model:refined="refined"
         :show-follow="showFollow"
+        :show-refine="showRefine"
         :show-presets="controlPresets"
         :show-range="controlRange"
       >
@@ -311,6 +416,7 @@ if (!props.sharedSources) {
       v-else
       v-model:view="view"
       :layout="layout"
+      :fit-y="refinedWindow"
       :revision="revision"
       :static="props.static"
       class="col"

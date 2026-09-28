@@ -11,6 +11,7 @@ import { GraphConfig, GraphSource, QueryParams } from '@/plugins/history/types';
 import { emptyGraphConfig, isOpenEndedQuery } from '@/plugins/history/utils';
 import { notify } from '@/utils/notify';
 import {
+  doubleClick,
   guiRelayout,
   guiRestyle,
   shownXRange,
@@ -51,6 +52,9 @@ interface Mounted {
   reload: () => Promise<void>;
   gd: () => HTMLElement;
   followButton: () => DOMWrapper<Element> | undefined;
+  refineButton: () => DOMWrapper<Element> | undefined;
+  refineSource: () => GraphSource | null;
+  sendRefined: (minutes: number[]) => Promise<void>;
 }
 
 const mounted: VueWrapper[] = [];
@@ -92,6 +96,31 @@ async function mountGraph(
     await settle();
   };
 
+  // The refined window: its own stream, answered once, here with values 100 + minute
+  const refineIds = (): string[] =>
+    Object.keys(historyStore.sources).filter((id) =>
+      id.startsWith(`${graphId}:refine:`),
+    );
+  const refineSource = (): GraphSource | null => {
+    const ids = refineIds();
+    expect(ids.length).toBeLessThanOrEqual(1);
+    return ids.length
+      ? (historyStore.sources[ids[0]].value as GraphSource)
+      : null;
+  };
+  const sendRefined = async (minutes: number[]): Promise<void> => {
+    const ref = historyStore.sources[refineIds()[0]];
+    graphSourceTransformer(ref.value as GraphSource, {
+      initial: true,
+      ranges: ['a', 'b'].map((key) => ({
+        metric: { __name__: key },
+        values: minutes.map((m) => [at(m) / 1000, `${100 + m}`]),
+      })),
+    });
+    triggerRef(ref);
+    await settle();
+  };
+
   // What happens when the graph gets too many points
   const reload = async (): Promise<void> => {
     source().value.truncated = true;
@@ -114,6 +143,12 @@ async function mountGraph(
       wrapper
         .findAll('.q-btn')
         .find((btn) => btn.find('.mdi-arrow-collapse-right').exists()),
+    refineButton: () =>
+      wrapper
+        .findAll('.q-btn')
+        .find((btn) => btn.find('.mdi-magnify-plus-outline').exists()),
+    refineSource,
+    sendRefined,
   };
 }
 
@@ -382,6 +417,181 @@ describe('HistoryGraph view', () => {
     await owner.send(false, [61]);
     expect(traceVisibility(shared.gd())).toEqual(['legendonly', true]);
     expect(traceVisibility(owner.gd())).toEqual([true, true]);
+  });
+
+  it('shows a refined window inside the live data', async () => {
+    const live = range(0, 60).filter((m) => m % 5 === 0);
+    const { gd, refineButton, refineSource, sendRefined } = await mountGraph(
+      {},
+      live,
+    );
+    const minutes = (): number[] =>
+      (gd() as any).data[0].x.map((x: number) => (x - T0) / MIN);
+    const name = (): string => (gd() as any).data[0].name;
+    expect(refineButton()).toBeUndefined();
+
+    await zoom(gd(), 10, 20);
+    await refineButton()!.trigger('click');
+    await settle();
+    expect(refineSource()!.params).toEqual({
+      start: new Date(at(10)).toISOString(),
+      end: new Date(at(20)).toISOString(),
+    });
+    expect(refineButton()!.classes()).toContain('text-primary');
+
+    await sendRefined(range(10, 20));
+    expect(minutes()).toEqual([
+      0,
+      5,
+      ...range(10, 20),
+      25,
+      30,
+      ...live.slice(7),
+    ]);
+    expect(shownXRange(gd())).toEqual([local(10), local(20)]);
+    expect(name()).toContain('120.00');
+  });
+
+  it('fits the y axis to a refined window', async () => {
+    const { gd, refineButton, sendRefined } = await mountGraph();
+    const yaxis = (): any => (gd() as any)._fullLayout.yaxis;
+
+    // A box zoom that sets the y range too
+    await guiRelayout(gd(), {
+      'xaxis.range[0]': local(10),
+      'xaxis.range[1]': local(20),
+      'yaxis.range[0]': 0,
+      'yaxis.range[1]': 5,
+    });
+    await settle();
+    await refineButton()!.trigger('click');
+    await settle();
+    // The refined values are 100 + minute
+    await sendRefined(range(10, 20));
+    expect(yaxis().range).toEqual([109.5, 120.5]);
+
+    // A diagonal box zoom inside it: the y axis fits the new window, not the box
+    await guiRelayout(gd(), {
+      'xaxis.range[0]': local(12),
+      'xaxis.range[1]': local(14),
+      'yaxis.range[0]': 0,
+      'yaxis.range[1]': 5,
+    });
+    await settle();
+    expect(refineButton()!.classes()).not.toContain('text-primary');
+    expect(yaxis().range.map((v: number) => +v.toFixed(2))).toEqual([
+      111.9, 114.1,
+    ]);
+
+    // Showing all data ends the refinement, and the y axis fits all data again
+    await doubleClick(gd());
+    await settle();
+    expect(yaxis().autorange).toBe(true);
+  });
+
+  it('refines again after another zoom, and stops on a click or double click', async () => {
+    const { gd, refineButton, refineSource, sendRefined } = await mountGraph();
+    const refineOn = async (): Promise<void> => {
+      await refineButton()!.trigger('click');
+      await settle();
+    };
+    await zoom(gd(), 10, 20);
+    await refineOn();
+    await sendRefined(range(10, 20));
+
+    // A zoom inside the refined window can be refined further
+    await zoom(gd(), 12, 14);
+    expect(refineButton()!.classes()).not.toContain('text-primary');
+    await refineOn();
+    expect(refineSource()!.params.start).toBe(new Date(at(12)).toISOString());
+    expect(refineButton()!.classes()).toContain('text-primary');
+
+    // Turned off: the live data only
+    await refineOn();
+    expect(refineSource()).toBeNull();
+    expect(refineButton()!.classes()).not.toContain('text-primary');
+
+    await refineOn();
+    expect(refineSource()).not.toBeNull();
+    await doubleClick(gd());
+    await settle();
+    expect(refineSource()).toBeNull();
+    expect(refineButton()).toBeUndefined();
+  });
+
+  it('ends the refinement when the query changes or the graph goes away', async () => {
+    const { gd, wrapper, refineButton, refineSource } = await mountGraph();
+    await zoom(gd(), 10, 20);
+    await refineButton()!.trigger('click');
+    await settle();
+
+    await wrapper.setProps({ config: graphConfig({ duration: '2h' }) });
+    await settle();
+    expect(refineSource()).toBeNull();
+
+    const other = await mountGraph();
+    await zoom(other.gd(), 10, 20);
+    await other.refineButton()!.trigger('click');
+    await settle();
+    expect(other.refineSource()).not.toBeNull();
+    other.wrapper.unmount();
+    expect(other.refineSource()).toBeNull();
+  });
+
+  it('waits for the live data when it reloads while refined', async () => {
+    const { gd, send, reload, wrapper, refineButton, sendRefined } =
+      await mountGraph();
+    await zoom(gd(), 10, 20);
+    await refineButton()!.trigger('click');
+    await settle();
+    await sendRefined(range(10, 20));
+
+    // Not the refined stretch alone, as if it were all data
+    await reload();
+    expect(wrapper.find('.js-plotly-plot').exists()).toBe(false);
+
+    await send(true, range(0, 61));
+    const minutes = (gd() as any).data[0].x.map((x: number) => (x - T0) / MIN);
+    expect(minutes).toEqual(range(0, 61));
+    expect((gd() as any).data[0].y.slice(10, 21)).toEqual(
+      range(10, 20).map((m) => 100 + m),
+    );
+  });
+
+  it('does not fetch the refined window again after a query edit', async () => {
+    const { gd, wrapper, refineButton, refineSource } = await mountGraph();
+    const store = useHistoryStore();
+    await zoom(gd(), 10, 20);
+    await refineButton()!.trigger('click');
+    await settle();
+    const create = vi.spyOn(store, 'createGraphSource');
+
+    // The graph widget reloads the data after every config edit
+    await wrapper.setProps({
+      config: graphConfig({ duration: '2h' }),
+      sourceRevision: new Date(),
+    });
+    await settle();
+    expect(refineSource()).toBeNull();
+    expect(create.mock.calls.map((call) => call[0])).not.toContainEqual(
+      expect.stringContaining(':refine:'),
+    );
+    create.mockRestore();
+  });
+
+  it('refines closed windows too, but not static graphs', async () => {
+    const closed = await mountGraph({
+      config: graphConfig({
+        start: new Date(at(0)).toISOString(),
+        end: new Date(at(60)).toISOString(),
+      }),
+    });
+    await zoom(closed.gd(), 10, 20);
+    expect(closed.refineButton()).toBeDefined();
+
+    await closed.wrapper.setProps({ static: true });
+    await settle();
+    expect(closed.refineButton()).toBeUndefined();
   });
 
   it('offers Follow only for graphs that get new data', async () => {
