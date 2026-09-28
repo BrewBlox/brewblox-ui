@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Block, Link } from 'brewblox-proto/ts';
 import truncate from 'lodash/truncate';
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 import { useField, UseFieldProps } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import type { ComparedBlockType } from '@/plugins/spark/types';
+import { ShowBlockKey } from '@/symbols';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 
@@ -53,8 +54,15 @@ const canEdit = computed<boolean>(
   () => block.value !== null && props.configurable && props.show,
 );
 
+// In a block dialog, the linked block is shown in the same dialog
+const showInDialog = inject(ShowBlockKey, null);
+
 function editBlock(): void {
-  createBlockDialog(block.value);
+  if (showInDialog && block.value) {
+    showInDialog(block.value.id);
+  } else {
+    createBlockDialog(block.value);
+  }
 }
 
 function openDialog(): void {
