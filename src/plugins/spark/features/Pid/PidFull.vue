@@ -17,7 +17,6 @@ import {
 } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
-import { isBlockClaimed } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
 import { matchesType } from '@/utils/objects';
@@ -51,8 +50,8 @@ const ambientBlock = computed<Block | null>(() =>
   sparkStore.blockByLink(serviceId, block.value.data.ambientId),
 );
 
-const inputClaimed = computed<boolean>(() =>
-  isBlockClaimed(inputBlock.value, sparkStore.claims),
+const inputClaimed = computed<boolean>(
+  () => inputBlock.value?.data.claimedBy?.id != null,
 );
 
 const inputStoredSetting = computed<Quantity | null>({

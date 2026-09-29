@@ -1,6 +1,5 @@
 import {
   Block,
-  BlockClaim,
   BlockRelation,
   Link,
   SparkPatchEvent,
@@ -21,9 +20,7 @@ import { useServiceStore } from '@/store/services';
 import { useWidgetStore } from '@/store/widgets';
 import { concatById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
-import { isJsonEqual } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
-import { calculateClaims } from '../utils/claims';
 import { isSparkPatch, isSparkState } from '../utils/info';
 import * as sparkApi from './spark-api';
 import {
@@ -55,7 +52,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
   const discoveredBlockIds = ref<ByService<string[]>>({});
   const statuses = ref<ByService<SparkStatusDescription | null>>({});
   const relations = ref<ByService<BlockRelation[]>>({});
-  const claims = ref<ByService<BlockClaim[]>>({});
   const lastBlocksAt = ref<ByService<Date | null>>({});
   const lastStatusAt = ref<ByService<Date | null>>({});
   const sessionConfigs = ref<ByService<SparkSessionConfig>>({});
@@ -132,10 +128,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
 
   function relationsByService(serviceId: Maybe<string>): BlockRelation[] {
     return has(serviceId) ? relations.value[serviceId] : [];
-  }
-
-  function claimsByService(serviceId: Maybe<string>): BlockClaim[] {
-    return has(serviceId) ? claims.value[serviceId] : [];
   }
 
   function lastBlocksAtByService(serviceId: Maybe<string>): Date | null {
@@ -225,7 +217,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
   function invalidateBlocks(serviceId: string): void {
     blocks.value[serviceId] = [];
     relations.value[serviceId] = [];
-    claims.value[serviceId] = [];
     lastBlocksAt.value[serviceId] = null;
   }
 
@@ -349,13 +340,11 @@ export const useSparkStore = defineStore('sparkStore', () => {
     lastBlocksAt.value[serviceId] = new Date();
   }
 
-  function updateComputed(
+  function updateRelations(
     serviceId: string,
     relationValues: BlockRelation[],
-    claimValues: BlockClaim[],
   ): void {
     relations.value[serviceId] = relationValues;
-    claims.value[serviceId] = claimValues;
   }
 
   function patchBlocks(evt: SparkPatchEvent): void {
@@ -374,12 +363,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
       concatById,
       existing.filter((v) => !deleted.includes(v.id)),
     );
-    // Patch events carry no claims, so they are derived from the blocks.
-    // The next state event replaces them with the list from the service.
-    const derivedClaims = calculateClaims(blocks.value[serviceId]);
-    if (!isJsonEqual(derivedClaims, claims.value[serviceId])) {
-      claims.value[serviceId] = derivedClaims;
-    }
     // A patch proves the full block list is still current.
     // The timestamp is only refreshed if it was not invalidated.
     if (lastBlocksAt.value[serviceId] != null) {
@@ -436,7 +419,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
     discoveredBlockIds.value[serviceId] = [];
     statuses.value[serviceId] = null;
     relations.value[serviceId] = [];
-    claims.value[serviceId] = [];
     lastBlocksAt.value[serviceId] = null;
     lastStatusAt.value[serviceId] = null;
     sessionConfigs.value[serviceId] = defaultSessionConfig();
@@ -448,16 +430,16 @@ export const useSparkStore = defineStore('sparkStore', () => {
           const serviceStore = useServiceStore();
           if (evt.data) {
             const blocks = evt.data.blocks.map(deserialize);
-            const { status, relations, claims } = evt.data;
+            const { status, relations } = evt.data;
 
             updateBlocks(serviceId, blocks);
             updateStatus(serviceId, status);
-            updateComputed(serviceId, relations, claims);
+            updateRelations(serviceId, relations);
             serviceStore.updateStatus(asServiceStatus(serviceId, status));
           } else {
             updateBlocks(serviceId, []);
             updateStatus(serviceId, null);
-            updateComputed(serviceId, [], []);
+            updateRelations(serviceId, []);
             serviceStore.updateStatus(asServiceStatus(serviceId, null));
           }
         }
@@ -490,7 +472,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
     delete discoveredBlockIds.value[serviceId];
     delete statuses.value[serviceId];
     delete relations.value[serviceId];
-    delete claims.value[serviceId];
     delete lastBlocksAt.value[serviceId];
     delete lastStatusAt.value[serviceId];
     delete sessionConfigs.value[serviceId];
@@ -504,7 +485,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
     discoveredBlockIds,
     statuses,
     relations,
-    claims,
     lastBlocksAt,
     lastStatusAt,
     sessionConfigs,
@@ -519,7 +499,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
     discoveredBlockIdsByService,
     statusByService,
     relationsByService,
-    claimsByService,
     lastBlocksAtByService,
     lastStatusAtByService,
     sessionConfigByService,

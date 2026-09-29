@@ -81,6 +81,7 @@
     "@types/pluralize": "^0.0.33",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
+    "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-vue": "^6.0.9",
     "@vitest/coverage-v8": "^4.1.11",
     "@vue/compiler-sfc": "^3.5.43",
@@ -102,6 +103,7 @@
     "sass": "^1.104.1",
     "simple-git-hooks": "^2.14.0",
     "svgpath": "^2.6.0",
+    "terser": "^5.16.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.6",
     "vite-plugin-checker": "^0.14.5",
@@ -113,8 +115,11 @@
     "node": ">= 22"
   },
   "browserslist": [
-    "defaults",
-    "not IE > 0"
+    "chrome >= 87",
+    "edge >= 88",
+    "firefox >= 78",
+    "safari >= 14",
+    "ios >= 14"
   ],
   "packageManager": "yarn@4.1.0"
 }

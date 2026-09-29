@@ -17,6 +17,8 @@ declare module '@vue/runtime-core' {
     GpioArrayEditor: typeof import('src/plugins/spark/components/widget/GpioArrayEditor.vue').default;
     BlockWidgetWrapper: typeof import('src/plugins/spark/components/widget/BlockWidgetWrapper.vue').default;
     BlockGraph: typeof import('src/plugins/spark/components/widget/BlockGraph.vue').default;
+    BlockChainSteps: typeof import('src/plugins/spark/components/widget/BlockChainSteps.vue').default;
+    BlockChain: typeof import('src/plugins/spark/components/widget/BlockChain.vue').default;
     AnalogArrayEditor: typeof import('src/plugins/spark/components/widget/AnalogArrayEditor.vue').default;
     BlockWidgetToolbar: typeof import('src/plugins/spark/components/toolbar/BlockWidgetToolbar.vue').default;
     BlockActions: typeof import('src/plugins/spark/components/toolbar/BlockActions.vue').default;
@@ -40,7 +42,6 @@ declare module '@vue/runtime-core' {
     DigitalConstraintsEditor: typeof import('src/plugins/spark/components/form/DigitalConstraintsEditor.vue').default;
     DigitalConstraintsDialog: typeof import('src/plugins/spark/components/form/DigitalConstraintsDialog.vue').default;
     DateValEdit: typeof import('src/plugins/spark/components/form/DateValEdit.vue').default;
-    ClaimIndicator: typeof import('src/plugins/spark/components/form/ClaimIndicator.vue').default;
     ChannelSelectField: typeof import('src/plugins/spark/components/form/ChannelSelectField.vue').default;
     BoolValEdit: typeof import('src/plugins/spark/components/form/BoolValEdit.vue').default;
     BlockHistoryGraph: typeof import('src/plugins/spark/components/form/BlockHistoryGraph.vue').default;
@@ -157,13 +158,13 @@ declare module '@vue/runtime-core' {
     SettingValueField: typeof import('src/components/form/SettingValueField.vue').default;
     SelectField: typeof import('src/components/form/SelectField.vue').default;
     SelectDialog: typeof import('src/components/form/SelectDialog.vue').default;
+    ScientificNumberField: typeof import('src/components/form/ScientificNumberField.vue').default;
+    ScientificNumberDialog: typeof import('src/components/form/ScientificNumberDialog.vue').default;
     SaveConfirmDialog: typeof import('src/components/form/SaveConfirmDialog.vue').default;
     QuantityField: typeof import('src/components/form/QuantityField.vue').default;
     QuantityDialog: typeof import('src/components/form/QuantityDialog.vue').default;
     NumberField: typeof import('src/components/form/NumberField.vue').default;
     NumberDialog: typeof import('src/components/form/NumberDialog.vue').default;
-    ScientificNumberField: typeof import('src/components/form/ScientificNumberField.vue').default;
-    ScientificNumberDialog: typeof import('src/components/form/ScientificNumberDialog.vue').default;
     MarkdownView: typeof import('src/components/form/MarkdownView.vue').default;
     MarkdownDialog: typeof import('src/components/form/MarkdownDialog.vue').default;
     LoginDialog: typeof import('src/components/form/LoginDialog.vue').default;

@@ -2,7 +2,8 @@ FROM nginx:alpine
 
 COPY dist /var/www/ui
 
-COPY <<EOF /etc/nginx/conf.d/default.conf
+# Quoted: nginx variables such as $uri must reach the file unexpanded
+COPY <<"EOF" /etc/nginx/conf.d/default.conf
 server {
   listen 80 default_server;
 

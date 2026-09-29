@@ -11,6 +11,7 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_VALVE_STATE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
+import { claimReason } from '@/plugins/spark/utils/formatting';
 import { getSpark3PinsBlock } from '@/plugins/spark/utils/system';
 
 const sparkStore = useSparkStore();
@@ -78,6 +79,7 @@ function enable12V(): void {
           :pending="block.data.state !== block.data.desiredState"
           :pending-reason="limitations"
           :disable="isClaimed"
+          :disable-reason="claimReason(block)"
           @update:model-value="(v) => patchBlock({ storedState: v })"
         />
       </LabeledField>
@@ -89,11 +91,6 @@ function enable12V(): void {
 
       <div class="col-break" />
 
-      <ClaimIndicator
-        :block-id="block.id"
-        :service-id="serviceId"
-        class="col-grow"
-      />
       <DigitalConstraintsField
         :model-value="block.data.constraints"
         :service-id="serviceId"

@@ -136,12 +136,10 @@ const ready = computed<boolean>(
           <div>Total: {{ block.data.memoryFree }}</div>
           <div>Contiguous: {{ block.data.memoryFreeContiguous }}</div>
           <div>Lowest: {{ block.data.memoryFreeLowest }}</div>
-        </LabeledField>
-        <LabeledField
-          label="Free stack (main task)"
-          class="col-lg-5 col-11"
-        >
-          <div>Lowest: {{ block.data.mainTaskStackFreeLowest }}</div>
+          <!-- Omitted by the firmware when zero -->
+          <div v-if="block.data.mainTaskStackFreeLowest">
+            Main task stack, lowest: {{ block.data.mainTaskStackFreeLowest }}
+          </div>
         </LabeledField>
       </div>
     </div>

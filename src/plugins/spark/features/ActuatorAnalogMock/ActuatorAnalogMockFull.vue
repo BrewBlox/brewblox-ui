@@ -65,11 +65,6 @@ const { serviceId, block, patchBlock, isClaimed } =
 
       <div class="col-break" />
 
-      <ClaimIndicator
-        :block-id="block.id"
-        :service-id="serviceId"
-        class="col-grow"
-      />
       <AnalogConstraintsField
         :service-id="serviceId"
         :model-value="block.data.constraints"

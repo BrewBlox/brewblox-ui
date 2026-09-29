@@ -5,11 +5,21 @@ import { ServerOptions } from 'https';
 import * as path from 'path';
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
 import inject from '@rollup/plugin-inject';
+import legacy from '@vitejs/plugin-legacy';
 import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, PluginOption } from 'vite';
 
 // https://vitejs.dev/config/
+// As before Vite 7 raised its default: see the legacy plugin below
+const SUPPORTED_BROWSERS = [
+  'chrome >= 87',
+  'edge >= 88',
+  'firefox >= 78',
+  'safari >= 14',
+  'ios >= 14',
+];
+
 export default defineConfig(({ command, mode }) => {
   const buildDate = new Date().toISOString();
   const performanceEnabled = false;
@@ -31,6 +41,16 @@ export default defineConfig(({ command, mode }) => {
     quasar({
       // An absolute path: the modern Sass API resolves imports from the importing file
       sassVariables: path.resolve(__dirname, 'src/css/variables.sass'),
+    }),
+
+    // The oldest browsers supported: the build compiles newer syntax down for them,
+    // and adds polyfills for the newer functions the bundle uses.
+    // Keep it equal to `browserslist` in package.json, which autoprefixer uses.
+    // index.html asks older browsers to update.
+    legacy({
+      modernTargets: SUPPORTED_BROWSERS,
+      modernPolyfills: true,
+      renderLegacyChunks: false,
     }),
   ];
 
@@ -91,6 +111,11 @@ export default defineConfig(({ command, mode }) => {
         'plotly.js': path.resolve(__dirname, './plotly-bundle'),
         // The bundler file still needs access to the actual plotly module
         'plotly-dist': path.resolve(__dirname, './node_modules/plotly.js'),
+        // Plotly imports the stylesheet of its map traces, which are not in our bundle
+        'maplibre-gl/dist/maplibre-gl.css': path.resolve(
+          __dirname,
+          './src/css/empty.css',
+        ),
 
         // This matches the @ alias set in tsconfig.json
         '@': path.resolve(__dirname, './src'),

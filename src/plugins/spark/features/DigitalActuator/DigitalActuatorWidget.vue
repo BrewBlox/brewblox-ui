@@ -11,6 +11,7 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_TRANSITION_PRESET } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
+import { claimReason } from '@/plugins/spark/utils/formatting';
 import { selectable } from '@/utils/collections';
 import { prettyQty } from '@/utils/quantity';
 
@@ -62,6 +63,7 @@ const softStartSupported = computed<boolean>(() => {
           :pending="block.data.state !== block.data.desiredState"
           :pending-reason="limitations"
           :disable="isClaimed"
+          :disable-reason="claimReason(block)"
           class="col-auto"
           @update:model-value="(v) => patchBlock({ storedState: v })"
         />
@@ -69,11 +71,6 @@ const softStartSupported = computed<boolean>(() => {
 
       <div class="col-break" />
 
-      <ClaimIndicator
-        :block-id="block.id"
-        :service-id="serviceId"
-        class="col-grow"
-      />
       <DigitalConstraintsField
         :model-value="block.data.constraints"
         :service-id="serviceId"

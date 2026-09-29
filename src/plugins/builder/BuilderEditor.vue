@@ -31,6 +31,8 @@ import {
 } from './composables';
 import { useMetrics } from './composables/use-metrics';
 import { builderTools, SQUARE_SIZE } from './const';
+import { isEditorEvent } from './editor-events';
+import { openPartMenu } from './part-menu';
 import { useBuilderStore } from './store';
 import { EditableKey, PortalIdKey } from './symbols';
 import {
@@ -98,6 +100,7 @@ const portalId = nanoid();
 provide(PortalIdKey, portalId);
 
 const toolsMenuExpanded = ref<boolean>(!dense.value);
+const focusAreaRef = ref<HTMLElement>();
 const activeToolId = ref<BuilderToolName | null>('pan');
 
 const gridHoverPos = ref<XYPosition | null>(null);
@@ -105,11 +108,6 @@ const partDragStart = ref<XYPosition | null>(null);
 
 const selectedIds = ref<string[]>([]);
 const floater = ref<Floater | null>(null);
-
-const focusWarningEnabled = computed<boolean>({
-  get: () => builderStore.focusWarningEnabled,
-  set: (v) => (builderStore.focusWarningEnabled = v),
-});
 
 const layouts = computed<BuilderLayout[]>(() => builderStore.layouts);
 
@@ -284,24 +282,25 @@ function combinedPartSize(parts: BuilderPart[]): AreaSize {
     );
 }
 
-function findPartAtCoords(coords: XYPosition | null): BuilderPart | null {
-  // iterate right to left to match rendering order
-  // when items overlap, the later item is rendered on top
-  if (coords) {
-    for (let idx = orderedParts.value.length - 1; idx >= 0; idx--) {
-      const part = orderedParts.value[idx];
+// The parts at a position, the topmost first:
+// when parts overlap, the later one is rendered on top
+function partsAtCoords(coords: XYPosition): BuilderPart[] {
+  return orderedParts.value
+    .filter((part) => {
       const { width, height } = rotatedSize(part.rotate, part);
-      if (
+      return (
         coords.x >= part.x &&
         coords.x < part.x + width &&
         coords.y >= part.y &&
         coords.y < part.y + height
-      ) {
-        return cloneDeep(part);
-      }
-    }
-  }
-  return null;
+      );
+    })
+    .reverse();
+}
+
+function findPartAtCoords(coords: XYPosition | null): BuilderPart | null {
+  const part = coords ? partsAtCoords(coords)[0] : null;
+  return part ? cloneDeep(part) : null;
 }
 
 function findHoveredPart(): BuilderPart | null {
@@ -611,6 +610,9 @@ const disabledTools = computed<BuilderToolName[]>(() => {
 ////////////////////////////////////////////////////////////////
 
 function onClipboardCopy(evt: ClipboardEvent): void {
+  if (!isEditorEvent(evt, focusAreaRef.value)) {
+    return;
+  }
   const activeParts = findActiveParts(true);
   if (!activeParts.length) {
     return;
@@ -623,6 +625,9 @@ function onClipboardCopy(evt: ClipboardEvent): void {
 }
 
 function onClipboardCut(evt: ClipboardEvent): void {
+  if (!isEditorEvent(evt, focusAreaRef.value)) {
+    return;
+  }
   const activeParts = findActiveParts(true);
   if (!activeParts.length) {
     return;
@@ -643,6 +648,9 @@ function onClipboardCut(evt: ClipboardEvent): void {
 }
 
 function onClipboardPaste(evt: ClipboardEvent): void {
+  if (!isEditorEvent(evt, focusAreaRef.value)) {
+    return;
+  }
   evt.preventDefault();
   const content = evt.clipboardData?.getData('BuilderClipboardContent');
   if (!content) {
@@ -675,7 +683,33 @@ function deltaMove(delta: XYPosition): void {
   });
 }
 
+/**
+ * A right click cancels what is pending, as Escape does:
+ * placing parts, a selection area, or the selection.
+ * With nothing pending, it opens the menu of the part under the pointer.
+ * In the interact tool, parts receive the right click themselves.
+ */
+function contextMenuHandler(evt: MouseEvent): void {
+  if (activeToolId.value === 'interact') {
+    return;
+  }
+  if (floater.value || activeSelectArea.value || selectedIds.value.length) {
+    clear();
+    return;
+  }
+  // The topmost part with a menu: a dip tube, for one, lies on a kettle without one
+  for (const part of partsAtCoords(toCoords(d3EventPos(evt)))) {
+    const partEl = svgContentRef.value?.querySelector(`[part-id="${part.id}"]`);
+    if (partEl && openPartMenu(partEl, evt.clientX, evt.clientY)) {
+      return;
+    }
+  }
+}
+
 function keyHandler(evt: KeyboardEvent): void {
+  if (!isEditorEvent(evt, focusAreaRef.value)) {
+    return;
+  }
   const key = keyEventString(evt);
   const keyDelta = moveKeys[key];
   const tool = builderTools.find((v) => v.shortcut === key);
@@ -964,12 +998,14 @@ watch(
 );
 
 onBeforeMount(() => {
+  document.body.addEventListener('keydown', keyHandler);
   document.body.addEventListener('copy', onClipboardCopy);
   document.body.addEventListener('cut', onClipboardCut);
   document.body.addEventListener('paste', onClipboardPaste);
 });
 
 onBeforeUnmount(() => {
+  document.body.removeEventListener('keydown', keyHandler);
   document.body.removeEventListener('copy', onClipboardCopy);
   document.body.removeEventListener('cut', onClipboardCut);
   document.body.removeEventListener('paste', onClipboardPaste);
@@ -979,9 +1015,6 @@ onBeforeUnmount(() => {
 <template>
   <q-page
     class="page-height"
-    @keydown="keyHandler"
-    @cut="onClipboardCut"
-    @paste="onClipboardPaste"
     @contextmenu.prevent
   >
     <TitleTeleport v-if="layout">
@@ -1028,10 +1061,6 @@ onBeforeUnmount(() => {
             icon="mdi-stretch-to-page-outline"
             @click="resetZoom"
           />
-          <ToggleAction
-            v-model="focusWarningEnabled"
-            label="Show focus warning"
-          />
         </template>
       </ActionMenu>
     </ButtonsTeleport>
@@ -1073,6 +1102,7 @@ onBeforeUnmount(() => {
     <!-- Grid -->
     <div
       v-else
+      ref="focusAreaRef"
       class="fit focus-area"
       tabindex="-1"
     >
@@ -1080,6 +1110,7 @@ onBeforeUnmount(() => {
         ref="svgRef"
         class="absolute fit"
         :style="{ cursor }"
+        @contextmenu="contextMenuHandler"
       >
         <!-- Background element to ensure mouse events
         outside content are received by the SVG element -->
@@ -1155,19 +1186,6 @@ onBeforeUnmount(() => {
         @touchstart.stop
         @mousedown.stop
       />
-      <div
-        v-if="focusWarningEnabled"
-        class="unfocus-overlay"
-        @click.stop="setFocus"
-        @contextmenu.prevent
-      >
-        <transition
-          appear
-          name="fade"
-        >
-          <div class="unfocus-message">Click to resume editing</div>
-        </transition>
-      </div>
     </div>
     <div id="builder-teleport" />
   </q-page>
@@ -1177,37 +1195,4 @@ onBeforeUnmount(() => {
 .q-page-container
   max-height: 100vh
   max-width: 100vw
-
-.focus-area:focus-within .unfocus-overlay
-  display: none
-
-.unfocus-overlay
-  position: absolute
-  top: 0
-  left: 0
-  height: 100%
-  width: 100%
-  background-color: rgba(0, 0, 0, 0.5)
-  transition: 1s
-
-.unfocus-message
-  position: absolute
-  top: 50%
-  left: 50%
-  transform: translate(-50%, -50%)
-  padding: 20px
-  border: 2px solid silver
-  border-radius: 40px
-  color: white
-  background-color: rgba(0, 0, 0, 0.7)
-  font-size: 1.8rem
-
-.fade-enter-active
-  transition: opacity 4s ease
-
-.fade-enter
-  opacity: 0
-
-  &-to
-    opacity: 1
 </style>

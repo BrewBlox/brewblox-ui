@@ -1,6 +1,5 @@
 import {
   Block,
-  BlockClaim,
   BlockIntfType,
   BlockType,
   COMPATIBLE_TYPES,
@@ -108,13 +107,6 @@ export function isBlockDisplayed(
     )
   );
 }
-
-export const isBlockClaimed = (
-  block: Maybe<Block>,
-  claims: Mapped<BlockClaim[]>,
-): boolean =>
-  block != null &&
-  !!claims[block.serviceId]?.some((claim) => claim.target === block.id);
 
 export const isSparkState = (data: unknown): data is SparkStateEvent =>
   (data as SparkStateEvent).type === 'Spark.state';

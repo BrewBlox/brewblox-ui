@@ -11,10 +11,17 @@ import {
   watch,
 } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
-import { BlockKey } from '@/plugins/spark/symbols';
+import { BlockChainKey, BlockKey } from '@/plugins/spark/symbols';
 import { BlockWidget } from '@/plugins/spark/types';
+import {
+  blockChain,
+  chainIncludes,
+  isChained,
+} from '@/plugins/spark/utils/chains';
 import { useFeatureStore } from '@/store/features';
 import {
+  CardFooterKey,
+  ChainOfKey,
   ChangeWidgetTitleKey,
   ContextKey,
   InvalidateKey,
@@ -74,6 +81,36 @@ function assignBlock(): void {
 // We handle checking up here to guarantee block.value
 // is never undefined in render components
 provide(BlockKey, block as ComputedRef<Block>);
+
+// A block in a control chain shows the chain in the footer of its card.
+// A block without its own chain, such as an IO module,
+// shows the chain it was opened from, if it is in that chain.
+const chainOf = inject(
+  ChainOfKey,
+  computed(() => null),
+);
+const chain = computed(() => {
+  const own = blockChain(serviceBlocks.value, blockId.value);
+  if (isChained(own) || !chainOf.value) {
+    return { chain: own, anchor: blockId.value };
+  }
+  const via = blockChain(serviceBlocks.value, chainOf.value);
+  return chainIncludes(via, blockId.value)
+    ? { chain: via, anchor: chainOf.value }
+    : { chain: own, anchor: blockId.value };
+});
+provide(BlockChainKey, chain);
+provide(
+  CardFooterKey,
+  computed(() =>
+    isChained(chain.value.chain)
+      ? {
+          component: 'BlockChain',
+          rows: Math.max(1, chain.value.chain.branches.length),
+        }
+      : null,
+  ),
+);
 
 // Override the function provided in WidgetWrapper
 provide(ChangeWidgetTitleKey, () => startChangeBlockId(block.value));

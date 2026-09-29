@@ -6,6 +6,7 @@ import {
   MutexedConstraint,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
+import { useShowBlock } from '@/plugins/spark/composables';
 import { durationString } from '@/utils/quantity';
 
 interface Props {
@@ -20,6 +21,8 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<{
   'update:modelValue': [payload: DigitalConstraints];
 }>();
+
+const showBlock = useShowBlock.setup(props.serviceId);
 
 const isConstrained = computed<boolean>(() => {
   const { minOn, minOff, delayedOn, delayedOff, mutexed } = props.modelValue;
@@ -60,8 +63,11 @@ function constraintMutexString(constraint: MutexedConstraint): string {
 </script>
 
 <template>
-  <div class="col-auto row q-ma-sm q-pa-sm q-gutter-x-sm">
-    <div class="col-auto column">
+  <LabeledField
+    label="Constraints"
+    class="q-ma-sm"
+  >
+    <div class="column">
       <div
         v-if="!isConstrained"
         class="text-italic darkish text-small"
@@ -99,11 +105,13 @@ function constraintMutexString(constraint: MutexedConstraint): string {
       </div>
       <div
         v-if="modelValue.mutexed?.enabled"
-        :class="constraintClass(modelValue.mutexed)"
+        :class="[constraintClass(modelValue.mutexed), 'clickable']"
+        @click="showBlock(modelValue.mutexed.mutexId.id)"
       >
+        <q-tooltip>{{ modelValue.mutexed.mutexId.id }}</q-tooltip>
         Mutex:
         {{ constraintMutexString(modelValue.mutexed) }}
       </div>
     </div>
-  </div>
+  </LabeledField>
 </template>

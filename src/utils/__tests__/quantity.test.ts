@@ -4,6 +4,7 @@ import {
   bloxQty,
   durationMs,
   durationString,
+  fixedNumber,
   prettyQty,
   prettyUnit,
   rawQty,
@@ -59,6 +60,17 @@ describe('prettify Quantity', () => {
   it('should prettify quantities', () => {
     expect(prettyQty(bloxQty(10, 'degC'))).toBe('10.00 °C');
     expect(prettyQty(bloxQty('61m30s'))).toBe('1h 1m 30s');
+  });
+});
+
+describe('fixedNumber', () => {
+  it('should show a placeholder with as many decimals', () => {
+    expect(fixedNumber(20.04, 1)).toEqual('20.0');
+    expect(fixedNumber(null, 1)).toEqual('--.-');
+    expect(fixedNumber(undefined)).toEqual('--.--');
+    expect(fixedNumber(null, 3)).toEqual('--.---');
+    expect(fixedNumber(null, 0)).toEqual('---');
+    expect(prettyQty(rawQty(null, 'degC'), 1)).toEqual('--.- °C');
   });
 });
 
@@ -145,6 +157,14 @@ describe('Check parsing durations', () => {
     expect(durationMs(bloxQty(10, 's'))).toBe(10000);
     expect(durationMs(bloxQty(null, 's'))).toBe(0);
     expect(durationMs(bloxQty(10, 'parsecs'))).toBe(0);
+  });
+
+  it('Should read a number without unit after a unit as the next smaller unit', () => {
+    // parse-duration 2 changed these: 1.x read '1h 30' as 1h 30ms
+    expect(durationMs('1h 30')).toBe((60 + 30) * 60 * 1000);
+    expect(durationMs('1m 30')).toBe(90 * 1000);
+    // Numbers without any unit are grouped digits, in ms
+    expect(durationMs('10 10')).toBe(1010);
   });
 
   it('Should format durations as string', () => {

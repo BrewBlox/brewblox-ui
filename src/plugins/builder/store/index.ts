@@ -9,7 +9,6 @@ const sorter = makeObjectSorter<BuilderLayout>('id');
 
 export const useBuilderStore = defineStore('builderStore', () => {
   const blueprints = shallowRef<BuilderBlueprint[]>([]);
-  const focusWarningEnabled = ref<boolean>(true);
   const lastLayoutId = ref<string | null>(null);
   const layoutMap = reactive<Mapped<BuilderLayout>>({});
 
@@ -75,7 +74,6 @@ export const useBuilderStore = defineStore('builderStore', () => {
 
   return {
     blueprints,
-    focusWarningEnabled,
     lastLayoutId,
     layouts,
 

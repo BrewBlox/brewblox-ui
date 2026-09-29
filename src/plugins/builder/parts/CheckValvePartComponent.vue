@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { RIGHT } from '@/plugins/builder/const';
+import { LEFT, RIGHT } from '@/plugins/builder/const';
 import { usePart } from '../composables';
 import { flowOnCoord, liquidOnCoord } from '../utils';
 
@@ -10,7 +10,14 @@ const flowSpeed = computed<number>(() =>
   flowOnCoord(part.value, flows.value, RIGHT),
 );
 
-const liquids = computed<string[]>(() =>
+// Liquid pushing against the flap stops at the tip of the arrow:
+// each side of the valve holds the liquid of its own tube,
+// and the arrow shows the liquid that comes in to pass it.
+const leftLiquids = computed<string[]>(() =>
+  liquidOnCoord(part.value, flows.value, LEFT),
+);
+
+const rightLiquids = computed<string[]>(() =>
   liquidOnCoord(part.value, flows.value, RIGHT),
 );
 </script>
@@ -32,8 +39,12 @@ const liquids = computed<string[]>(() =>
       />
     </g>
     <LiquidStroke
-      :paths="['M 0,25 h 50', 'M 20,15 L 30,25 L 20,35']"
-      :colors="liquids"
+      :paths="['M 0,25 h 30', 'M 20,15 L 30,25 L 20,35']"
+      :colors="leftLiquids"
+    />
+    <LiquidStroke
+      :paths="['M 30,25 h 20']"
+      :colors="rightLiquids"
     />
     <g class="fill">
       <path

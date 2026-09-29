@@ -1,6 +1,6 @@
 import { QTreeNode } from 'quasar';
 import { describe, expect, it } from 'vitest';
-import { defaultLabel, nodeBuilder } from '../nodes';
+import { defaultLabel, nodeBuilder, withFields } from '../nodes';
 
 const groupedFields = (): Mapped<string[]> => ({
   sparkey: ['actuator-pwm-1/setting', 'actuator-pwm-1/value'],
@@ -96,6 +96,37 @@ describe('Building nodes', () => {
   it('should build quasar nodes', () => {
     expect(nodeBuilder(groupedFields(), { selectable: true })).toMatchObject(
       nodes(),
+    );
+  });
+});
+
+describe('Adding fields', () => {
+  it('should add missing fields to their service', () => {
+    expect(
+      withFields(groupedFields(), [
+        'sparkey/actuator-pwm-1/value',
+        'sparkey/removed/value[1/degC]',
+        'gone/sensor/value[degC]',
+      ]),
+    ).toEqual({
+      ...groupedFields(),
+      sparkey: [
+        'actuator-pwm-1/setting',
+        'actuator-pwm-1/value',
+        'removed/value[1/degC]',
+      ],
+      gone: ['sensor/value[degC]'],
+    });
+  });
+
+  it('should ignore keys without a field', () => {
+    expect(withFields({}, ['', 'sparkey', 'sparkey/'])).toEqual({});
+  });
+
+  it('should build a leaf with the added key as value', () => {
+    const [node] = nodeBuilder(withFields({}, ['gone/sensor/value[1/degC]']));
+    expect(node.children?.[0].children?.[0].value).toEqual(
+      'gone/sensor/value[1/degC]',
     );
   });
 });

@@ -85,6 +85,26 @@ export function nodeBuilder(
   return Object.entries(raw).map(([k, v]) => nodeRecurser([], k, v, partial));
 }
 
+/**
+ * Add full field keys (`service/block/field[unit]`) to fields grouped by service.
+ * The field selector lists the selected fields this way,
+ * also when they have no values within the period it lists fields for.
+ */
+export function withFields(
+  fields: Mapped<string[]>,
+  keys: string[],
+): Mapped<string[]> {
+  const result = { ...fields };
+  for (const key of keys) {
+    const [service, ...sections] = key.split('/');
+    const field = sections.join('/');
+    if (field && !result[service]?.includes(field)) {
+      result[service] = [...(result[service] ?? []), field];
+    }
+  }
+  return result;
+}
+
 export function filteredNodes(nodes: QTreeNode[], filter: string): string[] {
   const exp = new RegExp(escapeRegExp(filter), 'i');
 

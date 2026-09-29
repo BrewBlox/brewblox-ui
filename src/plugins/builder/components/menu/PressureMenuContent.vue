@@ -8,9 +8,13 @@ interface Props {
   min: number;
   max: number;
   default: number;
+  /** Added to the dialog's explanation */
+  note?: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  note: '',
+});
 
 const { settings, patchSettings } = usePart.setup();
 
@@ -24,8 +28,13 @@ function editPressure(): void {
     componentProps: {
       modelValue: pressure.value,
       title: 'Liquid pressure',
-      message:
-        'Liquid flow speed is based on source pressure, pump pressure, and flow distance.',
+      message: [
+        'Only affects the flow animation.',
+        'Liquid flows faster with more pressure and over shorter distances.',
+        props.note,
+      ]
+        .filter(Boolean)
+        .join(' '),
       min: props.min,
       max: props.max,
     },
@@ -39,7 +48,10 @@ function editPressure(): void {
     clickable
     @click="editPressure"
   >
-    <q-item-section>Pressure</q-item-section>
+    <q-item-section>
+      <q-item-label>Pressure</q-item-label>
+      <q-item-label caption>Only affects the flow animation</q-item-label>
+    </q-item-section>
     <q-item-section side> {{ pressure }} / {{ max }} </q-item-section>
   </q-item>
 </template>

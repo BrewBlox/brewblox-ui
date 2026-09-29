@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
+import { DialogStepBackKey } from '@/symbols';
 import { getNumDialogs } from '@/utils/dialog';
 
 interface Props {
@@ -14,7 +15,7 @@ withDefaults(defineProps<Props>(), {
   icon: '',
 });
 
-defineEmits<{
+const emit = defineEmits<{
   close: [];
 }>();
 
@@ -28,6 +29,20 @@ const inDialog = computed<boolean>(
 );
 
 const numDialogs = computed<number>(() => getNumDialogs());
+
+// A dialog that shows another block in place steps back to the previous one
+const stepBack = inject(
+  DialogStepBackKey,
+  computed(() => null),
+);
+
+function close(): void {
+  if (stepBack.value) {
+    stepBack.value();
+  } else {
+    emit('close');
+  }
+}
 </script>
 
 <template>
@@ -58,15 +73,20 @@ const numDialogs = computed<number>(() => getNumDialogs());
     </div>
     <slot />
     <slot name="buttons" />
+    <!-- Stepping back within the dialog keeps it open -->
     <q-btn
       v-if="inDialog"
-      v-close-popup
+      v-close-popup="stepBack ? 0 : 1"
       flat
       round
       dense
-      :icon="numDialogs > 1 ? 'mdi-arrow-left-circle' : 'mdi-close-circle'"
+      :icon="
+        numDialogs > 1 || stepBack
+          ? 'mdi-arrow-left-circle'
+          : 'mdi-close-circle'
+      "
       class="close-button"
-      @click="$emit('close')"
+      @click="close"
     />
   </div>
 </template>
