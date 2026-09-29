@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, provide, reactive } from 'vue';
+import { computed, inject, provide, reactive } from 'vue';
 import { useGlobals, useWidget } from '@/composables';
 import { WidgetContext, WidgetMode } from '@/store/features';
-import { ContextKey } from '@/symbols';
+import { CardFooterKey, ContextKey, WidgetFooterKey } from '@/symbols';
 
 interface Props {
   active: boolean;
@@ -33,6 +33,16 @@ const context = reactive<WidgetContext>({
 
 // Overrides parent context
 provide(ContextKey, context);
+
+// The widget's card around this dialog tells nested cards not to show a footer:
+// the widget shown here is not nested, and shows the widget's footer
+provide(
+  CardFooterKey,
+  inject(
+    WidgetFooterKey,
+    computed(() => null),
+  ),
+);
 </script>
 
 <template>

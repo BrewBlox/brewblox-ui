@@ -20,8 +20,14 @@ export interface CardFooter {
   /** Rows of 32px */
   rows: number;
 }
-/** The footer a card shows, or null for none */
+/** The footer a card in a dialog shows, or null for none */
 export const CardFooterKey: InjectionKey<ComputedRef<CardFooter | null>> =
+  Symbol();
+/**
+ * The footer of a widget's card, for a dialog of the widget that is placed
+ * inside the widget's own card, such as the dialog of its expand button
+ */
+export const WidgetFooterKey: InjectionKey<ComputedRef<CardFooter | null>> =
   Symbol();
 /**
  * Shows another block in the same block dialog.

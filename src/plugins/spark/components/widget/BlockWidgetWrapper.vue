@@ -20,11 +20,13 @@ import {
 } from '@/plugins/spark/utils/chains';
 import { useFeatureStore } from '@/store/features';
 import {
+  CardFooter,
   CardFooterKey,
   ChainOfKey,
   ChangeWidgetTitleKey,
   ContextKey,
   InvalidateKey,
+  WidgetFooterKey,
   WidgetKey,
 } from '@/symbols';
 import { startRemoveWidget } from '@/utils/widgets';
@@ -100,17 +102,17 @@ const chain = computed(() => {
     : { chain: own, anchor: blockId.value };
 });
 provide(BlockChainKey, chain);
-provide(
-  CardFooterKey,
-  computed(() =>
-    isChained(chain.value.chain)
-      ? {
-          component: 'BlockChain',
-          rows: Math.max(1, chain.value.chain.branches.length),
-        }
-      : null,
-  ),
+// Cards show it in dialogs only: on a dashboard, it would take space from the widget
+const footer = computed<CardFooter | null>(() =>
+  isChained(chain.value.chain)
+    ? {
+        component: 'BlockChain',
+        rows: Math.max(1, chain.value.chain.branches.length),
+      }
+    : null,
 );
+provide(CardFooterKey, footer);
+provide(WidgetFooterKey, footer);
 
 // Override the function provided in WidgetWrapper
 provide(ChangeWidgetTitleKey, () => startChangeBlockId(block.value));

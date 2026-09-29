@@ -21,9 +21,12 @@ const props = defineProps({
 const { dense } = useGlobals.setup();
 const { context } = useContext.setup();
 
-const footer = inject(
+const offeredFooter = inject(
   CardFooterKey,
   computed(() => null),
+);
+const footer = computed(() =>
+  context.container === 'Dialog' ? offeredFooter.value : null,
 );
 // Cards inside this one have no footer of their own
 provide(
