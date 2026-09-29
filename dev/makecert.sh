@@ -26,13 +26,20 @@ if [ ! -f minica.pem ]; then
 fi
 
 if [ ! -f brew.blox/cert.pem ]; then
+  # macOS does not support `hostname -I`; use `ifconfig` instead.
+  if [ "$(uname -s)" = "Darwin" ]; then
+    ip_addresses="127.0.0.1,$(ifconfig 2>/dev/null | awk '/inet / {print $2}' | paste -sd, -)"
+  else
+    ip_addresses="127.0.0.1,$(hostname -I | tr ' ' , | sed 's/,$//')"
+  fi
+
   docker run \
     --rm \
     --user="$(id -u):$(id -g)" \
     --volume="$PWD":/cert \
     ghcr.io/brewblox/minica:develop \
     --domains="brew.blox,$(hostname),$(hostname).local,$(hostname).home,localhost" \
-    --ip-addresses="127.0.0.1,$(hostname -I | tr ' ' , | sed 's/,$//')"
+    --ip-addresses="$ip_addresses"
 fi
 
 if [ ! -f minica.der ]; then
