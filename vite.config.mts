@@ -140,9 +140,11 @@ export default defineConfig(({ command, mode }) => {
       // Everything outside /ui is forwarded to the Traefik dev proxy.
       // The browser then only talks to this server, as it does with a Brewblox install:
       // no CORS, and the certificate only has to be accepted once.
+      // The root stays here, so Vite redirects it to /ui/: Traefik would answer it with
+      // the production page from dist/, whose scripts under /ui/ this server cannot serve.
       proxy: isDev
         ? {
-            '^/(?!ui(/|$))': {
+            '^/(?!ui(/|$)|(index\\.html)?(\\?|$))': {
               target: 'https://localhost:9001',
               secure: false,
               ws: true,
