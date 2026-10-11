@@ -51,7 +51,7 @@ export function makeBlockIdRules(serviceId: string): InputRule[] {
     (v) =>
       /^[a-zA-Z0-9 \(\)_\-\|]*$/.test(v) ||
       'Name may only contain letters, numbers, spaces, and ()-_|',
-    (v) => v.length < 200 || 'Name must be less than 200 characters',
+    (v) => v.length <= 64 || 'Name must be at most 64 characters',
   ];
 }
 

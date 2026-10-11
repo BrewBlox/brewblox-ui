@@ -394,7 +394,7 @@ onMounted(() => {
                       The name may only contain alphanumeric characters, space,
                       and _-()|.
                     </li>
-                    <li>The name must be less than 200 characters.</li>
+                    <li>The name must be at most 64 characters.</li>
                   </ul>
                 </q-tooltip>
               </q-icon>

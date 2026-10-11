@@ -40,7 +40,7 @@ const ERROR_TEXT: Record<SequenceError, string | null> = {
   [SequenceError.INVALID_TARGET]: 'Target block is invalid or missing',
   [SequenceError.DISABLED_TARGET]: 'Target block is disabled',
   [SequenceError.INACTIVE_TARGET]:
-    'Target block is inactive or claimed by disabled block',
+    'Target block is inactive, has no value, or is in error',
   [SequenceError.SYSTEM_TIME_NOT_AVAILABLE]:
     'System time not set on controller',
   [SequenceError.VARIABLES_NOT_SUPPORTED]:
@@ -132,6 +132,9 @@ const runtimeError = computed<string | null>(() => {
     return msg;
   }
   const [opcode] = instruction.split(' ', 1);
+  if (opcode === 'WAIT_DURATION' && error === SequenceError.INVALID_ARGUMENT) {
+    return `${opcode}: Duration is too long, a wait is at most 49 days`;
+  }
   return `${opcode}: ${msg}`;
 });
 
@@ -466,6 +469,11 @@ function skipTo(idx: number): void {
           When the Spark starts it restores all blocks settings.
           This includes sequence position and enabled/disabled state.<br/>
           You can choose to reset the sequence to a specific state.
+          </p>
+
+          <p>
+          The position is stored once an instruction has run for a minute.
+          A WAIT_DURATION that was running starts over.
           </p>
 
           <p>

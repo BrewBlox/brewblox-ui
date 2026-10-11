@@ -223,27 +223,27 @@ function rescheduleSetup(): void {
   }
 }
 
+// Each message is a whole frame: 3 bytes R, G, B per pixel, row by row.
+// The panel keeps 6 bits per channel, so the low 2 bits of each byte are cleared.
 function handleScreenUpdate(buffer: DataView, length: number): void {
-  let index = 0;
-  while (index < length && data != null) {
-    const addr = buffer.getUint32(index, true);
-    const color = buffer.getUint32(index + 4, true);
+  if (data == null) {
+    return;
+  }
+  if (length !== WIDTH * HEIGHT * 3) {
+    log(`ignored a display message of ${length} bytes`);
+    return;
+  }
+  for (let i = 0, o = 0; i < WIDTH * HEIGHT; i += 1, o += 3) {
+    const r = buffer.getUint8(o);
+    const g = buffer.getUint8(o + 1);
+    const b = buffer.getUint8(o + 2);
 
-    const rr = (color >>> 11) % 32;
-    const gg = (color >>> 5) % 64;
-    const bb = (color >>> 0) % 32;
-
-    const r = (rr << 3) | ((rr >>> 2) & 7);
-    const g = (gg << 2) | ((gg >>> 3) & 3);
-    const b = (bb << 3) | ((bb >>> 2) & 7);
-
-    data[addr] =
+    // The top bits fill the cleared ones, so a full channel shows as 255
+    data[i] =
       (255 << 24) | // alpha
-      (b << 16) | // blue
-      (g << 8) | // green
-      r; // red
-
-    index += 8;
+      ((b | (b >>> 6)) << 16) | // blue
+      ((g | (g >>> 6)) << 8) | // green
+      (r | (r >>> 6)); // red
   }
 }
 </script>

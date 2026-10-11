@@ -3,6 +3,7 @@ import {
   ChannelCapabilities,
   FastPwmBlock,
   IoArrayInterfaceBlock,
+  PwmFrequency,
   TransitionDurationPreset,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
@@ -15,7 +16,11 @@ import {
 } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
-import { channelName, prettyBlock } from '@/plugins/spark/utils/formatting';
+import {
+  channelName,
+  claimReason,
+  prettyBlock,
+} from '@/plugins/spark/utils/formatting';
 import { selectable } from '@/utils/collections';
 import { fixedNumber, prettyQty, roundedNumber } from '@/utils/quantity';
 
@@ -31,6 +36,22 @@ const { serviceId, block, patchBlock, isClaimed } =
 const target = computed<IoArrayInterfaceBlock | null>(() =>
   sparkStore.blockByLink(serviceId, block.value.data.hwDevice),
 );
+
+// A channel without 2kHz support runs every frequency at 100Hz.
+// The block keeps the frequency it was given.
+const runsAt100Hz = computed<boolean>(() => {
+  const channel = target.value?.data.channels.find(
+    (c) => c.id === block.value.data.channel,
+  );
+  return (
+    channel != null &&
+    block.value.data.frequency !== PwmFrequency.PWM_FREQ_100HZ &&
+    Boolean(
+      channel.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ,
+    ) &&
+    !(channel.capabilities & ChannelCapabilities.CHAN_SUPPORTS_PWM_2000HZ)
+  );
+});
 
 const isLimited = computed<boolean>(
   () =>
@@ -57,6 +78,12 @@ const pwmDesired = computed<number | null>(() => {
     <div class="q-mx-auto">
       <CardWarning v-if="!target || !block.data.channel">
         <template #message> PWM has no target channel configured. </template>
+      </CardWarning>
+      <CardWarning v-else-if="runsAt100Hz">
+        <template #message>
+          This channel runs the PWM at 100Hz, not
+          {{ ENUM_LABELS_PWM_FREQUENCY[block.data.frequency] }}.
+        </template>
       </CardWarning>
       <BlockEnableToggle>
         <template #enabled>
@@ -113,8 +140,7 @@ const pwmDesired = computed<number | null>(() => {
           v-else
           class="col-grow text-center text-italic fade-3"
         >
-          This PWM is claimed by a PID block. <br />
-          Manual settings are disabled.
+          {{ claimReason(block) }}
         </div>
 
         <div class="col-break" />

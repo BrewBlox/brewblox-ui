@@ -12,9 +12,18 @@ updates:
         update-types:
           - minor
           - patch
+      # One PR for all security fixes, whatever their kind of update
+      security:
+        applies-to: security-updates
+        patterns:
+          - '*'
     ignore:
       # Pinned to the firmware release by `yarn firmware`
       - dependency-name: brewblox-proto
+      # Majors are taken by hand, one at a time, with a manual pass in the UI
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
   - package-ecosystem: github-actions
     directory: /
     schedule:
