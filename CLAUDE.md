@@ -15,7 +15,8 @@ yarn start                   # recreate backend containers + reset dev data + vi
 yarn serve                   # vite dev server only (backend containers must already be running)
 yarn compose:new             # recreate backend containers (docker compose) and reload presets
 yarn build                   # production build to dist/
-yarn lint                    # vue-tsc --noEmit && eslint && prettier --check  (also runs as git pre-push hook)
+yarn lint                    # vue-tsc --noEmit && eslint && prettier --check && lint:dedupe  (also runs as git pre-push hook)
+yarn lint:dedupe             # fails when a CodeMirror package is locked twice; fix: yarn dedupe '@codemirror/*' '@lezer/*', then check the Sequence editor
 yarn lint:fix                # eslint --fix + prettier --write
 yarn lint:tsc                # type-check only
 yarn test                    # vitest in watch mode
