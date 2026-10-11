@@ -492,6 +492,10 @@ function openDerivativeFilterDialog(): void {
                        which makes I the main driver of the output instead of P. </li>
                   </ul>
                 </p>
+                <p>
+                  While the output is missing or disabled, I does not build up,
+                  and slowly returns to zero.
+                </p>
                 <p>Setting Ti to zero will disable the integrator.</p>
                 "
             borderless
@@ -559,7 +563,8 @@ function openDerivativeFilterDialog(): void {
               </p>
               <p>
                 When there is little overshoot in the system, Td is best kept at zero.
-                D is clipped to +/- P to avoid oscillations.
+                D is limited to the largest P of roughly the last 1.5 Td,
+                to avoid oscillations.
               </p>
               "
             borderless

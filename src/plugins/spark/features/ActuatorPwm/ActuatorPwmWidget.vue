@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
+import { claimReason } from '@/plugins/spark/utils/formatting';
 import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
 
 const { context, inDialog } = useContext.setup();
@@ -81,8 +82,7 @@ const pwmDesired = computed<number | null>(() => {
           v-else
           class="col-grow text-center text-italic fade-3"
         >
-          This PWM is claimed by a PID block. <br />
-          Manual settings are disabled.
+          {{ claimReason(block) }}
         </div>
 
         <div class="col-break" />
