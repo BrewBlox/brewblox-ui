@@ -47,7 +47,6 @@ const values = reactive<WiFiSettingsBlock['data']>({
   password: '',
   security: WifiSecurityType.WLAN_SEC_WPA2,
   cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
-  signal: 0,
 });
 
 const block = computed<WiFiSettingsBlock>(() =>
