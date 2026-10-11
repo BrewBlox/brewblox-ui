@@ -146,7 +146,7 @@ async function drawGraph(
   renderedEdges.value = edges;
   const layoutId = ++layoutCount;
 
-  const graph = await elk.layout({
+  const graph: ElkNode = await elk.layout({
     id: 'root',
     layoutOptions: {
       'elk.algorithm': 'layered',
