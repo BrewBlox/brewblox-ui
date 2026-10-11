@@ -2,7 +2,8 @@ name: CI build
 
 on:
   push:
-    branches: ['**']
+    # Dependabot's branches build in their pull request: its token may not push the image
+    branches: ['**', '!dependabot/**']
   pull_request:
     branches: [develop, edge]
 
