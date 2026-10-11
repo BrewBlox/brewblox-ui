@@ -81,7 +81,13 @@ function editSetting(): void {
           </LabeledField>
 
           <DurationField
+            title="Timeout"
             label="Timeout"
+            message="
+              The sensor has no value if no new setting arrives within this time.
+              With a timeout of 0, the setting never expires,
+              and is kept through a reboot, but not through a power loss.
+            "
             class="col-grow min-width-md"
             :model-value="block.data.timeout"
             @update:model-value="(v) => patchBlock({ timeout: v })"
