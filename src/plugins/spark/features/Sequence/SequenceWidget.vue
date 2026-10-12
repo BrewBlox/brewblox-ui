@@ -267,11 +267,11 @@ function revertLocal(): void {
 async function saveLocal(): Promise<void> {
   try {
     const wasEnabled = block.value.data.enabled;
+    // Every line is an instruction: the service stores a blank line as a COMMENT without text,
+    // so line numbers and the active instruction stay in step with the editor
+    const text = localInstructionsText.value;
     const patched = await sparkStore.patchBlock(block.value, {
-      instructions: localInstructionsText.value
-        .trim()
-        .split('\n')
-        .filter((s) => !!s.trim()),
+      instructions: text === '' ? [] : text.split('\n'),
     });
     configError.value = undefined;
     // The controller stops the sequence if the edit removed the active instruction
