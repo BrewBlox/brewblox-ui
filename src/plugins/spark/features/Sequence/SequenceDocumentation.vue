@@ -79,8 +79,9 @@ import { instructions } from 'brewblox-proto/docs/Sequence.json';
         </p>
         <p>
           Lines that start with a <code>#</code> are comments, and will not be
-          executed. Comments are stored on the Spark, and may cause it to run
-          out of memory.
+          executed. Blank lines are kept as empty comments. Comments are stored
+          on the Spark, and may cause it to run out of memory. Adding or
+          removing comments in a running sequence does not restart it.
         </p>
         <p>Example instructions:</p>
         <p>
