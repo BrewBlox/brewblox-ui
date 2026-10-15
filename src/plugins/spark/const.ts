@@ -1,4 +1,5 @@
 import {
+  AnalogCalibrationState,
   AnalogCompareOp,
   AnalogConstraintKey,
   AnalogSensorType,
@@ -253,3 +254,11 @@ export const ENUM_LABELS_ANALOG_SENSOR_TYPE: EnumLabels<AnalogSensorType> = {
   ANALOG_SENSOR_TYPE_STRAIN_GAUGE_LOW_RESISTANCE:
     'Strain gauge (low resistance)',
 };
+
+export const ENUM_LABELS_ANALOG_CALIBRATION_STATE: EnumLabels<AnalogCalibrationState> =
+  {
+    ANALOG_CALIBRATION_STATE_NONE: 'Not calibrated',
+    ANALOG_CALIBRATION_STATE_RUNNING: 'Calibrating',
+    ANALOG_CALIBRATION_STATE_DONE: 'Calibrated',
+    ANALOG_CALIBRATION_STATE_FAILED: 'Calibration failed',
+  };
