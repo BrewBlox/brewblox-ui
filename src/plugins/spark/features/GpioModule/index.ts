@@ -45,6 +45,7 @@ const plugin: Plugin = {
           faultsHistory60m: GpioErrorFlags.NONE,
         },
         analogChannels: [],
+        calibrateAnalog: false,
       }),
       analyze: (block: GpioModuleBlock) => {
         const { moduleStatus } = block.data.status;
