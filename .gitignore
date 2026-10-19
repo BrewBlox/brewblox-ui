@@ -18,6 +18,10 @@ yarn-error.log*
 .yarn
 .pnp.*
 
+# The local issue tracker (docs/agents/issue-tracker.md): specs, tickets, maps and research
+# notes, synced between Elco's machines, never committed.
+/.scratch/
+
 # Build output
 /dist
 /coverage

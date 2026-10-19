@@ -76,3 +76,15 @@ The block list of a service and its relations diagram (`service/SparkPage.vue`, 
 ### Dev backend
 
 `docker-compose.yml` runs the backend stack (traefik, eventbus/mosquitto, redis, victoria, victoria-dense, history, auth, two Spark simulators `sparkey` and `spock`, usb-proxy, tilt, node-red). Traefik config is in `dev/traefik/`. `yarn start` resets the datastore widgets and Spark blocks to `dev/presets/` on every run; commit updated presets after `yarn redis:save`/`yarn spark:save` to make changes permanent. History data persists under `${BREWBLOX_CACHE_DIR}/history`. `yarn start` does not pull images: run `docker compose pull` to get new `:develop` images.
+
+## Agent skills
+
+### Issue tracker
+
+Specs and tickets are local markdown under `.scratch/`, gitignored and synced between Elco's machines.
+See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` at the root and `docs/adr/`, created lazily.
+See `docs/agents/domain.md`.
