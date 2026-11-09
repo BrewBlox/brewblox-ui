@@ -451,7 +451,9 @@ function skipTo(idx: number): void {
     <template v-if="context.mode === 'Full'">
       <q-separator inset />
       <div class="widget-body row">
+        <!-- A Spark built without Variables sends no variablesId -->
         <LinkField
+          v-if="block.data.variablesId"
           :model-value="block.data.variablesId"
           :service-id="serviceId"
           title="Variables"
