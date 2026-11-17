@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { svgPathProperties } from 'svg-path-properties';
 import { computed } from 'vue';
+import { vSkipSmilReplay } from '@/plugins/builder/smil';
 
 interface Props {
   path: string;
@@ -63,6 +64,7 @@ const keyPoints = computed<string>(
       />
       <!-- Note: SVG attributes are case-sensitive -->
       <animateMotion
+        v-skip-smil-replay
         :path="path"
         :begin="start"
         :keyPoints="keyPoints"

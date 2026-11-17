@@ -16,6 +16,7 @@ import {
   PWM_TYPES,
   PwmBlockT,
 } from '@/plugins/builder/const';
+import { vSkipSmilReplay } from '@/plugins/builder/smil';
 import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { prettyLink, roundedNumber } from '@/utils/quantity';
@@ -219,6 +220,7 @@ function interactHandler(): void {
         />
         <animateTransform
           v-if="active"
+          v-skip-smil-replay
           attributeName="transform"
           attributeType="XML"
           type="rotate"
