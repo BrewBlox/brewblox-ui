@@ -2,6 +2,7 @@ import { produce } from 'immer';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 import {
   computed,
   ComputedRef,
@@ -75,21 +76,35 @@ export const useFlowParts: UseFlowPartsComposable = {
 
     // Blueprint transitions depend on part settings,
     // and may also depend on external state, such as linked blocks.
-    // All reactive state read while evaluating is tracked here,
-    // so a change to a linked block causes the transitions to be re-evaluated.
+    // Each part tracks the state its blueprint reads in its own computed,
+    // so a change to a linked block only re-evaluates the parts that read it.
     // Coordinates are made absolute here, so that moving, rotating,
     // or flipping a part also changes the result.
-    const transitions = computed<Mapped<PartTransitions>>(() =>
-      Object.values(parts.value).reduce((acc, part) => {
-        const partTransitions = builderStore
-          .blueprintByType(part.type)
-          ?.transitions(part);
-        if (partTransitions) {
-          acc[part.id] = translatedTransitions(part, partTransitions);
-        }
-        return acc;
-      }, {}),
+    const partTransitionRefs = computed(() =>
+      Object.values(parts.value).map((part) => {
+        const transitionsRef = computed<PartTransitions | null>((previous) => {
+          const raw = builderStore
+            .blueprintByType(part.type)
+            ?.transitions(part);
+          const next = raw ? translatedTransitions(part, raw) : null;
+          // An equal result keeps its identity, and does not trigger
+          return previous !== undefined && isEqual(previous, next)
+            ? previous
+            : next;
+        });
+        return [part.id, transitionsRef] as const;
+      }),
     );
+
+    const transitions = computed<Mapped<PartTransitions>>(() => {
+      const acc: Mapped<PartTransitions> = {};
+      for (const [id, transitionsRef] of partTransitionRefs.value) {
+        if (transitionsRef.value) {
+          acc[id] = transitionsRef.value;
+        }
+      }
+      return acc;
+    });
 
     // Transitions used for the most recent calculation.
     // Re-evaluated transitions are only used if they are different.
@@ -105,7 +120,11 @@ export const useFlowParts: UseFlowPartsComposable = {
           Object.values(parts.value),
           current,
         );
-        flows.value = result.flows;
+        // Parts whose flows did not change keep their object, and do not render again
+        const previous = flows.value;
+        flows.value = mapValues(result.flows, (value, id) =>
+          isEqual(value, previous[id]) ? previous[id] : value,
+        );
         result.warnings
           .filter((msg) => !shownWarnings.has(msg))
           .forEach((msg) => {
