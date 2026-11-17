@@ -13,7 +13,10 @@ import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_ANALOG_CALIBRATION_STATE } from '@/plugins/spark/const';
 import { asBlockAddress } from '@/plugins/spark/utils/configuration';
-import { analogChannelName } from '@/plugins/spark/utils/formatting';
+import {
+  adcErrorLabel,
+  analogChannelName,
+} from '@/plugins/spark/utils/formatting';
 import { createDialogPromise } from '@/utils/dialog';
 import { bloxQty } from '@/utils/quantity';
 
@@ -180,6 +183,20 @@ const errors = computed<string[]>(() => {
       values.push(
         'WARNING: Open Load on pin ' + listedPins(relevantPins).toString(),
       );
+    }
+  }
+  // Both channels of an ADC pair carry the pair's error
+  for (const pair of [
+    [1, 2],
+    [3, 4],
+  ]) {
+    const error = block.value.data.analogChannels.find((c) =>
+      pair.includes(c.id),
+    )?.error;
+    const label = adcErrorLabel(error);
+    if (label) {
+      const names = pair.map(analogChannelName).join(', ');
+      values.push(`ERROR: ADC of channels ${names} stopped: ${label}`);
     }
   }
   return values;

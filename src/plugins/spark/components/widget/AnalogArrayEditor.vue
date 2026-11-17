@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import {
-  AnalogClaimerInterfaceBlock,
   AnalogModuleChannel,
   AnalogSensorType,
   Block,
-  BlockIntfType,
   BlockOrIntfType,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { ENUM_LABELS_ANALOG_SENSOR_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
-import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import { analogChannelReaders } from '@/plugins/spark/utils/info';
 import { createBlockDialog } from '@/utils/block-dialog';
 import { createDialog } from '@/utils/dialog';
-import { analogChannelName } from '../../utils/formatting';
+import { adcErrorLabel, analogChannelName } from '../../utils/formatting';
 
 interface Props {
   channels: Readonly<AnalogModuleChannel[]>;
@@ -25,16 +23,11 @@ const sparkStore = useSparkStore();
 const props = defineProps<Props>();
 
 const existingSensors = computed<{ [channelId: number]: Block[] }>(() => {
-  const sensors = sparkStore
-    .blocksByService(props.address.serviceId)
-    .filter((block): block is AnalogClaimerInterfaceBlock =>
-      isBlockCompatible(block, BlockIntfType.AnalogClaimerInterface),
-    )
-    .filter((block) => block.data.analogDevice.id === props.address.id);
+  const blocks = sparkStore.blocksByService(props.address.serviceId);
   return props.channels.reduce((acc, channel) => {
-    acc[channel.id] = sensors.filter(
-      (block) => block.data.analogChannel === channel.id,
-    );
+    acc[channel.id] = props.address.id
+      ? analogChannelReaders(blocks, props.address.id, channel.id)
+      : [];
     return acc;
   }, {});
 });
@@ -86,6 +79,17 @@ function createSensor(sensorType: BlockOrIntfType | null): void {
         class="col-2"
       >
         {{ ENUM_LABELS_ANALOG_SENSOR_TYPE[channel.sensorType] }}
+      </LabeledField>
+      <LabeledField
+        v-if="adcErrorLabel(channel.error)"
+        label="ADC stopped"
+        readonly
+        class="col-2 text-negative"
+        tooltip="Channels A1 and A2 share an ADC, as do channels B1 and B2.
+        While their ADC is stopped, both channels have no readings.
+        The module keeps trying to restart it."
+      >
+        {{ adcErrorLabel(channel.error) }}
       </LabeledField>
       <QuantityField
         v-if="channel.resistance !== undefined"

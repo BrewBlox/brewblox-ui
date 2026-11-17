@@ -1,4 +1,5 @@
 import {
+  AdcError,
   AnalogCalibrationState,
   AnalogCompareOp,
   AnalogConstraintKey,
@@ -254,6 +255,22 @@ export const ENUM_LABELS_ANALOG_SENSOR_TYPE: EnumLabels<AnalogSensorType> = {
   ANALOG_SENSOR_TYPE_RTD_3WIRE_LS: 'RTD (3-wire low side)',
   ANALOG_SENSOR_TYPE_STRAIN_GAUGE_LOW_RESISTANCE:
     'Strain gauge (low resistance)',
+};
+
+export const ENUM_LABELS_ADC_ERROR: EnumLabels<AdcError> = {
+  ADC_ERROR_OK: 'OK',
+  ADC_ERROR_NOT_READY: 'Not ready',
+  ADC_ERROR_REF_LOW_ALARM: 'Reference voltage low',
+  ADC_ERROR_PGA_LOW_ALARM: 'Input below range',
+  ADC_ERROR_PGA_HIGH_ALARM: 'Input above range',
+  ADC_ERROR_CRC_ERROR: 'Communication error (CRC)',
+  ADC_ERROR_RESET_DETECTED: 'ADC was reset',
+  ADC_ERROR_SYSTEM_SPI_ERROR: 'SPI error',
+  ADC_ERROR_SPI_ACQUIRE_ERROR: 'SPI bus busy',
+  ADC_ERROR_SPI_VALIDATE_ERROR: 'SPI write not confirmed',
+  ADC_ERROR_WRITING_LOCKED_REGISTER: 'Register locked',
+  ADC_ERROR_INVALID_CHANNEL: 'Invalid channel',
+  ADC_ERROR_DATA_READY_TIMEOUT: 'No data in time',
 };
 
 export const ENUM_LABELS_ANALOG_CALIBRATION_STATE: EnumLabels<AnalogCalibrationState> =

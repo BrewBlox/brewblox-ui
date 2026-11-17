@@ -1,5 +1,4 @@
 import {
-  AnalogClaimerInterfaceBlock,
   AnalogConstraintKey,
   AnalogConstraints,
   Block,
@@ -178,37 +177,6 @@ export async function unlinkIoChannelClaimers(
   );
 }
 
-export async function unlinkAnalogChannelClaimers(
-  serviceId: string,
-  analogDevice: Link,
-  analogChannel: number,
-): Promise<void> {
-  if (!analogDevice.id || !analogChannel) {
-    return;
-  }
-
-  const sparkStore = useSparkStore();
-
-  await Promise.all(
-    sparkStore
-      .blocksByService(serviceId)
-      .filter((block): block is AnalogClaimerInterfaceBlock =>
-        isBlockCompatible(block, BlockIntfType.AnalogClaimerInterface),
-      )
-      .filter(
-        (block) =>
-          block.data.analogDevice.id === analogDevice.id &&
-          block.data.analogChannel === analogChannel,
-      )
-      .map((block) =>
-        sparkStore.patchBlock(block, {
-          analogDevice: bloxLink(null),
-          analogChannel: 0,
-        }),
-      ),
-  );
-}
-
 export async function setExclusiveIoChannelClaimer(
   actuator: Maybe<Block>,
   hwDevice: Link,
@@ -232,37 +200,6 @@ export async function setExclusiveIoChannelClaimer(
 
   await unlinkIoChannelClaimers(actuator.serviceId, hwDevice, channel);
   await useSparkStore().patchBlock(actuator, { hwDevice, channel });
-}
-
-export async function setAnalogChannelClaimer(
-  sensor: Maybe<Block>,
-  analogDevice: Link,
-  analogChannel: number,
-  exclusive: boolean,
-): Promise<void> {
-  if (
-    !isBlockCompatible<AnalogClaimerInterfaceBlock>(
-      sensor,
-      BlockIntfType.AnalogClaimerInterface,
-    )
-  ) {
-    return;
-  }
-
-  if (
-    sensor.data.analogDevice.id === analogDevice.id &&
-    sensor.data.analogChannel === analogChannel
-  ) {
-    return; // no change
-  }
-  if (exclusive) {
-    await unlinkAnalogChannelClaimers(
-      sensor.serviceId,
-      analogDevice,
-      analogChannel,
-    );
-  }
-  await useSparkStore().patchBlock(sensor, { analogDevice, analogChannel });
 }
 
 export function emptyAnalogConstraints(): DeepNonNullable<AnalogConstraints> {

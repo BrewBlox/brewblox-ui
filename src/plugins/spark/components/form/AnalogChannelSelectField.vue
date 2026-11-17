@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import {
   AnalogArrayInterfaceBlock,
-  AnalogClaimerInterfaceBlock,
   BlockIntfType,
   Link,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { ENUM_LABELS_ANALOG_SENSOR_TYPE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { isBlockCompatible } from '@/plugins/spark/utils/info';
+import {
+  analogChannelReaders,
+  isBlockCompatible,
+} from '@/plugins/spark/utils/info';
 import { bloxLink } from '@/utils/link';
 import { analogChannelName } from '../../utils/formatting';
 
@@ -60,44 +62,29 @@ const model = computed<string | null>({
   },
 });
 
-const channelOpts = computed<SelectOption[]>(() =>
-  sparkStore
-    .blocksByService(props.serviceId)
+const channelOpts = computed<SelectOption[]>(() => {
+  const blocks = sparkStore.blocksByService(props.serviceId);
+  return blocks
     .filter((block): block is AnalogArrayInterfaceBlock =>
       isBlockCompatible(block, BlockIntfType.AnalogArrayInterface),
     )
     .flatMap((block: AnalogArrayInterfaceBlock) =>
-      block.data.analogChannels
-        .map((analogChannel) => ({ block, analogChannel }))
-        .map(({ block, analogChannel }) => ({
+      block.data.analogChannels.map((analogChannel) => {
+        const readers = analogChannelReaders(blocks, block.id, analogChannel.id)
+          .map((reader) => reader.id)
+          .join(', ');
+        return {
           label:
             `<b>${channelNameWithBlock(block.id, analogChannel.id)}: </b>` +
             `<small> ${ENUM_LABELS_ANALOG_SENSOR_TYPE[analogChannel.sensorType]}` +
-            sparkStore
-              .blocksByService(props.serviceId)
-              .filter((other): other is AnalogClaimerInterfaceBlock =>
-                isBlockCompatible(other, BlockIntfType.AnalogClaimerInterface),
-              )
-              .filter(
-                (other) =>
-                  other.data.analogDevice.id === block.id &&
-                  other.data.analogChannel === analogChannel.id,
-              )
-              .reduce((acc, block) => {
-                if (!acc) {
-                  acc = ' -> ';
-                } else {
-                  acc = acc + ', ';
-                }
-                acc = acc + block.id;
-                return acc;
-              }, '') +
+            (readers ? ` -> ${readers}` : '') +
             '</small>',
           value: `${block.id}/${analogChannel.id}`,
           html: true,
-        })),
-    ),
-);
+        };
+      }),
+    );
+});
 </script>
 
 <template>
