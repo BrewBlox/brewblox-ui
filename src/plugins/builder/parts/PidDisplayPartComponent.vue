@@ -22,8 +22,14 @@ const { part, flows, width, height, bordered, passthrough, placeholder } =
 
 const color = computed<string>(() => liquidBorderColor(flows.value));
 
-const { block, blockStatus, isBroken, showBlockDialog, showBlockSelectDialog } =
-  useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
+const {
+  block,
+  hasBlock,
+  blockStatus,
+  isBroken,
+  showBlockDialog,
+  showBlockSelectDialog,
+} = useSettingsBlock.setup<PidBlockT>(PID_KEY, PID_TYPES);
 
 const contentTransform = computed<string>(() =>
   textTransformation(part.value, { width: 1, height: 1 }),
@@ -80,7 +86,7 @@ const suffix = computed<string>(() => {
       class="content"
     >
       <BrokenSvgIcon v-if="isBroken" />
-      <UnlinkedSvgIcon v-else-if="!block && !placeholder" />
+      <UnlinkedSvgIcon v-else-if="!hasBlock && !placeholder" />
       <template v-else>
         <BlockStatusSvg :status="blockStatus" />
         <HeatingSvgIcon
@@ -122,7 +128,7 @@ const suffix = computed<string>(() => {
       >
         <q-list>
           <BlockMenuContent
-            :available="!!block"
+            :available="hasBlock"
             @show="showBlockDialog"
             @assign="showBlockSelectDialog"
           />

@@ -1,5 +1,6 @@
 import { DateString, StoreObject } from 'brewblox-proto/ts';
 import { Annotations, Layout, PlotData } from 'plotly.js';
+import { LineTraceType } from '@/utils/graph';
 
 export interface QueryParams {
   database?: string;
@@ -92,7 +93,7 @@ export interface TimeSeriesMetricsResult {
 }
 
 export interface RangeValue extends PlotData {
-  type: 'scattergl';
+  type: LineTraceType;
   mode: 'lines';
   name: string;
   yaxis: GraphAxis;

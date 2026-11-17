@@ -254,6 +254,49 @@ describe('useFlowParts', () => {
     wrapper.unmount();
   });
 
+  it('evaluates only the parts that read a changed block', async () => {
+    const calls: string[] = [];
+    builderStore.blueprints = Object.values(blueprints).map((bp) => ({
+      ...bp,
+      transitions: (part: BuilderPart) => {
+        calls.push(part.id);
+        return bp.transitions(part);
+      },
+    }));
+    mocks.onLayoutChanged(valveLayout());
+    sparkStore.blocks[serviceId] = [valveBlock(DigitalState.STATE_ACTIVE)];
+    const wrapper = mount(Host, { props: { layoutId: 'valve-layout' } });
+    await settle();
+    calls.length = 0;
+
+    // Replaced with new objects, like a state event would
+    sparkStore.blocks[serviceId] = [valveBlock(DigitalState.STATE_ACTIVE)];
+    await settle();
+    expect(calls).toEqual(['valve']);
+    wrapper.unmount();
+  });
+
+  it('keeps the flows of parts whose flows did not change', async () => {
+    const layout = {
+      ...valveLayout(),
+      id: 'lone-layout',
+      parts: [...valveLayout().parts, makePart('lone', 'StraightTube', 8, 8)],
+    };
+    mocks.onLayoutChanged(layout);
+    sparkStore.blocks[serviceId] = [valveBlock(DigitalState.STATE_ACTIVE)];
+    const wrapper = mount(Host, { props: { layoutId: 'lone-layout' } });
+    await settle();
+    const before = wrapper.vm.api.flows.value;
+
+    sparkStore.blocks[serviceId] = [valveBlock(DigitalState.STATE_INACTIVE)];
+    await settle();
+    const after = wrapper.vm.api.flows.value;
+    expect(after).not.toBe(before);
+    expect(after['tube1']).not.toBe(before['tube1']);
+    expect(after['lone']).toBe(before['lone']);
+    wrapper.unmount();
+  });
+
   it('recalculates when parts are updated', async () => {
     mocks.onLayoutChanged(valveLayout());
     const wrapper = mount(Host, { props: { layoutId: 'valve-layout' } });

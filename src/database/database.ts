@@ -1,5 +1,6 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { DatastoreEvent, StoreObject } from 'brewblox-proto/ts';
+import isEqual from 'lodash/isEqual';
 import isObjectLike from 'lodash/isObjectLike';
 import { STORE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
@@ -71,13 +72,84 @@ async function checkDatastore(): Promise<void> {
   }
 }
 
+function reportHandlerError(namespace: string, e: unknown): void {
+  notify.error(`DB error in handling a change (${namespace}): ${e}`, {
+    shown: false,
+  });
+}
+
+/**
+ * Whether the handler did not throw.
+ * An async handler's rejection is reported only.
+ */
+function handled(namespace: string, handle: () => unknown): boolean {
+  try {
+    Promise.resolve(handle()).catch((e) => reportHandlerError(namespace, e));
+    return true;
+  } catch (e) {
+    reportHandlerError(namespace, e);
+    return false;
+  }
+}
+
 export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   // handlers are indexed on namespace
   private handlers: Mapped<EventHandler> = {};
   private rootNamespaces: string[] = [];
+  // Compared whenever the eventbus connects, to find what changed while it was not
+  private lastSeen: Mapped<Map<string, StoreObject>> = {};
+  private changedWhileFetching: Mapped<Set<string>> = {};
+  private catchUpRun = 0;
 
   public async connect(): Promise<void> {
     await checkDatastore();
+    eventbus.onConnect(() => this.catchUp());
+  }
+
+  private async catchUp(): Promise<void> {
+    const run = ++this.catchUpRun;
+    await checkDatastore();
+    // A later connect fetches newer data
+    if (run !== this.catchUpRun) {
+      return;
+    }
+    await Promise.all(
+      Object.values(this.handlers).map(async (handler) => {
+        const { namespace } = handler;
+        const changedWhileFetching = new Set<string>();
+        this.changedWhileFetching[namespace] = changedWhileFetching;
+        const objs = await this.mget(namespace).catch(() => null);
+        if (this.changedWhileFetching[namespace] === changedWhileFetching) {
+          delete this.changedWhileFetching[namespace];
+        }
+        if (objs === null || run !== this.catchUpRun) {
+          return;
+        }
+
+        const seen = this.lastSeen[namespace] ?? new Map<string, StoreObject>();
+        this.lastSeen[namespace] = seen;
+        // A change event during the fetch may be newer than what the fetch read
+        const fetched = new Map(
+          objs
+            .filter((obj) => !changedWhileFetching.has(obj.id))
+            .map((obj) => [obj.id, obj]),
+        );
+        const deleted = [...seen.keys()].filter(
+          (id) => !fetched.has(id) && !changedWhileFetching.has(id),
+        );
+        const changed = [...fetched.values()].filter(
+          (obj) => !isEqual(seen.get(obj.id), obj),
+        );
+
+        // A handler that throws gets its object again on the next connect
+        deleted
+          .filter((id) => handled(namespace, () => handler.onDeleted(id)))
+          .forEach((id) => seen.delete(id));
+        changed
+          .filter((obj) => handled(namespace, () => handler.onChanged(obj)))
+          .forEach((obj) => seen.set(obj.id, obj));
+      }),
+    );
   }
 
   private subscribeChanged(namespace: string): void {
@@ -96,7 +168,11 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   }
 
   private onChanged(changed: StoreObject[]): void {
-    changed.forEach((obj) => this.handlers[obj.namespace!]?.onChanged(obj));
+    changed.forEach((obj) => {
+      this.lastSeen[obj.namespace!]?.set(obj.id, obj);
+      this.changedWhileFetching[obj.namespace!]?.add(obj.id);
+      this.handlers[obj.namespace!]?.onChanged(obj);
+    });
   }
 
   private onDeleted(deleted: string[]): void {
@@ -106,6 +182,8 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
       const idx = key.lastIndexOf(':');
       const namespace = key.substring(0, idx);
       const id = key.substring(idx + 1);
+      this.lastSeen[namespace]?.delete(id);
+      this.changedWhileFetching[namespace]?.add(id);
       this.handlers[namespace]?.onDeleted(id);
     });
   }
@@ -122,9 +200,7 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
     this.subscribeChanged(namespace);
   }
 
-  public async fetchAll<T extends StoreObject>(
-    namespace: string,
-  ): Promise<T[]> {
+  private async mget<T extends StoreObject>(namespace: string): Promise<T[]> {
     return http
       .post<MultiQueryArgs, AxiosResponse<MultiValue<T>>>(
         '/history/datastore/mget',
@@ -135,6 +211,14 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
       )
       .then((resp) => resp.data.values)
       .catch(intercept('Fetch all objects', namespace));
+  }
+
+  public async fetchAll<T extends StoreObject>(
+    namespace: string,
+  ): Promise<T[]> {
+    const values = await this.mget<T>(namespace);
+    this.lastSeen[namespace] = new Map(values.map((v) => [v.id, v]));
+    return values;
   }
 
   public async fetchById<T extends StoreObject>(

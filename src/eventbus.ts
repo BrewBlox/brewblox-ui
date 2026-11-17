@@ -21,6 +21,7 @@ export class BrewbloxEventbus {
   private client: mqtt.MqttClient | null = null;
   private topics: Set<string> = new Set();
   private listeners: EventListener[] = [];
+  private connectCallbacks: (() => unknown)[] = [];
   public readonly connected: Ref<boolean> = ref(false);
 
   public async connect(): Promise<void> {
@@ -33,6 +34,8 @@ export class BrewbloxEventbus {
       reschedulePings: false,
       // mqtt's own worker timers can fire every keepalive at once: see workerInterval
       timerVariant: workerInterval,
+      // The connect handler subscribes, and is called back once the broker acknowledged it
+      resubscribe: false,
     };
     if (this.client) {
       this.client.end();
@@ -45,8 +48,14 @@ export class BrewbloxEventbus {
       notify.error(`mqtt error: ${e}`);
     });
     client.on('connect', () => {
-      this.topics.forEach((topic) => client.subscribe(topic));
       this.connected.value = true;
+      const topics = [...this.topics];
+      // Messages published before the broker acknowledged the subscriptions are not received
+      if (topics.length) {
+        client.subscribe(topics, () => this.runConnectCallbacks());
+      } else {
+        this.runConnectCallbacks();
+      }
     });
     client.on('close', () => {
       this.connected.value = false;
@@ -118,6 +127,22 @@ export class BrewbloxEventbus {
       this.client.subscribe(topic);
     }
     this.topics.add(topic);
+  }
+
+  private runConnectCallbacks(): void {
+    this.connectCallbacks.forEach((cb) =>
+      Promise.resolve()
+        .then(cb)
+        .catch((e) => notify.error(`Error after the eventbus connected: ${e}`)),
+    );
+  }
+
+  /**
+   * Called whenever the eventbus connects, the first time included:
+   * messages published while it was not connected were not received.
+   */
+  public onConnect(cb: () => unknown): void {
+    this.connectCallbacks.push(cb);
   }
 
   public addListener(topic: string, callback: EventCallback): string {

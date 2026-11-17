@@ -62,7 +62,7 @@ Everything under `src/components/**` and each plugin's `components/**` is glob-r
 ### Persistent state and events
 
 - Pinia stores in `src/store/*` hold dashboards, widgets, services, etc.
-  Persistent objects are kept in two-way sync with the Redis datastore through `src/database` (full load at startup, then change events).
+  Persistent objects are kept in two-way sync with the Redis datastore through `src/database` (full load at startup, then change events, and a fetch of what changed whenever the eventbus connects).
   Objects that need post-load initialization are added to `startup` in `main.ts`.
 - `src/eventbus.ts` is the MQTT client.
   Plugins `subscribe()` to topics and `addListener()` for callbacks; the Spark plugin receives block state and patch events this way.

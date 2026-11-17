@@ -22,6 +22,11 @@ export interface UseSettingsBlockComponent<BlockT extends Block> {
   hasAddress: ComputedRef<boolean>;
   address: ComputedRef<BlockAddress>;
   block: ComputedRef<BlockT | null>;
+  /**
+   * A template that reads this instead of the block does not render again
+   * on every state event, which replaces the block.
+   */
+  hasBlock: ComputedRef<boolean>;
   blockStatus: ComputedRef<BlockStatus | null>;
   isBroken: ComputedRef<boolean>;
   isClaimed: ComputedRef<boolean>;
@@ -93,6 +98,8 @@ export const useSettingsBlock: UseSettingsBlockComposable = {
 
     const hasAddress = computed<boolean>(() => address.value.id !== null);
 
+    const hasBlock = computed<boolean>(() => block.value !== null);
+
     const isBroken = computed<boolean>(
       () => block.value === null && hasAddress.value,
     );
@@ -126,6 +133,7 @@ export const useSettingsBlock: UseSettingsBlockComposable = {
       hasAddress,
       address,
       block,
+      hasBlock,
       blockStatus,
       isBroken,
       isClaimed,

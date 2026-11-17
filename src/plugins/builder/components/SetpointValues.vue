@@ -33,6 +33,7 @@ const { placeholder } = usePart.setup();
 const {
   address,
   block,
+  hasBlock,
   blockStatus,
   isBroken,
   showBlockDialog,
@@ -73,7 +74,7 @@ const tempUnit = computed<string>(() =>
 
 <template>
   <svg
-    v-if="block || always"
+    v-if="hasBlock || always"
     v-bind="{ x, y, width, height }"
     viewBox="0 0 100 50"
   >
@@ -82,7 +83,7 @@ const tempUnit = computed<string>(() =>
       x="30"
     />
     <UnlinkedSvgIcon
-      v-else-if="!block && !placeholder"
+      v-else-if="!hasBlock && !placeholder"
       x="30"
     />
     <template v-else>
@@ -135,7 +136,7 @@ const tempUnit = computed<string>(() =>
       >
         <q-list>
           <BlockMenuContent
-            :available="!!block"
+            :available="hasBlock"
             @show="showBlockDialog"
             @assign="showBlockSelectDialog"
           />

@@ -11,6 +11,7 @@ import { useContext, useGlobals } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { useSparkStore } from '@/plugins/spark/store';
 import { createComponentDialog } from '@/utils/dialog';
+import { lineTraceType } from '@/utils/graph';
 import { durationMs, parseDate, prettyLink } from '@/utils/quantity';
 import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';
@@ -115,7 +116,7 @@ watchEffect(() => {
   // Prepare the base trace
   const baseTrace: Partial<PlotData> = {
     name: 'Setting applied by profile',
-    type: 'scattergl',
+    type: lineTraceType(),
     x: xPoints,
     y: yPoints,
   };
@@ -182,7 +183,7 @@ watchEffect(() => {
 
     const rampTrace: Partial<PlotData> = {
       name: 'Setting after ramp limit',
-      type: 'scattergl',
+      type: lineTraceType(),
       x: xPointsRamped,
       y: yPointsRamped,
       line: {

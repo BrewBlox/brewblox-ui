@@ -16,6 +16,7 @@ import {
   PWM_TYPES,
   PwmBlockT,
 } from '@/plugins/builder/const';
+import { vSkipSmilReplay } from '@/plugins/builder/smil';
 import { liquidOnCoord, showAbsentBlock } from '@/plugins/builder/utils';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { prettyLink, roundedNumber } from '@/utils/quantity';
@@ -26,6 +27,7 @@ const { part, flows, settings, width, height, patchSettings } = usePart.setup();
 
 const {
   block,
+  hasBlock,
   blockStatus,
   hasAddress,
   isClaimed,
@@ -219,6 +221,7 @@ function interactHandler(): void {
         />
         <animateTransform
           v-if="active"
+          v-skip-smil-replay
           attributeName="transform"
           attributeType="XML"
           type="rotate"
@@ -288,7 +291,7 @@ function interactHandler(): void {
             ]"
           />
           <BlockMenuContent
-            :available="!!block"
+            :available="hasBlock"
             @show="showBlockDialog"
             @assign="showBlockSelectDialog"
           />
