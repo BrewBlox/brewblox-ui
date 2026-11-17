@@ -70,28 +70,11 @@ export function filterLabel(
   return `${samples} samples`;
 }
 
-export function derivativeFilterLabel(
-  choice: FilterChoice,
-  updateIntervalMs: number | null = null,
-): string {
-  if (choice === FilterChoice.FILTER_NONE) return 'Derived from Td';
-  return filterLabel(choice, updateIntervalMs);
-}
-
 export function filterSelectOptions(
   updateIntervalMs: number | null = null,
 ): SelectOption<FilterChoice>[] {
   return Object.keys(FILTER_SAMPLES).map((key) => ({
     label: filterLabel(key as FilterChoice, updateIntervalMs),
-    value: key as FilterChoice,
-  }));
-}
-
-export function derivativeFilterSelectOptions(
-  updateIntervalMs: number | null = null,
-): SelectOption<FilterChoice>[] {
-  return Object.keys(FILTER_SAMPLES).map((key) => ({
-    label: derivativeFilterLabel(key as FilterChoice, updateIntervalMs),
     value: key as FilterChoice,
   }));
 }
