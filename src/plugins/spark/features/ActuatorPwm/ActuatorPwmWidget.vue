@@ -4,10 +4,12 @@ import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { PWM_SELECT_OPTIONS } from '@/plugins/spark/const';
+import { useSparkStore } from '@/plugins/spark/store';
 import { claimReason } from '@/plugins/spark/utils/formatting';
 import { fixedNumber, prettyLink, roundedNumber } from '@/utils/quantity';
 
 const { context, inDialog } = useContext.setup();
+const sparkStore = useSparkStore();
 
 const { serviceId, block, patchBlock, isClaimed } =
   useBlockWidget.setup<ActuatorPwmBlock>();
@@ -17,8 +19,26 @@ const outputLink = computed<Link>(() => block.value.data.actuatorId);
 const isLimited = computed<boolean>(
   () =>
     block.value.data.enabled &&
+    block.value.data.setting != null &&
     block.value.data.setting !== block.value.data.desiredSetting,
 );
+
+// The firmware reports no setting while the PWM delivers nothing
+const drivesNothing = computed<string | null>(() => {
+  const { enabled, desiredSetting, setting, actuatorId } = block.value.data;
+  if (!enabled || desiredSetting == null || setting != null || !actuatorId.id) {
+    return null;
+  }
+  const actuator = sparkStore.blockByLink(serviceId, actuatorId);
+  if (!actuator) {
+    return `its target ${actuatorId.id} is gone`;
+  }
+  const holder = actuator.data.claimedBy?.id;
+  if (holder && holder !== block.value.id) {
+    return `its target ${actuatorId.id} is held by ${holder}`;
+  }
+  return `its target ${actuatorId.id} does not take its setting`;
+});
 
 const pwmDesired = computed<number | null>(() => {
   const v = block.value.data.desiredSetting;
@@ -39,6 +59,9 @@ const pwmDesired = computed<number | null>(() => {
     <div class="q-mx-auto">
       <CardWarning v-if="!outputLink.id">
         <template #message> PWM has no target actuator configured. </template>
+      </CardWarning>
+      <CardWarning v-else-if="drivesNothing">
+        <template #message> PWM drives nothing: {{ drivesNothing }}. </template>
       </CardWarning>
       <BlockEnableToggle>
         <template #enabled>
