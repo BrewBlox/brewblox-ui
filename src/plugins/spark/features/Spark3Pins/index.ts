@@ -21,11 +21,11 @@ const plugin: Plugin = {
       hasRelations: true,
       generate: (): Spark3PinsBlock['data'] => ({
         channels: [],
-        enableIoSupply5V: false,
         enableIoSupply12V: false,
         soundAlarm: false,
         voltage5: 0,
         voltage12: 0,
+        powerCycleIoSupply5V: false,
       }),
       analyze: () => 'Active',
     };
@@ -37,13 +37,6 @@ const plugin: Plugin = {
         title: 'Alarm sound',
         component: 'BoolValEdit',
         generate: () => false,
-      },
-      {
-        type,
-        key: 'enableIoSupply5V',
-        title: 'Enable 5V power supply',
-        component: 'BoolValEdit',
-        generate: () => true,
       },
       {
         type,

@@ -139,6 +139,7 @@ export const ENUM_LABELS_RESET_REASON: EnumLabels<ResetReason> = {
   RESET_REASON_SAFE_MODE: 'Safe mode',
   RESET_REASON_DFU_MODE: 'DFU mode',
   RESET_REASON_USER_REQUESTED: 'Requested by user',
+  RESET_REASON_FIRMWARE_UPDATE_ABORTED: 'Firmware update aborted',
 };
 
 export const ENUM_LABELS_DIGITAL_STATE: EnumLabels<DigitalState> = {

@@ -31,6 +31,7 @@ import TempSensorAnalog from './TempSensorAnalog';
 import TempSensorCombi from './TempSensorCombi';
 import TempSensorExternal from './TempSensorExternal';
 import TempSensorMock from './TempSensorMock';
+import TempSensorMockFluctuating from './TempSensorMockFluctuating';
 import TempSensorOneWire from './TempSensorOneWire';
 import Variables from './Variables';
 
@@ -67,6 +68,7 @@ const plugins: Plugin[] = [
   TempSensorCombi,
   TempSensorExternal,
   TempSensorMock,
+  TempSensorMockFluctuating,
   TempSensorOneWire,
   Variables,
 ];

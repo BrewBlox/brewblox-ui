@@ -24,7 +24,7 @@
     {
       "id": "Ferment Beer Sensor",
       "nid": 106,
-      "type": "TempSensorMock",
+      "type": "TempSensorMockFluctuating",
       "serviceId": "sparkey",
       "data": {
         "connected": true,
@@ -265,8 +265,7 @@
           "value": 0
         },
         "boilMinOutput": 0,
-        "boilModeActive": false,
-        "derivativeFilter": 0
+        "boilModeActive": false
       }
     },
     {
@@ -316,8 +315,7 @@
           "unit": "degC",
           "value": 0,
           "readonly": true
-        },
-        "fluctuations": []
+        }
       }
     },
     {
@@ -500,8 +498,7 @@
           "value": 0
         },
         "boilMinOutput": 0,
-        "boilModeActive": false,
-        "derivativeFilter": 0
+        "boilModeActive": false
       }
     },
     {
@@ -740,8 +737,7 @@
           "unit": "delta_degC",
           "value": 0
         },
-        "boilModeActive": false,
-        "derivativeFilter": 0
+        "boilModeActive": false
       }
     },
     {
@@ -802,8 +798,7 @@
           "unit": "degC",
           "value": 0,
           "readonly": true
-        },
-        "fluctuations": []
+        }
       }
     },
     {
@@ -986,8 +981,7 @@
           "unit": "delta_degC",
           "value": 0
         },
-        "boilModeActive": false,
-        "derivativeFilter": 0
+        "boilModeActive": false
       }
     },
     {
@@ -1048,8 +1042,7 @@
           "unit": "degC",
           "value": 0,
           "readonly": true
-        },
-        "fluctuations": []
+        }
       }
     },
     {
@@ -1229,8 +1222,7 @@
           "value": 0
         },
         "boilMinOutput": 0,
-        "boilModeActive": false,
-        "derivativeFilter": 0
+        "boilModeActive": false
       }
     },
     {
@@ -1250,8 +1242,7 @@
           "unit": "degC",
           "value": 0,
           "readonly": true
-        },
-        "fluctuations": []
+        }
       }
     },
     {

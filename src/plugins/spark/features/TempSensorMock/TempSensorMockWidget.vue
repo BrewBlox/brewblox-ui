@@ -1,17 +1,32 @@
 <script setup lang="ts">
-import { Fluctuation, TempSensorMockBlock } from 'brewblox-proto/ts';
+import {
+  BlockType,
+  Fluctuation,
+  TempSensorMockBlock,
+  TempSensorMockFluctuatingBlock,
+} from 'brewblox-proto/ts';
+import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
 import { bloxQty, deltaTempQty, prettyQty } from '@/utils/quantity';
 
+// The widget of both mock sensors: only the fluctuating one has fluctuations
 const { context, inDialog } = useContext.setup();
-const { block, patchBlock } = useBlockWidget.setup<TempSensorMockBlock>();
+const { block, patchBlock } = useBlockWidget.setup<
+  TempSensorMockBlock | TempSensorMockFluctuatingBlock
+>();
+
+const fluctuations = computed<Fluctuation[] | null>(() =>
+  block.value.type === BlockType.TempSensorMockFluctuating
+    ? block.value.data.fluctuations
+    : null,
+);
 
 function addFluctuation(): void {
   patchBlock({
     fluctuations: [
-      ...block.value.data.fluctuations,
+      ...(fluctuations.value ?? []),
       {
         amplitude: deltaTempQty(1),
         period: bloxQty('6h'),
@@ -21,14 +36,14 @@ function addFluctuation(): void {
 }
 
 function updateFluctuation(idx: number, fluct: Fluctuation): void {
-  const fluctuations = [...block.value.data.fluctuations];
-  fluctuations[idx] = fluct;
-  patchBlock({ fluctuations });
+  const updated = [...(fluctuations.value ?? [])];
+  updated[idx] = fluct;
+  patchBlock({ fluctuations: updated });
 }
 
 function removeFluctuation(idx: number): void {
   patchBlock({
-    fluctuations: block.value.data.fluctuations.filter((_, i) => i !== idx),
+    fluctuations: (fluctuations.value ?? []).filter((_, i) => i !== idx),
   });
 }
 
@@ -101,55 +116,58 @@ function editSetting(): void {
             @update:model-value="(v) => patchBlock({ connected: v })"
           />
         </LabeledField>
-        <div class="text-h6 text-italic q-pl-sm">Fluctuations</div>
-        <p
-          v-if="block.data.fluctuations.length === 0"
-          class="text-italic q-pl-sm"
-        >
-          Add value fluctuations to simulate periodic temperature changes.
-        </p>
-        <div
-          v-for="(fluct, idx) in block.data.fluctuations"
-          :key="`fluct-${idx}`"
-          class="row q-gutter-x-sm q-ml-none fluctuation"
-        >
-          <QuantityField
-            :model-value="fluct.amplitude"
-            title="Amplitude"
-            label="Amplitude"
-            class="col-grow"
-            @update:model-value="
-              (amplitude) => updateFluctuation(idx, { ...fluct, amplitude })
-            "
-          />
-          <DurationField
-            :model-value="fluct.period"
-            title="Period"
-            label="Period"
-            class="col-grow"
-            @update:model-value="
-              (period) => updateFluctuation(idx, { ...fluct, period })
-            "
-          />
-          <q-btn
-            flat
-            round
-            icon="delete"
-            class="col-auto self-center"
-            @click="removeFluctuation(idx)"
-          />
-        </div>
-        <div class="row justify-end q-pr-md">
-          <q-btn
-            fab-mini
-            icon="add"
-            color="indigo-4"
-            class="self-center"
-            @click="addFluctuation"
+        <template v-if="fluctuations">
+          <div class="text-h6 text-italic q-pl-sm">Fluctuations</div>
+          <p
+            v-if="fluctuations.length === 0"
+            class="text-italic q-pl-sm"
           >
-            <q-tooltip>Add fluctuation</q-tooltip>
-          </q-btn>
-        </div>
+            Add value fluctuations to simulate periodic temperature changes. A
+            fluctuation with period 0 is a constant offset.
+          </p>
+          <div
+            v-for="(fluct, idx) in fluctuations"
+            :key="`fluct-${idx}`"
+            class="row q-gutter-x-sm q-ml-none fluctuation"
+          >
+            <QuantityField
+              :model-value="fluct.amplitude"
+              title="Amplitude"
+              label="Amplitude"
+              class="col-grow"
+              @update:model-value="
+                (amplitude) => updateFluctuation(idx, { ...fluct, amplitude })
+              "
+            />
+            <DurationField
+              :model-value="fluct.period"
+              title="Period"
+              label="Period"
+              class="col-grow"
+              @update:model-value="
+                (period) => updateFluctuation(idx, { ...fluct, period })
+              "
+            />
+            <q-btn
+              flat
+              round
+              icon="delete"
+              class="col-auto self-center"
+              @click="removeFluctuation(idx)"
+            />
+          </div>
+          <div class="row justify-end q-pr-md">
+            <q-btn
+              fab-mini
+              icon="add"
+              color="indigo-4"
+              class="self-center"
+              @click="addFluctuation"
+            >
+              <q-tooltip>Add fluctuation</q-tooltip>
+            </q-btn>
+          </div>
+        </template>
       </template>
     </div>
   </PreviewCard>
