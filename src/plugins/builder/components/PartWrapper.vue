@@ -146,6 +146,7 @@ watch(
         ]"
       >
         <rect
+          v-if="selectable"
           class="selection-overlay"
           :width="dimensions.width"
           :height="dimensions.height"
@@ -157,6 +158,7 @@ watch(
           />
         </g>
         <rect
+          v-if="selectable || selected"
           class="selection-highlight"
           :width="dimensions.width"
           :height="dimensions.height"
