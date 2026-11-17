@@ -15,6 +15,7 @@ import {
   TimeSeriesMetricsResult,
   TimeSeriesRangesResult,
 } from '@/plugins/history/types';
+import { lineTraceType } from '@/utils/graph';
 import { fixedNumber } from '@/utils/quantity';
 
 function boundedConcat(left: number[] = [], right: number[] = []): number[] {
@@ -168,7 +169,7 @@ export function graphSourceTransformer(
       uid: traceUid(key),
       x,
       y,
-      type: 'scattergl',
+      type: lineTraceType(),
       mode: 'lines',
       name: fieldLabel(source, key, last(y)),
       yaxis: source.axes[key] ?? 'y',
