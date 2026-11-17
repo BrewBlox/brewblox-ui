@@ -221,6 +221,7 @@ const pwmDesired = computed<number | null>(() => {
             @update:model-value="(v) => patchBlock({ frequency: v })"
           />
           <ChannelSelectField
+            :claimer="block"
             :model-value="{
               hwDevice: block.data.hwDevice,
               channel: block.data.channel,

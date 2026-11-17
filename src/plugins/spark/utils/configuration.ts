@@ -149,31 +149,55 @@ export function calculateWiFiPct(dbm: number): number {
   return Math.round(-0.0154 * dbm * dbm - 0.3794 * dbm + 98.182);
 }
 
+/**
+ * The channels a block of this type holds from its channel:
+ * a MotorValve holds four from its start channel, all or none.
+ */
+export function claimedChannels(type: string, channel: number): number[] {
+  if (!channel) {
+    return [];
+  }
+  return type === BlockType.MotorValve
+    ? [channel, channel + 1, channel + 2, channel + 3]
+    : [channel];
+}
+
+// By the claimers' own links: a DS2408 in valve mode reports only the start channels
+export function ioChannelClaimers(
+  serviceId: string,
+  hwDevice: Link,
+  channels: number[],
+  except: string | null = null,
+): IoClaimerInterfaceBlock[] {
+  if (!hwDevice.id || !channels.length) {
+    return [];
+  }
+  return useSparkStore()
+    .blocksByService(serviceId)
+    .filter((block): block is IoClaimerInterfaceBlock =>
+      isBlockCompatible(block, BlockIntfType.IoClaimerInterface),
+    )
+    .filter(
+      (block) =>
+        block.id !== except &&
+        block.data.hwDevice.id === hwDevice.id &&
+        claimedChannels(block.type, block.data.channel).some((c) =>
+          channels.includes(c),
+        ),
+    );
+}
+
 export async function unlinkIoChannelClaimers(
   serviceId: string,
   hwDevice: Link,
-  channel: number,
+  channels: number[],
+  except: string | null = null,
 ): Promise<void> {
-  if (!hwDevice.id || !channel) {
-    return;
-  }
-
   const sparkStore = useSparkStore();
-
   await Promise.all(
-    sparkStore
-      .blocksByService(serviceId)
-      .filter((block): block is IoClaimerInterfaceBlock =>
-        isBlockCompatible(block, BlockIntfType.IoClaimerInterface),
-      )
-      .filter(
-        (block) =>
-          block.data.hwDevice.id === hwDevice.id &&
-          block.data.channel === channel,
-      )
-      .map((block) =>
-        sparkStore.patchBlock(block, { hwDevice: bloxLink(null), channel: 0 }),
-      ),
+    ioChannelClaimers(serviceId, hwDevice, channels, except).map((block) =>
+      sparkStore.patchBlock(block, { hwDevice: bloxLink(null), channel: 0 }),
+    ),
   );
 }
 
@@ -191,15 +215,19 @@ export async function setExclusiveIoChannelClaimer(
     return;
   }
 
+  // Also when it keeps its channel: a block refused it gets it by freeing the holder
+  await unlinkIoChannelClaimers(
+    actuator.serviceId,
+    hwDevice,
+    claimedChannels(actuator.type, channel),
+    actuator.id,
+  );
   if (
-    actuator.data.hwDevice.id === hwDevice.id &&
-    actuator.data.channel === channel
+    actuator.data.hwDevice.id !== hwDevice.id ||
+    actuator.data.channel !== channel
   ) {
-    return; // no change
+    await useSparkStore().patchBlock(actuator, { hwDevice, channel });
   }
-
-  await unlinkIoChannelClaimers(actuator.serviceId, hwDevice, channel);
-  await useSparkStore().patchBlock(actuator, { hwDevice, channel });
 }
 
 export function emptyAnalogConstraints(): DeepNonNullable<AnalogConstraints> {

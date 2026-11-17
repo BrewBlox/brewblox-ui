@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  BlockIntfType,
   ChannelCapabilities,
   MotorValveBlock,
   Spark3PinsBlock,
@@ -10,7 +11,11 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ENUM_LABELS_VALVE_STATE } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
-import { setExclusiveIoChannelClaimer } from '@/plugins/spark/utils/configuration';
+import {
+  claimedChannels,
+  ioChannelClaimers,
+  setExclusiveIoChannelClaimer,
+} from '@/plugins/spark/utils/configuration';
 import { claimReason } from '@/plugins/spark/utils/formatting';
 import { getSpark3PinsBlock } from '@/plugins/spark/utils/system';
 
@@ -34,6 +39,27 @@ const valveLabel = computed<string>(
       block.value.data.valveState ?? ValveState.VALVE_UNKNOWN
     ],
 );
+
+// A valve refused one of its four channels takes none and sends no valve state
+const drivesNothing = computed<string | null>(() => {
+  const { hwDevice, channel, valveState } = block.value.data;
+  if (!hwDevice.id || !channel || valveState != null) {
+    return null;
+  }
+  if (!sparkStore.blockByLink(serviceId, hwDevice)) {
+    return `its device ${hwDevice.id} is gone`;
+  }
+  const holders = ioChannelClaimers(
+    serviceId,
+    hwDevice,
+    claimedChannels(block.value.type, channel),
+    block.value.id,
+  ).map((b) => b.id);
+  if (holders.length > 1) {
+    return `${holders.join(', ')} hold some of its channels`;
+  }
+  return holders.length ? `${holders[0]} holds one of its channels` : null;
+});
 
 function enable12V(): void {
   sparkStore.patchBlock(spark3Pins.value, { enableIoSupply12V: true });
@@ -66,6 +92,11 @@ function enable12V(): void {
     <CardWarning v-else-if="!block.data.hwDevice.id || !block.data.channel">
       <template #message>
         <span>This Motor Valve has no channel selected.</span>
+      </template>
+    </CardWarning>
+    <CardWarning v-else-if="drivesNothing">
+      <template #message>
+        <span>This Motor Valve drives nothing: {{ drivesNothing }}.</span>
       </template>
     </CardWarning>
 
@@ -103,12 +134,14 @@ function enable12V(): void {
 
       <div class="widget-body row">
         <ChannelSelectField
+          :claimer="block"
           :model-value="{
             hwDevice: block.data.hwDevice,
             channel: block.data.channel,
           }"
           :service-id="serviceId"
           :capabilities="ChannelCapabilities.CHAN_SUPPORTS_BIDIRECTIONAL"
+          :device-type="BlockIntfType.DS2408Interface"
           clearable
           title="Target channel"
           label="Channel"
