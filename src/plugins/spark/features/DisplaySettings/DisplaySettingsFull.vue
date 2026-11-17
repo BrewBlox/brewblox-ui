@@ -51,11 +51,8 @@ const sysInfo = computed<SysInfoBlock | undefined>(() =>
 
 const displayBrightness = computed<number>({
   get: () => {
-    const brightness = sysInfo.value?.data.displayBrightness ?? 255;
-    if (brightness < 20) {
-      return 255; // values under 20 are not applied in firmware and will give max brightness
-    }
-    return brightness;
+    // A Spark 4 shows 1 to 19 as 20; a Spark 2 or 3 skips them and keeps its level
+    return Math.max(sysInfo.value?.data.displayBrightness ?? 255, 20);
   },
   set: (displayBrightness) => {
     sparkStore.patchBlock(sysInfo.value, { displayBrightness });
