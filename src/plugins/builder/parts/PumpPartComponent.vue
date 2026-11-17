@@ -27,6 +27,7 @@ const { part, flows, settings, width, height, patchSettings } = usePart.setup();
 
 const {
   block,
+  hasBlock,
   blockStatus,
   hasAddress,
   isClaimed,
@@ -290,7 +291,7 @@ function interactHandler(): void {
             ]"
           />
           <BlockMenuContent
-            :available="!!block"
+            :available="hasBlock"
             @show="showBlockDialog"
             @assign="showBlockSelectDialog"
           />
