@@ -18,7 +18,7 @@ async function onAppSetup(): Promise<void> {
   if (!(await authRefresh())) {
     await createDialogPromise({ component: 'LoginDialog' });
   }
-  setInterval(() => authRefresh().catch(), AUTH_REFRESH_INTERVAL_MS);
+  setInterval(() => authRefresh().catch(() => {}), AUTH_REFRESH_INTERVAL_MS);
 
   await database.connect();
   await startup.start();
