@@ -6,7 +6,6 @@ import { BlockFieldSpec, BlockSpec } from '@/plugins/spark/types';
 import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { tempQty } from '@/utils/quantity';
 
-// Only the simulator has this block: a Spark refuses to create it
 const type = BlockType.TempSensorMockFluctuating;
 const title = 'Temp Sensor (Mock, fluctuating)';
 
@@ -19,6 +18,7 @@ const plugin: Plugin = {
       type,
       title,
       hasRelations: true,
+      simulatorOnly: true,
       generate: (): TempSensorMockFluctuatingBlock['data'] => ({
         value: tempQty(20),
         setting: tempQty(20),

@@ -159,6 +159,8 @@ export interface BlockSpec<T extends Block = Block> {
   hasRelations?: boolean;
   generate: () => T['data'];
   analyze: (block: T) => BlockStatus;
+  /** Only the simulator has this block type: a Spark refuses to create it */
+  simulatorOnly?: boolean;
 }
 
 /** A step of a control chain, as the chain footer of a block widget shows it */

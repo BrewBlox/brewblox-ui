@@ -30,6 +30,13 @@ export const getDisplaySettingsBlock: SysBlockFn<DisplaySettingsBlock> = (
 export const getSysInfoBlock: SysBlockFn<SysInfoBlock> = (serviceId) =>
   getSysBlock(serviceId, SystemBlockType.SysInfo);
 
+/**
+ * Whether the service's controller is the simulator, as its handshake names it:
+ * known before its blocks load, and for a simulator the service reaches over TCP too
+ */
+export const isSimulator = (serviceId: string | null | undefined): boolean =>
+  useSparkStore().statusByService(serviceId)?.controller?.platform === 'sim';
+
 export const getWiFiSettingsBlock: SysBlockFn<WiFiSettingsBlock> = (
   serviceId,
 ) => getSysBlock(serviceId, SystemBlockType.WiFiSettings);
