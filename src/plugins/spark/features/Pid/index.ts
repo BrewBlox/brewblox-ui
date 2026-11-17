@@ -1,9 +1,4 @@
-import {
-  BlockIntfType,
-  BlockType,
-  FilterChoice,
-  PidBlock,
-} from 'brewblox-proto/ts';
+import { BlockIntfType, BlockType, PidBlock } from 'brewblox-proto/ts';
 import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
@@ -53,15 +48,13 @@ const plugin: Plugin = {
         error: deltaTempQty(0),
         integral: 0,
         derivative: 0,
-        derivativeFilter: FilterChoice.FILTER_NONE,
-        derivativeFilterChoice: FilterChoice.FILTER_NONE,
         integralReset: 0,
         boilPointAdjust: deltaTempQty(0),
         boilMinOutput: 0,
         boilModeActive: false,
         ambientValue: tempQty(0),
         ambientOffset: deltaTempQty(0),
-        smoothBand: deltaTempQty(0),
+        smoothBand: deltaTempQty(0.25),
         smoothGain: 1,
       }),
       analyze: (block: PidBlock) => {

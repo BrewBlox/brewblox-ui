@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import {
+  AnalogArrayInterfaceBlock,
+  BlockIntfType,
   Quantity,
   TempSensorAnalogBlock,
   TempSensorAnalogSpec,
@@ -13,7 +15,9 @@ import {
   ENUM_LABELS_TEMP_SENSOR_ANALOG_SPEC,
   ENUM_LABELS_TEMP_SENSOR_ANALOG_TYPE,
 } from '@/plugins/spark/const';
-import { setAnalogChannelClaimer } from '@/plugins/spark/utils/configuration';
+import { useSparkStore } from '@/plugins/spark/store';
+import { adcErrorLabel } from '@/plugins/spark/utils/formatting';
+import { ifCompatible } from '@/plugins/spark/utils/info';
 import { selectable } from '@/utils/collections';
 import { bloxQty } from '@/utils/quantity';
 
@@ -27,8 +31,27 @@ const tempSensorAnalogSpecOpts = selectable(
 const { context, inDialog } = useContext.setup();
 const { block, serviceId, patchBlock } =
   useBlockWidget.setup<TempSensorAnalogBlock>();
+const sparkStore = useSparkStore();
 
 const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
+
+// The firmware reports the resistance whatever the spec, and a temperature only with one
+const needsSpec = computed<boolean>(
+  () =>
+    block.value.data.spec === TempSensorAnalogSpec.SPEC_NOT_SET &&
+    block.value.data.resistance?.value != null,
+);
+
+// What stopped the ADC of the channel this sensor reads
+const adcError = computed<string | null>(() => {
+  const { analogDevice, analogChannel } = block.value.data;
+  return adcErrorLabel(
+    ifCompatible<AnalogArrayInterfaceBlock>(
+      sparkStore.blockByLink(serviceId, analogDevice),
+      BlockIntfType.AnalogArrayInterface,
+    )?.data.analogChannels.find((c) => c.id === analogChannel)?.error,
+  );
+});
 </script>
 
 <template>
@@ -43,7 +66,22 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
 
     <div>
       <CardWarning v-if="!hasValue">
-        <template #message> Analog Sensor could not be read. </template>
+        <template
+          v-if="needsSpec"
+          #message
+        >
+          Select a sensor spec to turn the measured resistance into a
+          temperature.
+        </template>
+        <template
+          v-else
+          #message
+        >
+          Analog Sensor could not be read.
+          <template v-if="adcError">
+            Its ADC on {{ block.data.analogDevice.id }} stopped: {{ adcError }}.
+          </template>
+        </template>
       </CardWarning>
 
       <div class="q-ma-md row justify-center">
@@ -82,12 +120,7 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             class="col-grow"
             @update:model-value="
               ({ analogDevice, analogChannel }) =>
-                setAnalogChannelClaimer(
-                  block,
-                  analogDevice,
-                  analogChannel,
-                  false,
-                )
+                patchBlock({ analogDevice, analogChannel })
             "
           />
           <SelectField
@@ -116,10 +149,10 @@ const hasValue = computed<boolean>(() => block.value.data.value.value !== null);
             readonly
             label="Detected type"
             class="col-grow"
-            tooltip="Detected sensor type.
-            If this doesn't match the selected type, the sensor will not give a value.
-            Detected 3-wire when 4-wires was configured is allowed,
-            beause the lead-wire resistance can still be corrected for."
+            tooltip="The sensor type the module detects on the channel.
+            If it doesn't match the selected type, the sensor gives no value and no resistance.
+            A 3-wire sensor detected where 4-wire is selected is fine,
+            because the lead-wire resistance can still be corrected for."
           />
           <QuantityField
             :model-value="block.data.resistance ?? bloxQty(0, 'ohm')"

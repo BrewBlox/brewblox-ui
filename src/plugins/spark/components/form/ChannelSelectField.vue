@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import {
+  Block,
   BlockIntfType,
+  BlockOrIntfType,
   ChannelCapabilities,
   IoArrayInterfaceBlock,
   Link,
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useSparkStore } from '@/plugins/spark/store';
+import {
+  claimedChannels,
+  ioChannelClaimers,
+} from '@/plugins/spark/utils/configuration';
 import { channelName } from '@/plugins/spark/utils/formatting';
 import { isBlockCompatible } from '@/plugins/spark/utils/info';
 import { bloxLink } from '@/utils/link';
@@ -21,11 +27,38 @@ interface Props {
   serviceId: string;
   modelValue: ChannelAddress;
   capabilities?: ChannelCapabilities;
+  /** The block that takes the channel: its type gives the channels it holds */
+  claimer?: Block | null;
+  /** The devices the block can link, where not every IO array */
+  deviceType?: BlockOrIntfType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   capabilities: ChannelCapabilities.CHAN_SUPPORTS_NONE,
+  claimer: null,
+  deviceType: BlockIntfType.IoArrayInterface,
 });
+
+function holders(block: IoArrayInterfaceBlock, start: number): string[] {
+  const self = props.claimer?.id ?? null;
+  const channels = claimedChannels(props.claimer?.type ?? '', start);
+  const reported = block.data.channels
+    .filter((c) => channels.includes(c.id))
+    .map((c) => c.claimedBy.id);
+  const linked = ioChannelClaimers(
+    props.serviceId,
+    bloxLink(block.id),
+    channels,
+    self,
+  ).map((b) => b.id);
+  return [
+    ...new Set(
+      [...reported, ...linked].filter(
+        (id): id is string => !!id && id !== self,
+      ),
+    ),
+  ];
+}
 
 const emit = defineEmits<{
   'update:modelValue': [payload: ChannelAddress];
@@ -65,8 +98,10 @@ const channelLabel = computed<string>(() => {
 const channelOpts = computed<SelectOption[]>(() =>
   sparkStore
     .blocksByService(props.serviceId)
-    .filter((block): block is IoArrayInterfaceBlock =>
-      isBlockCompatible(block, BlockIntfType.IoArrayInterface),
+    .filter(
+      (block): block is IoArrayInterfaceBlock =>
+        isBlockCompatible(block, BlockIntfType.IoArrayInterface) &&
+        isBlockCompatible(block, props.deviceType),
     )
     .flatMap((block: IoArrayInterfaceBlock) =>
       block.data.channels.map((channel) => ({ block, channel })),
@@ -78,11 +113,14 @@ const channelOpts = computed<SelectOption[]>(() =>
       );
     })
     .map(({ block, channel }) => ({
+      block,
+      channel,
+      ids: holders(block, channel.id),
+    }))
+    .map(({ block, channel, ids }) => ({
       label:
         `<b>${block.id}</b> ${channelName(block, channel.id)}` +
-        (channel.claimedBy.id
-          ? ` <small>(replace ${channel.claimedBy.id})</small>`
-          : ''),
+        (ids.length ? ` <small>(replace ${ids.join(', ')})</small>` : ''),
       value: `${block.id}/${channel.id}`,
       html: true,
     })),

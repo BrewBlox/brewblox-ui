@@ -10,11 +10,7 @@ import {
 } from 'brewblox-proto/ts';
 import { computed } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import {
-  derivativeFilterLabel,
-  derivativeFilterSelectOptions,
-  filterLabel,
-} from '@/plugins/spark/const';
+import { filterLabel } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { prettyBlock } from '@/plugins/spark/utils/formatting';
 import { createBlockDialog } from '@/utils/block-dialog';
@@ -39,9 +35,6 @@ const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
 
 const updateIntervalMs = computed(
   () => inputBlock.value?.data.updateInterval?.value ?? null,
-);
-const derivativeFilterOpts = computed(() =>
-  derivativeFilterSelectOptions(updateIntervalMs.value),
 );
 
 const showSmoothGain = computed(() => block.value.data.smoothGain != null);
@@ -117,9 +110,31 @@ const ambientRaw = computed<Quantity>(() =>
 
 // P, I and D are null while the PID input is invalid.
 // FF is null without a valid ambient value, and then adds nothing.
+// While the ambient is gone, a held FF is inside I, which the sum takes.
 const outputSum = computed<number | null>(() => {
   const { p, i, d, ff } = block.value.data;
   return p != null && i != null && d != null ? p + i + d + (ff ?? 0) : null;
+});
+
+// While the ambient is gone, the Spark holds FF at its last value inside I and sends no FF
+const heldFf = computed<number | null>(() => {
+  const { ff, i, integral, ti } = block.value.data;
+  if (ff != null || i == null) {
+    return null;
+  }
+  const tiSeconds = durationMs(ti) / 1000;
+  const held = i - (tiSeconds ? integral / tiSeconds : 0);
+  return roundedNumber(held, 2) !== 0 ? held : null;
+});
+
+// The Spark limits D to Kp x the largest recent error, and sends the derivative it limited
+const dLimited = computed<boolean>(() => {
+  const { d, derivative, td } = block.value.data;
+  if (d == null) {
+    return false;
+  }
+  const unlimited = (derivative * durationMs(td)) / 1000;
+  return roundedNumber(Math.abs(unlimited) - Math.abs(d), 2) > 0;
 });
 
 function showInput(): void {
@@ -156,48 +171,16 @@ function startEditIValue(): void {
       title: 'Override I part of PID',
       message: `
                 <p>
-                  The integrator slowly builds up when the error is not zero.
-                  If you don't want to wait for that,
-                  you can manually set the integral part of the output here.
+                  I builds up slowly while the temperature is off the setpoint.
+                  To skip the wait, set I here.
                 </p>
                 <p>
-                  It will continue to adjust automatically afterwards.
+                  It keeps adjusting itself afterwards.
                 </p>
                 `,
       html: true,
     },
   }).onOk((v: number) => patchBlock({ integralReset: v || 0.001 }));
-}
-
-function openDerivativeFilterDialog(): void {
-  createDialog({
-    component: 'SelectDialog',
-    componentProps: {
-      modelValue: block.value.data.derivativeFilterChoice,
-      title: 'Derivative filter',
-      message: `
-              <p>
-                The derivative is calculated from filtered input to reduce
-                the effect of noise and limited sensor resolution.
-              </p>
-              <p>
-                A stronger filter suppresses quick fluctuations more,
-                but too much delay can cause the D component to be out of sync with P.
-                The displayed duration is how long it takes for the filter
-                to catch up to 95% of a step change.
-              </p>
-              <p>
-                When you choose <b>Derived from Td</b>, a filter is selected automatically
-                based on the derivative time constant (Td).
-              </p>
-              `,
-      html: true,
-      selectOptions: derivativeFilterOpts.value,
-      selectProps: {
-        label: 'Filter delay',
-      },
-    },
-  }).onOk((v) => patchBlock({ derivativeFilterChoice: v }));
 }
 </script>
 
@@ -219,13 +202,15 @@ function openDerivativeFilterDialog(): void {
           label="Input Block"
           html
           message="
-              <p>A PID block sets its target setting to regulate its input value.</p>
               <p>
-                This input is a ProcessValue:
-                something that has a target setting and an measured value.
-                In most cases, the input will be a Setpoint block.
+                The input is the Setpoint the PID controls.
+                It has a setting, the temperature you want,
+                and a measured temperature.
               </p>
-              <p>The input setting minus the input value is called the error</p>
+              <p>
+                The PID changes its output to bring the measured temperature to the setting.
+                The setting minus the measured temperature is the error.
+              </p>
               "
           class="col"
           @update:model-value="(v) => patchBlock({ inputId: v })"
@@ -282,14 +267,12 @@ function openDerivativeFilterDialog(): void {
           label="Output Block"
           html
           message="
-              <p>The PID sets its output block setting to the result from the PID calculation.</p>
               <p>
-                The output value is the sum of 3 parts derived from the input error:
-                Proportional, Integral and Derivative.
+                The output is the actuator the PID drives, such as a PWM or a Setpoint Driver.
+                The PID sets it to the sum of four parts: P, I, D and FF.
               </p>
               <p>
-                The output block is an 'analog' actuator.
-                The analog actuator may in turn set the setting for a digital actuator.
+                A PWM in turn switches a digital actuator, such as a heater relay, on and off.
               </p>
               "
           class="col"
@@ -337,21 +320,18 @@ function openDerivativeFilterDialog(): void {
           label="Ambient Block (optional)"
           html
           message="
-              <p>The ambient sensor block provides the ambient temperature.
-                This value is used in the feed forward calculation.
-                </p>
               <p>
-                Feed forward is added to the output indepedent of the input sensor.
-                It is calculated from the input setting and the ambient temperature instead.
-                The offset between the setting and the ambient temperature is multiplied
-                by the feed forward gain.
+                The ambient sensor measures the temperature around your vessel, such as the room.
               </p>
               <p>
-                By using a feed forward gain, the PID does not have to rely on just the integral
-                to overcome the effect of ambient temperature and can compensate for it faster.
+                Feed forward (FF) uses it to add output for the heat lost to the surroundings,
+                or gained from them when cooling,
+                so the PID does not have to wait for I to build up.
+                FF = Kff × (setting - ambient temperature).
               </p>
               <p>
-                The ambient temperature is smoothed with a time constant in the order of Ti.
+                The PID smooths the ambient temperature over about Ti, and at least 12 seconds.
+                If the ambient sensor stops, the PID holds the FF it had until the sensor returns.
               </p>
               "
           class="col"
@@ -412,11 +392,11 @@ function openDerivativeFilterDialog(): void {
             label="Kp"
             message="
               <p>
-                Kp is the proportional gain, which is directly mutiplied by the error.
-                The output of the PID is Kp * input error.
-                Set it to what you think the output should be for a 1 degree error.
+                Kp sets how strongly the PID reacts to the error: P = Kp × error.
+                Near the setpoint, the smooth band can turn P down.
+                Set it to the output you want for a 1 degree error.
               </p>
-              <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
+              <p>Kp is negative when the actuator lowers the temperature, such as a cooler.</p>
               "
             borderless
             @update:model-value="(kp) => patchBlock({ kp })"
@@ -470,33 +450,26 @@ function openDerivativeFilterDialog(): void {
             label="Ti"
             message="
                 <p>
-                  The I part of PID, the integrator, is for removing steady state errors.
-                  The integrator slowly builds up when the error is not zero by accumulating P,
-                  until the target is reached and P is zero.
+                  I removes the error that P alone leaves.
+                  It adds up the error over time:
+                  every second, I grows by about Kp × error / Ti,
+                  until the temperature reaches the setpoint.
                 </p>
                 <p>
-                  I increases with P / Ti every second.
-                  Ti should be long enough so I does not increase much during a step change,
-                  where P should bring the output to the target.
+                  Ti should be long enough that I grows little during a step,
+                  which P should handle.
+                  A good guess is at least 3 × the time from when the output drops below 100%
+                  until the temperature reaches the setpoint.
                 </p>
                 <p>
-                  A good guess for Ti is: <br/>
-                  at least 3x the time between the output dipping under 100%
-                  and reaching the setpoint on a step.
+                  When I causes overshoot, either Ti is too short, so I grows too fast,
+                  or Kp is too low, so I drives the output instead of P.
                 </p>
                 <p>
-                  When you have overshoot due to I, it can have 2 reasons:
-                  <ul>
-                    <li> Ti is too short, so I increases too fast. </li>
-                    <li> Kp is too low,
-                       which makes I the main driver of the output instead of P. </li>
-                  </ul>
+                  While the output is missing, disabled, or drives nothing,
+                  I does not grow and slowly returns to zero.
+                  Set Ti to zero to turn I off.
                 </p>
-                <p>
-                  While the output is missing or disabled, I does not build up,
-                  and slowly returns to zero.
-                </p>
-                <p>Setting Ti to zero will disable the integrator.</p>
                 "
             borderless
             @update:model-value="(ti) => patchBlock({ ti })"
@@ -521,6 +494,12 @@ function openDerivativeFilterDialog(): void {
         >
           <div class="big i-parts text-right q-pr-sm full-width">
             {{ fixedNumber(block.data.i) }}
+            <div
+              v-if="heldFf !== null"
+              class="text-caption fade-4"
+            >
+              incl. held FF
+            </div>
           </div>
         </div>
 
@@ -552,19 +531,20 @@ function openDerivativeFilterDialog(): void {
             label="Td"
             message="
               <p>
-                The D part of PID, the derivative, has the opposite sign of P.
-                When the input is approaching the target quickly,
-                it will reduce the output to avoid overshoot.
+                D reacts to how fast the temperature changes.
+                When it moves quickly toward the setpoint,
+                D reduces the output so the temperature does not overshoot.
               </p>
               <p>
-                Td is the derivative time constant.
-                A good starting point for Td is
-                the time between when the output is 0% and when the overshoot peaks.
+                Td sets how strongly D reacts.
+                A good starting point for Td is the time from
+                when the output turns off to when the overshoot peaks.
+                When the temperature barely overshoots, leave Td at zero.
               </p>
               <p>
-                When there is little overshoot in the system, Td is best kept at zero.
-                D is limited to the largest P of roughly the last 1.5 Td,
-                to avoid oscillations.
+                D is never larger than Kp × the largest error
+                of roughly the last 1.5 × Td.
+                This keeps a Td that is set too high from making the output swing.
               </p>
               "
             borderless
@@ -579,23 +559,20 @@ function openDerivativeFilterDialog(): void {
           </DurationField>
         </div>
 
-        <div :class="showSmoothGain ? 'span-s big text-center' : ''">
-          {{ showSmoothGain ? '\xd7' : '' }}
-        </div>
-        <div :class="showSmoothGain ? 'span-l' : ''">
-          <LabeledField
-            v-if="showSmoothGain"
-            label="Smoothing"
-          >
-            {{ fixedNumber(block.data.smoothGain, 2) }}
-          </LabeledField>
-        </div>
+        <div :class="showSmoothGain ? 'span-s' : ''" />
+        <div :class="showSmoothGain ? 'span-l' : ''" />
 
         <div class="span-s text-center big">=</div>
 
         <div class="span-m row items-center full-height">
           <div class="big d-parts text-right q-pr-sm full-width">
             {{ fixedNumber(block.data.d) }}
+            <div
+              v-if="dLimited"
+              class="text-caption fade-4"
+            >
+              limited
+            </div>
           </div>
         </div>
 
@@ -621,19 +598,15 @@ function openDerivativeFilterDialog(): void {
             label="Kff"
             :message="`
               <p>
-                Kff is the feed forward gain.
+                Kff sets how much feed forward (FF) the PID adds
+                per degree between the setting and the ambient temperature:
+                FF = Kff × (setting - ambient temperature).
               </p>
               <p>
-                The feed forward part (FF) is added to the output,
-                 to compensate for ambient temperature.
-                </p>
-                <p>
-                FF = Kff * (input setting - ambient temperature).
-                </p>
-                <p>
-                  When you change Kff, the integral will be adjusted so that I+FF does not change.
-                  You can click the I part to override it if desired.
-                </p>${ambientHint}`"
+                When you change Kff, I changes the other way, so the output does not jump.
+                With I off, at Ti 0 or in boil mode, the output changes with FF.
+                You can click I to set it yourself.
+              </p>${ambientHint}`"
             borderless
             @update:model-value="(kff) => patchBlock({ kff })"
           />
@@ -646,7 +619,16 @@ function openDerivativeFilterDialog(): void {
 
         <div class="span-m row items-center full-height">
           <div class="big ff-parts text-right q-pr-sm full-width">
-            {{ fixedNumber(block.data.ff) }}
+            <template v-if="heldFf !== null">
+              <span class="fade-4">{{ fixedNumber(heldFf) }}</span>
+              <q-tooltip>
+                The ambient sensor is gone. FF holds its last value, which the
+                Spark counts in I until the sensor returns.
+              </q-tooltip>
+            </template>
+            <template v-else>
+              {{ fixedNumber(block.data.ff) }}
+            </template>
           </div>
         </div>
 
@@ -691,9 +673,10 @@ function openDerivativeFilterDialog(): void {
             :class="{ 'text-green': boiling }"
             title="Boiling point"
             message="
-        When the Setpoint is set to this temperature or higher,
-      the output of the PID will stay above the configured miniumum for boiling.
-      "
+              When the setpoint is at this temperature or higher,
+              the PID keeps its output at least at the minimum for boiling.
+              I is off in boil mode.
+            "
           />
         </div>
       </div>
@@ -707,17 +690,17 @@ function openDerivativeFilterDialog(): void {
             html
             message="
               <p>
-                When temperature is steady near the setpoint,
-                the integral does all the work.
-                Smooth band gradually reduces P and D gain
-                while temperature remains stable,
-                so they don't react to small sensor fluctuations caused by noise.
-                If temperature drifts, they ramp back up quickly.
+                When the temperature is steady near the setpoint, I does most of the work.
+                The smooth band then slowly turns P and D down,
+                so they do not react to sensor noise.
+                When the temperature moves away, they turn back up quickly.
+                When I itself starts to swing the temperature,
+                P and D get their gain back, so the band doesn't make the loop cycle.
               </p>
               <p>
-                The gain decreases on the same time scale as Ti.
-                Set the band to 2-3x the noise
-                on your sensor. Default is 0.25°C. Set to 0 to disable.
+                P and D turn down over about Ti.
+                Set the band to 2-3 × the noise on your sensor; the default is 0.25 °C.
+                Set it to 0 to turn smoothing off.
               </p>
               "
             @update:model-value="(v) => patchBlock({ smoothBand: v })"
@@ -739,40 +722,6 @@ function openDerivativeFilterDialog(): void {
           >
             {{ filterLabel(inputFilter, updateIntervalMs) }}
           </span>
-        </div>
-      </div>
-      <div class="row items-center justify-center q-pa-sm">
-        <div class="col-auto">
-          <span
-            >The derivative has a low-pass filter
-            {{
-              block.data.derivativeFilterChoice === FilterChoice.FILTER_NONE
-                ? ''
-                : 'with a delay of'
-            }}</span
-          >
-          <span
-            class="clickable q-pa-sm q-ma-xs rounded-borders text-bold"
-            style="line-height: 200%"
-            @click="openDerivativeFilterDialog"
-          >
-            {{
-              derivativeFilterLabel(
-                block.data.derivativeFilterChoice,
-                updateIntervalMs,
-              )
-            }}
-          </span>
-          <template
-            v-if="
-              block.data.derivativeFilterChoice === FilterChoice.FILTER_NONE &&
-              block.data.derivativeFilter !== FilterChoice.FILTER_NONE
-            "
-          >
-            with a delay of
-            {{ filterLabel(block.data.derivativeFilter, updateIntervalMs) }}
-          </template>
-          <template v-else> </template>
         </div>
       </div>
     </div>

@@ -48,6 +48,7 @@ const { serviceId, block, patchBlock } =
 
       <div class="widget-body row">
         <ChannelSelectField
+          :claimer="block"
           :model-value="{
             hwDevice: block.data.hwDevice,
             channel: block.data.channel,

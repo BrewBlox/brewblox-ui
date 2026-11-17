@@ -23,7 +23,6 @@ const plugin: Plugin = {
       generate: (): TempSensorMockBlock['data'] => ({
         value: tempQty(20),
         setting: tempQty(20),
-        fluctuations: [],
         connected: true,
       }),
       analyze: (block: TempSensorMockBlock) => {

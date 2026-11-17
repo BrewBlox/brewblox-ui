@@ -4,6 +4,7 @@ import {
   BlockType,
   COMPATIBLE_TYPES,
   DisplaySettingsBlock,
+  Link,
   SparkPatchEvent,
   SparkStateEvent,
   SparkUpdateEvent,
@@ -78,6 +79,31 @@ export const ERROR_BLOCK_TYPES = ['ErrorObject', 'UnknownType'];
 
 export function isErrorBlockType(type: Maybe<string>): boolean {
   return type != null && ERROR_BLOCK_TYPES.includes(type);
+}
+
+/**
+ * A block that reads an analog channel of a GPIO module
+ * names it in its own `analogDevice` and `analogChannel` fields.
+ * Several blocks may read the same channel.
+ */
+export interface AnalogChannelReaderBlock extends Block {
+  data: {
+    analogDevice: Link;
+    analogChannel: number;
+  };
+}
+
+export function analogChannelReaders(
+  blocks: Block[],
+  moduleId: string,
+  analogChannel: number,
+): AnalogChannelReaderBlock[] {
+  return blocks.filter(
+    (block): block is AnalogChannelReaderBlock =>
+      isLink(block.data.analogDevice) &&
+      block.data.analogDevice.id === moduleId &&
+      block.data.analogChannel === analogChannel,
+  );
 }
 
 export function isBlockDisplayReady(addr: BlockAddress): boolean {

@@ -9,6 +9,7 @@ import {
 import { computed } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { useSparkStore } from '@/plugins/spark/store';
 import { createComponentDialog } from '@/utils/dialog';
 import { fixedNumber, prettyLink } from '@/utils/quantity';
 import ActuatorOffsetDisableDialog from './ActuatorOffsetDisableDialog.vue';
@@ -19,6 +20,7 @@ const referenceOpts: SelectOption<ReferenceKind>[] = [
 ];
 
 const { context, inDialog } = useContext.setup();
+const sparkStore = useSparkStore();
 const { serviceId, block, patchBlock, isClaimed } =
   useBlockWidget.setup<ActuatorOffsetBlock>();
 
@@ -55,8 +57,50 @@ const isLimited = computed<boolean>(() => {
   const { enabled, desiredSetting, setting } = block.value.data;
   return (
     enabled &&
+    setting.value != null &&
     fixedNumber(desiredSetting.value, 1) !== fixedNumber(setting.value, 1)
   );
+});
+
+// The firmware reports no setting while the Setpoint Driver delivers nothing
+const drivesNothing = computed<string | null>(() => {
+  const {
+    enabled,
+    desiredSetting,
+    setting,
+    targetId,
+    referenceId,
+    referenceSettingOrValue,
+  } = block.value.data;
+  if (
+    !enabled ||
+    desiredSetting.value == null ||
+    setting.value != null ||
+    !targetId.id ||
+    !referenceId.id
+  ) {
+    return null;
+  }
+  const targetBlock = sparkStore.blockByLink(serviceId, targetId);
+  if (!targetBlock) {
+    return `its target ${targetId.id} is gone`;
+  }
+  const holder = targetBlock.data.claimedBy?.id;
+  if (holder && holder !== block.value.id) {
+    return `its target ${targetId.id} is held by ${holder}`;
+  }
+  const ref = sparkStore.blockByLink(serviceId, referenceId);
+  if (!ref) {
+    return `its reference ${referenceId.id} is gone`;
+  }
+  if (referenceSettingOrValue === ReferenceKind.REF_SETTING) {
+    if (ref.data.setting?.value == null) {
+      return `its reference ${referenceId.id} has no setting`;
+    }
+  } else if (ref.data.value?.value == null) {
+    return `its reference ${referenceId.id} has no measured value`;
+  }
+  return `its target ${targetId.id} does not take its setting`;
 });
 
 function changeEnabled(enabled: boolean): void {
@@ -92,6 +136,11 @@ function changeEnabled(enabled: boolean): void {
       <CardWarning v-else-if="!reference.id">
         <template #message>
           Setpoint Driver has no reference Setpoint configured.
+        </template>
+      </CardWarning>
+      <CardWarning v-else-if="drivesNothing">
+        <template #message>
+          Setpoint Driver drives nothing: {{ drivesNothing }}.
         </template>
       </CardWarning>
       <BlockEnableToggle

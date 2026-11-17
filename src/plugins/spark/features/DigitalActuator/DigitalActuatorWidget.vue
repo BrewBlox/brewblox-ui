@@ -83,6 +83,7 @@ const softStartSupported = computed<boolean>(() => {
 
       <div class="widget-body row">
         <ChannelSelectField
+          :claimer="block"
           :model-value="{
             hwDevice: block.data.hwDevice,
             channel: block.data.channel,

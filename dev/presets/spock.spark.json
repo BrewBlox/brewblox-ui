@@ -167,8 +167,7 @@
           "__bloxtype": "Quantity",
           "unit": "degC",
           "value": 0
-        },
-        "fluctuations": []
+        }
       }
     },
     {
@@ -188,8 +187,7 @@
           "__bloxtype": "Quantity",
           "unit": "degC",
           "value": 0
-        },
-        "fluctuations": []
+        }
       }
     },
     {
@@ -209,8 +207,7 @@
           "__bloxtype": "Quantity",
           "unit": "degC",
           "value": 0
-        },
-        "fluctuations": []
+        }
       }
     },
     {
@@ -525,8 +522,7 @@
           "value": 0
         },
         "boilMinOutput": 0,
-        "boilModeActive": false,
-        "derivativeFilter": 0
+        "boilModeActive": false
       }
     },
     {
@@ -760,8 +756,7 @@
           "__bloxtype": "Quantity",
           "unit": "degC",
           "value": 0
-        },
-        "fluctuations": []
+        }
       }
     },
     {
@@ -781,8 +776,7 @@
           "__bloxtype": "Quantity",
           "unit": "degC",
           "value": 0
-        },
-        "fluctuations": []
+        }
       }
     },
     {

@@ -1,4 +1,5 @@
 import {
+  AdcError,
   AnalogConstraints,
   Block,
   BlockType,
@@ -12,6 +13,7 @@ import {
   GpioModuleBlock,
 } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
+import { ENUM_LABELS_ADC_ERROR } from '@/plugins/spark/const';
 import { BlockAddress } from '@/plugins/spark/types';
 import { matchesType } from '@/utils/objects';
 import { durationString, prettyLink } from '@/utils/quantity';
@@ -60,6 +62,16 @@ export function analogChannelName(analogChannel: number): string {
       ? 'Invalid channel'
       : names[analogChannel];
   return channelName;
+}
+
+/**
+ * What stopped the ADC of an analog channel, or null while it runs.
+ * Firmware that predates the field sends no error.
+ */
+export function adcErrorLabel(error: Maybe<AdcError>): string | null {
+  return error && error !== AdcError.ADC_ERROR_OK
+    ? ENUM_LABELS_ADC_ERROR[error]
+    : null;
 }
 
 export function prettyConstraints(

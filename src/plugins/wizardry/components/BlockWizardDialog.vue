@@ -23,6 +23,7 @@ import {
   isDiscoveredBlockType,
   isSystemBlockType,
 } from '@/plugins/spark/utils/info';
+import { isSimulator } from '@/plugins/spark/utils/system';
 import { useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
@@ -36,6 +37,7 @@ import { tryCreateBlock } from '../utils';
 
 interface BlockOption extends SelectOption<BlockType> {
   generate: BlockSpec['generate'];
+  simulatorOnly: boolean;
   disable: boolean;
   tooltip?: string;
 }
@@ -83,6 +85,20 @@ const selectedDashboardOpt = ref<DashboardOption | null>(null);
 const newBlockId = ref<string>('');
 const finishBusy = ref<boolean>(false);
 
+const sparkServiceOpts = computed<ServiceOption[]>(() =>
+  serviceStore.services
+    .filter((svc) => svc.type === SPARK_SERVICE_TYPE)
+    .filter((svc) => !props.serviceId || svc.id === props.serviceId)
+    .map((svc) => ({
+      label: svc.title,
+      value: svc.id,
+    })),
+);
+
+const hasSimulator = computed<boolean>(() =>
+  sparkServiceOpts.value.some((opt) => isSimulator(opt.value)),
+);
+
 const allBlockOpts = computed<BlockOption[]>(() =>
   blockSpecStore.blockSpecs
     .filter(
@@ -92,15 +108,20 @@ const allBlockOpts = computed<BlockOption[]>(() =>
     .map((spec): BlockOption => {
       const sysBlock = isSystemBlockType(spec.type);
       const discovered = isDiscoveredBlockType(spec.type);
+      const simulatorOnly = !!spec.simulatorOnly;
+      const noSimulator = simulatorOnly && !hasSimulator.value;
       return {
         value: spec.type,
         label: spec.title,
-        disable: sysBlock || discovered,
+        simulatorOnly,
+        disable: sysBlock || discovered || noSimulator,
         tooltip: discovered
           ? 'Discovered block'
           : sysBlock
             ? 'System block'
-            : undefined,
+            : noSimulator
+              ? 'Simulator only'
+              : undefined,
         generate: spec.generate,
       };
     })
@@ -114,14 +135,11 @@ const blockOpts = computed<BlockOption[]>(() => {
   );
 });
 
+// A Spark refuses to create a simulator-only block
 const serviceOpts = computed<ServiceOption[]>(() =>
-  serviceStore.services
-    .filter((svc) => svc.type === SPARK_SERVICE_TYPE)
-    .filter((svc) => !props.serviceId || svc.id === props.serviceId)
-    .map((svc) => ({
-      label: svc.title,
-      value: svc.id,
-    })),
+  selectedBlockOpt.value?.simulatorOnly
+    ? sparkServiceOpts.value.filter((opt) => isSimulator(opt.value))
+    : sparkServiceOpts.value,
 );
 
 const dashboardOpts = computed<DashboardOption[]>(() =>
@@ -257,6 +275,14 @@ function next(): void {
 
   switch (step.value) {
     case 'block':
+      // The service of the current page may not take this block type
+      if (
+        !serviceOpts.value.some(
+          (opt) => opt.value === selectedServiceOpt.value?.value,
+        )
+      ) {
+        selectedServiceOpt.value = null;
+      }
       step.value = 'service';
       break;
 

@@ -53,11 +53,45 @@ const runsAt100Hz = computed<boolean>(() => {
   );
 });
 
+const PWM_CAPABILITIES =
+  ChannelCapabilities.CHAN_SUPPORTS_PWM_80HZ |
+  ChannelCapabilities.CHAN_SUPPORTS_PWM_100HZ |
+  ChannelCapabilities.CHAN_SUPPORTS_PWM_200HZ |
+  ChannelCapabilities.CHAN_SUPPORTS_PWM_2000HZ;
+
 const isLimited = computed<boolean>(
   () =>
     block.value.data.enabled &&
+    block.value.data.setting != null &&
     block.value.data.setting !== block.value.data.desiredSetting,
 );
+
+// The firmware reports no setting while the PWM delivers nothing
+const drivesNothing = computed<string | null>(() => {
+  const { enabled, desiredSetting, setting, channel } = block.value.data;
+  if (
+    !enabled ||
+    desiredSetting == null ||
+    setting != null ||
+    !target.value ||
+    !channel
+  ) {
+    return null;
+  }
+  const name = `${channelName(target.value, channel) ?? channel} on ${target.value.id}`;
+  const found = target.value.data.channels.find((c) => c.id === channel);
+  const holder = found?.claimedBy?.id;
+  if (holder && holder !== block.value.id) {
+    return `${name} is held by ${holder}`;
+  }
+  if (!found) {
+    return `${target.value.id} has no channel ${channel}`;
+  }
+  if (!(found.capabilities & PWM_CAPABILITIES)) {
+    return `${name} does not support PWM`;
+  }
+  return `${name} answers an error`;
+});
 
 const pwmDesired = computed<number | null>(() => {
   const v = block.value.data.desiredSetting;
@@ -76,8 +110,16 @@ const pwmDesired = computed<number | null>(() => {
     </template>
 
     <div class="q-mx-auto">
-      <CardWarning v-if="!target || !block.data.channel">
+      <CardWarning v-if="!block.data.hwDevice.id || !block.data.channel">
         <template #message> PWM has no target channel configured. </template>
+      </CardWarning>
+      <CardWarning v-else-if="!target">
+        <template #message>
+          PWM's device {{ block.data.hwDevice.id }} is gone.
+        </template>
+      </CardWarning>
+      <CardWarning v-else-if="drivesNothing">
+        <template #message> PWM drives nothing: {{ drivesNothing }}. </template>
       </CardWarning>
       <CardWarning v-else-if="runsAt100Hz">
         <template #message>
@@ -179,6 +221,7 @@ const pwmDesired = computed<number | null>(() => {
             @update:model-value="(v) => patchBlock({ frequency: v })"
           />
           <ChannelSelectField
+            :claimer="block"
             :model-value="{
               hwDevice: block.data.hwDevice,
               channel: block.data.channel,

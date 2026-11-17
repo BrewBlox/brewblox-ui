@@ -23,7 +23,7 @@ const plugin: Plugin = {
       generate: (): TempSensorExternalBlock['data'] => ({
         enabled: true,
         timeout: bloxQty('5m'),
-        setting: tempQty(20),
+        setting: tempQty(null),
         lastUpdated: null,
         value: tempQty(null),
       }),

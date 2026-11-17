@@ -2,10 +2,26 @@
 import { Spark3PinsBlock } from 'brewblox-proto/ts';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { createDialogPromise } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/quantity';
 
 const { context } = useContext.setup();
 const { block, patchBlock } = useBlockWidget.setup<Spark3PinsBlock>();
+
+async function powerCycle5V(): Promise<void> {
+  const ok = await createDialogPromise({
+    component: 'ConfirmDialog',
+    componentProps: {
+      title: 'Power-cycle 5V',
+      message:
+        'The 5V supply switches off for a second and on again.' +
+        ' The devices on the RJ12 ports, such as OneWire sensors, restart.',
+    },
+  });
+  if (ok) {
+    await patchBlock({ powerCycleIoSupply5V: true });
+  }
+}
 </script>
 
 <template>
@@ -25,18 +41,10 @@ const { block, patchBlock } = useBlockWidget.setup<Spark3PinsBlock>();
         <div class="col-break" />
 
         <LabeledField
-          label="Enable 5V"
-          class="col-grow"
-        >
-          <q-toggle
-            :model-value="block.data.enableIoSupply5V"
-            dense
-            @update:model-value="(v) => patchBlock({ enableIoSupply5V: v })"
-          />
-        </LabeledField>
-        <LabeledField
           label="Enable 12V"
           class="col-grow"
+          tooltip="12V stays as you set it through a reboot, and is off until you switch it on.
+          With 12V on the outputs, a short is more likely to cause damage."
         >
           <q-toggle
             :model-value="block.data.enableIoSupply12V"
@@ -44,6 +52,20 @@ const { block, patchBlock } = useBlockWidget.setup<Spark3PinsBlock>();
             @update:model-value="(v) => patchBlock({ enableIoSupply12V: v })"
           />
         </LabeledField>
+        <div class="col-grow row justify-end items-center">
+          <q-btn
+            flat
+            dense
+            color="secondary"
+            label="Power-cycle 5V"
+            @click="powerCycle5V"
+          >
+            <q-tooltip>
+              Switches 5V off for a second to power-cycle the devices on the
+              RJ12 ports.
+            </q-tooltip>
+          </q-btn>
+        </div>
 
         <div class="col-break" />
 

@@ -85,8 +85,13 @@ function editSetting(): void {
             label="Timeout"
             message="
               The sensor has no value if no new setting arrives within this time.
+              Until then, a Setpoint using this sensor counts the setting
+              as a new reading every second.
               With a timeout of 0, the setting never expires,
               and is kept through a reboot, but not through a power loss.
+              Only a new setting is a reading then:
+              a Setpoint using this sensor has no value from 5 seconds after the last one,
+              also after a reboot.
             "
             class="col-grow min-width-md"
             :model-value="block.data.timeout"
