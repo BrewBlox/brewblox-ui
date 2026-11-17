@@ -25,6 +25,7 @@ yarn vitest run src/utils/__tests__/quantity.test.ts   # single test file
 yarn vitest run -t "pattern"                           # tests matching a name
 yarn components              # regenerate src/auto-import.d.ts (global component typings)
 yarn firmware [release]      # pull firmware.ini for a firmware release and check out the brewblox-proto submodule at its proto_sha
+yarn timezones               # rewrite src/assets/timezones.json from this machine's tzdata (/usr/share/zoneinfo, or $ZONEINFO)
 yarn redis / yarn spark      # reset datastore widgets / Spark blocks from dev/presets
 yarn redis:save / yarn spark:save   # overwrite dev/presets with the current backend state
 ```

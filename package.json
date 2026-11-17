@@ -32,6 +32,7 @@
     "lint:fix:prettier": "prettier --write ./src ./test ./dev/*.mjs ./*.js ./*.yml",
     "lint:fix": "yarn lint:fix:eslint && yarn lint:fix:prettier",
     "firmware": "bash dev/update-firmware.sh",
+    "timezones": "node dev/timezones.mjs",
     "components": "vue-global-type-gen && echo 'export {};' >> src/auto-import.d.ts"
   },
   "simple-git-hooks": {

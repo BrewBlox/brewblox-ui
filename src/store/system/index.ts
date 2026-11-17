@@ -257,8 +257,8 @@ export function startChangeTimezone(): DialogChainObject {
       title: 'Choose timezone',
       message: `
       <p>
-        Choose the timezone for your Spark 4 services.
-        This will affect the time displayed on the display.
+        Choose the timezone for your Spark services.
+        The controller display shows its time in this zone.
       </p>
       <p>
         History data is always stored as UTC, and is unaffected by this setting.
