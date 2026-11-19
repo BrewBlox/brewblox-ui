@@ -19,6 +19,7 @@ const plugin: Plugin = {
       type,
       title,
       hasRelations: true,
+      platforms: ['esp32', 'sim'],
       generate: (): VariablesBlock['data'] => ({
         variables: {},
       }),

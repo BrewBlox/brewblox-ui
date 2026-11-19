@@ -6,7 +6,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { createMemoryHistory, createRouter } from 'vue-router';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, ControllerPlatform } from '@/plugins/spark/types';
 import { useServiceStore } from '@/store/services';
 import { DenseKey, TouchKey } from '@/symbols';
 import { slotStub } from '../../../../../test/block-widget';
@@ -22,11 +22,15 @@ const ListSelect = defineComponent({
   render: () => null,
 });
 
-const spec = (type: string, title: string, simulatorOnly = false): BlockSpec =>
+const spec = (
+  type: string,
+  title: string,
+  platforms?: ControllerPlatform[],
+): BlockSpec =>
   ({
     type,
     title,
-    simulatorOnly,
+    platforms,
     generate: () => ({}),
     analyze: () => 'Active',
   }) as unknown as BlockSpec;
@@ -38,7 +42,8 @@ const SERVICES = {
   spark4: 'esp32',
 };
 
-type Platforms = Partial<Record<keyof typeof SERVICES, string>>;
+// A platform left undefined is one the service has not reported yet
+type Platforms = Partial<Record<keyof typeof SERVICES, string | undefined>>;
 
 /** The wizard, opened from the given page, among these Spark services */
 async function mountWizard(
@@ -74,8 +79,11 @@ async function mountWizard(
     spec(
       BlockType.TempSensorMockFluctuating,
       'Temp Sensor (Mock, fluctuating)',
-      true,
+      ['sim'],
     ),
+  );
+  specStore.addBlockSpec(
+    spec(BlockType.Variables, 'Variables', ['esp32', 'sim']),
   );
 
   const router = createRouter({
@@ -185,5 +193,38 @@ describe('BlockWizardDialog with a simulator-only block type', () => {
     await chooseType(wrapper, BlockType.TempSensorMockFluctuating);
 
     expect(lists(wrapper)[1].props('modelValue')).toBeNull();
+  });
+
+  it('keeps it for a Spark that has not reported its platform yet', async () => {
+    const wrapper = await mountWizard({ spark4: undefined });
+
+    expect(blockOpt(wrapper, BlockType.TempSensorMockFluctuating).disable).toBe(
+      false,
+    );
+    await chooseType(wrapper, BlockType.TempSensorMockFluctuating);
+    expect(serviceIds(wrapper)).toEqual(['spark4']);
+  });
+});
+
+describe('BlockWizardDialog with a block type that two platforms build', () => {
+  it('lists the Sparks on those platforms only', async () => {
+    const wrapper = await mountWizard({
+      sparkey: SERVICES.sparkey,
+      spark3: SERVICES.spark3,
+      spark4: SERVICES.spark4,
+    });
+
+    await chooseType(wrapper, BlockType.Variables);
+
+    expect(serviceIds(wrapper)).toEqual(['spark4', 'sparkey']);
+  });
+
+  it('greys it out, naming both, when no listed Spark is on either', async () => {
+    const wrapper = await mountWizard({ spark3: SERVICES.spark3 });
+
+    expect(blockOpt(wrapper, BlockType.Variables)).toMatchObject({
+      disable: true,
+      tooltip: 'Spark 4 and simulator only',
+    });
   });
 });
