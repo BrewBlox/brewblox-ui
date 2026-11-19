@@ -1,7 +1,7 @@
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { BlockType, SparkStatusDescription } from 'brewblox-proto/ts';
 import { createPinia, setActivePinia } from 'pinia';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { computed, defineComponent, ref } from 'vue';
 import { createMemoryHistory, createRouter } from 'vue-router';
 import { SPARK_SERVICE_TYPE } from '@/plugins/spark/const';
@@ -11,6 +11,12 @@ import { useServiceStore } from '@/store/services';
 import { DenseKey, TouchKey } from '@/symbols';
 import { slotStub } from '../../../../../test/block-widget';
 import BlockWizardDialog from '../BlockWizardDialog.vue';
+
+const { discoverBlocks } = vi.hoisted(() => ({ discoverBlocks: vi.fn() }));
+vi.mock('@/plugins/spark/utils/actions', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/plugins/spark/utils/actions')>()),
+  discoverBlocks,
+}));
 
 const ListSelect = defineComponent({
   name: 'ListSelect',
@@ -101,7 +107,7 @@ async function mountWizard(
         [TouchKey as symbol]: ref(false),
       },
       stubs: {
-        Card: slotStub('default'),
+        Card: slotStub('default', 'actions'),
         KeyboardButton: true,
         ListSelect,
         QDialog: slotStub('default'),
@@ -226,5 +232,24 @@ describe('BlockWizardDialog with a block type that two platforms build', () => {
       disable: true,
       tooltip: 'Spark 4 and simulator only',
     });
+  });
+
+  it('still discovers blocks on a Spark that does not build it', async () => {
+    discoverBlocks.mockClear();
+    const wrapper = await mountWizard({
+      sparkey: SERVICES.sparkey,
+      spark3: SERVICES.spark3,
+    });
+    await chooseType(wrapper, BlockType.Variables);
+
+    await wrapper
+      .findAll('button')
+      .find((btn) => btn.text() === 'Discover blocks')!
+      .trigger('click');
+
+    expect(discoverBlocks.mock.calls.map(([id]) => id)).toEqual([
+      'spark3',
+      'sparkey',
+    ]);
   });
 });

@@ -190,8 +190,9 @@ function showBlockIdKeyboard(): void {
   }).onOk((v: string) => (newBlockId.value = v));
 }
 
+// Discovery finds devices, whatever block type is selected
 function discoverAll(): void {
-  serviceOpts.value.forEach((opt) => discoverBlocks(opt.value));
+  sparkServiceOpts.value.forEach((opt) => discoverBlocks(opt.value));
 }
 
 async function finish(): Promise<void> {
