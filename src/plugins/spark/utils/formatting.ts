@@ -14,7 +14,7 @@ import {
 } from 'brewblox-proto/ts';
 import { Enum } from 'typescript-string-enums';
 import { ENUM_LABELS_ADC_ERROR } from '@/plugins/spark/const';
-import { BlockAddress } from '@/plugins/spark/types';
+import { BlockAddress, ControllerPlatform } from '@/plugins/spark/types';
 import { matchesType } from '@/utils/objects';
 import { durationString, prettyLink } from '@/utils/quantity';
 
@@ -72,6 +72,23 @@ export function adcErrorLabel(error: Maybe<AdcError>): string | null {
   return error && error !== AdcError.ADC_ERROR_OK
     ? ENUM_LABELS_ADC_ERROR[error]
     : null;
+}
+
+const PLATFORM_NAMES: Record<ControllerPlatform, string> = {
+  esp32: 'Spark 4',
+  p1: 'Spark 3',
+  photon: 'Spark 2',
+  sim: 'simulator',
+};
+
+/** "Spark 4 and simulator only", for a block type only these platforms build */
+export function platformsOnlyLabel(platforms: ControllerPlatform[]): string {
+  const names = platforms.map((platform) => PLATFORM_NAMES[platform]);
+  const listed =
+    names.length > 1
+      ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+      : names.join('');
+  return `${listed.charAt(0).toUpperCase()}${listed.slice(1)} only`;
 }
 
 export function prettyConstraints(

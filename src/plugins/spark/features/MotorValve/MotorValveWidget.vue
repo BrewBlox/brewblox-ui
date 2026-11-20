@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {
   BlockIntfType,
+  BlockType,
   ChannelCapabilities,
+  DS2408Block,
   MotorValveBlock,
   Spark3PinsBlock,
   ValveState,
@@ -17,6 +19,7 @@ import {
   setExclusiveIoChannelClaimer,
 } from '@/plugins/spark/utils/configuration';
 import { claimReason } from '@/plugins/spark/utils/formatting';
+import { ifCompatible } from '@/plugins/spark/utils/info';
 import { getSpark3PinsBlock } from '@/plugins/spark/utils/system';
 
 const sparkStore = useSparkStore();
@@ -40,13 +43,14 @@ const valveLabel = computed<string>(
     ],
 );
 
-// A valve refused one of its four channels takes none and sends no valve state
+// A valve that cannot reach, claim, set up or read its four channels sends no valve state
 const drivesNothing = computed<string | null>(() => {
   const { hwDevice, channel, valveState } = block.value.data;
   if (!hwDevice.id || !channel || valveState != null) {
     return null;
   }
-  if (!sparkStore.blockByLink(serviceId, hwDevice)) {
+  const device = sparkStore.blockByLink(serviceId, hwDevice);
+  if (!device) {
     return `its device ${hwDevice.id} is gone`;
   }
   const holders = ioChannelClaimers(
@@ -58,7 +62,14 @@ const drivesNothing = computed<string | null>(() => {
   if (holders.length > 1) {
     return `${holders.join(', ')} hold some of its channels`;
   }
-  return holders.length ? `${holders[0]} holds one of its channels` : null;
+  if (holders.length) {
+    return `${holders[0]} holds one of its channels`;
+  }
+  const ds2408 = ifCompatible<DS2408Block>(device, BlockType.DS2408);
+  if (ds2408?.data.connected === false) {
+    return `its device ${hwDevice.id} is not connected`;
+  }
+  return 'it cannot set up or read its channels';
 });
 
 function enable12V(): void {

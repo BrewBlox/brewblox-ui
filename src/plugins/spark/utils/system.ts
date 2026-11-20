@@ -8,6 +8,7 @@ import {
   WiFiSettingsBlock,
 } from 'brewblox-proto/ts';
 import { useSparkStore } from '@/plugins/spark/store';
+import { BlockSpec } from '@/plugins/spark/types';
 import { makeTypeFilter } from '@/utils/functional';
 
 type SysBlockFn<BlockT extends Block> = (
@@ -31,11 +32,20 @@ export const getSysInfoBlock: SysBlockFn<SysInfoBlock> = (serviceId) =>
   getSysBlock(serviceId, SystemBlockType.SysInfo);
 
 /**
- * Whether the service's controller is the simulator, as its handshake names it:
- * known before its blocks load, and for a simulator the service reaches over TCP too
+ * Whether the service's Spark can create blocks of a type, by the platforms its spec lists.
+ * The handshake names the Spark's platform, so it is known before the blocks load.
+ * True without a spec, for a type that lists no platforms, and while the Spark has not reported
+ * its platform.
  */
-export const isSimulator = (serviceId: string | null | undefined): boolean =>
-  useSparkStore().statusByService(serviceId)?.controller?.platform === 'sim';
+export function canCreate(
+  serviceId: string | null | undefined,
+  spec: Maybe<Pick<BlockSpec, 'platforms'>>,
+): boolean {
+  const platforms = spec?.platforms;
+  const platform =
+    useSparkStore().statusByService(serviceId)?.controller?.platform;
+  return !platforms || !platform || platforms.some((name) => name === platform);
+}
 
 export const getWiFiSettingsBlock: SysBlockFn<WiFiSettingsBlock> = (
   serviceId,

@@ -18,7 +18,7 @@ const plugin: Plugin = {
       type,
       title,
       hasRelations: true,
-      simulatorOnly: true,
+      platforms: ['sim'],
       generate: (): TempSensorMockFluctuatingBlock['data'] => ({
         value: tempQty(20),
         setting: tempQty(20),
