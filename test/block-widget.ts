@@ -17,11 +17,15 @@ import {
   WidgetKey,
 } from '@/symbols';
 
-/** A stub that shows a slot other than the default one */
-export const slotStub = (slot: string): Component =>
+/** A stub that renders the named slots, in the order given */
+export const slotStub = (...names: string[]): Component =>
   defineComponent({
     setup(_, { slots }) {
-      return () => h('div', slots[slot]?.());
+      return () =>
+        h(
+          'div',
+          names.map((name) => slots[name]?.()),
+        );
     },
   });
 

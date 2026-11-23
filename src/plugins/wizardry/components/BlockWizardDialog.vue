@@ -18,12 +18,13 @@ import {
 } from '@/plugins/spark/types';
 import { discoverBlocks } from '@/plugins/spark/utils/actions';
 import { makeBlockIdRules } from '@/plugins/spark/utils/configuration';
+import { platformsOnlyLabel } from '@/plugins/spark/utils/formatting';
 import {
   isCompatible,
   isDiscoveredBlockType,
   isSystemBlockType,
 } from '@/plugins/spark/utils/info';
-import { isSimulator } from '@/plugins/spark/utils/system';
+import { canCreate } from '@/plugins/spark/utils/system';
 import { useDashboardStore } from '@/store/dashboards';
 import { useFeatureStore } from '@/store/features';
 import { useServiceStore } from '@/store/services';
@@ -37,7 +38,7 @@ import { tryCreateBlock } from '../utils';
 
 interface BlockOption extends SelectOption<BlockType> {
   generate: BlockSpec['generate'];
-  simulatorOnly: boolean;
+  platforms: BlockSpec['platforms'];
   disable: boolean;
   tooltip?: string;
 }
@@ -95,10 +96,6 @@ const sparkServiceOpts = computed<ServiceOption[]>(() =>
     })),
 );
 
-const hasSimulator = computed<boolean>(() =>
-  sparkServiceOpts.value.some((opt) => isSimulator(opt.value)),
-);
-
 const allBlockOpts = computed<BlockOption[]>(() =>
   blockSpecStore.blockSpecs
     .filter(
@@ -108,19 +105,22 @@ const allBlockOpts = computed<BlockOption[]>(() =>
     .map((spec): BlockOption => {
       const sysBlock = isSystemBlockType(spec.type);
       const discovered = isDiscoveredBlockType(spec.type);
-      const simulatorOnly = !!spec.simulatorOnly;
-      const noSimulator = simulatorOnly && !hasSimulator.value;
+      const { platforms } = spec;
+      // A type that lists no platforms stays open, also while no Spark is listed
+      const anySparkCanCreate =
+        !platforms ||
+        sparkServiceOpts.value.some((opt) => canCreate(opt.value, spec));
       return {
         value: spec.type,
         label: spec.title,
-        simulatorOnly,
-        disable: sysBlock || discovered || noSimulator,
+        platforms,
+        disable: sysBlock || discovered || !anySparkCanCreate,
         tooltip: discovered
           ? 'Discovered block'
           : sysBlock
             ? 'System block'
-            : noSimulator
-              ? 'Simulator only'
+            : !anySparkCanCreate
+              ? platformsOnlyLabel(platforms)
               : undefined,
         generate: spec.generate,
       };
@@ -135,11 +135,11 @@ const blockOpts = computed<BlockOption[]>(() => {
   );
 });
 
-// A Spark refuses to create a simulator-only block
+// A Spark refuses to create a block type its firmware does not build
 const serviceOpts = computed<ServiceOption[]>(() =>
-  selectedBlockOpt.value?.simulatorOnly
-    ? sparkServiceOpts.value.filter((opt) => isSimulator(opt.value))
-    : sparkServiceOpts.value,
+  sparkServiceOpts.value.filter((opt) =>
+    canCreate(opt.value, selectedBlockOpt.value),
+  ),
 );
 
 const dashboardOpts = computed<DashboardOption[]>(() =>
@@ -190,8 +190,9 @@ function showBlockIdKeyboard(): void {
   }).onOk((v: string) => (newBlockId.value = v));
 }
 
+// Discovery finds devices, whatever block type is selected
 function discoverAll(): void {
-  serviceOpts.value.forEach((opt) => discoverBlocks(opt.value));
+  sparkServiceOpts.value.forEach((opt) => discoverBlocks(opt.value));
 }
 
 async function finish(): Promise<void> {

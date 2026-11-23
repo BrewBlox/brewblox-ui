@@ -159,9 +159,15 @@ export interface BlockSpec<T extends Block = Block> {
   hasRelations?: boolean;
   generate: () => T['data'];
   analyze: (block: T) => BlockStatus;
-  /** Only the simulator has this block type: a Spark refuses to create it */
-  simulatorOnly?: boolean;
+  /**
+   * The platforms whose firmware builds this block type: a Spark on another refuses to create it.
+   * Absent for a type every platform builds.
+   */
+  platforms?: ControllerPlatform[];
 }
+
+/** A controller's platform, as the service's handshake names it */
+export type ControllerPlatform = 'esp32' | 'p1' | 'photon' | 'sim';
 
 /** A step of a control chain, as the chain footer of a block widget shows it */
 export interface ChainItem {

@@ -28,6 +28,8 @@ const plugin: Plugin = {
       type,
       title,
       hasRelations: true,
+      // The Spark 4's GPIO modules carry the analog channels
+      platforms: ['esp32'],
       generate: (): TempSensorAnalogBlock['data'] => ({
         value: tempQty(null),
         sensorType: TempSensorAnalogType.TEMP_SENSOR_TYPE_NOT_SET,

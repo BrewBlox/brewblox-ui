@@ -40,6 +40,7 @@ const ds2408: Block = {
   serviceId: 'sparkey',
   type: BlockType.DS2408,
   data: {
+    connected: true,
     connectMode: DS2408ConnectMode.CONNECT_VALVE,
     channels: [5, 1].map((id) => ({
       id,
@@ -89,10 +90,22 @@ describe('MotorValveWidget', () => {
     );
   });
 
-  it('warns of nothing for a block on the other valve', () => {
-    expect(text(valve(null), [ds2408, actuator('Pump', 6)])).not.toContain(
-      'drives nothing',
+  it('names a device that is not connected', () => {
+    const disconnected = {
+      ...ds2408,
+      data: { ...ds2408.data, connected: false },
+    };
+    expect(text(valve(null), [disconnected])).toContain(
+      'This Motor Valve drives nothing: its device DS is not connected.',
     );
+  });
+
+  it('says it cannot set up or read its channels, naming no block on the other valve', () => {
+    const shown = text(valve(null), [ds2408, actuator('Pump', 6)]);
+    expect(shown).toContain(
+      'This Motor Valve drives nothing: it cannot set up or read its channels.',
+    );
+    expect(shown).not.toContain('Pump');
   });
 
   it('warns of nothing while it reports a valve state', () => {
